@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+
+	<definition name="layout.3col" template="/WEB-INF/jsp/layout-3col.jsp">
+		<put-attribute name="head" value="/WEB-INF/jsp/header.jsp"/>
+		<put-attribute name="body" value=""/>
+		<put-attribute name="foot" value="/WEB-INF/jsp/footer.jsp"/>
+	</definition>
+	
+	<definition name="home" extends="layout.3col">
+		<put-attribute name="body" value="/WEB-INF/jsp/home.jsp"/>
+	</definition>	
+
+	<definition name="generic.page" extends="layout.3col">
+		<put-attribute name="body" value="/WEB-INF/jsp/generic.jsp"/>
+	</definition>	
+
+</tiles-definitions>

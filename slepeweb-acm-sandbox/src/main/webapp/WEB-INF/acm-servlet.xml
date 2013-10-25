@@ -1,0 +1,91 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:cache="http://www.springframework.org/schema/cache" 
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    	http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.1.xsd
+    	http://www.springframework.org/schema/mvc 
+    	http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd 
+    	http://www.springframework.org/schema/cache 
+    	http://www.springframework.org/schema/cache/spring-cache.xsd" 
+    default-autowire="byName">
+
+	<mvc:annotation-driven>
+	    <mvc:argument-resolvers>
+			<bean class="com.slepeweb.sandbox.acm.mvc.RequestAttributeArgumentResolver"/>
+			<bean class="com.slepeweb.sandbox.acm.mvc.AcmObjectArgumentResolver"/>
+    	</mvc:argument-resolvers>
+	</mvc:annotation-driven>
+
+	<!-- Configures Handler Interceptors -->
+	<mvc:interceptors>
+		<bean class="com.slepeweb.sandbox.acm.mvc.AcmInterceptor" />
+	</mvc:interceptors>
+	
+	
+	<bean id="tilesViewResolver"
+		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass">
+			<value>
+				org.springframework.web.servlet.view.tiles2.TilesView
+            </value>
+		</property>
+		<property name="requestContextAttribute"><value>rc</value></property>
+		<property name="order"><value>0</value></property>
+	</bean>
+	
+	<bean id="tilesConfigurer"
+		class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>/WEB-INF/tiles.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 
+		This will serve JSP's from /WEB-INF/templates
+	 -->
+    <bean id="legacyViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/WEB-INF/templates/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property> 
+        <property name="order">
+        	<value>1</value>
+        </property>
+    </bean>
+    
+	<!-- These classes are required by both dummy mode and ACM mode -->
+	<!-- 
+	<bean id="messageSource" class="com.jaguar.jdxwww.sdl.mvc.AcmMessageSource" >
+		<property name="useCodeAsDefaultMessage" value="false" />	
+	</bean>
+	 -->
+	
+	<bean id="eventListenerBean" class="com.slepeweb.sandbox.acm.mvc.AcmContextListener" />
+	
+	<bean id="applicationProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:properties/acm.properties</value>
+			</list>
+		</property>
+		<property name="ignoreResourceNotFound" value="true"/>
+	</bean>
+
+	<bean class="com.slepeweb.sandbox.acm.mvc.ApplicationProperties">
+		<property name="properties" ref="applicationProperties" />
+	</bean>
+	
+	<context:component-scan	base-package="com.slepeweb.sandbox.acm.mvc" />
+			
+	<bean id="acmCache" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cache-manager-ref="cacheFactory"/>
+	<bean id="cacheFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:config-location="classpath:ehcache.xml"/>
+</beans>
