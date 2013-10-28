@@ -3,17 +3,17 @@ package com.slepeweb.sandbox.www.model;
 import java.util.List;
 
 public class Link {
-	private String label, href;
+	private String title, teaser, href;
 	private Image thumbnail;
 	private boolean trusted, selected;
 	private List<Link> children;
 	
-	public String getLabel() {
-		return label;
+	public String getTitle() {
+		return title;
 	}
 	
-	public Link setLabel(String label) {
-		this.label = label;
+	public Link setTitle(String label) {
+		this.title = label;
 		return this;
 	}
 	
@@ -59,5 +59,14 @@ public class Link {
 	
 	public void setChildren(List<Link> children) {
 		this.children = children;
+	}
+
+	public String getTeaser() {
+		return teaser;
+	}
+
+	public Link setTeaser(String teaser) {
+		this.teaser = teaser;
+		return this;
 	}
 }

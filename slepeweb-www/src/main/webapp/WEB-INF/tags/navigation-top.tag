@@ -10,7 +10,7 @@
 			<nav id="nav">
 				<ul>
 					<c:forEach items="${_page.header.topNavigation}" var="link">
-						<li<c:if test="${link.selected}"> class="current_page_item"</c:if>><a href="${link.href}">${link.label}</a></li>
+						<li<c:if test="${link.selected}"> class="current_page_item"</c:if>><a href="${link.href}">${link.title}</a></li>
 					</c:forEach>
 				</ul>
 			</nav>

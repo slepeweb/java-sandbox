@@ -213,7 +213,12 @@
 			line-height: 2.5em;
 		}
 		
-		.link-list li:first-child
+		.compact
+		{
+			font-size: 0.8em;
+		}
+		
+.link-list li:first-child
 		{
 			border-top: none;
 		}

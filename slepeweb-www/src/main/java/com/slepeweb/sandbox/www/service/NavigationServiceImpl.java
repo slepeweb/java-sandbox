@@ -11,13 +11,11 @@ import com.slepeweb.sandbox.www.model.Page;
 @Service( "navigationService" )
 public class NavigationServiceImpl implements NavigationService {
 
-	@Override
 	public List<Link> getGlobalNavigation(Page page) {
 		// TODO Auto-generated method stub
 		return new ArrayList<Link>();
 	}
 
-	@Override
 	public List<Link> getTopNavigation(Page page) {
 		List<Link> links = new ArrayList<Link>();
 		links.add(makeLink("Home", "/home", page));
@@ -25,20 +23,18 @@ public class NavigationServiceImpl implements NavigationService {
 		return links;
 	}
 
-	@Override
 	public List<Link> getBottomNavigation(Page page) {
 		// TODO Auto-generated method stub
 		return new ArrayList<Link>();
 	}
 
-	@Override
 	public List<Link> getBreadcrumbs(Page page) {
 		// TODO Auto-generated method stub
 		return new ArrayList<Link>();
 	}
 
 	private Link makeLink(String label, String href, Page currentPage) {
-		Link l = new Link().setLabel(label).setHref(href);
+		Link l = new Link().setTitle(label).setHref(href);
 		l.setSelected(currentPage != null && currentPage.getPath().equals(href));
 		return l;
 	}

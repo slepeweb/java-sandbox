@@ -7,6 +7,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.slepeweb.sandbox.www.model.Page;
 import com.slepeweb.sandbox.www.service.NavigationService;
+import com.slepeweb.sandbox.www.service.RomeService;
 
 @Controller
 public class HomepageController {
@@ -14,11 +15,15 @@ public class HomepageController {
 	@Autowired
 	private NavigationService navigationService;
 	
+	@Autowired
+	private RomeService romeService;
+	
 	@RequestMapping(value = { "/home", "/homepage" })
 	public ModelAndView doGeneric() {
 		ModelAndView modelAndView = new ModelAndView("home");
 		Page page = new Page().setPath("/home");
 		modelAndView.addObject("_page", page);
+		modelAndView.addObject("_rss", this.romeService.getFeed("http://feeds.bbci.co.uk/news/technology/rss.xml"));
 		
 		page.getHeader().setTopNavigation(this.navigationService.getTopNavigation(page));
 		return modelAndView;

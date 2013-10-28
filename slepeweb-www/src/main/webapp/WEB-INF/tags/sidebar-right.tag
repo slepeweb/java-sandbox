@@ -2,15 +2,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <section>
-	<h3>Ipsum Dolor</h3>
-	<p>Vehicula fermentum ligula at pretium. Suspendisse semper iaculis
-		eros, eu aliquam iaculis. Phasellus ultrices diam sit amet orci
-		lacinia sed consequat.</p>
+	<h3>Technology news</h3>
+	<p>Latest technology news feed from the BBC:</p>
 	<ul class="link-list">
-		<li><a href="#">Sed dolore viverra</a></li>
-		<li><a href="#">Ligula non varius</a></li>
-		<li><a href="#">Dis parturient montes</a></li>
-		<li><a href="#">Nascetur ridiculus</a></li>
+		<c:forEach items="${_rss}" var="link" end="3">
+			<li class="compact"><a class="iframe cboxElement" href="${link.href}">${link.title}</a></li>
+		</c:forEach>
 	</ul>
 </section>
 
