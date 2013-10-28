@@ -7,13 +7,17 @@
 		Slepe Web Solutions continues to provide expert resources to support the
 		design and build of large-scale CMS-driven websites.</p> --%>
 
-	<p>With an impressive track record of building dynamic websites, Slepe Web Solutions (SWS) continues to provide web
-		application expertise, keeping pace with this ever-changing technological landscape. Whilst its main strengths are
-		back-end java skills, a sound understanding of the corresponding front-end technologies are an essential part of the
-		skills matrix.</p>
+	<p>With an impressive track record of building dynamic websites,
+		Slepe Web Solutions (SWS) continues to provide java web application
+		expertise, keeping pace with this ever-changing technological
+		landscape. Whilst its main strengths are back-end java skills, a sound
+		understanding of the corresponding front-end technologies are an
+		essential part of the skills matrix.</p>
 
-	<p>Another key feature of SWS is the depth of experience in designing CMS-driven solutions, primarily with the
-		Alterian CMS product, which is used by many leading companies.</p>
+	<p>Another key feature of SWS is the depth of experience in
+		designing CMS-driven solutions, primarily with the Alterian CMS
+		product. A good CMS design means efficient content storage and re-use,
+		easy updates for business users, and efficient content delivery.</p>
 
 	<p>The list of clients over the past 12 years includes:
 	<ul>
