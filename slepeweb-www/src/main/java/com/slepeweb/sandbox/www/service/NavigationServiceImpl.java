@@ -20,6 +20,7 @@ public class NavigationServiceImpl implements NavigationService {
 		List<Link> links = new ArrayList<Link>();
 		links.add(makeLink("Home", "/home", page));
 		links.add(makeLink("Projects", "/projects", page));
+		links.add(makeLink("Sandbox", "/sandbox", page));
 		return links;
 	}
 
