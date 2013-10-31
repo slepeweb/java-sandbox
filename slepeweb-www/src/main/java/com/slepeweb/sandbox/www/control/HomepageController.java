@@ -28,4 +28,24 @@ public class HomepageController {
 		page.getHeader().setTopNavigation(this.navigationService.getTopNavigation(page));
 		return modelAndView;
 	}
+	
+	@RequestMapping(value = "/sandbox")
+	public ModelAndView doSandbox() {
+		ModelAndView modelAndView = new ModelAndView("sandbox");
+		Page page = new Page().setPath("/sandbox");
+		modelAndView.addObject("_page", page);
+		
+		page.getHeader().setTopNavigation(this.navigationService.getTopNavigation(page));
+		return modelAndView;
+	}
+	
+	@RequestMapping(value = "/projects")
+	public ModelAndView doProjects() {
+		ModelAndView modelAndView = new ModelAndView("projects");
+		Page page = new Page().setPath("/projects");
+		modelAndView.addObject("_page", page);
+		
+		page.getHeader().setTopNavigation(this.navigationService.getTopNavigation(page));
+		return modelAndView;
+	}
 }

@@ -10,8 +10,22 @@
 		<put-attribute name="foot" value="/WEB-INF/jsp/footer.jsp"/>
 	</definition>
 	
+	<definition name="layout.2col" template="/WEB-INF/jsp/layout-2col.jsp">
+		<put-attribute name="head" value="/WEB-INF/jsp/header.jsp"/>
+		<put-attribute name="body" value=""/>
+		<put-attribute name="foot" value="/WEB-INF/jsp/footer.jsp"/>
+	</definition>
+	
 	<definition name="home" extends="layout.3col">
 		<put-attribute name="body" value="/WEB-INF/jsp/home.jsp"/>
+	</definition>	
+
+	<definition name="projects" extends="layout.3col">
+		<put-attribute name="body" value="/WEB-INF/jsp/projects.jsp"/>
+	</definition>	
+
+	<definition name="sandbox" extends="layout.2col">
+		<put-attribute name="body" value="/WEB-INF/jsp/sandbox.jsp"/>
 	</definition>	
 
 	<definition name="generic.page" extends="layout.3col">
