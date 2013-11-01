@@ -8,7 +8,7 @@ public class Page {
 	private Header header;
 	private Footer footer;
 	private Sidebar leftSidebar, rightSidebar;
-	private String heading, body, view;
+	private String title, heading, body, view;
 	private List<Component> components;
 	
 	public Page() {
@@ -92,6 +92,15 @@ public class Page {
 
 	public Page setPath(String path) {
 		this.path = path;
+		return this;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public Page setTitle(String title) {
+		this.title = title;
 		return this;
 	}
 }

@@ -1,0 +1,9 @@
+
+.two-col-table .heading {
+	font-weight: bold;
+	text-align: right;
+}
+
+.two-col-table td {
+	padding: 0px 10px;
+}

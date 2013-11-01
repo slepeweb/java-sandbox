@@ -21,7 +21,7 @@ public class HomepageController {
 	@RequestMapping(value = { "/home", "/homepage" })
 	public ModelAndView doGeneric() {
 		ModelAndView modelAndView = new ModelAndView("home");
-		Page page = new Page().setPath("/home");
+		Page page = new Page().setPath("/home").setTitle("Home");
 		modelAndView.addObject("_page", page);
 		modelAndView.addObject("_rss", this.romeService.getFeed("http://feeds.bbci.co.uk/news/technology/rss.xml"));
 		
@@ -32,7 +32,7 @@ public class HomepageController {
 	@RequestMapping(value = "/sandbox")
 	public ModelAndView doSandbox() {
 		ModelAndView modelAndView = new ModelAndView("sandbox");
-		Page page = new Page().setPath("/sandbox");
+		Page page = new Page().setPath("/sandbox").setTitle("Sandbox");
 		modelAndView.addObject("_page", page);
 		
 		page.getHeader().setTopNavigation(this.navigationService.getTopNavigation(page));
@@ -42,7 +42,8 @@ public class HomepageController {
 	@RequestMapping(value = "/projects")
 	public ModelAndView doProjects() {
 		ModelAndView modelAndView = new ModelAndView("projects");
-		Page page = new Page().setPath("/projects");
+		Page page = new Page().setPath("/projects").setTitle("Projects");
+		page.getHeader().getStylesheets().add("/resources/css/slepeweb.css");
 		modelAndView.addObject("_page", page);
 		
 		page.getHeader().setTopNavigation(this.navigationService.getTopNavigation(page));
