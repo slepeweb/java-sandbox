@@ -1,7 +1,10 @@
 package com.slepeweb.sandbox.www.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import com.slepeweb.sandbox.www.model.User.Role;
 
 public class Page {
 	private String path;
@@ -10,6 +13,7 @@ public class Page {
 	private Sidebar leftSidebar, rightSidebar;
 	private String title, heading, body, view;
 	private List<Component> components;
+	private List<Role> roles;
 	
 	public Page() {
 		this.header = new Header();
@@ -17,6 +21,26 @@ public class Page {
 		this.leftSidebar = new Sidebar();
 		this.rightSidebar = new Sidebar();
 		this.components = new ArrayList<Component>();
+	}
+	
+	public Page addRole(Role r) {
+		if (getRoles() == null) {
+			setRoles(new ArrayList<Role>());
+		}
+		getRoles().add(r);
+		return this;
+	}
+	
+	public boolean isAccessibleBy(User u) {
+		if (getRoles() == null) {
+			return true;
+		}
+		else {
+			if (u != null && u.getRoles() != null) {
+				return ! Collections.disjoint(getRoles(), u.getRoles());
+			}
+		}
+		return false;
 	}
 	
 	public Header getHeader() {
@@ -102,5 +126,13 @@ public class Page {
 	public Page setTitle(String title) {
 		this.title = title;
 		return this;
+	}
+
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
 	}
 }

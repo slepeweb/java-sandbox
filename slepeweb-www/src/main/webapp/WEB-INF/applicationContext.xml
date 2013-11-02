@@ -9,4 +9,12 @@
     	http://www.springframework.org/schema/mvc 
     	http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd"
 	default-autowire="byName">
+	
+	<bean id="mongoConnection" 
+		class="com.slepeweb.sandbox.mongo.MongoConnection" 
+		init-method="init">
+		
+		<property name="dbName" value="mydb" />
+	</bean>
+
 </beans>
