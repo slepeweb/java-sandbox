@@ -1,14 +1,21 @@
 package com.slepeweb.sandbox.www.control;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.jasypt.util.password.BasicPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.slepeweb.sandbox.mongo.UserDAO;
+import com.slepeweb.sandbox.www.model.LoginForm;
 import com.slepeweb.sandbox.www.model.LoginPage;
 import com.slepeweb.sandbox.www.model.Page;
 import com.slepeweb.sandbox.www.model.User;
@@ -51,22 +58,21 @@ public class HomepageController {
 	
 	@RequestMapping(value = "/projects")
 	public ModelAndView doProjects(HttpSession session) {
-		User u = this.userDAOservice.findUser(1);
-		if (u != null) {
-			LOG.info(String.format("Found user [%s]", u.getName()));
-		}
-		
-		Page page = new Page().setPath("/projects").setTitle("Projects").addRole(Role.ADMIN).addRole(Role.AGENT);
+		Page page = new Page().
+			setPath("/projects").
+			setView("projects").
+			setTitle("Projects").
+			addRole(Role.ADMIN).addRole(Role.AGENT);
 		
 		if (page.isAccessibleBy(getUser(session))) {
-			ModelAndView modelAndView = new ModelAndView("projects");			
+			ModelAndView modelAndView = new ModelAndView(page.getView());			
 			page.getHeader().getStylesheets().add("/resources/css/slepeweb.css");
 			modelAndView.addObject("_page", page);			
 			page.getHeader().setTopNavigation(this.navigationService.getTopNavigation(page));
 			return modelAndView;
 		}
 		else {
-			return doLogin(page.getPath());
+			return doLoginForm(page.getPath());
 		}
 	}
 	
@@ -74,15 +80,39 @@ public class HomepageController {
 		return (User) session.getAttribute("_user");
 	}
 	
-	private ModelAndView doLogin(String targetPath) {
+	
+	@RequestMapping(value = "/loginForm")
+	public ModelAndView doLoginForm(String nextPath) {
 		LoginPage page = new LoginPage();
-		page.setPath("/login").setTitle("Login");
-		page.setNextPath(targetPath);
+		page.setPath("/loginForm").setTitle("Login");
+		page.setNextPath(nextPath);
 		
-		ModelAndView modelAndView = new ModelAndView("login");			
+		LoginForm form = new LoginForm();
+		form.setNextPath(nextPath);
+		
+		ModelAndView modelAndView = new ModelAndView("loginForm", "loginForm", form);			
 		page.getHeader().getStylesheets().add("/resources/css/slepeweb.css");
 		modelAndView.addObject("_page", page);			
 		page.getHeader().setTopNavigation(this.navigationService.getTopNavigation(page));
 		return modelAndView;
+	}
+	
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public String doLogon(@ModelAttribute LoginForm loginForm, HttpServletRequest req, HttpServletResponse resp) {
+		// Find this user in the db
+		User target = this.userDAOservice.findUser(loginForm.getAlias());
+		String nextPath = "/loginForm";
+		
+		if (target != null) {
+			// Check passwords match
+			BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
+			if (passwordEncryptor.checkPassword(loginForm.getPassword(), target.getEncryptedPassword())) {
+				// Success
+				req.getSession().setAttribute("_user", target);
+				nextPath = loginForm.getNextPath();
+			}			
+		}
+		
+		return "redirect:" + nextPath;
 	}
 }
