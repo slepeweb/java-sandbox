@@ -28,7 +28,7 @@
 		<put-attribute name="body" value="/WEB-INF/jsp/sandbox.jsp"/>
 	</definition>	
 
-	<definition name="loginForm" extends="layout.3col">
+	<definition name="login" extends="layout.3col">
 		<put-attribute name="body" value="/WEB-INF/jsp/login.jsp"/>
 	</definition>	
 

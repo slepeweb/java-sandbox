@@ -36,9 +36,14 @@ public class UserDAOImpl implements UserDAO {
 		DB db = this.mongoConnection.getDb();
 		BasicDBObject q = new BasicDBObject("alias", alias);
 		DBCursor c = db.getCollection("user").find(q);
-		User user = toUser(c.next());
-		LOG.info(String.format("Found user [%s]", user.getName()));
-		return user;
+		
+		if (c.hasNext()) {
+			User user = toUser(c.next());
+			LOG.info(String.format("Found user [%s]", user.getName()));
+			return user;
+		}
+		
+		return null;
 	}
 
 	public static void main(String[] args) {
@@ -93,7 +98,7 @@ public class UserDAOImpl implements UserDAO {
 		return dflt;
 	}
 	
-	@SuppressWarnings({ "unchecked", "unused", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private List<String> getValuesAsList(DBObject obj, String key) {
 		if (obj != null) {
 			Object o = obj.get(key);

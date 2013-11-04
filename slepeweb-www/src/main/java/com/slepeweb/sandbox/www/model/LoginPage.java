@@ -1,14 +1,14 @@
 package com.slepeweb.sandbox.www.model;
 
 public class LoginPage extends Page {
-	private String nextPath;
+	private String nextView;
 
-	public String getNextPath() {
-		return nextPath;
+	public String getNextView() {
+		return nextView;
 	}
 
-	public LoginPage setNextPath(String nextPath) {
-		this.nextPath = nextPath;
+	public LoginPage setNextView(String nextView) {
+		this.nextView = nextView;
 		return this;
 	}
 }

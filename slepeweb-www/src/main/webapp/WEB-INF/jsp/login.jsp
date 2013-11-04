@@ -10,10 +10,18 @@
 	<p>
 		Please login to access the desired page:
 	</p>
+	
 	<form:form method="post" action="/login" commandName="loginForm">
+		<form:errors path="*" element="div" cssClass="form-error" />
 		<table class="two-col-table">
-			<tr><td class="heading">User name</td><td><form:input path="alias" size="32" /></td></tr>
-			<tr><td class="heading">Password</td><td><form:password path="password" size="32" /></td></tr>
+			<tr>
+				<td class="heading"><label for="alias">User name</label></td>
+				<td><form:input path="alias" size="32" /></td>
+			</tr>
+			<tr>
+				<td class="heading"><label for="password">Password</label></td>
+				<td><form:password path="password" size="32" /></td>
+			</tr>
 		</table>
 		<form:hidden path="nextPath" />
 		<br />

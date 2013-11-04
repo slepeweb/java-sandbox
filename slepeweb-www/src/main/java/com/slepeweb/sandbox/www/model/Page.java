@@ -7,7 +7,7 @@ import java.util.List;
 import com.slepeweb.sandbox.www.model.User.Role;
 
 public class Page {
-	private String path;
+	private String href;
 	private Header header;
 	private Footer footer;
 	private Sidebar leftSidebar, rightSidebar;
@@ -16,7 +16,7 @@ public class Page {
 	private List<Role> roles;
 	
 	public Page() {
-		this.header = new Header();
+		this.header = new Header(this);
 		this.footer = new Footer();
 		this.leftSidebar = new Sidebar();
 		this.rightSidebar = new Sidebar();
@@ -41,6 +41,21 @@ public class Page {
 			}
 		}
 		return false;
+	}
+	
+	public Page setTopNavigation(List<Link> links) {
+		getHeader().setTopNavigation(links);
+		return this;
+	}
+	
+	public Page addStylesheet(String path) {
+		getHeader().getStylesheets().add(path);
+		return this;
+	}
+	
+	public Page addJavascript(String path) {
+		getHeader().getJavascripts().add(path);
+		return this;
 	}
 	
 	public Header getHeader() {
@@ -110,12 +125,12 @@ public class Page {
 		return components;
 	}
 
-	public String getPath() {
-		return path;
+	public String getHref() {
+		return href;
 	}
 
-	public Page setPath(String path) {
-		this.path = path;
+	public Page setHref(String href) {
+		this.href = href;
 		return this;
 	}
 

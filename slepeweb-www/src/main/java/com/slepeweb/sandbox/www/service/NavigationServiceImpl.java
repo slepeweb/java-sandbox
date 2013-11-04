@@ -16,11 +16,11 @@ public class NavigationServiceImpl implements NavigationService {
 		return new ArrayList<Link>();
 	}
 
-	public List<Link> getTopNavigation(Page page) {
+	public List<Link> getTopNavigation() {
 		List<Link> links = new ArrayList<Link>();
-		links.add(makeLink("Home", "/home", page));
-		links.add(makeLink("Projects", "/projects", page));
-		links.add(makeLink("Sandbox", "/sandbox", page));
+		links.add(makeLink("Home", "/home"));
+		links.add(makeLink("Projects", "/projects"));
+		links.add(makeLink("Sandbox", "/sandbox"));
 		return links;
 	}
 
@@ -34,9 +34,7 @@ public class NavigationServiceImpl implements NavigationService {
 		return new ArrayList<Link>();
 	}
 
-	private Link makeLink(String label, String href, Page currentPage) {
-		Link l = new Link().setTitle(label).setHref(href);
-		l.setSelected(currentPage != null && currentPage.getPath().equals(href));
-		return l;
+	private Link makeLink(String label, String href) {
+		return new Link().setTitle(label).setHref(href);
 	}
 }

@@ -6,13 +6,15 @@ import java.util.List;
 public class Header {
 	private List<String> stylesheets, javascripts;
 	private List<Link> globalNavigation, topNavigation, breadcrumbs;
+	private Page page;
 	
-	public Header() {
+	public Header(Page page) {
 		this.stylesheets = new ArrayList<String>();
 		this.javascripts = new ArrayList<String>();
 		this.globalNavigation = new ArrayList<Link>();
 		this.topNavigation = new ArrayList<Link>();
 		this.breadcrumbs = new ArrayList<Link>();
+		this.page = page;
 	}
 	
 	public List<String> getStylesheets() {
@@ -32,6 +34,10 @@ public class Header {
 	}
 	
 	public List<Link> getTopNavigation() {
+		// Select current page
+		for (Link l : this.topNavigation) {
+			l.setSelected(l.getHref().equals(this.page.getHref()));
+		}
 		return topNavigation;
 	}
 	
@@ -45,5 +51,13 @@ public class Header {
 	
 	public void setBreadcrumbs(List<Link> breadcrumbs) {
 		this.breadcrumbs = breadcrumbs;
+	}
+
+	public Page getPage() {
+		return page;
+	}
+
+	public void setPage(Page page) {
+		this.page = page;
 	}
 }

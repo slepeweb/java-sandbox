@@ -35,7 +35,7 @@ $(function() {
     <li><a href="#tabs-2">JAX-WS</a></li>
   </ul>
 
-	<div id="tabs-1">
+	<div id="tabs-1" class="compact">
 		<article class="first">
 			<h2>Sandbox</h2>
 			<h3>Jersey, JAX-RS</h3>
@@ -52,7 +52,7 @@ $(function() {
 		</article>
 	</div>
 	
-	<div id="tabs-2">
+	<div id="tabs-2" class="compact">
 		<article class="first">
 			<h2>JAX-WS</h2>
 		</article>

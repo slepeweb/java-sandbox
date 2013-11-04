@@ -89,11 +89,11 @@
 			<p>*** Check whether there are any other useful technology-dropping ***</p>
 		</div>
 
-		<div id="tabs-3">
+		<div id="tabs-3" class="compact">
 			<h3>Welsh Assembly Government</h3>
 		</div>
 
-		<div id="tabs-4">
+		<div id="tabs-4" class="compact">
 			<h3>Simply Health</h3>
 		</div>
 	</div>

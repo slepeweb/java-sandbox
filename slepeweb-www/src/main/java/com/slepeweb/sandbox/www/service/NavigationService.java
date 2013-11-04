@@ -7,7 +7,7 @@ import com.slepeweb.sandbox.www.model.Page;
 
 public interface NavigationService {
 	List<Link> getGlobalNavigation(Page page);
-	List<Link> getTopNavigation(Page page);
+	List<Link> getTopNavigation();
 	List<Link> getBottomNavigation(Page page);
 	List<Link> getBreadcrumbs(Page page);
 }
