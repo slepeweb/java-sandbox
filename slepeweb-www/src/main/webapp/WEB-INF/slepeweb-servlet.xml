@@ -13,19 +13,10 @@
     	http://www.springframework.org/schema/cache/spring-cache.xsd" 
     default-autowire="byName">
 
-<!-- 
-	<mvc:annotation-driven>
-	    <mvc:argument-resolvers>
-			<bean class="com.slepeweb.sandbox.acm.mvc.RequestAttributeArgumentResolver"/>
-			<bean class="com.slepeweb.sandbox.acm.mvc.AcmObjectArgumentResolver"/>
-    	</mvc:argument-resolvers>
-	</mvc:annotation-driven>
-
-	<mvc:interceptors>
-		<bean class="com.slepeweb.sandbox.acm.mvc.AcmInterceptor" />
-	</mvc:interceptors>
-	 -->
-	
+	<mvc:annotation-driven />	
+	<mvc:view-controller path="/" view-name="home" />	
+	<context:component-scan	base-package="com.slepeweb.sandbox" />
+		
 	<bean id="tilesViewResolver"
 		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
 		<property name="viewClass">
@@ -46,18 +37,6 @@
 		</property>
 	</bean>
     
-	<!-- These classes are required by both dummy mode and ACM mode -->
-	<!-- 
-	<bean id="messageSource" class="com.jaguar.jdxwww.sdl.mvc.AcmMessageSource" >
-		<property name="useCodeAsDefaultMessage" value="false" />	
-	</bean>
-	 -->
-	
-	<!-- 
-	<bean id="eventListenerBean" class="com.slepeweb.sandbox.acm.mvc.AcmContextListener" />
-	 -->
-	
-	<context:component-scan	base-package="com.slepeweb.sandbox" />
 			
 	<!-- 
 	<bean id="acmCache" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cache-manager-ref="cacheFactory"/>

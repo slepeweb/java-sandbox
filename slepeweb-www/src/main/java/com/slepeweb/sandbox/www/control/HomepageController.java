@@ -60,7 +60,9 @@ public class HomepageController {
 			setTitle("Sandbox").
 			setView("sandbox").
 			addRole(Role.ADMIN).
-			setTopNavigation(getTopNavigation());
+			setTopNavigation(getTopNavigation()).
+			addStylesheet("/resources/css/slepeweb.css").
+			addJavascript("/resources/js/sandbox.js");
 		
 		return checkAccessibility(page, getUser(session));
 	}
