@@ -36,7 +36,7 @@
 
 <section>
 	<h3>Technology news</h3>
-	<p>Latest technology news feed from the BBC:</p>
+	<p>Latest stories from the BBC:</p>
 	<ul class="link-list">
 		<c:forEach items="${_rss}" var="link" end="3">
 			<li class="compact"><a class="iframe cboxElement group2" href="${link.href}">${link.title}</a></li>

@@ -45,7 +45,8 @@ public class HomepageController {
 			setHref("/home").
 			setTitle("Home").
 			setView("home").
-			setTopNavigation(getTopNavigation());
+			setTopNavigation(getTopNavigation()).
+			addStylesheet("/resources/css/slepeweb.css");
 		
 		ModelAndView modelAndView = new ModelAndView(page.getView());
 		modelAndView.addObject("_page", page);

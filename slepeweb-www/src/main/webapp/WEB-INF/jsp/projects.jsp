@@ -18,36 +18,45 @@
 			<li><a href="#tabs-2">Jaguar</a></li>
 			<li><a href="#tabs-3">Welsh Assembly</a></li>
 			<li><a href="#tabs-4">Simply Health</a></li>
+			<li><a href="#tabs-9">Skills</a></li>
 		</ul>
 
 		<div id="tabs-1" class="compact">
-			<h3>Personal</h3>
-			<table class="two-col-table">
-				<tr>
-					<td class="heading">Name</td>
-					<td>George Buttigieg</td>
-				</tr>
-				<tr>
-					<td class="heading">Email</td>
-					<td>george@slepeweb.com</td>
-				</tr>
-				<tr>
-					<td class="heading">Mobile</td>
-					<td>0755 777 0817</td>
-				</tr>
-				<tr>
-					<td class="heading">Degree</td>
-					<td>Mechanical Engineering, 1st class, City University, London</td>
-				</tr>
-				<tr>
-					<td class="heading">Interests</td>
-					<td>Tennis, golf, walking, asian food</td>
-				</tr>
-				<tr>
-					<td class="heading">Location</td>
-					<td>St. Ives, Cambs.</td>
-				</tr>
-			</table>
+			<div class="flow-ltr width-50pc">
+				<h3>Personal</h3>
+				<table class="two-col-table">
+					<tr>
+						<td class="heading">Name</td>
+						<td>George Buttigieg</td>
+					</tr>
+					<tr>
+						<td class="heading">Email</td>
+						<td>george@slepeweb.com</td>
+					</tr>
+					<tr>
+						<td class="heading">Mobile</td>
+						<td>0755 777 0817</td>
+					</tr>
+					<tr>
+						<td class="heading">Degree</td>
+						<td>Mechanical Engineering, 1st class, City University, London</td>
+					</tr>
+					<tr>
+						<td class="heading">Interests</td>
+						<td>Tennis, golf, walking, asian food</td>
+					</tr>
+					<tr>
+						<td class="heading">Location</td>
+						<td>St. Ives, Cambs.</td>
+					</tr>
+					<tr>
+						<td class="heading">Download</td>
+						<td><a href="/resources/doc/cv.doc">Latest CV</a></td>
+					</tr>
+				</table>
+			</div>
+			<img class="me-photo" src="/resources/images/gb.jpg" />
+			<div style="clear:both"></div>
 		</div>
 
 		<div id="tabs-2" class="compact">
@@ -95,6 +104,39 @@
 
 		<div id="tabs-4" class="compact">
 			<h3>Simply Health</h3>
+		</div>
+		
+		<div id="tabs-9" class="compact">
+			<h3>Skills</h3>
+			<p>My skills have been organised according to how frequently they are applied in my work.</p>
+			<table class="two-col-table">
+				<tr>
+					<td class="heading">Every day</td>
+					<td>Java, JSP, Servlet, JSTL, Spring MVC, Custom tags, Windows, Linux,
+						SVN, Eclipse, Alterian CMS</td>
+				</tr>
+				<tr>
+					<td class="heading">Occasional</td>
+					<td>Javascript, jQuery, Dojo, Ajax, CSS, HTML, Maven, Git, Apache, Tomcat, Websphere, Weblogic, 
+						XSD, XML, XSLT, JAXB, RESTful and SOAP web services, Bash scripting, CVS, Amazon Cloud services</td>
+				</tr>
+				<tr>
+					<td class="heading">Infrequent</td>
+					<td>Ant, Perl</td>
+				</tr>
+				<tr>
+					<td class="heading">Project-specific</td>
+					<td>JDBC, JMS, Hibernate, Ibatis, Lucene, Struts</td>
+				</tr>
+				<tr>
+					<td class="heading">Historical</td>
+					<td>C</td>
+				</tr>
+				<tr>
+					<td class="heading">Educational</td>
+					<td>EJB, Ruby on Rails, Groovy, MongoDB, JSF</td>
+				</tr>
+			</table>
 		</div>
 	</div>
 </article>
