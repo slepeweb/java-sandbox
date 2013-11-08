@@ -11,14 +11,13 @@
 		which is important for integrating the two parts.</p>
 
 	<p>Another key strength of SWS is the depth of experience in
-		designing and building CMS-driven solutions, primarily with the
+		designing and building CMS-driven websites, primarily with the
 		Alterian product. A good CMS design means feature-rich web pages,
 		efficient content storage, easy updates for business users, and
 		performant multi-channel content delivery.</p>
+		
+	<p>See the <a href="/projects">projects</a> page for a better idea of 
+		the deliverables typically produced by SWS. </p>
 
-	<p>For more information, please contact: <br />
-		Email: <a href="mailto:admin@slepeweb.com">admin@slepeweb.com</a> <br />
-		Phone: +44 755 777 0817
-	</p>
 </article>
 

@@ -27,7 +27,7 @@
 					
 					<!-- Sidebar -->
 					<div class="3u">	
-						<sw:sidebar-right />
+						<tiles:insertAttribute name="right" />
 					</div>
 				</div>
 			</div>

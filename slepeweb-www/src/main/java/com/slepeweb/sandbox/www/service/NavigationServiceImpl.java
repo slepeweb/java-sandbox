@@ -18,8 +18,9 @@ public class NavigationServiceImpl implements NavigationService {
 
 	public List<Link> getTopNavigation() {
 		List<Link> links = new ArrayList<Link>();
-		links.add(makeLink("Home", "/home"));
+		links.add(makeLink("About", "/home"));
 		links.add(makeLink("Projects", "/projects"));
+		links.add(makeLink("Contact", "/contact"));
 		links.add(makeLink("Sandbox", "/sandbox"));
 		return links;
 	}

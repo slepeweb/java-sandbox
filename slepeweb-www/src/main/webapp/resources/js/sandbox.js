@@ -5,7 +5,7 @@ $(function() {
 	
 	$("#lotteryrefresh").click(function(e) {		
 		$.ajax({
-			url : "/rest/lottery/numbers/3",
+			url : "/ws/lotterynumbers/3",
 			dataType : "json",
 			cache : false
 		}).done(function(resp) {

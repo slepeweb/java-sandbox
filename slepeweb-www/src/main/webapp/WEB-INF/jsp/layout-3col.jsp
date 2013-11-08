@@ -21,7 +21,7 @@
 				<div class="row">
 					<!-- Left Sidebar -->
 					<div class="3u">
-						<sw:sidebar-left />
+						<tiles:insertAttribute name="left" />
 					</div>
 	
 					<!-- Main Content -->
@@ -31,7 +31,7 @@
 	
 					<div class="3u">
 						<!-- Right Sidebar -->
-						<sw:sidebar-right />
+						<tiles:insertAttribute name="right" />
 					</div>
 				</div>
 			</div>

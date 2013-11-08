@@ -8,7 +8,9 @@
 <article class="first">
 	<h2>Login</h2>
 	<p>
-		Please login to access the desired page:
+		The page you requested is protected - please login with your details. 
+		<br />
+		If you don't have a login account, please contact the <a href="mailto:admin@slepeweb.com">administrator.</a>
 	</p>
 	
 	<form:form method="post" action="/login" commandName="loginForm">

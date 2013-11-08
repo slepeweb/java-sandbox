@@ -73,3 +73,8 @@ ul.bullets {
 	list-style-type: circle; 
 	margin-left: 30px;
 }
+
+.inline {
+	display: inline-block;
+	vertical-align: bottom;
+}

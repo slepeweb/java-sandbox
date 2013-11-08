@@ -81,6 +81,20 @@ public class HomepageController {
 		return checkAccessibility(page, getUser(session));
 	}
 	
+	@RequestMapping(value = "/contact")
+	public ModelAndView doContact() {
+		Page page = new Page().
+			setHref("/contact").
+			setTitle("Contact us").
+			setView("contact").
+			setTopNavigation(getTopNavigation()).
+			addStylesheet("/resources/css/slepeweb.css");
+		
+		ModelAndView modelAndView = new ModelAndView(page.getView());
+		modelAndView.addObject("_page", page);
+		return modelAndView;
+	}
+	
 	private User getUser(HttpSession session) {
 		return (User) session.getAttribute("_user");
 	}

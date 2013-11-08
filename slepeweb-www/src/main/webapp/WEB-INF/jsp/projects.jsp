@@ -22,7 +22,7 @@
 		</ul>
 
 		<div id="tabs-1" class="compact">
-			<div class="flow-ltr width-50pc">
+			<div class="inline width-50pc">
 				<h3>Personal</h3>
 				<table class="two-col-table">
 					<tr>
@@ -56,7 +56,6 @@
 				</table>
 			</div>
 			<img class="me-photo" src="/resources/images/gb.jpg" />
-			<div style="clear:both"></div>
 		</div>
 
 		<div id="tabs-2" class="compact">
