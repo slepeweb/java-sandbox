@@ -5,7 +5,7 @@
 	<div class="row">
 		<div class="12u">
 			<div id="logo">
-				<h1><a href="/home">slepe web solutions</a></h1>
+				<h1><a href="/about">slepe web solutions</a></h1>
 			</div>
 			<nav id="nav">
 				<ul>

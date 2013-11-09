@@ -9,6 +9,14 @@ public class User {
 	public enum Role {
 		PUBLIC, ADMIN, AGENT, FRIEND;
 	}
+	
+	public boolean hasRole(Role role) {
+		if (getRoles() != null) {
+			return getRoles().contains(role);
+		}
+		return false;
+	}
+
 
 	public String getName() {
 		return name;

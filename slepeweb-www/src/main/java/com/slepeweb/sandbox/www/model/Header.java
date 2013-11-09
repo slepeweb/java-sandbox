@@ -34,10 +34,6 @@ public class Header {
 	}
 	
 	public List<Link> getTopNavigation() {
-		// Select current page
-		for (Link l : this.topNavigation) {
-			l.setSelected(l.getHref().equals(this.page.getHref()));
-		}
 		return topNavigation;
 	}
 	

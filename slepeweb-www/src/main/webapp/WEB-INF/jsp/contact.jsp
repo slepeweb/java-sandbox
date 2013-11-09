@@ -7,7 +7,8 @@
     
 <article class="first">
 	<h2>Contact us</h2>
-	<p>For more information, please contact Slepe Web Solutions using: <br />
+	<p>Slepe Web Solutions are located in St. Ives, Cambridgeshire, and can be reached by: </p>
+	<p>
 		Email: <a href="mailto:admin@slepeweb.com">admin@slepeweb.com</a> <br />
 		Mobile: +44 755 777 0817
 	</p>

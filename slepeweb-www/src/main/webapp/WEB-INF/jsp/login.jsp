@@ -8,9 +8,9 @@
 <article class="first">
 	<h2>Login</h2>
 	<p>
-		The page you requested is protected - please login with your details. 
-		<br />
-		If you don't have a login account, please contact the <a href="mailto:admin@slepeweb.com">administrator.</a>
+		If you have a login account, please use it here in order to see priveleged content. 
+		Otherwise, you can contact the <a href="mailto:admin@slepeweb.com">administrator</a>
+		to obtain an account.
 	</p>
 	
 	<form:form method="post" action="/login" commandName="loginForm">

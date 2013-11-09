@@ -1,10 +1,29 @@
+<h2>Sandbox</h2>
+<p>This is a sandbox area for demonstration and testing of various web technologies.</p>
 
 <div id="tabs">
 	<ul>
+    <li><a href="#tabs-0">Platform</a></li>
     <li><a href="#tabs-1">JAX-RS</a></li>
     <li><a href="#tabs-2">JAX-WS</a></li>
   </ul>
 
+	<div id="tabs-0" class="compact">
+		<article class="first">
+			<h3>The computing environment</h3>
+			<p>
+				This website is being served by an Amazon EC2 virtual server, 
+				running Ubuntu 12.04 LTS. Installed on this server are: Java 1.6, Tomcat 7, Apache 2.2 and MongoDB. The
+				database is being used to store login account details, with the Jasypt library being used to encrypt 
+				passwords.</p>
+				
+			<p>
+				The website design was originated by n33.co, and is a responsive design based on skelJS. jQuery coding
+				has been added to provide user-friendly layouts and to handle Ajax calls.</p>
+
+		</article>
+	</div>
+	
 	<div id="tabs-1" class="compact">
 		<article class="first">
 			<h3>Lottery numbers service</h3>

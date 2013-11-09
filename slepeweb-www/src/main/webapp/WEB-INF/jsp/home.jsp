@@ -16,8 +16,8 @@
 		efficient content storage, easy updates for business users, and
 		performant multi-channel content delivery.</p>
 		
-	<p>See the <a href="/projects">projects</a> page for a better idea of 
-		the deliverables typically produced by SWS. </p>
+	<p>See the <a href="/profile">Profile</a> page for a more detailed
+		description of the work that SWS delivers. </p>
 
 </article>
 

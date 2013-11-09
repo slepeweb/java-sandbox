@@ -1,5 +1,6 @@
 package com.slepeweb.sandbox.www.service;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.sandbox.www.model.Link;
 import com.slepeweb.sandbox.www.model.Page;
+import com.slepeweb.sandbox.www.model.User;
+import com.slepeweb.sandbox.www.model.User.Role;
 
 @Service( "navigationService" )
 public class NavigationServiceImpl implements NavigationService {
@@ -16,12 +19,27 @@ public class NavigationServiceImpl implements NavigationService {
 		return new ArrayList<Link>();
 	}
 
-	public List<Link> getTopNavigation() {
+	public List<Link> getTopNavigation(Page page, User user) {
 		List<Link> links = new ArrayList<Link>();
-		links.add(makeLink("About", "/home"));
-		links.add(makeLink("Projects", "/projects"));
+		links.add(makeLink("About", "/about"));
+		links.add(makeLink("Profile", "/profile"));
 		links.add(makeLink("Contact", "/contact"));
-		links.add(makeLink("Sandbox", "/sandbox"));
+		
+		if (user != null && user.hasRole(Role.ADMIN)) {
+			links.add(makeLink("Sandbox", "/sandbox"));
+		}
+		
+		if (user == null || user.getAlias() == null) {
+			try {
+				links.add(makeLink("Login", "/login?nextPath=" + URLEncoder.encode(page.getHref(), "utf-8")));
+			}
+			catch (Exception e) {}
+		}
+		
+		for (Link l : links) {
+			l.setSelected(l.getHref().startsWith(page.getHref()));
+		}
+		
 		return links;
 	}
 

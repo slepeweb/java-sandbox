@@ -2,8 +2,6 @@ package com.slepeweb.sandbox.www.control;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.jasypt.util.password.BasicPasswordEncryptor;
@@ -15,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.slepeweb.sandbox.mongo.UserDAO;
@@ -39,14 +38,15 @@ public class HomepageController {
 	@Autowired
 	private UserDAO userDAOservice;
 	
-	@RequestMapping(value = { "/home", "/homepage" })
-	public ModelAndView doGeneric() {
+	@RequestMapping(value = "/about")
+	public ModelAndView doGeneric(@ModelAttribute("_user") User user) {
 		Page page = new Page().
-			setHref("/home").
-			setTitle("Home").
+			setHref("/about").
+			setTitle("About").
 			setView("home").
-			setTopNavigation(getTopNavigation()).
 			addStylesheet("/resources/css/slepeweb.css");
+		
+		page.setTopNavigation(getTopNavigation(page, user));
 		
 		ModelAndView modelAndView = new ModelAndView(page.getView());
 		modelAndView.addObject("_page", page);
@@ -55,48 +55,68 @@ public class HomepageController {
 	}
 	
 	@RequestMapping(value = "/sandbox")
-	public ModelAndView doSandbox(HttpSession session) {
+	public ModelAndView doSandbox(@ModelAttribute("_user") User user) {
 		Page page = new Page().
 			setHref("/sandbox").
 			setTitle("Sandbox").
 			setView("sandbox").
 			addRole(Role.ADMIN).
-			setTopNavigation(getTopNavigation()).
 			addStylesheet("/resources/css/slepeweb.css").
 			addJavascript("/resources/js/sandbox.js");
 		
-		return checkAccessibility(page, getUser(session));
+		page.setTopNavigation(getTopNavigation(page, user));
+		return checkAccessibility(page, user);
 	}
 	
-	@RequestMapping(value = "/projects")
-	public ModelAndView doProjects(HttpSession session) {
+	@RequestMapping(value = "/profile")
+	public ModelAndView doProjects(@ModelAttribute("_user") User user) {
 		Page page = new Page().
-			setHref("/projects").
-			setTitle("Projects").
+			setHref("/profile").
+			setTitle("Profile").
 			setView("projects").
-			addRole(Role.AGENT).
-			setTopNavigation(getTopNavigation()).
 			addStylesheet("/resources/css/slepeweb.css");
 		
-		return checkAccessibility(page, getUser(session));
+		page.setTopNavigation(getTopNavigation(page, user));
+
+		ModelAndView modelAndView = new ModelAndView(page.getView());			
+		modelAndView.addObject("_page", page);			
+		return modelAndView;
 	}
 	
 	@RequestMapping(value = "/contact")
-	public ModelAndView doContact() {
+	public ModelAndView doContact(@ModelAttribute("_user") User user) {
 		Page page = new Page().
 			setHref("/contact").
 			setTitle("Contact us").
 			setView("contact").
-			setTopNavigation(getTopNavigation()).
 			addStylesheet("/resources/css/slepeweb.css");
 		
+		page.setTopNavigation(getTopNavigation(page, user));
+
 		ModelAndView modelAndView = new ModelAndView(page.getView());
 		modelAndView.addObject("_page", page);
 		return modelAndView;
 	}
 	
-	private User getUser(HttpSession session) {
+	@ModelAttribute("_user")
+	public User getUser(HttpSession session) {
 		return (User) session.getAttribute("_user");
+	}
+	
+	@ModelAttribute(value="userHasAgentRole")
+	public boolean userHasAgentRole(@ModelAttribute("_user") User user) {
+		if (user != null) {
+			return user.hasRole(Role.AGENT);
+		}
+		return false;
+	}
+	
+	@ModelAttribute(value="userHasAdminRole")
+	public boolean userHasAdminRole(@ModelAttribute("_user") User user) {
+		if (user != null) {
+			return user.hasRole(Role.ADMIN);
+		}
+		return false;
 	}
 	
 	private ModelAndView checkAccessibility(Page requestedPage, User user) {
@@ -106,13 +126,17 @@ public class HomepageController {
 			return modelAndView;
 		}
 		else {
-			return doLoginForm(requestedPage.getView());
+			return doLoginForm(user, requestedPage.getView());
 		}
 	}	
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public ModelAndView doLoginForm(String nextPath) {
-		Page page = getLoginPage(nextPath);
+	public ModelAndView doLoginForm(@RequestParam String nextPath, @ModelAttribute("_user") User user) {
+		return doLoginForm(user, nextPath);
+	}
+	
+	private ModelAndView doLoginForm(User user, String nextPath) {
+		Page page = getLoginPage(user, nextPath);
 		
 		LoginForm form = new LoginForm();
 		form.setNextPath(nextPath);
@@ -125,7 +149,7 @@ public class HomepageController {
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String doLogon(@ModelAttribute LoginForm loginForm, BindingResult result, Model model,
-			HttpServletRequest req, HttpServletResponse resp) {
+			HttpSession session) {
 		
 		boolean isError = false;
 		
@@ -142,7 +166,13 @@ public class HomepageController {
 				BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
 				if (passwordEncryptor.checkPassword(loginForm.getPassword(), target.getEncryptedPassword())) {
 					// Password matches DB value
-					req.getSession().setAttribute("_user", target);
+					session.setAttribute("_user", target);
+					
+					// TODO: Note that this form of redirect adds request params
+					// corresponding to existinf=g model attributes.
+					// Eg. Where loginForm.getNextPath() equals "/about", the redirect is to:
+					//   /about?userHasAgentRole=false&userHasAdminRole=false
+					// TODO: How can you stop this?
 					return "redirect:" + loginForm.getNextPath();
 				}
 				else {
@@ -165,24 +195,23 @@ public class HomepageController {
 		}
 		
 		// Go back to login page
-		model.addAttribute("_page", getLoginPage(loginForm.getNextPath()));			
+		model.addAttribute("_page", getLoginPage(null, loginForm.getNextPath()));			
 		return "login";
 	}
 	
-	private Page getLoginPage(String nextPath) {
+	private Page getLoginPage(User user, String nextPath) {
 		LoginPage page = new LoginPage();
 		page.setNextView(nextPath);
 		page.
 			setHref("/login").
 			setView("login").
 			setTitle("Login").
-			setTopNavigation(getTopNavigation()).
 			addStylesheet("/resources/css/slepeweb.css");
 		
-		return page;
+		return page.setTopNavigation(getTopNavigation(page, user));
 	}
 	
-	private List<Link> getTopNavigation() {
-		return this.navigationService.getTopNavigation();
+	private List<Link> getTopNavigation(Page page, User user) {
+		return this.navigationService.getTopNavigation(page, user);
 	}
 }
