@@ -38,7 +38,7 @@ public class HomepageController {
 	@Autowired
 	private UserDAO userDAOservice;
 	
-	@RequestMapping(value = "/about")
+	@RequestMapping(value="/about")
 	public ModelAndView doGeneric(@ModelAttribute("_user") User user) {
 		Page page = new Page().
 			setHref("/about").
@@ -74,13 +74,12 @@ public class HomepageController {
 			setHref("/profile").
 			setTitle("Profile").
 			setView("projects").
+			addRole(Role.ADMIN).
+			addRole(Role.AGENT).
 			addStylesheet("/resources/css/slepeweb.css");
 		
 		page.setTopNavigation(getTopNavigation(page, user));
-
-		ModelAndView modelAndView = new ModelAndView(page.getView());			
-		modelAndView.addObject("_page", page);			
-		return modelAndView;
+		return checkAccessibility(page, user);
 	}
 	
 	@RequestMapping(value = "/contact")

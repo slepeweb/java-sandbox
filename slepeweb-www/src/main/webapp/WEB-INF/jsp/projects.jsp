@@ -13,9 +13,9 @@
 
 <article class="first">
 
-	<h2>Projects</h2>
-	<p>This page describes a small selection of projects in which 
-		<c:if test="${userHasAgentRole}">George Buttigieg,</c:if> the director of SWS 
+	<h2>Profile</h2>
+	<p>This page describes a small selection of projects in which the director of SWS
+		<c:if test="${userHasAgentRole}">, George Buttigieg, </c:if> 
 		played a lead role.</p>
 
 	<div id="tabs">
