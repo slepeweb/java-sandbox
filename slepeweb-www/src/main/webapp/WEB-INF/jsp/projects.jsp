@@ -75,7 +75,7 @@
 		<div id="tabs-2" class="compact">
 			<h3>Jaguar Landrover</h3>
 			<p>About 5 years ago, Jaguar decided to revamp there company
-				website. The marketing team made a bold decisidocon to serve up every
+				website. The marketing team made a bold decision to serve up every
 				page on the site using flash movies, which at the time offered an
 				exciting user experience.</p>
 
@@ -87,7 +87,7 @@
 				page layout, and the other provided the content for each component
 				on the page. I was responsible for the design and implementation of
 				this framework, which relied heavily on JAXB technology to 
-				marchall/un-marshall the XML.</p>
+				marshall/un-marshall the XML.</p>
 
 			<p>Shortly after the Jaguar site launched, work was underway on
 				the Landrover site. In this case, the argument for an all-Flash

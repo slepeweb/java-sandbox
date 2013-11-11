@@ -78,3 +78,20 @@ ul.bullets {
 	display: inline-block;
 	vertical-align: bottom;
 }
+
+#weather-report {
+	font-size: 0.8em;
+	line-height: 1.2em;
+}
+
+#weather-report td {
+	padding: 3px;
+}
+
+#weather-report td:first-child {
+	font-weight: bold;
+}
+
+.slepe-photo {
+	width: 100%;
+}

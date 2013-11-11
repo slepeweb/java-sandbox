@@ -46,6 +46,7 @@
 	<definition name="contact" extends="layout.3col">
 		<put-attribute name="body" value="/WEB-INF/jsp/contact.jsp"/>
 		<put-attribute name="left" value="/WEB-INF/jsp/slepe.jsp"/>
+		<put-attribute name="right" value="/WEB-INF/jsp/weather.jsp"/>
 	</definition>	
 
 </tiles-definitions>

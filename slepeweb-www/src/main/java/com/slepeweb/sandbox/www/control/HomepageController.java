@@ -125,7 +125,7 @@ public class HomepageController {
 			return modelAndView;
 		}
 		else {
-			return doLoginForm(user, requestedPage.getView());
+			return doLoginForm(user, requestedPage.getHref());
 		}
 	}	
 	
@@ -168,11 +168,11 @@ public class HomepageController {
 					session.setAttribute("_user", target);
 					
 					// TODO: Note that this form of redirect adds request params
-					// corresponding to existinf=g model attributes.
+					// corresponding to existing model attributes.
 					// Eg. Where loginForm.getNextPath() equals "/about", the redirect is to:
 					//   /about?userHasAgentRole=false&userHasAdminRole=false
 					// TODO: How can you stop this?
-					return "redirect:" + loginForm.getNextPath();
+					return "redirect://www.slepeweb.com" + loginForm.getNextPath();
 				}
 				else {
 					// Password failure
