@@ -1,6 +1,12 @@
+<%@ 
+    taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@ 
+    taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
 <h2>Sandbox</h2>
+
 <p>This is a sandbox area for demonstration and testing purposes.</p>
 
+<c:choose><c:when test="${userHasAdminRole}">
 <div id="tabs">
 	<ul>
     <li><a href="#tabs-0">Platform</a></li>
@@ -82,3 +88,6 @@
 		</article>
 	</div>
 </div>
+</c:when><c:otherwise>
+	<p>You will need to <a href="/login?nextPath=%2Fsandbox">login</a> to see this content.</p>
+</c:otherwise></c:choose>

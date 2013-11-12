@@ -60,7 +60,7 @@ public class HomepageController {
 			setHref("/sandbox").
 			setTitle("Sandbox").
 			setView("sandbox").
-			addRole(Role.ADMIN).
+//			addRole(Role.ADMIN).
 			addStylesheet("/resources/css/slepeweb.css").
 			addJavascript("/resources/js/sandbox.js");
 		
@@ -74,8 +74,8 @@ public class HomepageController {
 			setHref("/profile").
 			setTitle("Profile").
 			setView("projects").
-			addRole(Role.ADMIN).
-			addRole(Role.AGENT).
+//			addRole(Role.ADMIN).
+//			addRole(Role.AGENT).
 			addStylesheet("/resources/css/slepeweb.css");
 		
 		page.setTopNavigation(getTopNavigation(page, user));

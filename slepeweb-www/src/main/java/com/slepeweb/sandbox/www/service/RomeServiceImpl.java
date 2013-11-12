@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.sandbox.www.model.Link;
@@ -14,8 +16,12 @@ import com.sun.syndication.io.XmlReader;
 
 @Service( "romeService" )
 public class RomeServiceImpl implements RomeService {
+	private static Logger LOG = Logger.getLogger(RomeServiceImpl.class);
 
+	@Cacheable(value="componentCache", key="'bbc-news'")
 	public List<Link> getFeed(String url) {
+		LOG.info(String.format("Getting RSS feed [%s] at %2$tH:%2$tM:%2$tS", url, System.currentTimeMillis()));
+
 		List<Link> links = new ArrayList<Link>();
 		URL feedUrl = null;
 		

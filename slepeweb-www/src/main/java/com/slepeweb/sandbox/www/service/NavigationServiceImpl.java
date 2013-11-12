@@ -1,5 +1,6 @@
 package com.slepeweb.sandbox.www.service;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +25,12 @@ public class NavigationServiceImpl implements NavigationService {
 		links.add(makeLink("Profile", "/profile"));
 		links.add(makeLink("Sandbox", "/sandbox"));
 		
-//		if (user == null || user.getAlias() == null) {
-//			try {
-//				links.add(makeLink("Login", "/login?nextPath=" + URLEncoder.encode(page.getHref(), "utf-8")));
-//			}
-//			catch (Exception e) {}
-//		}
+		if (user == null || user.getAlias() == null) {
+			try {
+				links.add(makeLink("Login", "/login?nextPath=" + URLEncoder.encode(page.getHref(), "utf-8")));
+			}
+			catch (Exception e) {}
+		}
 		
 		for (Link l : links) {
 			l.setSelected(l.getHref().startsWith(page.getHref()));

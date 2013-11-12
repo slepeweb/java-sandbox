@@ -35,10 +35,8 @@
 			</list>
 		</property>
 	</bean>
-    
-			
-	<!-- 
-	<bean id="acmCache" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cache-manager-ref="cacheFactory"/>
-	<bean id="cacheFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:config-location="classpath:ehcache.xml"/>
-	 -->
+    			
+	<cache:annotation-driven />
+ 	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cache-manager-ref="compCache"/>
+	<bean id="compCache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:config-location="classpath:compcache.xml"/>
 </beans>

@@ -3,74 +3,71 @@
     taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@ 
     taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<script>
-	$(function() {
-		$("#tabs").tabs(
-		//{active: 0}
-		);
-	});
-</script>
-
 <article class="first">
 
 	<h2>Profile</h2>
-	<p>This page describes a small selection of projects in which the director of SWS
-		<c:if test="${userHasAgentRole}">, George Buttigieg, </c:if> 
-		played a lead role.</p>
+	
+<c:choose><c:when test="${userHasAgentRole}">
+	<script>
+		$(function() {
+			$("#tabs").tabs(
+			//{active: 0}
+			);
+		});
+	</script>
+
+	<p>This page describes a small selection of projects in which the director of 
+		SWS, George Buttigieg, played a lead role.</p>
 
 	<div id="tabs">
 		<ul>
-			<c:if test="${userHasAgentRole}">
-				<li><a href="#tabs-1">Personal</a></li>
-				<li><a href="#tabs-9">Skills</a></li>
-			</c:if>
+			<li><a href="#tabs-1">Personal</a></li>
+			<li><a href="#tabs-9">Skills</a></li>
 			<li><a href="#tabs-2">Jaguar Landrover</a></li>
 			<li><a href="#tabs-3">Welsh Assembly</a></li>
 			<li><a href="#tabs-4">Simply Health</a></li>
 		</ul>
 
-		<c:if test="${userHasAgentRole}">
-			<div id="tabs-1" class="compact">
-				<div class="inline width-50pc">
-					<h3>Personal</h3>
-					<table class="two-col-table">
-						<tr>
-							<td class="heading">Name</td>
-							<td>George Buttigieg</td>
-						</tr>
-						<tr>
-							<td class="heading">Job title</td>
-							<td>Consultant, and SWS Director</td>
-						</tr>
-						<tr>
-							<td class="heading">Email</td>
-							<td>george@slepeweb.com</td>
-						</tr>
-						<tr>
-							<td class="heading">Mobile</td>
-							<td>0755 777 0817</td>
-						</tr>
-						<tr>
-							<td class="heading">Degree</td>
-							<td>Mechanical Engineering (1st), City University, London</td>
-						</tr>
-						<tr>
-							<td class="heading">Interests</td>
-							<td>Tennis, golf, walking, asian food</td>
-						</tr>
-						<tr>
-							<td class="heading">Location</td>
-							<td>St. Ives, Cambridgeshire</td>
-						</tr>
-						<tr>
-							<td class="heading">Full CV</td>
-							<td><a href="/resources/doc/cv.pdf">Latest CV</a></td>
-						</tr>
-					</table>
-				</div>
-				<img class="me-photo" src="/resources/images/gb.jpg" />
+		<div id="tabs-1" class="compact">
+			<div class="inline width-50pc">
+				<h3>Personal</h3>
+				<table class="two-col-table">
+					<tr>
+						<td class="heading">Name</td>
+						<td>George Buttigieg</td>
+					</tr>
+					<tr>
+						<td class="heading">Job title</td>
+						<td>Consultant, and SWS Director</td>
+					</tr>
+					<tr>
+						<td class="heading">Email</td>
+						<td>george@slepeweb.com</td>
+					</tr>
+					<tr>
+						<td class="heading">Mobile</td>
+						<td>0755 777 0817</td>
+					</tr>
+					<tr>
+						<td class="heading">Degree</td>
+						<td>Mechanical Engineering (1st), City University, London</td>
+					</tr>
+					<tr>
+						<td class="heading">Interests</td>
+						<td>Tennis, golf, walking, asian food</td>
+					</tr>
+					<tr>
+						<td class="heading">Location</td>
+						<td>St. Ives, Cambridgeshire</td>
+					</tr>
+					<tr>
+						<td class="heading">Full CV</td>
+						<td><a href="/resources/doc/cv.pdf">Latest CV</a></td>
+					</tr>
+				</table>
 			</div>
-		</c:if>
+			<img class="me-photo" src="/resources/images/gb-300x261.jpg" />
+		</div>
 
 		<div id="tabs-2" class="compact">
 			<h3>Jaguar Landrover</h3>
@@ -151,40 +148,42 @@
 				wired together using Spring.</p>
 		</div>
 
-		<c:if test="${userHasAgentRole}">
-			<div id="tabs-9" class="compact">
-				<h3>Skills</h3>
-				<p>My skills have been organised according to how frequently they are applied in my work.</p>
-				<table class="two-col-table">
-					<tr>
-						<td class="heading">Every day</td>
-						<td>Java, JSP, Servlet, JSTL, Spring MVC, Tiles, Custom tags, Windows, Linux,
-							SVN, Eclipse, Alterian CMS</td>
-					</tr>
-					<tr>
-						<td class="heading">Occasional</td>
-						<td>Javascript, jQuery, Dojo, Ajax, CSS, HTML, Maven, Git, Apache, Tomcat, Websphere, Weblogic, 
-							XSD, XML, XSLT, JAXB, RESTful and SOAP web services, Quartz, Bash scripting, CVS, 
-							Amazon Cloud services</td>
-					</tr>
-					<tr>
-						<td class="heading">Project-specific</td>
-						<td>JDBC, JMS, Hibernate, Ibatis, Lucene, Struts</td>
-					</tr>
-					<tr>
-						<td class="heading">Infrequent</td>
-						<td>Ant, Ruby, Perl</td>
-					</tr>
-					<tr>
-						<td class="heading">Historical</td>
-						<td>C</td>
-					</tr>
-					<tr>
-						<td class="heading">Educational</td>
-						<td>EJB, Ruby on Rails, Groovy, MongoDB, JSF</td>
-					</tr>
-				</table>
-			</div>
-		</c:if>
+		<div id="tabs-9" class="compact">
+			<h3>Skills</h3>
+			<p>My skills have been organised according to how frequently they are applied in my work.</p>
+			<table class="two-col-table">
+				<tr>
+					<td class="heading">Every day</td>
+					<td>Java, JSP, Servlet, JSTL, Spring MVC, Tiles, Custom tags, Windows, Linux,
+						SVN, Eclipse, Alterian CMS</td>
+				</tr>
+				<tr>
+					<td class="heading">Occasional</td>
+					<td>Javascript, jQuery, Dojo, Ajax, CSS, HTML, Maven, Git, Apache, Tomcat, Websphere, Weblogic, 
+						XSD, XML, XSLT, JAXB, RESTful and SOAP web services, Quartz, Bash scripting, CVS, 
+						Amazon Cloud services</td>
+				</tr>
+				<tr>
+					<td class="heading">By project</td>
+					<td>JDBC, JMS, Hibernate, Ibatis, Lucene, Struts</td>
+				</tr>
+				<tr>
+					<td class="heading">Infrequent</td>
+					<td>Ant, Ruby, Perl</td>
+				</tr>
+				<tr>
+					<td class="heading">Historical</td>
+					<td>C</td>
+				</tr>
+				<tr>
+					<td class="heading">Educational</td>
+					<td>EJB, Ruby on Rails, Groovy, MongoDB, JSF</td>
+				</tr>
+			</table>
+		</div>
 	</div>
+</c:when><c:otherwise>
+	<p>This page provides confidential information about SWS staff and projects undertaken.</p>
+	<p>You will need to <a href="/login?nextPath=%2Fprofile">login</a> to see this content.</p>
+</c:otherwise></c:choose>
 </article>

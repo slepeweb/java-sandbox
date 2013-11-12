@@ -1,5 +1,9 @@
 package com.slepeweb.sandbox.ws.soap;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,8 +12,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="CurrentWeather")
 public class WeatherBean {
+	// Example temperature: 72 F (21 C)
 	private static Pattern TEMPERATURE_PATTERN = Pattern.compile("^\\d+ F \\((\\d+ C)\\)$");
 	
+	// Example time: Nov 12, 2013 - 03:50 PM EST / 2013.11.12 2050 UTC
+	private static Pattern TIME_PATTERN = Pattern.compile("^.*? - (\\d{2}):(\\d{2}) (\\w{2}) EST / (\\d{4})\\.(\\d+)\\.(\\d+) .*$");
 	
 	private String location, time, wind, visibility, skyConditions, 
 		temperature, dewPoint, relativeHumidity, pressure, status;
@@ -29,15 +36,21 @@ public class WeatherBean {
 	}
 
 	public String getTime() {
-		String[] parts = this.time.split("-");
-		if (parts.length == 2) {
-			String[] subParts = parts[1].split("/");
-			if (subParts.length == 2) {
-				// TODO: Convert subPart to GMT/BST
-				return parts[0] + subParts[0];
-			}
-			return parts[0];
+		Matcher m = TIME_PATTERN.matcher(this.time);
+		if (m.matches()) {
+			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("EST"));
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MINUTE, Integer.parseInt(m.group(2)));
+			cal.set(Calendar.HOUR, Integer.parseInt(m.group(1)));
+			cal.set(Calendar.AM_PM, m.group(3).equals("AM") ? Calendar.AM : Calendar.PM);
+			cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(m.group(6)));
+			cal.set(Calendar.MONTH, Integer.parseInt(m.group(5)) - 1);
+			cal.set(Calendar.YEAR, Integer.parseInt(m.group(4)));
+			
+			DateFormat df = new SimpleDateFormat("MMM dd, yyyy HH:mm z");
+			return df.format(cal.getTime());
 		}
+
 		return time;
 	}
 
