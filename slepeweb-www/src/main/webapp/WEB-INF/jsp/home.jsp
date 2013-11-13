@@ -15,9 +15,4 @@
 		for business users, and performant multi-channel content delivery. SWS is
 		a leader in this field.</p>
 
-	<p>
-		See the <a href="/profile">Profile</a> page for a more detailed
-		description of SWS deliverables on past projects.
-	</p>
-
 </article>

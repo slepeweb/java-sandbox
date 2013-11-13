@@ -1,6 +1,7 @@
 package com.slepeweb.sandbox.www.control;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.slepeweb.sandbox.mongo.ConfigDAO;
 import com.slepeweb.sandbox.mongo.UserDAO;
 import com.slepeweb.sandbox.www.model.Link;
 import com.slepeweb.sandbox.www.model.LoginForm;
@@ -37,6 +39,9 @@ public class HomepageController {
 	
 	@Autowired
 	private UserDAO userDAOservice;
+	
+	@Autowired
+	private ConfigDAO configDAOservice;
 	
 	@RequestMapping(value="/about")
 	public ModelAndView doGeneric(@ModelAttribute("_user") User user) {
@@ -167,12 +172,15 @@ public class HomepageController {
 					// Password matches DB value
 					session.setAttribute("_user", target);
 					
-					// TODO: Note that this form of redirect adds request params
-					// corresponding to existing model attributes.
-					// Eg. Where loginForm.getNextPath() equals "/about", the redirect is to:
-					//   /about?userHasAgentRole=false&userHasAdminRole=false
-					// TODO: How can you stop this?
-					return "redirect://www.slepeweb.com" + loginForm.getNextPath();
+					// Eliminate existing model attributes, otherwise they get added by Spring
+					// to the redirect URL
+					Map<String, Object> map = model.asMap();
+					map.remove("userHasAgentRole");
+					map.remove("userHasAdminRole");
+					
+					// Which host to redirect to?
+					String host = this.configDAOservice.findValue("server.host.name", "www.slepeweb.com");
+					return "redirect://" + host + loginForm.getNextPath();
 				}
 				else {
 					// Password failure

@@ -16,8 +16,8 @@
 		});
 	</script>
 
-	<p>This page describes a small selection of projects in which the director of 
-		SWS, George Buttigieg, played a lead role.</p>
+	<p>This page describes a small selection of projects in which George Buttigieg, the director of 
+		SWS, played a lead role.</p>
 
 	<div id="tabs">
 		<ul>
@@ -26,6 +26,7 @@
 			<li><a href="#tabs-2">Jaguar Landrover</a></li>
 			<li><a href="#tabs-3">Welsh Assembly</a></li>
 			<li><a href="#tabs-4">Simply Health</a></li>
+			<li><a href="#tabs-5">Finance Calculator</a></li>
 		</ul>
 
 		<div id="tabs-1" class="compact">
@@ -148,6 +149,11 @@
 				wired together using Spring.</p>
 		</div>
 
+		<div id="tabs-5" class="compact">
+			<h3>Jaguar Finance Calculator</h3>
+			<p></p>
+		</div>
+
 		<div id="tabs-9" class="compact">
 			<h3>Skills</h3>
 			<p>My skills have been organised according to how frequently they are applied in my work.</p>
@@ -183,7 +189,30 @@
 		</div>
 	</div>
 </c:when><c:otherwise>
-	<p>This page provides confidential information about SWS staff and projects undertaken.</p>
-	<p>You will need to <a href="/login?nextPath=%2Fprofile">login</a> to see this content.</p>
+	<div class="short-profile">
+		<p>George Buttigieg is a director of SWS, and has played a lead role in the back-end design and build
+			of internet sites for some major brands. These were dynamic CMS-driven websites (Alterian CMS), with
+			integrations to 3rd party systems.</p>
+			
+		<table class="two-col-table">
+			<tr><td class="heading">Jaguar Landrover</td><td>2012, 2008</td></tr>
+			<tr><td class="heading">Foreign and Commonwealth Office</td><td>2008</td></tr>
+			<tr><td class="heading">Department for Transport</td><td>2007</td></tr>
+			<tr><td class="heading">Welsh Assembly Government</td><td></td></tr>
+			<tr><td class="heading">Home Office</td><td></td></tr>
+			<tr><td class="heading">Oxford University Press</td><td></td></tr>
+			<tr><td class="heading">Croydon Council</td><td>2004</td></tr>
+			<tr><td class="heading">Cancer Research UK</td><td></td></tr>
+			<tr><td class="heading">Plan International</td><td></td></tr>
+		</table>
+		
+		<p>
+			<br />
+			Please <a href="/login?nextPath=%2Fprofile">login</a> if you would like access to more detailed 
+			content in this section.</p>
+	</div>
+	<div class="short-profile">
+		<img src="/resources/images/profile.jpg" alt="Anon" />
+	</div>
 </c:otherwise></c:choose>
 </article>

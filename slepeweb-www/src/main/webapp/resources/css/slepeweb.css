@@ -95,3 +95,13 @@ ul.bullets {
 .slepe-photo {
 	width: 100%;
 }
+
+.short-profile {
+	width: 48%;
+	display: inline-block;
+	vertical-align: top;
+}
+
+.short-profile img {
+	margin-left: 10%;
+}

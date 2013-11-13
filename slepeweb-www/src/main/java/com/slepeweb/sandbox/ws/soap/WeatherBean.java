@@ -47,7 +47,7 @@ public class WeatherBean {
 			cal.set(Calendar.MONTH, Integer.parseInt(m.group(5)) - 1);
 			cal.set(Calendar.YEAR, Integer.parseInt(m.group(4)));
 			
-			DateFormat df = new SimpleDateFormat("MMM dd, yyyy HH:mm z");
+			DateFormat df = new SimpleDateFormat("MMM dd, yyyy HH:mm a z");
 			return df.format(cal.getTime());
 		}
 
