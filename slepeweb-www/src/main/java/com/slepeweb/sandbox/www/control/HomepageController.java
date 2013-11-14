@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.jasypt.util.password.BasicPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,7 @@ import com.slepeweb.sandbox.www.service.RomeService;
 
 @Controller
 public class HomepageController {
+	private static Logger LOG = Logger.getLogger(HomepageController.class);
 
 	@Autowired
 	private NavigationService navigationService;
@@ -108,7 +110,8 @@ public class HomepageController {
 	}
 	
 	@ModelAttribute(value="userHasAgentRole")
-	public boolean userHasAgentRole(@ModelAttribute("_user") User user) {
+	public boolean userHasAgentRole(HttpSession session) {
+		User user = getUser(session);
 		if (user != null) {
 			return user.hasRole(Role.AGENT);
 		}
@@ -116,7 +119,8 @@ public class HomepageController {
 	}
 	
 	@ModelAttribute(value="userHasAdminRole")
-	public boolean userHasAdminRole(@ModelAttribute("_user") User user) {
+	public boolean userHasAdminRole(HttpSession session) {
+		User user = getUser(session);
 		if (user != null) {
 			return user.hasRole(Role.ADMIN);
 		}
@@ -171,6 +175,7 @@ public class HomepageController {
 				if (passwordEncryptor.checkPassword(loginForm.getPassword(), target.getEncryptedPassword())) {
 					// Password matches DB value
 					session.setAttribute("_user", target);
+					LOG.info(String.format("User logged in [%s]", target.getName()));
 					
 					// Eliminate existing model attributes, otherwise they get added by Spring
 					// to the redirect URL
