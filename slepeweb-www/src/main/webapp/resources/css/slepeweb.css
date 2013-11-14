@@ -105,3 +105,16 @@ ul.bullets {
 .short-profile img {
 	margin-left: 10%;
 }
+
+.project-list {
+	font-weight: bold;
+	margin-left: 5%;
+}
+
+.user-info {
+	float: right;
+	font-size: 0.64em;
+	color: #c0c0c0;
+	line-height: 1.4em;
+	margin: 5px;
+}

@@ -20,11 +20,16 @@ public class WeatherServiceImpl implements WeatherService {
 	public WeatherBean getWeather(String country, String city) {
 		LOG.info(String.format("Getting weather for %s, %s at %3$tH:%3$tM:%3$tS", country, city, System.currentTimeMillis()));
 		
-		GlobalWeather gw = new GlobalWeather();
-		String xml = gw.getGlobalWeatherSoap().getWeather(city, country);
-		Object obj = this.xmlMarshallingService.unmarshall(xml, new WeatherBean());
-		if (obj != null && obj instanceof WeatherBean) {
-			return (WeatherBean) obj;
+		try {
+			GlobalWeather gw = new GlobalWeather();
+			String xml = gw.getGlobalWeatherSoap().getWeather(city, country);
+			Object obj = this.xmlMarshallingService.unmarshall(xml, new WeatherBean());
+			if (obj != null && obj instanceof WeatherBean) {
+				return (WeatherBean) obj;
+			}
+		}
+		catch (Exception e) {
+			LOG.error("Failed to get weather report", e);
 		}
 		
 		WeatherBean error = new WeatherBean();

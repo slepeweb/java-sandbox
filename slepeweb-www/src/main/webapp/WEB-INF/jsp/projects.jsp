@@ -16,8 +16,8 @@
 		});
 	</script>
 
-	<p>This page describes a small selection of projects in which George Buttigieg, the director of 
-		SWS, played a lead role.</p>
+	<p>This page describes a small selection of projects in which George Buttigieg (a director of 
+		SWS) played a lead role.</p>
 
 	<div id="tabs">
 		<ul>
@@ -72,8 +72,8 @@
 
 		<div id="tabs-2" class="compact">
 			<h3>Jaguar Landrover</h3>
-			<p>About 5 years ago, Jaguar decided to revamp there company
-				website. The marketing team made a bold decision to serve up every
+			<p>About 5 years ago, Jaguar decided to revamp their main
+				website. The marketing team took a bold decision to serve up every
 				page on the site using flash movies, which at the time offered an
 				exciting user experience.</p>
 
@@ -91,7 +91,7 @@
 				the Landrover site. In this case, the argument for an all-Flash
 				approach from the Landrover side of the business was not so strong, and
 				so a traditional HTML approach was taken, adopting jQuery UI
-				components to provide special effects and an equally compelling user
+				components to provide special UI effects and an equally compelling user
 				experience. The main challenge for me on
 				this project was the design of the Alterian content model, which had
 				to provide much higher levels of flexibility regarding page layouts,
@@ -102,8 +102,8 @@
 			<p>In 2012, the Jaguar site was overhauled completely in terms of
 				content and presentation, although still using Alterian CMS for
 				content management. The main purpose of the revamp was to produce a
-				responsive web design, so that desktop, tablet and mobile devices
-				could utilise the same HTML, but rendered differently on each
+				responsive front-end web design, so that desktop, tablet and mobile devices
+				could utilise the same HTML, but rendered it differently on each
 				device. At the backend, the opportunity was taken to use the Spring
 				MVC framework, and to design a new object model to simplify code
 				production and maintenance. Another interesting aspect of the
@@ -111,9 +111,9 @@
 				cacheing of key components/objects. Maven was used to handle dependencies
 				and to build war files for the Dev, QA, and Production servers.</p>
 				
-			<p>One of my tasks was to rationalize the 'dealer locator' functionality, 
+			<p>One of my tasks on this project was to rationalize the 'dealer locator' functionality, 
 				mainly to fit into the Spring MVC framework. This called a RESTful service
-				provided by Bing maps, where the dealer data was integrated with the map
+				provided by Bing maps, who had integrated the dealer data with the map
 				data. JAXB was used once again in our webapp to unmarshall the Bing response.</p>
 			
 		</div>
@@ -125,22 +125,25 @@
 				foundation layer of code to support them. The interesting point
 				about this site was its bi-lingual functionality - on any page, you
 				could change language from English to Welsh, and vice versa. This
-				required care in designing both the CMS, and the content delivery
-				software.</p>
+				required care in designing the CMS, and the content delivery
+				software needed to tackle the bi-lingual nature of the site at a
+				lower level, so as not to burden the people building the JSP 
+				templates.</p>
 
 			<p>A follow-on project for this client involved the use of JMS to
 				distribute visitor-submitted form data to a server on the government
-				GSi network, from where it could be further distributed using email
-				without compromising government security rules.</p>
+				GSi network, from where it could be distributed by email
+				without contravening government security rules.</p>
 		</div>
 
 		<div id="tabs-4" class="compact">
 			<h3>Simply Health</h3>
-			<p>This project was quite unusual - the client required an
+			<p>One this relatively small project, the client required an
 				integration between Mediasurface (the predecessor to Alterian CMS)
 				and ATG Dynamo. Content from the Mediasurface repository had to be
-				synchronised with the ATG database. SimplyHealth were responsible
-				for building the ATG web application, and I was responsible for
+				synchronised with the ATG database, and delivered to site visitors
+				using the ATG webapp. SimplyHealth were responsible
+				for building the ATG delivery code, and I was responsible for
 				building the synchronisation software. This comprised a 'listener'
 				application that responded to content change events, and propagated
 				these to the ATG database tables. At the same time, JMS messages
@@ -151,7 +154,20 @@
 
 		<div id="tabs-5" class="compact">
 			<h3>Jaguar Finance Calculator</h3>
-			<p></p>
+			<p>The finance calculator was a small add-on to the main
+				Jaguar webapp. As its name suggests, it provided site visitors
+				with alternative finance quotes for their intended purchase. The
+				visitor was able to either pick a car off the shelf, or
+				personalise one using 3rd party car configuration software.</p>
+
+			<p>The webapp pulled the car configuration options from the 3rd
+				party system using RESTful services, and presented these to the
+				end user. It then calculated the total cost of the selected model,
+				bodystyle and engine, plus any optional extras. It then used all
+				this data to pull available finance options from another 3rd part
+				system, again using REST-style services. The visitor could add up
+				to 3 quotes to his basket, and could also download these as PDF
+				documents for presentation to dealers.
 		</div>
 
 		<div id="tabs-9" class="compact">
@@ -190,21 +206,21 @@
 	</div>
 </c:when><c:otherwise>
 	<div class="short-profile">
-		<p>George Buttigieg is a director of SWS, and has played a lead role in the back-end design and build
-			of internet sites for some major brands. These were dynamic CMS-driven websites (Alterian CMS), with
-			integrations to 3rd party systems.</p>
-			
-		<table class="two-col-table">
-			<tr><td class="heading">Jaguar Landrover</td><td>2012, 2008</td></tr>
-			<tr><td class="heading">Foreign and Commonwealth Office</td><td>2008</td></tr>
-			<tr><td class="heading">Department for Transport</td><td>2007</td></tr>
-			<tr><td class="heading">Welsh Assembly Government</td><td></td></tr>
-			<tr><td class="heading">Home Office</td><td></td></tr>
-			<tr><td class="heading">Oxford University Press</td><td></td></tr>
-			<tr><td class="heading">Croydon Council</td><td>2004</td></tr>
-			<tr><td class="heading">Cancer Research UK</td><td></td></tr>
-			<tr><td class="heading">Plan International</td><td></td></tr>
-		</table>
+		<p>George Buttigieg is a director of SWS, and has played a lead role in the back-end design/build
+			of web sites for some major brands. These were dynamic CMS-driven websites (Alterian CMS), with
+			various integrations to 3rd party systems.</p>
+		
+		<ul class="project-list">
+			<li>Jaguar Landrover</li>
+			<li>Foreign and Commonwealth Office</li>
+			<li>Department for Transport</li>
+			<li>Welsh Assembly Government</li>
+			<li>Home Office</li>
+			<li>Oxford University Press</li>
+			<li>Croydon Council</li>
+			<li>Cancer Research UK</li>
+			<li>Plan International</li>
+		</ul>
 		
 		<p>
 			<br />
