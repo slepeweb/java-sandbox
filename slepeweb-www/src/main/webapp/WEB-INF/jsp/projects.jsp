@@ -23,10 +23,10 @@
 		<ul>
 			<li><a href="#tabs-1">Personal</a></li>
 			<li><a href="#tabs-9">Skills</a></li>
-			<li><a href="#tabs-2">Jaguar Landrover</a></li>
-			<li><a href="#tabs-3">Welsh Assembly</a></li>
+			<li><a href="#tabs-2">Jaguar</a></li>
+			<li><a href="#tabs-3">WAG</a></li>
 			<li><a href="#tabs-4">Simply Health</a></li>
-			<li><a href="#tabs-5">Finance Calculator</a></li>
+			<li><a href="#tabs-5">Calculator</a></li>
 		</ul>
 
 		<div id="tabs-1" class="compact">

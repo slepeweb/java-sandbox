@@ -21,9 +21,9 @@ public class NavigationServiceImpl implements NavigationService {
 	public List<Link> getTopNavigation(Page page, User user) {
 		List<Link> links = new ArrayList<Link>();
 		links.add(makeLink("About", "/about"));
-		links.add(makeLink("Contact", "/contact"));
 		links.add(makeLink("Profile", "/profile"));
 		links.add(makeLink("Sandbox", "/sandbox"));
+		links.add(makeLink("Contact", "/contact"));
 		
 		if (user == null || user.getAlias() == null) {
 			try {
