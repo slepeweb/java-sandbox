@@ -10,13 +10,18 @@ import java.util.regex.Pattern;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.log4j.Logger;
+
 @XmlRootElement(name="CurrentWeather")
 public class WeatherBean {
+	private static Logger LOG = Logger.getLogger(WeatherBean.class);
+	
 	// Example temperature: 72 F (21 C)
 	private static Pattern TEMPERATURE_PATTERN = Pattern.compile("^\\d+ F \\((\\d+ C)\\)$");
 	
 	// Example time: Nov 12, 2013 - 03:50 PM EST / 2013.11.12 2050 UTC
-	private static Pattern TIME_PATTERN = Pattern.compile("^.*? - (\\d{2}):(\\d{2}) (\\w{2}) EST / (\\d{4})\\.(\\d+)\\.(\\d+) .*$");
+	//private static Pattern TIME_PATTERN = Pattern.compile("^.*? - (\\d{2}):(\\d{2}) (\\w{2}) EST / (\\d{4})\\.(\\d+)\\.(\\d+) .*$");
+	private static Pattern TIME_PATTERN = Pattern.compile("^.*? / (\\d{4})\\.(\\d+)\\.(\\d+) (\\d{2})(\\d{2}) UTC$");
 	
 	private String location, time, wind, visibility, skyConditions, 
 		temperature, dewPoint, relativeHumidity, pressure, status;
@@ -37,18 +42,21 @@ public class WeatherBean {
 
 	public String getTime() {
 		Matcher m = TIME_PATTERN.matcher(this.time);
+		LOG.debug(String.format("Time was [%s]", this.time));
+
 		if (m.matches()) {
-			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("EST"));
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MINUTE, Integer.parseInt(m.group(2)));
-			cal.set(Calendar.HOUR, Integer.parseInt(m.group(1)));
-			cal.set(Calendar.AM_PM, m.group(3).equals("AM") ? Calendar.AM : Calendar.PM);
-			cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(m.group(6)));
-			cal.set(Calendar.MONTH, Integer.parseInt(m.group(5)) - 1);
-			cal.set(Calendar.YEAR, Integer.parseInt(m.group(4)));
+			Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+			cal.set(Calendar.YEAR, Integer.parseInt(m.group(1)));
+			cal.set(Calendar.MONTH, Integer.parseInt(m.group(2)) - 1);
+			cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(m.group(3)));
+			//cal.set(Calendar.AM_PM, m.group(3).equals("AM") ? Calendar.AM : Calendar.PM);
+			cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(m.group(4)));
+			cal.set(Calendar.MINUTE, Integer.parseInt(m.group(5)));
 			
 			DateFormat df = new SimpleDateFormat("MMM dd, yyyy HH:mm a z");
-			return df.format(cal.getTime());
+			String reformatted = df.format(cal.getTime());
+			LOG.debug(String.format("Reformatted to [%s]", reformatted));
+			return reformatted;
 		}
 
 		return time;

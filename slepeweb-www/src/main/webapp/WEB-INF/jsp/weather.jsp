@@ -4,12 +4,20 @@
 
 <script>
 $(function() {
+	var weather = {
+			error: "<tr><td></td><td>... not available right now.</td></tr>",
+			updateTable: function(html) {
+				var table = $("#weather-report");
+				table.empty();
+				table.append(html);	
+			}
+	};
+	
 	$.ajax({
 		url : "/ws/weather/united%20kingdom/cambridge",
 		dataType : "json",
 		cache : false
 	}).done(function(resp) {
-		var html;
 		if (resp.status == "Success") {
 			html = "<tr><td>Location:</td><td>" + resp.location + "</td></tr>";
 			html += "<tr><td>Time:</td><td>" + resp.time + "</td></tr>";
@@ -19,17 +27,13 @@ $(function() {
 			html += "<tr><td>Sky:</td><td>" + resp.skyConditions + "</td></tr>";
 			html += "<tr><td>Dew point:</td><td>" + resp.dewPoint + "</td></tr>";
 			html += "<tr><td>Pressure:</td><td>" + resp.pressure + "</td></tr>";
+			weather.updateTable(html);
 		}
 		else {
-			html = "<tr><td></td><td>... not available right now.</td></tr>";
-		}
-	
-		var table = $("#weather-report");
-		table.empty();
-		table.append(html);
-		
+			weather.updateTable(weather.error);
+		}	
 	}).fail(function(jqXHR, status) {
-		//console.log(status);
+		weather.updateTable(weather.error);
 	});		
 });
 </script>  
