@@ -96,19 +96,24 @@ ul.bullets {
 	width: 100%;
 }
 
-.short-profile {
-	width: 48%;
+.short-profile-left {
+	width: 80%;
 	display: inline-block;
 	vertical-align: top;
 }
 
-.short-profile img {
-	margin-left: 10%;
+.short-profile-right {
+	width: 15%;
+	margin-left: 4%;
+	display: inline-block;
+	vertical-align: top;
 }
 
 .project-list {
 	font-weight: bold;
 	margin-left: 5%;
+	display: inline-block;
+	width: 40%;
 }
 
 .user-info {

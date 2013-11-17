@@ -205,10 +205,10 @@
 		</div>
 	</div>
 </c:when><c:otherwise>
-	<div class="short-profile">
+	<div class="short-profile-left">
 		<p>George Buttigieg is a director of SWS, and has played a lead role in the back-end design/build
-			of web sites for some major brands. These were dynamic CMS-driven websites (Alterian CMS), with
-			various integrations to 3rd party systems.</p>
+			of web sites for some major brands. These were mostly dynamic CMS-driven websites (Alterian CMS), with
+			various integrations to 3rd party systems. Here is a selection of those brands: </p>
 		
 		<ul class="project-list">
 			<li>Jaguar Landrover</li>
@@ -216,19 +216,31 @@
 			<li>Department for Transport</li>
 			<li>Welsh Assembly Government</li>
 			<li>Home Office</li>
+		</ul>
+
+		<ul class="project-list">
 			<li>Oxford University Press</li>
 			<li>Croydon Council</li>
 			<li>Cancer Research UK</li>
 			<li>Plan International</li>
 		</ul>
-		
+
+		<p><br />It is worth pointing out that with Alterian CMS, content
+			management and content delivery are quite distinct components, in
+			that the 'management' side imposes no constraints on the 'delivery'
+			side. In other words, you have complete control over the
+			HTML/CSS/JS that is delivered, and you have access to all the Java
+			frameworks/libraries and 3rd party systems that you need to
+			integrate with.</p>
+			
 		<p>
-			<br />
 			Please <a href="/login?nextPath=%2Fprofile">login</a> if you would like access to more detailed 
 			content in this section.</p>
 	</div>
-	<div class="short-profile">
+	
+	<div class="short-profile-right">
 		<img src="/resources/images/profile.jpg" alt="Anon" />
 	</div>
+
 </c:otherwise></c:choose>
 </article>
