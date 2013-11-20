@@ -225,7 +225,7 @@
 			<li>Plan International</li>
 		</ul>
 
-		<p><br />It is worth pointing out that with Alterian CMS, content
+		<p><br />With Alterian CMS, content
 			management and content delivery are quite distinct components, in
 			that the 'management' side imposes no constraints on the 'delivery'
 			side. In other words, you have complete control over the
