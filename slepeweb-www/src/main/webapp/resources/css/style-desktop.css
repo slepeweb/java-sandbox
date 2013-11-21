@@ -242,6 +242,7 @@
 		{
 			margin: 0 0 1.5em 0;
 		}
+		
 
 		.subpage section, .subpage article
 		{
@@ -250,4 +251,7 @@
 		
 /* Added by slepeweb */
 		
-		
+.project-list {
+	display: inline-block;
+	width: 40%;
+}

@@ -61,6 +61,13 @@
 
 		/* Added by slepeweb */
 		
+/* Added by slepeweb */
+		
+.project-list {
+	display: inline-block;
+	width: 40%;
+}
+
 .subpage article {
 		margin-left: 0.6em;
 }

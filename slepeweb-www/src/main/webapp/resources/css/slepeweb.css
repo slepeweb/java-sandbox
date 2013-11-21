@@ -112,8 +112,8 @@ ul.bullets {
 .project-list {
 	font-weight: bold;
 	margin-left: 5%;
-	display: inline-block;
-	width: 40%;
+/* 	display: inline-block; */
+/* 	width: 40%; */
 }
 
 .user-info {

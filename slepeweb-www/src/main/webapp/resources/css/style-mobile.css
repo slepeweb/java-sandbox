@@ -229,3 +229,11 @@
 			font-size: 1.4em;
 			padding: 0.5em 1em 0.5em 1em;
 		}
+		
+/* Added by slepeweb */
+		
+.project-list {
+	display: block;
+	width: 100%;
+}
+		
