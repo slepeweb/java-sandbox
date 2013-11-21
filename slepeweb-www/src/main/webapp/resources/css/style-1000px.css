@@ -12,7 +12,7 @@
 
 	body
 	{
-		font-size: 13pt;
+		font-size: 12pt;
 	}
 
 /* Wrappers */
@@ -61,3 +61,6 @@
 
 		/* Added by slepeweb */
 		
+.subpage article {
+		margin-left: 0.6em;
+}
