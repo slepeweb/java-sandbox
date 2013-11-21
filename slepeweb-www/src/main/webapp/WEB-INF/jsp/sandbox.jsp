@@ -30,7 +30,7 @@
 				for RSS feeds, the JAXWS reference implementation from Sun,
 				Jackson for marshalling Java POJOs to JSON, and Jasypt for
 				encrypting passwords. Ehcache is used to cache selected components
-				for a fixed period of time.</p>
+				for a fixed TTL.</p>
 
 		</article>
 	</div>
