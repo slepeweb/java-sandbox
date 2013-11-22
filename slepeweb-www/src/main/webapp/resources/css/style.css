@@ -210,7 +210,10 @@
 		.link-list li
 		{
 			border-top: solid 1px #d0d0d0;
-			line-height: 2.5em;
+/* 			line-height: 2.5em; */
+			line-height: 1.4em;
+			padding-top: 0.6em;
+			padding-bottom: 0.6em;
 		}
 		
 .link-list li:first-child
