@@ -3,6 +3,9 @@ package com.slepeweb.sandbox.orm;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jasypt.util.password.BasicPasswordEncryptor;
 
@@ -37,7 +40,7 @@ public class User {
 		return false;
 	}
 	
-	public void encryptPassword() {
+	public void encryptPasswordIfNotBlank() {
 		if (! StringUtils.isBlank(getPassword())) {
 			BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
 			setEncryptedPassword(passwordEncryptor.encryptPassword(getPassword()));
@@ -52,6 +55,7 @@ public class User {
 		setRoles(u.getRoles());
 	}
 	
+	@Size(min=2, max=32, message="Please enter your full name (32 chars max.)")
     public String getName() {
 		return name;
 	}
@@ -60,6 +64,7 @@ public class User {
 		this.name = name;
 	}
 
+	@Size(min=6, max=32, message="Please enter your login name (min. 6chars, max. 32 chars)")
 	public String getAlias() {
 		return alias;
 	}
@@ -92,6 +97,7 @@ public class User {
 		this.id = id;
 	}
 
+	@Valid
 	public Set<Role> getRoles() {
 		return roles;
 	}

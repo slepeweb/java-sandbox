@@ -11,6 +11,7 @@
     <li><a href="#tabs-0">Platform</a></li>
     <li><a href="#tabs-1">RESTful</a></li>
     <li><a href="#tabs-2">JAX-WS</a></li>
+    <li><a href="#tabs-3">Hibernate</a></li>
   </ul>
 
 	<div id="tabs-0" class="compact">
@@ -18,20 +19,24 @@
 			<h3>The computing environment</h3>
 			<p>This website is being served by an Amazon EC2 virtual server,
 				running Ubuntu 12.04 LTS. Installed on this server are: Java 1.7,
-				Tomcat 7, Apache 2.2 and MongoDB. The database is being used
-				initially to store login account details and site configuration data.</p>
+				Tomcat 7, Apache 2.2 and MySql 5.5. The database is being used
+				to manage login accounts and site configuration data.</p>
 
 			<p>The website design was originated by n33.co, and is a
 				responsive design based on skelJS. jQuery coding has been added to
 				provide user-friendly layouts and to handle Ajax calls.</p>
 
-			<p>The webapp is built using Spring MVC 3.1.2, integrated with
-				Tiles to manage JSP layouts. Other software components include Rome
+			<p>The webapp is built using Spring MVC 3.1.2, with Tiles to
+				support the view mechanism. Hibernate 3.6 is used to manage user
+				login accounts, but this functionality is only available to
+				certain users.</p>
+			
+			<p>Other software components include Rome
 				for RSS feeds, the JAXWS reference implementation from Sun,
 				Jackson for marshalling Java POJOs to JSON, and Jasypt for
 				encrypting passwords. Ehcache is used to cache selected components
 				for a fixed TTL.</p>
-
+			
 		</article>
 	</div>
 	
@@ -83,6 +88,28 @@
 			</p>
 			
 			<p>(Inspect the <a href=/jaxws/password?wsdl>wsdl</a>)</p>
+			
+		</article>
+	</div>
+
+	<div id="tabs-3" class="compact">
+		<article class="first">
+			<h3>User login account management</h3>
+			
+			<p>
+				This demo is only available to site visitors who have been assigned to the relevant role. 
+				Please contact the <a href="mailto:admin@slepeweb.com">administrator</a> if you are 
+				interested in seeing the demo in action.
+			</p>
+			
+			<p>
+				Spring and Hibernate are working together to support the various CRUD activities: 
+				list/add/update/delete users. Users are assigned to one or more roles, each role giving
+				access to different parts of the webapp.
+				Spring forms are bound to backing objects which collect the
+				form data. Annotaions on the persisitent entity classes define various validation constraints.
+				DAO services use the Hibernate APIs to interact with the MySql backend.
+			</p>
 			
 		</article>
 	</div>

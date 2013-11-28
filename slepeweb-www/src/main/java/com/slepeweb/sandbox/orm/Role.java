@@ -1,5 +1,7 @@
 package com.slepeweb.sandbox.orm;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 
 public class Role {
 	
@@ -10,6 +12,7 @@ public class Role {
     private Integer id;
 	private String name;
 
+	@NotBlank
 	public String getName() {
 		return name;
 	}

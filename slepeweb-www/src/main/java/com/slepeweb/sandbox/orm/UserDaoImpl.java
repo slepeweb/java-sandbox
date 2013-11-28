@@ -21,7 +21,13 @@ public class UserDaoImpl implements UserDao {
 	@Transactional
 	public void updateUser(User u) {
 		User target = getUser(u.getId());
+		
 		if (target != null) {
+			/*
+			 *  The target object is now in a persistent state - any changes to it
+			 *  will be automatically persisted to the db. Changes are made here by
+			 *  assimilating the properties of a transient (form) object.
+			 */
 			target.assimilate(u);
 		}
 	}
@@ -46,6 +52,10 @@ public class UserDaoImpl implements UserDao {
 
 	@Transactional(readOnly=true)
 	public String[] getAvailableRoles() {
+		/*
+		 * The <select> element on the Spring form wants a List or String[] containing the
+		 * available options. We're using an array.
+		 */
 		@SuppressWarnings("unchecked")
 		List<Object> rolesObj = this.sessionFactory.getCurrentSession().createQuery("from Role order by name").list();
 		String [] roles = new String[rolesObj.size()];
