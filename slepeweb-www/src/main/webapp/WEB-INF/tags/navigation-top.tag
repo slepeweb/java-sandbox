@@ -17,12 +17,10 @@
 			
 			<c:if test="${not empty _user}">
 				<div class="user-info">
-					<p>Logged in as: ${_user.alias}
-						<br />
-						Role(s): 
+					<p>Logged in as: ${_user.alias} ( 
 						<c:forEach items="${_user.roles}" var="role" varStatus="status">
-							<c:if test="${not status.first}">, </c:if>${role}
-						</c:forEach>
+							<c:if test="${not status.first}">, </c:if>${role.name}
+						</c:forEach> )
 					</p>
 				</div>
 			</c:if>

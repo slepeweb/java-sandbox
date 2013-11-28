@@ -1,8 +1,8 @@
-package com.slepeweb.sandbox.www.model;
+package com.slepeweb.sandbox.mongo;
 
 import java.util.List;
 
-public class User {
+public class MongoUser {
 	private String name, alias, password, encryptedPassword;
 	private List<Role> roles;
 	
@@ -22,7 +22,7 @@ public class User {
 		return name;
 	}
 
-	public User setName(String name) {
+	public MongoUser setName(String name) {
 		this.name = name;
 		return this;
 	}
@@ -31,7 +31,7 @@ public class User {
 		return alias;
 	}
 
-	public User setAlias(String alias) {
+	public MongoUser setAlias(String alias) {
 		this.alias = alias;
 		return this;
 	}
@@ -40,7 +40,7 @@ public class User {
 		return roles;
 	}
 
-	public User setRoles(List<Role> roles) {
+	public MongoUser setRoles(List<Role> roles) {
 		this.roles = roles;
 		return this;
 	}
@@ -57,7 +57,7 @@ public class User {
 		return encryptedPassword;
 	}
 
-	public User setEncryptedPassword(String encryptedPassword) {
+	public MongoUser setEncryptedPassword(String encryptedPassword) {
 		this.encryptedPassword = encryptedPassword;
 		return this;
 	}

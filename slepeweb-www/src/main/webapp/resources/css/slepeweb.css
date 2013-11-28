@@ -16,6 +16,11 @@
 	padding: 0px 10px;
 }
 
+.user-table td {
+	border: 2px solid #cccccc;
+}
+
+
 .form-error {
 	color: red;
 	border-style: solid;

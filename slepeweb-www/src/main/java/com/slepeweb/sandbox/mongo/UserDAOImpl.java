@@ -13,8 +13,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.slepeweb.sandbox.www.model.User;
-import com.slepeweb.sandbox.www.model.User.Role;
+import com.slepeweb.sandbox.mongo.MongoUser.Role;
 
 @Service("userDAOservice")
 public class UserDAOImpl implements UserDAO {
@@ -23,22 +22,22 @@ public class UserDAOImpl implements UserDAO {
 	@Autowired
 	private MongoConnection mongoConnection;
 	
-	public User findUser(Integer id) {
+	public MongoUser findUser(Integer id) {
 		DB db = this.mongoConnection.getDb();
 		DBObject obj = db.getCollection("user").findOne();
 		String alias = (String) obj.get("alias");
-		User user = new User().setAlias(alias);
+		MongoUser user = new MongoUser().setAlias(alias);
 		LOG.info(String.format("Found user [%s]", alias));
 		return user;
 	}
 	
-	public User findUser(String alias) {
+	public MongoUser findUser(String alias) {
 		DB db = this.mongoConnection.getDb();
 		BasicDBObject q = new BasicDBObject("alias", alias);
 		DBCursor c = db.getCollection("user").find(q);
 		
 		if (c.hasNext()) {
-			User user = toUser(c.next());
+			MongoUser user = toUser(c.next());
 			LOG.info(String.format("Found user [%s]", user.getName()));
 			return user;
 		}
@@ -67,9 +66,9 @@ public class UserDAOImpl implements UserDAO {
 		coll.insert(obj);
 	}
 	
-	private User toUser(DBObject obj) {
+	private MongoUser toUser(DBObject obj) {
 		if (obj != null) {
-			User u = new User().
+			MongoUser u = new MongoUser().
 				setAlias(getValue(obj, "alias")).
 				setName(getValue(obj, "name")).
 				setEncryptedPassword(getValue(obj, "password"));

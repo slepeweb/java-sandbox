@@ -6,9 +6,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.sandbox.orm.Role;
+import com.slepeweb.sandbox.orm.User;
 import com.slepeweb.sandbox.www.model.Link;
 import com.slepeweb.sandbox.www.model.Page;
-import com.slepeweb.sandbox.www.model.User;
 
 @Service( "navigationService" )
 public class NavigationServiceImpl implements NavigationService {
@@ -30,6 +31,9 @@ public class NavigationServiceImpl implements NavigationService {
 				links.add(makeLink("Login", "/login?nextPath=" + URLEncoder.encode(page.getHref(), "utf-8")));
 			}
 			catch (Exception e) {}
+		}
+		else if (user.hasRole(Role.USER_ADMIN_ROLE)) {
+			links.add(makeLink("Users", "/user/list"));
 		}
 		
 		for (Link l : links) {

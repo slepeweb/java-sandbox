@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.slepeweb.sandbox.www.model.User.Role;
+import com.slepeweb.sandbox.orm.Role;
+import com.slepeweb.sandbox.orm.User;
+
 
 public class Page {
 	private String href;
@@ -13,7 +15,7 @@ public class Page {
 	private Sidebar leftSidebar, rightSidebar;
 	private String title, heading, body, view;
 	private List<Component> components;
-	private List<Role> roles;
+	private List<String> roles;
 	
 	public Page() {
 		this.header = new Header(this);
@@ -23,9 +25,9 @@ public class Page {
 		this.components = new ArrayList<Component>();
 	}
 	
-	public Page addRole(Role r) {
+	public Page addRole(String r) {
 		if (getRoles() == null) {
-			setRoles(new ArrayList<Role>());
+			setRoles(new ArrayList<String>());
 		}
 		getRoles().add(r);
 		return this;
@@ -37,7 +39,11 @@ public class Page {
 		}
 		else {
 			if (u != null && u.getRoles() != null) {
-				return ! Collections.disjoint(getRoles(), u.getRoles());
+				List<String> userRoles = new ArrayList<String>(u.getRoles().size());
+				for (Role r : u.getRoles()) {
+					userRoles.add(r.getName());
+				}
+				return ! Collections.disjoint(getRoles(), userRoles);
 			}
 		}
 		return false;
@@ -143,11 +149,11 @@ public class Page {
 		return this;
 	}
 
-	public List<Role> getRoles() {
+	public List<String> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(List<Role> roles) {
+	public void setRoles(List<String> roles) {
 		this.roles = roles;
 	}
 }
