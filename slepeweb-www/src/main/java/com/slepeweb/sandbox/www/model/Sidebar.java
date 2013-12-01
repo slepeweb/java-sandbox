@@ -24,4 +24,8 @@ public class Sidebar {
 	public List<Link> getRelatedPages() {
 		return relatedPages;
 	}
+
+	public void setNavigation(List<Link> navigation) {
+		this.navigation = navigation;
+	}
 }

@@ -34,8 +34,9 @@ public class UserDaoImpl implements UserDao {
 
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly=true)
-	public List<User> getAllUsers() {
-		return this.sessionFactory.getCurrentSession().createQuery("from User order by alias").list();
+	public List<User> getAllUsers(boolean onlyDemoUsers) {
+		String hql = onlyDemoUsers ? "from User where demo_user = 1 order by alias" : "from User order by alias";
+		return this.sessionFactory.getCurrentSession().createQuery(hql).list();
 	}
 
 	@Transactional

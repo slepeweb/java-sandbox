@@ -15,10 +15,15 @@
 				</ul>
 			</nav>
 			
-			<c:if test="${not empty _user}">
+			<%--
+				WHOAAH! Spring is not letting me output a session attribute - I had to copy the session 
+					attribute '_loggedInUser' to a model attribute with the same name in order to get
+					the next block of JSTL to work.
+			--%>
+			<c:if test="${not empty _loggedInUser}">
 				<div class="user-info">
-					<p>Logged in as: ${_user.alias} ( 
-						<c:forEach items="${_user.roles}" var="role" varStatus="status">
+					<p>Logged in as: ${_loggedInUser.alias} ( 
+						<c:forEach items="${_loggedInUser.roles}" var="role" varStatus="status">
 							<c:if test="${not status.first}">, </c:if>${role.name}
 						</c:forEach> )
 					</p>

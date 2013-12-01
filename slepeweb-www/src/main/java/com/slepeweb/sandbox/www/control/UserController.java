@@ -2,6 +2,7 @@ package com.slepeweb.sandbox.www.control;
 
 import java.util.HashSet;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,21 +15,32 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.slepeweb.sandbox.orm.Role;
 import com.slepeweb.sandbox.orm.User;
 import com.slepeweb.sandbox.orm.UserDao;
 import com.slepeweb.sandbox.www.model.Page;
+import com.slepeweb.sandbox.www.service.NavigationService;
 
 @Controller
-@RequestMapping(value = "/user")
+@RequestMapping(value = "/sandbox/user")
 public class UserController extends BaseController {
 
 	@Autowired
 	private UserDao userDao;
 	
-	@RequestMapping(value = "/add", method = RequestMethod.GET)
-	public String addUser(@ModelAttribute("_user") User loggedInUser, ModelMap model) {
+	@Autowired
+	private NavigationService navigationService;
+	
+	@RequestMapping(value="", method=RequestMethod.GET)
+	public String index(HttpSession session, ModelMap model) {
+		return introPage(session, model);
+	}
+	
+	@RequestMapping(value = "add", method = RequestMethod.GET)
+	public String addUser(HttpSession session, ModelMap model) {
+		User loggedInUser = getLoggedInUser(session);
 		Page page = getUserFormPage(loggedInUser);
 
 		if (page.isAccessibleBy(loggedInUser)) {
@@ -41,22 +53,24 @@ public class UserController extends BaseController {
 	
 	private Page getUserFormPage(User loggedInUser) {
 		Page page = new Page().
-				setHref("/user/add").
+				setHref("/sandbox/user/add").
 				setTitle("Users").
-				setView("userForm").
-				addRole(Role.USER_ADMIN_ROLE).
+				setView("sandbox.userForm").
+				//addRole(Role.USER_ADMIN_ROLE).
 				addStylesheet("/resources/css/slepeweb.css");
 			
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
+		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));
 		return page;
 	}
 
 	/*
 	 * The BindingResult parameter MUST follow the object being (data-) bound.
 	 */
-	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public String addUser(@ModelAttribute("_user") User loggedInUser, 
-			@Valid @ModelAttribute("userForm") User userForm, BindingResult result, ModelMap model) {
+	@RequestMapping(value = "add", method = RequestMethod.POST)
+	public String addUser(HttpSession session, 
+			@Valid @ModelAttribute("userForm") User userForm, BindingResult result, 
+			ModelMap model, RedirectAttributes rattr) {
 		
 		// Need to validate user here, since it is optional when the form is used to update an existing user
 		if (StringUtils.isBlank(userForm.getPassword())) {
@@ -70,71 +84,90 @@ public class UserController extends BaseController {
 					"Please enter a password"));
 		}
 		
+		User loggedInUser = getLoggedInUser(session);
+
 		if (! result.hasErrors()) {
-			userForm.encryptPasswordIfNotBlank();
-			
-			// Convert rolesStr to an array of Roles
-			Role r;
-			for (String roleStr : userForm.getSelectedRoles()) {
-				r = this.userDao.getRole(Integer.valueOf(roleStr.trim()));
-				if (r != null) {
-					userForm.getRoles().add(r);
-				}
+			if (hasRole(loggedInUser, Role.USER_ADMIN_ROLE)) {
+				userForm.encryptPasswordIfNotBlank();
+				
+				selected2Roles(userForm);
+				this.userDao.addUser(userForm);
+				
+				rattr.addFlashAttribute("_flashMsg", 
+						String.format("User [%s] successfully added", userForm.getName()));
 			}
-			
-			this.userDao.addUser(userForm);
-			
+			else {
+				rattr.addFlashAttribute("_flashError", "You have insufficient privileges to add a user");
+			}
+
 			// TODO: redirects need attention for Production
 			removeModelAttributes(model);
-			return "redirect:/user/list";
+			return "redirect:/sandbox/user/list";
 		}
 		
-		
-		model.addAttribute("_page", getUserFormPage(loggedInUser));
+		Page page = getUserFormPage(loggedInUser);
+		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));
+		model.addAttribute("_page", page);
 		model.addAttribute("availableRoles", this.userDao.getAvailableRoles());
-		return "userForm";
+		return page.getView();
 	}
 
-	@RequestMapping("/list")
-	public String listUsers(@ModelAttribute("_user") User loggedInUser, ModelMap model) {
+	@RequestMapping("list")
+	public String listUsers(HttpSession session, ModelMap model) {
 		Page page = new Page().
-			setHref("/user/list").
+			setHref("/sandbox/user/list").
 			setTitle("Users").
-			setView("userList").
-			addRole(Role.USER_ADMIN_ROLE).
+			setView("sandbox.userList").
+			//addRole(Role.USER_ADMIN_ROLE).
 			addStylesheet("/resources/css/slepeweb.css");
 		
+		User loggedInUser = getLoggedInUser(session);
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
+		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));
 
 		if (page.isAccessibleBy(loggedInUser)) {
-			model.addAttribute("userList", this.userDao.getAllUsers());
+			boolean onlyDemoUsers = ! (loggedInUser != null && 
+					loggedInUser.hasRole(Role.USER_ADMIN_ROLE));
+			model.addAttribute("userList", this.userDao.getAllUsers(onlyDemoUsers));
 		}
 		
 		return checkAccessibility(page, loggedInUser, model);
 	}
 	
-	@RequestMapping("/delete/{id}")
-	public String deleteUser(@PathVariable("id") Integer id, ModelMap model) {
+	@RequestMapping("delete/{id}")
+	public String deleteUser(HttpSession session, 
+			@PathVariable("id") Integer id, 
+			ModelMap model, RedirectAttributes rattr) {
 		
-		this.userDao.deleteUser(id);
+		User loggedInUser = getLoggedInUser(session);
+
+		if (hasRole(loggedInUser, Role.USER_ADMIN_ROLE)) {
+			this.userDao.deleteUser(id);
+			rattr.addFlashAttribute("_flashMsg", "User successfully deleted");
+		}
+		else {
+			rattr.addFlashAttribute("_flashError", "You have insufficient privileges to delete a user");
+		}
 
 		// TODO: redirects need attention for Production
 		removeModelAttributes(model);
-		return "redirect:/user/list";
+		return "redirect:/sandbox/user/list";
 	}
 	
-	@RequestMapping(value = "/update/{id}", method = RequestMethod.GET)
-	public String updateUser(@ModelAttribute("_user") User loggedInUser, 
+	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
+	public String updateUser(HttpSession session, 
 			@PathVariable("id") Integer id, ModelMap model) {
 		
 		Page page = new Page().
-			setHref("/user/update").
+			setHref("/sandbox/user/update").
 			setTitle("Users").
-			setView("userForm").
-			addRole(Role.USER_ADMIN_ROLE).
+			setView("sandbox.userForm").
+			//addRole(Role.USER_ADMIN_ROLE).
 			addStylesheet("/resources/css/slepeweb.css");
 		
+		User loggedInUser = getLoggedInUser(session);
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
+		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));
 
 		if (page.isAccessibleBy(loggedInUser)) {
 			User target = this.userDao.getUser(id);
@@ -149,28 +182,60 @@ public class UserController extends BaseController {
 	/*
 	 * The BindingResult parameter MUST follow the object being (data-) bound.
 	 */
-	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String updateUser(@ModelAttribute("_user") User loggedInUser,
-			@Valid @ModelAttribute("userForm") User userForm, BindingResult result, ModelMap model) {
+	@RequestMapping(value="update", method=RequestMethod.POST)
+	public String updateUser(HttpSession session,
+			@Valid @ModelAttribute("userForm") User userForm, BindingResult result, 
+			ModelMap model, RedirectAttributes rattr) {
 		
 		/*
 		 * The password property on userForm may be blank, in which case no attempt will
 		 * be made to change the encrypted value - the original encryped value will be
 		 * obtained from the hidden input field on the form.
 		 */
+		User loggedInUser = getLoggedInUser(session);
 		if (! result.hasErrors()) {
-			selected2Roles(userForm);
-			userForm.encryptPasswordIfNotBlank();
-			this.userDao.updateUser(userForm);
-							
+			if (hasRole(loggedInUser, Role.USER_ADMIN_ROLE)) {
+				selected2Roles(userForm);
+				userForm.encryptPasswordIfNotBlank();
+				this.userDao.updateUser(userForm);
+								
+				rattr.addFlashAttribute("_flashMsg", 
+						String.format("User [%s] successfully updated", userForm.getName()));
+			}
+			else {
+				rattr.addFlashAttribute("_flashError", "You have insufficient privileges to update a user");
+			}
+
 			// TODO: redirects need attention for Production
 			removeModelAttributes(model);
-			return "redirect:/user/list";
+			return "redirect:/sandbox/user/list";
 		}
 		
-		model.addAttribute("_page", getUserFormPage(loggedInUser));
+		Page page = getUserFormPage(loggedInUser);
+		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));
+		model.addAttribute("_page", page);
 		model.addAttribute("availableRoles", this.userDao.getAvailableRoles());
-		return "userForm";
+		return page.getView();
+	}
+	
+	@RequestMapping(value="intro", method=RequestMethod.GET)
+	public String introPage(HttpSession session, ModelMap model) {
+		Page page = new Page().
+				setHref("/sandbox/user/intro").
+				setTitle("Users").
+				setView("sandbox.intro").
+				//addRole(Role.USER_ADMIN_ROLE).
+				addStylesheet("/resources/css/slepeweb.css");
+			
+		User loggedInUser = getLoggedInUser(session);
+		page.setTopNavigation(getTopNavigation(page, loggedInUser));
+		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));
+		model.addAttribute("_page", page);
+		return page.getView();
+	}
+	
+	private boolean hasRole(User u, String role) {
+		return u != null && u.hasRole(role);
 	}
 	
 	/*
@@ -199,6 +264,4 @@ public class UserController extends BaseController {
 			}
 		}
 	}
-	
-
 }

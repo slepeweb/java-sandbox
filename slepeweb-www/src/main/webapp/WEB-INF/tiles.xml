@@ -41,8 +41,29 @@
 		<put-attribute name="body" value="/WEB-INF/jsp/projects.jsp"/>
 	</definition>	
 
-	<definition name="sandbox" extends="layout.1col">
-		<put-attribute name="body" value="/WEB-INF/jsp/sandbox.jsp"/>
+	<definition name="sandbox.platform" extends="layout.2col.left">
+		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
+		<put-attribute name="body" value="/WEB-INF/jsp/sandbox/platform.jsp"/>
+	</definition>	
+
+	<definition name="sandbox.ws" extends="layout.2col.left">
+		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
+		<put-attribute name="body" value="/WEB-INF/jsp/sandbox/web-services.jsp"/>
+	</definition>	
+
+	<definition name="sandbox.intro" extends="layout.2col.left">
+		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
+		<put-attribute name="body" value="/WEB-INF/jsp/user/intro.jsp"/>
+	</definition>	
+
+	<definition name="sandbox.userForm" extends="layout.2col.left">
+		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
+		<put-attribute name="body" value="/WEB-INF/jsp/user/form.jsp"/>
+	</definition>	
+
+	<definition name="sandbox.userList" extends="layout.2col.left">
+		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
+		<put-attribute name="body" value="/WEB-INF/jsp/user/list.jsp"/>
 	</definition>	
 
 	<definition name="login" extends="layout.3col">
@@ -54,16 +75,6 @@
 		<put-attribute name="body" value="/WEB-INF/jsp/contact.jsp"/>
 		<put-attribute name="left" value="/WEB-INF/jsp/slepe.jsp"/>
 		<put-attribute name="right" value="/WEB-INF/jsp/weather.jsp"/>
-	</definition>	
-
-	<definition name="userForm" extends="layout.2col.left">
-		<put-attribute name="left" value="/WEB-INF/jsp/user/submenu.jsp"/>
-		<put-attribute name="body" value="/WEB-INF/jsp/user/form.jsp"/>
-	</definition>	
-
-	<definition name="userList" extends="layout.2col.left">
-		<put-attribute name="left" value="/WEB-INF/jsp/user/submenu.jsp"/>
-		<put-attribute name="body" value="/WEB-INF/jsp/user/list.jsp"/>
 	</definition>	
 
 </tiles-definitions>

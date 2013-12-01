@@ -11,8 +11,9 @@
 		</id>
 		
 		<property name="name" type="string" column="name" />
-		<property name="alias" type="string" column="alias" />
+		<property name="alias" type="string" column="alias" unique="true" />
 		<property name="encryptedPassword" type="string" column="password" />
+		<property name="demoUser" type="short" column="demo_user" />
 
 		<!-- 
 			A User has zero/many Role instances.

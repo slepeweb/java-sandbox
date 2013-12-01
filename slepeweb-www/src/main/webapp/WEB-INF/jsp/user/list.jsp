@@ -4,6 +4,7 @@
   
 <article class="first">
 	<h2>User listing</h2>
+	<jsp:include page="./flash-messages.jsp" />
 
 	<c:choose><c:when test="${not empty userList}">
 		<table class="two-col-table user-table compact">
@@ -11,13 +12,13 @@
 		    <tr>
 		        <td>${user.alias}</td>
 		        <td>${user}</td>
-		        <td><a href="/user/update/${user.id}">Update</a></td>
-		        <td><a href="/user/delete/${user.id}">Delete</a></td>
+		        <td><a href="/sandbox/user/update/${user.id}">Update</a></td>
+		        <td><a href="/sandbox/user/delete/${user.id}">Delete</a></td>
 		    </tr>
 		</c:forEach>
 		</table>
 	</c:when><c:otherwise>
-		<p>No users in database.</p>
+		<p>No users in the database.</p>
 	</c:otherwise></c:choose>
 	
 </article>

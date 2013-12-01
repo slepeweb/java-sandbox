@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.slepeweb.sandbox.mongo.ConfigDAO;
 import com.slepeweb.sandbox.orm.User;
 import com.slepeweb.sandbox.orm.UserDao;
+import com.slepeweb.sandbox.www.bean.SessionAttr;
 import com.slepeweb.sandbox.www.model.LoginForm;
 import com.slepeweb.sandbox.www.model.Page;
 import com.slepeweb.sandbox.www.service.RomeService;
@@ -35,36 +36,22 @@ public class MainController extends BaseController {
 	private ConfigDAO configDAOservice;
 	
 	@RequestMapping(value="/about")
-	public String doGeneric(@ModelAttribute("_user") User user, ModelMap model) {
+	public String doGeneric(HttpSession session, ModelMap model) {
 		Page page = new Page().
 			setHref("/about").
 			setTitle("About").
 			setView("home").
 			addStylesheet("/resources/css/slepeweb.css");
 		
-		page.setTopNavigation(getTopNavigation(page, user));
+		page.setTopNavigation(getTopNavigation(page, getLoggedInUser(session)));
 		
 		model.addAttribute("_page", page);
 		model.addAttribute("_rss", this.romeService.getFeed("http://feeds.bbci.co.uk/news/technology/rss.xml"));
 		return page.getView();
 	}
 	
-	@RequestMapping(value = "/sandbox")
-	public String doSandbox(@ModelAttribute("_user") User user, ModelMap model) {
-		Page page = new Page().
-			setHref("/sandbox").
-			setTitle("Sandbox").
-			setView("sandbox").
-//			addRole(Role.ADMIN).
-			addStylesheet("/resources/css/slepeweb.css").
-			addJavascript("/resources/js/sandbox.js");
-		
-		page.setTopNavigation(getTopNavigation(page, user));
-		return checkAccessibility(page, user, model);
-	}
-	
 	@RequestMapping(value = "/profile")
-	public String doProjects(@ModelAttribute("_user") User user, ModelMap model) {
+	public String doProjects(HttpSession session, ModelMap model) {
 		Page page = new Page().
 			setHref("/profile").
 			setTitle("Profile").
@@ -73,33 +60,40 @@ public class MainController extends BaseController {
 //			addRole(Role.AGENT).
 			addStylesheet("/resources/css/slepeweb.css");
 		
-		page.setTopNavigation(getTopNavigation(page, user));
-		return checkAccessibility(page, user, model);
+		User loggedInUser = getLoggedInUser(session);
+		page.setTopNavigation(getTopNavigation(page, loggedInUser));
+		return checkAccessibility(page, loggedInUser, model);
 	}
 	
 	@RequestMapping(value = "/contact")
-	public String doContact(@ModelAttribute("_user") User user, ModelMap model) {
+	public String doContact(HttpSession session, ModelMap model) {
 		Page page = new Page().
 			setHref("/contact").
 			setTitle("Contact us").
 			setView("contact").
 			addStylesheet("/resources/css/slepeweb.css");
 		
-		page.setTopNavigation(getTopNavigation(page, user));
+		User loggedInUser = getLoggedInUser(session);
+		page.setTopNavigation(getTopNavigation(page, loggedInUser));
 
 		model.addAttribute("_page", page);
 		return page.getView();
 	}
 		
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String doLoginForm(@RequestParam String nextPath, @ModelAttribute("_user") User user,
-			ModelMap map) {
-		return doLoginForm(user, nextPath, map);
+	public String doLoginForm(HttpSession session, @RequestParam String nextPath, ModelMap map) {
+		return doLoginForm(getLoggedInUser(session), nextPath, map);
 	}
 		
+	/*
+	 * BEWARE: The objects in @ModelAttribute-annotated method arguments are automatically
+	 * updated by Spring with the values of request parameters, if the parameter name
+	 * matches an object property. This is exactly what you want for form command objects,
+	 * but otherwise could have some serious side effects.
+	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public String doLogon(@ModelAttribute LoginForm loginForm, BindingResult result, ModelMap model,
-			HttpSession session) {
+	public String doLogon(HttpSession session, @ModelAttribute LoginForm loginForm, BindingResult result, 
+			ModelMap model) {
 		
 		boolean isError = false;
 		
@@ -116,7 +110,7 @@ public class MainController extends BaseController {
 				BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
 				if (passwordEncryptor.checkPassword(loginForm.getPassword(), target.getEncryptedPassword())) {
 					// Password matches DB value
-					session.setAttribute("_user", target);
+					session.setAttribute(SessionAttr.LOGGED_IN_USER, target);
 					LOG.info(String.format("User logged in [%s]", target));
 					
 					removeModelAttributes(model);

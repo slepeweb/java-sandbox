@@ -10,13 +10,13 @@
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic" rel="stylesheet" type="text/css">
 <link href="/resources/css/colorbox.css" rel="stylesheet" type="text/css">
-<sw:extraCSS />
 <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
 <script src="/resources/js/config.js"></script>
 <script src="/resources/js/skel.min.js"></script>
 <script src="/resources/js/skel-panels.min.js"></script>
 <script src="/resources/js/jquery.colorbox-min.js"></script>
+<sw:extraCSS />
 <sw:extraJS />
 <noscript>
 	<link rel="stylesheet" href="/resources/css/skel-noscript.css" />

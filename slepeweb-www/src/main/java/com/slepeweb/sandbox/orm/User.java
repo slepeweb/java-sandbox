@@ -14,6 +14,7 @@ public class User {
     private Integer id;
 	private String name, alias, password, encryptedPassword;
 	private String[] selectedRoles;
+	private Short demoUser = 0;
 
     private Set<Role> roles = new HashSet<Role>();
 	
@@ -64,7 +65,7 @@ public class User {
 		this.name = name;
 	}
 
-	@Size(min=6, max=32, message="Please enter your login name (min. 6chars, max. 32 chars)")
+	@Size(min=4, max=32, message="Please enter your login name (min. 4, max. 32 chars)")
 	public String getAlias() {
 		return alias;
 	}
@@ -112,6 +113,14 @@ public class User {
 
 	public void setSelectedRoles(String[] selectedRoles) {
 		this.selectedRoles = selectedRoles;
+	}
+
+	public Short getDemoUser() {
+		return demoUser;
+	}
+
+	public void setDemoUser(Short demoUser) {
+		this.demoUser = demoUser;
 	}
 
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.slepeweb.sandbox.orm.Role;
 import com.slepeweb.sandbox.orm.User;
+import com.slepeweb.sandbox.www.bean.SessionAttr;
 import com.slepeweb.sandbox.www.model.Link;
 import com.slepeweb.sandbox.www.model.LoginForm;
 import com.slepeweb.sandbox.www.model.LoginPage;
@@ -23,45 +24,47 @@ public class BaseController {
 	@Autowired
 	private NavigationService navigationService;
 	
-	@ModelAttribute("_user")
-	public User getUser(HttpSession session) {
-		return (User) session.getAttribute("_user");
+	@ModelAttribute(value=SessionAttr.LOGGED_IN_USER)
+	protected User getLoggedInUser(HttpSession session) {
+		return (User) session.getAttribute(SessionAttr.LOGGED_IN_USER);
 	}
 	
 	@ModelAttribute(value="userHasAgentRole")
 	public boolean userHasAgentRole(HttpSession session) {
-		User user = getUser(session);
-		if (user != null) {
-			return user.hasRole(Role.AGENT_ROLE);
-		}
-		return false;
+		return checkPrivileges(session, Role.AGENT_ROLE);
 	}
 	
 	@ModelAttribute(value="userHasAdminRole")
 	public boolean userHasAdminRole(HttpSession session) {
-		User user = getUser(session);
-		if (user != null) {
-			return user.hasRole(Role.GLOBAL_ADMIN_ROLE);
-		}
-		return false;
+		return checkPrivileges(session, Role.GLOBAL_ADMIN_ROLE);
 	}
 	
-	protected List<Link> getTopNavigation(Page page, User user) {
-		return this.navigationService.getTopNavigation(page, user);
+	@ModelAttribute(value="userHasUserAdminRole")
+	public boolean userHasUserAdminRole(HttpSession session) {
+		return checkPrivileges(session, Role.USER_ADMIN_ROLE);
 	}
 	
-	protected String checkAccessibility(Page requestedPage, User user, ModelMap map) {
-		if (requestedPage.isAccessibleBy(user)) {
+	private boolean checkPrivileges(HttpSession session, String roleName) {
+		User user = getLoggedInUser(session);
+		return user != null && user.hasRole(roleName);
+	}
+	
+	protected List<Link> getTopNavigation(Page page, User loggedInUser) {
+		return this.navigationService.getTopNavigation(page, loggedInUser);
+	}
+	
+	protected String checkAccessibility(Page requestedPage, User loggedInUser, ModelMap map) {
+		if (requestedPage.isAccessibleBy(loggedInUser)) {
 			map.addAttribute("_page", requestedPage);			
 			return requestedPage.getView();
 		}
 		else {
-			return doLoginForm(user, requestedPage.getHref(), map);
+			return doLoginForm(loggedInUser, requestedPage.getHref(), map);
 		}
 	}	
 	
-	protected String doLoginForm(User user, String nextPath, ModelMap map) {
-		Page page = getLoginPage(user, nextPath);
+	protected String doLoginForm(User loggedInUser, String nextPath, ModelMap map) {
+		Page page = getLoginPage(loggedInUser, nextPath);
 		
 		LoginForm form = new LoginForm();
 		form.setNextPath(nextPath);
@@ -71,7 +74,7 @@ public class BaseController {
 		return page.getView();
 	}
 	
-	protected Page getLoginPage(User user, String nextPath) {
+	protected Page getLoginPage(User loggedInUser, String nextPath) {
 		LoginPage page = new LoginPage();
 		page.setNextView(nextPath);
 		page.
@@ -80,7 +83,7 @@ public class BaseController {
 			setTitle("Login").
 			addStylesheet("/resources/css/slepeweb.css");
 		
-		return page.setTopNavigation(getTopNavigation(page, user));
+		return page.setTopNavigation(getTopNavigation(page, loggedInUser));
 	}	
 	
 	protected void removeModelAttributes(ModelMap map) {
@@ -88,5 +91,6 @@ public class BaseController {
 		// to the redirect URL
 		map.remove("userHasAgentRole");
 		map.remove("userHasAdminRole");
+		map.remove("userHasUserAdminRole");
 	}
 }

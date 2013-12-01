@@ -1,12 +1,13 @@
 package com.slepeweb.sandbox.www.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Link {
 	private String title, teaser, href;
 	private Image thumbnail;
 	private boolean trusted, selected;
-	private List<Link> children;
+	private List<Link> children = new ArrayList<Link>();
 	
 	public String getTitle() {
 		return title;

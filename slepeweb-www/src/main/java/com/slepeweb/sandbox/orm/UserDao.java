@@ -5,7 +5,7 @@ import java.util.List;
 public interface UserDao {
 	void addUser(User u);
 	void updateUser(User u);
-	List<User> getAllUsers();
+	List<User> getAllUsers(boolean onlyDemoUsers);
 	void deleteUser(Integer id);
 	void deleteUser(User u);
 	String[] getAvailableRoles();
