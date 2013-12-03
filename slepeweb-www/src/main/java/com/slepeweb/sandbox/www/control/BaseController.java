@@ -9,8 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.slepeweb.sandbox.orm.Config;
+import com.slepeweb.sandbox.orm.ConfigDao;
 import com.slepeweb.sandbox.orm.Role;
 import com.slepeweb.sandbox.orm.User;
+import com.slepeweb.sandbox.www.bean.ConfigAttr;
 import com.slepeweb.sandbox.www.bean.SessionAttr;
 import com.slepeweb.sandbox.www.model.Link;
 import com.slepeweb.sandbox.www.model.LoginForm;
@@ -23,6 +26,9 @@ public class BaseController {
 
 	@Autowired
 	private NavigationService navigationService;
+	
+	@Autowired
+	private ConfigDao configDao;
 	
 	@ModelAttribute(value=SessionAttr.LOGGED_IN_USER)
 	protected User getLoggedInUser(HttpSession session) {
@@ -92,5 +98,10 @@ public class BaseController {
 		map.remove("userHasAgentRole");
 		map.remove("userHasAdminRole");
 		map.remove("userHasUserAdminRole");
+	}
+	
+	protected String getServerHostname() {
+		Config cfg = this.configDao.getConfig(ConfigAttr.SERVER_HOSTNAME);
+		return cfg != null ? cfg.getValue() : "www.slepeweb.com";
 	}
 }

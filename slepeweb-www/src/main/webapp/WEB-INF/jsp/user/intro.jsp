@@ -2,10 +2,9 @@
 	<h2>User login account management</h2>
 
 	<p>Spring and Hibernate are working together here to support the
-		various CRUD activities: list/add/update/delete users. Users are
+		various (CRUD) activities, ie. list/add/update/delete users. Users are
 		assigned to one or more roles, each role giving access to different
-		parts of the webapp. Spring forms are bound to backing objects which
-		collect the form data. Annotations on the persisitent entity classes
+		parts of the webapp. Spring forms collect the form data. Annotations on the persisitent entity classes
 		define various validation constraints. DAO services use the Hibernate
 		APIs to interact with the MySql backend.</p>
 

@@ -5,7 +5,8 @@
  
 <hibernate-configuration>
     <session-factory>
-			<mapping resource="com/slepeweb/sandbox/orm/User.hbm.xml"/>
-			<mapping resource="com/slepeweb/sandbox/orm/Role.hbm.xml"/>
+			<mapping resource="com/slepeweb/sandbox/orm/User.hbm.xml" />
+			<mapping resource="com/slepeweb/sandbox/orm/Role.hbm.xml" />
+			<mapping resource="com/slepeweb/sandbox/orm/Config.hbm.xml" />
 		</session-factory>   
 </hibernate-configuration>

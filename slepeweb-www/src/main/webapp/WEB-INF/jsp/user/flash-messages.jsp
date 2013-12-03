@@ -4,10 +4,6 @@
 	<c:if test="${not userHasUserAdminRole}">
 		<p class="flash-msg orange compact">Please note: You can modify form data, but you do not have sufficient privileges to update the database.</p>
 	</c:if>
-	<!-- 
-	msg:   [${_flashMsg}]
-	error: [${_flashError}]
-	 -->
 </c:when><c:when test="${not empty _flashMsg}">
 	<p class="flash-msg green">${_flashMsg}</p>
 </c:when><c:when test="${not empty _flashError}">

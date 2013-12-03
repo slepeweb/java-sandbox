@@ -100,9 +100,8 @@ public class UserController extends BaseController {
 				rattr.addFlashAttribute("_flashError", "You have insufficient privileges to add a user");
 			}
 
-			// TODO: redirects need attention for Production
 			removeModelAttributes(model);
-			return "redirect:/sandbox/user/list";
+			return String.format("redirect://%s/%s", getServerHostname(), "sandbox/user/list");
 		}
 		
 		Page page = getUserFormPage(loggedInUser);
@@ -149,9 +148,8 @@ public class UserController extends BaseController {
 			rattr.addFlashAttribute("_flashError", "You have insufficient privileges to delete a user");
 		}
 
-		// TODO: redirects need attention for Production
 		removeModelAttributes(model);
-		return "redirect:/sandbox/user/list";
+		return String.format("redirect://%s/%s", getServerHostname(), "sandbox/user/list");
 	}
 	
 	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
@@ -206,9 +204,8 @@ public class UserController extends BaseController {
 				rattr.addFlashAttribute("_flashError", "You have insufficient privileges to update a user");
 			}
 
-			// TODO: redirects need attention for Production
 			removeModelAttributes(model);
-			return "redirect:/sandbox/user/list";
+			return String.format("redirect://%s/%s", getServerHostname(), "sandbox/user/list");
 		}
 		
 		Page page = getUserFormPage(loggedInUser);

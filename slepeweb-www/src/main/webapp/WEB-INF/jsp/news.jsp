@@ -39,7 +39,7 @@
 	<p>Latest stories from the BBC:</p>
 	<ul class="link-list">
 		<c:forEach items="${_rss}" var="link" end="3">
-			<li class="compact"><a href="${link.href}">${link.title}</a></li>
+			<li class="compact"><a class="iframe group2" href="${link.href}">${link.title}</a></li>
 		</c:forEach>
 	</ul>
 </section>

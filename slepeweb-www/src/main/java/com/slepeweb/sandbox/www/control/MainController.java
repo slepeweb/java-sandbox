@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.slepeweb.sandbox.mongo.ConfigDAO;
 import com.slepeweb.sandbox.orm.User;
 import com.slepeweb.sandbox.orm.UserDao;
 import com.slepeweb.sandbox.www.bean.SessionAttr;
@@ -31,9 +30,6 @@ public class MainController extends BaseController {
 	
 	@Autowired
 	private UserDao userDao;
-	
-	@Autowired
-	private ConfigDAO configDAOservice;
 	
 	@RequestMapping(value="/about")
 	public String doGeneric(HttpSession session, ModelMap model) {
@@ -116,8 +112,7 @@ public class MainController extends BaseController {
 					removeModelAttributes(model);
 					
 					// Which host to redirect to?
-					String host = this.configDAOservice.findValue("server.host.name", "www.slepeweb.com");
-					return "redirect://" + host + loginForm.getNextPath();
+					return String.format("redirect://%s%s", getServerHostname(), loginForm.getNextPath());
 				}
 				else {
 					// Password failure

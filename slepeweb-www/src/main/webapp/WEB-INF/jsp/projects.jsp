@@ -39,7 +39,7 @@
 					</tr>
 					<tr>
 						<td class="heading">Job title</td>
-						<td>Consultant, and SWS Director</td>
+						<td>Java Developer, SWS Director</td>
 					</tr>
 					<tr>
 						<td class="heading">Email</td>
@@ -181,7 +181,7 @@
 				</tr>
 				<tr>
 					<td class="heading">Occasional</td>
-					<td>Javascript, jQuery, Dojo, Ajax, CSS, HTML, Maven, Git, Apache, Tomcat, Websphere, Weblogic, 
+					<td>Javascript, jQuery, Dojo, Ajax, CSS, HTML, SQL, Oracle, MySQL, Maven, Git, Apache, Tomcat, Websphere, Weblogic, 
 						XSD, XML, XSLT, JAXB, RESTful and SOAP web services, Quartz, Bash scripting, CVS, 
 						Amazon Cloud services</td>
 				</tr>
@@ -199,7 +199,7 @@
 				</tr>
 				<tr>
 					<td class="heading">Educational</td>
-					<td>EJB, Ruby on Rails, Groovy, MongoDB, JSF</td>
+					<td>TDD, EJB, Ruby on Rails, Groovy, MongoDB, JSF</td>
 				</tr>
 			</table>
 		</div>

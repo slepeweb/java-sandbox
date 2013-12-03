@@ -65,12 +65,10 @@ public class NavigationServiceImpl implements NavigationService {
 	}
 
 	public List<Link> getBottomNavigation(Page page) {
-		// TODO Auto-generated method stub
 		return new ArrayList<Link>();
 	}
 
 	public List<Link> getBreadcrumbs(Page page) {
-		// TODO Auto-generated method stub
 		return new ArrayList<Link>();
 	}
 

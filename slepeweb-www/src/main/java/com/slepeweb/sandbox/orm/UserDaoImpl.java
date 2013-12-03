@@ -47,6 +47,9 @@ public class UserDaoImpl implements UserDao {
         }
 	}
 
+	/*
+	 * This is currently never used, and I suspect it may fail if called.
+	 */
 	public void deleteUser(User u) {
 		deleteUser(u.getId());
 	}

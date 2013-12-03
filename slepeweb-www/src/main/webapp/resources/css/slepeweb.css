@@ -20,6 +20,9 @@
 	border: 2px solid #cccccc;
 }
 
+.user-table img {
+	vertical-align: text-bottom;
+}
 
 .form-error {
 	color: red;
@@ -163,3 +166,21 @@ ul.level-1 {
 	font-size: 0.8em;
 	border-top: none;
 }
+
+li.selected {
+	font-weight: bold;
+}
+
+li.unselected {
+	font-weight: normal;
+}
+
+#delete-user-alert {
+	padding: 10px; 
+	background: #fff;
+}
+
+#delete-user-alert button {
+	margin-top: 1em;
+}
+
