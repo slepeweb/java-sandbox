@@ -1,80 +1,183 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
-  <display-name>Archetype Created Web Application</display-name>
-  <servlet>
-    <servlet-name>acm</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet>
-    <servlet-name>MediasurfaceController</servlet-name>
-    <servlet-class>com.slepeweb.sandbox.acm.mvc.AcmControllerServlet</servlet-class>
-    <init-param>
-      <param-name>default-binary-servlet-name</param-name>
-      <param-value>Stream</param-value>
-    </init-param>
-    <init-param>
-      <param-name>bypass-url-stem</param-name>
-      <param-value>/model/schemas/,/model/wsdl/,/static/,/resources/,/404/,/favicon.ico</param-value>
-    </init-param>
-    <init-param>
-      <param-name>authenticate-realm</param-name>
-      <param-value>Mediasurface</param-value>
-    </init-param>
-    <init-param>
-      <param-name>template-separator</param-name>
-      <param-value>/</param-value>
-    </init-param>
-    <init-param>
-      <param-name>template-extension</param-name>
-      <param-value></param-value>
-    </init-param>
-    <init-param>
-      <param-name>template-group-separator</param-name>
-      <param-value>#</param-value>
-    </init-param>
-    <init-param>
-      <param-name>logging</param-name>
-      <param-value>false</param-value>
-    </init-param>
-    <init-param>
-      <param-name>forward-to-default-if-not-found</param-name>
-      <param-value>false</param-value>
-    </init-param>
-    <init-param>
-      <param-name>default-servlet-name</param-name>
-      <param-value>default</param-value>
-    </init-param>
-    <load-on-startup>2</load-on-startup>
-  </servlet>
-  <servlet>
-    <servlet-name>Stream</servlet-name>
-    <servlet-class>com.mediasurface.client.servlets.StreamServlet</servlet-class>
-    <load-on-startup>3</load-on-startup>
-  </servlet>
-  <context-param>
-    <param-name>org.apache.tiles.factory.TilesContainerFactory.MUTABLE</param-name>
-    <param-value>false</param-value>
-  </context-param>
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
-  </listener>
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>/resources/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>acm</servlet-name>
-    <url-pattern>/WEB-INF/templates/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MediasurfaceController</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
+	<display-name>Slepeweb ACM Sandbox</display-name>
+	
+	<servlet>
+		<servlet-name>acm</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>MediasurfaceController</servlet-name>
+		<servlet-class>com.slepeweb.sandbox.acm.mvc.AcmControllerServlet</servlet-class>
+		<init-param>
+			<param-name>default-binary-servlet-name</param-name>
+			<param-value>Stream</param-value>
+		</init-param>
+		<init-param>
+			<param-name>bypass-url-stem</param-name>
+			<param-value>/model/schemas/,/model/wsdl/,/static/,/resources/,/404/,/favicon.ico</param-value>
+		</init-param>
+		<init-param>
+			<param-name>authenticate-realm</param-name>
+			<param-value>Mediasurface</param-value>
+		</init-param>
+		<init-param>
+			<param-name>template-separator</param-name>
+			<param-value>/</param-value>
+		</init-param>
+		<init-param>
+			<param-name>template-extension</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>template-group-separator</param-name>
+			<param-value>#</param-value>
+		</init-param>
+		<init-param>
+			<param-name>logging</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forward-to-default-if-not-found</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		
+	<init-param>
+		<param-name>default-servlet-name</param-name>
+		<param-value>default</param-value>
+	</init-param>
+	
+	<init-param>
+		<param-name>server-name</param-name>
+		<param-value>Development</param-value>
+	</init-param>
+	
+	<init-param>
+		<param-name>server-port</param-name>
+		<param-value>8080</param-value>
+	</init-param>
+	<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>Stream</servlet-name>
+		<servlet-class>com.mediasurface.client.servlets.StreamServlet</servlet-class>
+		<load-on-startup>3</load-on-startup>
+	</servlet>
+
+	<context-param>
+		<param-name>org.apache.tiles.factory.TilesContainerFactory.MUTABLE</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<listener>
+		<listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
+	</listener>
+	
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>/resources/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>acm</servlet-name>
+		<url-pattern>/WEB-INF/templates/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>MediasurfaceController</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<!-- PageStudio starts ... -->
+	<servlet>
+		<servlet-name>PageStudioSave</servlet-name>
+		<servlet-class>com.mediasurface.pagestudio.servlets.SaveOverlayServlet</servlet-class>
+		<init-param>
+			<param-name>logging</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</servlet>
+	
+	<!-- The follow value should point to the absolute hostname and port that 
+		serves the web-app -->
+	<context-param>
+		<param-name>component-DTD-location</param-name>
+		<param-value>http://localhost:8080/pageStudio/components/ps-component.dtd</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>components-dir</param-name>
+		<param-value>/pageStudio/components</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>component-rules</param-name>
+		<param-value>/pageStudio/components/component-rules.xml</param-value>
+	</context-param>
+	
+	<servlet>
+		<servlet-name>PageStudioComponents</servlet-name>
+		<servlet-class>com.mediasurface.pagestudio.servlets.ComponentFactoryServlet</servlet-class>
+		<init-param>
+			<param-name>logging</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>use-custom-configuration-form-jsps</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>use-custom-invalid-properties-display</param-name>
+			<param-value>false</param-value>
+		</init-param>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>PageStudioLayoutDesigner</servlet-name>
+		<servlet-class>com.mediasurface.pagestudio.servlets.LayoutDesignerServlet</servlet-class>
+		<init-param>
+			<param-name>logging</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>overlay-css-location</param-name>
+			<param-value>/page-studio-layouts/overlay_css</param-value>
+		</init-param>
+		<init-param>
+			<param-name>item-field-containing-overlay-css</param-name>
+			<param-value>selectors</param-value>
+		</init-param>
+		<init-param>
+			<param-name>css-style-reader-type</param-name>
+			<param-value>binary</param-value>
+		</init-param>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>PageStudioSave</servlet-name>
+		<url-pattern>/ps-save-overlay</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>PageStudioComponents</servlet-name>
+		<url-pattern>/ps-component-factory</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>PageStudioLayoutDesigner</servlet-name>
+		<url-pattern>/ps-layout-designer</url-pattern>
+	</servlet-mapping>
+	
+	<!-- ... PageStudio ends -->
+
 </web-app>

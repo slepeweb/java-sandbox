@@ -1,0 +1,279 @@
+#ps_ui_container .ps_dialog_change_layout {
+	height: 405px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_dialog_body {
+	overflow: auto;
+}
+
+#ps_ui_container .change_layout_list_container {
+	background: #fff;
+	position: absolute;
+	left: 2px;
+	right: 2px;
+	top: 57px;
+	bottom: 64px;
+	font-size: 12px;
+	overflow-y: scroll;
+	border: 1px solid #849DBD;
+}
+
+#ps_ui_container .ps_change_layout_controls {
+	position: absolute;
+	left: 0px;
+	right: 12px;
+	bottom: 34px;
+}
+
+#ps_ui_container .bottom_controls {
+	bottom: 6px;
+	margin-top: 0;
+}
+
+#ps_ui_container .ps_change_layout_controls button {
+	float: right;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_change_layout_instructions {
+	background-image: url("../../images/ui/toolbar/table_new.png");
+	background-repeat: no-repeat;
+	background-position: top left;
+	position: absolute;
+	left: 2px;
+	right: 2px;
+	top: 2px;
+	height: 30px;
+	font-family: Segoe UI, tahoma;
+	font-size: 9pt;
+	margin: 5px;
+	padding: 3px 2px 2px 25px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_filter_form {
+	left: auto;
+	width: 200px;
+}
+
+#ps_ui_container .ps_dialog_change_layout form.ps_change_layout_type_select_form {
+	position: absolute;
+	top: 35px;
+	left: 2px;
+	height: 10px;
+	line-height: 10px;
+	vertical-align: bottom;
+}
+
+#ps_ui_container .ps_dialog_change_layout form.ps_change_layout_type_select_form input {
+	position: relative;
+	bottom: 1px;
+}
+
+#ps_ui_container .ps_dialog_change_layout form.ps_change_layout_type_select_form label {
+	padding: 2px 0 2px 20px;
+	line-height: 16px;
+	display: inline-block;
+	margin: 0 2px 0 2px;
+	background-repeat: no-repeat;
+	background-position: center left;
+	min-width: 110px;
+}
+
+#ps_ui_container .ps_dialog_change_layout form.ps_change_layout_type_select_form label.ps_layout_type_all_label {
+	padding-left: 0;
+}
+
+#ps_ui_container .ps_dialog_change_layout form.ps_change_layout_type_select_form label.ps_layout_type_site_label {
+	background-image: url("../../images/ui/change_layout/house.png");
+}
+
+#ps_ui_container .ps_dialog_change_layout form.ps_change_layout_type_select_form label.ps_layout_type_other_label {
+	background-image: url("../../images/ui/change_layout/layout.png");
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item {
+	position: relative;
+	float: left;
+	width: 200px;
+	height: 81px;
+	text-align: center;
+	margin: 4px;
+	font-weight: bold;
+	font-size: 9pt;
+	z-index: 100;
+	overflow: visible;
+	border: 1px solid #9C9BB4;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item.ps_button_selected {
+  background-color: #FFE7A2;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item .ps_button_label {
+	float: left;
+	display: block;
+	height: 21px;
+	width: 184px;
+	padding-left: 16px;
+	vertical-align: middle;
+	line-height: 21px;
+	text-align: center;
+	background-image: url("../../images/ui/change_layout/layout.png");
+	background-position: 5px 50%;
+	background-repeat: no-repeat;
+	border: inherit;
+	border-top: 0px;
+	margin-left: -1px;
+	padding-bottom: 1px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item.ps_site_layout .ps_button_label {
+	background-image: url("../../images/ui/change_layout/house.png");
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item .ps_layout_thumbnail {
+	position: relative;
+	overflow: hidden;
+	float: left;
+	height: 51px;
+	min-height: 51px;
+	width: 192px;
+	max-width: 192px;
+	padding: 4px;
+	margin: 0;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item.expanded {
+	z-index: 1000;
+	background-color: #FFE7A2;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item.expanded .ps_layout_thumbnail {
+	overflow: visible;
+	z-index: 10000;
+	background-color: inherit;
+	border-top: 0px;
+	height: auto;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item.expanded .ps_button_label {
+	z-index: 10000;
+	background-color: inherit;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item .ps_layout_thumbnail.overflow {
+	background-color: #FFE7A2;
+	margin-top: -1px;
+	margin-left: -1px;
+	border: inherit;
+	border-bottom: none;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item .ps_layout_thumbnail .ps_thumbnail_cell {
+	height: 13px;
+	border: 1px solid #9C9BB4;
+	background-color: #BBCEE6;
+	text-align: center;
+	overflow: hidden;
+}
+
+/* Change Layout Styles */
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout form.ps_create_layout_form {
+	position: absolute;
+	right: 160px;
+	left: 12px;
+	top: 64px;
+	line-height: 33px;
+	height: 33px;
+	vertical-align: middle;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_native_button.ps_edit_layout_button {
+	width: 28px;
+	height: 28px;
+	min-width: 0;
+	min-height: 0;
+	padding: 0;
+	position: absolute;
+	right: 4px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_native_button.ps_import_layout_button {
+	float: left;
+	margin-left: 9px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_add_cell_button {
+	top: 96px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_remove_cell_button {
+	top: 128px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout form.ps_create_layout_form input {
+	left: 40px;
+	top: 4px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout form.ps_create_layout_form label {
+	margin-right: 4px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout form.ps_create_layout_form label:after {
+	content: ":";
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_layout_preview_width {
+	position: absolute;
+	top: 40px;
+	left: 12px;
+	height: 15px;
+	font-weight: normal;
+	font-style: italic;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_layout_preview_width em {
+	font-weight: bold;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_layout_preview_wrapper {
+	position: absolute;
+	top: 95px;
+	bottom: 34px;
+	left: 10px;
+	right: 36px;
+	overflow-y: scroll;
+	border: 1px solid #9C9BB4;
+	background-color: #fff;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_layout_preview {
+	position: absolute;
+	left: 5px;
+	right: 4px;
+	top: 4px;
+	bottom: 4px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_layout_preview .ps_cell {
+	display: block;
+	float: left;
+	text-align: center;
+	line-height: 20px;
+	height: 20px;
+	border: 1px solid #9C9BB4;
+	background-color: #BBCEE6;
+	margin: -1px -1px 0 -1px;
+	overflow: hidden;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_layout_preview .ps_cell.ps_selected {
+	background-color: #FFE69E;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_tool_tip {
+	position: absolute;
+	left: 20px;
+	max-width: 300px;
+}

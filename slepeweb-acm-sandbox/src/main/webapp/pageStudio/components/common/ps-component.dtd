@@ -1,0 +1,25 @@
+<!ELEMENT ps-component (basic | itemField | configurable)  >
+<!ATTLIST ps-component inclusionType NMTOKEN "include" >
+<!ATTLIST ps-component componentType NMTOKEN "basic" >
+<!ATTLIST ps-component category CDATA "none" >
+<!ATTLIST ps-component id NMTOKEN #REQUIRED >
+<!ELEMENT basic ( name , description, location ) >
+<!ELEMENT name (#PCDATA) >
+<!ELEMENT description (#PCDATA) >
+<!ELEMENT location (#PCDATA) >
+<!ELEMENT itemField ( fieldName , displayName, location ) >
+<!ELEMENT fieldName (#PCDATA) >
+<!ELEMENT displayName (#PCDATA) >
+<!ELEMENT configurable ( name , description, location, configurator, properties ) >
+<!ELEMENT configurator (#PCDATA) >
+<!ELEMENT properties (property+) >
+<!ELEMENT property EMPTY>
+<!ATTLIST property name CDATA #REQUIRED >
+<!ATTLIST property type CDATA #REQUIRED >
+<!ATTLIST property defaultValue CDATA #IMPLIED>
+<!ATTLIST property value CDATA "none">
+<!ATTLIST property scope CDATA "request" >
+<!ATTLIST property range CDATA #IMPLIED>
+<!ATTLIST property size CDATA "0">
+<!ATTLIST property mandatory CDATA "false" >
+

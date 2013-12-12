@@ -1,0 +1,34 @@
+.ps_body .ps_toolbar { 
+	height: 24px;
+	line-height: 24px;
+	background-color: #DCE8F6;
+  background-image: url("../../../images/ui/toolbar/toolbar_background.png");
+	background: -webkit-gradient(linear, left top, left bottom, from(#EFF6FD), to(#ECF0F5));
+	background: -moz-linear-gradient(top, #EFF6FD, #ECF0F5);
+	position: absolute;
+	border-style: solid;
+	border-color: #9FB2C7;
+	z-index: 900;
+	background-repeat: repeat-x;
+	background-position: bottom left;
+	font-size: 9pt; /*prevents it being overridden by cell wrapper styles. */
+}
+
+.ps_body .ps_toolbar .ps_button, #ps_ui_container .ps_dialog_tracker .ps_button, .ps_body .ps_toolbar .ps_item_handle {
+	background-repeat: no-repeat;
+	background-position: center center;
+	height: 22px;
+	width: 22px;
+	margin: 1px;
+	float: left;
+	overflow: hidden;
+}
+
+.ps_body .ps_toolbar .ps_item_handle {
+	background-image: url("../../../images/ui/cursors/moveCursor.gif");
+	cursor: url("../../../images/ui/cursors/openhand.cur"), auto;
+}
+
+.ps_body .ps_toolbar .ps_corner {
+	border-width: 0;
+}

@@ -1,0 +1,62 @@
+.ps_reset, .ps_reset table,.ps_reset td,.ps_reset tr,.ps_reset th,.ps_reset tbody,.ps_reset thead,.ps_reset a,.ps_reset abbr,.ps_reset acronym,.ps_reset b,.ps_reset bdo,.ps_reset big,.ps_reset br,.ps_reset cite,.ps_reset code,.ps_reset dfn,.ps_reset em,.ps_reset i,.ps_reset img,.ps_reset kbd,.ps_reset label,.ps_reset legend,.ps_reset q,.ps_reset samp,.ps_reset select,.ps_reset small,.ps_reset span,.ps_reset strong,.ps_reset sub,.ps_reset sup,.ps_reset textarea,.ps_reset tt,.ps_reset var
+.ps_reset address,.ps_reset blockquote,.ps_reset div,.ps_reset dl,.ps_reset fieldset,.ps_reset form,.ps_reset h1,.ps_reset h2,.ps_reset h3,.ps_reset h4,.ps_reset h5,.ps_reset h6,.ps_reset hr,.ps_reset noscript,.ps_reset ol,.ps_reset p,.ps_reset pre,.ps_reset ul {
+	margin: 0; padding: 0; font-weight: inherit; font-style: inherit; font-size: normal;
+	font-family: inherit; vertical-align: baseline; text-align: left;
+	line-height: normal; width: auto; height: auto; background: none; float: none; z-index: 0;
+	outline: 0; border: 0; border-color: black; position: static;
+	left: auto; right: auto; top: auto; bottom: auto;
+}
+
+.ps_body .overlay,.ps_body .overContainer,.ps_body .overSplitContainer {
+	float: left;
+}
+
+/*Inline Elements*/
+.ps_reset a,.ps_reset abbr,.ps_reset acronym,.ps_reset b,.ps_reset bdo,.ps_reset big,.ps_reset br,.ps_reset cite,.ps_reset code,.ps_reset dfn,.ps_reset em,.ps_reset i,.ps_reset img,.ps_reset input,.ps_reset kbd,.ps_reset label,.ps_reset q,.ps_reset samp,.ps_reset select,.ps_reset small,.ps_reset span,.ps_reset strong,.ps_reset sub,.ps_reset sup,.ps_reset textarea,.ps_reset tt,.ps_reset var {
+	display: inline;
+}
+
+/*Block Elements*/
+.ps_reset address,.ps_reset blockquote,.ps_reset div,.ps_reset dl,.ps_reset fieldset,.ps_reset form,.ps_reset h1,.ps_reset h2,.ps_reset h3,.ps_reset h4,.ps_reset h5,.ps_reset h6,.ps_reset hr,.ps_reset noscript,.ps_reset ol,.ps_reset p,.ps_reset pre,.ps_reset ul {
+	display: block;
+}
+
+/*Input Elements*/
+.ps_reset input {
+	margin: 2px; padding: 0;
+	font-weight: inherit; font-style: inherit; font-size: auto; font-family: inherit; color: black;
+	vertical-align: middle;  width: auto; height: auto; float: none;
+	z-index: 0; position: static;
+}
+
+.ps_reset button {
+	vertical-align: middle;
+}
+
+.ps_reset input[type="hidden"] {
+	display: none;
+}
+
+/*Other*/
+.ps_reset ol,.ps_reset ul {
+	list-style: none;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+.ps_reset table {
+	border-collapse: separate;
+	border-spacing: 0;
+}
+
+.ps_reset caption,th,td {
+	text-align: left;
+	font-weight: normal;
+}
+
+.ps_reset blockquote:before,blockquote:after,q:before,q:after {
+	content: "";
+}
+
+.ps_reset blockquote,q {
+	quotes: "" "";
+}

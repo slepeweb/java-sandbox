@@ -1,0 +1,295 @@
+#ps_ui_container .ps_dialog .ps_dialog_body
+{
+    padding-left: 10px;
+}
+
+#ps_ui_container .ps_dialog .ps_dialog_body .ps_tool
+{
+    bottom: 7px;
+    right: 7px;
+}
+
+#ps_ui_container .ps_select_component_dialog .ps_component_list
+{
+    bottom: 22px;
+    right: 42px;
+}
+
+#ps_ui_container .ps_select_component_dialog .ps_component_filter
+{
+    right: 16px;
+}
+
+#ps_ui_container .ps_resize_grip
+{
+    right: -7px;
+    bottom: 4px;
+}
+
+.ps_body .ps_image img
+{
+    width: 100%;
+}
+
+#ps_ui_container .ps_dialog .ps_dialog_handle
+{
+    padding-left: 10px;
+}
+
+#ps_ui_container .ps_browser .ps_image_browser_image_container img
+{
+    width: 164px;
+    height: 136px;
+}
+
+#ps_ui_container .ps_component_list_item,
+.ps_component_list_item.ps_drag_wrapper
+{
+    overflow: visible;
+}
+
+#ps_ui_container .ps_component_list_item .ps_thumbnail,
+.ps_drag_wrapper .ps_thumbnail
+{
+    width: 120px;
+    height: 100px;
+}
+
+div.ps_type_name_string,
+div.ps_type_name_int,
+div.ps_type_name_date,
+div.ps_type_name_url,
+div.ps_type_name_british_post_code,
+div.ps_type_name_phone_number,
+div.ps_type_name_markup,
+div.ps_browser_item_button,
+div.ps_instructions,
+div.ps_toolbar .ps_button,
+img.ps_button_icon,
+img.ps_icon
+{
+    /* Unlike image paths, a relative path to the HTC file is relative to the page displayed, not the CSS.
+       Therefore, an absolute path is used to make sure it's always found and applied to whichever page
+       is displayed. */
+    behavior: url(/pageStudio/css/iepngfix.htc);
+}
+
+#ps_ui_container div.ps_button_on_mouse_over
+{
+    background-color: #FFE7A2;
+}
+
+/*--- Config Forms ----*/
+
+#ps_ui_container table.ps_dialog_table td input,
+#ps_ui_container table.ps_dialog_table td select
+{
+    width: auto;
+}
+
+#ps_ui_container .ps_config_form_body div.ps_configuration_form_title,
+#ps_ui_container .ps_config_form_body div.ps_configuration_form_description,
+html #ps_ui_container div.ps_configure_component_dialog .ps_config_form_controls
+{
+    width: 230px;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog .ps_config_form
+{
+    position: relative;
+    width: auto;
+    overflow: hidden;
+    bottom: auto;
+    float: left;
+    clear: both;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog .ps_config_form_body
+{
+    position: static !important;
+    width: auto;
+    overflow: scroll;
+    float: left;
+    clear: both;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog .ps_config_form_controls
+{
+    position: static;
+    float: left;
+    clear: both;
+    height: 30px;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog .ps_config_form_controls .ps_button
+{
+    margin-right: 5px;
+    float: left;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog div.ps_resize_grip_footer
+{
+    float: left;
+    clear: both;
+    width: 100%;
+    position: static;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog .ps_blocker
+{
+    display: none;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog .ps_dialog_handle
+{
+    width: 100%;
+    position: relative;
+    float: left;
+    clear: both;
+    left: 0;
+    padding: 0 1px 0 0;
+    margin: 0;
+}
+html #ps_ui_container div.ps_configure_component_dialog .ps_dialog_corner_left
+{
+    left: 0;
+    position: relative;
+    float: left;
+}
+html #ps_ui_container div.ps_configure_component_dialog .ps_dialog_corner_right
+{
+    right: 0;
+    background-position: auto;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog .ps_dialog_body .ps_tool
+{
+    float: left;
+    width: auto;
+    position: relative;
+    float: left;
+    right: auto;
+    top: auto;
+    left: auto;
+    bottom: auto;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog .ps_dialog_body .ps_tool_wrapper
+{
+    position: relative;
+    float: left;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: auto;
+}
+
+html #ps_ui_container div.ps_configure_component_dialog .ps_dialog_body
+{
+    position: relative;
+    float: left;
+    clear: both;
+    width: auto;
+    top: 0;
+    height: 100%;
+}
+
+/*-------*/
+
+/*
+* Fixes for lack of multiple class selectors in IE6.
+*/
+/* Main Tab */
+html .ps_body .ps_area_toolbar .ps_button_on_mouse_enter_ps_select_component
+{
+    background-image: url("../../images/ui/toolbar/id_card_add_hover.png");
+}
+
+html .ps_body .ps_area_toolbar .ps_button_on_mouse_down_ps_select_component
+{
+    background-image: url("../../images/ui/toolbar/id_card_add_down.png");
+}
+
+html .ps_body .ps_area_toolbar .ps_button_on_mouse_enter_ps_change_layout
+{
+    background-image: url("../../images/ui/toolbar/table_new_hover.png");
+}
+
+html .ps_body .ps_area_toolbar .ps_button_on_mouse_down_ps_change_layout
+{
+    background-image: url("../../images/ui/toolbar/table_new_down.png");
+}
+
+html .ps_body .ps_area_toolbar .ps_button_on_mouse_enter_ps_save_master_layout
+{
+    background-image: url("../../images/ui/toolbar/save_master_hover.png");
+}
+
+html .ps_body .ps_area_toolbar .ps_button_on_mouse_down_ps_save_master_layout
+{
+    background-image: url("../../images/ui/toolbar/save_master_down.png");
+}
+
+/* Item Tab */
+html .ps_body .ps_item_toolbar .ps_button_on_mouse_enter_ps_delete_item_button
+{
+    background-image: url("../../images/ui/toolbar/delete_button_hover.png");
+}
+
+html .ps_body .ps_item_toolbar .ps_button_on_mouse_down_ps_delete_item_button
+{
+    background-image: url("../../images/ui/toolbar/delete_button_down.png");
+}
+
+html .ps_body .ps_item_toolbar .ps_button_on_mouse_down_ps_display_component_configuration_button
+{
+    background-image: url("../../images/ui/toolbar/reconfigure_down.png");
+}
+
+html .ps_body .ps_item_toolbar .ps_button_on_mouse_enter_ps_display_component_configuration_button
+{
+    background-image: url("../../images/ui/toolbar/reconfigure_hover.png");
+}
+
+html .ps_body .ps_item_toolbar .ps_button_on_mouse_down_ps_insert_markup_component_button
+{
+    background-image: url("../../images/ui/toolbar/markup_cogs_down.png");
+}
+
+html .ps_body .ps_item_toolbar .ps_button_on_mouse_enter_ps_insert_markup_component_button
+{
+    background-image: url("../../images/ui/toolbar/markup_cogs_hover.png");
+}
+
+/* Cell Tab */
+
+html .ps_body .ps_cell_toolbar .ps_button_on_mouse_enter_ps_cell_properties_button
+{
+    background-image: url("../../images/ui/toolbar/cell_props_hover.png");
+}
+
+html .ps_body .ps_cell_toolbar .ps_button_on_mouse_down_ps_ps_cell_properties_button
+{
+    background-image: url("../../images/ui/toolbar/cell_props_down.png");
+}
+
+html .ps_body .ps_cell_toolbar .ps_button_on_mouse_enter_ps_select_component
+{
+    background-image: url("../../images/ui/toolbar/id_card_add_hover.png");
+}
+
+html .ps_body .ps_cell_toolbar .ps_button_on_mouse_down_ps_ps_select_component
+{
+    background-image: url("../../images/ui/toolbar/id_card_add_down.png");
+}
+
+html .ps_body .ps_cell_toolbar .ps_button_on_mouse_enter_ps_cell_delete_button
+{
+    background-image: url("../../images/ui/toolbar/delete_cell_button_hover.png");
+}
+
+html .ps_body .ps_cell_toolbar .ps_button_on_mouse_down_ps_ps_cell_delete_button
+{
+    background-image: url("../../images/ui/toolbar/delete_cell_button_down.png");
+}

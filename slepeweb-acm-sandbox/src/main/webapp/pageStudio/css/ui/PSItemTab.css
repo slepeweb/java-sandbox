@@ -1,0 +1,42 @@
+.ps_body .ps_item_toolbar {
+	right: -1px;
+	top: 0;
+	border-width: 0 1px 1px 1px;
+	border-bottom-left-radius: 2px; -webkit-border-bottom-left-radius: 2px; -moz-border-radius-bottomleft: 2px;
+}
+
+.ps_body .ps_item_toolbar .ps_delete_item_button {
+	background-image: url("../../images/ui/toolbar/delete_button.png");
+}
+
+.ps_body .ps_item_toolbar .ps_delete_item_button.ps_button_on_mouse_over {
+	background-image: url("../../images/ui/toolbar/delete_button_hover.png");
+}
+
+.ps_body .ps_item_toolbar .ps_delete_item_button.ps_button_on_mouse_down {
+	background-image: url("../../images/ui/toolbar/delete_button_down.png");
+}
+
+.ps_body .ps_item_toolbar .ps_display_component_configuration_button {
+	background-image: url("../../images/ui/toolbar/reconfigure.png");
+}
+
+.ps_body .ps_item_toolbar .ps_display_component_configuration_button.ps_button_on_mouse_over {
+	background-image: url("../../images/ui/toolbar/reconfigure_hover.png");
+}
+
+.ps_body .ps_item_toolbar .ps_display_component_configuration_button.ps_button_on_mouse_down {
+	background-image: url("../../images/ui/toolbar/reconfigure_down.png");
+}
+
+.ps_body .ps_item_toolbar .ps_insert_markup_component_button {
+	background-image: url("../../images/ui/toolbar/markup_cogs.png");
+}
+
+.ps_body .ps_item_toolbar .ps_insert_markup_component_button.ps_button_on_mouse_over.ps_button_on_mouse_down {
+	background-image: url("../../images/ui/toolbar/markup_cogs_down.png");
+}
+
+.ps_body .ps_item_toolbar .ps_insert_markup_component_button.ps_button_on_mouse_over {
+	background-image: url("../../images/ui/toolbar/markup_cogs_hover.png");
+}

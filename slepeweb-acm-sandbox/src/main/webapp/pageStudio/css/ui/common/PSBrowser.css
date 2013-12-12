@@ -1,0 +1,29 @@
+#ps_ui_container .ps_browser {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 1px;
+	bottom: 0;
+	overflow: hidden;
+}
+
+#ps_ui_container .ps_browser .ps_browser_list {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 30px;
+	bottom: 0;
+	overflow-y: scroll;
+	border-top: 1px solid #849DBD;
+	background: #fff;
+}
+
+#ps_ui_container .ps_browser .ps_browser_item {
+	color: black;
+}
+
+#ps_ui_container .ps_browser_item .ps_browser_item_button, .ps_browser_item.ps_drag_wrapper .ps_browser_item_button {
+	position: absolute;
+	background-image: url("../../../images/ui/small_add.png");
+	background-position: center center; background-repeat: no-repeat;
+}

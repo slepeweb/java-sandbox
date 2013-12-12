@@ -16,7 +16,7 @@ public class GenericController {
 	@Autowired
 	HelloWorldService helloWorldService;
 	
-	@RequestMapping(value = "/generic")
+	@RequestMapping(value = "/page")
 	public ModelAndView doGeneric(@AcmObjectAnno Object obj) {
 		ModelAndView modelAndView = new ModelAndView("generic.page");
 		modelAndView.addObject( RequestAttribute.GENERIC_LIST, this.helloWorldService.getLevelOneItems( ( AcmObject ) obj ) );

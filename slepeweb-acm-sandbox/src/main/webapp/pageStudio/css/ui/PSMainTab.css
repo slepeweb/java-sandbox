@@ -1,0 +1,44 @@
+.ps_body .ps_area_toolbar {
+	right: -1px;
+	top: -26px;
+	border-width: 1px 1px 0 1px;
+	border-radius: 2px 2px 0 0; -webkit-border-top-right-radius: 2px; -webkit-border-top-left-radius: 2px; -moz-border-radius: 2px 2px 0 0;
+	z-index: -1;
+	position: absolute;
+}
+
+.ps_body .ps_area_toolbar .ps_select_component {
+	background-image: url("../../images/ui/toolbar/id_card_add.png");
+}
+
+.ps_body .ps_area_toolbar .ps_select_component.ps_button_on_mouse_over {
+	background-image: url("../../images/ui/toolbar/id_card_add_hover.png");
+}
+
+.ps_body .ps_area_toolbar .ps_select_component.ps_button_on_mouse_down {
+	background-image: url("../../images/ui/toolbar/id_card_add_down.png");
+}
+
+.ps_body .ps_area_toolbar .ps_change_layout {
+	background-image: url("../../images/ui/toolbar/table_new.png");
+}
+
+.ps_body .ps_area_toolbar .ps_change_layout.ps_button_on_mouse_over {
+	background-image: url("../../images/ui/toolbar/table_new_hover.png");
+}
+
+.ps_body .ps_area_toolbar .ps_change_layout.ps_button_on_mouse_down {
+	background-image: url("../../images/ui/toolbar/table_new_down.png");
+}
+
+.ps_body .ps_area_toolbar .ps_save_master_layout {
+	background-image: url("../../images/ui/toolbar/save_master.png");
+}
+
+.ps_body .ps_area_toolbar .ps_save_master_layout.ps_button_on_mouse_over {
+	background-image: url("../../images/ui/toolbar/save_master_hover.png");
+}
+
+.ps_body .ps_area_toolbar .ps_save_master_layout.ps_button_on_mouse_down {
+	background-image: url("../../images/ui/toolbar/save_master_down.png");
+}

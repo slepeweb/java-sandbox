@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+
+<digester-rules>
+
+	<pattern value="ps-component">
+
+		<!-- 
+			All custom components should be registered within this rules file.
+			
+			Each custom component definition should include a pattern match for
+			the element that defines the custom component. 
+			This element should identify the processing rules used to handle an
+			instance of this custom component and has to include:
+				- An <object-create-rule> which creates an IPageStudioComponent implementing
+				class to include at least the values for name and description.
+	
+			e.g a basic component is defined in a .psc file as follows:
+				<ps-component id="b1" >
+					<basic>
+					..
+					.. [ rules for processing a basic component ]
+										..
+					</basic>
+				</ps-component>
+				
+				a custom component would be identified in a .psc files
+				<ps-component id="cc2" >
+					<custom1>
+					..
+					.. [ rules for processing a custom1 component ]
+					..
+					</custom1>
+				</ps-component>
+
+		-->
+			
+		<!-- The basic component -->
+		<pattern value="basic">
+		  <object-create-rule classname="com.mediasurface.pagestudio.components.BaseComponent" />
+			<call-method-rule pattern="name" methodname="setName"
+		                paramcount="0" paramtypes="java.lang.String"/>
+			<call-method-rule pattern="description" methodname="setDescription"
+		                paramcount="0" paramtypes="java.lang.String"/>	
+			<call-method-rule pattern="location" methodname="setLocation"
+		                paramcount="0" paramtypes="java.lang.String"/>	
+			<set-next-rule methodname="setComponent" />
+		</pattern>
+
+		<!-- The Item Field component (non-markup field) -->
+		<pattern value="itemField">
+		  <object-create-rule classname="com.mediasurface.pagestudio.components.BaseComponent" />
+			<call-method-rule pattern="fieldName" methodname="setName"
+		                paramcount="0" paramtypes="java.lang.String"/>
+			<call-method-rule pattern="displayName" methodname="setDescription"
+		                paramcount="0" paramtypes="java.lang.String"/>	
+			<call-method-rule pattern="location" methodname="setLocation"
+		                paramcount="0" paramtypes="java.lang.String"/>	
+			<set-next-rule methodname="setComponent" />
+		</pattern>
+
+		<!-- The configurable component (contains a configuration form 
+					for setting component instance values) -->
+		<pattern value="configurable">
+		  <object-create-rule classname="com.mediasurface.pagestudio.components.ConfigurableComponent" />
+			<call-method-rule pattern="name" methodname="setName"
+		                paramcount="0" paramtypes="java.lang.String"/>
+			<call-method-rule pattern="description" methodname="setDescription"
+		                paramcount="0" paramtypes="java.lang.String"/>	
+			<call-method-rule pattern="location" methodname="setLocation"
+		                paramcount="0" paramtypes="java.lang.String"/>
+		  <call-method-rule pattern="configurator" methodname="setConfigurator"
+		                paramcount="0" paramtypes="java.lang.String"/>
+			<pattern value="properties/property">
+		  		<object-create-rule classname="com.mediasurface.pagestudio.components.ComponentProperty" />
+					<set-properties-rule>
+      			<alias attr-name="name" prop-name="name" />
+   				</set-properties-rule>     
+					<set-properties-rule>
+      			<alias attr-name="type" prop-name="type" />
+   				</set-properties-rule>     
+					<set-properties-rule>
+      			<alias attr-name="value" prop-name="value" />
+   				</set-properties-rule>     
+					<set-properties-rule>
+      			<alias attr-name="range" prop-name="range" />
+   				</set-properties-rule>     
+					<set-properties-rule>
+      			<alias attr-name="defaultValue" prop-name="defaultValue" />
+   				</set-properties-rule>     
+					<set-properties-rule>
+      			<alias attr-name="scope" prop-name="scope" />
+   				</set-properties-rule>
+					<set-properties-rule>
+      			<alias attr-name="mandatory" prop-name="mandatory" />
+   				</set-properties-rule>   				  
+					<set-properties-rule>
+      			<alias attr-name="size" prop-name="size" />
+   				</set-properties-rule>   				  
+   				<set-next-rule methodname="setProperty" />     
+		  </pattern>                       	
+			<set-next-rule methodname="setComponent" />
+		</pattern>
+
+		<!-- Insert custom components below -->
+
+	</pattern>
+
+</digester-rules>

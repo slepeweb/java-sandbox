@@ -10,21 +10,8 @@ import org.springframework.web.context.request.RequestAttributes;
 import com.slepeweb.sandbox.acm.constants.RequestAttribute;
 import com.slepeweb.sandbox.acm.mvc.annotation.AcmObjectAnno;
 
-
-/**
- * Obtain Security Credentials specified by the main CMS Servlet,
- * and required in order to pull data out of the CMS.
- * 
- * If using a Stub system, or an alternative CMS for development,
- * a different AcmObjectArgumentResolver implementation may be 
- * specified in spring-servlet.xml if required.
- * 
- * @author adam
- *
- */
 public class AcmObjectArgumentResolver implements WebArgumentResolver {
 
-	//@Override
 	public Object resolveArgument(MethodParameter methodParameter, NativeWebRequest webRequest) throws Exception {
 		Object paramAnn = null;
 		Annotation[] paramAnns = methodParameter.getParameterAnnotations();

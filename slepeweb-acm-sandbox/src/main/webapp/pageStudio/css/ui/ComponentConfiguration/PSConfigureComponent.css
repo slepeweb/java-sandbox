@@ -1,0 +1,154 @@
+#ps_ui_container .ps_configure_component_dialog .ps_loading {
+	background-image: url("../../../images/ui/dialog/loading.gif");
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_tool {
+	background-color: #D6DFF7;
+	overflow: auto;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form {
+	position: absolute;
+	font-family: Segoe UI, tahoma;
+	font-size: 9pt;
+	left: 0; right: 0; top: 0; bottom: 0;
+	overflow: hidden;
+	padding: 4px;
+}
+
+#ps_ui_container .ps_config_form_body .ps_invalid {
+	background-color: #FFFFE1;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form label {
+	min-width: 60px;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form textarea {
+	border: 1px solid #A5ACB2;
+	background-color: white;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form select {
+	border: 1px solid #A5ACB2;
+	background-color: white;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form_body {
+	overflow: hidden;
+	position: relative;
+	padding-bottom: 5px
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form_body.ps_loading {
+	width: 200px;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form_body iframe {
+	background: none;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form_controls {
+	text-align: right;
+	bottom: 6px;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form_controls .ps_button {
+	display: inline-block;
+	margin-left: 4px;
+	width: 50px;
+	height: 25px; line-height: 25px;
+	text-align: center;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_config_form_controls .ps_button span {
+	line-height: 25px;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_error_details {
+	margin-top: 5px;
+	cursor: pointer;
+	font-style: italic;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_error_details:hover {
+	text-decoration: underline;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_error_details.ps_error_details_text:hover {
+	text-decoration: none;
+	cursor: text;
+}
+
+#ps_ui_container .ps_form {
+	width: 350px;
+	position: relative;
+}
+
+#ps_ui_container .ps_form .ps_form_radio_group {
+	width: 220px;
+}
+
+#ps_ui_container .ps_form .ps_form_radio_group label,#ps_ui_container .ps_form .ps_form_radio_group input {
+	display: inline;
+	width: auto;
+	float: none;
+	margin-left: 2px;
+}
+
+#ps_ui_container .ps_form .ps_form_title {
+	float: left;
+	clear: both;
+	font-weight: bold;
+	margin-bottom: 6px;
+}
+
+#ps_ui_container .ps_form label {
+	display: block;
+	float: left;
+	clear: left;
+	margin: 2px;
+	width: 90px;
+	text-align: left;
+	line-height: 17px;
+}
+
+#ps_ui_container .ps_form input,#ps_ui_container .ps_form textarea,#ps_ui_container .ps_form select {
+	line-height: 17px;
+	width: 190px;
+	float: left;
+	padding: 2px;
+	margin: 2px;
+}
+
+#ps_ui_container .ps_cf_dsv_select {
+	height: 116px;
+}
+
+#ps_ui_container .ps_dialog_table td .ps_cf_move_btn {
+	width: 25px; height: 55px; display: block; text-align: center;
+}
+
+#ps_ui_container .ps_configuration_form_title {
+	font-size: 1.8em;
+	min-height: 32px;
+	line-height: 32px;
+}
+
+#ps_ui_container .ps_configuration_form_title .ps_config_icon {
+	float: left; height: 32px; margin-right: 4px;
+}
+
+#ps_ui_container .ps_configuration_form_description {
+	max-width: 400px;
+	margin: 1em 0;
+	max-width: 400px;
+}
+
+/*Item Picker*/
+#ps_ui_container .ps_item_key_field { border-collapse: collapse; width: 100%; }
+#ps_ui_container .ps_item_key_field td { border: 0; }
+#ps_ui_container .ps_dialog_table .ps_item_key_field input { padding: 0 2px; }
+#ps_ui_container .ps_item_key_field button { width: 71px; margin-left: 4px; }

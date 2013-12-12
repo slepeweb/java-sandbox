@@ -1,0 +1,233 @@
+.ps_twitter {
+	background-color: #EEE;
+	width: 100%;
+	float: left;
+}
+
+.ps_twitter_logo {
+	height: 60px;
+	width: 100%;
+	background: url('images/tweetstudio-logo.png') white no-repeat 9px 10px;
+	border-bottom: 3px solid #AAA;
+	float: left;
+	clear: both;
+}
+
+.ps_twitter_body {
+	float: left;
+	clear: both;
+	max-width: 530px;
+	width: auto !important;
+	width: 530px;
+	min-height: 100px;
+	border: 1px solid #CCC;
+	background-color: #FFF;
+	margin: 9px;
+	padding: 9px;
+}
+
+.ps_twitter h2 {
+	float: left;
+	clear: both;
+	font-size: 20px;
+	font-weight: normal;
+	line-height: 23px;
+	margin: 0 0 10px 0;
+}
+
+.ps_twitter_container {
+	float: left;
+	width: 90%; min-height: 55px;
+	border-top: 1px dashed #CCC;
+	padding: 9px 9px 0 9px;
+	font-family: Helvetica, sans-serif;
+	font-size: 14px;
+	position: relative;
+}
+
+.ps_twitter_container.reply {
+	background-color: #E3F6FC;
+}
+
+.ps_twitter_container:hover {
+	background-color: #F7F7F7
+}
+
+.ps_twitter_container .ps_twitter_controls {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	width: 24px;
+	margin-top: 5px;
+}
+
+.ps_twitter_container .ps_twitter_controls div {
+	float: left;
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+	margin: 4px;
+	display: none;
+}
+
+.ps_twitter_container:hover .ps_twitter_controls div {
+	display: block;
+}
+
+.ps_twitter_container .ps_twitter_controls .reply {
+	background: url('images/icon_reply.gif') no-repeat top left;
+}
+
+.ps_twitter_container .ps_twitter_controls .fave {
+	background: url('images/icon_star_empty.gif') no-repeat top left;
+}
+
+.ps_twitter_container .ps_twitter_controls .delete {
+	background: url('images/icon_trash.gif') no-repeat top left;
+}
+
+.ps_twitter_container.favorited .ps_twitter_controls div.loading,.ps_twitter_container .ps_twitter_controls div.loading
+	{
+	display: block;
+	background: url('images/icon_loading.gif') no-repeat top left;
+}
+
+.ps_twitter_container.favorited .ps_twitter_controls .fave {
+	display: block;
+	background: url('images/icon_star_full.gif') no-repeat top left;
+}
+
+.ps_twitter_avatar {
+	position: absolute;
+	left: 0; max-width: 48px; max-height: 48px;
+}
+
+.ps_twitter a {
+	color: #003DE8;
+	text-decoration: none;
+}
+
+.ps_twitter a:hover {
+	text-decoration: underline;
+}
+
+.ps_twitter_text {
+	font-size: 14.4px;
+	font-family: 'Lucida Grande', sans-serif;
+	margin: 0 20px 7px 48px;
+	word-break: keep-all;
+}
+
+.ps_twitter_details {
+	color: #999;
+	font-size: 11px;
+}
+
+.ps_twitter_details a {
+	color: #999;
+}
+
+.ps_twitter_form {
+	float: left;
+	clear: both;
+	width: 100%;
+	margin: 0 0 10px 0;
+}
+
+.ps_twitter_form textarea {
+	float: left;
+	clear: both;
+	width: 99%;
+}
+
+.ps_twitter_form .ps_twitter_update_btn {
+	border: 1px solid #CCCCCC;
+	color: #AAA;
+	font-size: 14px;
+	cursor: pointer;
+	padding: 4px 8px;
+	margin: 5px 0 3px 3px;
+	vertical-align: top;
+	float: right;
+	border: 0 none;
+	background: url('images/twitter_btn.png') top left no-repeat;
+	width: 115px;
+	height: 32px;
+}
+
+.ps_twitter_form .ps_twitter_update_btn.active {
+	color: #666;
+}
+
+.ps_twitter_form .ps_twitter_update_btn.active.hover,.ps_twitter_form .ps_twitter_update_btn.active:hover
+	{
+	color: #444;
+	background: url('images/twitter_btn_over.png');
+}
+
+.ps_twitter_header {
+	width: 100%;
+	position: relative;
+}
+
+.ps_twitter_char_count {
+	position: absolute;
+	top: 0;
+	right: 0;
+	font-family: Georgia;
+	color: #CCCCCC;
+	font-size: 29.4px;
+	text-align: right;
+	font-weight: bold;
+	line-height: 29.4px;
+	vertical-align: middle;
+}
+
+.ps_twitter_char_count.below_20 {
+	color: #5C0002;
+}
+
+.ps_twitter_char_count.below_10 {
+	color: #D40D12;
+}
+
+.ps_twitter_nav {
+	position: relative;
+	float: left; clear: both;
+	width: 100%;
+	max-width: 530px;
+	min-height: 30px;
+}
+
+.ps_twitter_nav a {
+	display: none;
+}
+
+.ps_twitter_nav a.ps_twitter_prev {
+	position: absolute;
+	top: 0; left: 0;
+}
+
+.ps_twitter_nav a.ps_twitter_next {
+	position: absolute;
+	top: 0; right: 0;
+}
+
+div.ps_twitter_notifications {
+	float: left; clear: both;
+	font-weight: bold; font-size: 14.4px;
+	text-align : center;
+	border: 1px solid #00BB00;
+	background-color: #AAFFAA;
+	height: 26px; line-height: 26px;
+	width: 99%;
+	margin-bottom: 10px;
+	display: none;
+	cursor: pointer;
+}
+
+div.ps_twitter_notifications.ps_error {
+	border-color: #BB0000;
+	background-color: #FFAAAA;
+}

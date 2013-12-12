@@ -25,7 +25,9 @@ public class AuthenticationGuard
     {
     	// By-pass requests for .wsdl
     	// Probably better to specify path /wsdl/ as a bypass stem, but hey!
-    	if ( req.getRequestURI().endsWith( ".wsdl" ) || req.getRequestURI().endsWith( ".xsd" ) || req.getRequestURI().startsWith( "/static/" ) || req.getRequestURI().startsWith( "/lofi/" ))
+    	if ( req.getRequestURI().endsWith( ".wsdl" ) || 
+    			req.getRequestURI().endsWith( ".xsd" ) || 
+    			req.getRequestURI().endsWith( ".dtd" ) )
     	{
     		return false;
     	}

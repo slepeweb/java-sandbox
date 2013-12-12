@@ -1,0 +1,125 @@
+#ps_ui_container .ps_insert_markup_component {
+	height: 348px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_controls {
+	position:absolute; bottom: 0; right: 12px; left: 0; height: 29px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_native_button {
+	float: right;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_filter_form {
+	position: absolute; top: 2px; left: 5px; width: 320px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_filter_form .ps_filter_input {
+	width: 304px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view {
+    width: 320px; background-color: white; font-family: Segoe UI, tahoma; font-size: 9pt;
+    position: absolute; top: 33px; bottom: 2px; border: 1px solid #849DBD;
+    margin: 0 5px; overflow: auto;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view_table {
+    border-collapse: collapse; width: 100%;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view tr {
+	width: 320px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view th {
+	width: 120px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view td {
+	padding: 5px; width: 120px; vertical-align: middle;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view td:nth-child(2) {
+	width: 154px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view th:first-child {
+	width: 200px;
+	border: none;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view thead {
+    background-color: #E8F0FA;
+    border-bottom: 1px solid #849DBD;
+    color: #1E395B;
+    background: -webkit-gradient(linear, left top, left bottom, from(#EFF5FB), to(#E1ECFA));
+    background: -moz-linear-gradient(top, #EFF5FB, #E1ECFA);
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view thead tr {
+	height: 20px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view tbody {
+	overflow: auto;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view th {
+    border-left: 1px solid #849DBD; line-height: 20px;
+    padding: 0 5px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view .ps_list_view_item_icon {
+	max-width: 16px; max-height: 16px; vertical-align: center;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view .ps_list_view_item_icon_cell {
+	width: 16px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view .ps_listViewItem_selected {
+    background-color: #A7CDF0;
+    border: dotted #000;
+    border-width: 1px 0;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset {
+	position:absolute; top: 5px; bottom: 32px; left: 333px; right: 5px;
+	padding: 5px;
+	box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset legend {
+	margin-left: 5px; font-size: 9pt;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset .ps_imc_configure_form_body {
+	position: absolute; top: 0; bottom: 14px; left: 0; right: 10px; overflow-y: auto; overflow-x: hidden;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset .ps_imc_configure_form_body {
+	position: absolute; top: 20px; left: 4px; bottom: 0; right: 4px;
+	overflow-y: auto;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset .ps_config_form_body {
+	position: absolute; top: 0; left: 0; right: 0;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset .ps_dialog_table {
+	position: absolute; left: 0; right: 0;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset .ps_dialog_table td {
+	word-wrap: break-word; max-width: 150px;
+}
+
+#ps_ui_container .ps_imc_component_description {
+	width: 100%; text-align: center;
+	font-size: 9pt;
+}
+
+#ps_ui_container .ps_imc_component_description .ps_markup_component_thumbnail {
+	max-height: 200px; max-width: 150px; border: 1px solid #9C9BB4; margin: 2px auto 8px auto; display: block; 
+}

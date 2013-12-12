@@ -1,0 +1,130 @@
+#ps_ui_container .ps_dialog_cell_properties {
+	height: 394px;
+}
+
+#ps_ui_container .ps_dialog_cell_properties .ps_dialog_body {
+	overflow: auto;
+}
+
+#ps_ui_container .ps_dialog_cell_properties form {
+	margin: 4px;
+}
+
+#ps_ui_container .ps_cell_properties_description {
+	margin: 5px;
+	padding: 3px 2px 2px 25px;
+	background-image: url("../../images/ui/toolbar/cell_props.png");
+	background-repeat: no-repeat;
+	background-position: top left;
+	min-height: 22px;
+}
+
+#ps_ui_container .ps_dialog_cell_properties .cell_properties_value {
+	height: 20px;
+	padding: 0 3px;
+	width: 100%;
+}
+
+#ps_ui_container .ps_dialog_cell_properties select {
+	height: 20px;
+	width: 100%;
+	font-size: 1em
+}
+
+#ps_ui_container .ps_dialog_cell_properties input {
+	font-size: 1em
+}
+
+#ps_ui_container .ps_dialog_cell_properties .ps_tool_wrapper fieldset {
+	margin: 4px;
+	padding: 2px;
+}
+
+#ps_ui_container .ps_dialog_cell_properties .ps_tool_wrapper fieldset .cell_id_button {
+	width: 60px;
+	font-size: 1em;
+}
+
+#ps_ui_container .ps_dialog_cell_properties .ps_tool_wrapper legend {
+	margin-left: 4px;
+}
+
+#ps_ui_container .ps_dialog_cell_properties .ps_preview_styles_option_container {
+	float: left;
+	clear: both;
+	width: 100%;
+	margin: 0 2px;
+}
+
+#ps_ui_container .ps_dialog_cell_properties .ps_preview_styles_option_container label {
+	margin: 2px;
+}
+
+#ps_ui_container .ps_dialog_cell_properties .ps_preview_styles_option_container input {
+	position: relative;
+	top: -2px;
+}
+
+#ps_ui_container .cell_class_fieldset select {
+	float: left;
+	height: 120px;
+	width: 100%;
+	background: white;
+}
+
+#ps_ui_container .cell_class_fieldset select option {
+	width: 100%;
+}
+
+#ps_ui_container fieldset form {
+	display: block;
+	float: left;
+	clear: both;
+}
+
+#ps_ui_container .classes_buttons_container {
+	display: block;
+	float: left;
+	width: 40px;
+	margin-top: 28px;
+}
+
+#ps_ui_container .classes_buttons_container button {
+	float: left;
+	margin: 8px 6px;
+	padding: 4px 5px;
+}
+
+#ps_ui_container .cell_class_fieldset .style_list_container {
+	float: left;
+	margin: 0 4px 2px 4px;
+	width: 138px;
+}
+
+#ps_ui_container .cell_class_fieldset .list_label {
+	text-align: center;
+	display: block;
+	padding-bottom: 2px;
+}
+
+#ps_ui_container .cell_class_fieldset .style_list {
+	float: left;
+	clear: both;
+}
+
+#ps_ui_container .cell_class_fieldset .ps_custom_styles_container {
+	float: left;
+	clear: both;
+	width: 100%;
+	margin: 0 2px;
+}
+
+#ps_ui_container .cell_class_fieldset .ps_custom_styles_container input {
+	width: 136px;
+	margin: 0 2px;
+}
+
+#ps_ui_container .cell_class_fieldset .ps_custom_styles_container button {
+	width: 60px;
+	font-size: 1em;
+}

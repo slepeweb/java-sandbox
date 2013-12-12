@@ -1,0 +1,130 @@
+#ps_ui_container .ps_dialog_cell_properties {
+	height: 398px;
+}
+
+#ps_ui_container .classes_buttons_container button {
+	padding: 4px;
+}
+
+#ps_ui_container .ps_dialog_cell_properties select {
+	height: auto;
+}
+
+#ps_ui_container .ps_dialog_table td  {
+	position: relative;
+}
+
+#ps_ui_container .ps_dialog_table td input {
+	width: auto;
+}
+
+#ps_ui_container .ps_dialog_table table {
+	border-collapse: collapse;
+}
+
+#ps_ui_container .ps_dialog_table table select{
+	width: 100%;
+	border: none;
+}
+
+#ps_ui_container .ps_table_fieldset legend {
+	padding-bottom: 4px;
+}
+
+/* Select Component Tool */
+
+#ps_ui_container .ps_select_component_dialog .ps_category_list .ps_category_list_item .ps_button_label {
+	position: relative;
+	top: 5px;
+}
+
+/* Insert Mark-up Component Dialogue */
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset .ps_imc_configure_form_body {
+	top: 18px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view_table th {
+	background-color: #e2eefc;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view_table {
+	height: 100%; 
+	position:absolute;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view thead th {
+	top: 100px;
+	border-bottom: 1px solid #9C9BB4;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset legend {
+	margin-left: -5px;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_list_view .ps_listViewItem_selected td{
+	background-color: #cce;
+}
+
+#ps_ui_container .ps_insert_markup_component .ps_imc_configure_fieldset .ps_dialog_table input {
+	z-index:100;
+}
+
+#ps_ui_container .ps_insert_markup_component table td input {
+	width: 207px; 
+}
+
+#ps_ui_container .ps_insert_markup_component table.ps_item_key_field td input {
+	width: 145px;
+}
+
+/* Component Configuration */
+#ps_ui_container .ps_configure_component_dialog .ps_config_form_controls .ps_button {
+	display: inline;
+}
+
+#ps_ui_container .ps_configure_component_dialog .ps_dialog_table input {
+	background-color: white;
+}
+
+/* Change Layout Dialogue */
+#ps_ui_container .ps_dialog_change_layout FORM.ps_change_layout_type_select_form label {
+	min-width : 106px
+}
+
+#ps_ui_container .ps_dialog .ps_native_button {
+	width: auto !important;
+	width: 75px;
+	min-width: 75px;
+	padding: 2px 4px;
+	overflow: visible;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item.expanded .ps_button_label {
+	z-index: 10000;
+	background-color: #FFE7A2;
+	border: 1px solid #9C9BB4;
+	border-top: none;
+	padding-left: 15px;
+	padding-right: 1px;
+	background-position: 4px 50%;
+}
+
+#ps_ui_container .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item .ps_layout_thumbnail.overflow {
+	border: 1px solid #9C9BB4;
+	border-bottom: none;
+}
+
+/* Manage Layout */
+
+.ps_create_layout_form label {
+	position: relative;
+	top: 9px;
+}
+
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_add_cell_button,
+#ps_ui_container .ps_dialog_change_layout .ps_tool_create_layout .ps_remove_cell_button {
+	width: auto !important;
+	width: 28px;
+	min-width: 28px;
+}

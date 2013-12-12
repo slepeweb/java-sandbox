@@ -1,0 +1,111 @@
+#ps_ui_container .ps_image_browser .ps_browser_list {
+	bottom: 62px;
+}
+
+#ps_ui_container .ps_image_browser.ps_no_controls .ps_browser_list {
+	bottom: 35px;
+	background: #fff;
+}
+
+#ps_ui_container .ps_image_browser .ps_image_browser_item.ps_browserItem_selected {
+	border: 1px dotted #58320F;
+	background-color: #A7CDF0;
+	width: 158px; height: 129px;
+}
+
+#ps_ui_container .ps_image_browser .ps_image_browser_item.ps_browserItem_selected .ps_browser_item_button {
+	height: 19px;
+}
+
+#ps_ui_container .ps_image_browser_item, .ps_image_browser_item.ps_drag_wrapper {
+	position: relative;
+	cursor: url("../../../images/ui/cursors/openhand.cur"), auto;
+	background: #fff;
+	height: 130px;
+}
+
+#ps_ui_container .ps_image_browser .ps_image_browser_item {
+	height: 131px;
+} 
+
+#ps_ui_container .ps_image_browser .ps_image_browser_item, .ps_image_browser_item.ps_drag_wrapper {
+	width: 160px;
+}
+
+#ps_ui_container .ps_image_browser .ps_image_browser_item {
+	margin-top: 2px; margin-left: 2px;
+	float: left;
+}
+
+#ps_ui_container .ps_image_browser_image_container,
+ .ps_image_browser_item.ps_drag_wrapper .ps_image_browser_image_container {
+	position: absolute;
+	top: 0px; bottom: 16px;
+	left: 2px; right: 2px;
+	text-align: center;
+	line-height: 115px;
+}
+
+#ps_ui_container .ps_image_browser_image_container img,
+ .ps_image_browser_item.ps_drag_wrapper .ps_image_browser_image_container img {
+	max-height: 100px;
+	max-width: 150px;
+	vertical-align: middle;
+	border: 1px solid black;
+}
+
+#ps_ui_container .ps_image_browser_control {
+	position: absolute;
+	right: 2px; bottom: 2px;
+	height: 25px;
+}
+
+#ps_ui_container .ps_image_browser .ps_add_image_info {
+	position: absolute; height: 30px; bottom: 27px; left: 0; right: 0;
+	border: solid #849DBD; border-width: 1px 0;
+	padding: 2px;
+}
+
+#ps_ui_container .ps_image_browser .ps_add_image_info .ps_instructions {
+	background-image: url("../../../images/ui/info.png");
+	background-position: -1px -1px;
+	background-repeat: no-repeat;
+	padding-left: 32px;
+	min-height: 32px;
+}
+
+#ps_ui_container .ps_image_browser.ps_no_controls .ps_add_image_info {
+	bottom: 0; border-bottom-width: 0;
+}
+
+#ps_ui_container .ps_image_browser .ps_add_image_info strong:after {
+	content: ":";
+}
+
+#ps_ui_container .ps_image_browser .ps_add_image_info .ps_info_span {
+	margin: 0 5px; float: left;
+}
+
+#ps_ui_container .ps_image_browser .ps_add_image_info strong {
+	font-weight: bold; margin-right: 4px;
+}
+
+#ps_ui_container .ps_image_browser .ps_add_image_info img {
+	height: 26px; max-width: 50px; float: left; margin: 2px;
+}
+
+#ps_ui_container .ps_image_browser .ps_image_browser_item .ps_browser_item_button {
+	bottom: 0; left: 0; right: 0;
+	height: 20px; width: 100%;
+	text-align: center; line-height: 20px; font-weight: normal;
+	background-image: none;
+}
+
+.ps_image_browser_item.ps_drag_wrapper .ps_browser_item_button {
+	display: none;
+}
+
+#ps_ui_container .ps_image_browser .ps_image_browser_item .ps_browser_item_button.ps_button_on_mouse_over {
+	background-color: #FFE7A2;
+}
+

@@ -1,0 +1,55 @@
+.ps_body {
+	float: left !important;
+	float: none;
+	padding: 0;
+	width: 100%;
+	position: relative;
+	z-index: 1;
+}
+
+.ps_body .overLeftCol {
+	float: left;
+	width: 49%;
+}
+
+.ps_body .overRightCol {
+	float: left;
+	width: 50%;
+}
+
+.ps_body .overRow {
+	float: left;
+	width: 100%;
+}
+
+.ps_body .ps_field, .ps_body .ps_component {
+	background: none;
+	float: left;
+	width: 100%;
+}
+
+.ps_body .overContainer, .ps_body .overSplitContainer, .ps_body .ps_cell, #ps_ui_container .ps_thumbnail_cell {
+	float: left; word-wrap: break-word;
+	position: relative;
+	width: 100%;
+	z-index: 0;
+}
+
+.ps_body .ps_cell_item {
+	position: relative;
+	float: left;
+	width: 100%;
+	padding: 1px 0;
+}
+
+.ps_body .ps_cell_item, .ps_body .ps_cell_item span {
+	float: left;
+}
+
+.ps_body .ps_cell img {
+	max-width: 100%;
+}
+
+.ps_markup_component {
+	display: none;
+}

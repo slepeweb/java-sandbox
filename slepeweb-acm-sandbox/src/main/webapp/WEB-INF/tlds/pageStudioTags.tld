@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+    version="2.1">
+    
+	<tlib-version>1.0</tlib-version>
+  	<short-name>ps</short-name>
+  	<uri>pageStudioTags</uri>
+  	<tag>
+    	<name>init</name>
+    	<tag-class>com.mediasurface.pagestudio.taglib.InitTag</tag-class>
+    	<body-content>JSP</body-content>
+  	</tag>
+  
+	<tag>
+		<name>area</name>
+		<tag-class>com.mediasurface.pagestudio.taglib.AreaTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>id</name>
+	    	<required>false</required>
+	    	<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>original</name>
+	    	<required>false</required>
+	    	<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+  
+	<tag>
+    	<name>component</name>
+    	<tag-class>com.mediasurface.pagestudio.taglib.ComponentTag</tag-class>
+		<tei-class>com.mediasurface.pagestudio.taglib.ComponentTagTEI</tei-class>
+    	<body-content>JSP</body-content> 
+	</tag>
+	
+	<tag>
+    	<name>tcomponent</name>
+    	<tag-class>com.mediasurface.pagestudio.taglib.TemplateComponentTag</tag-class>
+    	<body-content>JSP</body-content> 
+    	<attribute>
+		    <name>cid</name>
+		    <required>true</required>
+		    <rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	  	<attribute>
+		    <name>cinst</name>
+		    <required>true</required>
+		    <rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	</tag>
+	
+	<tag>
+    	<name>tparam</name>
+    	<tag-class>com.mediasurface.pagestudio.taglib.ParamTag</tag-class>
+    	<body-content>JSP</body-content>
+    	<attribute>
+		    <name>name</name>
+		    <required>true</required>
+		    <rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	  	<attribute>
+		    <name>value</name>
+		    <required>true</required>
+		    <rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	</tag>  
+  	
+  	<tag>
+    	<name>markup</name>
+    	<tag-class>com.mediasurface.pagestudio.taglib.PageStudioMarkupTag</tag-class>
+    	<body-content>JSP</body-content>
+    	<attribute>
+		    <name>name</name>
+		    <required>true</required>
+		    <rtexprvalue>true</rtexprvalue>
+	  	</attribute>
+	</tag>
+  	
+	<tag>
+    	<name>overlay</name>
+		<tag-class>com.mediasurface.pagestudio.taglib.OverlayTag</tag-class>
+		<body-content>JSP</body-content>
+	</tag>
+	
+	<tag>
+		<name>selectItem</name>
+		<tag-class>com.mediasurface.pagestudio.taglib.SelectItemTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>callback</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>cid</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>label</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
+		<name>externalScriptHelper</name>
+		<tag-class>com.mediasurface.pagestudio.taglib.ExternalScriptHelper</tag-class>
+		<body-content>JSP</body-content>
+	</tag>
+  
+</taglib>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

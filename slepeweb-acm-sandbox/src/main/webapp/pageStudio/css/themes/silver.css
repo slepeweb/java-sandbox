@@ -1,0 +1,140 @@
+#ps_ui_container.ps_theme_silver .ps_dialog,.ps_drag_wrapper,
+#ps_ui_container.ps_theme_silver .ps_dialog.ps_dialog_focused .ps_dialog_handle,
+#ps_ui_container.ps_theme_silver .ps_dialog.ps_dialog_focused .ps_dialog_handle,
+#ps_ui_container.ps_theme_silver .ps_dialog legend {
+  color: #3B3B3B;
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog .ps_dialog_body {
+  background: #FCFCFC;
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog .ps_dialog_body,
+#ps_ui_container.ps_theme_silver .ps_dialog .ps_dialog_handle {
+  border-color: #868B91;
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog.ps_dialog_focused .ps_dialog_body,
+#ps_ui_container.ps_theme_silver .ps_dialog.ps_dialog_focused .ps_dialog_handle
+{
+  border-color: #656D75;
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog .ps_dialog_handle {
+  background-color: #FCFCFC;
+  color: #8A8A8A;
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog_focused .ps_dialog_handle,
+#ps_ui_container.ps_theme_silver .ps_dialog.ps_dialog_focused .ps_dialog_body,
+#ps_ui_container.ps_theme_silver .ps_dialog .ps_dialog_body .ps_tool,
+#ps_ui_container.ps_theme_silver .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item .ps_layout_thumbnail .ps_thumbnail_cell,
+#ps_ui_container.ps_theme_silver .ps_dialog_change_layout .ps_tool_create_layout .ps_layout_preview .ps_cell,
+#ps_ui_container.ps_theme_silver .scroll_button
+{
+  background-color: #E3E6E8;
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog_focused .ps_dialog_handle {
+  background: -webkit-gradient(linear, left top, left bottom, from(#EBEDF0), to(#E3E6E8));
+  background: -moz-linear-gradient(top, #EBEDF0, #E3E6E8);
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog .ps_dialog_body .ps_tool {
+  background: -webkit-gradient(linear, left top, left bottom, from(#E9EDF1), to(#DADEE3));
+  background: -moz-linear-gradient(top, #E9EDF1, #DADEE3);
+  border-color: #838383;
+  border-top-color: #8B9097;
+}
+
+.ps_body.ps_theme_silver .ps_toolbar {
+  background-color: #FDFDFD;
+  background-image: url("../../../images/ui/toolbar/black/toolbar_background.png");
+  background: -webkit-gradient(linear, left top, left bottom, from(#FFF), to(#E5E9EE));
+  background: -moz-linear-gradient(top, #FFF, #E5E9EE);
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog fieldset {
+  border-color: #C3C3C3;
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog_table,
+#ps_ui_container.ps_theme_silver .ps_dialog_table td,
+#ps_ui_container.ps_theme_silver .change_layout_list_container,
+#ps_ui_container.ps_theme_silver .ps_dialog_table th,
+#ps_ui_container.ps_theme_silver .ps_insert_markup_component .ps_list_view,
+#ps_ui_container.ps_theme_silver .ps_insert_markup_component .ps_list_view th,
+#ps_ui_container.ps_theme_silver .ps_select_component_dialog .ps_component_list,
+#ps_ui_container.ps_theme_silver .ps_dialog .ps_input,
+#ps_ui_container.ps_theme_silver .ps_component_browser .ps_browser_item,
+#ps_ui_container.ps_theme_silver .ps_image_browser .ps_add_image_info,
+#ps_ui_container.ps_theme_silver .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item,
+#ps_ui_container.ps_theme_silver .ps_dialog_change_layout .change_layout_list_container .ps_layout_list_item .ps_layout_thumbnail .ps_thumbnail_cell,
+#ps_ui_container.ps_theme_silver .ps_dialog_change_layout .ps_tool_create_layout .ps_layout_preview .ps_cell,
+#ps_ui_container.ps_theme_silver .scroll_button
+{
+  border-color: #C6CACD;
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog_table th {
+  color: #3B3B3B;
+}
+
+#ps_ui_container.ps_theme_silver .ps_dialog_table thead tr,
+#ps_ui_container.ps_theme_silver .ps_insert_markup_component .ps_list_view thead
+{
+  background-color: #F1F4F7;
+  border-bottom-color: #C6CACD;
+  color: #3B3B3B;
+  background: -webkit-gradient(linear, left top, left bottom, from(#F5F7F9), to(#DFDFDF));
+  background: -moz-linear-gradient(top, #F5F7F9, #DFDFDF);
+}
+
+#ps_ui_container.ps_theme_silver .ps_select_component_dialog .ps_component_list {
+  -webkit-box-shadow: #CCC 0px 0px 8px;
+}
+
+#ps_ui_container.ps_theme_silver .ps_browser .ps_browser_list {
+  border-top-color: #C6CACD;
+}
+
+#ps_ui_container.ps_theme_silver .ps_browserItem_on_mouse_over {
+  box-shadow: inset 0 0 8px rgba(66,66,66, 0.25);
+  -moz-box-shadow: inset 0 0 8px rgba(66,66,66, 0.25);
+  -webkit-box-shadow: inset 0 0 8px rgba(66,66,66, 0.25);
+}
+
+.ps_reset.ps_tool_tip.ps_theme_silver {
+  background-color: #E4E4F0;
+  background: -webkit-gradient(linear, left top, left bottom, from(#FFF), to(#E4E4F0));
+  background: -moz-linear-gradient(top, #FFF, #E4E4F0);
+  border-color: #767676;
+  color: #4C4C4C;
+}
+
+#ps_ui_container.ps_theme_silver .ps_select_component_dialog .ps_category_list .ps_category_list_item.ps_button_selected,
+#ps_ui_container.ps_theme_silver .ps_select_component_dialog .ps_category_list .ps_category_list_item.ps_button_on_mouse_over {
+  border-color: #A1A9B3;
+}
+
+#ps_ui_container.ps_theme_silver .ps_select_component_dialog .ps_category_list .ps_category_list_item.ps_button_on_mouse_over {
+  background-image: url("../../images/ui/themes/silver/category_list_item_hover_background.png");
+}
+
+#ps_ui_container.ps_theme_silver .ps_select_component_dialog .ps_category_list .ps_button_selected {
+  background-image: url("../../images/ui/themes/silver/category_list_item_selected_background.png");
+}
+
+#ps_ui_container.ps_theme_silver .scroll_button_hover,
+#ps_ui_container.ps_theme_silver .ps_dialog_change_layout .ps_tool_create_layout .ps_layout_preview .ps_cell.ps_selected {
+  background-color: #FFE69E;
+  border-color: #9C9BB4;
+}
+
+#ps_ui_container.ps_theme_silver .scroll_button_top { 
+  background-image: url("../../images/ui/themes/silver/small_arrow_up.gif");
+}
+
+#ps_ui_container.ps_theme_silver .scroll_button_bottom {
+  background-image: url("../../images/ui/themes/silver/small_arrow_down.gif");
+}

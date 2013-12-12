@@ -1,0 +1,32 @@
+<!ELEMENT ps-component (basic | itemField | configurable)  >
+<!ATTLIST ps-component inclusionType NMTOKEN "include" >
+<!ATTLIST ps-component componentType NMTOKEN "basic" >
+<!ATTLIST ps-component category CDATA "none" >
+<!ATTLIST ps-component id NMTOKEN #REQUIRED >
+<!ATTLIST ps-component template (true|false) "true" >
+<!ATTLIST ps-component markup (true|false) "false" >
+<!ATTLIST ps-component autoConfigure (true|false) "false" >
+<!ELEMENT basic ( name , description, location, template, markup ) >
+<!ELEMENT name (#PCDATA) >
+<!ELEMENT description (#PCDATA) >
+<!ELEMENT location (#PCDATA) >
+<!ELEMENT icon (#PCDATA) >
+<!ELEMENT thumbnail (#PCDATA) >
+<!ELEMENT itemField ( fieldName , displayName, location ) >
+<!ELEMENT fieldName (#PCDATA) >
+<!ELEMENT displayName (#PCDATA) >
+<!ELEMENT configurable ( name , description, location, icon?, thumbnail?, configurator?, properties ) >
+<!ATTLIST property >
+<!ELEMENT configurator (#PCDATA) >
+<!ELEMENT properties (property+) >
+<!ELEMENT property EMPTY>
+<!ATTLIST property name CDATA #REQUIRED >
+<!ATTLIST property type CDATA #REQUIRED >
+<!ATTLIST property defaultValue CDATA #IMPLIED>
+<!ATTLIST property value CDATA "none">
+<!ATTLIST property scope CDATA "request" >
+<!ATTLIST property range CDATA #IMPLIED>
+<!ATTLIST property size CDATA "0">
+<!ATTLIST property mandatory CDATA "false" >
+<!ATTLIST property encrypted CDATA "false" >
+<!ATTLIST property accept CDATA #IMPLIED >

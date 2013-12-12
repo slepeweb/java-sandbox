@@ -1,0 +1,45 @@
+.ps_body .ps_cell_toolbar {
+	left: -1px;
+	right: auto;
+	top: -27px;
+	border-width: 1px 1px 0 1px;
+	border-radius: 2px 2px 0 0; -webkit-border-top-right-radius: 2px; -webkit-border-top-left-radius: 2px; -moz-border-radius: 2px 2px 0 0;
+	z-index: 10000;
+	min-width: 96px;
+}
+
+.ps_body .ps_cell_toolbar .ps_cell_properties_button {
+	background-image: url("../../images/ui/toolbar/cell_props.png");
+}
+
+.ps_body .ps_cell_toolbar .ps_cell_properties_button.ps_button_on_mouse_over {
+	background-image: url("../../images/ui/toolbar/cell_props_hover.png");
+}
+
+.ps_body .ps_cell_toolbar .ps_cell_properties_button.ps_button_on_mouse_down {
+	background-image: url("../../images/ui/toolbar/cell_props_down.png");
+}
+
+.ps_body .ps_cell_toolbar .ps_select_component {
+	background-image: url("../../images/ui/toolbar/id_card_add.png");
+}
+
+.ps_body .ps_cell_toolbar .ps_select_component.ps_button_on_mouse_over {
+	background-image: url("../../images/ui/toolbar/id_card_add_hover.png");
+}
+
+.ps_body .ps_cell_toolbar .ps_select_component.ps_button_on_mouse_down {
+	background-image: url("../../images/ui/toolbar/id_card_add_down.png");
+}
+
+.ps_body .ps_cell_toolbar .ps_cell_delete_button {
+	background-image: url("../../images/ui/toolbar/delete_button.png");
+}
+
+.ps_body .ps_cell_toolbar .ps_cell_delete_button.ps_button_on_mouse_over {
+	background-image: url("../../images/ui/toolbar/delete_button_hover.png");
+}
+
+.ps_body .ps_cell_toolbar .ps_cell_delete_button.ps_button_on_mouse_down {
+	background-image: url("../../images/ui/toolbar/delete_button_down.png");
+}
