@@ -22,6 +22,21 @@
 			<scope>test</scope>
 		</dependency>
 
+    <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-all</artifactId>
+        <version>1.9.5</version>
+        <scope>test</scope>
+    </dependency>
+    
+		<!-- For parameterised unit testing - recommended in 'Practical Unit Testing', section 3.6 -->
+		<dependency>
+		  <groupId>pl.pragmatists</groupId>
+		  <artifactId>JUnitParams</artifactId>
+		  <version>1.0.2</version>
+		  <scope>test</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
