@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<var name="order" class="com.slepeweb.sandbox.spizza.bean.Order" />
+	
+	<subflow-state id="identifyCustomer" subflow="sandbox/spizza/customer">
+		<!-- 
+			The <output> element takes the 'customer' variable returned by 
+			the subflow, and assigns it to the order.customer property.
+		 -->
+		<output name="customer" value="order.customer" />
+		<transition on="customerReady" to="buildOrder" />
+	</subflow-state>
+
+	<subflow-state id="buildOrder" subflow="sandbox/spizza/order">
+		<!-- The 'order' variable is passed as input to the subflow, where it can be updated. -->
+		<input name="order" value="order" />
+		<transition on="orderCreated" to="takePayment" />
+	</subflow-state>
+	
+	<subflow-state id="takePayment" subflow="sandbox/spizza/payment">
+		<input name="order" value="order" />
+		<transition on="paymentTaken" to="saveOrder" />
+	</subflow-state>
+	
+	<action-state id="saveOrder">
+		<evaluate expression="spizzaFlowActions.saveOrder(order)" />
+		<transition to="thankCustomer" />
+	</action-state>
+	
+	<view-state id="thankCustomer" view="spizza.thankCustomer">
+		<transition to="endState" />
+	</view-state>
+	
+	<end-state id="endState" />
+	
+	<global-transitions>
+		<transition on="cancel" to="endState" />
+	</global-transitions>
+</flow>

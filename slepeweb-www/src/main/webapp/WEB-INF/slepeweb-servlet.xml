@@ -1,9 +1,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" 
 	xmlns:cache="http://www.springframework.org/schema/cache" 
 	xmlns:p="http://www.springframework.org/schema/p" 
 	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:flow="http://www.springframework.org/schema/webflow-config"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
     	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
     	http://www.springframework.org/schema/context
@@ -13,7 +15,10 @@
     	http://www.springframework.org/schema/cache 
     	http://www.springframework.org/schema/cache/spring-cache.xsd 
 			http://www.springframework.org/schema/tx 
-			http://www.springframework.org/schema/tx/spring-tx.xsd"
+			http://www.springframework.org/schema/tx/spring-tx.xsd
+			http://www.springframework.org/schema/webflow-config
+			http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd"
+			
     default-autowire="byName">
 
 	<mvc:annotation-driven />	
@@ -84,4 +89,39 @@
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
+	
+	<!-- Webflow functionality -->
+	
+	<!-- 
+		The flowhandler mapping identifies URLs for flows, and 
+		tells the DispatcherServlet to ignores those URLs.
+		For example, a flow with id 'spizza' ia mapped to URL '/spizza'.
+	-->
+	<bean class="org.springframework.webflow.mvc.servlet.FlowHandlerMapping">
+		<property name="flowRegistry" ref="flowRegistry" />
+	</bean>
+	
+	<!-- The registry loads flow definitions -->
+	<flow:flow-registry id="flowRegistry" flow-builder-services="flowBuilderServices">
+		<flow:flow-location id="sandbox/spizza" path="/WEB-INF/flows/spizza/spizza-flow.xml" />
+		<flow:flow-location id="sandbox/spizza/customer" path="/WEB-INF/flows/spizza/identify-customer-flow.xml" />
+		<flow:flow-location id="sandbox/spizza/order" path="/WEB-INF/flows/spizza/order-flow.xml" />
+		<flow:flow-location id="sandbox/spizza/payment" path="/WEB-INF/flows/spizza/payment-flow.xml" />
+	</flow:flow-registry>
+	
+	<!-- The flow executor is responsible for managing flows -->
+	<flow:flow-executor id="flowExecutor" flow-registry="flowRegistry" />
+	
+	<!-- The flow handler adapter is effectively a controller for flow requests -->
+	<bean class="org.springframework.webflow.mvc.servlet.FlowHandlerAdapter">
+		<property name="flowExecutor" ref="flowExecutor" />
+	</bean>
+	
+	<flow:flow-builder-services id="flowBuilderServices" view-factory-creator="mvcViewFactoryCreator" />
+	
+	<bean id="mvcViewFactoryCreator" class="org.springframework.webflow.mvc.builder.MvcViewFactoryCreator">
+	    <property name="viewResolvers" ref="tilesViewResolver" />
+	</bean>
+	
+	<bean id="spizzaFlowActions" class="com.slepeweb.sandbox.spizza.SpizzaFlowActions" />
 </beans>

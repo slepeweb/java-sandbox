@@ -28,6 +28,8 @@ public class NavigationServiceImpl implements NavigationService {
 		subLinks.add(makeLink("List users", "/sandbox/user/list"));
 		subLinks.add(makeLink("Add a user", "/sandbox/user/add"));
 		
+		links.add(makeLink("Webflow", "/sandbox/spizza"));
+
 		// Identify selected links
 		for (Link topLink : links) {
 			topLink.setSelected(page.getHref().startsWith(topLink.getHref()));

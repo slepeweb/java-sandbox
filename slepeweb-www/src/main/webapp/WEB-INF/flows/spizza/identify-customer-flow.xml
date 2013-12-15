@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<var name="customer" class="com.slepeweb.sandbox.spizza.bean.Customer" />
+
+	<view-state id="welcome" view="spizza.welcome">
+		<transition on="phoneEntered" to="lookupCustomer" />
+	</view-state>
+
+	<action-state id="lookupCustomer">
+		<evaluate result="customer"
+			expression="spizzaFlowActions.lookupCustomer(requestParameters.phoneNumber)" />
+		<transition to="registrationForm" on-exception="java.lang.Exception" />
+		<transition to="customerReady" />
+	</action-state>
+
+	<view-state id="registrationForm" view="spizza.registrationForm" model="customer">
+		<on-entry>
+			<evaluate expression="customer.phoneNumber = requestParameters.phoneNumber" />
+		</on-entry>
+		<transition on="submit" to="checkDeliveryArea" />
+	</view-state>
+
+	<decision-state id="checkDeliveryArea">
+		<if test="spizzaFlowActions.checkDeliveryArea(customer.zipCode)"
+			then="addCustomer" else="deliveryWarning" />
+	</decision-state>
+
+	<view-state id="deliveryWarning" view="spizza.deliveryWarning">
+		<transition on="accept" to="addCustomer" />
+	</view-state>
+
+	<action-state id="addCustomer">
+		<evaluate expression="spizzaFlowActions.addCustomer(customer)" />
+		<transition to="customerReady" />
+	</action-state>
+
+	<end-state id="cancel" />
+
+	<end-state id="customerReady">
+		<output name="customer" />
+	</end-state>
+
+	<global-transitions>
+		<transition on="cancel" to="cancel" />
+	</global-transitions>
+</flow>
