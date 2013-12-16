@@ -22,11 +22,15 @@ import com.slepeweb.sandbox.orm.User;
 import com.slepeweb.sandbox.orm.UserDao;
 import com.slepeweb.sandbox.www.model.Page;
 import com.slepeweb.sandbox.www.service.NavigationService;
+import com.slepeweb.sandbox.www.service.PageService;
 
 @Controller
 @RequestMapping(value = "/sandbox/user")
 public class UserController extends BaseController {
 
+	@Autowired
+	private PageService pageService;
+	
 	@Autowired
 	private UserDao userDao;
 	
@@ -52,13 +56,7 @@ public class UserController extends BaseController {
 	}
 	
 	private Page getUserFormPage(User loggedInUser) {
-		Page page = new Page().
-				setHref("/sandbox/user/add").
-				setTitle("Users").
-				setView("sandbox.userForm").
-				//addRole(Role.USER_ADMIN_ROLE).
-				addStylesheet("/resources/css/slepeweb.css");
-			
+		Page page = this.pageService.getPage(PageService.USER_ADD);		
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
 		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));
 		return page;
@@ -113,13 +111,7 @@ public class UserController extends BaseController {
 
 	@RequestMapping("list")
 	public String listUsers(HttpSession session, ModelMap model) {
-		Page page = new Page().
-			setHref("/sandbox/user/list").
-			setTitle("Users").
-			setView("sandbox.userList").
-			//addRole(Role.USER_ADMIN_ROLE).
-			addStylesheet("/resources/css/slepeweb.css");
-		
+		Page page = this.pageService.getPage(PageService.USER_LIST);				
 		User loggedInUser = getLoggedInUser(session);
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
 		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));
@@ -156,13 +148,7 @@ public class UserController extends BaseController {
 	public String updateUser(HttpSession session, 
 			@PathVariable("id") Integer id, ModelMap model) {
 		
-		Page page = new Page().
-			setHref("/sandbox/user/update").
-			setTitle("Users").
-			setView("sandbox.userForm").
-			//addRole(Role.USER_ADMIN_ROLE).
-			addStylesheet("/resources/css/slepeweb.css");
-		
+		Page page = this.pageService.getPage(PageService.USER_UPDATE);				
 		User loggedInUser = getLoggedInUser(session);
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
 		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));
@@ -217,13 +203,7 @@ public class UserController extends BaseController {
 	
 	@RequestMapping(value="intro", method=RequestMethod.GET)
 	public String introPage(HttpSession session, ModelMap model) {
-		Page page = new Page().
-				setHref("/sandbox/user/intro").
-				setTitle("Users").
-				setView("sandbox.intro").
-				//addRole(Role.USER_ADMIN_ROLE).
-				addStylesheet("/resources/css/slepeweb.css");
-			
+		Page page = this.pageService.getPage(PageService.USER_INTRO);					
 		User loggedInUser = getLoggedInUser(session);
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
 		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));

@@ -123,5 +123,4 @@
 	    <property name="viewResolvers" ref="tilesViewResolver" />
 	</bean>
 	
-	<bean id="spizzaFlowActions" class="com.slepeweb.sandbox.spizza.SpizzaFlowActions" />
 </beans>

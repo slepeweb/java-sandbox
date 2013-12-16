@@ -12,7 +12,7 @@
 	</c:forEach>
 	</ul>
 	<c:if test="${fn:length(order.pizzas) == 0}">
-		<p>Nothing ordered yet - fill your boots!
+		<p>Nothing ordered yet - click on 'Create pizza', and fill your boots!
 	</c:if>
 	
 	<form:form>

@@ -9,10 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.sandbox.www.model.Page;
 import com.slepeweb.sandbox.www.service.NavigationService;
+import com.slepeweb.sandbox.www.service.PageService;
 
 @Controller
 @RequestMapping(value="/sandbox")
 public class SandboxController extends BaseController {
+	
+	@Autowired
+	private PageService pageService;
 	
 	@Autowired
 	private NavigationService navigationService;
@@ -24,13 +28,7 @@ public class SandboxController extends BaseController {
 	
 	@RequestMapping(value="platform")
 	public String doPlatform(HttpSession session, ModelMap model) {
-		Page page = new Page().
-			setHref("/sandbox/platform").
-			setTitle("Sandbox platform").
-			setView("sandbox.platform").
-			addStylesheet("/resources/css/slepeweb.css").
-			addJavascript("/resources/js/sandbox.js");
-		
+		Page page = this.pageService.getPage(PageService.SANDBOX_PLATFORM);				
 		page.setTopNavigation(getTopNavigation(page, getLoggedInUser(session)));
 		model.addAttribute("_page", page);		
 		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));		
@@ -39,13 +37,7 @@ public class SandboxController extends BaseController {
 	
 	@RequestMapping(value="ws")
 	public String doServices(HttpSession session, ModelMap model) {
-		Page page = new Page().
-			setHref("/sandbox/ws").
-			setTitle("Sandbox web services").
-			setView("sandbox.ws").
-			addStylesheet("/resources/css/slepeweb.css").
-			addJavascript("/resources/js/sandbox.js");
-		
+		Page page = this.pageService.getPage(PageService.SANDBOX_WS);						
 		page.setTopNavigation(getTopNavigation(page, getLoggedInUser(session)));
 		model.addAttribute("_page", page);			
 		page.getLeftSidebar().setNavigation(this.navigationService.getSandboxNavigation(page));

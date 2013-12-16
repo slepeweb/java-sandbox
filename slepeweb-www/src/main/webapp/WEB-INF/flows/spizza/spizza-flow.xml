@@ -5,7 +5,12 @@
 		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
 
 	<var name="order" class="com.slepeweb.sandbox.spizza.bean.Order" />
+	<var name="_page" class="com.slepeweb.sandbox.www.model.Page" />
 	
+	<on-start>
+		<evaluate expression="spizzaFlowActions.getPage()" result="conversationScope._page" />
+	</on-start>
+
 	<subflow-state id="identifyCustomer" subflow="sandbox/spizza/customer">
 		<!-- 
 			The <output> element takes the 'customer' variable returned by 

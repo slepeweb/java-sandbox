@@ -1,5 +1,6 @@
 package com.slepeweb.sandbox.www.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +9,8 @@ import com.slepeweb.sandbox.orm.Role;
 import com.slepeweb.sandbox.orm.User;
 
 
-public class Page {
+public class Page implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String href;
 	private Header header;
 	private Footer footer;

@@ -1,9 +1,11 @@
 package com.slepeweb.sandbox.www.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Link {
+public class Link implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String title, teaser, href;
 	private Image thumbnail;
 	private boolean trusted, selected;

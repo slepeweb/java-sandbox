@@ -103,6 +103,7 @@
 	</definition>	
 
 	<definition name="spizza.takePayment" extends="layout.3col">
+		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
 		<put-attribute name="body" value="/WEB-INF/jsp/spizza/takePayment.jsp"/>
 	</definition>	
 

@@ -5,8 +5,12 @@
 		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
 
 	<var name="customer" class="com.slepeweb.sandbox.spizza.bean.Customer" />
+<!-- 	<var name="_page" class="com.slepeweb.sandbox.www.model.Page" /> -->
 
 	<view-state id="welcome" view="spizza.welcome">
+<!-- 		<on-entry> -->
+<!-- 			<evaluate expression="spizzaFlowActions.getPage()" result="_page" /> -->
+<!-- 		</on-entry> -->
 		<transition on="phoneEntered" to="lookupCustomer" />
 	</view-state>
 

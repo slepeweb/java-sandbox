@@ -1,9 +1,11 @@
 package com.slepeweb.sandbox.www.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sidebar {
+public class Sidebar implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private List<Link> navigation, relatedPages;
 	private List<Component> components;
 	

@@ -1,6 +1,9 @@
 package com.slepeweb.sandbox.www.model;
 
-public class Image {
+import java.io.Serializable;
+
+public class Image implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String title, src, alt;
 	private int width, height;
 	

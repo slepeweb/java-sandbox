@@ -19,6 +19,7 @@ import com.slepeweb.sandbox.orm.UserDao;
 import com.slepeweb.sandbox.www.bean.SessionAttr;
 import com.slepeweb.sandbox.www.model.LoginForm;
 import com.slepeweb.sandbox.www.model.Page;
+import com.slepeweb.sandbox.www.service.PageService;
 import com.slepeweb.sandbox.www.service.RomeService;
 
 @Controller
@@ -26,19 +27,17 @@ public class MainController extends BaseController {
 	private static Logger LOG = Logger.getLogger(MainController.class);
 
 	@Autowired
+	private PageService pageService;
+	
+	@Autowired
 	private RomeService romeService;
 	
 	@Autowired
 	private UserDao userDao;
 	
-	@RequestMapping(value="/about")
+	@RequestMapping(value = PageService.ABOUT)
 	public String doGeneric(HttpSession session, ModelMap model) {
-		Page page = new Page().
-			setHref("/about").
-			setTitle("About").
-			setView("home").
-			addStylesheet("/resources/css/slepeweb.css");
-		
+		Page page = this.pageService.getPage(PageService.ABOUT);		
 		page.setTopNavigation(getTopNavigation(page, getLoggedInUser(session)));
 		
 		model.addAttribute("_page", page);
@@ -46,28 +45,18 @@ public class MainController extends BaseController {
 		return page.getView();
 	}
 	
-	@RequestMapping(value = "/profile")
+	@RequestMapping(value = PageService.PROFILE)
 	public String doProjects(HttpSession session, ModelMap model) {
-		Page page = new Page().
-			setHref("/profile").
-			setTitle("Profile").
-			setView("projects").
-//			addRole(Role.ADMIN).
-//			addRole(Role.AGENT).
-			addStylesheet("/resources/css/slepeweb.css");
+		Page page = this.pageService.getPage(PageService.PROFILE);		
 		
 		User loggedInUser = getLoggedInUser(session);
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
 		return checkAccessibility(page, loggedInUser, model);
 	}
 	
-	@RequestMapping(value = "/contact")
+	@RequestMapping(value = PageService.CONTACT)
 	public String doContact(HttpSession session, ModelMap model) {
-		Page page = new Page().
-			setHref("/contact").
-			setTitle("Contact us").
-			setView("contact").
-			addStylesheet("/resources/css/slepeweb.css");
+		Page page = this.pageService.getPage(PageService.CONTACT);		
 		
 		User loggedInUser = getLoggedInUser(session);
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
