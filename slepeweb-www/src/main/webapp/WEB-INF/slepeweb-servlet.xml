@@ -17,8 +17,8 @@
 			http://www.springframework.org/schema/tx 
 			http://www.springframework.org/schema/tx/spring-tx.xsd
 			http://www.springframework.org/schema/webflow-config
-			http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd"
-			
+			http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.3.xsd"
+
     default-autowire="byName">
 
 	<mvc:annotation-driven />	
@@ -92,6 +92,8 @@
 	
 	<!-- Webflow functionality -->
 	
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+	
 	<!-- 
 		The flowhandler mapping identifies URLs for flows, and 
 		tells the DispatcherServlet to ignores those URLs.
@@ -117,7 +119,10 @@
 		<property name="flowExecutor" ref="flowExecutor" />
 	</bean>
 	
-	<flow:flow-builder-services id="flowBuilderServices" view-factory-creator="mvcViewFactoryCreator" />
+	<flow:flow-builder-services id="flowBuilderServices" 
+		view-factory-creator="mvcViewFactoryCreator"
+		development="true"
+		validator="validator" />
 	
 	<bean id="mvcViewFactoryCreator" class="org.springframework.webflow.mvc.builder.MvcViewFactoryCreator">
 	    <property name="viewResolvers" ref="tilesViewResolver" />
