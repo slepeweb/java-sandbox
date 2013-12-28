@@ -5,10 +5,10 @@
     taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <article class="first">
-	<h2>Registration</h2>
+	<h2>Please register your details</h2>
+	<%-- TODO: Put this in a common folder - also used by 'user' functionality --%>
+	<jsp:include page="../user/flash-messages.jsp" />
 	
-	<p>Please register your new account details:</p>
-		
 	<form:form method="post" commandName="customer">
 	  
 	    <table class="two-col-table">
@@ -38,8 +38,13 @@
 	        <td><form:errors path="email" cssClass="form-field-error compact" /></td>
 	    </tr>
 	    <tr>
+	        <td class="heading"><form:label path="confirmEmail">Confirm email</form:label></td>
+	        <td><form:input path="confirmEmail" /></td>
+	        <td><form:errors path="confirmEmail" cssClass="form-field-error compact" /></td>
+	    </tr>
+	    <tr>
 	        <td class="heading"><form:label path="password">Password</form:label></td>
-	        <td><form:password path="password" /></td>
+	        <td><form:input path="password" /></td>
 	        <td><form:errors path="password" cssClass="form-field-error compact" /></td>
 	    </tr>
 	    <tr>
@@ -47,11 +52,9 @@
 	        <td><form:password path="confirmPassword" /></td>
 	        <td><form:errors path="confirmPassword" cssClass="form-field-error compact" /></td>
 	    </tr>
-	    <tr>
-	        <td class="buttons"><input class="button" type="submit" name="_eventId_register" value="Register" /></td>
-	        <td align="right"><input class="button" type="submit" name="_eventId_cancel" value="Cancel" /></td>
-	        <td></td>
-	    </tr>
 			</table> 
+			<br />
+
+	    <input class="button" type="submit" name="_eventId_register" value="Register" />	    
 	</form:form>
 </article>

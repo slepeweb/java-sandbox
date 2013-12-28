@@ -2,26 +2,17 @@ package com.slepeweb.sandbox.spizza.bean;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class Customer implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private String name, address, phoneNumber, zipCode;
+	private String name, address, email, phoneNumber;
+	private String zipCode, password, confirmPassword;
 
-//	public void validateRegistrationForm(ValidationContext ctx) {
-//	     MessageContext mctx = ctx.getMessageContext();
-//	     validateMandatory("name", getName(), "Please enter your name", mctx);
-//	     validateMandatory("phoneNumber", getPhoneNumber(), "Please enter your phone number", mctx);
-//	     validateMandatory("zipCode", getZipCode(), "Please enter your postcode", mctx);
-//	}
-//	
-//	private void validateMandatory(String property, String value, String msg, MessageContext messages) {
-//		if (isBlank(value)) {
-//            messages.addMessage(new MessageBuilder().error().source(property).defaultText(msg).build());
-//		}
-//	}
-	
 	@NotEmpty
 	public String getName() {
 		return name;
@@ -55,5 +46,34 @@ public class Customer implements Serializable {
 
 	public void setZipCode(String zipCode) {
 		this.zipCode = zipCode;
+	}
+
+	@NotEmpty
+	@Email
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	@NotEmpty
+	@Size(min=6)
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	@NotEmpty
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
 	}
 }

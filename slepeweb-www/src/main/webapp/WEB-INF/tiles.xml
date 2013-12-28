@@ -77,37 +77,42 @@
 		<put-attribute name="right" value="/WEB-INF/jsp/weather.jsp"/>
 	</definition>	
 
-	<definition name="spizza.welcome" extends="layout.3col">
+	<definition name="spizza.welcome" extends="layout.2col.left">
 		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
 		<put-attribute name="body" value="/WEB-INF/jsp/spizza/welcome.jsp"/>
 	</definition>	
 
-	<definition name="spizza.registrationForm" extends="layout.3col">
+	<definition name="spizza.register" extends="layout.2col.left">
+		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
+		<put-attribute name="body" value="/WEB-INF/jsp/spizza/register.jsp"/>
+	</definition>	
+
+	<definition name="spizza.registrationForm" extends="layout.2col.left">
 		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
 		<put-attribute name="body" value="/WEB-INF/jsp/spizza/registrationForm.jsp"/>
 	</definition>	
 
-	<definition name="spizza.deliveryWarning" extends="layout.3col">
+	<definition name="spizza.deliveryWarning" extends="layout.2col.left">
 		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
 		<put-attribute name="body" value="/WEB-INF/jsp/spizza/deliveryWarning.jsp"/>
 	</definition>	
 
-	<definition name="spizza.showOrder" extends="layout.3col">
+	<definition name="spizza.showOrder" extends="layout.2col.left">
 		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
 		<put-attribute name="body" value="/WEB-INF/jsp/spizza/showOrder.jsp"/>
 	</definition>	
 
-	<definition name="spizza.createPizza" extends="layout.3col">
+	<definition name="spizza.createPizza" extends="layout.2col.left">
 		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
 		<put-attribute name="body" value="/WEB-INF/jsp/spizza/createPizza.jsp"/>
 	</definition>	
 
-	<definition name="spizza.takePayment" extends="layout.3col">
+	<definition name="spizza.takePayment" extends="layout.2col.left">
 		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
 		<put-attribute name="body" value="/WEB-INF/jsp/spizza/takePayment.jsp"/>
 	</definition>	
 
-	<definition name="spizza.thankCustomer" extends="layout.3col">
+	<definition name="spizza.thankCustomer" extends="layout.2col.left">
 		<put-attribute name="left" value="/WEB-INF/jsp/sandbox/menu.jsp"/>
 		<put-attribute name="body" value="/WEB-INF/jsp/spizza/thankCustomer.jsp"/>
 	</definition>	

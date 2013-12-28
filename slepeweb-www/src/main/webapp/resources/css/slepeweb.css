@@ -7,6 +7,10 @@
 	line-height: 1.2em;
 }
 
+.italic {
+	font-style: italic;
+}
+
 .two-col-table .heading {
 	font-weight: bold;
 	text-align: left;
@@ -14,6 +18,47 @@
 
 .two-col-table td {
 	padding: 0px 10px;
+}
+
+.two-col-table th {
+	padding: 0px 10px;
+	font-weight: bold;
+	text-align: left;
+}
+
+.two-col-table td.buttons {
+	padding-top: 2em;
+}
+
+#pizza-options-table tr:first-child td {
+	padding-left: 2em;
+	padding-right: 2em;
+	border-style: solid;
+	border-left-width: 2px;
+	border-right-width: 2px;
+	border-color: #cccccc;
+}
+
+#pizza-order-table th {
+	font-weight: bold;
+	text-align: left;
+}
+
+#pizza-order-table th, #pizza-order-table td {
+	padding-left: 1em;
+	padding-right: 1em;
+	border-style: solid;
+	border-left-width: 2px;
+	border-right-width: 2px;
+	border-color: #cccccc;
+}
+
+#pizza-order-table tr:last-child td {
+	border-style: none;
+}
+
+#pizza-order-table td.buttons {
+	padding-top: 2em;
 }
 
 .user-table td {

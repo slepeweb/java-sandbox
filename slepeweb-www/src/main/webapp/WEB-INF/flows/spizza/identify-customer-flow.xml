@@ -4,51 +4,47 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/webflow
 		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
 
+	<var name="loginForm" class="com.slepeweb.sandbox.spizza.bean.LoginForm" />
 	<var name="customer" class="com.slepeweb.sandbox.spizza.bean.Customer" />
-<!-- 	<var name="_page" class="com.slepeweb.sandbox.www.model.Page" /> -->
 
-	<view-state id="welcome" view="spizza.welcome">
-<!-- 		<on-entry> -->
-<!-- 			<evaluate expression="spizzaFlowActions.getPage()" result="_page" /> -->
-<!-- 		</on-entry> -->
-		<transition on="phoneEntered" to="lookupCustomer" />
+	<view-state id="welcome" view="spizza.welcome" model="loginForm">
+		<transition on="login" to="authenticate" />
+		<transition on="register" to="registration" validate="false" />
 	</view-state>
 
-	<action-state id="lookupCustomer">
-		<evaluate result="customer"
-			expression="spizzaFlowActions.lookupCustomer(requestParameters.phoneNumber)" />
-		<transition to="registrationForm" on-exception="java.lang.Exception" />
-		<transition to="customerReady" />
+	<action-state id="authenticate">
+		<evaluate expression="spizzaFlowActions.identifyCustomer" />
+		<transition on="success" to="checkDeliveryArea" />
+		<transition on="error" to="welcome" />
 	</action-state>
-
-	<view-state id="registrationForm" view="spizza.registrationForm" model="customer">
-		<on-entry>
-			<evaluate expression="customer.phoneNumber = requestParameters.phoneNumber" />
-		</on-entry>
-		<transition on="submit" to="checkDeliveryArea" />
+	
+	<view-state id="registration" view="spizza.registrationForm" model="customer">
+		<transition on="register" to="validateRegistration" />
 	</view-state>
 
-	<decision-state id="checkDeliveryArea">
-		<if test="spizzaFlowActions.checkDeliveryArea(customer.zipCode)"
-			then="addCustomer" else="deliveryWarning" />
-	</decision-state>
+	<action-state id="validateRegistration">
+		<evaluate expression="spizzaFlowActions.validateRegistration" />
+		<transition on="success" to="checkDeliveryArea" />
+		<transition on="error" to="registration" />
+	</action-state>
+	
+	<action-state id="checkDeliveryArea">
+		<evaluate expression="spizzaFlowActions.checkDeliveryArea" />
+		<transition on="success" to="customerReady" />
+		<transition on="error" to="deliveryWarning" />
+	</action-state>
 
 	<view-state id="deliveryWarning" view="spizza.deliveryWarning">
-		<transition on="accept" to="addCustomer" />
+		<transition on="accept" to="customerReady" />
 	</view-state>
-
-	<action-state id="addCustomer">
-		<evaluate expression="spizzaFlowActions.addCustomer(customer)" />
-		<transition to="customerReady" />
-	</action-state>
-
-	<end-state id="cancel" />
 
 	<end-state id="customerReady">
 		<output name="customer" />
 	</end-state>
 
+	<end-state id="cancel" />
+	
 	<global-transitions>
-		<transition on="cancel" to="cancel" />
+		<transition on="cancel" to="cancel" bind="false" validate="false" />
 	</global-transitions>
 </flow>

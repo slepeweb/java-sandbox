@@ -4,11 +4,12 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/webflow
 		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
 
-	<var name="order" class="com.slepeweb.sandbox.spizza.bean.Order" />
-	<var name="_page" class="com.slepeweb.sandbox.www.model.Page" />
+<!-- 	<var name="order" class="com.slepeweb.sandbox.spizza.bean.Order" /> -->
+<!-- 	<var name="_page" class="com.slepeweb.sandbox.www.model.Page" /> -->
 	
 	<on-start>
 		<evaluate expression="spizzaFlowActions.getPage()" result="conversationScope._page" />
+		<evaluate expression="spizzaFlowActions.newOrder()" result="flowScope.order"/>
 	</on-start>
 
 	<subflow-state id="identifyCustomer" subflow="sandbox/spizza/customer">
@@ -32,8 +33,8 @@
 	</subflow-state>
 	
 	<action-state id="saveOrder">
-		<evaluate expression="spizzaFlowActions.saveOrder(order)" />
-		<transition to="thankCustomer" />
+		<evaluate expression="spizzaFlowActions.saveOrder" />
+		<transition on="success" to="thankCustomer" />
 	</action-state>
 	
 	<view-state id="thankCustomer" view="spizza.thankCustomer">

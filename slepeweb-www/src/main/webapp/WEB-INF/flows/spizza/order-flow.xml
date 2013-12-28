@@ -6,22 +6,27 @@
 		
 	<input name="order" required="true" />
 	
+	<view-state id="createPizza" view="spizza.createPizza" model="flowScope.pizzaForm">
+		<on-entry>
+			<set name="flowScope.pizzaForm" value="spizzaFlowActions.initPizzaForm()" />
+		</on-entry>
+		<transition on="addPizza" to="showOrder">
+			<evaluate expression="order.addPizza(flowScope.pizzaForm)" />
+		</transition>
+		<transition on="cancel" to="showOrder" />
+	</view-state>
+	
 	<view-state id="showOrder" view="spizza.showOrder">
 		<transition on="createPizza" to="createPizza" />
 		<transition on="checkout" to="orderCreated" />
 		<transition on="cancel" to="cancel" />
+		<transition on="remove" to="removePizza" />
 	</view-state>
 	
-	<view-state id="createPizza" view="spizza.createPizza" model="flowScope.pizza">
-		<on-entry>
-			<set name="flowScope.pizza" value="new com.slepeweb.sandbox.spizza.bean.Pizza()" />
-			<evaluate result="viewScope.toppingsList" expression="T(com.slepeweb.sandbox.spizza.bean.Topping).asList()" />
-		</on-entry>
-		<transition on="addPizza" to="showOrder">
-			<evaluate expression="order.addPizza(flowScope.pizza)" />
-		</transition>
-		<transition on="cancel" to="showOrder" />
-	</view-state>
+	<action-state id="removePizza">
+		<evaluate expression="spizzaFlowActions.removePizza" />
+		<transition on="success" to="showOrder" />
+	</action-state>
 	
 	<end-state id="cancel" />
 	<end-state id="orderCreated" />

@@ -17,9 +17,8 @@
 	</view-state>
 	
 	<action-state id="verifyPayment">
-		<evaluate result="order.payment"
-			expression="spizzaFlowActions.verifyPayment(flowScope.paymentDetails)" />
-		<transition to="paymentTaken" />
+		<evaluate expression="spizzaFlowActions.verifyPayment" />
+		<transition on="success" to="paymentTaken" />
 	</action-state>
 	
 	<end-state id="cancel" />
