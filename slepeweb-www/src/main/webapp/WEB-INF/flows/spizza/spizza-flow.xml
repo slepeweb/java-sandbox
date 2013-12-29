@@ -29,13 +29,8 @@
 	
 	<subflow-state id="takePayment" subflow="sandbox/spizza/payment">
 		<input name="order" value="order" />
-		<transition on="paymentTaken" to="saveOrder" />
+		<transition on="paymentTaken" to="thankCustomer" />
 	</subflow-state>
-	
-	<action-state id="saveOrder">
-		<evaluate expression="spizzaFlowActions.saveOrder" />
-		<transition on="success" to="thankCustomer" />
-	</action-state>
 	
 	<view-state id="thankCustomer" view="spizza.thankCustomer">
 		<transition to="endState" />

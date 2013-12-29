@@ -26,13 +26,18 @@ public class Pizza implements Serializable {
 	
 	public String getToppingsAsString() {
 		StringBuilder sb = new StringBuilder();
-		for (Topping t : getToppings()) {
-			if (sb.length() > 0) {
-				sb.append(", ");
+		
+		if (getToppings().size() > 0) {
+			for (Topping t : getToppings()) {
+				if (sb.length() > 0) {
+					sb.append(", ");
+				}
+				sb.append(t.getLabel());
 			}
-			sb.append(t.getLabel());
+			return sb.toString();
 		}
-		return sb.toString();
+		
+		return "No extra toppings";
 	}
 	
 	public List<Topping> getToppings() {
@@ -84,4 +89,11 @@ public class Pizza implements Serializable {
 		this.price = price;
 	}
 
+	@Override
+	public String toString() {		
+		StringBuilder sb = new StringBuilder(String.format("%s, %s [%s]", 
+				getBase().getLabel(), getSize().getLabel(), getToppingsAsString()));
+		
+		return sb.toString();
+	}
 }

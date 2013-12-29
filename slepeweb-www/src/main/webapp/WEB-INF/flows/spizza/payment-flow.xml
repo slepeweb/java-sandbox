@@ -6,19 +6,21 @@
 		
 	<input name="order" required="true" />
 	
-	<view-state id="takePayment" view="spizza.takePayment" model="flowScope.paymentDetails">
-		<on-entry>
-			<set name="flowScope.paymentDetails" value="new com.slepeweb.sandbox.spizza.bean.PaymentDetails()" />
-			<evaluate result="viewScope.paymentTypeList"
-				expression="T(com.slepeweb.sandbox.spizza.bean.PaymentType).asList()" />
-		</on-entry>
-		<transition on="paymentSubmitted" to="verifyPayment" />
+	<on-start>
+		<evaluate expression="spizzaFlowActions.initPaymentForm()" result="flowScope.paymentForm"/>
+	</on-start>
+	
+	<view-state id="takePayment" view="spizza.takePayment" model="paymentForm">
+		<transition on="submitPayment" to="verifyPayment" />
 		<transition on="cancel" to="cancel" />
 	</view-state>
 	
 	<action-state id="verifyPayment">
 		<evaluate expression="spizzaFlowActions.verifyPayment" />
-		<transition on="success" to="paymentTaken" />
+		<transition on="success" to="paymentTaken">
+			<evaluate expression="spizzaFlowActions.updateOrderWithPayment(order, flowScope.paymentForm)" />
+		</transition>
+		<transition on="error" to="takePayment" />
 	</action-state>
 	
 	<end-state id="cancel" />

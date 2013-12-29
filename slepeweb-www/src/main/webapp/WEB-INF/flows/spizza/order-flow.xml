@@ -6,7 +6,7 @@
 		
 	<input name="order" required="true" />
 	
-	<view-state id="createPizza" view="spizza.createPizza" model="flowScope.pizzaForm">
+	<view-state id="createPizza" view="spizza.createPizza" model="pizzaForm">
 		<on-entry>
 			<set name="flowScope.pizzaForm" value="spizzaFlowActions.initPizzaForm()" />
 		</on-entry>

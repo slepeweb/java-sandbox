@@ -17,6 +17,7 @@ public class Order implements Serializable {
 	private Customer customer;
 	private List<Pizza> pizzas;
 	private Payment payment;
+	private String deliveryEta;
 
 	public static synchronized Order getInstance() {
 		Order o = new Order();
@@ -94,5 +95,13 @@ public class Order implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getDeliveryEta() {
+		return deliveryEta;
+	}
+
+	public void setDeliveryEta(String deliveryEta) {
+		this.deliveryEta = deliveryEta;
 	}
 }
