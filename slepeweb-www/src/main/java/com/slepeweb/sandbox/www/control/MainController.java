@@ -51,7 +51,8 @@ public class MainController extends BaseController {
 		
 		User loggedInUser = getLoggedInUser(session);
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
-		return checkAccessibility(page, loggedInUser, model);
+		model.addAttribute("_page", page);
+		return page.getView();
 	}
 	
 	@RequestMapping(value = PageService.CONTACT)
@@ -60,7 +61,6 @@ public class MainController extends BaseController {
 		
 		User loggedInUser = getLoggedInUser(session);
 		page.setTopNavigation(getTopNavigation(page, loggedInUser));
-
 		model.addAttribute("_page", page);
 		return page.getView();
 	}

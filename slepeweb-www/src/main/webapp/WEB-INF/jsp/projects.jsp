@@ -7,7 +7,7 @@
 
 	<h2>Profile</h2>
 	
-<c:choose><c:when test="${userHasAgentRole}">
+<c:choose><c:when test="${userHasAgentRole or userHasAdminRole}">
 	<script>
 		$(function() {
 			$("#tabs").tabs(
@@ -16,8 +16,9 @@
 		});
 	</script>
 
-	<p>This page describes a small selection of projects in which George Buttigieg (a director of 
-		SWS) played a lead role.</p>
+	<p>This page profiles George Buttigieg, SWS Managing Director, and
+		describes a small selection of projects in which he has played a
+		lead role.</p>
 
 	<div id="tabs">
 		<ul>
@@ -39,7 +40,7 @@
 					</tr>
 					<tr>
 						<td class="heading">Job title</td>
-						<td>Java Developer, SWS Director</td>
+						<td>Java Web Application Developer</td>
 					</tr>
 					<tr>
 						<td class="heading">Email</td>
@@ -55,7 +56,7 @@
 					</tr>
 					<tr>
 						<td class="heading">Interests</td>
-						<td>Tennis, golf, walking, asian food</td>
+						<td>Tennis, golf, walking</td>
 					</tr>
 					<tr>
 						<td class="heading">Location</td>
@@ -206,10 +207,11 @@
 	</div>
 </c:when><c:otherwise>
 	<div class="short-profile-left">
-		<p>George Buttigieg is a director of SWS, and has played a lead role in the back-end design/build
-			of web sites for some major brands. These were mostly dynamic CMS-driven websites (Alterian CMS), with
-			various integrations to 3rd party systems. Here is a selection of those brands: </p>
-		
+		<p>SWS has played a lead role in the back-end design/build of
+			web sites for some major brands, including those listed below.
+			These were mostly dynamic CMS-driven websites (Alterian CMS), with
+			various integrations to 3rd party systems.</p>
+
 		<ul class="project-list">
 			<li>Jaguar Landrover</li>
 			<li>Foreign and Commonwealth Office</li>
@@ -223,6 +225,7 @@
 			<li>Croydon Council</li>
 			<li>Cancer Research UK</li>
 			<li>Plan International</li>
+			<li>Scottish Power</li>
 		</ul>
 
 		<p><br />With Alterian CMS, content

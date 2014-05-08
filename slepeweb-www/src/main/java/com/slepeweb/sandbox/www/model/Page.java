@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.slepeweb.sandbox.orm.Role;
 import com.slepeweb.sandbox.orm.User;
 
 
 public class Page implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static Logger LOG = Logger.getLogger(Page.class);
 	private String href;
 	private Header header;
 	private Footer footer;
@@ -36,18 +39,31 @@ public class Page implements Serializable {
 	}
 	
 	public boolean isAccessibleBy(User u) {
-		if (getRoles() == null) {
-			return true;
-		}
-		else {
-			if (u != null && u.getRoles() != null) {
-				List<String> userRoles = new ArrayList<String>(u.getRoles().size());
-				for (Role r : u.getRoles()) {
-					userRoles.add(r.getName());
+		if (u != null) {
+			if (getRoles() == null) {
+				LOG.debug(String.format("Page [%s] is not secured, so is always visible to public", getHref()));
+				return true;
+			}
+			else {
+				if (u.getRoles() != null) {
+					List<String> userRoles = new ArrayList<String>(u.getRoles().size());
+					for (Role r : u.getRoles()) {
+						userRoles.add(r.getName());
+					}
+					boolean hasRole = ! Collections.disjoint(getRoles(), userRoles);
+					LOG.debug(String.format("User [%s] is assigned to all roles required for page [%s]", 
+							u.getAlias(), getHref()));
+					return hasRole;
 				}
-				return ! Collections.disjoint(getRoles(), userRoles);
+				else {
+					LOG.debug(String.format("User [%s] is not assigned to any roles, so cannot access [%s]", 
+							u.getAlias(), getHref()));
+				}
 			}
 		}
+		
+		LOG.debug(String.format("User requesting page [%s] is not identifiable, so cannot get access to page", 
+				getHref()));
 		return false;
 	}
 	
