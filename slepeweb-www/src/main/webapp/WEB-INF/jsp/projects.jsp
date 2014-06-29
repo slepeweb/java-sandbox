@@ -27,7 +27,8 @@
 			<li><a href="#tabs-2">Jaguar</a></li>
 			<li><a href="#tabs-3">WAG</a></li>
 			<li><a href="#tabs-4">Simply Health</a></li>
-			<li><a href="#tabs-5">Calculator</a></li>
+			<li><a href="#tabs-5">Finance Calculator</a></li>
+			<li><a href="#tabs-6">Scottish Power</a></li>
 		</ul>
 
 		<div id="tabs-1" class="compact">
@@ -167,40 +168,65 @@
 				bodystyle and engine, plus any optional extras. It then used all
 				this data to pull available finance options from another 3rd part
 				system, again using REST-style services. The visitor could add up
-				to 3 quotes to his basket, and could also download these as PDF
-				documents for presentation to dealers.
+				to 3 quotes to his basket for comparison purposes, and could also 
+				download these as PDF documents.
 		</div>
 
-		<div id="tabs-9" class="compact">
+			<div id="tabs-6" class="compact">
+				<h3>Scottish Power</h3>
+				<p>This work involved developing the online services delivered
+					by the Scottish Power (SP) website, www.scottishpower.co.uk. The
+					web application accessed a middle tier through REST services,
+					which in turn interacted with a SAP database containing customer
+					information. The web front end was an interesting integration
+					between Alterian CMS and Spring Webflow. The CMS provided content
+					authors with a means to define and manage the online forms,
+					allowing them to update text content, change field ordering or
+					field types, choose different css styles, different validation
+					controls, etc. These form definitions were then rendered by JSPs
+					using Spring tags, providing view states for the (Spring)
+					webflows.</p>
+				<p>The first task was to extend existing functionality to
+					provide tailored online forms for SME (small business) users. This
+					included forms to display account information, capture meter
+					readings, change direct debit details, etc.</p>
+				<p>The second task was to provide search functionality for
+					Tariff Information Labels. All energy providers had been
+					instructed by the regulators to offer this functionality before
+					the end of March, otherwise they could expect significant
+					financial penalties.</p>
+			</div>
+
+			<div id="tabs-9" class="compact">
 			<h3>Skills</h3>
 			<p>My skills have been organised according to how frequently they are applied in my work.</p>
-			<table class="two-col-table">
+			<table id="skills-table">
 				<tr>
 					<td class="heading">Every day</td>
 					<td>Java, JSP, Servlet, JSTL, Spring MVC, Tiles, Custom tags, Windows, Linux,
 						SVN, Eclipse, Alterian CMS</td>
 				</tr>
 				<tr>
-					<td class="heading">Occasional</td>
+					<td class="heading">Less frequently</td>
 					<td>Javascript, jQuery, Dojo, Ajax, CSS, HTML, SQL, Oracle, MySQL, Maven, Git, Apache, Tomcat, Websphere, Weblogic, 
 						XSD, XML, XSLT, JAXB, RESTful and SOAP web services, Quartz, Bash scripting, CVS, 
 						Amazon Cloud services</td>
 				</tr>
 				<tr>
-					<td class="heading">By project</td>
-					<td>JDBC, JMS, Hibernate, Ibatis, Lucene, Struts</td>
-				</tr>
-				<tr>
-					<td class="heading">Infrequent</td>
+					<td class="heading">As needed</td>
 					<td>Ant, Ruby, Perl</td>
 				</tr>
 				<tr>
-					<td class="heading">Historical</td>
-					<td>C</td>
+					<td class="heading">For specific projects</td>
+					<td>JDBC, JMS, Hibernate, Ibatis, Lucene, Struts</td>
 				</tr>
 				<tr>
-					<td class="heading">Educational</td>
+					<td class="heading">Background reading</td>
 					<td>TDD, EJB, Ruby on Rails, Groovy, MongoDB, JSF</td>
+				</tr>
+				<tr>
+					<td class="heading">First language</td>
+					<td>C</td>
 				</tr>
 			</table>
 		</div>

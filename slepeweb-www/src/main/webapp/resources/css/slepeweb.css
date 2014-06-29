@@ -229,3 +229,12 @@ li.unselected {
 	margin-top: 1em;
 }
 
+#skills-table th, #skills-table td {
+	border: 1px solid black;
+	padding: 3px;
+}
+
+#skills-table td.heading {
+	width: 20%;
+	font-weight: bold;
+}
