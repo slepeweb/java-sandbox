@@ -102,7 +102,7 @@
 				also a good learning opportunity.</p>
 
 			<p>In 2012, the Jaguar site was overhauled completely in terms of
-				content and presentation, although still using Alterian CMS for
+				content and presentation, although still using Alterian CME for
 				content management. The main purpose of the revamp was to produce a
 				responsive front-end web design, so that desktop, tablet and mobile devices
 				could utilise the same HTML, but rendered it differently on each
@@ -141,7 +141,7 @@
 		<div id="tabs-4" class="compact">
 			<h3>Simply Health</h3>
 			<p>One this relatively small project, the client required an
-				integration between Mediasurface (the predecessor to Alterian CMS)
+				integration between Mediasurface (the predecessor to Alterian CME)
 				and ATG Dynamo. Content from the Mediasurface repository had to be
 				synchronised with the ATG database, and delivered to site visitors
 				using the ATG webapp. SimplyHealth were responsible
@@ -179,7 +179,7 @@
 					web application accessed a middle tier through REST services,
 					which in turn interacted with a SAP database containing customer
 					information. The web front end was an interesting integration
-					between Alterian CMS and Spring Webflow. The CMS provided content
+					between Alterian CME and Spring Webflow. The CMS provided content
 					authors with a means to define and manage the online forms,
 					allowing them to update text content, change field ordering or
 					field types, choose different css styles, different validation
@@ -204,7 +204,7 @@
 				<tr>
 					<td class="heading">Every day</td>
 					<td>Java, JSP, Servlet, JSTL, Spring MVC, Tiles, Custom tags, Windows, Linux,
-						SVN, Eclipse, Alterian CMS</td>
+						SVN, Eclipse, Alterian CME</td>
 				</tr>
 				<tr>
 					<td class="heading">Less frequently</td>
@@ -235,7 +235,7 @@
 	<div class="short-profile-left">
 		<p>SWS has played a lead role in the back-end design/build of
 			web sites for some major brands, including those listed below.
-			These were mostly dynamic CMS-driven websites (Alterian CMS), with
+			These were mostly dynamic CMS-driven websites (Alterian CME), with
 			various integrations to 3rd party systems.</p>
 
 		<ul class="project-list">
@@ -254,7 +254,7 @@
 			<li>Scottish Power</li>
 		</ul>
 
-		<p><br />With Alterian CMS, content
+		<p><br />With Alterian CME, content
 			management and content delivery are quite distinct components, in
 			that the 'management' side imposes no constraints on the 'delivery'
 			side. In other words, you have complete control over the
