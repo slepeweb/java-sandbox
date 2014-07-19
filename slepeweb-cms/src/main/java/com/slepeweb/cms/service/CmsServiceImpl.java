@@ -24,7 +24,7 @@ public class CmsServiceImpl implements CmsService {
 	}
 
 	public void addSite(Site s) {
-		this.siteService.addSite(s);
+		this.siteService.insertSite(s);
 	}
 
 	public Item getItem(Long siteId, String path) {

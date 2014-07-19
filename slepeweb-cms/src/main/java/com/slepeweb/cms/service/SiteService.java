@@ -4,7 +4,7 @@ import com.slepeweb.cms.bean.Site;
 
 
 public interface SiteService {
-	void addSite(Site s);
+	void insertSite(Site s);
 	void updateSite(Site s);
 	void deleteSite(Long id);
 	void deleteSite(Site s);

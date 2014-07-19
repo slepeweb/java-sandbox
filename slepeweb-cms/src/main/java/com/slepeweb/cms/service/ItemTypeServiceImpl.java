@@ -14,7 +14,7 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 	
 	private static Logger LOG = Logger.getLogger(ItemTypeServiceImpl.class);
 	
-	public void addItemType(ItemType it) {
+	public void insertItemType(ItemType it) {
 		this.jdbcTemplate.update(
 				"insert into itemtype (name) values (?)", 
 				it.getName());

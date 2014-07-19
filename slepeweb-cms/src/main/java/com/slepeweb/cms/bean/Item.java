@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.cms.service.ItemService;
-
 public class Item implements Serializable {
 	private static final long serialVersionUID = -1107189949889224015L;
 	private Site site;
@@ -17,8 +15,6 @@ public class Item implements Serializable {
 	private Timestamp dateCreated, dateUpdated;
 	private boolean deleted;
 	private Long id;
-	
-	private transient ItemService itemService;
 	
 	public void assimilate(Item i) {
 		setName(i.getName());
@@ -31,24 +27,24 @@ public class Item implements Serializable {
 		setType(i.getType());
 	}
 	
-	public boolean isDefined() {
+	public boolean isDefined4Insert() {
 		return 
 			StringUtils.isNotBlank(getName()) &&
-			StringUtils.isNotBlank(getSimpleName()) &&
 			StringUtils.isNotBlank(getPath()) &&
+			(StringUtils.isNotBlank(getSimpleName()) || isRoot()) &&
 			getDateCreated() != null &&
 			getDateUpdated() != null &&
 			getSite() != null &&
 			getSite().getId() != null &&
 			getType() != null &&
-			getType().getId() != null
-			;
+			getType().getId() != null;
+	}
+	
+	public boolean isRoot() {
+		return getPath() != null && getPath().equals("/");
 	}
 	
 	public ItemType getType() {
-		if (! getType().isDefined()) {
-			this.type = this.itemService.getItemType(this);
-		}
 		return type;
 	}
 	public void setType(ItemType type) {
@@ -91,9 +87,6 @@ public class Item implements Serializable {
 		this.id = id;
 	}
 	public Site getSite() {
-		if (! this.site.isDefined()) {
-			this.site = this.itemService.getSite(this);
-		}
 		return site;
 	}
 	public void setSite(Site site) {
@@ -110,13 +103,5 @@ public class Item implements Serializable {
 	}
 	public void setDateUpdated(Timestamp dateUpdated) {
 		this.dateUpdated = dateUpdated;
-	}
-
-	public ItemService getItemService() {
-		return itemService;
-	}
-
-	public void setItemService(ItemService itemService) {
-		this.itemService = itemService;
 	}
 }

@@ -1,3 +1,4 @@
+drop table link;
 drop table itemtype;
 drop table item;
 drop table site;
@@ -36,3 +37,14 @@ create table item
 	primary key (id),
 	unique key idx_item_site_path (siteid, path)
 );
+
+create table link
+(
+	parentid int references item(id),
+	childid int references item(id),
+	linktype enum ('binding', 'relation', 'inline', 'shortcut'),
+	name varchar(64),
+	primary key (parentid, childid)
+);
+
+

@@ -10,7 +10,7 @@ public class ItemType {
 		setName(it.getName());
 	}
 	
-	public boolean isDefined() {
+	public boolean isDefined4Insert() {
 		return 
 			StringUtils.isNotBlank(getName());
 	}

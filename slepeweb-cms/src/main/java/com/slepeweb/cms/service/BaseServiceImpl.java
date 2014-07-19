@@ -43,11 +43,4 @@ public class BaseServiceImpl {
 		return "";
 	}
 	
-	protected boolean isDefined(Site s) {
-		if (! s.isDefined()) {
-			LogUtil.warn(LOG, "Site is not fully defined", String.valueOf(s.getId()));
-			return false;
-		}
-		return true;
-	}
 }

@@ -6,7 +6,7 @@ import com.slepeweb.cms.bean.Site;
 
 
 public interface ItemService {
-	void addItem(Item i);
+	void insertItem(Item i);
 	void updateItem(Item i);
 	void deleteItem(Long id);
 	Item getItem(Long siteId, String path);

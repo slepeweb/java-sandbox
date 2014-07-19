@@ -40,11 +40,16 @@ public class RowMapperUtil {
 			item.setDateUpdated(rs.getTimestamp("dateupdated"));
 			item.setDeleted(rs.getBoolean("deleted"));
 			
-			item.setType(new ItemType());
-			item.getType().setId(rs.getLong("typeid"));
+			ItemType type = new ItemType();
+			item.setType(type);
+			type.setId(rs.getLong("typeid"));
+			type.setName(rs.getString("typename"));
 			
-			item.setSite(new Site());
-			item.getSite().setId(rs.getLong("siteid"));
+			Site site = new Site();
+			item.setSite(site);
+			site.setId(rs.getLong("siteid"));
+			site.setName(rs.getString("sitename"));
+			site.setHostname(rs.getString("hostname"));
 			return item;
 		}
 	}

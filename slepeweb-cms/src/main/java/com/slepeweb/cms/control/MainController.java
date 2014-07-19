@@ -36,7 +36,7 @@ public class MainController extends BaseController {
 			s = new Site();
 			s.setName("YRP");
 			s.setHostname("www.yrp.com");		
-			this.siteService.addSite(s);
+			this.siteService.insertSite(s);
 		}
 		
 		s = this.siteService.getSite("Slepeweb");
@@ -44,28 +44,60 @@ public class MainController extends BaseController {
 			s = new Site();
 			s.setName("Slepeweb");
 			s.setHostname("www.slepeweb.com");		
-			this.siteService.addSite(s);
+			this.siteService.insertSite(s);
 		}
 		
 		// Create types
-		ItemType it = this.itemTypeService.getItemType("News");
+		ItemType it;
+		
+		it = this.itemTypeService.getItemType("Root");
+		if (it == null) {
+			it = new ItemType();
+			it.setName("Root");
+			this.itemTypeService.insertItemType(it);
+		}
+		
+		it = this.itemTypeService.getItemType("Section");
+		if (it == null) {
+			it = new ItemType();
+			it.setName("Section");
+			this.itemTypeService.insertItemType(it);
+		}
+		
+		it = this.itemTypeService.getItemType("News");
 		if (it == null) {
 			it = new ItemType();
 			it.setName("News");
-			this.itemTypeService.addItemType(it);
+			this.itemTypeService.insertItemType(it);
 		}
 		
 		it = this.itemTypeService.getItemType("Article");
 		if (it == null) {
 			it = new ItemType();
 			it.setName("Article");
-			this.itemTypeService.addItemType(it);
+			this.itemTypeService.insertItemType(it);
 		}
 		
 		// Create items
+		Item i;
 		s = this.siteService.getSite("Slepeweb");
-		it = this.itemTypeService.getItemType("Article");
-		Item i = this.itemService.getItem(s.getId(), "/news/101");
+		
+		it = this.itemTypeService.getItemType("Section");		
+		i = this.itemService.getItem(s.getId(), "/news");
+		if (i == null) {
+			i = new Item();
+			i.setName("News section");
+			i.setSimpleName("news");
+			i.setPath("/news");
+			i.setDateCreated(new Timestamp(System.currentTimeMillis()));
+			i.setDateUpdated(i.getDateCreated());
+			i.setSite(s);
+			i.setType(it);
+			this.itemService.insertItem(i);
+		}
+		
+		it = this.itemTypeService.getItemType("Article");		
+		i = this.itemService.getItem(s.getId(), "/news/101");
 		if (i == null) {
 			i = new Item();
 			i.setName("News item #1");
@@ -75,7 +107,7 @@ public class MainController extends BaseController {
 			i.setDateUpdated(i.getDateCreated());
 			i.setSite(s);
 			i.setType(it);
-			this.itemService.addItem(i);
+			this.itemService.insertItem(i);
 		}
 		
 		i = this.itemService.getItem(s.getId(), "/news/102");
@@ -88,7 +120,7 @@ public class MainController extends BaseController {
 			i.setDateUpdated(i.getDateCreated());
 			i.setSite(s);
 			i.setType(it);
-			this.itemService.addItem(i);
+			this.itemService.insertItem(i);
 		}
 		
 		model.addAttribute("_page", "helo");

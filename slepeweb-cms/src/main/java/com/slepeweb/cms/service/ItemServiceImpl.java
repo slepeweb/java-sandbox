@@ -17,19 +17,50 @@ import com.slepeweb.cms.utils.RowMapperUtil;
 public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	private static Logger LOG = Logger.getLogger(ItemServiceImpl.class);
+	private static final String GET_ITEM_SQL = 
+			"select i.*, s.name as sitename, s.hostname, it.name as typename from " +
+			"item i, site s, itemtype it where " +
+			"i.siteid=s.id and i.typeid=it.id and %s and i.deleted=0";
+	
 	private String columns = "name, simplename, path, siteid, typeid, datecreated, dateupdated, deleted";
 	
 	@Autowired private SiteService siteService;
 	@Autowired private ItemTypeService itemTypeService;
 	
-	public void addItem(Item i) {
-		this.jdbcTemplate.update(
-				String.format("insert into item (%s) values (%s)", columns, placeholders4Insert(columns)),
-				i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
-				i.getDateCreated(), i.getDateUpdated(), false);
-		
-		// TODO: Fields?
-		LogUtil.info(LOG, "Added new item", i.getPath());
+	public void insertItem(Item i) {
+		if (i.isDefined4Insert()) {
+			// Parent item exists?
+			String parentPath = getParentPath(i.getPath());
+			Item parentItem = getItem(i.getSite().getId(), parentPath);
+			
+			if (i.isRoot() || parentItem != null) {
+				// Item table
+				this.jdbcTemplate.update(
+						String.format("insert into item (%s) values (%s)", columns, placeholders4Insert(columns)),
+						i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
+						i.getDateCreated(), i.getDateUpdated(), false);				
+				
+				LogUtil.info(LOG, "Added new item", i.getPath());
+				
+				if (! i.isRoot()) {
+					Long lastId = getLastInsertId();
+					
+					// Link table
+					this.jdbcTemplate.update(
+							"insert into link (parentid, childid, linktype, name) values (?, ?, ?, ?)",
+							parentItem.getId(), lastId, "binding", "std");
+					
+					
+					LogUtil.info(LOG, "Added child link", parentItem.getPath());
+				}
+				
+				// TODO: Fields
+				
+			}
+			else {
+				LogUtil.warn(LOG, "Parent item not found", parentPath);
+			}
+		}
 	}
 
 	public void updateItem(Item i) {
@@ -62,11 +93,13 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 
 	public Item getItem(Long siteId, String path) {
-		return getItem("select * from item where siteid = ? and path = ?", new Object[]{siteId, path});
+		return getItem(
+			String.format(GET_ITEM_SQL, "i.siteid=? and i.path=?"),
+			new Object[]{siteId, path});
 	}
 
 	public Item getItem(Long id) {
-		return getItem("select * from item where id = ?", new Object[]{id});
+		return getItem(String.format(GET_ITEM_SQL, "i.id=?"), new Object[]{id});
 	}
 	
 	private Item getItem(String sql, Object[] params) {
@@ -95,4 +128,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return item.getSite();
 	}
 
+	private String getParentPath(String path) {
+		int c = path.lastIndexOf("/");
+		if (c > 0) {
+			return path.substring(0, c);
+		}
+		return "/";
+	}
 }

@@ -17,7 +17,7 @@ public class Site implements Serializable {
 		setHostname(s.getHostname());
 	}
 	
-	public boolean isDefined() {
+	public boolean isDefined4Insert() {
 		return 
 			StringUtils.isNotBlank(getName()) &&
 			StringUtils.isNotBlank(getHostname());
