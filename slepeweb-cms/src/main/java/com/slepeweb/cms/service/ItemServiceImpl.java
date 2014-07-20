@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.Link.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.cms.utils.RowMapperUtil;
@@ -26,6 +28,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	@Autowired private SiteService siteService;
 	@Autowired private ItemTypeService itemTypeService;
+	@Autowired private LinkService linkService;
 	
 	public void insertItem(Item i) {
 		if (i.isDefined4Insert()) {
@@ -44,13 +47,22 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				
 				if (! i.isRoot()) {
 					Long lastId = getLastInsertId();
+					Item childItem = getItem(lastId);
+					List<Link> existingLinks = this.linkService.getLinks(parentItem, LinkType.binding.name(), null);
+					int listlen = existingLinks.size();
+					int ordering = 0;
+					if (listlen > 0) {
+						ordering = existingLinks.get(listlen - 1).getOrdering() + 1;
+					}
 					
-					// Link table
-					this.jdbcTemplate.update(
-							"insert into link (parentid, childid, linktype, name) values (?, ?, ?, ?)",
-							parentItem.getId(), lastId, "binding", "std");
+					Link l = new Link();
+					l.setParent(parentItem);
+					l.setChild(childItem);
+					l.setType(LinkType.binding);
+					l.setName("std");
+					l.setOrdering(ordering);
 					
-					
+					this.linkService.insertLink(l);					
 					LogUtil.info(LOG, "Added child link", parentItem.getPath());
 				}
 				

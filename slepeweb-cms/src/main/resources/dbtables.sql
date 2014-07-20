@@ -1,3 +1,4 @@
+drop table field;
 drop table link;
 drop table itemtype;
 drop table item;
@@ -5,7 +6,7 @@ drop table site;
 
 create table site
 (
-	id int(11) not null auto_increment,
+	id int not null auto_increment,
 	name varchar(255),
 	hostname varchar(255),
 	primary key (id),
@@ -16,7 +17,7 @@ create table site
 
 create table itemtype
 (
-	id int(11) not null auto_increment,
+	id int not null auto_increment,
 	name varchar(255),
 	primary key (id),
 	unique key idx_itemtype_name (name)
@@ -25,7 +26,7 @@ create table itemtype
 
 create table item
 (
-	id int(11) not null auto_increment,
+	id int not null auto_increment,
 	name varchar(255),
 	simplename varchar(255),
 	path varchar(255),
@@ -44,7 +45,37 @@ create table link
 	childid int references item(id),
 	linktype enum ('binding', 'relation', 'inline', 'shortcut'),
 	name varchar(64),
+	ordering smallint,
 	primary key (parentid, childid)
 );
 
+create table field
+(
+   id int not null auto_increment,
+   name varchar(64) not null,
+   variable varchar(32) not null,
+   fieldtype enum ('text', 'markup', 'integer', 'date', 'url'),
+   size int not null,
+   helptext varchar(512),
+   primary key (id),
+   unique key idx_field_variable (name)
+);
 
+create table fieldfortype
+(
+   fieldid int references field(id),
+   itemtypeid int references itemtype(id),
+   fieldorder int not null,
+   mandatory boolean,
+   primary key (fieldid, itemtypeid)
+);
+
+create table fieldvalue
+(
+   fieldid int references field(id),
+   itemid int references item(id),
+   stringvalue text,
+   intvalue int,
+   datevalue timestamp,
+   primary key (fieldid, itemid)
+);
