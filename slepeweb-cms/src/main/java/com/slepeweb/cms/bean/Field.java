@@ -1,9 +1,12 @@
 package com.slepeweb.cms.bean;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.StringUtils;
 
 
-public class Field {
+public class Field extends CmsBean implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private Long id;
 	private String name, variable, help;
 	private FieldType type;
@@ -32,47 +35,53 @@ public class Field {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public Field setId(Long id) {
 		this.id = id;
+		return this;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public Field setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public String getVariable() {
 		return variable;
 	}
 
-	public void setVariable(String variable) {
+	public Field setVariable(String variable) {
 		this.variable = variable;
+		return this;
 	}
 
 	public String getHelp() {
 		return help;
 	}
 
-	public void setHelp(String help) {
+	public Field setHelp(String help) {
 		this.help = help;
+		return this;
 	}
 
 	public FieldType getType() {
 		return type;
 	}
 
-	public void setType(FieldType type) {
+	public Field setType(FieldType type) {
 		this.type = type;
+		return this;
 	}
 
 	public int getSize() {
 		return size;
 	}
 
-	public void setSize(int size) {
+	public Field setSize(int size) {
 		this.size = size;
+		return this;
 	}
 }

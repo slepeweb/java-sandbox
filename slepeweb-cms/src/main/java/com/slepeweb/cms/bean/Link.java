@@ -1,6 +1,9 @@
 package com.slepeweb.cms.bean;
 
-public class Link {
+import java.io.Serializable;
+
+public class Link extends CmsBean implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private Item parent, child;
 	private LinkType type;
 	private String name;

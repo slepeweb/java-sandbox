@@ -75,7 +75,7 @@ create table fieldvalue
    fieldid int references field(id),
    itemid int references item(id),
    stringvalue text,
-   intvalue int,
+   integervalue int,
    datevalue timestamp,
    primary key (fieldid, itemid)
 );

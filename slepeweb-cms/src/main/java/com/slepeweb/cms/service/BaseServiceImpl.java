@@ -1,18 +1,14 @@
 package com.slepeweb.cms.service;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.utils.LogUtil;
-
 public class BaseServiceImpl {
 	
-	private static Logger LOG = Logger.getLogger(BaseServiceImpl.class);
+	//private static Logger LOG = Logger.getLogger(BaseServiceImpl.class);
 
 	@Autowired protected JdbcTemplate jdbcTemplate;
-
+	
 	protected Long getLastInsertId() {
 		return this.jdbcTemplate.queryForLong("select last_insert_id()");
 	}
@@ -24,7 +20,8 @@ public class BaseServiceImpl {
 		}
 		
 		if (sb.length() > 0) {
-			return sb.substring(0, sb.length() - 2);
+			return sb.substring(0, sb.length() - 2);//			instrument(result);
+
 		}
 		
 		return "";
@@ -42,5 +39,9 @@ public class BaseServiceImpl {
 		
 		return "";
 	}
-	
+
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
+	}
+
 }

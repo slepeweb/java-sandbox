@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class Item implements Serializable {
-	private static final long serialVersionUID = -1107189949889224015L;
+public class Item extends CmsBean implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private Site site;
 	private ItemType type;
 	private List<Field> fields;
@@ -40,68 +40,112 @@ public class Item implements Serializable {
 			getType().getId() != null;
 	}
 	
+	// TODO
+	public List<Item> getBoundItems() {
+		return null;
+	}
+	
+	// TODO
+	public List<Item> getRelatedItems() {
+		return null;
+	}
+	
+	// TODO
+	public List<Item> getInlineItems() {
+		return null;
+	}
+	
 	public boolean isRoot() {
 		return getPath() != null && getPath().equals("/");
 	}
 	
-	public ItemType getType() {
-		return type;
-	}
-	public void setType(ItemType type) {
+	public Item setType(ItemType type) {
 		this.type = type;
+		return this;
 	}
+	
 	public List<Field> getFields() {
 		return fields;
 	}
-	public void setFields(List<Field> fields) {
+	
+	public Item setFields(List<Field> fields) {
 		this.fields = fields;
+		return this;
 	}
+	
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
+	
+	public Item setName(String name) {
 		this.name = name;
+		return this;
 	}
+	
 	public String getSimpleName() {
 		return simpleName;
 	}
-	public void setSimpleName(String simpleName) {
+	
+	public Item setSimpleName(String simpleName) {
 		this.simpleName = simpleName;
+		return this;
 	}
+	
 	public String getPath() {
 		return path;
 	}
-	public void setPath(String path) {
+	
+	public Item setPath(String path) {
 		this.path = path;
+		return this;
 	}
+	
 	public boolean isDeleted() {
 		return deleted;
 	}
-	public void setDeleted(boolean deleted) {
+	
+	public Item setDeleted(boolean deleted) {
 		this.deleted = deleted;
+		return this;
 	}
+	
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	
+	public Item setId(Long id) {
 		this.id = id;
+		return this;
 	}
-	public Site getSite() {
-		return site;
-	}
-	public void setSite(Site site) {
+	
+	public Item setSite(Site site) {
 		this.site = site;
+		return this;
 	}
+	
 	public Timestamp getDateCreated() {
 		return dateCreated;
 	}
-	public void setDateCreated(Timestamp dateCreated) {
+	
+	public Item setDateCreated(Timestamp dateCreated) {
 		this.dateCreated = dateCreated;
+		return this;
 	}
+	
 	public Timestamp getDateUpdated() {
 		return dateUpdated;
 	}
-	public void setDateUpdated(Timestamp dateUpdated) {
+	
+	public Item setDateUpdated(Timestamp dateUpdated) {
 		this.dateUpdated = dateUpdated;
+		return this;
+	}
+
+	public Site getSite() {
+		return site;
+	}
+
+	public ItemType getType() {
+		return type;
 	}
 }

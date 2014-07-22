@@ -17,11 +17,11 @@ import com.slepeweb.cms.utils.RowMapperUtil;
 public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	
 	private static Logger LOG = Logger.getLogger(SiteServiceImpl.class);
-	
-	@Autowired private ItemService itemService;
-	@Autowired private ItemTypeService itemTypeService;
+	@Autowired protected ItemTypeService itemTypeService;	
+	@Autowired protected ItemService itemService;	
 	
 	public void insertSite(Site s) {
+		
 		if (s.isDefined4Insert()) {
 			String rootName = "Root";
 			ItemType type = this.itemTypeService.getItemType(rootName);
@@ -93,11 +93,18 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 			sql, params, new RowMapperUtil.SiteMapper());
 		
 		if (group.size() > 0) {
-			return group.get(0);
+			Site s = group.get(0);
+			return s;
 		}
 		else {
 			return null;
 		}
+	}
+
+	@Override
+	public List<Site> getAllSites() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

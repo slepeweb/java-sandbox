@@ -1,8 +1,11 @@
 package com.slepeweb.cms.bean;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.StringUtils;
 
-public class ItemType {
+public class ItemType extends CmsBean implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private Long id;
 	private String name;
 	
@@ -15,16 +18,30 @@ public class ItemType {
 			StringUtils.isNotBlank(getName());
 	}
 	
+	public ItemType addField(Field f, Long ordering, boolean mandatory) {
+		if (isServiced()) {
+			FieldForType fft = new FieldForType().setType(this).setField(f).setOrdering(ordering).setMandatory(mandatory);
+			getCmsService().getFieldForTypeService().insertFieldForType(fft);
+		}
+		
+		return this;
+	}
+	
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	
+	public ItemType setId(Long id) {
 		this.id = id;
+		return this;
 	}
+	
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
+	
+	public ItemType setName(String name) {
 		this.name = name;
+		return this;
 	}
 }

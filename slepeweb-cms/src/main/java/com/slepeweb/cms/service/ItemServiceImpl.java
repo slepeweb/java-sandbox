@@ -2,16 +2,13 @@ package com.slepeweb.cms.service;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Link.LinkType;
-import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
@@ -24,11 +21,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			"item i, site s, itemtype it where " +
 			"i.siteid=s.id and i.typeid=it.id and %s and i.deleted=0";
 	
+	@Autowired protected LinkService linkService;
 	private String columns = "name, simplename, path, siteid, typeid, datecreated, dateupdated, deleted";
-	
-	@Autowired private SiteService siteService;
-	@Autowired private ItemTypeService itemTypeService;
-	@Autowired private LinkService linkService;
 	
 	public void insertItem(Item i) {
 		if (i.isDefined4Insert()) {
@@ -63,7 +57,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 					l.setOrdering(ordering);
 					
 					this.linkService.insertLink(l);					
-					LogUtil.info(LOG, "Added child link", parentItem.getPath());
 				}
 				
 				// TODO: Fields
@@ -119,25 +112,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			sql, params, new RowMapperUtil.ItemMapper());
 		
 		if (group.size() > 0) {
-			return group.get(0);
+			Item result = group.get(0);
+			return result;
 		}
 		else {
 			return null;
 		}
-	}
-
-	public ItemType getItemType(Item item) {
-		if (StringUtils.isBlank(item.getType().getName())) {
-			item.setType(this.itemTypeService.getItemType(item.getType().getId()));
-		}
-		return item.getType();
-	}
-
-	public Site getSite(Item item) {
-		if (StringUtils.isBlank(item.getSite().getName())) {
-			item.setSite(this.siteService.getSite(item.getSite().getId()));
-		}
-		return item.getSite();
 	}
 
 	private String getParentPath(String path) {

@@ -17,8 +17,10 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 	public void insertField(Field f) {
 		if (f.isDefined4Insert()) {
 			this.jdbcTemplate.update(
-					"insert into field (name, variable, type, help, size) values (?, ?, ?, ?, ?)", 
+					"insert into field (name, variable, fieldtype, helptext, size) values (?, ?, ?, ?, ?)", 
 					f.getName(), f.getVariable(), f.getType().name(), f.getHelp(), f.getSize());				
+			
+			LogUtil.info(LOG, "Inserted new field", f.getName());
 		}
 	}
 
@@ -30,7 +32,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 				dbRow.assimilate(field);
 				
 				this.jdbcTemplate.update(
-						"update field set name = ?, variable = ? type = ?, help = ?, size = ? where id = ?", 
+						"update field set name = ?, variable = ? fieldtype = ?, helptext = ?, size = ? where id = ?", 
 						dbRow.getName(), dbRow.getVariable(), dbRow.getType().name(), dbRow.getHelp(), dbRow.getSize());
 				
 				LogUtil.info(LOG, "Updated field", field.getName());

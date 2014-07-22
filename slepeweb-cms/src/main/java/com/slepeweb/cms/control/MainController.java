@@ -10,120 +10,106 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.slepeweb.cms.bean.Field;
+import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.CmsService;
-import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.cms.service.ItemTypeService;
-import com.slepeweb.cms.service.SiteService;
+import com.slepeweb.cms.utils.LogUtil;
 
 @Controller
 public class MainController extends BaseController {
 	private static Logger LOG = Logger.getLogger(MainController.class);
 
 	@Autowired private CmsService cmsService;
-	@Autowired private SiteService siteService;
-	@Autowired private ItemTypeService itemTypeService;
-	@Autowired private ItemService itemService;
 	
 	@RequestMapping("/test")
 	public String doGeneric(HttpSession session, ModelMap model) {
 		
-		// Create a site or two ...
-		Site s = this.siteService.getSite("YRP");		
-		if (s == null) {
-			s = new Site();
-			s.setName("YRP");
-			s.setHostname("www.yrp.com");		
-			this.siteService.insertSite(s);
-		}
+		addType("Root");
+		addType("Section");
+		addType("News");
+		addType("Article");
 		
-		s = this.siteService.getSite("Slepeweb");
-		if (s == null) {
-			s = new Site();
-			s.setName("Slepeweb");
-			s.setHostname("www.slepeweb.com");		
-			this.siteService.insertSite(s);
-		}
+		ItemType sectionType = this.cmsService.getItemType("Section");
+		ItemType newsType = this.cmsService.getItemType("News");
 		
-		// Create types
-		ItemType it;
+		addSite("YRP", "www.yrp.com");
+		addSite("Slepeweb", "www.slepeweb.com");
 		
-		it = this.itemTypeService.getItemType("Root");
-		if (it == null) {
-			it = new ItemType();
-			it.setName("Root");
-			this.itemTypeService.insertItemType(it);
-		}
+		addField("Title", "title", "Page title - also used in links to this page", FieldType.text, 64);
+		addField("Teaser", "teaser", "Used in links to this page", FieldType.text, 256);
 		
-		it = this.itemTypeService.getItemType("Section");
-		if (it == null) {
-			it = new ItemType();
-			it.setName("Section");
-			this.itemTypeService.insertItemType(it);
-		}
-		
-		it = this.itemTypeService.getItemType("News");
-		if (it == null) {
-			it = new ItemType();
-			it.setName("News");
-			this.itemTypeService.insertItemType(it);
-		}
-		
-		it = this.itemTypeService.getItemType("Article");
-		if (it == null) {
-			it = new ItemType();
-			it.setName("Article");
-			this.itemTypeService.insertItemType(it);
-		}
+		Field titleField = this.cmsService.getFieldService().getField("Title");
+		Field teaserField = this.cmsService.getFieldService().getField("Teaser");
+		addFieldForType(newsType, titleField, 1L, true);
+		addFieldForType(newsType, teaserField, 2L, false);
 		
 		// Create items
-		Item i;
-		s = this.siteService.getSite("Slepeweb");
-		
-		it = this.itemTypeService.getItemType("Section");		
-		i = this.itemService.getItem(s.getId(), "/news");
-		if (i == null) {
-			i = new Item();
-			i.setName("News section");
-			i.setSimpleName("news");
-			i.setPath("/news");
-			i.setDateCreated(new Timestamp(System.currentTimeMillis()));
-			i.setDateUpdated(i.getDateCreated());
-			i.setSite(s);
-			i.setType(it);
-			this.itemService.insertItem(i);
-		}
-		
-		it = this.itemTypeService.getItemType("Article");		
-		i = this.itemService.getItem(s.getId(), "/news/101");
-		if (i == null) {
-			i = new Item();
-			i.setName("News item #1");
-			i.setSimpleName("101");
-			i.setPath("/news/101");
-			i.setDateCreated(new Timestamp(System.currentTimeMillis()));
-			i.setDateUpdated(i.getDateCreated());
-			i.setSite(s);
-			i.setType(it);
-			this.itemService.insertItem(i);
-		}
-		
-		i = this.itemService.getItem(s.getId(), "/news/102");
-		if (i == null) {
-			i = new Item();
-			i.setName("News item #2");
-			i.setSimpleName("102");
-			i.setPath("/news/102");
-			i.setDateCreated(new Timestamp(System.currentTimeMillis()));
-			i.setDateUpdated(i.getDateCreated());
-			i.setSite(s);
-			i.setType(it);
-			this.itemService.insertItem(i);
-		}
-		
+		Site s = this.cmsService.getSite("Slepeweb");	
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		addItem("News section", "news", "/news", now, now, s, sectionType);
+		addItem("News item #1", "101", "/news/101", now, now, s, newsType);
+		addItem("News item #2", "102", "/news/102", now, now, s, newsType);
+				
 		model.addAttribute("_page", "helo");
 		return "test";
 	}
+	
+	private void addSite(String name, String hostname) {
+		Site s = new Site().setName(name).setHostname(hostname);	
+		if (this.cmsService.getSite(name) == null) {					
+			this.cmsService.addSite(s);
+		}
+		else {
+			LogUtil.warn(LOG, "Site already exists", s.getName());
+		}
+	}
+	
+	private void addType(String name) {
+		ItemType it = new ItemType().setName(name);
+		if (this.cmsService.getItemType(name) == null) {					
+			this.cmsService.addItemType(it);
+		}
+		else {
+			LogUtil.warn(LOG, "Item type already exists", it.getName());
+		}
+	}
+
+	private void addField(String name, String variable, String help, FieldType type, int size) {
+		Field f = new Field().setName(name).setVariable(variable).setHelp(help).setType(type).setSize(size);
+		if (this.cmsService.getField(name) == null) {								
+			this.cmsService.addField(f);
+		}
+		else {
+			LogUtil.warn(LOG, "Field already exists", f.getName());
+		}
+	}
+	
+	private void addItem(String name, String simplename, String path, 
+			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type) {
+		
+		Item i = new Item().setName(name).setSimpleName(simplename).setPath(path).
+			setDateCreated(dateCreated).setDateUpdated(dateUpdated).setType(type);
+		
+		if (site.getItem(i.getPath()) == null) {								
+			site.addItem(i);
+		}
+		else {
+			LogUtil.warn(LOG, "Item already exists", i.getPath());
+		}
+	}
+	
+	private void addFieldForType(ItemType itemType, Field field, Long ordering, boolean mandatory) {
+		FieldForType fft = new FieldForType().setType(itemType).setField(field).setOrdering(ordering).setMandatory(mandatory);
+		if (this.cmsService.getFieldForTypeService().getFieldForType(fft.getField().getId(), fft.getType().getId()) == null) {								
+			this.cmsService.getFieldForTypeService().insertFieldForType(fft);
+		}
+		else {
+			LogUtil.warn(LOG, "Field for type already exists", fft.getType().getName());
+		}
+	}
+	
 }

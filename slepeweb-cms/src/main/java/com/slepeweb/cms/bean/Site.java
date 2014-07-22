@@ -4,9 +4,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.cms.service.SiteService;
-
-public class Site implements Serializable {
+public class Site extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Item root;
 	private String name, hostname;
@@ -23,35 +21,58 @@ public class Site implements Serializable {
 			StringUtils.isNotBlank(getHostname());
 	}
 	
+	public Item getItem(String path) {
+		if (isServiced()) {
+			return getItemService().getItem(getId(), path);
+		}
+		return null;
+	}
+	
+	public void addItem(Item i) {
+		if (isServiced()) {
+			i.setSite(this);
+			getItemService().insertItem(i);
+		}
+	}
+	
+	@Override
+	public boolean isServiced() {
+		return getItemService() != null;
+	}
+	
 	public Item getRoot() {
 		return root;
 	}
 	
-	public void setRoot(Item root) {
+	public Site setRoot(Item root) {
 		this.root = root;
+		return this;
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
-	public void setName(String name) {
+	public Site setName(String name) {
 		this.name = name;
+		return this;
 	}
 	
 	public Long getId() {
 		return id;
 	}
 	
-	public void setId(Long id) {
+	public Site setId(Long id) {
 		this.id = id;
+		return this;
 	}
 	
 	public String getHostname() {
 		return hostname;
 	}
 
-	public void setHostname(String hostname) {
+	public Site setHostname(String hostname) {
 		this.hostname = hostname;
+		return this;
 	}
 }
