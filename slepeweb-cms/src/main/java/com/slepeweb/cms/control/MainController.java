@@ -4,112 +4,82 @@ import java.sql.Timestamp;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
-import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.service.CmsService;
-import com.slepeweb.cms.utils.LogUtil;
 
 @Controller
 public class MainController extends BaseController {
-	private static Logger LOG = Logger.getLogger(MainController.class);
+	//private static Logger LOG = Logger.getLogger(MainController.class);
 
-	@Autowired private CmsService cmsService;
-	
 	@RequestMapping("/test")
 	public String doGeneric(HttpSession session, ModelMap model) {
 		
 		addType("Root");
-		addType("Section");
-		addType("News");
+		ItemType sectionType = addType("Section");
+		ItemType newsType = addType("News");
 		addType("Article");
 		
-		ItemType sectionType = this.cmsService.getItemType("Section");
-		ItemType newsType = this.cmsService.getItemType("News");
+		Field titleField = addField("Title", "title", "Page title - also used in links to this page", FieldType.text, 64);
+		Field teaserField = addField("Teaser", "teaser", "Used in links to this page", FieldType.text, 256);
+		
+		newsType.addFieldForType(titleField, 1L, true);
+		newsType.addFieldForType(teaserField, 2L, false);
+		newsType.save();
 		
 		addSite("YRP", "www.yrp.com");
-		addSite("Slepeweb", "www.slepeweb.com");
-		
-		addField("Title", "title", "Page title - also used in links to this page", FieldType.text, 64);
-		addField("Teaser", "teaser", "Used in links to this page", FieldType.text, 256);
-		
-		Field titleField = this.cmsService.getFieldService().getField("Title");
-		Field teaserField = this.cmsService.getFieldService().getField("Teaser");
-		addFieldForType(newsType, titleField, 1L, true);
-		addFieldForType(newsType, teaserField, 2L, false);
+		Site s = addSite("Slepeweb", "www.slepeweb.com");
 		
 		// Create items
-		Site s = this.cmsService.getSite("Slepeweb");	
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		addItem("News section", "news", "/news", now, now, s, sectionType);
-		addItem("News item #1", "101", "/news/101", now, now, s, newsType);
+		Item newsItem = addItem("News item #1", "101", "/news/101", now, now, s, newsType);
 		addItem("News item #2", "102", "/news/102", now, now, s, newsType);
+		
+		// Set field values
+		newsItem.setFieldValue("title", "News item #1");
+		newsItem.setFieldValue("teaser", "Ukranian militia return bodies to the Netherlands");
+		newsItem.save();
+		newsItem.setFieldValue("title", "News item #1 (modified)");
+		newsItem.setFieldValue("teaser", "This teaser smells");
+		newsItem.save();
 				
 		model.addAttribute("_page", "helo");
 		return "test";
 	}
 	
-	private void addSite(String name, String hostname) {
-		Site s = new Site().setName(name).setHostname(hostname);	
-		if (this.cmsService.getSite(name) == null) {					
-			this.cmsService.addSite(s);
-		}
-		else {
-			LogUtil.warn(LOG, "Site already exists", s.getName());
-		}
+	private Site addSite(String name, String hostname) {
+		Site s = CmsBeanFactory.getSite().setName(name).setHostname(hostname);	
+		s.save();
+		return s;
 	}
 	
-	private void addType(String name) {
-		ItemType it = new ItemType().setName(name);
-		if (this.cmsService.getItemType(name) == null) {					
-			this.cmsService.addItemType(it);
-		}
-		else {
-			LogUtil.warn(LOG, "Item type already exists", it.getName());
-		}
+	private ItemType addType(String name) {
+		ItemType it = CmsBeanFactory.getItemType().setName(name);
+		it.save();
+		return it;
 	}
 
-	private void addField(String name, String variable, String help, FieldType type, int size) {
-		Field f = new Field().setName(name).setVariable(variable).setHelp(help).setType(type).setSize(size);
-		if (this.cmsService.getField(name) == null) {								
-			this.cmsService.addField(f);
-		}
-		else {
-			LogUtil.warn(LOG, "Field already exists", f.getName());
-		}
+	private Field addField(String name, String variable, String help, FieldType type, int size) {
+		Field f = CmsBeanFactory.getField().setName(name).setVariable(variable).setHelp(help).setType(type).setSize(size);
+		f.save();
+		return f;
 	}
 	
-	private void addItem(String name, String simplename, String path, 
+	private Item addItem(String name, String simplename, String path, 
 			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type) {
 		
-		Item i = new Item().setName(name).setSimpleName(simplename).setPath(path).
+		Item i = CmsBeanFactory.getItem().setName(name).setSimpleName(simplename).setPath(path).
 			setDateCreated(dateCreated).setDateUpdated(dateUpdated).setType(type);
 		
-		if (site.getItem(i.getPath()) == null) {								
-			site.addItem(i);
-		}
-		else {
-			LogUtil.warn(LOG, "Item already exists", i.getPath());
-		}
-	}
-	
-	private void addFieldForType(ItemType itemType, Field field, Long ordering, boolean mandatory) {
-		FieldForType fft = new FieldForType().setType(itemType).setField(field).setOrdering(ordering).setMandatory(mandatory);
-		if (this.cmsService.getFieldForTypeService().getFieldForType(fft.getField().getId(), fft.getType().getId()) == null) {								
-			this.cmsService.getFieldForTypeService().insertFieldForType(fft);
-		}
-		else {
-			LogUtil.warn(LOG, "Field for type already exists", fft.getType().getName());
-		}
+		return site.addItem(i);
 	}
 	
 }

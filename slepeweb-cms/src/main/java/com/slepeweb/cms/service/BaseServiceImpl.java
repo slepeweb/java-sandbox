@@ -3,6 +3,8 @@ package com.slepeweb.cms.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.slepeweb.cms.utils.LogUtil;
+
 public class BaseServiceImpl {
 	
 	//private static Logger LOG = Logger.getLogger(BaseServiceImpl.class);
@@ -13,6 +15,10 @@ public class BaseServiceImpl {
 		return this.jdbcTemplate.queryForLong("select last_insert_id()");
 	}
 	
+	protected String compose(String template, Object ... params) {
+		return LogUtil.compose(template, params);
+	}
+	
 	protected String placeholders4Insert(String fields) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < fields.split(",").length; i++) {
@@ -20,7 +26,7 @@ public class BaseServiceImpl {
 		}
 		
 		if (sb.length() > 0) {
-			return sb.substring(0, sb.length() - 2);//			instrument(result);
+			return sb.substring(0, sb.length() - 2);
 
 		}
 		

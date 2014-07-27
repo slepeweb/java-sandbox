@@ -1,6 +1,7 @@
 package com.slepeweb.cms.bean;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,6 +9,7 @@ public class ItemType extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long id;
 	private String name;
+	private List<FieldForType> fieldsForType;
 	
 	public void assimilate(ItemType it) {
 		setName(it.getName());
@@ -18,13 +20,31 @@ public class ItemType extends CmsBean implements Serializable {
 			StringUtils.isNotBlank(getName());
 	}
 	
-	public ItemType addField(Field f, Long ordering, boolean mandatory) {
-		if (isServiced()) {
-			FieldForType fft = new FieldForType().setType(this).setField(f).setOrdering(ordering).setMandatory(mandatory);
-			getCmsService().getFieldForTypeService().insertFieldForType(fft);
+	public FieldForType addFieldForType(Field f, Long ordering, boolean mandatory) {
+		FieldForType fft = CmsBeanFactory.getFieldForType().setTypeId(getId()).
+				setField(f).setOrdering(ordering).setMandatory(mandatory);
+		getFieldsForType().add(fft);		
+		return fft;
+	}
+	
+	public List<FieldForType> getFieldsForType() {
+		if (this.fieldsForType == null) {
+			this.fieldsForType = getFieldForTypeService().getFieldsForType(getId());
 		}
-		
-		return this;
+		return this.fieldsForType;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("%s", getName());
+	}
+	
+	public ItemType save() {
+		return getItemTypeService().save(this);
+	}
+	
+	public void delete() {
+		getItemTypeService().deleteItemType(getId());
 	}
 	
 	public Long getId() {
@@ -44,4 +64,30 @@ public class ItemType extends CmsBean implements Serializable {
 		this.name = name;
 		return this;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ItemType other = (ItemType) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+
 }

@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Site extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private Item root;
 	private String name, hostname;
 	private Long id;
 		
@@ -21,32 +20,26 @@ public class Site extends CmsBean implements Serializable {
 			StringUtils.isNotBlank(getHostname());
 	}
 	
-	public Item getItem(String path) {
-		if (isServiced()) {
-			return getItemService().getItem(getId(), path);
-		}
-		return null;
-	}
-	
-	public void addItem(Item i) {
-		if (isServiced()) {
-			i.setSite(this);
-			getItemService().insertItem(i);
-		}
-	}
-	
 	@Override
-	public boolean isServiced() {
-		return getItemService() != null;
+	public String toString() {
+		return String.format("%s: %s", getName(), getHostname());
 	}
 	
-	public Item getRoot() {
-		return root;
+	public Site save() {
+		return getSiteService().save(this);
 	}
 	
-	public Site setRoot(Item root) {
-		this.root = root;
-		return this;
+	public void delete() {
+		getSiteService().deleteSite(getId());
+	}
+	
+	public Item getItem(String path) {
+		return getItemService().getItem(getId(), path);
+	}
+	
+	public Item addItem(Item i) {
+		i.setSite(this);
+		return getItemService().save(i);
 	}
 	
 	public String getName() {
@@ -75,4 +68,36 @@ public class Site extends CmsBean implements Serializable {
 		this.hostname = hostname;
 		return this;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((hostname == null) ? 0 : hostname.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Site other = (Site) obj;
+		if (hostname == null) {
+			if (other.hostname != null)
+				return false;
+		} else if (!hostname.equals(other.hostname))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+
 }

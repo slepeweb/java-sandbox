@@ -47,6 +47,7 @@ public class RowMapperUtil {
 		Item item = CmsBeanFactory.getItem();
 		item.setId(rs.getLong("id"));
 		item.setName(rs.getString("name"));
+		item.setSimpleName(rs.getString("simplename"));
 		item.setPath(rs.getString("path"));
 		item.setDateCreated(rs.getTimestamp("datecreated"));
 		item.setDateUpdated(rs.getTimestamp("dateupdated"));
@@ -67,12 +68,13 @@ public class RowMapperUtil {
 	
 	public static final class LinkMapper implements RowMapper<Link> {
 		public Link mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Link it = CmsBeanFactory.getLink();
-			it.setChild(mapItem(rs));
-			it.setType(LinkType.valueOf(rs.getString("linktype")));
-			it.setName(rs.getString("name"));
-			it.setOrdering(rs.getInt("ordering"));
-			return it;
+			Link l = CmsBeanFactory.getLink();
+			l.setParentId(rs.getLong("parentid"));
+			l.setChild(mapItem(rs));
+			l.setType(LinkType.valueOf(rs.getString("linktype")));
+			l.setName(rs.getString("name"));
+			l.setOrdering(rs.getInt("ordering"));
+			return l;
 		}
 	}
 	
@@ -85,6 +87,9 @@ public class RowMapperUtil {
 	public static Field mapField(ResultSet rs) throws SQLException {
 		Field f = CmsBeanFactory.getField();
 		f.setId(rs.getLong("id"));
+//		if (! setFieldId(rs, "id", f)) {
+//			setFieldId(rs, "fieldid", f);
+//		}		
 		f.setName(rs.getString("name"));
 		f.setVariable(rs.getString("variable"));
 		f.setHelp(rs.getString("helptext"));
@@ -93,15 +98,22 @@ public class RowMapperUtil {
 		return f;
 	}
 	
+	@SuppressWarnings("unused")
+	private static boolean setFieldId(ResultSet rs, String name, Field f) {
+		try {
+			f.setId(rs.getLong(name));
+			return true;
+		}
+		catch (SQLException e) {}
+		return false;
+	}
+	
 	public static final class FieldForTypeMapper implements RowMapper<FieldForType> {
 		public FieldForType mapRow(ResultSet rs, int rowNum) throws SQLException {
 			FieldForType fft = CmsBeanFactory.getFieldForType();
 			fft.setField(mapField(rs));
-			ItemType it = CmsBeanFactory.getItemType();
-			it.setId(rs.getLong("itemtypeid"));
-			it.setName(rs.getString("itemtypename"));
-			fft.setType(it);
-			fft.setOrdering(rs.getLong("ordering"));
+			fft.setTypeId(rs.getLong("itemtypeid"));
+			fft.setOrdering(rs.getLong("fieldorder"));
 			fft.setMandatory(rs.getBoolean("mandatory"));
 			return fft;
 		}

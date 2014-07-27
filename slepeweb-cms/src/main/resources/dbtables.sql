@@ -1,3 +1,5 @@
+drop table fieldvalue;
+drop table fieldfortype;
 drop table field;
 drop table link;
 drop table itemtype;
@@ -58,7 +60,7 @@ create table field
    size int not null,
    helptext varchar(512),
    primary key (id),
-   unique key idx_field_variable (name)
+   unique key idx_field_variable (variable)
 );
 
 create table fieldfortype
@@ -77,5 +79,5 @@ create table fieldvalue
    stringvalue text,
    integervalue int,
    datevalue timestamp,
-   primary key (fieldid, itemid)
+   primary key (itemid, fieldid)
 );

@@ -22,6 +22,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected ItemService itemService;
 	@Autowired protected LinkService linkService;
 	@Autowired protected FieldForTypeService fieldForTypeService;
+	@Autowired protected FieldValueService fieldValueService;
 	
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {
@@ -37,7 +38,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	}
 
 	public void addSite(Site s) {
-		this.siteService.insertSite(s);
+		this.siteService.save(s);
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	}
 
 	public void addItemType(ItemType it) {
-		this.itemTypeService.insertItemType(it);		
+		this.itemTypeService.save(it);		
 	}
 
 	public Field getField(String name) {
@@ -63,7 +64,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	}
 
 	public void addField(Field f) {
-		this.fieldService.insertField(f);
+		this.fieldService.save(f);
 	}
 
 	public SiteService getSiteService() {
@@ -92,6 +93,10 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public void setFieldForTypeService(FieldForTypeService fieldForTypeService) {
 		this.fieldForTypeService = fieldForTypeService;
+	}
+
+	public FieldValueService getFieldValueService() {
+		return fieldValueService;
 	}
 
 }

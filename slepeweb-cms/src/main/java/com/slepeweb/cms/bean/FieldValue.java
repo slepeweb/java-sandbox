@@ -3,6 +3,8 @@ package com.slepeweb.cms.bean;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class FieldValue extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long itemId;
@@ -10,6 +12,7 @@ public class FieldValue extends CmsBean implements Serializable {
 	private String stringValue;
 	private Integer integerValue;
 	private Timestamp dateValue;
+	private Timestamp dateUpdated;
 	
 	public void assimilate(FieldValue fv) {
 		setItemId(fv.getItemId());
@@ -25,6 +28,19 @@ public class FieldValue extends CmsBean implements Serializable {
 			getField() != null && getField().getId() != null;
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("ItemId=%d: %s {%s}", getItemId(), getField(), StringUtils.abbreviate(getStringValue(), 64));
+	}
+	
+	public FieldValue save() {
+		return getFieldValueService().save(this);
+	}
+	
+	public void delete() {
+		getFieldValueService().deleteFieldValue(getField().getId(), getItemId());
+	}
+	
 	public Field getField() {
 		return field;
 	}
@@ -33,7 +49,20 @@ public class FieldValue extends CmsBean implements Serializable {
 		this.field = field;
 		return this;
 	}
+	
+	public FieldValue setValue(Object value) {
+		setStringValue(value.toString());
+		
+		if (value instanceof Integer) {
+			setIntegerValue((Integer) value);
+		}
+		else if (value instanceof Timestamp) {
+			setDateValue((Timestamp) value);
+		}
 
+		return this;
+	}
+	
 	public String getStringValue() {
 		return stringValue;
 	}
@@ -69,8 +98,72 @@ public class FieldValue extends CmsBean implements Serializable {
 		return itemId;
 	}
 
-	public void setItemId(Long itemId) {
+	public FieldValue setItemId(Long itemId) {
 		this.itemId = itemId;
+		return this;
+	}
+
+	public Timestamp getDateUpdated() {
+		return dateUpdated;
+	}
+
+	public void setDateUpdated(Timestamp dateUpdated) {
+		this.dateUpdated = dateUpdated;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((dateUpdated == null) ? 0 : dateUpdated.hashCode());
+		result = prime * result + ((dateValue == null) ? 0 : dateValue.hashCode());
+		result = prime * result + ((field == null) ? 0 : field.getId().hashCode());
+		result = prime * result + ((integerValue == null) ? 0 : integerValue.hashCode());
+		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
+		result = prime * result + ((stringValue == null) ? 0 : stringValue.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FieldValue other = (FieldValue) obj;
+		if (dateUpdated == null) {
+			if (other.dateUpdated != null)
+				return false;
+		} else if (!dateUpdated.equals(other.dateUpdated))
+			return false;
+		if (dateValue == null) {
+			if (other.dateValue != null)
+				return false;
+		} else if (!dateValue.equals(other.dateValue))
+			return false;
+		if (field == null) {
+			if (other.field != null)
+				return false;
+		} else if (!field.getId().equals(other.field.getId()))
+			return false;
+		if (integerValue == null) {
+			if (other.integerValue != null)
+				return false;
+		} else if (!integerValue.equals(other.integerValue))
+			return false;
+		if (itemId == null) {
+			if (other.itemId != null)
+				return false;
+		} else if (!itemId.equals(other.itemId))
+			return false;
+		if (stringValue == null) {
+			if (other.stringValue != null)
+				return false;
+		} else if (!stringValue.equals(other.stringValue))
+			return false;
+		return true;
 	}
 
 }

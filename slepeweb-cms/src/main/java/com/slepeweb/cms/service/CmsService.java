@@ -14,6 +14,7 @@ public interface CmsService {
 	ItemService getItemService();
 	LinkService getLinkService();
 	FieldForTypeService getFieldForTypeService();
+	FieldValueService getFieldValueService();
 	
 	void addSite(Site s);
 	Site getSite(String name);

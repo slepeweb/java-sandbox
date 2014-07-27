@@ -5,8 +5,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
+import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.ItemType;
-import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -14,34 +14,62 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 	
 	private static Logger LOG = Logger.getLogger(ItemTypeServiceImpl.class);
 	
-	public void insertItemType(ItemType it) {
+	public ItemType save(ItemType it) {
+		if (it.isDefined4Insert()) {
+			ItemType dbRecord = getItemType(it.getName());		
+			if (dbRecord != null) {
+				updateItemType(dbRecord, it);
+			}
+			else {
+				insertItemType(it);
+			}
+			
+			saveFieldsForType(it);
+			// TODO: need to remove old fields
+		}
+		
+		return it;
+	}
+	
+	private void insertItemType(ItemType it) {
 		this.jdbcTemplate.update(
 				"insert into itemtype (name) values (?)", 
 				it.getName());
-
-		LogUtil.info(LOG, "Added new item type", it.getName());
+		
+		it.setId(getLastInsertId());
+		LOG.info(compose("Added new item type", it.getName()));
 	}
 
-	public void updateItemType(ItemType it) {
-		ItemType dbRecord = getItemType(it.getId());
-		
-		if (dbRecord != null) {
+	private void updateItemType(ItemType dbRecord, ItemType it) {
+		if (! dbRecord.equals(it)) {
 			dbRecord.assimilate(it);
 			
 			this.jdbcTemplate.update(
 					"update itemtype set name = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getId());
 			
-			LogUtil.info(LOG, "Updated item type", it.getName());
+			LOG.info(compose("Updated item type", it.getName()));
 		}
 		else {
-			LogUtil.warn(LOG, "Item type not found", it.getName());
+			it.setId(dbRecord.getId());
+			LOG.info(compose("Item type not modified", it.getName()));
+		}
+	}
+	
+	private void saveFieldsForType(ItemType it) {
+		if (it.getFieldsForType() != null) {
+			for (FieldForType fft : it.getFieldsForType()) {
+				fft.save();
+			}
+		}
+		else {
+			LOG.debug(compose("No fields defined for this type", it.getName()));
 		}
 	}
 
 	public void deleteItemType(Long id) {
 		if (this.jdbcTemplate.update("delete from itemtype where id = ?", id) > 0) {
-			LogUtil.warn(LOG, "Deleted item type", String.valueOf(id));
+			LOG.warn(compose("Deleted item type", String.valueOf(id)));
 		}
 	}
 
@@ -64,5 +92,6 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			return null;
 		}
 	}
+
 
 }

@@ -7,4 +7,13 @@ public class Template extends CmsBean implements Serializable {
 	private String name, jspPath;
 	private ItemType itemType;
 	private Integer id;
+	
+	public Template save() {
+		return null;
+	}
+	
+	public void delete() {
+		
+	}
+	
 }

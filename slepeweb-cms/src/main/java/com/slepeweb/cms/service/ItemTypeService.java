@@ -4,9 +4,8 @@ import com.slepeweb.cms.bean.ItemType;
 
 
 public interface ItemTypeService {
-	void insertItemType(ItemType it);
-	void updateItemType(ItemType it);
 	void deleteItemType(Long id);
 	ItemType getItemType(String name);
 	ItemType getItemType(Long id);
+	ItemType save(ItemType it);
 }

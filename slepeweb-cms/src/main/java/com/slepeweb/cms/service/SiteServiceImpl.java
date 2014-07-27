@@ -7,10 +7,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -20,59 +20,70 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	@Autowired protected ItemTypeService itemTypeService;	
 	@Autowired protected ItemService itemService;	
 	
-	public void insertSite(Site s) {
-		
+	public Site save(Site s) {
 		if (s.isDefined4Insert()) {
-			String rootName = "Root";
-			ItemType type = this.itemTypeService.getItemType(rootName);
-			
-			if (type != null) {
-				this.jdbcTemplate.update(
-						"insert into site (name, hostname) values (?, ?)", 
-						s.getName(), s.getHostname());
-				
-				s.setId(getLastInsertId());
-				Item r = new Item();
-				r.setName(rootName);
-				r.setSimpleName("");
-				r.setPath("/");
-				r.setSite(s);
-				r.setType(type);
-				r.setDateCreated(new Timestamp(System.currentTimeMillis()));
-				r.setDateUpdated(r.getDateCreated());
-				r.setDeleted(false);
-				this.itemService.insertItem(r);
-				
-				LogUtil.info(LOG, "Added new site", s.getName());
+			Site dbRecord = getSite(s.getName());		
+			if (dbRecord != null) {
+				updateSite(dbRecord, s);
 			}
 			else {
-				LogUtil.info(LOG, "No root item type defined", "Root");
+				insertSite(s);
 			}
 		}
+		
+		return s;
+	}
+	
+	private Site insertSite(Site s) {
+		
+		String rootName = "Root";
+		ItemType type = this.itemTypeService.getItemType(rootName);
+		
+		if (type != null) {
+			this.jdbcTemplate.update(
+					"insert into site (name, hostname) values (?, ?)", 
+					s.getName(), s.getHostname());
+			
+			s.setId(getLastInsertId());
+			Item r = CmsBeanFactory.getItem();
+			r.setName(rootName);
+			r.setSimpleName("");
+			r.setPath("/");
+			r.setSite(s);
+			r.setType(type);
+			r.setDateCreated(new Timestamp(System.currentTimeMillis()));
+			r.setDateUpdated(r.getDateCreated());
+			r.setDeleted(false);
+			this.itemService.save(r);
+			
+			LOG.info(compose("Added new site", s.getName()));
+		}
+		else {
+			LOG.info(compose("No root item type defined", "Root"));
+		}
+		
+		return s;
 	}
 
-	public void updateSite(Site site) {
-		if (site.isDefined4Insert()) {
-			Site dbRecord = getSite(site.getId());
+	private void updateSite(Site dbRecord, Site site) {
+		if (! dbRecord.equals(site)) {
+			dbRecord.assimilate(site);
 			
-			if (dbRecord != null) {
-				dbRecord.assimilate(site);
-				
-				this.jdbcTemplate.update(
-						"update site set name = ?, hostname = ? where id = ?", 
-						dbRecord.getName(), dbRecord.getHostname(), dbRecord.getId());
-				
-				LogUtil.info(LOG, "Updated site", site.getName());
-			}
-			else {
-				LogUtil.warn(LOG, "Site not found", site.getName());
-			}
+			this.jdbcTemplate.update(
+					"update site set name = ?, hostname = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getHostname(), dbRecord.getId());
+			
+			LOG.info(compose("Updated site", site.getName()));
+		}
+		else {
+			site.setId(dbRecord.getId());
+			LOG.info(compose("Site not modified", site.getName()));
 		}
 	}
 
 	public void deleteSite(Long id) {
 		if (this.jdbcTemplate.update("delete from site where id = ?", id) > 0) {
-			LogUtil.warn(LOG, "Deleted site", String.valueOf(id));
+			LOG.warn(compose("Deleted site", String.valueOf(id)));
 		}
 	}
 

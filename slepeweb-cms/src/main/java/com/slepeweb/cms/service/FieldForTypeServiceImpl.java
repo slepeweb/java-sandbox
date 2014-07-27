@@ -6,64 +6,78 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FieldForType;
-import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
 public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldForTypeService {
 	
 	private static Logger LOG = Logger.getLogger(FieldForTypeServiceImpl.class);
+	private static final String SELECTOR_TEMPLATE = 
+			"select fft.*, f.* from fieldfortype fft, field f where " +
+			"fft.fieldid = f.id and %s";
 	
-	public void insertFieldForType(FieldForType fft) {
+	public FieldForType save(FieldForType fft) {
 		if (fft.isDefined4Insert()) {
-			this.jdbcTemplate.update(
-					"insert into fieldfortype (fieldid, itemtypeid, fieldorder, mandatory) values (?, ?, ?, ?)", 
-					fft.getField().getId(), fft.getType().getId(), fft.getOrdering(), fft.isMandatory());
-			
-			LogUtil.info(LOG, "Inserted new field for type", fft.getField().getName());
-		}
-	}
-
-	public void updateFieldForType(FieldForType fft) {
-		if (fft.isDefined4Insert()) {
-			FieldForType dbRow = getFieldForType(fft.getField().getId(), fft.getType().getId());
-			
-			if (dbRow != null) {
-				dbRow.assimilate(fft);
-				
-				this.jdbcTemplate.update(
-						"update fieldfortype set fieldorder = ?, mandatory = ? where fieldid = ? and itemtypeid = ?", 
-						fft.getOrdering(), fft.isMandatory(), fft.getField().getId(), fft.getType().getId());
-				
-				LogUtil.info(LOG, "Updated field for type", fft.getType().getName());
+			FieldForType dbRecord = getFieldForType(fft.getField().getId(), fft.getTypeId());		
+			if (dbRecord != null) {
+				updateFieldForType(dbRecord, fft);
 			}
 			else {
-				LogUtil.warn(LOG, "Field for type not found", fft.getType().getName());
+				insertFieldForType(fft);
 			}
+		}
+		
+		return fft;
+	}
+	
+	private void insertFieldForType(FieldForType fft) {
+		this.jdbcTemplate.update(
+				"insert into fieldfortype (fieldid, itemtypeid, fieldorder, mandatory) values (?, ?, ?, ?)", 
+				fft.getField().getId(), fft.getTypeId(), fft.getOrdering(), fft.isMandatory());
+		
+		// Note: No new key generated for this insert
+		LOG.info(compose("Inserted new field for type", fft.getField().getName()));
+	}
+
+	private void updateFieldForType(FieldForType dbRecord, FieldForType fft) {
+		if (! dbRecord.equals(fft)) {
+			dbRecord.assimilate(fft);
+			
+			this.jdbcTemplate.update(
+					"update fieldfortype set fieldorder = ?, mandatory = ? where fieldid = ? and itemtypeid = ?", 
+					fft.getOrdering(), fft.isMandatory(), fft.getField().getId(), fft.getTypeId());
+			
+			LOG.info(compose("Updated field for type", fft.getTypeId()));
+		}
+		else {
+			LOG.debug(compose("Field for type already defined", fft.getTypeId(), fft.getField().getVariable()));
 		}
 	}
 
 	public void deleteFieldForType(Long fieldId, Long itemTypeId) {
 		if (this.jdbcTemplate.update("delete from fieldfortype where fieldid = ? and itemtypeid = ?", fieldId, itemTypeId) > 0) {
-			LogUtil.warn(LOG, "Deleted field for type", "");
+			LOG.warn(compose("Deleted field for type", ""));
 		}
 	}
 
 	public FieldForType getFieldForType(Long fieldId, Long itemTypeId) {
-		String sql = "select fft.*, f.id as fieldid, f.name as fieldname, f.variable, f.helptext, f.fieldtype, f.size, " +
-				"it.name as itemtypename, it.id as itemtypeid from fieldfortype fft, field f, itemtype it where " +
-				"fft.fieldid = f.id and fft.itemtypeid = it.id and fft.fieldid = ? and fft.itemtypeid = ?";
-		
 		Object[] params = new Object[] {fieldId, itemTypeId};
 		
+		String sql = String.format(SELECTOR_TEMPLATE, "fft.fieldid = ? and fft.itemtypeid = ?");
 		List<FieldForType> group = this.jdbcTemplate.query(sql, params, new RowMapperUtil.FieldForTypeMapper());
 			
 		if (group.size() > 0) {
-				return group.get(0);
-			}
-			else {
-				return null;
-			}
+			return group.get(0);
+		}
+		else {
+			return null;
+		}
 	}
 
+	public List<FieldForType> getFieldsForType(Long itemTypeId) {
+		Object[] params = new Object[] {itemTypeId};
+		
+		String sql = String.format(SELECTOR_TEMPLATE, "fft.itemtypeid = ?");
+		return this.jdbcTemplate.query(sql, params, new RowMapperUtil.FieldForTypeMapper());
+	}
 }
