@@ -32,7 +32,7 @@ public class Item extends CmsBean implements Serializable {
 		setSite(i.getSite());
 		setType(i.getType());
 		
-		// TODO: must assimilate fields and links too
+		// TODO: must assimilate fields and links too ???
 	}
 	
 	public boolean isDefined4Insert() {
@@ -89,6 +89,10 @@ public class Item extends CmsBean implements Serializable {
 		}
 		
 		return this;
+	}
+	
+	public Item addChild(Item child) {
+		return getItemService().save(child);
 	}
 	
 	public List<Item> getBoundItems() {
