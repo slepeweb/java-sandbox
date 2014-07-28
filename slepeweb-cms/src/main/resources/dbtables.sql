@@ -32,8 +32,8 @@ create table item
 	name varchar(255),
 	simplename varchar(255),
 	path varchar(255),
-	siteid int references site(id),
-	typeid int references itemtype(id),
+	siteid int references site(id) on delete cascade,
+	typeid int references itemtype(id) on delete cascade,
 	datecreated timestamp,
 	dateupdated timestamp,
 	deleted boolean,
@@ -43,8 +43,8 @@ create table item
 
 create table link
 (
-	parentid int references item(id),
-	childid int references item(id),
+	parentid int references item(id) on delete cascade,
+	childid int references item(id) on delete cascade,
 	linktype enum ('binding', 'relation', 'inline', 'shortcut'),
 	name varchar(64),
 	ordering smallint,
@@ -66,7 +66,7 @@ create table field
 create table fieldfortype
 (
    fieldid int references field(id),
-   itemtypeid int references itemtype(id),
+   itemtypeid int references itemtype(id) on delete cascade,
    fieldorder int not null,
    mandatory boolean,
    primary key (fieldid, itemtypeid)
@@ -74,8 +74,8 @@ create table fieldfortype
 
 create table fieldvalue
 (
-   fieldid int references field(id),
-   itemid int references item(id),
+   fieldid int references field(id) on delete cascade,
+   itemid int references item(id) on delete cascade,
    stringvalue text,
    integervalue int,
    datevalue timestamp,
