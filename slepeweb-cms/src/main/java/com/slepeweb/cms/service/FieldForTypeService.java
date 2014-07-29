@@ -10,4 +10,6 @@ public interface FieldForTypeService {
 	void deleteFieldForType(Long fieldId, Long itemTypeId);
 	List<FieldForType> getFieldsForType(Long itemTypeId);
 	FieldForType save(FieldForType fft);
+	int getCount();
+	int getCount(Long itemTypeId);
 }

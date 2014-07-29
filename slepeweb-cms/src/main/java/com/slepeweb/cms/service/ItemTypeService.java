@@ -8,4 +8,5 @@ public interface ItemTypeService {
 	ItemType getItemType(String name);
 	ItemType getItemType(Long id);
 	ItemType save(ItemType it);
+	int getCount();
 }

@@ -1,6 +1,7 @@
 package com.slepeweb.cms.bean;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,7 +12,7 @@ public class Field extends CmsBean implements Serializable {
 	private String name, variable, help;
 	private FieldType type;
 	private int size;
-	private Object defaultValue;
+	private String defaultValue;
 	
 	public enum FieldType {
 		text, markup, integer, date, url;
@@ -100,11 +101,30 @@ public class Field extends CmsBean implements Serializable {
 	}
 
 	public Object getDefaultValue() {
-		return defaultValue;
+		if (getType() == FieldType.integer) {
+			return StringUtils.isNotBlank(this.defaultValue) ? Integer.valueOf(this.defaultValue) : 0;
+		}
+		else if (getType() == FieldType.date) {
+			// TODO: convert string to timestamp
+			return StringUtils.isNotBlank(this.defaultValue) ? new Timestamp(System.currentTimeMillis()) : 
+				new Timestamp(System.currentTimeMillis());
+		}
+		else {
+			return StringUtils.isNotBlank(this.defaultValue) ? this.defaultValue : "";
+		}
 	}
 
-	public void setDefaultValue(Object defaultValue) {
-		this.defaultValue = defaultValue;
+	public Field setDefaultValue(Object value) {
+		if (value instanceof Integer && getType() == FieldType.integer) {
+			this.defaultValue = String.valueOf(value);
+		}
+		else if (value instanceof Timestamp && getType() == FieldType.date) {
+			this.defaultValue = ((Timestamp) value).toString();
+		}
+		else {
+			this.defaultValue = value.toString();
+		}
+		return this;
 	}
 
 	@Override

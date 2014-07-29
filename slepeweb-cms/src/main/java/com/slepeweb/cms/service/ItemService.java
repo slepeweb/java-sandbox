@@ -8,4 +8,8 @@ public interface ItemService {
 	Item getItem(Long siteId, String path);
 	Item getItem(Long id);
 	Item save(Item i);
+	int getCount();
+	int getCount(String path);
+	int getCountByType(Long itemTypeId);
+
 }

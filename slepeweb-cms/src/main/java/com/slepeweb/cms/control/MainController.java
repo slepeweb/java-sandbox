@@ -1,9 +1,10 @@
 package com.slepeweb.cms.control;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,19 +15,84 @@ import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.cms.utils.TestResult;
 
 @Controller
 public class MainController extends BaseController {
-	//private static Logger LOG = Logger.getLogger(MainController.class);
+	
+	@Autowired private CmsService cmsService;
 
-	@RequestMapping("/test")
-	public String doGeneric(HttpSession session, ModelMap model) {
+	@RequestMapping("/test/delete")
+	public String doPurge(ModelMap model) {
 		
-		// If request parameter indicates content deletion:
-		// Delete all items - cascade should delete fieldvalues, fieldfortypes and links
-		// Delete all item types
-		// Delete all field definitions
-		// Delete site 'Test'
+		List<TestResult> results = new ArrayList<TestResult>();
+		TestResult r;
+		ItemType it;
+		
+		// Delete the News item type
+		it = this.cmsService.getItemTypeService().getItemType("News");
+		results.add(r = new TestResult().setId(10).setTitle("Delete News type"));
+		if (it == null) {
+			r.setNotes("News type is not defined").fail();
+		}
+		else {
+			int typeCount = this.cmsService.getItemTypeService().getCount();
+			int newsCount = this.cmsService.getItemService().getCountByType(it.getId());
+			int itemCount = this.cmsService.getItemService().getCount();
+			int fieldValueCount = this.cmsService.getFieldValueService().getCount();
+			int fieldForTypeCount = this.cmsService.getFieldForTypeService().getCount();
+			
+			// Delete the news item type
+			it.delete();
+			
+			// Check that exactly 1 item type has been deleted
+			int diff = typeCount - this.cmsService.getItemTypeService().getCount();
+			r.setNotes(diff + " item types have been deleted");
+			if (diff != 1) {
+				r.fail();
+			}
+			
+			// Check the number of news items that have been deleted
+			results.add(r = new TestResult().setId(20).setTitle("Confirm all news items have been cascade-deleted"));
+			diff = itemCount - this.cmsService.getItemService().getCount();
+			r.setNotes(diff + " news items have been deleted");
+			if (diff != newsCount) {
+				r.setNotes(diff + " news items have been deleted - should have been " + newsCount).fail();
+			}
+			
+			// Check that field values have been cascade-deleted
+			results.add(r = new TestResult().setId(30).setTitle("Check N field values have been cascade-deleted"));
+			diff = fieldValueCount - this.cmsService.getFieldValueService().getCount();
+			r.setNotes(diff + " field value records have been deleted");
+			if (diff <= 0) {
+				r.fail();
+			}
+			
+			// Check that fieldfortype records have been cascade-deleted
+			results.add(r = new TestResult().setId(40).setTitle("Check N fieldfortype records have been cascade-deleted"));
+			diff = fieldForTypeCount - this.cmsService.getFieldForTypeService().getCount();
+			r.setNotes(diff + " fieldfortype records have been deleted");
+			if (diff <= 0) {
+				r.fail();
+			}
+
+		}
+				
+		// END
+		model.addAttribute("testResults", results);
+		return "test";
+	}
+	
+	@RequestMapping("/test/build")
+	public String doPop(ModelMap model) {
+		
+		List<TestResult> results = new ArrayList<TestResult>();
+		TestResult r;
+		int testId = 1;
+		String testSiteName = "Integration Testing";
+		Site site;
+		int count;
 		
 		// Create item types
 		addType("Root");
@@ -38,8 +104,8 @@ public class MainController extends BaseController {
 		// Assert Test site has been created
 		
 		// Create fields
-		Field titleField = addField("Title", "title", "Page title - also used in links to this page", FieldType.text, 64);
-		Field teaserField = addField("Teaser", "teaser", "Used in links to this page", FieldType.text, 256);
+		Field titleField = addField("Title", "title", "Page title - also used in links to this page", FieldType.text, 64, "");
+		Field teaserField = addField("Teaser", "teaser", "Used in links to this page", FieldType.text, 256, "");
 		
 		// Assert N fields have been created
 		// Assert properties of title field
@@ -54,7 +120,7 @@ public class MainController extends BaseController {
 		// Assert properties of teaser field
 		
 		// Create test site
-		Site s = addSite("Integeration Test", "test.slepeweb.com");
+		Site s = addSite("Integration Test", "test.slepeweb.com");
 		
 		// Assert test site has a root item
 		Item root = s.getItem("/");
@@ -89,7 +155,6 @@ public class MainController extends BaseController {
 		model.addAttribute("_page", "helo");
 		return "test";
 	}
-	
 	private Site addSite(String name, String hostname) {
 		Site s = CmsBeanFactory.getSite().setName(name).setHostname(hostname);	
 		s.save();
@@ -102,8 +167,9 @@ public class MainController extends BaseController {
 		return it;
 	}
 
-	private Field addField(String name, String variable, String help, FieldType type, int size) {
-		Field f = CmsBeanFactory.getField().setName(name).setVariable(variable).setHelp(help).setType(type).setSize(size);
+	private Field addField(String name, String variable, String help, FieldType type, int size, Object dflt) {
+		Field f = CmsBeanFactory.getField().setName(name).setVariable(variable).setHelp(help).setType(type).
+				setSize(size).setDefaultValue(dflt);
 		f.save();
 		return f;
 	}
@@ -111,8 +177,9 @@ public class MainController extends BaseController {
 	private Item addItem(Item parent, String name, String simplename, 
 			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type) {
 		
-		Item i = CmsBeanFactory.getItem().setName(name).setSimpleName(simplename).setPath(parent.getPath() + "/" + simplename).
-			setDateCreated(dateCreated).setDateUpdated(dateUpdated).setType(type);
+		String path = parent.isRoot() ? parent.getPath() + simplename : parent.getPath() + "/" + simplename;
+		Item i = CmsBeanFactory.getItem().setName(name).setSimpleName(simplename).setPath(path).
+			setDateCreated(dateCreated).setDateUpdated(dateUpdated).setSite(site).setType(type);
 		
 		return parent.addChild(i);
 	}

@@ -1,12 +1,15 @@
 package com.slepeweb.cms.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
@@ -24,6 +27,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	@Autowired protected LinkService linkService;
 	@Autowired protected FieldValueService fieldValueService;
+	@Autowired protected FieldForTypeService fieldForTypeService;
 
 	private String columns = "name, simplename, path, siteid, typeid, datecreated, dateupdated, deleted";
 	
@@ -60,7 +64,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			
 			Long lastId = getLastInsertId();
 			i.setId(lastId);
-			LOG.info(compose("Added new item", i.getPath()));
+			setDefaultFieldValues(i);
+			LOG.info(compose("Added new item", i));
 			
 			// Insert binding link to parent item
 			if (! i.isRoot()) {
@@ -93,11 +98,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 					dbRecord.getSite().getId(), dbRecord.getType().getId(), 
 					dbRecord.getDateCreated(), dbRecord.getDateUpdated(), dbRecord.isDeleted(), i.getId());
 			
-			LOG.info(compose("Updated item", i.getPath()));
+			LOG.info(compose("Updated item", i));
 		}
 		else {
 			i.setId(dbRecord.getId());
-			LOG.info(compose("Item not modified", i.getPath()));
+			LOG.info(compose("Item not modified", i));
 		}
 		
 		// TODO: Simplename or binding may have changed.
@@ -108,6 +113,16 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		if (i.getFieldValues() != null) {
 			for (FieldValue fv : i.getFieldValues()) {
 				fv.save();
+			}
+		}
+	}
+	
+	private void setDefaultFieldValues(Item i) {
+		if (i.getFieldValues() == null) {
+			i.setFieldValues(new ArrayList<FieldValue>());
+			// If item has no field values, create them, with default values
+			for (FieldForType fft : this.fieldForTypeService.getFieldsForType(i.getType().getId())) {
+				i.setFieldValue(fft.getField().getVariable(), fft.getField().getDefaultValue());
 			}
 		}
 	}
@@ -125,7 +140,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			for (Link dbLink : dbRecord.getLinks()) {
 				if (! i.getLinks().contains(dbLink)) {
 					// TODO: Cautionary move: dbLink.delete();
-					LOG.info(compose("Deleted old child link", dbLink.getParentId(), dbLink.getChild().getPath()));
+					LOG.info(compose("Deleted old child link", dbLink));
 				}
 			}
 		}
@@ -134,6 +149,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	public void deleteItem(Long id) {
 		if (this.jdbcTemplate.update("delete from item where id = ?", id) > 0) {
 			LOG.warn(compose("Deleted item", String.valueOf(id)));
+			
+			// TODO: Should also delete child/descendant items
+			// Perhaps fail if there are descendants, and look for confirmation before deleting all descendants.
 		}
 	}
 
@@ -153,6 +171,23 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			new Object[]{id});
 	}
 	
+	public int getCount() {
+		return getCount(null);
+	}
+	
+	public int getCount(String path) {
+		if (StringUtils.isNotBlank(path)) {
+			return this.jdbcTemplate.queryForInt("select count(*) from item where path like ?", path + "%");
+		}
+		else {
+			return this.jdbcTemplate.queryForInt("select count(*) from item");
+		}
+	}
+	
+	public int getCountByType(Long itemTypeId) {
+		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
+	}
+
 	private Item getItem(String sql, Object[] params) {
 		List<Item> group = this.jdbcTemplate.query(
 			sql, params, new RowMapperUtil.ItemMapper());
@@ -170,4 +205,5 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 		return "/";
 	}
+
 }

@@ -38,7 +38,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 				l.getParentId(), l.getChild().getId(), l.getType().name(), l.getName(), l.getOrdering());
 		
 		// Note: no new id generated for this bean
-		LOG.info(compose("Added new link", l.getParentId(), l.getChild().getPath()));
+		LOG.info(compose("Added new link", l));
 	}
 	
 	private void updateLink(Link dbRecord, Link l) {
@@ -50,10 +50,10 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 					dbRecord.getType().name(), dbRecord.getName(), dbRecord.getOrdering(), 
 					dbRecord.getParentId(), dbRecord.getChild().getId());
 			
-			LOG.info(compose("Updated link link", l.getParentId(), l.getChild().getPath()));
+			LOG.info(compose("Updated link link", l));
 		}
 		else {
-			LOG.debug(compose("Link not modified", l.getParentId(), l.getChild().getPath()));
+			LOG.debug(compose("Link not modified", l));
 		}
 	}
 
@@ -94,4 +94,18 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		}
 		return null;
 	}
+	
+	public int getCount() {
+		return getCount(null);
+	}
+	
+	public int getCount(Long parentId) {
+		if (parentId != null) {
+			return this.jdbcTemplate.queryForInt("select count(*) from link where parentid = ?", parentId);
+		}
+		else {
+			return this.jdbcTemplate.queryForInt("select count(*) from link");
+		}
+	}
+	
 }

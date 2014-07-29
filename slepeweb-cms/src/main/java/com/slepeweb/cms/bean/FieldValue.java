@@ -30,7 +30,7 @@ public class FieldValue extends CmsBean implements Serializable {
 	
 	@Override
 	public String toString() {
-		return String.format("ItemId=%d: %s {%s}", getItemId(), getField(), StringUtils.abbreviate(getStringValue(), 64));
+		return String.format("itemId=%d: %s {%s}", getItemId(), getField(), StringUtils.abbreviate(getStringValue(), 64));
 	}
 	
 	public FieldValue save() {

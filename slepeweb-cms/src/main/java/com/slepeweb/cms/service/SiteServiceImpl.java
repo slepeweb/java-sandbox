@@ -56,7 +56,7 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 			r.setDeleted(false);
 			this.itemService.save(r);
 			
-			LOG.info(compose("Added new site", s.getName()));
+			LOG.info(compose("Added new site", s));
 		}
 		else {
 			LOG.info(compose("No root item type defined", "Root"));
@@ -73,11 +73,11 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 					"update site set name = ?, hostname = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getHostname(), dbRecord.getId());
 			
-			LOG.info(compose("Updated site", site.getName()));
+			LOG.info(compose("Updated site", site));
 		}
 		else {
 			site.setId(dbRecord.getId());
-			LOG.info(compose("Site not modified", site.getName()));
+			LOG.info(compose("Site not modified", site));
 		}
 	}
 
@@ -87,8 +87,10 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		}
 	}
 
-	public void deleteSite(Site s) {
-		deleteSite(s.getId());
+	public void deleteSite(String name) {
+		if (this.jdbcTemplate.update("delete from site where name = ?", name) > 0) {
+			LOG.warn(compose("Deleted site", name));
+		}
 	}
 
 	public Site getSite(String name) {

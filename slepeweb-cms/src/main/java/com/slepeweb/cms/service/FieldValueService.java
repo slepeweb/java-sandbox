@@ -11,4 +11,6 @@ public interface FieldValueService {
 	FieldValue getFieldValue(Long fieldId, Long itemId);
 	void deleteFieldValue(Long fieldId, Long itemId);
 	FieldValue save(FieldValue fv);
+	int getCount();
+	int getCount(Long itemId);
 }

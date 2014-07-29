@@ -1,17 +1,14 @@
-<article class="first">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
+    taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@ 
+    taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%><%@ 
+    taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%>
 
-	<h2>About us</h2>
-
-	<p>With a strong track record of building dynamic websites for some
-		major brands, Slepe Web Solutions (SWS) offers its clients in-depth
-		expertise in java web application development. Whilst its main strengths
-		are in back-end java web technologies and frameworks, SWS also has a
-		lot of experience integrating with the latest front-end technologies.</p>
-
-	<p>Another key strength of SWS is the depth of experience in
-		designing and building Alterian CMS-driven websites. A good CMS design
-		means feature-rich web pages, efficient content storage, easy updates
-		for business users, and performant multi-channel content delivery. SWS
-		is a leader in this field.</p>
-
-</article>
+<h1>Test results</h1>
+<table border="1">
+	<tr><th>Id</th><th align="left">Title</th><th>Result</th><th>Notes</th></tr>
+	<c:forEach items="${testResults}" var="result">
+		<tr><td>${result.id}</td><td>${result.title}</td>
+		<td class="<c:choose><c:when test="${result.result eq 'Fail'}">fail</c:when><c:otherwise>pass</c:otherwise></c:choose>">${result.result}</td>
+		<td>${result.notes}</td></tr>
+	</c:forEach>
+</table>

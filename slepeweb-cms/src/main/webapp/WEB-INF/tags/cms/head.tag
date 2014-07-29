@@ -7,5 +7,6 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
+<link rel="stylesheet" href="/resources/css/main.css" type="text/css">
 <cms:extraCSS />
 <cms:extraJS />

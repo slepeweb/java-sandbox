@@ -11,4 +11,6 @@ public interface LinkService {
 	List<Link> getLinks(Long parentId);
 	Link getLink(Long parentId, Long childId);
 	Link save(Link l);
+	int getCount();
+	int getCount(Long parentId);
 }

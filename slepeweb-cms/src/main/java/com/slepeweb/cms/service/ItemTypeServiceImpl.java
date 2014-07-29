@@ -37,7 +37,7 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 				it.getName());
 		
 		it.setId(getLastInsertId());
-		LOG.info(compose("Added new item type", it.getName()));
+		LOG.info(compose("Added new item type", it));
 	}
 
 	private void updateItemType(ItemType dbRecord, ItemType it) {
@@ -48,11 +48,11 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 					"update itemtype set name = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getId());
 			
-			LOG.info(compose("Updated item type", it.getName()));
+			LOG.info(compose("Updated item type", it));
 		}
 		else {
 			it.setId(dbRecord.getId());
-			LOG.info(compose("Item type not modified", it.getName()));
+			LOG.info(compose("Item type not modified", it));
 		}
 	}
 	
@@ -63,7 +63,7 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			}
 		}
 		else {
-			LOG.debug(compose("No fields defined for this type", it.getName()));
+			LOG.debug(compose("No fields defined for this type", it));
 		}
 	}
 
@@ -93,5 +93,8 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 		}
 	}
 
+	public int getCount() {
+		return this.jdbcTemplate.queryForInt("select count(*) from itemtype");
+	}
 
 }

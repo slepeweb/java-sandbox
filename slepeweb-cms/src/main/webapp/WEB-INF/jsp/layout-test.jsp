@@ -31,6 +31,7 @@
 		<!-- Footer -->
 	
 		<div id="footer-wrapper">
+			<br />
 			<cms:footer />
 		</div>
 	

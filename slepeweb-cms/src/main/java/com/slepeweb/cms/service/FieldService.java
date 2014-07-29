@@ -11,4 +11,5 @@ public interface FieldService {
 	Field getField(String name);
 	Field getField(Long id);
 	Field save(Field f);
+	int getCount();
 }

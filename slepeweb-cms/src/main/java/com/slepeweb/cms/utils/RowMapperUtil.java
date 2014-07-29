@@ -87,14 +87,12 @@ public class RowMapperUtil {
 	public static Field mapField(ResultSet rs) throws SQLException {
 		Field f = CmsBeanFactory.getField();
 		f.setId(rs.getLong("id"));
-//		if (! setFieldId(rs, "id", f)) {
-//			setFieldId(rs, "fieldid", f);
-//		}		
 		f.setName(rs.getString("name"));
 		f.setVariable(rs.getString("variable"));
 		f.setHelp(rs.getString("helptext"));
 		f.setType(FieldType.valueOf(rs.getString("fieldtype")));
 		f.setSize(rs.getInt("size"));
+		f.setDefaultValue(rs.getString("dflt"));
 		return f;
 	}
 	

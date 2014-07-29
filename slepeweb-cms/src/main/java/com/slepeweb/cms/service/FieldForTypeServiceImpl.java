@@ -36,7 +36,7 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 				fft.getField().getId(), fft.getTypeId(), fft.getOrdering(), fft.isMandatory());
 		
 		// Note: No new key generated for this insert
-		LOG.info(compose("Inserted new field for type", fft.getField().getName()));
+		LOG.info(compose("Inserted new field for type", fft));
 	}
 
 	private void updateFieldForType(FieldForType dbRecord, FieldForType fft) {
@@ -47,10 +47,10 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 					"update fieldfortype set fieldorder = ?, mandatory = ? where fieldid = ? and itemtypeid = ?", 
 					fft.getOrdering(), fft.isMandatory(), fft.getField().getId(), fft.getTypeId());
 			
-			LOG.info(compose("Updated field for type", fft.getTypeId()));
+			LOG.info(compose("Updated field for type", fft));
 		}
 		else {
-			LOG.debug(compose("Field for type already defined", fft.getTypeId(), fft.getField().getVariable()));
+			LOG.debug(compose("Field for type already defined", fft));
 		}
 	}
 
@@ -79,5 +79,18 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 		
 		String sql = String.format(SELECTOR_TEMPLATE, "fft.itemtypeid = ?");
 		return this.jdbcTemplate.query(sql, params, new RowMapperUtil.FieldForTypeMapper());
+	}
+
+	public int getCount() {
+		return getCount(null);
+	}
+	
+	public int getCount(Long itemTypeId) {
+		if (itemTypeId != null) {
+			return this.jdbcTemplate.queryForInt("select count(*) from fieldfortype where itemtypeid = ?", itemTypeId);
+		}
+		else {
+			return this.jdbcTemplate.queryForInt("select count(*) from fieldfortype");
+		}
 	}
 }

@@ -7,7 +7,7 @@ import com.slepeweb.cms.bean.Site;
 
 public interface SiteService {
 	void deleteSite(Long id);
-	void deleteSite(Site s);
+	void deleteSite(String name);
 	Site getSite(String name);
 	Site getSite(Long id);
 	List<Site> getAllSites();

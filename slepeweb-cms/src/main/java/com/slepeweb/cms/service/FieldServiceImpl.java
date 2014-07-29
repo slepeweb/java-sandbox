@@ -29,11 +29,11 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 	
 	private void insertField(Field f) {
 		this.jdbcTemplate.update(
-				"insert into field (name, variable, fieldtype, helptext, size) values (?, ?, ?, ?, ?)", 
-				f.getName(), f.getVariable(), f.getType().name(), f.getHelp(), f.getSize());				
+				"insert into field (name, variable, fieldtype, helptext, size, dflt) values (?, ?, ?, ?, ?, ?)", 
+				f.getName(), f.getVariable(), f.getType().name(), f.getHelp(), f.getSize(), f.getDefaultValue());				
 		
 		f.setId(getLastInsertId());
-		LOG.info(compose("Inserted new field", f.getName()));
+		LOG.info(compose("Inserted new field", f));
 	}
 
 	private void updateField(Field dbRecord, Field field) {
@@ -41,14 +41,15 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 			dbRecord.assimilate(field);
 			
 			this.jdbcTemplate.update(
-					"update field set name = ?, variable = ? fieldtype = ?, helptext = ?, size = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getVariable(), dbRecord.getType().name(), dbRecord.getHelp(), dbRecord.getSize());
+					"update field set name = ?, variable = ? fieldtype = ?, helptext = ?, size = ?, dflt = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getVariable(), dbRecord.getType().name(), 
+					dbRecord.getHelp(), dbRecord.getSize(), dbRecord.getDefaultValue());
 			
-			LOG.info(compose("Updated field", field.getName()));
+			LOG.info(compose("Updated field", field));
 		}
 		else {
 			field.setId(dbRecord.getId());
-			LOG.info(compose("Field not modified", field.getName()));
+			LOG.info(compose("Field not modified", field));
 		}
 	}
 
@@ -83,4 +84,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 		}
 	}
 
+	public int getCount() {
+		return this.jdbcTemplate.queryForInt("select count(*) from field");
+	}
 }
