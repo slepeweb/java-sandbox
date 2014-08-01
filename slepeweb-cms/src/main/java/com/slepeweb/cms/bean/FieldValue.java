@@ -58,6 +58,7 @@ public class FieldValue extends CmsBean implements Serializable {
 		}
 		else if (value instanceof Timestamp) {
 			setDateValue((Timestamp) value);
+			setStringValue(getDateValue().toString());
 		}
 
 		return this;
@@ -85,8 +86,9 @@ public class FieldValue extends CmsBean implements Serializable {
 		return dateValue;
 	}
 
-	public FieldValue setDateValue(Timestamp dateValue) {
+	public FieldValue setDateValue(Timestamp dateValue) {		
 		this.dateValue = dateValue;
+		this.dateValue.setNanos(0);
 		return this;
 	}
 
@@ -107,8 +109,9 @@ public class FieldValue extends CmsBean implements Serializable {
 		return dateUpdated;
 	}
 
-	public void setDateUpdated(Timestamp dateUpdated) {
+	public FieldValue setDateUpdated(Timestamp dateUpdated) {
 		this.dateUpdated = dateUpdated;
+		return this;
 	}
 
 	@Override

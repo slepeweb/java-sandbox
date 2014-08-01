@@ -1,5 +1,6 @@
 package com.slepeweb.cms.service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			
 			saveFieldValues(i);
 			saveChildLinks(i);
-			removeOldChildLinks(dbRecord, i);
+			removeStaleChildLinks(dbRecord, i);
 		}
 		
 		return i;
@@ -118,11 +119,19 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	private void setDefaultFieldValues(Item i) {
-		if (i.getFieldValues() == null) {
+		// If item has no field values, create them, with default values
+		if (i.getFieldValues() == null || i.getFieldValues().size() == 0) {
 			i.setFieldValues(new ArrayList<FieldValue>());
-			// If item has no field values, create them, with default values
+			FieldValue fv;
+
 			for (FieldForType fft : this.fieldForTypeService.getFieldsForType(i.getType().getId())) {
-				i.setFieldValue(fft.getField().getVariable(), fft.getField().getDefaultValue());
+				fv = CmsBeanFactory.getFieldValue().
+					setField(fft.getField()).
+					setItemId(i.getId()).
+					setValue(fft.getField().getDefaultValue()).
+					setDateUpdated(new Timestamp(System.currentTimeMillis()));
+				
+				i.getFieldValues().add(fv);
 			}
 		}
 	}
@@ -135,11 +144,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
-	private void removeOldChildLinks(Item dbRecord, Item i) {
+	private void removeStaleChildLinks(Item dbRecord, Item i) {
 		if (dbRecord != null && dbRecord.getLinks() != null && i.getLinks() != null) {
 			for (Link dbLink : dbRecord.getLinks()) {
 				if (! i.getLinks().contains(dbLink)) {
-					// TODO: Cautionary move: dbLink.delete();
+					dbLink.delete();
 					LOG.info(compose("Deleted old child link", dbLink));
 				}
 			}
@@ -150,8 +159,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		if (this.jdbcTemplate.update("delete from item where id = ?", id) > 0) {
 			LOG.warn(compose("Deleted item", String.valueOf(id)));
 			
-			// TODO: Should also delete child/descendant items
-			// Perhaps fail if there are descendants, and look for confirmation before deleting all descendants.
+			// TODO: Should move descendants to an orphan bin, perhaps retaining original paths ...
 		}
 	}
 

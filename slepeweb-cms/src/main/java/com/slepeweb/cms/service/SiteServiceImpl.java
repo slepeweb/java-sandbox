@@ -1,15 +1,12 @@
 package com.slepeweb.cms.service;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
@@ -21,47 +18,36 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	@Autowired protected ItemService itemService;	
 	
 	public Site save(Site s) {
+		return save(s, null);
+	}
+	
+	public Site save(Site s, Item homepageItem) {
 		if (s.isDefined4Insert()) {
 			Site dbRecord = getSite(s.getName());		
 			if (dbRecord != null) {
 				updateSite(dbRecord, s);
 			}
 			else {
-				insertSite(s);
+				insertSite(s, homepageItem);
 			}
 		}
 		
 		return s;
 	}
 	
-	private Site insertSite(Site s) {
+	private Site insertSite(Site s, Item homepageItem) {
 		
-		String rootName = "Root";
-		ItemType type = this.itemTypeService.getItemType(rootName);
+		this.jdbcTemplate.update(
+				"insert into site (name, hostname) values (?, ?)", 
+				s.getName(), s.getHostname());
 		
-		if (type != null) {
-			this.jdbcTemplate.update(
-					"insert into site (name, hostname) values (?, ?)", 
-					s.getName(), s.getHostname());
-			
-			s.setId(getLastInsertId());
-			Item r = CmsBeanFactory.getItem();
-			r.setName(rootName);
-			r.setSimpleName("");
-			r.setPath("/");
-			r.setSite(s);
-			r.setType(type);
-			r.setDateCreated(new Timestamp(System.currentTimeMillis()));
-			r.setDateUpdated(r.getDateCreated());
-			r.setDeleted(false);
-			this.itemService.save(r);
-			
-			LOG.info(compose("Added new site", s));
-		}
-		else {
-			LOG.info(compose("No root item type defined", "Root"));
+		s.setId(getLastInsertId());
+		
+		if (homepageItem != null) {
+			this.itemService.save(homepageItem);
 		}
 		
+		LOG.info(compose("Added new site", s));		
 		return s;
 	}
 
@@ -98,7 +84,7 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	}
 
 	public Site getSite(Long id) {
-		return getSite("select * from sitegroup where id = ?", new Object[]{id});
+		return getSite("select * from site where id = ?", new Object[]{id});
 	}
 	
 	private Site getSite(String sql, Object[] params) {
@@ -114,10 +100,9 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		}
 	}
 
-	@Override
 	public List<Site> getAllSites() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.jdbcTemplate.query(
+			"select * from site", new RowMapperUtil.SiteMapper());
 	}
 
 }

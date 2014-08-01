@@ -76,18 +76,7 @@ public class Item extends CmsBean implements Serializable {
 			LOG.debug(compose("Updated existing field value", getPath(), value));
 			return this;
 		}
-		
-//		// New field value
-//		Field f = getFieldService().getField(variable);
-//		if (f != null) {
-//			fv = CmsBeanFactory.getFieldValue();
-//			fv.setField(f);
-//			fv.setItemId(getId());
-//			fv.setValue(value);
-//			getFieldValues().add(fv);
-//			LOG.debug(compose("Added new field value", getPath(), value));
-//		}
-		
+
 		return this;
 	}
 	
@@ -141,6 +130,14 @@ public class Item extends CmsBean implements Serializable {
 	}
 	
 	public List<FieldValue> getFieldValues() {
+		// If this item is not loaded with field values, get them from the database
+		if (this.fieldValues == null) {
+			/* If there are no field values defined in the db, this returns an empty list
+			 * so that the next time getFieldValues() is called, this method does not repeat
+			 * the db lookup.
+			 */
+			setFieldValues(getCmsService().getFieldValueService().getFieldValues(getId()));
+		}
 		return this.fieldValues;
 	}
 	

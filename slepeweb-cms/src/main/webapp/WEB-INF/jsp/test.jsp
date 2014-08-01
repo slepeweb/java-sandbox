@@ -4,6 +4,10 @@
     taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%>
 
 <h1>Test results</h1>
+<h2><c:choose><c:when 
+	test="${testCompleted}">All tests successfully executed</c:when><c:otherwise>Not 
+		all tests could be executed</c:otherwise></c:choose></h2>
+
 <table border="1">
 	<tr><th>Id</th><th align="left">Title</th><th>Result</th><th>Notes</th></tr>
 	<c:forEach items="${testResults}" var="result">
