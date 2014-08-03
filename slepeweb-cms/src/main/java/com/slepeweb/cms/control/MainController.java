@@ -235,6 +235,89 @@ public class MainController extends BaseController {
 		return "test";
 	}
 	
+	@RequestMapping("/test/items")
+	public String doItems(ModelMap model) {
+		
+		List<TestResult> results = new ArrayList<TestResult>();
+		TestResult r;
+		boolean testCompleted = false;
+		
+		// Set field values for first news item
+		Site site = this.cmsService.getSiteService().getSite(TEST_SITE_NAME);
+		if (site != null) {
+			Item aboutSectionItem = this.cmsService.getItemService().getItem(site.getId(), "/about");
+			Item newsSectionItem = this.cmsService.getItemService().getItem(site.getId(), "/news");
+			
+			if (aboutSectionItem != null && newsSectionItem != null) {
+				aboutSectionItem.move(newsSectionItem);
+				
+				// Assert news section has 3 children
+				results.add(r = new TestResult().setId(4010).setTitle("Check news section has 3 children"));
+				int count = newsSectionItem.getBoundItems().size();
+				r.setNotes("News section has " + count + " children");
+				if (count != 3) {
+					r.fail();
+				}
+				
+				// Check path of article item
+				results.add(r = new TestResult().setId(4020).setTitle("Check path of about article"));
+				String articlePath = "/news/about/about-us";
+				aboutSectionItem = this.cmsService.getItemService().getItem(site.getId(), "/news/about");
+				Item article = null;
+				for (Item child : aboutSectionItem.getBoundItems()) {
+					if (child.getPath().equals(articlePath)) {
+						article = child;
+						break;
+					}
+				}
+				
+				r.setNotes(LogUtil.compose("Article path should be", articlePath));
+				if (article == null) {
+					r.fail();
+				}
+				
+				// Restore the links
+				Item rootItem = this.cmsService.getItemService().getItem(site.getId(), "/");
+				
+				if (aboutSectionItem != null && rootItem != null) {
+					aboutSectionItem.move(rootItem);
+					
+					// Assert news section has original 2 children
+					results.add(r = new TestResult().setId(4030).setTitle("Reverse previous move"));
+					newsSectionItem = this.cmsService.getItemService().getItem(site.getId(), "/news");
+					count = newsSectionItem.getBoundItems().size();
+					r.setNotes("News section has " + count + " children");
+					if (count != 2) {
+						r.fail();
+					}
+					
+					// Re-check path of article item
+					results.add(r = new TestResult().setId(4030).setTitle("Re-check path of about article"));
+					aboutSectionItem = this.cmsService.getItemService().getItem(site.getId(), "/about");
+					articlePath = "/about/about-us";
+					article = null;
+					for (Item child : aboutSectionItem.getBoundItems()) {
+						if (child.getPath().equals(articlePath)) {
+							article = child;
+							break;
+						}
+					}
+					
+					r.setNotes(LogUtil.compose("Article path should be", articlePath));
+					if (article == null) {
+						r.fail();
+					}
+					
+					testCompleted = true;
+				}
+			}
+		}
+				
+		model.addAttribute("testResults", results);
+		model.addAttribute("testCompleted", testCompleted);
+		return "test";
+	}
+	
 	@RequestMapping("/test/delete")
 	public String doPurge(ModelMap model) {
 		

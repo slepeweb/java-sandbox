@@ -195,6 +195,36 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	public int getCountByType(Long itemTypeId) {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
 	}
+	
+	/*
+	 * This method can be used if a child item moves to a different parent, and  
+	 * NOT if the child's simplename has changed.
+	 */
+	public void move(Item child, Item newParent) {
+		Link parentLink = this.linkService.getParent(child.getId());
+		if (parentLink != null) {
+			// Un-link from current path
+			this.linkService.deleteLinks(parentLink.getParentId(), child.getId());
+			
+			// Bind to new parent
+			parentLink.setParentId(newParent.getId()).setOrdering(1);
+			parentLink.save();
+			
+			// Update paths of descendant items
+			String divider = newParent.isRoot() ? "" : "/";
+			String newChildPath = newParent.getPath() + divider + child.getSimpleName();
+			updateDescendantPaths(child.getPath(), newChildPath);
+			
+			// Update child item path
+			updateItemPath(child.getId(), newChildPath);
+			
+			// Force newParent links to be re-calculated, since they have now changed
+			newParent.setLinks(null);
+		}
+		else {
+			LOG.error(compose("Failed to identify parent item", child.getPath()));
+		}
+	}
 
 	private Item getItem(String sql, Object[] params) {
 		List<Item> group = this.jdbcTemplate.query(
@@ -214,4 +244,16 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return "/";
 	}
 
+	/*
+	 * Ensure that both string args have trailing slash
+	 */
+	private void updateDescendantPaths(String oldPath, String newPath) {
+		if (! oldPath.endsWith("/")) oldPath += "/";
+		if (! newPath.endsWith("/")) newPath += "/";
+		this.jdbcTemplate.update("update item set path = replace(path, ?, ?) where path like ?", oldPath, newPath, oldPath + "%");
+	}
+	
+	private void updateItemPath(Long itemId, String newPath) {
+		this.jdbcTemplate.update("update item set path = ? where id = ?", newPath, itemId);
+	}
 }

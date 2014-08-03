@@ -112,6 +112,10 @@ public class Item extends CmsBean implements Serializable {
 		return list;
 	}
 	
+	public void move(Item newParent) {
+		getCmsService().getItemService().move(this, newParent);
+	}
+	
 	public List<Item> getRelatedItems() {
 		return null;
 	}
@@ -183,6 +187,10 @@ public class Item extends CmsBean implements Serializable {
 	public Item setPath(String path) {
 		this.path = path;
 		return this;
+	}
+	
+	public String getUrl() {
+		return new StringBuilder("//").append(getSite().getHostname()).append(getPath()).toString();
 	}
 	
 	public boolean isDeleted() {

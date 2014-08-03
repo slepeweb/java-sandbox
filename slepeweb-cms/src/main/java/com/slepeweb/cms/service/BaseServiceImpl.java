@@ -1,5 +1,7 @@
 package com.slepeweb.cms.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -13,6 +15,14 @@ public class BaseServiceImpl {
 	
 	protected Long getLastInsertId() {
 		return this.jdbcTemplate.queryForLong("select last_insert_id()");
+	}
+	
+	protected <T> Object getFirstInList(List<T> list) {
+		if (list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+
 	}
 	
 	protected String compose(String template, Object ... params) {

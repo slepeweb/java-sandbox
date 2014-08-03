@@ -86,13 +86,8 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 
 	public Link getLink(Long parentId, Long childId) {
 		String sql = String.format(SELECTOR_TEMPLATE, "l.parentid = ? and l.childid = ?");
-		List<Link> group = this.jdbcTemplate.query(sql, new Object[] {parentId, childId}, 
-				new RowMapperUtil.LinkMapper());
-		
-		if (group.size() > 0) {
-			return group.get(0);
-		}
-		return null;
+		return (Link) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {parentId, childId}, 
+				new RowMapperUtil.LinkMapper()));
 	}
 	
 	public int getCount() {
@@ -108,4 +103,9 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		}
 	}
 	
+	public Link getParent(Long childId) {
+		String sql = String.format(SELECTOR_TEMPLATE, "l.childid = ? and l.linktype = 'binding'");
+		return (Link) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {childId}, 
+				new RowMapperUtil.LinkMapper()));
+	}
 }

@@ -11,5 +11,5 @@ public interface ItemService {
 	int getCount();
 	int getCount(String path);
 	int getCountByType(Long itemTypeId);
-
+	void move(Item child, Item newParent);
 }
