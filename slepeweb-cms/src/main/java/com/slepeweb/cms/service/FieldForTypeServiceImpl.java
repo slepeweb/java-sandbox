@@ -64,14 +64,7 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 		Object[] params = new Object[] {fieldId, itemTypeId};
 		
 		String sql = String.format(SELECTOR_TEMPLATE, "fft.fieldid = ? and fft.itemtypeid = ?");
-		List<FieldForType> group = this.jdbcTemplate.query(sql, params, new RowMapperUtil.FieldForTypeMapper());
-			
-		if (group.size() > 0) {
-			return group.get(0);
-		}
-		else {
-			return null;
-		}
+		return (FieldForType) getFirstInList(this.jdbcTemplate.query(sql, params, new RowMapperUtil.FieldForTypeMapper()));
 	}
 
 	public List<FieldForType> getFieldsForType(Long itemTypeId) {

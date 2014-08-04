@@ -88,16 +88,8 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	}
 	
 	private Site getSite(String sql, Object[] params) {
-		List<Site> group = this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.SiteMapper());
-		
-		if (group.size() > 0) {
-			Site s = group.get(0);
-			return s;
-		}
-		else {
-			return null;
-		}
+		return (Site) getFirstInList(this.jdbcTemplate.query(
+			sql, params, new RowMapperUtil.SiteMapper()));
 	}
 
 	public List<Site> getAllSites() {

@@ -1,7 +1,5 @@
 package com.slepeweb.cms.service;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
@@ -33,8 +31,8 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 	
 	private void insertItemType(ItemType it) {
 		this.jdbcTemplate.update(
-				"insert into itemtype (name) values (?)", 
-				it.getName());
+				"insert into itemtype (name, media) values (?, ?)", 
+				it.getName(), it.isMedia());
 		
 		it.setId(getLastInsertId());
 		LOG.info(compose("Added new item type", it));
@@ -45,8 +43,8 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			dbRecord.assimilate(it);
 			
 			this.jdbcTemplate.update(
-					"update itemtype set name = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getId());
+					"update itemtype set name = ?, media = ? where id = ?", 
+					dbRecord.getName(), dbRecord.isMedia(), dbRecord.getId());
 			
 			LOG.info(compose("Updated item type", it));
 		}
@@ -82,15 +80,8 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 	}
 	
 	private ItemType getItemType(String sql, Object[] params) {
-		List<ItemType> group = this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.ItemTypeMapper());
-		
-		if (group.size() > 0) {
-			return group.get(0);
-		}
-		else {
-			return null;
-		}
+		return (ItemType) getFirstInList(this.jdbcTemplate.query(
+			sql, params, new RowMapperUtil.ItemTypeMapper()));
 	}
 
 	public int getCount() {

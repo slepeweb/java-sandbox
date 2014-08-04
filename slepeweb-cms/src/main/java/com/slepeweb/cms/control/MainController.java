@@ -1,5 +1,6 @@
 package com.slepeweb.cms.control;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,15 +31,17 @@ public class MainController extends BaseController {
 	private static final String NEWS_TYPE_NAME = "ZNews";
 	private static final String EVENT_TYPE_NAME = "ZEvent";
 	private static final String ARTICLE_TYPE_NAME = "ZArticle";
+	private static final String IMAGE_TYPE_NAME = "ZImage";
 	private static final String TITLE_FIELD_NAME = "ztitle";
 	private static final String TEASER_FIELD_NAME = "zteaser";
 	private static final String BODY_FIELD_NAME = "zbodytext";
 	private static final String EMBARGO_FIELD_NAME = "zembargodate";
+	private static final String ALTTEXT_FIELD_NAME = "zalttext";
 	
 	@Autowired private CmsService cmsService;
 
 	@RequestMapping("/test/build")
-	public String doPop(ModelMap model) {
+	public String doBuild(ModelMap model) {
 		
 		List<TestResult> results = new ArrayList<TestResult>();
 		TestResult r;
@@ -50,14 +53,16 @@ public class MainController extends BaseController {
 			site.delete();
 		}
 		
-		for (String variable : new String[] {TITLE_FIELD_NAME, TEASER_FIELD_NAME, BODY_FIELD_NAME, EMBARGO_FIELD_NAME}) {			
+		for (String variable : new String[] {
+				TITLE_FIELD_NAME, TEASER_FIELD_NAME, BODY_FIELD_NAME, EMBARGO_FIELD_NAME, ALTTEXT_FIELD_NAME}) {			
 			Field f = this.cmsService.getFieldService().getField(variable);
 			if (f != null) {
 				f.delete();
 			}
 		}
 		
-		for (String name : new String[] {HOMEPAGE_TYPE_NAME, SECTION_TYPE_NAME, NEWS_TYPE_NAME, EVENT_TYPE_NAME, ARTICLE_TYPE_NAME}) {			
+		for (String name : new String[] {
+				HOMEPAGE_TYPE_NAME, SECTION_TYPE_NAME, NEWS_TYPE_NAME, EVENT_TYPE_NAME, ARTICLE_TYPE_NAME, IMAGE_TYPE_NAME}) {			
 			ItemType it = this.cmsService.getItemTypeService().getItemType(name);
 			if (it != null) {
 				it.delete();
@@ -70,12 +75,13 @@ public class MainController extends BaseController {
 		ItemType newsType = addType(NEWS_TYPE_NAME);
 		ItemType eventType = addType(EVENT_TYPE_NAME);
 		ItemType articleType = addType(ARTICLE_TYPE_NAME);
+		ItemType imageType = addType(IMAGE_TYPE_NAME, true);
 		
 		// Assert N types have been created
-		results.add(r = new TestResult().setId(2010).setTitle("Check item types have been created"));
+		results.add(r = new TestResult().setId(2010).setTitle("Check N item types have been created"));
 		int numItemTypes = this.cmsService.getItemTypeService().getCount();
 		r.setNotes(numItemTypes + " items types have been created");
-		if (numItemTypes != 5) {
+		if (numItemTypes != 6) {
 			r.fail();
 		}
 		
@@ -84,12 +90,13 @@ public class MainController extends BaseController {
 		Field teaserField = addField("Teaser", TEASER_FIELD_NAME, "Used in links to this page", FieldType.text, 256, "");
 		Field bodyField = addField("Body text", BODY_FIELD_NAME, "Main content for page", FieldType.markup, 0, "");
 		Field embargoField = addField("Embargo date", EMBARGO_FIELD_NAME, "Future date when page can be seen", FieldType.date, 0, "");
+		Field alttextField = addField("Alt text", ALTTEXT_FIELD_NAME, "Alt text for image", FieldType.text, 128, "*");
 		
 		// Assert 3 fields have been created
 		results.add(r = new TestResult().setId(2020).setTitle("Check N fields have been created"));
 		int numFields = this.cmsService.getFieldService().getCount();
 		r.setNotes(numFields + " fields have been created");
-		if (numFields != 4) {
+		if (numFields != 5) {
 			r.fail();
 		}
 		
@@ -101,15 +108,20 @@ public class MainController extends BaseController {
 			it.save();
 		}
 		
+		// Define fields for image type
+		imageType.addFieldForType(titleField, 1L, true);
+		imageType.addFieldForType(alttextField, 2L, true);
+		imageType.save();
+		
 		// Add the embargo field to the article type
 		articleType.addFieldForType(embargoField, 4L, true);
 		articleType.save();
 		
 		// Assert number of fieldfortype rows
-		results.add(r = new TestResult().setId(2020).setTitle("Check 16 fieldfortype rows have been created"));
+		results.add(r = new TestResult().setId(2020).setTitle("Check N fieldfortype rows have been created"));
 		int numFieldForTypes = this.cmsService.getFieldForTypeService().getCount();
 		r.setNotes(numFieldForTypes + " fieldfortype rows have been created");
-		if (numFieldForTypes != 16) {
+		if (numFieldForTypes != 18) {
 			r.fail();
 		}		
 				
@@ -132,12 +144,13 @@ public class MainController extends BaseController {
 				Item newsSection = addItem(rootItem, "News section", "news", now, now, site, sectionType);
 				addItem(rootItem, "Events section", "events", now, now, site, sectionType);
 				Item aboutSection = addItem(rootItem, "About section", "about", now, now, site, sectionType);
+				Item mediaSection = addItem(rootItem, "Media section", "media", now, now, site, sectionType);
 				
 				// Assert N items have been created
-				results.add(r = new TestResult().setId(2050).setTitle("Check total number of section items created"));
+				results.add(r = new TestResult().setId(2050).setTitle("Check N section items created"));
 				int sectionCount = this.cmsService.getItemService().getCountByType(sectionType.getId());
 				r.setNotes(sectionCount + " sections have been created");
-				if (sectionCount != 3) {
+				if (sectionCount != 4) {
 					r.fail();
 				}
 				
@@ -168,6 +181,13 @@ public class MainController extends BaseController {
 				
 				if (aboutSection != null) {
 					addItem(aboutSection, "About us", "about-us", now, now, site, articleType);
+				}
+				else {
+					testCompleted = false;
+				}
+				
+				if (mediaSection != null) {
+					addItem(mediaSection, "Example image", "ex1", now, now, site, imageType);
 				}
 				else {
 					testCompleted = false;
@@ -318,6 +338,62 @@ public class MainController extends BaseController {
 		return "test";
 	}
 	
+	@RequestMapping("/test/media")
+	public String doMedia(ModelMap model) {
+		
+		List<TestResult> results = new ArrayList<TestResult>();
+		TestResult r;
+		boolean testCompleted = false;
+		String imageItemPath = "/media/ex1";
+		
+		// Set field values for first news item
+		Site site = this.cmsService.getSiteService().getSite(TEST_SITE_NAME);
+		if (site != null) {
+			Item imageItem = this.cmsService.getItemService().getItem(site.getId(), imageItemPath);
+			
+			if (imageItem != null) {
+				String sourceImageFilename = "/home/george/test-image.jpg";
+				long fileSize = new File(sourceImageFilename).length();
+
+				if (! imageItem.hasMedia()) {
+					int startCount = this.cmsService.getMediaService().getCount();
+					imageItem.setMediaUploadFilePath(sourceImageFilename);
+					this.cmsService.getMediaService().save(imageItem);
+					
+					// Assert 1 new row has been added to the media table
+					results.add(r = new TestResult().setId(4010).setTitle("Check media table has a new row"));
+					int endCount = this.cmsService.getMediaService().getCount();
+					int diff = endCount - startCount;
+					r.setNotes("Media table has " + diff + " new rows");
+					if (diff != 1) {
+						r.fail();
+					}
+				}
+					
+				// Assert media data can be read from db
+				String retrievedFilePath = "/home/george/test-image-retrieved.jpg";
+				results.add(r = new TestResult().setId(4020).setTitle("Get media data from db"));
+				this.cmsService.getMediaService().writeMedia(imageItem.getId(), retrievedFilePath);
+				File f = new File(retrievedFilePath);
+				if (! f.exists()) {
+					r.setNotes("Media output to file failed").fail();
+				}
+				else {
+					r.setNotes("Output file size = " + f.length());
+					if (f.length() != fileSize) {
+						r.fail();
+					}
+				}
+				
+				testCompleted = true;
+			}
+		}
+				
+		model.addAttribute("testResults", results);
+		model.addAttribute("testCompleted", testCompleted);
+		return "test";
+	}
+	
 	@RequestMapping("/test/delete")
 	public String doPurge(ModelMap model) {
 		
@@ -408,7 +484,11 @@ public class MainController extends BaseController {
 	}
 	
 	private ItemType addType(String name) {
-		ItemType it = CmsBeanFactory.getItemType().setName(name);
+		return addType(name, false);
+	}
+	
+	private ItemType addType(String name, boolean isMedia) {
+		ItemType it = CmsBeanFactory.getItemType().setName(name).setMedia(isMedia);
 		it.save();
 		return it;
 	}

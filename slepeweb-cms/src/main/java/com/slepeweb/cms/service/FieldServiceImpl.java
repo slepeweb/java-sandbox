@@ -1,7 +1,5 @@
 package com.slepeweb.cms.service;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
@@ -72,16 +70,8 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 	}
 	
 	private Field getField(String sql, Object[] params) {
-		List<Field> group = this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.FieldMapper());
-		
-		if (group.size() > 0) {
-			return group.get(0);
-		}
-		else {
-			LOG.warn(compose("Field does not exist", params[0]));
-			return null;
-		}
+		return (Field) getFirstInList(this.jdbcTemplate.query(
+			sql, params, new RowMapperUtil.FieldMapper()));
 	}
 
 	public int getCount() {

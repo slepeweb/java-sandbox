@@ -1,5 +1,6 @@
 package com.slepeweb.cms.utils;
 
+import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -33,6 +34,7 @@ public class RowMapperUtil {
 			ItemType it = CmsBeanFactory.getItemType();
 			it.setId(rs.getLong("id"));
 			it.setName(rs.getString("name"));
+			it.setMedia(rs.getBoolean("media"));
 			return it;
 		}
 	}
@@ -57,6 +59,7 @@ public class RowMapperUtil {
 		item.setType(type);
 		type.setId(rs.getLong("typeid"));
 		type.setName(rs.getString("typename"));
+		type.setMedia(rs.getBoolean("media"));
 		
 		Site site = CmsBeanFactory.getSite();
 		item.setSite(site);
@@ -129,4 +132,27 @@ public class RowMapperUtil {
 		}
 	}
 	
+	public static final class MediaMapper implements RowMapper<Blob> {
+		public Blob mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return rs.getBlob("data");
+			
+//			ByteArrayOutputStream baos = new ByteArrayOutputStream(100);
+//			byte[] buffer = new byte[100];
+//			InputStream is = rs.getBinaryStream("data");
+//			
+//			try {
+//				while (is.read(buffer) > 0) {
+//					baos.write(buffer);
+//			    }
+//			    return baos.toByteArray();
+//			}
+//			catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+//			finally {
+//				try {baos.close();}
+//				catch (Exception e) {}
+//			}
+		}
+	}	
 }

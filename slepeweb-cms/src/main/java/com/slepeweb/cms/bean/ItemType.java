@@ -9,10 +9,12 @@ public class ItemType extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long id;
 	private String name;
+	private boolean media;
 	private List<FieldForType> fieldsForType;
 	
 	public void assimilate(ItemType it) {
 		setName(it.getName());
+		setMedia(it.isMedia());
 	}
 	
 	public boolean isDefined4Insert() {
@@ -88,6 +90,15 @@ public class ItemType extends CmsBean implements Serializable {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	public boolean isMedia() {
+		return media;
+	}
+
+	public ItemType setMedia(boolean media) {
+		this.media = media;
+		return this;
 	}
 
 }

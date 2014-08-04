@@ -21,6 +21,7 @@ public class Item extends CmsBean implements Serializable {
 	private boolean deleted;
 	private Long id;
 	private List<Link> links;
+	private String mediaUploadFilePath;
 	
 	public void assimilate(Item i) {
 		setName(i.getName());
@@ -31,6 +32,7 @@ public class Item extends CmsBean implements Serializable {
 		setDeleted(i.isDeleted());
 		setSite(i.getSite());
 		setType(i.getType());
+		setMediaUploadFilePath(i.getMediaUploadFilePath());
 		
 		// TODO: must assimilate fields and links too ???
 	}
@@ -114,6 +116,10 @@ public class Item extends CmsBean implements Serializable {
 	
 	public void move(Item newParent) {
 		getCmsService().getItemService().move(this, newParent);
+	}
+	
+	public boolean hasMedia() {
+		return getCmsService().getMediaService().hasMedia(this);
 	}
 	
 	public List<Item> getRelatedItems() {
@@ -303,5 +309,13 @@ public class Item extends CmsBean implements Serializable {
 		} else if (!type.getId().equals(other.type.getId()))
 			return false;
 		return true;
+	}
+
+	public String getMediaUploadFilePath() {
+		return mediaUploadFilePath;
+	}
+
+	public void setMediaUploadFilePath(String mediaUploadFilePath) {
+		this.mediaUploadFilePath = mediaUploadFilePath;
 	}
 }

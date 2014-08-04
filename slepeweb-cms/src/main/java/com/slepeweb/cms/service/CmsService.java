@@ -9,4 +9,5 @@ public interface CmsService {
 	LinkService getLinkService();
 	FieldForTypeService getFieldForTypeService();
 	FieldValueService getFieldValueService();	
+	MediaService getMediaService();	
 }

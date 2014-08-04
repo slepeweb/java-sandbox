@@ -22,13 +22,15 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	private static Logger LOG = Logger.getLogger(ItemServiceImpl.class);
 	private static final String SELECT_TEMPLATE = 
-			"select i.*, s.name as sitename, s.hostname, it.name as typename from " +
+			"select i.*, s.name as sitename, s.hostname, " +
+			"it.id as typeid, it.name as typename, it.media from " +
 			"item i, site s, itemtype it where " +
 			"i.siteid=s.id and i.typeid=it.id and %s and i.deleted=0";
 	
 	@Autowired protected LinkService linkService;
 	@Autowired protected FieldValueService fieldValueService;
 	@Autowired protected FieldForTypeService fieldForTypeService;
+	@Autowired protected MediaService mediaService;
 
 	private String columns = "name, simplename, path, siteid, typeid, datecreated, dateupdated, deleted";
 	
@@ -45,6 +47,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			saveFieldValues(i);
 			saveChildLinks(i);
 			removeStaleChildLinks(dbRecord, i);
+			saveMedia(i);
 		}
 		
 		return i;
@@ -115,6 +118,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			for (FieldValue fv : i.getFieldValues()) {
 				fv.save();
 			}
+		}
+	}
+	
+	private void saveMedia(Item i) {
+		if (i.getMediaUploadFilePath() != null && i.getType().isMedia()) {
+			this.mediaService.save(i);
 		}
 	}
 	
@@ -227,13 +236,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 
 	private Item getItem(String sql, Object[] params) {
-		List<Item> group = this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.ItemMapper());
-		
-		if (group.size() > 0) {
-			return group.get(0);
-		}
-		return null;
+		return (Item) getFirstInList(this.jdbcTemplate.query(
+			sql, params, new RowMapperUtil.ItemMapper()));
 	}
 
 	private String getParentPath(String path) {

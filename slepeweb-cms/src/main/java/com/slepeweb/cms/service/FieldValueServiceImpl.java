@@ -61,15 +61,8 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 
 	public FieldValue getFieldValue(Long fieldId, Long itemId) {
 		String sql = String.format(SELECTOR_TEMPLATE, "f.id = ? and fv.itemid = ?");		
-		List<FieldValue> group = this.jdbcTemplate.query(sql, new Object[] {fieldId, itemId}, 
-				new RowMapperUtil.FieldValueMapper());
-			
-		if (group.size() > 0) {
-				return group.get(0);
-			}
-			else {
-				return null;
-			}
+		return (FieldValue) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {fieldId, itemId}, 
+				new RowMapperUtil.FieldValueMapper()));
 	}
 
 	public int deleteFieldValues(Long itemId) {

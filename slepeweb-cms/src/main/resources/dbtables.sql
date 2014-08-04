@@ -1,3 +1,4 @@
+drop table media;
 drop table fieldvalue;
 drop table fieldfortype;
 drop table field;
@@ -21,6 +22,7 @@ create table itemtype
 (
 	id int not null auto_increment,
 	name varchar(255),
+	media boolean,
 	primary key (id),
 	unique key idx_itemtype_name (name)
 ) ENGINE=InnoDB;
@@ -89,5 +91,13 @@ create table fieldvalue
    datevalue timestamp,
    primary key (itemid, fieldid),
 	 constraint foreign key (fieldid) references field(id) on delete cascade,
+	 constraint foreign key (itemid) references item(id) on delete cascade
+) ENGINE=InnoDB;
+
+create table media
+(
+   itemid int,
+   data mediumblob,
+   primary key (itemid),
 	 constraint foreign key (itemid) references item(id) on delete cascade
 ) ENGINE=InnoDB;
