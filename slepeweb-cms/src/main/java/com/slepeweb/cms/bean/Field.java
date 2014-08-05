@@ -2,6 +2,8 @@ package com.slepeweb.cms.bean;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -105,9 +107,14 @@ public class Field extends CmsBean implements Serializable {
 			return StringUtils.isNotBlank(this.defaultValue) ? Integer.valueOf(this.defaultValue) : 0;
 		}
 		else if (getType() == FieldType.date) {
-			// TODO: convert string to timestamp
-			return StringUtils.isNotBlank(this.defaultValue) ? new Timestamp(System.currentTimeMillis()) : 
-				new Timestamp(System.currentTimeMillis());
+			// Timestamp format example: 2014-08-04 14:20:07.0
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+			try {
+				return new Timestamp(sdf.parse(this.defaultValue).getTime());
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			return new Timestamp(System.currentTimeMillis());
 		}
 		else {
 			return StringUtils.isNotBlank(this.defaultValue) ? this.defaultValue : "";

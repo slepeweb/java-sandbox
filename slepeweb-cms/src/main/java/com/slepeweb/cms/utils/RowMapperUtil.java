@@ -75,7 +75,7 @@ public class RowMapperUtil {
 			l.setParentId(rs.getLong("parentid"));
 			l.setChild(mapItem(rs));
 			l.setType(LinkType.valueOf(rs.getString("linktype")));
-			l.setName(rs.getString("name"));
+			l.setName(rs.getString("linkname"));
 			l.setOrdering(rs.getInt("ordering"));
 			return l;
 		}

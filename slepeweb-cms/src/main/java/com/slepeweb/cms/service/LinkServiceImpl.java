@@ -14,7 +14,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	
 	private static Logger LOG = Logger.getLogger(LinkServiceImpl.class);
 	private static final String SELECTOR_TEMPLATE = 
-			"select i.*, s.name as sitename, s.hostname, it.name as typename, l.parentid, l.linktype, l.name, l.ordering from "
+			"select i.*, s.name as sitename, s.hostname, it.name as typename, it.media, l.parentid, l.linktype, l.name as linkname, l.ordering from "
 			+ "item i, site s, itemtype it, link l where l.childid = i.id and i.siteid=s.id and i.typeid=it.id and "
 			+ "%s and i.deleted=0 " + "order by l.linktype, l.name, l.ordering";
 
@@ -46,7 +46,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 			dbRecord.assimilate(l);
 			
 			this.jdbcTemplate.update(
-					"update link set linktype = ?, name = ?, ordering = ?) where parentid = ? and childid = ?", 
+					"update link set linktype = ?, name = ?, ordering = ? where parentid = ? and childid = ?", 
 					dbRecord.getType().name(), dbRecord.getName(), dbRecord.getOrdering(), 
 					dbRecord.getParentId(), dbRecord.getChild().getId());
 			

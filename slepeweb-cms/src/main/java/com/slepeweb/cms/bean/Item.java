@@ -34,7 +34,8 @@ public class Item extends CmsBean implements Serializable {
 		setType(i.getType());
 		setMediaUploadFilePath(i.getMediaUploadFilePath());
 		
-		// TODO: must assimilate fields and links too ???
+		// Must assimilate fields and links too? 
+		// NO - fields and links are loaded when needed.
 	}
 	
 	public boolean isDefined4Insert() {
@@ -86,24 +87,49 @@ public class Item extends CmsBean implements Serializable {
 		return getItemService().save(child);
 	}
 	
-	public List<Item> getBoundItems() {
+	// TODO: need a way to set ordering for links, eg 'end of list'
+	public Item addInline(Item inline) {
+		if (! getLinks().contains(inline)) {
+			getLinks().add(toChildLink(inline, LinkType.inline));
+		}
+		
+		return this;
+	}
+	
+	public boolean removeInline(Item inline) {
+		return getLinks().remove(toChildLink(inline, LinkType.inline));
+	}
+	
+	// TODO: need a better way to handle ordering - currently hardcoding to 0
+	private Link toChildLink(Item i, LinkType lt) {
+		return CmsBeanFactory.getLink().
+				setParentId(getId()).
+				setChild(i).
+				setType(lt).
+				setName("std").
+				setOrdering(0);
+	}
+	
+	public final List<Item> getBoundItems() {
 		return getBoundItems(null);
 	}
 	
-	public List<Item> getBoundItems(String linkName) {
-		return getChildItems(LinkType.binding, linkName);
+	public final List<Item> getBoundItems(String linkName) {
+		return getLinkedItems(LinkType.binding, linkName);
 	}
 	
-	public List<Item> getRelatedItems(String linkName) {
-		return getChildItems(LinkType.relation, linkName);
+	public final List<Item> getRelatedItems(String linkName) {
+		return getLinkedItems(LinkType.relation, linkName);
 	}
 	
-	public List<Item> getInlineItems(String linkName) {
-		return getChildItems(LinkType.inline, linkName);
+	public final List<Item> getInlineItems(String linkName) {
+		return getLinkedItems(LinkType.inline, linkName);
 	}
 	
-	private List<Item> getChildItems(LinkType linkType, String linkName) {
+	private final List<Item> getLinkedItems(LinkType linkType, String linkName) {
 		List<Item> list = new ArrayList<Item>();
+		
+		// getLinks() will pull links from the DB if null in this object.
 		for (Link l : getLinks()) {
 			if (l.getType() == linkType) {
 				if (linkName == null || l.getName().equals(linkName)) {
@@ -123,11 +149,11 @@ public class Item extends CmsBean implements Serializable {
 	}
 	
 	public List<Item> getRelatedItems() {
-		return null;
+		return getRelatedItems(null);
 	}
 	
 	public List<Item> getInlineItems() {
-		return null;
+		return getInlineItems(null);
 	}
 	
 	public boolean isRoot() {

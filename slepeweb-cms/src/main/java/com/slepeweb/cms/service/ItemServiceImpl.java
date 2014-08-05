@@ -45,8 +45,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			}
 			
 			saveFieldValues(i);
-			saveChildLinks(i);
-			removeStaleChildLinks(dbRecord, i);
+			removeStaleLinks(dbRecord, i);
+			saveCurrentLinks(i);
 			saveMedia(i);
 		}
 		
@@ -145,7 +145,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 
-	private void saveChildLinks(Item i) {
+	private void saveCurrentLinks(Item i) {
 		if (i.getLinks() != null) {
 			for (Link l : i.getLinks()) {
 				l.save();
@@ -153,7 +153,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
-	private void removeStaleChildLinks(Item dbRecord, Item i) {
+	private void removeStaleLinks(Item dbRecord, Item i) {
 		if (dbRecord != null && dbRecord.getLinks() != null && i.getLinks() != null) {
 			for (Link dbLink : dbRecord.getLinks()) {
 				if (! i.getLinks().contains(dbLink)) {

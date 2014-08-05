@@ -21,6 +21,8 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		return save(s, null);
 	}
 	
+	// TODO: need to create more items : a) content folder, b) orphan bin
+	
 	public Site save(Site s, Item homepageItem) {
 		if (s.isDefined4Insert()) {
 			Site dbRecord = getSite(s.getName());		

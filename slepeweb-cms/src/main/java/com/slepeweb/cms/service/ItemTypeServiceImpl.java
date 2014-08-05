@@ -23,7 +23,7 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			}
 			
 			saveFieldsForType(it);
-			// TODO: need to remove old fields
+			// TODO: need to remove old fields - similar to old links.
 		}
 		
 		return it;

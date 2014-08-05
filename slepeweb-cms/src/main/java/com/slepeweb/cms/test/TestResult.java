@@ -1,4 +1,4 @@
-package com.slepeweb.cms.utils;
+package com.slepeweb.cms.test;
 
 public class TestResult {
 	private int id, result = 1;
