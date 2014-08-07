@@ -19,7 +19,7 @@ public class Item extends CmsBean implements Serializable {
 	private String name, simpleName, path;
 	private Timestamp dateCreated, dateUpdated;
 	private boolean deleted;
-	private Long id;
+	private Long id = -1L;
 	private List<Link> links;
 	private String mediaUploadFilePath;
 	
@@ -144,6 +144,19 @@ public class Item extends CmsBean implements Serializable {
 		getCmsService().getItemService().move(this, newParent);
 	}
 	
+	public String getParentPath() {
+		if (! isRoot()) {
+			int c = getPath().lastIndexOf("/");
+			if (c > 0) {
+				return getPath().substring(0, c);
+			}
+			return "/";
+		}
+		
+		// A null parent means that this item is a root item
+		return null;
+	}
+
 	public boolean hasMedia() {
 		return getCmsService().getMediaService().hasMedia(this);
 	}
@@ -156,8 +169,13 @@ public class Item extends CmsBean implements Serializable {
 		return getInlineItems(null);
 	}
 	
+	public boolean isSiteRoot() {
+		return getPath().equals("/");
+	}
+	
 	public boolean isRoot() {
-		return getPath() != null && getPath().equals("/");
+		return getPath().equals("/") ||
+				(getType().getName().equals(ItemType.CONTENT_FOLDER_TYPE_NAME) && getPath().lastIndexOf("/") == 0);
 	}
 	
 	public Item setType(ItemType type) {
@@ -209,16 +227,27 @@ public class Item extends CmsBean implements Serializable {
 	
 	public Item setSimpleName(String simpleName) {
 		this.simpleName = simpleName;
+		if (getPath() != null && ! isSiteRoot()) {
+			refreshPath();
+		}
 		return this;
 	}
 	
 	public String getPath() {
-		return path;
+		return this.path;
 	}
 	
-	public Item setPath(String path) {
-		this.path = path;
-		return this;
+	public String refreshPath() {
+		if (! isSiteRoot()) {
+			if (isRoot()) {
+				setPath("/" + this.simpleName);
+			}
+			else {
+				String parentPath = getParentPath();
+				setPath(parentPath.equals("/") ? "/" + this.simpleName : parentPath + "/" + simpleName);
+			}
+		}
+		return this.path;
 	}
 	
 	public String getUrl() {
@@ -292,7 +321,6 @@ public class Item extends CmsBean implements Serializable {
 		result = prime * result + (deleted ? 1231 : 1237);
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
-		result = prime * result + ((simpleName == null) ? 0 : simpleName.hashCode());
 		result = prime * result + ((site == null) ? 0 : site.getId().hashCode());
 		result = prime * result + ((type == null) ? 0 : type.getId().hashCode());
 		return result;
@@ -319,11 +347,6 @@ public class Item extends CmsBean implements Serializable {
 				return false;
 		} else if (!path.equals(other.path))
 			return false;
-		if (simpleName == null) {
-			if (other.simpleName != null)
-				return false;
-		} else if (!simpleName.equals(other.simpleName))
-			return false;
 		if (site == null) {
 			if (other.site != null)
 				return false;
@@ -343,5 +366,10 @@ public class Item extends CmsBean implements Serializable {
 
 	public void setMediaUploadFilePath(String mediaUploadFilePath) {
 		this.mediaUploadFilePath = mediaUploadFilePath;
+	}
+
+	public Item setPath(String path) {
+		this.path = path;
+		return this;
 	}
 }

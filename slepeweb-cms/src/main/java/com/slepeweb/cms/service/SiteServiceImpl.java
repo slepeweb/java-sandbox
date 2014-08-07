@@ -6,7 +6,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
@@ -18,35 +19,36 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	@Autowired protected ItemService itemService;	
 	
 	public Site save(Site s) {
-		return save(s, null);
-	}
-	
-	// TODO: need to create more items : a) content folder, b) orphan bin
-	
-	public Site save(Site s, Item homepageItem) {
 		if (s.isDefined4Insert()) {
 			Site dbRecord = getSite(s.getName());		
 			if (dbRecord != null) {
 				updateSite(dbRecord, s);
 			}
 			else {
-				insertSite(s, homepageItem);
+				insertSite(s);
 			}
 		}
 		
 		return s;
 	}
 	
-	private Site insertSite(Site s, Item homepageItem) {
+	private Site insertSite(Site s) {
 		
 		this.jdbcTemplate.update(
 				"insert into site (name, hostname) values (?, ?)", 
 				s.getName(), s.getHostname());
 		
-		s.setId(getLastInsertId());
+		s.setId(getLastInsertId());	
 		
-		if (homepageItem != null) {
-			this.itemService.save(homepageItem);
+		CmsBeanFactory.bakeHomepageItem(s);
+		ItemType cfolderType = this.itemTypeService.getItemType(ItemType.CONTENT_FOLDER_TYPE_NAME);
+		
+		if (cfolderType != null) {
+			CmsBeanFactory.bakeContentFolderRootItem(s, cfolderType);
+			CmsBeanFactory.bakeOrphanFolder(s, cfolderType);
+		}
+		else {
+			LOG.error(compose("Content folders could not be created", ItemType.CONTENT_FOLDER_TYPE_NAME));
 		}
 		
 		LOG.info(compose("Added new site", s));		

@@ -36,7 +36,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	public Item save(Item i) {
 		if (i.isDefined4Insert()) {
-			Item dbRecord = getItem(i.getSite().getId(), i.getPath());		
+			Item dbRecord = getItem(i.getId());		
 			if (dbRecord != null) {
 				updateItem(dbRecord, i);
 			}
@@ -54,26 +54,23 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	private void insertItem(Item i) {
-		// Parent item exists?
-		String parentPath = getParentPath(i.getPath());
-		Item parentItem = getItem(i.getSite().getId(), parentPath);
+		// Item table
+		this.jdbcTemplate.update(
+				String.format("insert into item (%s) values (%s)", columns, placeholders4Insert(columns)),
+				i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
+				i.getDateCreated(), i.getDateUpdated(), false);				
 		
-		if (i.isRoot() || parentItem != null) {
+		Long lastId = getLastInsertId();
+		i.setId(lastId);
+		setDefaultFieldValues(i);
+		LOG.info(compose("Added new item", i));
+		
+		// Insert binding link to parent item
+		if (! i.isRoot()) {
+			Item parentItem = getItem(i.getSite().getId(), i.getParentPath());				
+			Item childItem = getItem(lastId);
 			
-			// Item table
-			this.jdbcTemplate.update(
-					String.format("insert into item (%s) values (%s)", columns, placeholders4Insert(columns)),
-					i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
-					i.getDateCreated(), i.getDateUpdated(), false);				
-			
-			Long lastId = getLastInsertId();
-			i.setId(lastId);
-			setDefaultFieldValues(i);
-			LOG.info(compose("Added new item", i));
-			
-			// Insert binding link to parent item
-			if (! i.isRoot()) {
-				Item childItem = getItem(lastId);
+			if (parentItem != null && childItem != null) {
 				List<Link> existingSiblingLinks = this.linkService.getLinks(parentItem.getId());
 				int ordering = existingSiblingLinks.size() + 1;
 				
@@ -84,16 +81,21 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 					setName("std").
 					setOrdering(ordering);
 				
-				this.linkService.save(l);					
+				this.linkService.save(l);	
 			}
-		}
-		else {
-			LOG.warn(compose("Parent item not found", parentPath));
+			else {
+				LOG.warn(compose("Parent item not found", i.getParentPath()));
+			}
 		}
 	}
 
 	private void updateItem(Item dbRecord, Item i) {
 		if (! dbRecord.equals(i)) {
+			boolean simplenameHasChanged = ! dbRecord.getSimpleName().equals(i.getSimpleName());
+			String oldPath = dbRecord.getPath();
+			String newPath = i.getPath();
+			
+			// -Now- merge the changed properties from i into dbRecord
 			dbRecord.assimilate(i);
 			
 			this.jdbcTemplate.update(
@@ -103,14 +105,17 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 					dbRecord.getDateCreated(), dbRecord.getDateUpdated(), dbRecord.isDeleted(), i.getId());
 			
 			LOG.info(compose("Updated item", i));
+			
+			if (simplenameHasChanged) {
+				// All child (binding) descendants will need their path properties updated
+				updateDescendantPaths(oldPath, newPath);
+			}
 		}
 		else {
 			i.setId(dbRecord.getId());
 			LOG.info(compose("Item not modified", i));
 		}
 		
-		// TODO: Simplename or binding may have changed.
-		// Either way, all child (binding) descendants will need their path properties updated
 	}
 	
 	private void saveFieldValues(Item i) {
@@ -238,14 +243,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private Item getItem(String sql, Object[] params) {
 		return (Item) getFirstInList(this.jdbcTemplate.query(
 			sql, params, new RowMapperUtil.ItemMapper()));
-	}
-
-	private String getParentPath(String path) {
-		int c = path.lastIndexOf("/");
-		if (c > 0) {
-			return path.substring(0, c);
-		}
-		return "/";
 	}
 
 	/*

@@ -1,8 +1,6 @@
 package com.slepeweb.cms.test;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -19,17 +17,23 @@ public class BuildTest extends BaseTest {
 	public TestResultSet execute() {
 		
 		TestResult r;
-		TestResultSet trs = new TestResultSet();
-		List<TestResult> results = new ArrayList<TestResult>();
-		trs.setResults(results);
-		boolean testCompleted = false;
-		
+		TestResultSet trs = new TestResultSet().
+			register(2010, "Check N item types have been created").
+			register(2020, "Check N fields have been created").
+			register(2030, "Check N fieldfortype rows have been created").
+			register(2040, "Check test site has been created").
+			register(2050, "Check root item has been created").
+			register(2060, "Check N section items created").
+			register(2070, "Check total number of field values created").
+			register(2080, "Check number of bindings for news section");
+
 		// First, purge the test site
 		Site site = this.cmsService.getSiteService().getSite(TEST_SITE_NAME);
 		if (site != null) {
 			site.delete();
 		}
 		
+		// Purge fields
 		for (String variable : new String[] {
 				TITLE_FIELD_NAME, TEASER_FIELD_NAME, BODY_FIELD_NAME, EMBARGO_FIELD_NAME, ALTTEXT_FIELD_NAME}) {			
 			Field f = this.cmsService.getFieldService().getField(variable);
@@ -38,8 +42,10 @@ public class BuildTest extends BaseTest {
 			}
 		}
 		
+		// Purge item types (BUT NOT content folder)
 		for (String name : new String[] {
-				HOMEPAGE_TYPE_NAME, SECTION_TYPE_NAME, NEWS_TYPE_NAME, EVENT_TYPE_NAME, ARTICLE_TYPE_NAME, IMAGE_TYPE_NAME}) {			
+				HOMEPAGE_TYPE_NAME, SECTION_TYPE_NAME, NEWS_TYPE_NAME, EVENT_TYPE_NAME, ARTICLE_TYPE_NAME, 
+				IMAGE_TYPE_NAME}) {			
 			ItemType it = this.cmsService.getItemTypeService().getItemType(name);
 			if (it != null) {
 				it.delete();
@@ -47,18 +53,17 @@ public class BuildTest extends BaseTest {
 		}
 		
 		// Create item types
-		ItemType homepageType = addType(HOMEPAGE_TYPE_NAME);
+		ItemType cfolderType = addType(ItemType.CONTENT_FOLDER_TYPE_NAME);
 		ItemType sectionType = addType(SECTION_TYPE_NAME);
 		ItemType newsType = addType(NEWS_TYPE_NAME);
 		ItemType eventType = addType(EVENT_TYPE_NAME);
 		ItemType articleType = addType(ARTICLE_TYPE_NAME);
 		ItemType imageType = addType(IMAGE_TYPE_NAME, true);
 		
-		// Assert N types have been created
-		results.add(r = new TestResult().setId(2010).setTitle("Check N item types have been created"));
+		// 2010: Assert N types have been created
 		int numItemTypes = this.cmsService.getItemTypeService().getCount();
-		r.setNotes(numItemTypes + " items types have been created");
-		if (numItemTypes != 6) {
+		r = trs.execute(2010).setNotes(numItemTypes + " items types have been created");
+		if (numItemTypes != 7) {
 			r.fail();
 		}
 		
@@ -69,16 +74,15 @@ public class BuildTest extends BaseTest {
 		Field embargoField = addField("Embargo date", EMBARGO_FIELD_NAME, "Future date when page can be seen", FieldType.date, 0, "");
 		Field alttextField = addField("Alt text", ALTTEXT_FIELD_NAME, "Alt text for image", FieldType.text, 128, "*");
 		
-		// Assert 3 fields have been created
-		results.add(r = new TestResult().setId(2020).setTitle("Check N fields have been created"));
+		// 2020: Assert 3 fields have been created
 		int numFields = this.cmsService.getFieldService().getCount();
-		r.setNotes(numFields + " fields have been created");
+		r = trs.execute(2020).setNotes(numFields + " fields have been created");
 		if (numFields != 5) {
 			r.fail();
 		}
 		
 		// Define fields for all types
-		for (ItemType it : new ItemType[] {homepageType, sectionType, newsType, eventType, articleType} ) {
+		for (ItemType it : new ItemType[] {sectionType, newsType, eventType, articleType} ) {
 			it.addFieldForType(titleField, 1L, true);
 			it.addFieldForType(teaserField, 2L, false);
 			it.addFieldForType(bodyField, 3L, false);
@@ -94,26 +98,26 @@ public class BuildTest extends BaseTest {
 		articleType.addFieldForType(embargoField, 4L, true);
 		articleType.save();
 		
-		// Assert number of fieldfortype rows
-		results.add(r = new TestResult().setId(2020).setTitle("Check N fieldfortype rows have been created"));
+		// 2030: Assert number of fieldfortype rows
 		int numFieldForTypes = this.cmsService.getFieldForTypeService().getCount();
-		r.setNotes(numFieldForTypes + " fieldfortype rows have been created");
-		if (numFieldForTypes != 18) {
+		r = trs.execute(2030).setNotes(numFieldForTypes + " fieldfortype rows have been created");
+		if (numFieldForTypes != 15) {
 			r.fail();
 		}		
 				
 		// Create test site
 		site = addSite(TEST_SITE_NAME, "test.slepeweb.com", HOMEPAGE_TYPE_NAME);
 		
-		// Assert site has been created
-		results.add(r = new TestResult().setId(2030).setTitle("Check test site has been created"));
+		// 2040: Assert site has been created
+		r = trs.execute(2040);
 		if (site != null) {
 			r.setNotes(LogUtil.compose("Test site has been created", site.getName()));
 		
-			// Assert test site has a root item
+			// 2050: Assert test site has a root item
 			Item rootItem = site.getItem("/");
-			results.add(r = new TestResult().setId(2040).setTitle("Check root item has been created"));
-			if (rootItem != null) {			
+			r = trs.execute(2050);
+			if (rootItem != null) {
+				
 				// Create more items
 				Timestamp now = new Timestamp(System.currentTimeMillis());
 				
@@ -121,21 +125,20 @@ public class BuildTest extends BaseTest {
 				Item newsSection = addItem(rootItem, "News section", "news", now, now, site, sectionType);
 				addItem(rootItem, "Events section", "events", now, now, site, sectionType);
 				Item aboutSection = addItem(rootItem, "About section", "about", now, now, site, sectionType);
-				Item mediaSection = addItem(rootItem, "Media section", "media", now, now, site, sectionType);
+				Item contentFolder = site.getItem("/content");
+				Item mediaFolder = addItem(contentFolder, "Media section", "media", now, now, site, cfolderType);
 				
-				// Assert N items have been created
-				results.add(r = new TestResult().setId(2050).setTitle("Check N section items created"));
+				// 2060: Assert N section items have been created
 				int sectionCount = this.cmsService.getItemService().getCountByType(sectionType.getId());
-				r.setNotes(sectionCount + " sections have been created");
-				if (sectionCount != 4) {
+				r = trs.execute(2060).setNotes(sectionCount + " sections have been created");
+				if (sectionCount != 3) {
 					r.fail();
 				}
 				
 				if (newsSection != null) {
-					// Assert N field values have been created for the news section
-					results.add(r = new TestResult().setId(2060).setTitle("Check total number of field values created"));
+					// 2070: Assert N field values have been created for the news section
 					int fieldValueCount = this.cmsService.getFieldValueService().getCount(newsSection.getId());
-					r.setNotes(fieldValueCount + " field values have been created");
+					r = trs.execute(2070).setNotes(fieldValueCount + " field values have been created");
 					if (fieldValueCount != 3) {
 						r.fail();
 					}
@@ -144,43 +147,30 @@ public class BuildTest extends BaseTest {
 					addItem(newsSection, "News item #1", "101", now, now, site, newsType);
 					addItem(newsSection, "News item #2", "102", now, now, site, newsType);
 					
-					// Assert N bindings have been created
-					results.add(r = new TestResult().setId(2070).setTitle("Check number of bindings for news section"));
+					// 2080: Assert N bindings have been created
 					int bindingCount = this.cmsService.getLinkService().getCount(newsSection.getId());
-					r.setNotes(bindingCount + " children bound to parent");
+					r = trs.execute(2080).setNotes(bindingCount + " children bound to parent");
 					if (bindingCount != 2) {
 						r.fail();
 					}					
-				}
-				else {
-					testCompleted = false;
 				}
 				
 				if (aboutSection != null) {
 					addItem(aboutSection, "About us", "about-us", now, now, site, articleType);
 				}
-				else {
-					testCompleted = false;
-				}
 				
-				if (mediaSection != null) {
-					addItem(mediaSection, "Example image", "ex1", now, now, site, imageType);
-				}
-				else {
-					testCompleted = false;
+				if (mediaFolder != null) {
+					addItem(mediaFolder, "Example image", "ex1", now, now, site, imageType);
 				}
 			}
 			else {
-				testCompleted = false;
 				r.fail();
 			}
 		}		
 		else {
-			testCompleted = false;
 			r.fail();
 		}
 		
-		trs.setSuccess(testCompleted);
 		return trs;
 	}
 }

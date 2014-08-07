@@ -1,5 +1,7 @@
 package com.slepeweb.cms.bean;
 
+import java.sql.Timestamp;
+
 import org.springframework.stereotype.Component;
 
 import com.slepeweb.cms.service.CmsService;
@@ -53,5 +55,40 @@ public class CmsBeanFactory {
 		FieldValue fv = new FieldValue();
 		fv.setCmsService(CMS);
 		return fv;
+	}
+	
+	public static Item bakeHomepageItem(Site s) {
+		ItemType homepageType = bakeHomepageType(s.getName());
+		return proveItem(s, homepageType, "Homepage", "", "/").save();
+	}
+	
+	public static Item bakeContentFolderRootItem(Site s, ItemType it) {
+		return proveItem(s, it, "Content", "content", "/content").save();
+	}
+	
+	public static Item bakeOrphanFolder(Site s, ItemType it) {
+		return proveItem(s, it, "Orphan", "orphan", "/orphan").save();
+	}
+	
+	public static ItemType bakeContentFolderType() {
+		return getItemType().setName(ItemType.CONTENT_FOLDER_TYPE_NAME).setMedia(false).save();
+	}
+	
+	public static ItemType bakeHomepageType(String siteName) {
+		return getItemType().setName(siteName + " Homepage").setMedia(false).save();
+	}
+	
+	private static Item proveItem(Site s, ItemType type, String name, String simpleName, String path) {
+		Item i = getItem().
+			setName(name).
+			setSimpleName(simpleName).
+			setPath(path).
+			setSite(s).
+			setType(type).
+			setDateCreated(new Timestamp(System.currentTimeMillis()));
+			
+		return i.
+			setDateUpdated(i.getDateCreated()).
+			setDeleted(false);
 	}
 }

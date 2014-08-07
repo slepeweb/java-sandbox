@@ -26,11 +26,7 @@ public class Site extends CmsBean implements Serializable {
 	}
 	
 	public Site save() {
-		return getSiteService().save(this, null);
-	}
-	
-	public Site save(Item homepageItem) {
-		return getSiteService().save(this, homepageItem);
+		return getSiteService().save(this);
 	}
 	
 	public void delete() {

@@ -1,6 +1,5 @@
 package com.slepeweb.cms.test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -15,10 +14,15 @@ public class ItemTest extends BaseTest {
 	public TestResultSet execute() {
 		
 		TestResult r;
-		TestResultSet trs = new TestResultSet();
-		List<TestResult> results = new ArrayList<TestResult>();
-		trs.setResults(results);
-		boolean testCompleted = false;
+		TestResultSet trs = new TestResultSet().
+			register(4010, "Check news section has 3 children").
+			register(4020, "Check path of 'about' article").
+			register(4030, "Reverse previous move").
+			register(4040, "Re-check path of 'about' article").
+			register(4050, "Check inline item has been added").
+			register(4060, "Check inline item has been removed").
+			register(4070, "Check simplename change has propagated to descendants").
+			register(4080, "Revert simplename change");
 		
 		Site site = getTestSite();
 		
@@ -31,16 +35,14 @@ public class ItemTest extends BaseTest {
 				// Move the 'about' article item to the 'news' section
 				aboutSectionItem.move(newsSectionItem);
 				
-				// Assert news section now has 3 children
-				results.add(r = new TestResult().setId(4010).setTitle("Check news section has 3 children"));
+				// 4010: Assert news section now has 3 children
 				int count = newsSectionItem.getBoundItems().size();
-				r.setNotes("News section has " + count + " children");
+				r = trs.execute(4010).setNotes("News section has " + count + " children");
 				if (count != 3) {
 					r.fail();
 				}
 				
-				// Check path of article item has been updated
-				results.add(r = new TestResult().setId(4020).setTitle("Check path of about article"));
+				// 4020: Check path of article item has been updated
 				String articlePath = "/news/about/about-us";
 				aboutSectionItem = site.getItem("/news/about");
 				Item article = null;
@@ -51,7 +53,7 @@ public class ItemTest extends BaseTest {
 					}
 				}
 				
-				r.setNotes(LogUtil.compose("Article path should be", articlePath));
+				r = trs.execute(4020).setNotes(LogUtil.compose("Article path should be", articlePath));
 				if (article == null) {
 					r.fail();
 				}
@@ -64,17 +66,15 @@ public class ItemTest extends BaseTest {
 					// Move the 'about' article item back to its original location
 					aboutSectionItem.move(rootItem);
 					
-					// Assert news section has original 2 children
-					results.add(r = new TestResult().setId(4030).setTitle("Reverse previous move"));
+					// 4030: Assert news section has original 2 children
 					newsSectionItem = site.getItem("/news");
 					count = newsSectionItem.getBoundItems().size();
-					r.setNotes("News section has " + count + " children");
+					r = trs.execute(4030).setNotes("News section has " + count + " children");
 					if (count != 2) {
 						r.fail();
 					}
 					
-					// Re-check path of article item
-					results.add(r = new TestResult().setId(4030).setTitle("Re-check path of about article"));
+					// 4040: Re-check path of article item
 					aboutSectionItem = site.getItem("/about");
 					articlePath = "/about/about-us";
 					article = null;
@@ -85,25 +85,23 @@ public class ItemTest extends BaseTest {
 						}
 					}
 					
-					r.setNotes(LogUtil.compose("Article path should be", articlePath));
+					r = trs.execute(4040).setNotes(LogUtil.compose("Article path should be", articlePath));
 					if (article == null) {
 						r.fail();
 					}
-					
-					testCompleted = true;
 				}
 				
 				// Add an inline item to the article
 				Item articleItem = site.getItem("/about/about-us");
-				Item imageItem = site.getItem("/media/ex1");
+				Item imageItem = site.getItem("/content/media/ex1");
 				if (articleItem != null && imageItem != null) {
 					articleItem.addInline(imageItem);
 					articleItem.save();
 					
-					// Assert that article has an inline item
-					results.add(r = new TestResult().setId(4040).setTitle("Check inline item has been added"));
+					// 4050: Assert that article has an inline item
 					articleItem = site.getItem("/about/about-us");
 					List<Item> inlines = articleItem.getInlineItems();
+					r = trs.execute(4050);
 					if (! inlines.contains(imageItem)) {
 						r.setNotes("Image item inline not added").fail();
 					}
@@ -111,19 +109,60 @@ public class ItemTest extends BaseTest {
 					// Remove inline to restore original state
 					articleItem.removeInline(imageItem);
 					articleItem.save();
-					results.add(r = new TestResult().setId(4050).setTitle("Check inline item has been removed"));
+					
+					// 4060: Assert inline has been removed
 					articleItem = site.getItem("/about/about-us");
 					inlines = articleItem.getInlineItems();
+					r = trs.execute(4060);
 					if (inlines.size() > 0) {
 						r.setNotes("Image inlines still present").fail();
 					}
-					
-					testCompleted = testCompleted && true;
 				}
+				
+				// Change simplename of news section
+				newsSectionItem = site.getItem("/news");
+				newsSectionItem.setSimpleName("newz");
+				newsSectionItem.save();
+				
+				// 4070: Assert path of news item has changed
+				String newPath = "/newz/101";
+				Item newsItem = site.getItem(newPath);
+				
+				r = trs.execute(4070);
+				if (newsItem != null) {
+					r.setNotes("Path is: " + newsItem.getPath());
+					if (! newPath.equals(newsItem.getPath())) {
+						r.fail();
+					}
+					else {
+						// Revert simplename change
+						newsSectionItem = site.getItem("/newz");
+						newsSectionItem.setSimpleName("news");
+						newsSectionItem.save();
+						
+						// 4080: Assert path of news item has changed
+						newPath = "/news/101";
+						newsItem = site.getItem(newPath);
+						
+						r = trs.execute(4080);
+						if (newsItem != null) {
+							r.setNotes("Path is: " + newsItem.getPath());
+							if (! newPath.equals(newsItem.getPath())) {
+								r.fail();
+							}
+						}
+						else {
+							r.setNotes("No item found at " + newPath).fail();
+						}
+					}
+				}
+				else {
+					r.setNotes("No item found at " + newPath).fail();
+				}
+				
 			}
 		}
 				
-		trs.setSuccess(testCompleted);
 		return trs;
 	}
 }

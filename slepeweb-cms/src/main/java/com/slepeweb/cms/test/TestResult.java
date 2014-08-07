@@ -1,8 +1,9 @@
 package com.slepeweb.cms.test;
 
 public class TestResult {
-	private int id, result = 1;
+	private int id;
 	private String title, notes;
+	private boolean success = true, executed;
 	
 	public int getId() {
 		return id;
@@ -14,11 +15,11 @@ public class TestResult {
 	}
 	
 	public String getResult() {
-		return result == 0 ? "Fail" : "Pass";
+		return ! isExecuted() || ! success ? "Fail" : "Pass";
 	}
 	
-	public TestResult setResult(int result) {
-		this.result = result;
+	public TestResult setSuccess(boolean b) {
+		this.success = b;
 		return this;
 	}
 	
@@ -41,12 +42,34 @@ public class TestResult {
 	}
 	
 	public TestResult pass() {
-		this.result = 1;
+		this.success = true;
 		return this;
 	}
 	
 	public TestResult fail() {
-		this.result = 0;
+		this.success = false;
 		return this;
+	}
+
+	public boolean isExecuted() {
+		return executed;
+	}
+	
+	public String getExecutionFlag() {
+		return isExecuted() ? "Yes" : "No";
+	}
+
+	public TestResult setExecuted(boolean executed) {
+		this.executed = executed;
+		return this;
+	}
+
+	public TestResult setExecuted() {
+		this.executed = true;
+		return this;
+	}
+
+	public boolean isSuccess() {
+		return success;
 	}
 }

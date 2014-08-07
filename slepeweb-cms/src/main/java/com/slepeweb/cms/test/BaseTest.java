@@ -14,7 +14,7 @@ import com.slepeweb.cms.service.CmsService;
 
 public abstract class BaseTest {
 	protected static final String TEST_SITE_NAME = "Integration Testing";
-	protected static final String HOMEPAGE_TYPE_NAME = "ZHomepage";
+	protected static final String HOMEPAGE_TYPE_NAME = TEST_SITE_NAME + " Homepage";
 	protected static final String SECTION_TYPE_NAME = "ZSection";
 	protected static final String NEWS_TYPE_NAME = "ZNews";
 	protected static final String EVENT_TYPE_NAME = "ZEvent";
@@ -35,29 +35,7 @@ public abstract class BaseTest {
 	}
 
 	protected Site addSite(String name, String hostname, String homepageTypeName) {
-		Site s = CmsBeanFactory.getSite().setName(name).setHostname(hostname);	
-
-		
-		String rootName = "Homepage";
-		ItemType type = this.cmsService.getItemTypeService().getItemType(homepageTypeName);
-		Item homepageItem = null;
-		
-		if (type != null) {
-			homepageItem = CmsBeanFactory.getItem().
-				setName(rootName).
-				setSimpleName("").
-				setPath("/").
-				setSite(s).
-				setType(type).
-				setDateCreated(new Timestamp(System.currentTimeMillis()));
-			
-			homepageItem.
-				setDateUpdated(homepageItem.getDateCreated()).
-				setDeleted(false);
-		}
-		
-		s.save(homepageItem);
-		return s;
+		return CmsBeanFactory.getSite().setName(name).setHostname(hostname).save();	
 	}
 	
 	protected ItemType addType(String name) {
@@ -80,11 +58,15 @@ public abstract class BaseTest {
 	protected Item addItem(Item parent, String name, String simplename, 
 			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type) {
 		
-		String path = parent.isRoot() ? parent.getPath() + simplename : parent.getPath() + "/" + simplename;
+		String path = 
+			parent != null ? 
+				parent.isSiteRoot() ? parent.getPath() + simplename : parent.getPath() + "/" + simplename : 
+					"/" + simplename;
+		
 		Item i = CmsBeanFactory.getItem().setName(name).setSimpleName(simplename).setPath(path).
 			setDateCreated(dateCreated).setDateUpdated(dateUpdated).setSite(site).setType(type);
 		
-		return parent.addChild(i);
+		return parent != null ? parent.addChild(i) : null;
 	}
 	
 }

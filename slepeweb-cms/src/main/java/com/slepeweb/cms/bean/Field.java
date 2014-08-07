@@ -4,12 +4,17 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
+import com.slepeweb.cms.utils.LogUtil;
 
 
 public class Field extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static Logger LOG = Logger.getLogger(Field.class);
 	private Long id;
 	private String name, variable, help;
 	private FieldType type;
@@ -109,12 +114,18 @@ public class Field extends CmsBean implements Serializable {
 		else if (getType() == FieldType.date) {
 			// Timestamp format example: 2014-08-04 14:20:07.0
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-			try {
-				return new Timestamp(sdf.parse(this.defaultValue).getTime());
-			} catch (ParseException e) {
-				e.printStackTrace();
+			
+			if (StringUtils.isNotBlank(this.defaultValue)) {
+				try {
+					return new Timestamp(sdf.parse(this.defaultValue).getTime());
+				} catch (ParseException e) {
+					LOG.warn(LogUtil.compose("Default date not parseable", this.defaultValue));
+				}
 			}
-			return new Timestamp(System.currentTimeMillis());
+			
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.YEAR, 10);
+			return new Timestamp(cal.getTimeInMillis());
 		}
 		else {
 			return StringUtils.isNotBlank(this.defaultValue) ? this.defaultValue : "";
@@ -126,10 +137,12 @@ public class Field extends CmsBean implements Serializable {
 			this.defaultValue = String.valueOf(value);
 		}
 		else if (value instanceof Timestamp && getType() == FieldType.date) {
+			// TODO: format the date to 0 millis
 			this.defaultValue = ((Timestamp) value).toString();
 		}
 		else {
-			this.defaultValue = value.toString();
+			// TODO: May needs codes to indicate eg. 2 weeks hence (for dates), eg now, +2w, etc
+			this.defaultValue = value != null ? value.toString() : "";
 		}
 		return this;
 	}

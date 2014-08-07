@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ItemType extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
+	public static final String CONTENT_FOLDER_TYPE_NAME = "Content Folder";
 	private Long id;
 	private String name;
 	private boolean media;
