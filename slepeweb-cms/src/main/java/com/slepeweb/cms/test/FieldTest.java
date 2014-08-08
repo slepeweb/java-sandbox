@@ -15,7 +15,7 @@ public class FieldTest extends BaseTest {
 	public TestResultSet execute() {
 		
 		TestResult r;
-		TestResultSet trs = new TestResultSet().
+		TestResultSet trs = new TestResultSet("Fields testbed").
 			register(3010, "Check title field value update").
 			register(3020, "Check embargo date field value update");
 		

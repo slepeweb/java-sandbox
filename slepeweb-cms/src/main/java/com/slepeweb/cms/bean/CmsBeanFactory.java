@@ -66,10 +66,6 @@ public class CmsBeanFactory {
 		return proveItem(s, it, "Content", "content", "/content").save();
 	}
 	
-	public static Item bakeOrphanFolder(Site s, ItemType it) {
-		return proveItem(s, it, "Orphan", "orphan", "/orphan").save();
-	}
-	
 	public static ItemType bakeContentFolderType() {
 		return getItemType().setName(ItemType.CONTENT_FOLDER_TYPE_NAME).setMedia(false).save();
 	}

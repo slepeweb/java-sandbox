@@ -45,7 +45,6 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		
 		if (cfolderType != null) {
 			CmsBeanFactory.bakeContentFolderRootItem(s, cfolderType);
-			CmsBeanFactory.bakeOrphanFolder(s, cfolderType);
 		}
 		else {
 			LOG.error(compose("Content folders could not be created", ItemType.CONTENT_FOLDER_TYPE_NAME));

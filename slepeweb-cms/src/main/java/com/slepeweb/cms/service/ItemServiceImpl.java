@@ -25,7 +25,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			"select i.*, s.name as sitename, s.hostname, " +
 			"it.id as typeid, it.name as typename, it.media from " +
 			"item i, site s, itemtype it where " +
-			"i.siteid=s.id and i.typeid=it.id and %s and i.deleted=0";
+			"i.siteid=s.id and i.typeid=it.id and %s";
 	
 	@Autowired protected LinkService linkService;
 	@Autowired protected FieldValueService fieldValueService;
@@ -168,12 +168,39 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			}
 		}
 	}
+	
+	public int getBinCount() {
+		return this.jdbcTemplate.queryForInt("select count(*) from item where deleted = 1");
+	}
+
+	private Item trashAction(Long id, String actionHeading, int actionCode) {
+		Item i = actionCode == 1 ? getItem(id) : getItemFromBin(id);
+		
+		// Action the given item
+		if (this.jdbcTemplate.update("update item set deleted = ? where id = ?", actionCode, id) > 0) {
+			LOG.warn(compose(String.format("%sed item", actionHeading), String.valueOf(id)));
+			
+			// Now action any descendant items
+			int count = this.jdbcTemplate.update("update item set deleted = ? where siteid = ? and path like ?", 
+					actionCode, i.getSite().getId(), i.getPath() + "/%");
+			
+			LOG.warn(compose(String.format("%sed %d descendant items", actionHeading, count), String.valueOf(i.getPath())));
+		}
+		
+		return i.setDeleted(actionCode == 1);
+	}
+
+	public Item trashItem(Long id) {
+		return trashAction(id, "Trash", 1);
+	}
+	
+	public Item restoreItem(Long id) {
+		return trashAction(id, "Restore", 0);
+	}
 
 	public void deleteItem(Long id) {
-		if (this.jdbcTemplate.update("delete from item where id = ?", id) > 0) {
+		if (this.jdbcTemplate.update("delete from item where id = ? and deleted = 1", id) > 0) {
 			LOG.warn(compose("Deleted item", String.valueOf(id)));
-			
-			// TODO: Should move descendants to an orphan bin, perhaps retaining original paths ...
 		}
 	}
 
@@ -183,13 +210,19 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 
 	public Item getItem(Long siteId, String path) {
 		return getItem(
-			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=?"),
+			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=? and i.deleted=0"),
 			new Object[]{siteId, path});
 	}
 
 	public Item getItem(Long id) {
 		return getItem(
-			String.format(SELECT_TEMPLATE, "i.id=?"), 
+			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=0"), 
+			new Object[]{id});
+	}
+	
+	public Item getItemFromBin(Long id) {
+		return getItem(
+			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=1"), 
 			new Object[]{id});
 	}
 	

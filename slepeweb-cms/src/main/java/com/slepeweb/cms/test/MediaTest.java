@@ -13,7 +13,7 @@ public class MediaTest extends BaseTest {
 	public TestResultSet execute() {
 		
 		TestResult r;
-		TestResultSet trs = new TestResultSet().
+		TestResultSet trs = new TestResultSet("Media testbed").
 			register(4010, "Check media table has a new row").
 			register(4020, "Get media data from db");
 		

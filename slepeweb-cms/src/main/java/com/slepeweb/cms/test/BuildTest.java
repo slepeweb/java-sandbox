@@ -17,7 +17,7 @@ public class BuildTest extends BaseTest {
 	public TestResultSet execute() {
 		
 		TestResult r;
-		TestResultSet trs = new TestResultSet().
+		TestResultSet trs = new TestResultSet("Test site build").
 			register(2010, "Check N item types have been created").
 			register(2020, "Check N fields have been created").
 			register(2030, "Check N fieldfortype rows have been created").

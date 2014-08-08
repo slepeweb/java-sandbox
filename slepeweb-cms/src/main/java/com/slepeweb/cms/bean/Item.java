@@ -250,6 +250,14 @@ public class Item extends CmsBean implements Serializable {
 		return this.path;
 	}
 	
+	public void trash() {
+		this.cmsService.getItemService().trashItem(getId());
+	}
+	
+	public void restore() {
+		this.cmsService.getItemService().restoreItem(getId());
+	}
+	
 	public String getUrl() {
 		return new StringBuilder("//").append(getSite().getHostname()).append(getPath()).toString();
 	}

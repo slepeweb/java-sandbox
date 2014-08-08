@@ -12,4 +12,7 @@ public interface ItemService {
 	int getCount(String path);
 	int getCountByType(Long itemTypeId);
 	void move(Item child, Item newParent);
+	Item trashItem(Long id);
+	Item restoreItem(Long id);
+	int getBinCount();
 }

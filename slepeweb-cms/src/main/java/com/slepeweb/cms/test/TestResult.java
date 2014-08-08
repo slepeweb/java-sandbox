@@ -2,7 +2,7 @@ package com.slepeweb.cms.test;
 
 public class TestResult {
 	private int id;
-	private String title, notes;
+	private String title, expected = "", notes = "";
 	private boolean success = true, executed;
 	
 	public int getId() {
@@ -71,5 +71,14 @@ public class TestResult {
 
 	public boolean isSuccess() {
 		return success;
+	}
+
+	public String getExpected() {
+		return expected;
+	}
+
+	public TestResult setExpected(String expected) {
+		this.expected = expected;
+		return this;
 	}
 }

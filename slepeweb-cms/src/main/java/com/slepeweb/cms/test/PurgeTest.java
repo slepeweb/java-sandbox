@@ -10,7 +10,7 @@ public class PurgeTest extends BaseTest {
 	public TestResultSet execute() {
 		
 		TestResult r;
-		TestResultSet trs = new TestResultSet().
+		TestResultSet trs = new TestResultSet("Purge testbed").
 			register(1010, "Delete News type").
 			register(1020, "Confirm all news items have been cascade-deleted").
 			register(1030, "Check N field values have been cascade-deleted").

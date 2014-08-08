@@ -14,9 +14,18 @@ public class TestResultSet {
 	private static Logger LOG = Logger.getLogger(TestResultSet.class);
 	private List<TestResult> results = new ArrayList<TestResult>();
 	private Map<Integer, TestResult> map = new HashMap<Integer, TestResult>();
+	private String heading;
 	
-	public TestResultSet register(int id, String title) {		
-		TestResult r = new TestResult().setId(id).setTitle(title);
+	public TestResultSet(String heading) {
+		this.heading = heading;
+	}
+	
+	public TestResultSet register(int id, String title) {	
+		return register(id, title, "");
+	}
+	
+	public TestResultSet register(int id, String title, String expected) {		
+		TestResult r = new TestResult().setId(id).setTitle(title).setExpected(expected);
 		this.results.add(r);
 		this.map.put(id, r);
 		return this;
@@ -48,5 +57,13 @@ public class TestResultSet {
 	
 	public void setResults(List<TestResult> results) {
 		this.results = results;
+	}
+
+	public String getHeading() {
+		return heading;
+	}
+
+	public void setHeading(String heading) {
+		this.heading = heading;
 	}
 }
