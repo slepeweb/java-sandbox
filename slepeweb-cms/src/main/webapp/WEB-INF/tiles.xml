@@ -5,15 +5,19 @@
 <tiles-definitions>
 
 	<definition name="layout.test" template="/WEB-INF/jsp/layout-test.jsp">
-		<put-attribute name="head" value="/WEB-INF/jsp/header.jsp"/>
-		<put-attribute name="body" value=""/>
-		<put-attribute name="foot" value="/WEB-INF/jsp/footer.jsp"/>
-		<put-attribute name="left" value=""/>
-		<put-attribute name="right" value=""/>
+		<put-attribute name="body" value="" />
+	</definition>
+	
+	<definition name="layout.cms" template="/WEB-INF/jsp/cms/layout.jsp">
+		<put-attribute name="body" value="" />
 	</definition>
 	
 	<definition name="test" extends="layout.test">
-		<put-attribute name="body" value="/WEB-INF/jsp/test.jsp"/>
+		<put-attribute name="body" value="/WEB-INF/jsp/test.jsp" />
+	</definition>	
+
+	<definition name="cmseditor" extends="layout.cms">
+		<put-attribute name="body" value="/WEB-INF/jsp/cms/editor.jsp" />
 	</definition>	
 
 </tiles-definitions>
