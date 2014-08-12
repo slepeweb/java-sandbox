@@ -15,11 +15,15 @@ import com.slepeweb.cms.utils.LogUtil;
 public class Field extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static Logger LOG = Logger.getLogger(Field.class);
+	private static final String INPUT_TAG = "input";
+	private static final String TEXT_AREA_TAG = "textarea";
+	
 	private Long id;
 	private String name, variable, help;
 	private FieldType type;
 	private int size;
 	private String defaultValue;
+	// TODO: private String validValues; // pipe-delimited list
 	
 	public enum FieldType {
 		text, markup, integer, date, url;
@@ -51,6 +55,37 @@ public class Field extends CmsBean implements Serializable {
 	
 	public void delete() {
 		getFieldService().deleteField(this);
+	}
+	
+	public String getInputTag(String value) {
+		StringBuilder sb = new StringBuilder("<");
+		String tag = null;
+		String rows = null, cols = null;
+		
+		if (getType() == FieldType.integer || getType() == FieldType.date || getType() == FieldType.url) {
+			tag = INPUT_TAG;
+			rows = cols = null;
+		}
+		else if (getType() == FieldType.text || getType() == FieldType.markup) {
+			if (getSize() > 0 && getSize() <= 120) {
+				tag = INPUT_TAG;
+			}
+			else {
+				tag = TEXT_AREA_TAG;
+				cols = "80";
+				rows = getSize() > 0 && getSize() <= 256 ? "4" : "10";
+			}
+		}
+		
+		if (tag.equals(INPUT_TAG)) {
+			sb.append(tag).append(String.format(" name=\"%s\" value=\"%s\" />", getVariable(), value));
+		}
+		else {
+			sb.append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\">%s</%s>", 
+					getVariable(), cols, rows, value, tag));
+		}
+		
+		return sb.toString();
 	}
 	
 	public Long getId() {

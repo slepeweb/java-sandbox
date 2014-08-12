@@ -3,3 +3,5 @@
     taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%><%@ 
     taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%>
 
+<div id="item-editor">
+</div>

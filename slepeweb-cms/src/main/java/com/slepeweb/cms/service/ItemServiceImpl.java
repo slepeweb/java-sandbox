@@ -35,6 +35,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private String columns = "name, simplename, path, siteid, typeid, datecreated, dateupdated, deleted";
 	
 	public Item save(Item i) {
+		return save(i, false);
+	}
+	
+	public Item save(Item i, boolean extendedSave) {
 		if (i.isDefined4Insert()) {
 			Item dbRecord = getItem(i.getId());		
 			if (dbRecord != null) {
@@ -44,10 +48,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				insertItem(i);
 			}
 			
-			saveFieldValues(i);
-			removeStaleLinks(dbRecord, i);
-			saveCurrentLinks(i);
-			saveMedia(i);
+			if (extendedSave) {
+				saveFieldValues(i.getFieldValues());
+				removeStaleLinks(dbRecord, i);
+				saveLinks(i.getLinks());
+				saveMedia(i);
+			}
 		}
 		
 		return i;
@@ -118,9 +124,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		
 	}
 	
-	private void saveFieldValues(Item i) {
-		if (i.getFieldValues() != null) {
-			for (FieldValue fv : i.getFieldValues()) {
+	public void saveFieldValues(List<FieldValue> fieldValues) {
+		if (fieldValues != null) {
+			for (FieldValue fv : fieldValues) {
 				fv.save();
 			}
 		}
@@ -150,9 +156,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 
-	private void saveCurrentLinks(Item i) {
-		if (i.getLinks() != null) {
-			for (Link l : i.getLinks()) {
+	public void saveLinks(List<Link> links) {
+		if (links != null) {
+			for (Link l : links) {
 				l.save();
 			}
 		}

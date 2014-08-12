@@ -41,6 +41,10 @@ public class FieldValue extends CmsBean implements Serializable {
 		getFieldValueService().deleteFieldValue(getField().getId(), getItemId());
 	}
 	
+	public String getInputTag() {
+		return getField().getInputTag(getStringValue());
+	}
+	
 	public Field getField() {
 		return field;
 	}

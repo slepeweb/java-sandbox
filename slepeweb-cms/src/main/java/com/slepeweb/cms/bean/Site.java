@@ -37,11 +37,6 @@ public class Site extends CmsBean implements Serializable {
 		return getItemService().getItem(getId(), path);
 	}
 	
-	public Item addItem(Item i) {
-		i.setSite(this);
-		return getItemService().save(i);
-	}
-	
 	public String getName() {
 		return name;
 	}

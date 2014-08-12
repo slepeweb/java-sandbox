@@ -3,21 +3,25 @@
        "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
        "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
 <tiles-definitions>
-
-	<definition name="layout.test" template="/WEB-INF/jsp/layout-test.jsp">
+	
+	<!-- Back-end testing -->
+	<definition name="cms.test.layout" template="/WEB-INF/jsp/cms-test/layout.jsp">
 		<put-attribute name="body" value="" />
 	</definition>
 	
-	<definition name="layout.cms" template="/WEB-INF/jsp/cms/layout.jsp">
-		<put-attribute name="body" value="" />
-	</definition>
-	
-	<definition name="test" extends="layout.test">
-		<put-attribute name="body" value="/WEB-INF/jsp/test.jsp" />
+	<definition name="cms.test" extends="cms.test.layout">
+		<put-attribute name="body" value="/WEB-INF/jsp/cms-test/test.jsp" />
 	</definition>	
 
-	<definition name="cmseditor" extends="layout.cms">
+	<!-- CMS page -->
+	<definition name="cms.layout.top.and.tail" template="/WEB-INF/jsp/cms/layout.jsp">
+		<put-attribute name="body" value="" />
+	</definition>
+	
+	<definition name="cms.editor" extends="cms.layout.top.and.tail">
 		<put-attribute name="body" value="/WEB-INF/jsp/cms/editor.jsp" />
 	</definition>	
+
+	<definition name="cms.item.editor" template="/WEB-INF/jsp/cms/item-editor.jsp" />
 
 </tiles-definitions>

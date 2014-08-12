@@ -57,6 +57,10 @@ public class Item extends CmsBean implements Serializable {
 		return b;
 	}
 	
+	public void resetDateUpdated() {
+		setDateUpdated(new Timestamp(System.currentTimeMillis()));
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("%s: %s", getName(), getPath());
@@ -64,6 +68,18 @@ public class Item extends CmsBean implements Serializable {
 	
 	public Item save() {
 		return getItemService().save(this);
+	}
+	
+	public Item save(boolean extended) {
+		return getItemService().save(this, extended);
+	}
+	
+	public void saveFieldValues() {
+		getItemService().saveFieldValues(getFieldValues());
+	}
+	
+	public void saveLinks() {
+		 getItemService().saveLinks(getLinks());
 	}
 	
 	public void delete() {
@@ -331,6 +347,7 @@ public class Item extends CmsBean implements Serializable {
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
 		result = prime * result + ((site == null) ? 0 : site.getId().hashCode());
 		result = prime * result + ((type == null) ? 0 : type.getId().hashCode());
+		result = prime * result + ((dateUpdated == null) ? 0 : dateUpdated.hashCode());
 		return result;
 	}
 
@@ -365,6 +382,13 @@ public class Item extends CmsBean implements Serializable {
 				return false;
 		} else if (!type.getId().equals(other.type.getId()))
 			return false;
+		
+		if (dateUpdated == null) {
+			if (other.dateUpdated != null)
+				return false;
+		} else if (!dateUpdated.equals(other.dateUpdated))
+			return false;
+		
 		return true;
 	}
 

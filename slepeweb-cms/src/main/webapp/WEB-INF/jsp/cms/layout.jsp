@@ -17,18 +17,15 @@
 			<cms:navigation-top />
 		</div>
 		
-		<div id="leftnav">
-		</div>
-	
 		<!-- Main -->	
-		<div id="main-wrapper" class="subpage">
-			<div class="container">
-				<div class="row">
-					<!-- Main content -->	
-					<div class="12u skel-cell-mainContent">	
-						<tiles:insertAttribute name="body" />	
-					</div>					
-				</div>
+		<div id="main-wrapper">
+			<!-- Left navigation -->
+			<div id="leftnav">
+			</div>
+
+			<!-- Main content -->	
+			<div id="item-editor">
+				<tiles:insertAttribute name="body" />	
 			</div>
 		</div>
 	

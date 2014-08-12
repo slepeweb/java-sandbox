@@ -11,7 +11,7 @@ public class EditorPageController extends BaseController {
 	@RequestMapping(value="/editor")	
 	public String doMain(ModelMap model) {		
 
-		return "cmseditor";
+		return "cms.editor";
 	}
 	
 }

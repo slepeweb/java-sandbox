@@ -1,7 +1,53 @@
+body {
+	font-size: 12px;
+}
+
 .pass {
 	color: green;
 }
 
 .fail {
 	color: red;
+}
+
+label {
+	float: left;
+	width: 150px;
+}
+
+input {
+	width: 400px;
+}
+
+input[disabled="disabled"] {
+	background-color: #d8d8d8;
+	color: #909090;
+}
+
+#item-editor {
+/* 	display: inline-block; */
+/* 	position: absolute; */
+/* 	left: 180px; */
+/* 	clear: both; */
+	float:left;
+	margin-left: 10px;
+}
+
+#leftnav {
+/* 	display: inline-block; */
+/* 	position: absolute; */
+/* 	left: 0px; */
+	float:left;
+}
+
+#main-wrapper {
+	position: relative;
+}
+
+#footer-wrapper {
+	clear: both;
+}
+
+button {
+	margin-top: 20px;
 }
