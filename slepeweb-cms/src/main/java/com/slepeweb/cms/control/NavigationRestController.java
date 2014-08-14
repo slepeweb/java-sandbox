@@ -2,6 +2,7 @@ package com.slepeweb.cms.control;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,7 +24,7 @@ public class NavigationRestController extends BaseController {
 	@Autowired private SiteService siteService;
 	@Autowired private ItemService itemService;
 	
-	@RequestMapping(value="/leftnav", method=RequestMethod.GET, produces="application/json")	
+	@RequestMapping(value="/leftnav/full", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public List<Navigation.Node> doFullNav() {	
 		Site site = this.siteService.getSite("Integration Testing");
@@ -42,36 +43,83 @@ public class NavigationRestController extends BaseController {
 		return nav.getNodes();
 	}
 	
-	@RequestMapping(value="/lazyleftnav", method=RequestMethod.GET, produces="application/json")	
+	@RequestMapping(value="/leftnav/lazy/one", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
-	public List<Navigation.Node> doLazyNav(@RequestParam(value="key", required=false) String key) {	
+	public List<Navigation.Node> doLazyNavOneLevel(@RequestParam(value="key", required=false) String key) {	
+		List<Navigation.Node> level0 = new ArrayList<Navigation.Node>();
+		
 		if (key == null) {
-			List<Navigation.Node> level0 = new ArrayList<Navigation.Node>();
-			Site site = this.siteService.getSite("Integration Testing");			
-			level0.add(toNode(site.getItem("/")).setFolder(true).setLazy(true));
-			level0.add(toNode(site.getItem("/content")).setFolder(true).setLazy(true));
+			Site site = this.siteService.getSite("Integration Testing");
+			level0.add(dive(site.getItem("/")));
+			level0.add(dive(site.getItem("/content")));
 			return level0;
 		}
 		
 		return dive(this.itemService.getItem(Long.parseLong(key)), 1).getChildren();		
 	}
 	
+	@RequestMapping(value="/leftnav/lazy/thread", method=RequestMethod.GET, produces="application/json")	
+	@ResponseBody
+	public List<Navigation.Node> doLazyNavThread(@RequestParam(value="key", required=false) String key) {	
+		if (key == null) {
+			return doLazyNavOneLevel(key);
+		}
+		
+		Item item = this.itemService.getItem(Long.parseLong(key));
+		String[] parts = item.getPath().substring(1).split("/");
+		final Vector<String> pathComponents = new Vector<String>(parts.length);
+		for (String s : parts) {
+			pathComponents.add(s);
+		}
+		
+		List<Navigation.Node> level0 = new ArrayList<Navigation.Node>();
+		Site site = this.siteService.getSite("Integration Testing");
+		level0.add(dive(site.getItem("/"), pathComponents));
+		level0.add(dive(site.getItem("/content"), pathComponents));
+		return level0;		
+	}
+	
 	private Navigation.Node dive(Item parentItem) {
-		return dive(parentItem, -1);
+		return dive(parentItem, 1);
 	}
 	
 	private Navigation.Node dive(Item parentItem, int numLevels) {
-		Navigation.Node pNode = toNode(parentItem);
-		if (numLevels > -1) pNode.setLazy(true);
+		Navigation.Node pNode = toNode(parentItem);		
 		List<Item> bindings = parentItem.getBoundItems();
 		pNode.setFolder(bindings.size() > 0);
 		
-		if (numLevels != 0) {
-			Navigation.Node cNode;
+		if (numLevels > 0) {
 			for (Item child : bindings) {
-				cNode = dive(child, --numLevels);
-				pNode.getChildren().add(cNode);
-				if (numLevels == 1) cNode.setLazy(true);
+				pNode.addChild(dive(child, numLevels - 1));
+			}
+		}
+		
+		return pNode;
+	}
+	
+	private Navigation.Node dive(Item parentItem, final Vector<String> pathComponents) {
+		Navigation.Node pNode = toNode(parentItem);		
+		Navigation.Node cNode;
+		List<Item> bindings = parentItem.getBoundItems();
+		pNode.setFolder(bindings.size() > 0);
+		
+		if (pathComponents.size() > 0) {
+			for (Item child : bindings) {				
+				if (child.getSimpleName().equals(pathComponents.get(0))) {
+					@SuppressWarnings("unchecked")
+					Vector<String> workingPath = (Vector<String>) pathComponents.clone();
+					workingPath.remove(0);
+					cNode = dive(child, workingPath);
+					if (pathComponents.size() == 1) {
+						//cNode.setSelected(true);
+					}
+				}
+				else {
+					cNode = toNode(child);
+					cNode.setFolder(child.getBoundItems().size() > 0);
+				}
+				
+				pNode.addChild(cNode);
 			}
 		}
 		

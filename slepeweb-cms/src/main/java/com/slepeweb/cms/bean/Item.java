@@ -3,6 +3,7 @@ package com.slepeweb.cms.bean;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,34 @@ public class Item extends CmsBean implements Serializable {
 	
 	public void resetDateUpdated() {
 		setDateUpdated(new Timestamp(System.currentTimeMillis()));
+	}
+	
+	public String getNodeHierarchy() {
+		List<Long> list = new ArrayList<Long>();
+		list.add(getId());
+		Item climber = this, parent;
+		
+		while ((parent = climber.getParent()) != null) {
+			list.add(parent.getId());
+			climber = parent;
+		}
+		
+		Collections.reverse(list);
+		StringBuilder sb = new StringBuilder();
+
+		for (Long id : list) {
+			sb.append("/").append(id);
+		}
+				
+		return sb.toString();
+	}
+	
+	public Item getParent() {
+		Link l = this.cmsService.getLinkService().getParent(getId());
+		if (l != null) {
+			return this.cmsService.getItemService().getItem(l.getParentId());
+		}
+		return null;
 	}
 	
 	@Override

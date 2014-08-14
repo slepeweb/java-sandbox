@@ -3,6 +3,8 @@ package com.slepeweb.cms.component;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 public class Navigation {
 	
 //	String json = "[" +
@@ -26,13 +28,22 @@ public class Navigation {
 	}
 	
 	public static class Node {
+		private Node parentNode;
 		private String title, key;
-		private boolean folder, lazy;
+		private boolean folder, lazy = true, expanded, selected;
 		private List<Node> children = new ArrayList<Node>();
 		
 		public Node addChild(Node n) {
 			getChildren().add(n);
+			n.setParentNode(this);
+			n.getParentNode().setFolder(true).setExpanded(true);
 			return this;
+		}
+		
+		public void addChildren(List<Navigation.Node> children) {
+			for (Navigation.Node n : children) {
+				addChild(n);
+			}
 		}
 		
 		public String getTitle() {
@@ -54,7 +65,7 @@ public class Navigation {
 		}
 		
 		public boolean isFolder() {
-			return getChildren().size() > 0 || this.folder;
+			return this.folder;
 		}
 		
 		public Node setFolder(boolean folder) {
@@ -78,6 +89,30 @@ public class Navigation {
 		public Node setLazy(boolean lazy) {
 			this.lazy = lazy;
 			return this;
+		}
+
+		@JsonIgnore public Node getParentNode() {
+			return parentNode;
+		}
+
+		public void setParentNode(Node parent) {
+			this.parentNode = parent;
+		}
+
+		public boolean isExpanded() {
+			return expanded;
+		}
+
+		public void setExpanded(boolean expanded) {
+			this.expanded = expanded;
+		}
+
+		public boolean isSelected() {
+			return selected;
+		}
+
+		public void setSelected(boolean selected) {
+			this.selected = selected;
 		}		
 	}
 
