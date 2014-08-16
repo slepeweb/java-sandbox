@@ -4,6 +4,7 @@ drop table fieldfortype;
 drop table field;
 drop table link;
 drop table item;
+drop table template;
 drop table itemtype;
 drop table site;
 
@@ -28,6 +29,20 @@ create table itemtype
 ) ENGINE=InnoDB;
 
 
+create table template
+(
+	id int not null auto_increment,
+	name varchar(255),
+	forward varchar(255),
+	siteid int,
+	typeid int,
+	primary key (id),
+	unique key idx_template_site_name (siteid, name),
+	constraint foreign key (siteid) references site(id) on delete cascade,
+	constraint foreign key (typeid) references itemtype(id) on delete cascade
+) ENGINE=InnoDB;
+
+
 create table item
 (
 	id int not null auto_increment,
@@ -36,6 +51,7 @@ create table item
 	path varchar(255),
 	siteid int,
 	typeid int,
+	templateid int,
 	datecreated timestamp,
 	dateupdated timestamp,
 	deleted boolean,
@@ -44,6 +60,7 @@ create table item
 	constraint foreign key (siteid) references site(id) on delete cascade,
 	constraint foreign key (typeid) references itemtype(id) on delete cascade
 ) ENGINE=InnoDB;
+
 
 create table link
 (

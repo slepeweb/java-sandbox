@@ -39,6 +39,12 @@ public class CmsBeanFactory {
 		return i;
 	}
 	
+	public static Template getTemplate() {
+		Template t = new Template();
+		t.setCmsService(CMS);
+		return t;
+	}
+	
 	public static Link getLink() {
 		Link l = new Link();
 		l.setCmsService(CMS);

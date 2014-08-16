@@ -16,6 +16,7 @@ public class Item extends CmsBean implements Serializable {
 	private static Logger LOG = Logger.getLogger(Item.class);
 	private Site site;
 	private ItemType type;
+	private Template template;
 	private List<FieldValue> fieldValues;
 	private String name, simpleName, path;
 	private Timestamp dateCreated, dateUpdated;
@@ -33,6 +34,7 @@ public class Item extends CmsBean implements Serializable {
 		setDeleted(i.isDeleted());
 		setSite(i.getSite());
 		setType(i.getType());
+		setTemplate(i.getTemplate());
 		setMediaUploadFilePath(i.getMediaUploadFilePath());
 		
 		// Must assimilate fields and links too? 
@@ -92,7 +94,8 @@ public class Item extends CmsBean implements Serializable {
 	
 	@Override
 	public String toString() {
-		return String.format("%s: %s", getName(), getPath());
+		return String.format("(%s) %s: %s", getTemplate() != null ? getTemplate().getName() : "No template", 
+				getName(), getPath());
 	}
 	
 	public Item save() {
@@ -108,7 +111,7 @@ public class Item extends CmsBean implements Serializable {
 	}
 	
 	public void saveLinks() {
-		 getItemService().saveLinks(getLinks());
+		 getItemService().saveLinks(this);
 	}
 	
 	public void delete() {
@@ -141,8 +144,21 @@ public class Item extends CmsBean implements Serializable {
 		return this;
 	}
 	
+	// TODO: need a way to set ordering for links, eg 'end of list'
+	public Item addRelation(Item relation) {
+		if (! getLinks().contains(relation)) {
+			getLinks().add(toChildLink(relation, LinkType.relation));
+		}
+		
+		return this;
+	}
+	
 	public boolean removeInline(Item inline) {
 		return getLinks().remove(toChildLink(inline, LinkType.inline));
+	}
+	
+	public boolean removeRelation(Item relation) {
+		return getLinks().remove(toChildLink(relation, LinkType.relation));
 	}
 	
 	// TODO: need a better way to handle ordering - currently hardcoding to 0
@@ -431,6 +447,15 @@ public class Item extends CmsBean implements Serializable {
 
 	public Item setPath(String path) {
 		this.path = path;
+		return this;
+	}
+
+	public Template getTemplate() {
+		return template;
+	}
+
+	public Item setTemplate(Template template) {
+		this.template = template;
 		return this;
 	}
 }

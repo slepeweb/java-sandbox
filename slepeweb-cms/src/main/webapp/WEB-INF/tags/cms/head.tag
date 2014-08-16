@@ -20,6 +20,7 @@
 <script type="text/javascript">
 
   $(function(){
+	  // Get form field names and values for forms on item-editor 
 	  var getFieldsFormInputData = function() {
 		  var result = {};
 		  $("#field-form input, #field-form textarea").each(function(i, obj) {
@@ -28,6 +29,7 @@
 		  return result;
 	  };
 	  
+	  // (Re-)render the forms
 	  var renderItemForms = function(nodeKey) {
   		$.ajax("/rest/cms/item-editor", {
 				cache: false,
@@ -42,7 +44,7 @@
 					}
 					$("#item-editor").tabs();
 					$("#core-button").click(function () {
-						$.ajax("/rest/cms/item/" + node.key + "/update/core", {
+						$.ajax("/rest/cms/item/" + nodeKey + "/update/core", {
 								type: "POST",
 			    			cache: false,
 			    			data: {
@@ -56,7 +58,7 @@
 						});
 					});
 					$("#field-button").click(function () {
-						$.ajax("/rest/cms/item/" + node.key + "/update/fields", {
+						$.ajax("/rest/cms/item/" + nodeKey + "/update/fields", {
 								type: "POST",
 			    			cache: false,
 			    			data: getFieldsFormInputData(), 

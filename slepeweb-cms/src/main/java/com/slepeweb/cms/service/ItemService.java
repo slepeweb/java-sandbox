@@ -14,7 +14,7 @@ public interface ItemService {
 	Item save(Item i);
 	Item save(Item i, boolean extended);
 	void saveFieldValues(List<FieldValue> fvs);
-	void saveLinks(List<Link> links);
+	void saveLinks(Item i);
 	int getCount();
 	int getCount(String path);
 	int getCountByType(Long itemTypeId);

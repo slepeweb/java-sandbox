@@ -31,7 +31,7 @@
 			<label for="simplename">Simple name: </label><input name="simplename" value="${requestItem.simpleName}" />
 		</div>
 		<div>
-			<label>&nbsp;</label><button id="core-button" type="button">Submit</button>
+			<label>&nbsp;</label><button id="core-button" type="button">Update</button>
 		</div>
 	</form>
 </div>
@@ -45,13 +45,31 @@
 		</div>
 	</c:forEach>
 		<div>
-			<label>&nbsp;</label><button id="field-button" type="button">Submit</button>
+			<label>&nbsp;</label><button id="field-button" type="button">Update</button>
 		</div>
 	</form>
 </div>
 
 <div id="inline-tab">
+	<c:choose><c:when test="${fn:length(requestItem.inlineItems) > 0}">
+		<ol>
+		<c:forEach items="${requestItem.inlineItems}" var="item">
+			<li><a href="/cms/editor/${item.id}">${item}</a></li>
+		</c:forEach>
+		</ol>
+	</c:when><c:otherwise>
+		<p>No inlines for this item</p>
+	</c:otherwise></c:choose>
 </div>
 
 <div id="relation-tab">
+	<c:choose><c:when test="${fn:length(requestItem.relatedItems) > 0}">
+		<ol>
+		<c:forEach items="${requestItem.relatedItems}" var="item">
+			<li><a href="/cms/editor/${item.id}">${item}</a></li>
+		</c:forEach>
+		</ol>
+	</c:when><c:otherwise>
+		<p>No relations for this item</p>
+	</c:otherwise></c:choose>
 </div>

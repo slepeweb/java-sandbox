@@ -21,18 +21,30 @@ import com.slepeweb.cms.utils.RowMapperUtil;
 public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	private static Logger LOG = Logger.getLogger(ItemServiceImpl.class);
+
+	// Example uing left join:
+//	select i.name, s.name, it.name, t.name 
+//	from item i 
+//	join site s on i.siteid=s.id 
+//	join itemtype it on i.typeid = it.id
+//	left join template t on i.templateid=t.id 
+//	where i.path like '/news%'
+	
 	private static final String SELECT_TEMPLATE = 
-			"select i.*, s.name as sitename, s.hostname, " +
-			"it.id as typeid, it.name as typename, it.media from " +
-			"item i, site s, itemtype it where " +
-			"i.siteid=s.id and i.typeid=it.id and %s";
+			"select i.*, s.name as sitename, s.hostname, it.id as typeid, it.name as typename, it.media, " +
+			"t.id as templateid, t.name as templatename, t.forward " +
+			"from item i " +
+			"join site s on i.siteid = s.id " +
+			"join itemtype it on i.typeid = it.id " +
+			"left join template t on i.templateid=t.id " +
+			"where %s";
 	
 	@Autowired protected LinkService linkService;
 	@Autowired protected FieldValueService fieldValueService;
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected MediaService mediaService;
 
-	private String columns = "name, simplename, path, siteid, typeid, datecreated, dateupdated, deleted";
+	//private String columns = "name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted";
 	
 	public Item save(Item i) {
 		return save(i, false);
@@ -50,8 +62,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			
 			if (extendedSave) {
 				saveFieldValues(i.getFieldValues());
-				removeStaleLinks(dbRecord, i);
-				saveLinks(i.getLinks());
+				saveLinks(i, dbRecord);
 				saveMedia(i);
 			}
 		}
@@ -62,13 +73,14 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private void insertItem(Item i) {
 		// Item table
 		this.jdbcTemplate.update(
-				String.format("insert into item (%s) values (%s)", columns, placeholders4Insert(columns)),
+				"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted) " +
+				"values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 				i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
-				i.getDateCreated(), i.getDateUpdated(), false);				
+				i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false);				
 		
 		Long lastId = getLastInsertId();
 		i.setId(lastId);
-		setDefaultFieldValues(i);
+		saveDefaultFieldValues(i);
 		LOG.info(compose("Added new item", i));
 		
 		// Insert binding link to parent item
@@ -105,10 +117,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			dbRecord.assimilate(i);
 			
 			this.jdbcTemplate.update(
-					String.format("update item set %s where id = ?", placeholders4Update(this.columns)),
+					"update item set name = ?, simplename = ?, path = ?, templateid = ?, dateupdated = ?, deleted = ? where id = ?",
 					dbRecord.getName(), dbRecord.getSimpleName(), dbRecord.getPath(), 
-					dbRecord.getSite().getId(), dbRecord.getType().getId(), 
-					dbRecord.getDateCreated(), dbRecord.getDateUpdated(), dbRecord.isDeleted(), i.getId());
+					dbRecord.getTemplate() == null ? 0 : dbRecord.getTemplate().getId(), 
+					dbRecord.getDateUpdated(), dbRecord.isDeleted(), i.getId());
 			
 			LOG.info(compose("Updated item", i));
 			
@@ -138,7 +150,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
-	private void setDefaultFieldValues(Item i) {
+	private void saveDefaultFieldValues(Item i) {
 		// If item has no field values, create them, with default values
 		if (i.getFieldValues() == null || i.getFieldValues().size() == 0) {
 			i.setFieldValues(new ArrayList<FieldValue>());
@@ -151,23 +163,34 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 					setValue(fft.getField().getDefaultValue()).
 					setDateUpdated(new Timestamp(System.currentTimeMillis()));
 				
+				fv.save();
 				i.getFieldValues().add(fv);
 			}
 		}
 	}
 
-	public void saveLinks(List<Link> links) {
-		if (links != null) {
-			for (Link l : links) {
+	public void saveLinks(Item i) {
+		saveLinks(i, null);
+	}
+	
+	private void saveLinks(Item i, Item dbRecord) {
+		if (i.getLinks() != null) {
+			if (dbRecord == null) {
+				dbRecord = getItem(i.getId());
+			}
+			
+			removeStaleLinks(dbRecord.getLinks(), i.getLinks());
+			
+			for (Link l : i.getLinks()) {
 				l.save();
 			}
 		}
 	}
 	
-	private void removeStaleLinks(Item dbRecord, Item i) {
-		if (dbRecord != null && dbRecord.getLinks() != null && i.getLinks() != null) {
-			for (Link dbLink : dbRecord.getLinks()) {
-				if (! i.getLinks().contains(dbLink)) {
+	private void removeStaleLinks(List<Link> dbRecordLinks, List<Link> updatedLinks) {
+		if (dbRecordLinks != null && updatedLinks != null) {
+			for (Link dbLink : dbRecordLinks) {
+				if (! updatedLinks.contains(dbLink)) {
 					dbLink.delete();
 					LOG.info(compose("Deleted old child link", dbLink));
 				}

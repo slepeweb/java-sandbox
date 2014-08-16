@@ -33,7 +33,7 @@ public class FieldTest extends BaseTest {
 				cal.add(Calendar.DAY_OF_MONTH, 14);
 				Timestamp ts = new Timestamp(cal.getTime().getTime());
 				aboutItem.setFieldValue(EMBARGO_FIELD_NAME, ts);
-				aboutItem.save();
+				aboutItem.saveFieldValues();
 				
 				// 3010: Assert title field value update
 				Item checkItem = this.cmsService.getItemService().getItem(aboutItem.getId());

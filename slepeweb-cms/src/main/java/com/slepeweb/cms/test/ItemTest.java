@@ -100,7 +100,7 @@ public class ItemTest extends BaseTest {
 				Item imageItem = site.getItem("/content/media/ex1");
 				if (articleItem != null && imageItem != null) {
 					articleItem.addInline(imageItem);
-					articleItem.save();
+					articleItem.saveLinks();
 					
 					// 4050: Assert that article has an inline item
 					articleItem = site.getItem("/about/about-us");
@@ -112,7 +112,7 @@ public class ItemTest extends BaseTest {
 					
 					// Remove inline to restore original state
 					articleItem.removeInline(imageItem);
-					articleItem.save();
+					articleItem.saveLinks();
 					
 					// 4060: Assert inline has been removed
 					articleItem = site.getItem("/about/about-us");
@@ -121,6 +121,12 @@ public class ItemTest extends BaseTest {
 					if (inlines.size() > 0) {
 						r.setNotes("Image inlines still present").fail();
 					}
+					
+					// Leave some links in place
+					articleItem.addInline(imageItem);
+					articleItem.saveLinks();
+					newsSectionItem.addRelation(articleItem);
+					newsSectionItem.saveLinks();
 				}
 				
 				// Change simplename of news section

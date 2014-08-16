@@ -9,6 +9,7 @@ import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.utils.LogUtil;
 
 @Service
@@ -18,14 +19,17 @@ public class BuildTest extends BaseTest {
 		
 		TestResult r;
 		TestResultSet trs = new TestResultSet("Test site build").
-			register(2010, "Check N item types have been created").
-			register(2020, "Check N fields have been created").
-			register(2030, "Check N fieldfortype rows have been created").
+			register(2010, "Check 6 item types have been created").
+			register(2020, "Check 5 fields have been created").
+			register(2030, "Check 15 fieldfortype rows have been created").
 			register(2040, "Check test site has been created").
+			register(2045, "Check news template has been created").
 			register(2050, "Check root item has been created").
-			register(2060, "Check N section items created").
-			register(2070, "Check total number of field values created").
-			register(2080, "Check number of bindings for news section");
+			register(2060, "Check 3 section items created").
+			register(2070, "Check 3 field values created for news section page").
+			register(2080, "Check number of bindings for news section").
+			register(2090, "Check template applied to news item").
+			register(2100, "Check NO template applied to news section item");
 
 		// First, purge the test site
 		Site site = this.cmsService.getSiteService().getSite(TEST_SITE_NAME);
@@ -52,6 +56,7 @@ public class BuildTest extends BaseTest {
 			}
 		}
 		
+		
 		// Create item types
 		ItemType cfolderType = addType(ItemType.CONTENT_FOLDER_TYPE_NAME);
 		ItemType sectionType = addType(SECTION_TYPE_NAME);
@@ -63,7 +68,7 @@ public class BuildTest extends BaseTest {
 		// 2010: Assert N types have been created
 		int numItemTypes = this.cmsService.getItemTypeService().getCount();
 		r = trs.execute(2010).setNotes(numItemTypes + " items types have been created");
-		if (numItemTypes != 7) {
+		if (numItemTypes != 6) {
 			r.fail();
 		}
 		
@@ -74,7 +79,7 @@ public class BuildTest extends BaseTest {
 		Field embargoField = addField("Embargo date", EMBARGO_FIELD_NAME, "Future date when page can be seen", FieldType.date, 0, "");
 		Field alttextField = addField("Alt text", ALTTEXT_FIELD_NAME, "Alt text for image", FieldType.text, 128, "*");
 		
-		// 2020: Assert 3 fields have been created
+		// 2020: Assert N fields have been created
 		int numFields = this.cmsService.getFieldService().getCount();
 		r = trs.execute(2020).setNotes(numFields + " fields have been created");
 		if (numFields != 5) {
@@ -112,6 +117,15 @@ public class BuildTest extends BaseTest {
 		r = trs.execute(2040);
 		if (site != null) {
 			r.setNotes(LogUtil.compose("Test site has been created", site.getName()));
+			
+			Template newsTemplate = addTemplate(NEWS_TEMPLATE_NAME, "/page/news", site.getId(), newsType.getId());
+			
+			// 2045: Check news template has been created
+			r = trs.execute(2045);
+			newsTemplate = this.cmsService.getTemplateService().getTemplate(site.getId(), NEWS_TEMPLATE_NAME);
+			if (newsTemplate == null) {
+				r.setNotes("Template not in DB").fail();
+			}
 		
 			// 2050: Assert test site has a root item
 			Item rootItem = site.getItem("/");
@@ -122,11 +136,11 @@ public class BuildTest extends BaseTest {
 				Timestamp now = new Timestamp(System.currentTimeMillis());
 				
 				// Create sections section
-				Item newsSection = addItem(rootItem, "News section", "news", now, now, site, sectionType);
-				addItem(rootItem, "Events section", "events", now, now, site, sectionType);
-				Item aboutSection = addItem(rootItem, "About section", "about", now, now, site, sectionType);
+				Item newsSection = addItem(rootItem, "News section", "news", now, now, site, sectionType, null);
+				addItem(rootItem, "Events section", "events", now, now, site, sectionType, null);
+				Item aboutSection = addItem(rootItem, "About section", "about", now, now, site, sectionType, null);
 				Item contentFolder = site.getItem("/content");
-				Item mediaFolder = addItem(contentFolder, "Media section", "media", now, now, site, cfolderType);
+				Item mediaFolder = addItem(contentFolder, "Media section", "media", now, now, site, cfolderType, null);
 				
 				// 2060: Assert N section items have been created
 				int sectionCount = this.cmsService.getItemService().getCountByType(sectionType.getId());
@@ -144,23 +158,41 @@ public class BuildTest extends BaseTest {
 					}
 				
 					// Create 2 news items below the section
-					addItem(newsSection, "News item #1", "101", now, now, site, newsType);
-					addItem(newsSection, "News item #2", "102", now, now, site, newsType);
+					Item newsItem = addItem(newsSection, "News item #1", "101", now, now, site, newsType, newsTemplate);
+					addItem(newsSection, "News item #2", "102", now, now, site, newsType, newsTemplate);
 					
 					// 2080: Assert N bindings have been created
 					int bindingCount = this.cmsService.getLinkService().getCount(newsSection.getId());
 					r = trs.execute(2080).setNotes(bindingCount + " children bound to parent");
 					if (bindingCount != 2) {
 						r.fail();
-					}					
+					}
+					
+					// 2090: Check template applied to news item
+					r = trs.execute(2090);
+					if (newsItem == null) {
+						r.setNotes("News item not available for this test").fail();
+					}
+					else if (newsItem.getTemplate() == null) {
+						r.setNotes("News template not applied to this item").fail();
+					}
+					else if (! newsItem.getTemplate().getName().equals(NEWS_TEMPLATE_NAME)) {
+						r.setNotes(String.format("'%s' template applied to this item", newsItem.getTemplate().getName())).fail();
+					}
+					
+					// 2100: Check NO template applied to news section item
+					r = trs.execute(2100);
+					if (newsSection.getTemplate() != null) {
+						r.setNotes(String.format("'%s' template applied to this item", newsSection.getTemplate().getName())).fail();
+					}
 				}
 				
 				if (aboutSection != null) {
-					addItem(aboutSection, "About us", "about-us", now, now, site, articleType);
+					addItem(aboutSection, "About us", "about-us", now, now, site, articleType, null);
 				}
 				
 				if (mediaFolder != null) {
-					addItem(mediaFolder, "Example image", "ex1", now, now, site, imageType);
+					addItem(mediaFolder, "Example image", "ex1", now, now, site, imageType, null);
 				}
 			}
 			else {

@@ -14,9 +14,20 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	
 	private static Logger LOG = Logger.getLogger(LinkServiceImpl.class);
 	private static final String SELECTOR_TEMPLATE = 
-			"select i.*, s.name as sitename, s.hostname, it.name as typename, it.media, l.parentid, l.linktype, l.name as linkname, l.ordering from "
-			+ "item i, site s, itemtype it, link l where l.childid = i.id and i.siteid=s.id and i.typeid=it.id and "
-			+ "%s and i.deleted=0 " + "order by l.linktype, l.name, l.ordering";
+//			"select i.*, s.name as sitename, s.hostname, it.name as typename, it.media, l.parentid, l.linktype, l.name as linkname, l.ordering from "
+//			+ "item i, site s, itemtype it, link l where l.childid = i.id and i.siteid=s.id and i.typeid=it.id and "
+//			+ "%s and i.deleted=0 " + "order by l.linktype, l.name, l.ordering";	
+			"select i.*, s.name as sitename, s.hostname, it.id as typeid, it.name as typename, it.media, " +
+			"l.parentid, l.linktype, l.name as linkname, l.ordering, " +
+			"t.id as templateid, t.name as templatename, t.forward " +
+			"from item i " +
+			"join site s on i.siteid = s.id " +
+			"join itemtype it on i.typeid = it.id " +
+			"left join template t on i.templateid=t.id " +
+			"join link l on i.id = l.childid " +
+			"where %s and i.deleted=0 " +
+			"order by l.linktype, l.name, l.ordering";
+
 
 	public Link save(Link l) {
 		if (l.isDefined4Insert()) {

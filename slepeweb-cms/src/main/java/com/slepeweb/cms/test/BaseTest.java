@@ -6,10 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field;
+import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.service.CmsService;
 
 public abstract class BaseTest {
@@ -25,6 +26,7 @@ public abstract class BaseTest {
 	protected static final String BODY_FIELD_NAME = "zbodytext";
 	protected static final String EMBARGO_FIELD_NAME = "zembargodate";
 	protected static final String ALTTEXT_FIELD_NAME = "zalttext";
+	protected static final String NEWS_TEMPLATE_NAME = "News Template";
 	
 	@Autowired protected CmsService cmsService;
 	
@@ -56,7 +58,7 @@ public abstract class BaseTest {
 	}
 	
 	protected Item addItem(Item parent, String name, String simplename, 
-			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type) {
+			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type, Template t) {
 		
 		String path = 
 			parent != null ? 
@@ -64,9 +66,12 @@ public abstract class BaseTest {
 					"/" + simplename;
 		
 		Item i = CmsBeanFactory.getItem().setName(name).setSimpleName(simplename).setPath(path).
-			setDateCreated(dateCreated).setDateUpdated(dateUpdated).setSite(site).setType(type);
+			setDateCreated(dateCreated).setDateUpdated(dateUpdated).setSite(site).setType(type).setTemplate(t);
 		
 		return parent != null ? parent.addChild(i) : null;
 	}
 	
+	protected Template addTemplate(String name, String forward, Long siteId, Long typeId) {
+		return CmsBeanFactory.getTemplate().setName(name).setSiteId(siteId).setItemTypeId(typeId).save();
+	}
 }

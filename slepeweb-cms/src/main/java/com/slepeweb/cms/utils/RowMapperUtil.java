@@ -16,6 +16,7 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Link.LinkType;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.Template;
 
 public class RowMapperUtil {
 
@@ -46,26 +47,41 @@ public class RowMapperUtil {
 	}
 	
 	private static Item mapItem(ResultSet rs) throws SQLException {
-		Item item = CmsBeanFactory.getItem();
-		item.setId(rs.getLong("id"));
-		item.setName(rs.getString("name"));
-		item.setSimpleName(rs.getString("simplename"));
-		item.setPath(rs.getString("path"));
-		item.setDateCreated(rs.getTimestamp("datecreated"));
-		item.setDateUpdated(rs.getTimestamp("dateupdated"));
-		item.setDeleted(rs.getBoolean("deleted"));
+		Item item = CmsBeanFactory.getItem().
+				setId(rs.getLong("id")).
+				setName(rs.getString("name")).
+				setSimpleName(rs.getString("simplename")).
+				setPath(rs.getString("path")).
+				setDateCreated(rs.getTimestamp("datecreated")).
+				setDateUpdated(rs.getTimestamp("dateupdated")).
+				setDeleted(rs.getBoolean("deleted"));
 		
-		ItemType type = CmsBeanFactory.getItemType();
+		ItemType type = CmsBeanFactory.getItemType().
+				setId(rs.getLong("typeid")).
+				setName(rs.getString("typename")).
+				setMedia(rs.getBoolean("media"));
+		
 		item.setType(type);
-		type.setId(rs.getLong("typeid"));
-		type.setName(rs.getString("typename"));
-		type.setMedia(rs.getBoolean("media"));
 		
-		Site site = CmsBeanFactory.getSite();
+		Site site = CmsBeanFactory.getSite().
+				setId(rs.getLong("siteid")).
+				setName(rs.getString("sitename")).
+				setHostname(rs.getString("hostname"));
+		
 		item.setSite(site);
-		site.setId(rs.getLong("siteid"));
-		site.setName(rs.getString("sitename"));
-		site.setHostname(rs.getString("hostname"));
+		
+		Template t = null;
+		long templateId = rs.getLong("templateid");
+		if (templateId != 0) {
+			t = CmsBeanFactory.getTemplate().
+					setId(templateId).
+					setName(rs.getString("templatename")).
+					setForward(rs.getString("forward")).
+					setItemTypeId(rs.getLong("typeid")).
+					setSiteId(rs.getLong("siteid"));
+		}
+		
+		item.setTemplate(t);
 		return item;
 	}
 	
@@ -135,24 +151,19 @@ public class RowMapperUtil {
 	public static final class MediaMapper implements RowMapper<Blob> {
 		public Blob mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return rs.getBlob("data");
-			
-//			ByteArrayOutputStream baos = new ByteArrayOutputStream(100);
-//			byte[] buffer = new byte[100];
-//			InputStream is = rs.getBinaryStream("data");
-//			
-//			try {
-//				while (is.read(buffer) > 0) {
-//					baos.write(buffer);
-//			    }
-//			    return baos.toByteArray();
-//			}
-//			catch (Exception e) {
-//				throw new RuntimeException(e);
-//			}
-//			finally {
-//				try {baos.close();}
-//				catch (Exception e) {}
-//			}
 		}
-	}	
+	}
+	
+	public static final class TemplateMapper implements RowMapper<Template> {
+		public Template mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Template t = CmsBeanFactory.getTemplate().
+					setId(rs.getLong("id")).
+					setName(rs.getString("name")).
+					setForward(rs.getString("forward")).
+					setSiteId(rs.getLong("siteid")).
+					setItemTypeId(rs.getLong("typeid"));
+			return t;
+		}
+	}
+	
 }
