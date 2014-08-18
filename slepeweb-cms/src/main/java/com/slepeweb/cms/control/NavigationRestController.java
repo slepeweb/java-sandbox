@@ -103,24 +103,22 @@ public class NavigationRestController extends BaseController {
 		List<Item> bindings = parentItem.getBoundItems();
 		pNode.setFolder(bindings.size() > 0);
 		
-		if (pathComponents.size() > 0) {
-			for (Item child : bindings) {				
-				if (child.getSimpleName().equals(pathComponents.get(0))) {
-					@SuppressWarnings("unchecked")
-					Vector<String> workingPath = (Vector<String>) pathComponents.clone();
-					workingPath.remove(0);
-					cNode = dive(child, workingPath);
-					if (pathComponents.size() == 1) {
-						//cNode.setSelected(true);
-					}
+		for (Item child : bindings) {				
+			if (pathComponents.size() > 0 && child.getSimpleName().equals(pathComponents.get(0))) {
+				@SuppressWarnings("unchecked")
+				Vector<String> workingPath = (Vector<String>) pathComponents.clone();
+				workingPath.remove(0);
+				cNode = dive(child, workingPath);
+				if (pathComponents.size() == 1) {
+					//cNode.setSelected(true);
 				}
-				else {
-					cNode = toNode(child);
-					cNode.setFolder(child.getBoundItems().size() > 0);
-				}
-				
-				pNode.addChild(cNode);
 			}
+			else {
+				cNode = toNode(child);
+				cNode.setFolder(child.getBoundItems().size() > 0);
+			}
+			
+			pNode.addChild(cNode);
 		}
 		
 		return pNode;

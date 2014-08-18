@@ -1,6 +1,7 @@
 package com.slepeweb.cms.bean;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,6 +36,14 @@ public class Site extends CmsBean implements Serializable {
 	
 	public Item getItem(String path) {
 		return getItemService().getItem(getId(), path);
+	}
+	
+	public List<Template> getAvailableTemplates() {
+		return getCmsService().getTemplateService().getAvailableTemplates(getId());
+	}
+	
+	public List<ItemType> getAvailableItemTypes() {
+		return getCmsService().getItemTypeService().getAvailableItemTypes();
 	}
 	
 	public String getName() {

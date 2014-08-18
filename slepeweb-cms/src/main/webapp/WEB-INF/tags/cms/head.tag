@@ -16,6 +16,7 @@
 <!-- Include Fancytree skin and library -->
 <link href="/resources/fancytree/skin-win8/ui.fancytree.min.css" rel="stylesheet" type="text/css">
 <script src="/resources/fancytree/jquery.fancytree.min.js" type="text/javascript"></script>
+<script src="/resources/fancytree/jquery.fancytree.dnd.js" type="text/javascript"></script>
 <!-- Initialize the tree when page is loaded -->
 <script type="text/javascript">
 
@@ -36,20 +37,26 @@
 				data: {key: nodeKey}, 
 				dataType: "html",
 				mimeType: "text/html",
+				
+				// On successful loading of forms 
 				success: function(html, status, z) {
 					var tabsdiv = $("#item-editor");
 					tabsdiv.empty().append(html);
+					
+					// Re-build tabs 
 					if (tabsdiv.hasClass("ui-tabs")) {
 	    				$("#item-editor").tabs("destroy");
 					}
 					$("#item-editor").tabs();
+					
+					// Add behaviour to submit core item updates 
 					$("#core-button").click(function () {
 						$.ajax("/rest/cms/item/" + nodeKey + "/update/core", {
 								type: "POST",
 			    			cache: false,
 			    			data: {
-			    				name: $("input[name='name']").val(),
-			    				simplename: $("input[name='simplename']").val()
+			    				name: $("#core-tab input[name='name']").val(),
+			    				simplename: $("#core-tab input[name='simplename']").val()
 			    			}, 
 			    			dataType: "json",
 			    			success: function(json, status, z) {
@@ -57,6 +64,8 @@
 			    			}
 						});
 					});
+					
+					// Add behaviour to submit item field updates 
 					$("#field-button").click(function () {
 						$.ajax("/rest/cms/item/" + nodeKey + "/update/fields", {
 								type: "POST",
@@ -67,6 +76,53 @@
 			    				window.alert("Success");
 			    			}
 						});
+					});
+					
+					// Add behaviour to add new item 
+					$("#add-button").click(function () {
+						$.ajax("/rest/cms/item/" + nodeKey + "/add", {
+								type: "POST",
+			    			cache: false,
+			    			data: {
+			    					template: $("#add-tab select[name='template']").val(),
+			    					itemtype: $("#add-tab select[name='itemtype']").val(),
+				    				name: $("#add-tab input[name='name']").val(),
+				    				simplename: $("#add-tab input[name='simplename']").val()
+			    			}, 
+			    			dataType: "json",
+			    			success: function(json, status, z) {
+			    				window.alert("Success");
+			    				window.location = "/cms/editor/" + json;
+			    			}
+						});
+					});
+					
+					// Add behaviour to trash an item 
+					$("#trash-button").click(function () {
+						if (window.confirm("This will delete the current item PLUS ALL descendant items. Are you sure you want to do this?")) {
+							$.ajax("/rest/cms/item/" + nodeKey + "/trash", {
+									type: "POST",
+				    			cache: false,
+									data: {key: nodeKey}, 
+				    			dataType: "json",
+				    			success: function(json, status, z) {
+				    				window.alert("Success");
+				    				window.location = "/cms/editor/" + json;
+				    			}
+							});
+						}
+					});
+					
+					// Add behaviour to template & itemtype selectors 
+					$("#add-tab select[name='template']").change(function (e) {
+						var typeSelector = $("#add-tab select[name='itemtype']");
+						if ($(e.target).val() != "0") {
+							typeSelector.val("0");
+							typeSelector.attr("disabled", "true");
+						}
+						else {
+							typeSelector.removeAttr("disabled");
+						}
 					});
 				}
 			});
@@ -79,6 +135,7 @@
 		</c:if>
  			
     $("#leftnav").fancytree({
+    	extensions: ["dnd"],
     	source: {
     		url: "/rest/cms/leftnav/lazy/thread",
     		data: queryParams,
@@ -92,7 +149,40 @@
     			data: {key: node.key}
     		};
     	},
-    	activate: function(event, data) {
+      dnd: {
+        autoExpandMS: 400,
+        focusOnClick: true,
+        preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+        preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+        dragStart: function(node, data) {
+          return true;
+        },
+        dragEnter: function(node, data) {
+           return true;
+        },
+        dragDrop: function(node, data) {
+        	// hitMode can be one of: 'after', 'before', 'over' 
+//					TODO: WINDOW.CONFIRM isn't working here ...      	
+//         	if (window.confirm("Are you sure you want to move the selected item?")) {
+						$.ajax("/rest/cms/item/" + data.otherNode.key + "/move", {
+							type: "POST",
+							cache: false,
+							data: {
+								targetId: node.key,
+								mode: data.hitMode
+							}, 
+							dataType: "json",
+							success: function(json, status, z) {
+								window.alert("Success");
+								window.location = "/cms/editor/" + json;
+							}
+						});
+				        
+					  // data.otherNode.moveTo(node, data.hitMode);
+// 	        }
+        }
+      },
+   		activate: function(event, data) {
     		renderItemForms(data.node.key);
     	}
     });		

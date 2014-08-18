@@ -92,7 +92,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				List<Link> existingSiblingLinks = this.linkService.getLinks(parentItem.getId());
 				int ordering = existingSiblingLinks.size() + 1;
 				
-				Link l = CmsBeanFactory.getLink().
+				Link l = CmsBeanFactory.makeLink().
 					setParentId(parentItem.getId()).
 					setChild(childItem).
 					setType(LinkType.binding).
@@ -157,7 +157,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			FieldValue fv;
 
 			for (FieldForType fft : this.fieldForTypeService.getFieldsForType(i.getType().getId())) {
-				fv = CmsBeanFactory.getFieldValue().
+				fv = CmsBeanFactory.makeFieldValue().
 					setField(fft.getField()).
 					setItemId(i.getId()).
 					setValue(fft.getField().getDefaultValue()).
@@ -276,7 +276,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 * This method can be used if a child item moves to a different parent, and  
 	 * NOT if the child's simplename has changed.
 	 */
-	public void move(Item child, Item newParent) {
+	public Item move(Item child, Item newParent) {
 		Link parentLink = this.linkService.getParent(child.getId());
 		if (parentLink != null) {
 			// Un-link from current path
@@ -300,6 +300,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		else {
 			LOG.error(compose("Failed to identify parent item", child.getPath()));
 		}
+		
+		return child;
 	}
 
 	private Item getItem(String sql, Object[] params) {

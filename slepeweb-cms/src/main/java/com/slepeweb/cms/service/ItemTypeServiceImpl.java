@@ -1,5 +1,7 @@
 package com.slepeweb.cms.service;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
@@ -84,6 +86,11 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			sql, params, new RowMapperUtil.ItemTypeMapper()));
 	}
 
+	public List<ItemType> getAvailableItemTypes() {
+		return this.jdbcTemplate.query("select * from itemtype order by name", 
+				new Object[]{}, new RowMapperUtil.ItemTypeMapper());
+	}
+	
 	public int getCount() {
 		return this.jdbcTemplate.queryForInt("select count(*) from itemtype");
 	}

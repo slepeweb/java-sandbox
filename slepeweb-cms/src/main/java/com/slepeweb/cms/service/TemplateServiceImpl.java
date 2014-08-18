@@ -1,5 +1,7 @@
 package com.slepeweb.cms.service;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
@@ -57,6 +59,12 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 			this.jdbcTemplate.query("select * from template where siteid = ? and name = ?", 
 				new Object[]{siteId, name},
 				new RowMapperUtil.TemplateMapper()));
+	}
+	
+	public List<Template> getAvailableTemplates(Long siteId) {
+		return (List<Template>) this.jdbcTemplate.query("select * from template where siteid = ? order by name", 
+				new Object[]{siteId},
+				new RowMapperUtil.TemplateMapper());
 	}
 	
 	public int getCount() {

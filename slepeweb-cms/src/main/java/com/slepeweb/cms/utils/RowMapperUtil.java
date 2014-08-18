@@ -22,17 +22,16 @@ public class RowMapperUtil {
 
 	public static final class SiteMapper implements RowMapper<Site> {
 		public Site mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Site s = CmsBeanFactory.getSite();
-			s.setId(rs.getLong("id"));
-			s.setName(rs.getString("name"));
-			s.setHostname(rs.getString("hostname"));
-			return s;
+			return CmsBeanFactory.makeSite().
+					setId(rs.getLong("id")).
+					setName(rs.getString("name")).
+					setHostname(rs.getString("hostname"));
 		}
 	}
 	
 	public static final class ItemTypeMapper implements RowMapper<ItemType> {
 		public ItemType mapRow(ResultSet rs, int rowNum) throws SQLException {
-			ItemType it = CmsBeanFactory.getItemType();
+			ItemType it = CmsBeanFactory.makeItemType();
 			it.setId(rs.getLong("id"));
 			it.setName(rs.getString("name"));
 			it.setMedia(rs.getBoolean("media"));
@@ -47,7 +46,7 @@ public class RowMapperUtil {
 	}
 	
 	private static Item mapItem(ResultSet rs) throws SQLException {
-		Item item = CmsBeanFactory.getItem().
+		Item item = CmsBeanFactory.makeItem().
 				setId(rs.getLong("id")).
 				setName(rs.getString("name")).
 				setSimpleName(rs.getString("simplename")).
@@ -56,14 +55,14 @@ public class RowMapperUtil {
 				setDateUpdated(rs.getTimestamp("dateupdated")).
 				setDeleted(rs.getBoolean("deleted"));
 		
-		ItemType type = CmsBeanFactory.getItemType().
+		ItemType type = CmsBeanFactory.makeItemType().
 				setId(rs.getLong("typeid")).
 				setName(rs.getString("typename")).
 				setMedia(rs.getBoolean("media"));
 		
 		item.setType(type);
 		
-		Site site = CmsBeanFactory.getSite().
+		Site site = CmsBeanFactory.makeSite().
 				setId(rs.getLong("siteid")).
 				setName(rs.getString("sitename")).
 				setHostname(rs.getString("hostname"));
@@ -73,7 +72,7 @@ public class RowMapperUtil {
 		Template t = null;
 		long templateId = rs.getLong("templateid");
 		if (templateId != 0) {
-			t = CmsBeanFactory.getTemplate().
+			t = CmsBeanFactory.makeTemplate().
 					setId(templateId).
 					setName(rs.getString("templatename")).
 					setForward(rs.getString("forward")).
@@ -87,7 +86,7 @@ public class RowMapperUtil {
 	
 	public static final class LinkMapper implements RowMapper<Link> {
 		public Link mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Link l = CmsBeanFactory.getLink();
+			Link l = CmsBeanFactory.makeLink();
 			l.setParentId(rs.getLong("parentid"));
 			l.setChild(mapItem(rs));
 			l.setType(LinkType.valueOf(rs.getString("linktype")));
@@ -104,7 +103,7 @@ public class RowMapperUtil {
 	}
 	
 	public static Field mapField(ResultSet rs) throws SQLException {
-		Field f = CmsBeanFactory.getField();
+		Field f = CmsBeanFactory.makeField();
 		f.setId(rs.getLong("id"));
 		f.setName(rs.getString("name"));
 		f.setVariable(rs.getString("variable"));
@@ -127,7 +126,7 @@ public class RowMapperUtil {
 	
 	public static final class FieldForTypeMapper implements RowMapper<FieldForType> {
 		public FieldForType mapRow(ResultSet rs, int rowNum) throws SQLException {
-			FieldForType fft = CmsBeanFactory.getFieldForType();
+			FieldForType fft = CmsBeanFactory.makeFieldForType();
 			fft.setField(mapField(rs));
 			fft.setTypeId(rs.getLong("itemtypeid"));
 			fft.setOrdering(rs.getLong("fieldorder"));
@@ -138,7 +137,7 @@ public class RowMapperUtil {
 	
 	public static final class FieldValueMapper implements RowMapper<FieldValue> {
 		public FieldValue mapRow(ResultSet rs, int rowNum) throws SQLException {
-			FieldValue fv = CmsBeanFactory.getFieldValue();
+			FieldValue fv = CmsBeanFactory.makeFieldValue();
 			fv.setField(mapField(rs));
 			fv.setItemId(rs.getLong("itemid"));
 			fv.setStringValue(rs.getString("stringvalue"));
@@ -156,7 +155,7 @@ public class RowMapperUtil {
 	
 	public static final class TemplateMapper implements RowMapper<Template> {
 		public Template mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Template t = CmsBeanFactory.getTemplate().
+			Template t = CmsBeanFactory.makeTemplate().
 					setId(rs.getLong("id")).
 					setName(rs.getString("name")).
 					setForward(rs.getString("forward")).

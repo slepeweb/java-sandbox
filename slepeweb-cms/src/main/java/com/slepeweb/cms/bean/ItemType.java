@@ -24,7 +24,7 @@ public class ItemType extends CmsBean implements Serializable {
 	}
 	
 	public FieldForType addFieldForType(Field f, Long ordering, boolean mandatory) {
-		FieldForType fft = CmsBeanFactory.getFieldForType().setTypeId(getId()).
+		FieldForType fft = CmsBeanFactory.makeFieldForType().setTypeId(getId()).
 				setField(f).setOrdering(ordering).setMandatory(mandatory);
 		getFieldsForType().add(fft);		
 		return fft;

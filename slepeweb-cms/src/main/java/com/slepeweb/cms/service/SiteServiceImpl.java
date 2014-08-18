@@ -40,11 +40,11 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		
 		s.setId(getLastInsertId());	
 		
-		CmsBeanFactory.bakeHomepageItem(s);
+		CmsBeanFactory.makeHomepageItem(s);
 		ItemType cfolderType = this.itemTypeService.getItemType(ItemType.CONTENT_FOLDER_TYPE_NAME);
 		
 		if (cfolderType != null) {
-			CmsBeanFactory.bakeContentFolderRootItem(s, cfolderType);
+			CmsBeanFactory.makeContentFolderRootItem(s, cfolderType);
 		}
 		else {
 			LOG.error(compose("Content folders could not be created", ItemType.CONTENT_FOLDER_TYPE_NAME));

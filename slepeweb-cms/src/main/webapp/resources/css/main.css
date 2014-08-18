@@ -10,6 +10,11 @@ body {
 	color: red;
 }
 
+#trash-button {
+	background-color: red;
+	float: right;
+}
+
 label {
 	float: left;
 	width: 150px;

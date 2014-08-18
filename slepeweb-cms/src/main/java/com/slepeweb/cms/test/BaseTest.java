@@ -37,7 +37,7 @@ public abstract class BaseTest {
 	}
 
 	protected Site addSite(String name, String hostname, String homepageTypeName) {
-		return CmsBeanFactory.getSite().setName(name).setHostname(hostname).save();	
+		return CmsBeanFactory.makeSite().setName(name).setHostname(hostname).save();	
 	}
 	
 	protected ItemType addType(String name) {
@@ -45,13 +45,13 @@ public abstract class BaseTest {
 	}
 	
 	protected ItemType addType(String name, boolean isMedia) {
-		ItemType it = CmsBeanFactory.getItemType().setName(name).setMedia(isMedia);
+		ItemType it = CmsBeanFactory.makeItemType().setName(name).setMedia(isMedia);
 		it.save();
 		return it;
 	}
 
 	protected Field addField(String name, String variable, String help, FieldType type, int size, Object dflt) {
-		Field f = CmsBeanFactory.getField().setName(name).setVariable(variable).setHelp(help).setType(type).
+		Field f = CmsBeanFactory.makeField().setName(name).setVariable(variable).setHelp(help).setType(type).
 				setSize(size).setDefaultValue(dflt);
 		f.save();
 		return f;
@@ -65,13 +65,13 @@ public abstract class BaseTest {
 				parent.isSiteRoot() ? parent.getPath() + simplename : parent.getPath() + "/" + simplename : 
 					"/" + simplename;
 		
-		Item i = CmsBeanFactory.getItem().setName(name).setSimpleName(simplename).setPath(path).
+		Item i = CmsBeanFactory.makeItem().setName(name).setSimpleName(simplename).setPath(path).
 			setDateCreated(dateCreated).setDateUpdated(dateUpdated).setSite(site).setType(type).setTemplate(t);
 		
 		return parent != null ? parent.addChild(i) : null;
 	}
 	
 	protected Template addTemplate(String name, String forward, Long siteId, Long typeId) {
-		return CmsBeanFactory.getTemplate().setName(name).setSiteId(siteId).setItemTypeId(typeId).save();
+		return CmsBeanFactory.makeTemplate().setName(name).setSiteId(siteId).setItemTypeId(typeId).save();
 	}
 }

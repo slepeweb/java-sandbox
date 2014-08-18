@@ -15,73 +15,73 @@ public class CmsBeanFactory {
 		CMS = s;
 	}
 	
-	public static Site getSite() {
+	public static Site makeSite() {
 		Site s = new Site();
 		s.setCmsService(CMS);
 		return s;
 	}
 	
-	public static ItemType getItemType() {
+	public static ItemType makeItemType() {
 		ItemType it = new ItemType();
 		it.setCmsService(CMS);
 		return it;
 	}
 	
-	public static Field getField() {
+	public static Field makeField() {
 		Field f = new Field();
 		f.setCmsService(CMS);
 		return f;
 	}
 	
-	public static Item getItem() {
+	public static Item makeItem() {
 		Item i = new Item();
 		i.setCmsService(CMS);
 		return i;
 	}
 	
-	public static Template getTemplate() {
+	public static Template makeTemplate() {
 		Template t = new Template();
 		t.setCmsService(CMS);
 		return t;
 	}
 	
-	public static Link getLink() {
+	public static Link makeLink() {
 		Link l = new Link();
 		l.setCmsService(CMS);
 		return l;
 	}
 	
-	public static FieldForType getFieldForType() {
+	public static FieldForType makeFieldForType() {
 		FieldForType fft = new FieldForType();
 		fft.setCmsService(CMS);
 		return fft;
 	}
 	
-	public static FieldValue getFieldValue() {
+	public static FieldValue makeFieldValue() {
 		FieldValue fv = new FieldValue();
 		fv.setCmsService(CMS);
 		return fv;
 	}
 	
-	public static Item bakeHomepageItem(Site s) {
-		ItemType homepageType = bakeHomepageType(s.getName());
+	public static Item makeHomepageItem(Site s) {
+		ItemType homepageType = makeHomepageType(s.getName());
 		return proveItem(s, homepageType, "Homepage", "", "/").save();
 	}
 	
-	public static Item bakeContentFolderRootItem(Site s, ItemType it) {
+	public static Item makeContentFolderRootItem(Site s, ItemType it) {
 		return proveItem(s, it, "Content", "content", "/content").save();
 	}
 	
-	public static ItemType bakeContentFolderType() {
-		return getItemType().setName(ItemType.CONTENT_FOLDER_TYPE_NAME).setMedia(false).save();
+	public static ItemType makeContentFolderType() {
+		return makeItemType().setName(ItemType.CONTENT_FOLDER_TYPE_NAME).setMedia(false).save();
 	}
 	
-	public static ItemType bakeHomepageType(String siteName) {
-		return getItemType().setName(siteName + " Homepage").setMedia(false).save();
+	public static ItemType makeHomepageType(String siteName) {
+		return makeItemType().setName(siteName + " Homepage").setMedia(false).save();
 	}
 	
 	private static Item proveItem(Site s, ItemType type, String name, String simpleName, String path) {
-		Item i = getItem().
+		Item i = makeItem().
 			setName(name).
 			setSimpleName(simpleName).
 			setPath(path).

@@ -163,7 +163,7 @@ public class Item extends CmsBean implements Serializable {
 	
 	// TODO: need a better way to handle ordering - currently hardcoding to 0
 	private Link toChildLink(Item i, LinkType lt) {
-		return CmsBeanFactory.getLink().
+		return CmsBeanFactory.makeLink().
 				setParentId(getId()).
 				setChild(i).
 				setType(lt).
@@ -201,8 +201,8 @@ public class Item extends CmsBean implements Serializable {
 		return list;
 	}
 	
-	public void move(Item newParent) {
-		getCmsService().getItemService().move(this, newParent);
+	public Item move(Item newParent) {
+		return getCmsService().getItemService().move(this, newParent);
 	}
 	
 	public String getParentPath() {
