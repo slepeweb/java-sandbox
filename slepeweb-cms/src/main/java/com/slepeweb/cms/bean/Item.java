@@ -379,6 +379,16 @@ public class Item extends CmsBean implements Serializable {
 		return this.links;
 	}
 
+	public List<Link> getInlinesAndRelations() {
+		List<Link> list = new ArrayList<Link>();
+		for (Link l : getLinks()) {
+			if (l.getType() != LinkType.binding) {
+				list.add(l);
+			}
+		}
+		return list;
+	}
+
 	public void setLinks(List<Link> links) {
 		this.links = links;
 	}

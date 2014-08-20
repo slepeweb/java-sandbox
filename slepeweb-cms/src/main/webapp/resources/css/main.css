@@ -15,6 +15,63 @@ body {
 	float: right;
 }
 
+#addlinkdiv {
+	float: left;
+	visibility: hidden;
+}
+
+#linknav {
+		margin-left: 100px;
+}
+
+#addlinkdiv input {
+	width: 60px;
+}
+
+#addlinkdiv label {
+	width: 100px;
+}
+
+#savelinks-button {
+/* 	visibility: hidden; */
+	color: green;
+	float: right;
+}
+
+#link-confirm {
+	visibility: hidden;
+}
+
+.remove-link {
+	position: relative;
+	bottom: 5px;
+	color: red;
+}
+
+.float-left {
+	float: left;
+}
+
+.float-right {
+	float: right;
+}
+
+.inline {
+	display: inline-block;
+}
+
+.hide {
+	visibility: hidden;
+}
+
+.spacer10 {
+	margin-top: 10px;
+}
+
+.spacer20 {
+	margin-top: 20px;
+}
+
 label {
 	float: left;
 	width: 150px;
@@ -53,6 +110,26 @@ input[disabled="disabled"] {
 	clear: both;
 }
 
-button {
-	margin-top: 20px;
+/* button { */
+/* 	margin-top: 20px; */
+/* } */
+
+#sortable { 
+	list-style-type: none; 
+	margin: 0; 
+	padding: 0; 
+	width: 100%; 
+}
+
+#sortable li { 
+	margin: 0 3px 3px 3px; 
+	padding: 0.4em; 
+	padding-left: 1.5em; 
+/* 	font-size: 1.4em;  */
+	height: 16px; 
+}
+
+#sortable li span { 
+	position: absolute; 
+	margin-left: -1.3em; 
 }

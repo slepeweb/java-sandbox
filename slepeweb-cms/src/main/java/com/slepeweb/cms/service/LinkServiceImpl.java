@@ -61,7 +61,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 					dbRecord.getType().name(), dbRecord.getName(), dbRecord.getOrdering(), 
 					dbRecord.getParentId(), dbRecord.getChild().getId());
 			
-			LOG.info(compose("Updated link link", l));
+			LOG.info(compose("Updated link", l));
 		}
 		else {
 			LOG.debug(compose("Link not modified", l));

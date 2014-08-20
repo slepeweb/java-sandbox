@@ -70,7 +70,7 @@ create table link
 	name varchar(64),
 	ordering smallint,
 	primary key (parentid, childid),
-	unique key idx_link_child_linktype (childid, linktype),
+	index idx_link_child (childid),
 	constraint foreign key (parentid) references item(id) on delete cascade,
 	constraint foreign key (childid) references item(id) on delete cascade
 ) ENGINE=InnoDB;

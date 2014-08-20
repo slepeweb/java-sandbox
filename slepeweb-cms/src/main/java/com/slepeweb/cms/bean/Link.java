@@ -30,7 +30,7 @@ public class Link extends CmsBean implements Serializable {
 	
 	@Override
 	public String toString() {
-		return String.format("%d -> %d", getParentId(), getChild().getId());
+		return String.format("%s (%s): %s", getType().name(), getName(), getChild().getName());
 	}
 	
 	public Link save() {

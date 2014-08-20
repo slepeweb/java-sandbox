@@ -1,6 +1,8 @@
 package com.slepeweb.cms.control;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -9,18 +11,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.Link.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemTypeService;
 import com.slepeweb.cms.service.SiteService;
@@ -166,6 +172,44 @@ public class EditorialRestController extends BaseController {
 		}
 			
 		return moved.getId();
+	}
+	
+	@RequestMapping(value="/links/{parentId}/save", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public String saveLinks(@RequestBody LinkParams[] linkParams, @PathVariable long parentId, ModelMap model) {	
+		Item parent = this.itemService.getItem(parentId);
+		List<Link> links = new ArrayList<Link>();
+		Link l;
+		Item i;
+		
+		for (LinkParams lp : linkParams) {
+			l = CmsBeanFactory.makeLink().
+					setParentId(lp.getParentId()).
+					setName(lp.getName()).
+					setOrdering(lp.getOrdering()).
+					setType(LinkType.valueOf(lp.getType()));
+			
+			i = CmsBeanFactory.makeItem().
+					setId(lp.getChildId());
+			
+			l.setChild(i);			
+			links.add(l);
+		}
+		
+		parent.setLinks(links);
+		parent.saveLinks();
+		
+		return "success";
+	}
+	
+	@RequestMapping(value="/item/{itemId}/name", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public String getItemName(@PathVariable long itemId, ModelMap model) {	
+		Item i =  this.itemService.getItem(itemId);
+		if (i != null) {
+			return i.getName();
+		}
+		return "n/a";
 	}
 	
 	@ModelAttribute("site")

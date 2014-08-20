@@ -124,6 +124,97 @@
 							typeSelector.removeAttr("disabled");
 						}
 					});
+			  		
+					// Add a fancytree to identify child links 
+		 	    $("#linknav").fancytree({
+		 	    	source: {
+		 	    		url: "/rest/cms/leftnav/lazy/thread",
+		 	    		data: queryParams,
+		 	    		cache: false,
+		 	    		checkbox: true
+		 	    	},
+		 	    	lazyLoad: function(event, data) {
+		 	    		var node = data.node;
+		 	    		data.result = {
+		 	    			url: "/rest/cms/leftnav/lazy/one",
+		 	    			data: {key: node.key}
+		 	    		};
+		 	    	},
+		 	   		activate: function(event, data) {
+		 	   			var linkType = $("#addlinkdiv select[name='linktype']").val();
+		 	   			var linkName = $("#addlinkdiv input[name='linkname']").val();
+		 	   			var parentId = nodeKey;
+		 	   			var childId = data.node.key;
+		 	   			
+			 	 		  if (linkType != 'unknown') {
+			 	 	   	  	var selector = $("#sortable");
+			 	 	   	 		var copy = $("#link-template li").clone(true);
+			 	 	   	  	
+			 	 					$.ajax("/rest/cms/item/" + childId + "/name", {
+			 	 						type: "POST",
+			 	 						cache: false,
+			 	 						dataType: "text",
+			 	 						success: function(itemName, status, z) {
+			 	 			   	  	copy.find("a").attr("href", "/cms/editor/" + childId).html(linkType + " (" + linkName + "): " + itemName);
+			 	 			   	  	copy.find("span.hide").html(parentId + "," + childId + "," + linkType + "," + linkName);
+			 	 			   	  	copy.appendTo(selector);
+			 	 						}
+			 	 					});
+			 	 			  }
+			 	 			  else {
+			 	 				  window.alert("Please choose a link type");
+			 	 			  }
+		 	   			}
+		 	    });
+		 	    
+					// Show link tools when 'Add link' button is clicked
+		 	    $("#addlink-button").click(function(e) {
+		 	    	$("#addlinkdiv").css("visibility", "visible");
+		 	    });
+					
+					// Add behaviour to 'Save links' button 
+					$("#savelinks-button").click(function(e) {
+						var links = [];
+						var parts, obj;
+						
+						$("#sortable li").each(function(index, li) {
+							parts = $(li).find("span.hide").html().split(",");
+							obj = {
+									parentId: parts[0],
+									childId: parts[1],
+									type: parts[2],
+									name: parts[3],
+									ordering: index
+							};
+							links.push(obj);
+						});
+						
+		  			$.ajax("/rest/cms/links/" + nodeKey + "/save", {
+							type: "POST",
+							cache: false,
+							data: JSON.stringify(links), 
+							contentType: "application/json; charset=utf-8",
+							dataType: "text",
+							processData: false,
+							success: function(obj, status, z) {
+								// TODO: add dialog 
+								window.alert("Success");
+							},
+							error: function(obj, status, z) {
+								window.alert("Failure");
+							},
+
+						});
+					});
+					
+					// Add behaviour to 'Remove links' button 
+					$(".remove-link").click(function(e) {
+						$(this).parent().remove();
+					});
+					
+		 		  // Initialise sortable links 
+		 	    $( "#sortable" ).sortable();
+		 	    $( "#sortable" ).disableSelection();
 				}
 			});
 	  };
@@ -190,6 +281,7 @@
 		<c:if test="${not empty editingItem}">
 			renderItemForms("${editingItem.id}");
 		</c:if>
+		
 	});
 		
 </script>

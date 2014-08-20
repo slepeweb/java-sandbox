@@ -6,8 +6,7 @@
 <ul>
 	<li><a href="#core-tab">Core</a></li>
 	<li><a href="#field-tab">Fields</a></li>
-	<li><a href="#inline-tab">Inlines</a></li>
-	<li><a href="#relation-tab">Relations</a></li>
+	<li><a href="#links-tab">Links</a></li>
 	<li><a href="#add-tab">Add new</a></li>
 </ul>
 
@@ -58,28 +57,50 @@
 	</form>
 </div>
 
-<div id="inline-tab">
-	<c:choose><c:when test="${fn:length(requestItem.inlineItems) > 0}">
-		<ol>
-		<c:forEach items="${requestItem.inlineItems}" var="item">
-			<li><a href="/cms/editor/${item.id}">${item}</a></li>
-		</c:forEach>
-		</ol>
-	</c:when><c:otherwise>
-		<p>No inlines for this item</p>
-	</c:otherwise></c:choose>
-</div>
-
-<div id="relation-tab">
-	<c:choose><c:when test="${fn:length(requestItem.relatedItems) > 0}">
-		<ol>
-		<c:forEach items="${requestItem.relatedItems}" var="item">
-			<li><a href="/cms/editor/${item.id}">${item}</a></li>
-		</c:forEach>
-		</ol>
-	</c:when><c:otherwise>
-		<p>No relations for this item</p>
-	</c:otherwise></c:choose>
+<div id="links-tab">
+	<div>
+		<ul id="sortable">
+			<c:forEach items="${requestItem.inlinesAndRelations}" var="link">
+				<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
+					href="/cms/editor/${link.child.id}">${link}</a>
+						<button class="remove-link float-right">Remove</button><span 
+							class="hide">${link.parentId},${link.child.id},${link.type},${link.name}</span></li>
+			</c:forEach>
+		</ul>
+		<div class="spacer20">
+			<button id="addlink-button" type="button">Add link</button>
+			<button id="savelinks-button" type="button">Save changes</button>
+		</div>
+	</div>
+	
+	<div class="spacer20"></div>
+	<div id="addlinkdiv">
+		<div class="float-left">
+			<div>
+				<label for="linktype">Link type: </label>
+				<select name="linktype">
+					<option value="unknown">Choose ...</option>
+					<c:forTokens items="inline,relation" delims="," var="type">
+						<option value="${type}">${type}</option>
+					</c:forTokens>
+				</select>	
+			</div>
+			<div>
+				<label for="linkname">Link name: </label>
+				<input name="linkname" value="std" />
+			</div>
+		</div>		
+		<div id="linknav" class="inline"></div>
+	</div>
+	
+	<ul id="link-template" class="hide">
+		<li class="ui-state-default">
+			<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+			<a href="*">*</a>
+			<button class="remove-link float-right">Remove</button>
+			<span class="hide">*</span>
+		</li>		
+	</ul>
 </div>
 
 <div id="add-tab">
