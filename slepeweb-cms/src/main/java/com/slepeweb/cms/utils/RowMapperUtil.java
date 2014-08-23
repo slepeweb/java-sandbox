@@ -31,11 +31,10 @@ public class RowMapperUtil {
 	
 	public static final class ItemTypeMapper implements RowMapper<ItemType> {
 		public ItemType mapRow(ResultSet rs, int rowNum) throws SQLException {
-			ItemType it = CmsBeanFactory.makeItemType();
-			it.setId(rs.getLong("id"));
-			it.setName(rs.getString("name"));
-			it.setMedia(rs.getBoolean("media"));
-			return it;
+			return CmsBeanFactory.makeItemType().
+					setId(rs.getLong("id")).
+					setName(rs.getString("name")).
+					setMimeType(rs.getString("mimetype"));
 		}
 	}
 	
@@ -58,7 +57,7 @@ public class RowMapperUtil {
 		ItemType type = CmsBeanFactory.makeItemType().
 				setId(rs.getLong("typeid")).
 				setName(rs.getString("typename")).
-				setMedia(rs.getBoolean("media"));
+				setMimeType(rs.getString("mimetype"));
 		
 		item.setType(type);
 		

@@ -73,11 +73,11 @@ public class CmsBeanFactory {
 	}
 	
 	public static ItemType makeContentFolderType() {
-		return makeItemType().setName(ItemType.CONTENT_FOLDER_TYPE_NAME).setMedia(false).save();
+		return makeItemType().setName(ItemType.CONTENT_FOLDER_TYPE_NAME).save();
 	}
 	
 	public static ItemType makeHomepageType(String siteName) {
-		return makeItemType().setName(siteName + " Homepage").setMedia(false).save();
+		return makeItemType().setName(siteName + " Homepage").save();
 	}
 	
 	private static Item proveItem(Site s, ItemType type, String name, String simpleName, String path) {

@@ -21,17 +21,12 @@ import com.slepeweb.cms.utils.RowMapperUtil;
 public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	private static Logger LOG = Logger.getLogger(ItemServiceImpl.class);
+	private static final String MOVE_BEFORE = "before";
+	private static final String MOVE_AFTER = "after";
+	private static final String MOVE_OVER = "over";
 
-	// Example uing left join:
-//	select i.name, s.name, it.name, t.name 
-//	from item i 
-//	join site s on i.siteid=s.id 
-//	join itemtype it on i.typeid = it.id
-//	left join template t on i.templateid=t.id 
-//	where i.path like '/news%'
-	
 	private static final String SELECT_TEMPLATE = 
-			"select i.*, s.name as sitename, s.hostname, it.id as typeid, it.name as typename, it.media, " +
+			"select i.*, s.name as sitename, s.hostname, it.id as typeid, it.name as typename, it.mimetype, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
 			"from item i " +
 			"join site s on i.siteid = s.id " +
@@ -44,8 +39,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected MediaService mediaService;
 
-	//private String columns = "name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted";
-	
 	public Item save(Item i) {
 		return save(i, false);
 	}
@@ -272,38 +265,131 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
 	}
 	
+//	/*
+//	 * This method can be used if a child item moves to a different parent, but  
+//	 * NOT if the child's simplename has changed.
+//	 */
+//	public Item move(Item child, Item newParent) {
+//		Link parentLink = this.linkService.getParent(child.getId());
+//		if (parentLink != null) {
+//			// Un-link from current path
+//			this.linkService.deleteLinks(parentLink.getParentId(), child.getId());
+//			
+//			// Bind to new parent
+//			parentLink.setParentId(newParent.getId()).setOrdering(1);
+//			parentLink.save();
+//			
+//			// Update paths of descendant items
+//			String divider = newParent.isRoot() ? "" : "/";
+//			String newChildPath = newParent.getPath() + divider + child.getSimpleName();
+//			updateDescendantPaths(child.getPath(), newChildPath);
+//			
+//			// Update child item path
+//			updateItemPath(child.getId(), newChildPath);
+//			
+//			// Force newParent links to be re-calculated, since they have now changed
+//			newParent.setLinks(null);
+//		}
+//		else {
+//			LOG.error(compose("Failed to identify parent item", child.getPath()));
+//		}
+//		
+//		return child;
+//	}
+
+	public Item move(Item mover, Item parent) {
+		return move(mover, parent, "over");
+	}
+	
 	/*
-	 * This method can be used if a child item moves to a different parent, and  
-	 * NOT if the child's simplename has changed.
+	 * This provides a relative move, ie before/after target.
+	 * If mode == "over", then target is effectively a new parent.
 	 */
-	public Item move(Item child, Item newParent) {
-		Link parentLink = this.linkService.getParent(child.getId());
-		if (parentLink != null) {
-			// Un-link from current path
-			this.linkService.deleteLinks(parentLink.getParentId(), child.getId());
+	public Item move(Item mover, Item target, String mode) {
+		Link oldParentage = this.linkService.getParent(mover.getId());
+		Link moverLink = oldParentage;
+		
+		if (oldParentage != null) {
+			Item targetParent = target.getParent();
 			
-			// Bind to new parent
-			parentLink.setParentId(newParent.getId()).setOrdering(1);
-			parentLink.save();
+			// Break the parent link for the mover, even if it it is moving amongst its siblings
+			this.linkService.deleteLinks(oldParentage.getParentId(), mover.getId());
+			
+			// Bind to new parent - we'll save teh mover link later
+			if (mode.equals(MOVE_OVER)) {
+				moverLink.setParentId(target.getId());
+			}
+			else {
+				moverLink.setParentId(targetParent.getId());
+			}
+			
+			// Insert the mover alongside its siblings, in the correct order
+			List<Link> bindings;
+			if (mode.equals(MOVE_OVER)) {
+				// Append mover to end of list of children
+				bindings = this.linkService.getBindings(target.getId());
+				bindings.add(moverLink);
+			}
+			else {
+				// Append mover before/after target item
+				bindings = this.linkService.getBindings(targetParent.getId());
+				
+				// First identify the insertion point in the bindings list
+				int cursor = -1;
+				for (Link l : bindings) {
+					if (l.getChild().getId() == target.getId()) {
+						cursor = bindings.indexOf(l);
+						break;
+					}
+				}
+				
+				// Now insert the mover into the bindings list
+				if (cursor > -1) {
+					if (mode.equals(MOVE_BEFORE)) {
+						bindings.add(cursor, moverLink);
+					}
+					else if (mode.equals(MOVE_AFTER)) {
+						if (cursor < bindings.size()) {
+							bindings.add(cursor + 1, moverLink);
+						}
+						else {
+							bindings.add(moverLink);
+						}
+					}
+				}
+				else {
+					bindings.add(moverLink);
+				}
+			}
+			
+			// Re-order bindings from 0, then save
+			int cursor = 0;
+			for (Link l : bindings) {
+				if (l.getOrdering() != cursor) {
+					l.setOrdering(cursor);
+					l.save();
+				}
+				cursor++;
+			}
 			
 			// Update paths of descendant items
-			String divider = newParent.isRoot() ? "" : "/";
-			String newChildPath = newParent.getPath() + divider + child.getSimpleName();
-			updateDescendantPaths(child.getPath(), newChildPath);
+			String divider = target.isRoot() ? "" : "/";
+			String newChildPath = target.getPath() + divider + mover.getSimpleName();
+			updateDescendantPaths(mover.getPath(), newChildPath);
 			
 			// Update child item path
-			updateItemPath(child.getId(), newChildPath);
+			updateItemPath(mover.getId(), newChildPath);
 			
 			// Force newParent links to be re-calculated, since they have now changed
-			newParent.setLinks(null);
+			target.setLinks(null);
 		}
 		else {
-			LOG.error(compose("Failed to identify parent item", child.getPath()));
+			LOG.error(compose("Failed to identify parent item", mover.getPath()));
 		}
 		
-		return child;
+		return mover;
 	}
-
+	
 	private Item getItem(String sql, Object[] params) {
 		return (Item) getFirstInList(this.jdbcTemplate.query(
 			sql, params, new RowMapperUtil.ItemMapper()));

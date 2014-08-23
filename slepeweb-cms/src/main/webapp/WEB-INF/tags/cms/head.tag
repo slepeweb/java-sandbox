@@ -31,7 +31,7 @@
 	  };
 	  
 	  // (Re-)render the forms
-	  var renderItemForms = function(nodeKey) {
+	  var renderItemForms = function(nodeKey, activeTab) {
   		$.ajax("/rest/cms/item-editor", {
 				cache: false,
 				data: {key: nodeKey}, 
@@ -47,7 +47,7 @@
 					if (tabsdiv.hasClass("ui-tabs")) {
 	    				$("#item-editor").tabs("destroy");
 					}
-					$("#item-editor").tabs();
+					$("#item-editor").tabs({active: activeTab});
 					
 					// Add behaviour to submit core item updates 
 					$("#core-button").click(function () {
@@ -167,7 +167,7 @@
 		 	   			}
 		 	    });
 		 	    
-					// Show link tools when 'Add link' button is clicked
+					// Show link addition form when 'Add link' button is clicked
 		 	    $("#addlink-button").click(function(e) {
 		 	    	$("#addlinkdiv").css("visibility", "visible");
 		 	    });
@@ -189,6 +189,7 @@
 							links.push(obj);
 						});
 						
+						// Ajax call to save links to db 
 		  			$.ajax("/rest/cms/links/" + nodeKey + "/save", {
 							type: "POST",
 							cache: false,
@@ -253,7 +254,7 @@
         },
         dragDrop: function(node, data) {
         	// hitMode can be one of: 'after', 'before', 'over' 
-//					TODO: WINDOW.CONFIRM isn't working here ...      	
+//					TODO: WINDOW.CONFIRM - use a jquery dialog instead      	
 //         	if (window.confirm("Are you sure you want to move the selected item?")) {
 						$.ajax("/rest/cms/item/" + data.otherNode.key + "/move", {
 							type: "POST",
@@ -264,7 +265,6 @@
 							}, 
 							dataType: "json",
 							success: function(json, status, z) {
-								window.alert("Success");
 								window.location = "/cms/editor/" + json;
 							}
 						});
@@ -274,7 +274,12 @@
         }
       },
    		activate: function(event, data) {
-    		renderItemForms(data.node.key);
+   			var tabName = $("li.ui-tabs-active").attr("aria-controls");
+   			var tabNum = 0;
+   			if (tabName == 'field-tab') {tabNum = 1;}
+   			else if (tabName == 'links-tab') {tabNum = 2;}
+   			else if (tabName == 'add-tab') {tabNum = 3;}
+    		renderItemForms(data.node.key, tabNum);
     	}
     });		
     

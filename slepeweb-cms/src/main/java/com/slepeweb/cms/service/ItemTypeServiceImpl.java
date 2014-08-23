@@ -33,8 +33,8 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 	
 	private void insertItemType(ItemType it) {
 		this.jdbcTemplate.update(
-				"insert into itemtype (name, media) values (?, ?)", 
-				it.getName(), it.isMedia());
+				"insert into itemtype (name, mimetype) values (?, ?)", 
+				it.getName(), it.getMimeType());
 		
 		it.setId(getLastInsertId());
 		LOG.info(compose("Added new item type", it));
@@ -45,8 +45,8 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			dbRecord.assimilate(it);
 			
 			this.jdbcTemplate.update(
-					"update itemtype set name = ?, media = ? where id = ?", 
-					dbRecord.getName(), dbRecord.isMedia(), dbRecord.getId());
+					"update itemtype set name = ?, mimetype = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getMimeType(), dbRecord.getId());
 			
 			LOG.info(compose("Updated item type", it));
 		}

@@ -18,12 +18,11 @@ create table site
 	unique key idx_site_hostname (hostname)
 ) ENGINE=InnoDB;
 
-
 create table itemtype
 (
 	id int not null auto_increment,
 	name varchar(255),
-	media boolean,
+	mimetype varchar(64),
 	primary key (id),
 	unique key idx_itemtype_name (name)
 ) ENGINE=InnoDB;
@@ -110,6 +109,7 @@ create table fieldvalue
 	 constraint foreign key (fieldid) references field(id) on delete cascade,
 	 constraint foreign key (itemid) references item(id) on delete cascade
 ) ENGINE=InnoDB;
+
 
 create table media
 (

@@ -41,11 +41,11 @@ public abstract class BaseTest {
 	}
 	
 	protected ItemType addType(String name) {
-		return addType(name, false);
+		return addType(name, "application/cms");
 	}
 	
-	protected ItemType addType(String name, boolean isMedia) {
-		ItemType it = CmsBeanFactory.makeItemType().setName(name).setMedia(isMedia);
+	protected ItemType addType(String name, String mimeType) {
+		ItemType it = CmsBeanFactory.makeItemType().setName(name).setMimeType(mimeType);
 		it.save();
 		return it;
 	}

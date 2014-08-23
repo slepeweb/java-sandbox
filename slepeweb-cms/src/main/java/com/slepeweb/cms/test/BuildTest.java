@@ -63,7 +63,7 @@ public class BuildTest extends BaseTest {
 		ItemType newsType = addType(NEWS_TYPE_NAME);
 		ItemType eventType = addType(EVENT_TYPE_NAME);
 		ItemType articleType = addType(ARTICLE_TYPE_NAME);
-		ItemType imageType = addType(IMAGE_TYPE_NAME, true);
+		ItemType imageType = addType(IMAGE_TYPE_NAME, "image/jpeg");
 		
 		// 2010: Assert N types have been created
 		int numItemTypes = this.cmsService.getItemTypeService().getCount();

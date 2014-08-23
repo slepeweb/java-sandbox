@@ -160,17 +160,8 @@ public class EditorialRestController extends BaseController {
 		
 		Item mover = this.itemService.getItem(itemId);
 		Item target = this.itemService.getItem(targetId);
-		Item moved = null;
+		Item moved = mover.move(target, mode);
 		
-		if (mode.equals("before") || mode.equals("after")) {
-			// TODO: move into parent folder, and position 'before' or 'after' the target item
-			moved = mover.move(target.getParent());
-		}
-		else if (mode.equals("over")) {
-			// TODO: move into parent folder, and place at end of child list
-			moved = mover.move(target);
-		}
-			
 		return moved.getId();
 	}
 	

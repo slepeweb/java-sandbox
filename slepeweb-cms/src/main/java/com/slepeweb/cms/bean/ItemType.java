@@ -8,19 +8,21 @@ import org.apache.commons.lang3.StringUtils;
 public class ItemType extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static final String CONTENT_FOLDER_TYPE_NAME = "Content Folder";
+	public static final String PAGE_MIMETYPE = "application/cms";
+	
 	private Long id;
-	private String name;
-	private boolean media;
+	private String name, mimeType = PAGE_MIMETYPE;
 	private List<FieldForType> fieldsForType;
 	
 	public void assimilate(ItemType it) {
 		setName(it.getName());
-		setMedia(it.isMedia());
+		setMimeType(it.getMimeType());
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
-			StringUtils.isNotBlank(getName());
+			StringUtils.isNotBlank(getName()) &&
+			StringUtils.isNotBlank(getMimeType());
 	}
 	
 	public FieldForType addFieldForType(Field f, Long ordering, boolean mandatory) {
@@ -94,11 +96,15 @@ public class ItemType extends CmsBean implements Serializable {
 	}
 
 	public boolean isMedia() {
-		return media;
+		return getMimeType().equals(PAGE_MIMETYPE);
 	}
 
-	public ItemType setMedia(boolean media) {
-		this.media = media;
+	public String getMimeType() {
+		return mimeType;
+	}
+
+	public ItemType setMimeType(String mimeType) {
+		this.mimeType = mimeType;
 		return this;
 	}
 

@@ -176,33 +176,33 @@ public class Item extends CmsBean implements Serializable {
 	}
 	
 	public final List<Item> getBoundItems(String linkName) {
-		return getLinkedItems(LinkType.binding, linkName);
+		return toItems(getBindings(), linkName);
 	}
 	
 	public final List<Item> getRelatedItems(String linkName) {
-		return getLinkedItems(LinkType.relation, linkName);
+		return toItems(getRelations(), linkName);
 	}
 	
 	public final List<Item> getInlineItems(String linkName) {
-		return getLinkedItems(LinkType.inline, linkName);
+		return toItems(getInlines(), linkName);
 	}
 	
-	private final List<Item> getLinkedItems(LinkType linkType, String linkName) {
+	private final List<Item> toItems(List<Link> links, String linkName) {
 		List<Item> list = new ArrayList<Item>();
-		
-		// getLinks() will pull links from the DB if null in this object.
-		for (Link l : getLinks()) {
-			if (l.getType() == linkType) {
-				if (linkName == null || l.getName().equals(linkName)) {
-					list.add(l.getChild());
-				}
+		for (Link l : links) {
+			if (linkName == null || l.getName().equals(linkName)) {
+				list.add(l.getChild());
 			}
 		}
 		return list;
 	}
 	
-	public Item move(Item newParent) {
-		return getCmsService().getItemService().move(this, newParent);
+	public Item move(Item target) {
+		return move(target, "over");
+	}
+	
+	public Item move(Item target, String mode) {
+		return getCmsService().getItemService().move(this, target, mode);
 	}
 	
 	public String getParentPath() {
@@ -379,13 +379,31 @@ public class Item extends CmsBean implements Serializable {
 		return this.links;
 	}
 
-	public List<Link> getInlinesAndRelations() {
+	public List<Link> getBindings() {
+		return filterLinks(LinkType.binding);
+	}
+
+	public List<Link> getInlines() {
+		return filterLinks(LinkType.inline);
+	}
+
+	public List<Link> getRelations() {
+		return filterLinks(LinkType.relation);
+	}
+	
+	private List<Link> filterLinks(LinkType type) {
 		List<Link> list = new ArrayList<Link>();
 		for (Link l : getLinks()) {
-			if (l.getType() != LinkType.binding) {
+			if (l.getType() == type) {
 				list.add(l);
 			}
 		}
+		return list;
+	}
+
+	public List<Link> getInlinesAndRelations() {
+		List<Link> list = getInlines();
+		list.addAll(getRelations());		
 		return list;
 	}
 
