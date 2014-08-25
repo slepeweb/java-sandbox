@@ -34,7 +34,8 @@ $(function() {
 		    			cache: false,
 		    			data: {
 		    				name: $("#core-tab input[name='name']").val(),
-		    				simplename: $("#core-tab input[name='simplename']").val()
+		    				simplename: $("#core-tab input[name='simplename']").val(),
+		    				published: $("#core-tab input[name='published']").is(':checked')
 		    			}, 
 		    			dataType: "json",
 		    			success: function(json, status, z) {

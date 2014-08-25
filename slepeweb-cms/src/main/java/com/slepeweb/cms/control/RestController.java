@@ -53,6 +53,7 @@ public class RestController extends BaseController {
 			@PathVariable long itemId, 
 			@RequestParam("name") String name, 
 			@RequestParam("simplename") String simplename, 
+			@RequestParam("published") boolean published, 
 			ModelMap model) {	
 		
 		Item i = this.itemService.getItem(itemId);
@@ -60,6 +61,7 @@ public class RestController extends BaseController {
 			i.setName(name);
 			i.setSimpleName(simplename);
 			i.setDateUpdated(new Timestamp(System.currentTimeMillis()));
+			i.setPublished(published);
 			i.save();
 			
 			return true;

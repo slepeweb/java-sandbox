@@ -86,6 +86,10 @@ input[disabled="disabled"] {
 	color: #909090;
 }
 
+input[type="checkbox"] {
+	width: auto;
+}
+
 #item-editor {
 /* 	display: inline-block; */
 /* 	position: absolute; */

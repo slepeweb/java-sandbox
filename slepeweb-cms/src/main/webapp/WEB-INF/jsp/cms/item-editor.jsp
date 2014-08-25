@@ -31,10 +31,13 @@
 			<label for="dateupdated">Date last updated: </label><input disabled="disabled" value="${requestItem.dateUpdated}" />
 		</div>
 		<div>
-			<label for="name">Name: </label><input name="name" value="${requestItem.name}" />
+			<label for="name">Name: </label><input type="text" name="name" value="${requestItem.name}" />
 		</div>
 		<div>
-			<label for="simplename">Simple name: </label><input name="simplename" value="${requestItem.simpleName}" />
+			<label for="simplename">Simple name: </label><input type="text" name="simplename" value="${requestItem.simpleName}" />
+		</div>
+		<div>
+			<label for="published">Published? </label><input type="checkbox" name="published" <c:if test="${requestItem.published}">checked="checked"</c:if> />
 		</div>
 		<div>
 			<label>&nbsp;</label><button id="core-button" type="button">Update</button>
