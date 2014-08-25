@@ -20,7 +20,7 @@ public class Item extends CmsBean implements Serializable {
 	private List<FieldValue> fieldValues;
 	private String name, simpleName, path;
 	private Timestamp dateCreated, dateUpdated;
-	private boolean deleted;
+	private boolean deleted, published;
 	private Long id = -1L;
 	private List<Link> links;
 	private String mediaUploadFilePath;
@@ -36,6 +36,7 @@ public class Item extends CmsBean implements Serializable {
 		setType(i.getType());
 		setTemplate(i.getTemplate());
 		setMediaUploadFilePath(i.getMediaUploadFilePath());
+		setPublished(i.isPublished());
 		
 		// Must assimilate fields and links too? 
 		// NO - fields and links are loaded when needed.
@@ -421,6 +422,7 @@ public class Item extends CmsBean implements Serializable {
 		result = prime * result + ((site == null) ? 0 : site.getId().hashCode());
 		result = prime * result + ((type == null) ? 0 : type.getId().hashCode());
 		result = prime * result + ((dateUpdated == null) ? 0 : dateUpdated.hashCode());
+		result = prime * result + (published ? 1231 : 1237);
 		return result;
 	}
 
@@ -434,6 +436,8 @@ public class Item extends CmsBean implements Serializable {
 			return false;
 		Item other = (Item) obj;
 		if (deleted != other.deleted)
+			return false;
+		if (published != other.published)
 			return false;
 		if (name == null) {
 			if (other.name != null)
@@ -484,6 +488,15 @@ public class Item extends CmsBean implements Serializable {
 
 	public Item setTemplate(Template template) {
 		this.template = template;
+		return this;
+	}
+
+	public boolean isPublished() {
+		return published;
+	}
+
+	public Item setPublished(boolean published) {
+		this.published = published;
 		return this;
 	}
 }

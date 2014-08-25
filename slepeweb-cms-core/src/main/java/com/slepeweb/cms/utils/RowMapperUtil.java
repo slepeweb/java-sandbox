@@ -52,7 +52,8 @@ public class RowMapperUtil {
 				setPath(rs.getString("path")).
 				setDateCreated(rs.getTimestamp("datecreated")).
 				setDateUpdated(rs.getTimestamp("dateupdated")).
-				setDeleted(rs.getBoolean("deleted"));
+				setDeleted(rs.getBoolean("deleted")).
+				setPublished(rs.getBoolean("published"));
 		
 		ItemType type = CmsBeanFactory.makeItemType().
 				setId(rs.getLong("typeid")).
@@ -85,13 +86,12 @@ public class RowMapperUtil {
 	
 	public static final class LinkMapper implements RowMapper<Link> {
 		public Link mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Link l = CmsBeanFactory.makeLink();
-			l.setParentId(rs.getLong("parentid"));
-			l.setChild(mapItem(rs));
-			l.setType(LinkType.valueOf(rs.getString("linktype")));
-			l.setName(rs.getString("linkname"));
-			l.setOrdering(rs.getInt("ordering"));
-			return l;
+			return CmsBeanFactory.makeLink().
+					setParentId(rs.getLong("parentid")).
+					setChild(mapItem(rs)).
+					setType(LinkType.valueOf(rs.getString("linktype"))).
+					setName(rs.getString("linkname")).
+					setOrdering(rs.getInt("ordering"));
 		}
 	}
 	
@@ -102,15 +102,14 @@ public class RowMapperUtil {
 	}
 	
 	public static Field mapField(ResultSet rs) throws SQLException {
-		Field f = CmsBeanFactory.makeField();
-		f.setId(rs.getLong("id"));
-		f.setName(rs.getString("name"));
-		f.setVariable(rs.getString("variable"));
-		f.setHelp(rs.getString("helptext"));
-		f.setType(FieldType.valueOf(rs.getString("fieldtype")));
-		f.setSize(rs.getInt("size"));
-		f.setDefaultValue(rs.getString("dflt"));
-		return f;
+		return CmsBeanFactory.makeField().
+				setId(rs.getLong("id")).
+				setName(rs.getString("name")).
+				setVariable(rs.getString("variable")).
+				setHelp(rs.getString("helptext")).
+				setType(FieldType.valueOf(rs.getString("fieldtype"))).
+				setSize(rs.getInt("size")).
+				setDefaultValue(rs.getString("dflt"));
 	}
 	
 	@SuppressWarnings("unused")
@@ -125,24 +124,22 @@ public class RowMapperUtil {
 	
 	public static final class FieldForTypeMapper implements RowMapper<FieldForType> {
 		public FieldForType mapRow(ResultSet rs, int rowNum) throws SQLException {
-			FieldForType fft = CmsBeanFactory.makeFieldForType();
-			fft.setField(mapField(rs));
-			fft.setTypeId(rs.getLong("itemtypeid"));
-			fft.setOrdering(rs.getLong("fieldorder"));
-			fft.setMandatory(rs.getBoolean("mandatory"));
-			return fft;
+			return CmsBeanFactory.makeFieldForType().
+					setField(mapField(rs)).
+					setTypeId(rs.getLong("itemtypeid")).
+					setOrdering(rs.getLong("fieldorder")).
+					setMandatory(rs.getBoolean("mandatory"));
 		}
 	}
 	
 	public static final class FieldValueMapper implements RowMapper<FieldValue> {
 		public FieldValue mapRow(ResultSet rs, int rowNum) throws SQLException {
-			FieldValue fv = CmsBeanFactory.makeFieldValue();
-			fv.setField(mapField(rs));
-			fv.setItemId(rs.getLong("itemid"));
-			fv.setStringValue(rs.getString("stringvalue"));
-			fv.setIntegerValue(rs.getInt("integervalue"));
-			fv.setDateValue(rs.getTimestamp("datevalue"));
-			return fv;
+			return CmsBeanFactory.makeFieldValue().
+					setField(mapField(rs)).
+					setItemId(rs.getLong("itemid")).
+					setStringValue(rs.getString("stringvalue")).
+					setIntegerValue(rs.getInt("integervalue")).
+					setDateValue(rs.getTimestamp("datevalue"));
 		}
 	}
 	

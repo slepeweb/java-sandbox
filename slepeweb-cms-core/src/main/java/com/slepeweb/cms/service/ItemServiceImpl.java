@@ -25,7 +25,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private static final String MOVE_AFTER = "after";
 	private static final String MOVE_OVER = "over";
 
-	private static final String SELECT_TEMPLATE = 
+	private final static String SELECT_TEMPLATE = 
 			"select i.*, s.name as sitename, s.hostname, it.id as typeid, it.name as typename, it.mimetype, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
 			"from item i " +
@@ -66,10 +66,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private void insertItem(Item i) {
 		// Item table
 		this.jdbcTemplate.update(
-				"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted) " +
-				"values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, published) " +
+				"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 				i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
-				i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false);				
+				i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false, false);				
 		
 		Long lastId = getLastInsertId();
 		i.setId(lastId);
@@ -110,10 +110,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			dbRecord.assimilate(i);
 			
 			this.jdbcTemplate.update(
-					"update item set name = ?, simplename = ?, path = ?, templateid = ?, dateupdated = ?, deleted = ? where id = ?",
+					"update item set name = ?, simplename = ?, path = ?, templateid = ?, dateupdated = ?, deleted = ?, published = ? where id = ?",
 					dbRecord.getName(), dbRecord.getSimpleName(), dbRecord.getPath(), 
 					dbRecord.getTemplate() == null ? 0 : dbRecord.getTemplate().getId(), 
-					dbRecord.getDateUpdated(), dbRecord.isDeleted(), i.getId());
+					dbRecord.getDateUpdated(), dbRecord.isDeleted(), dbRecord.isPublished(), i.getId());
 			
 			LOG.info(compose("Updated item", i));
 			
@@ -127,6 +127,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			LOG.info(compose("Item not modified", i));
 		}
 		
+	}
+	
+	private String getSelector() {
+		return SELECT_TEMPLATE +  (this.config.isLiveDelivery() ? " and i.published = 1" : "");
 	}
 	
 	public void saveFieldValues(List<FieldValue> fieldValues) {
@@ -232,19 +236,19 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 
 	public Item getItem(Long siteId, String path) {
 		return getItem(
-			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=? and i.deleted=0"),
+			String.format(getSelector(), "i.siteid=? and i.path=? and i.deleted=0"),
 			new Object[]{siteId, path});
 	}
 
 	public Item getItem(Long id) {
 		return getItem(
-			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=0"), 
+			String.format(getSelector(), "i.id=? and i.deleted=0"), 
 			new Object[]{id});
 	}
 	
 	public Item getItemFromBin(Long id) {
 		return getItem(
-			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=1"), 
+			String.format(getSelector(), "i.id=? and i.deleted=1"), 
 			new Object[]{id});
 	}
 	
