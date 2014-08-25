@@ -30,17 +30,7 @@ create table itemtype
 ) ENGINE=InnoDB;
 
 
-create table templatecreate table config
-(
-	siteid int,
-	name varchar(128),
-	value varchar(1023),
-	primary key (siteid, name),
-	constraint foreign key (siteid) references site(id) on delete cascade
-) ENGINE=InnoDB;
-
-
-
+create table template
 (
 	id int not null auto_increment,
 	name varchar(255),
