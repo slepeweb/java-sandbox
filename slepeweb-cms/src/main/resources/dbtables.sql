@@ -1,3 +1,4 @@
+drop table config;
 drop table media;
 drop table fieldvalue;
 drop table fieldfortype;
@@ -7,6 +8,7 @@ drop table item;
 drop table template;
 drop table itemtype;
 drop table site;
+
 
 create table site
 (
@@ -28,7 +30,17 @@ create table itemtype
 ) ENGINE=InnoDB;
 
 
-create table template
+create table templatecreate table config
+(
+	siteid int,
+	name varchar(128),
+	value varchar(1023),
+	primary key (siteid, name),
+	constraint foreign key (siteid) references site(id) on delete cascade
+) ENGINE=InnoDB;
+
+
+
 (
 	id int not null auto_increment,
 	name varchar(255),
@@ -54,6 +66,7 @@ create table item
 	datecreated timestamp,
 	dateupdated timestamp,
 	deleted boolean,
+	published boolean,
 	primary key (id),
 	unique key idx_item_site_path (siteid, path),
 	constraint foreign key (siteid) references site(id) on delete cascade,
@@ -118,3 +131,15 @@ create table media
    primary key (itemid),
 	 constraint foreign key (itemid) references item(id) on delete cascade
 ) ENGINE=InnoDB;
+
+
+create table config
+(
+	siteid int,
+	name varchar(128),
+	value varchar(1023),
+	primary key (siteid, name),
+	constraint foreign key (siteid) references site(id) on delete cascade
+) ENGINE=InnoDB;
+
+
