@@ -126,7 +126,7 @@ $(function() {
 	 	   			var childId = data.node.key;
 	 	   			
 		 	 		  if (linkType != 'unknown') {
-		 	 	   	  	var selector = $("#sortable");
+		 	 	   	  	var selector = $("#sortable-links");
 		 	 	   	 		var copy = $("#link-template li").clone(true);
 		 	 	   	  	
 		 	 					$.ajax(_ctx + "/rest/item/" + childId + "/name", {
@@ -156,7 +156,7 @@ $(function() {
 					var links = [];
 					var parts, obj;
 					
-					$("#sortable li").each(function(index, li) {
+					$("#sortable-links li").each(function(index, li) {
 						parts = $(li).find("span.hide").html().split(",");
 						obj = {
 								parentId: parts[0],
@@ -193,8 +193,8 @@ $(function() {
 				});
 				
 	 		  // Initialise sortable links 
-	 	    $( "#sortable" ).sortable();
-	 	    $( "#sortable" ).disableSelection();
+	 	    $( "#sortable-links" ).sortable();
+	 	    $( "#sortable-links" ).disableSelection();
 			}
 		});
   };

@@ -72,6 +72,11 @@ public abstract class BaseTest {
 	}
 	
 	protected Template addTemplate(String name, String forward, Long siteId, Long typeId) {
-		return CmsBeanFactory.makeTemplate().setName(name).setSiteId(siteId).setItemTypeId(typeId).save();
+		return CmsBeanFactory.makeTemplate().
+				setName(name).
+				setForward(forward).
+				setSiteId(siteId).
+				setItemTypeId(typeId).
+				save();
 	}
 }

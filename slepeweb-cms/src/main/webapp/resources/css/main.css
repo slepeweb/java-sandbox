@@ -2,49 +2,33 @@ body {
 	font-size: 12px;
 }
 
+/* Form elements */
+
+label {
+	float: left;
+	width: 150px;
+}
+
+input {
+	width: 400px;
+}
+
+input[disabled="disabled"] {
+	background-color: #d8d8d8;
+	color: #909090;
+}
+
+input[type="checkbox"] {
+	width: auto;
+}
+
+/* Compoundable styles */
+
 .pass {
 	color: green;
 }
 
 .fail {
-	color: red;
-}
-
-#trash-button {
-	background-color: red;
-	float: right;
-}
-
-#addlinkdiv {
-	float: left;
-	visibility: hidden;
-}
-
-#linknav {
-		margin-left: 100px;
-}
-
-#addlinkdiv input {
-	width: 60px;
-}
-
-#addlinkdiv label {
-	width: 100px;
-}
-
-#savelinks-button {
-/* 	visibility: hidden; */
-	color: green;
-	float: right;
-}
-
-#link-confirm {
-	visibility: hidden;
-}
-
-.remove-link {
-	position: relative;
-	bottom: 5px;
 	color: red;
 }
 
@@ -72,38 +56,76 @@ body {
 	margin-top: 20px;
 }
 
-label {
+#trash-button {
+	background-color: red;
+	float: right;
+}
+
+/* Link tab: to identify link targets  */
+
+#linknav {
+		margin-left: 100px;
+}
+
+#addlinkdiv {
 	float: left;
-	width: 150px;
+	visibility: hidden;
 }
 
-input {
-	width: 400px;
+#addlinkdiv input {
+	width: 60px;
 }
 
-input[disabled="disabled"] {
-	background-color: #d8d8d8;
-	color: #909090;
+#addlinkdiv label {
+	width: 100px;
 }
 
-input[type="checkbox"] {
-	width: auto;
+#savelinks-button {
+/* 	visibility: hidden; */
+	color: green;
+	float: right;
 }
+
+#link-confirm {
+	visibility: hidden;
+}
+
+.remove-link {
+	position: relative;
+	bottom: 5px;
+	color: red;
+}
+
+#sortable-links { 
+	list-style-type: none; 
+	margin: 0; 
+	padding: 0; 
+	width: 100%; 
+}
+
+#sortable-links li { 
+	margin: 0 3px 3px 3px; 
+	padding: 0.4em; 
+	padding-left: 1.5em; 
+/* 	font-size: 1.4em;  */
+	height: 16px; 
+}
+
+#sortable-links li span { 
+	position: absolute; 
+	margin-left: -1.3em; 
+}
+
+/* Main page elements  */
 
 #item-editor {
-/* 	display: inline-block; */
-/* 	position: absolute; */
-/* 	left: 180px; */
-/* 	clear: both; */
 	float:left;
 	margin-left: 10px;
 }
 
 #leftnav {
-/* 	display: inline-block; */
-/* 	position: absolute; */
-/* 	left: 0px; */
 	float:left;
+	width: 300px;
 }
 
 #main-wrapper {
@@ -114,26 +136,3 @@ input[type="checkbox"] {
 	clear: both;
 }
 
-/* button { */
-/* 	margin-top: 20px; */
-/* } */
-
-#sortable { 
-	list-style-type: none; 
-	margin: 0; 
-	padding: 0; 
-	width: 100%; 
-}
-
-#sortable li { 
-	margin: 0 3px 3px 3px; 
-	padding: 0.4em; 
-	padding-left: 1.5em; 
-/* 	font-size: 1.4em;  */
-	height: 16px; 
-}
-
-#sortable li span { 
-	position: absolute; 
-	margin-left: -1.3em; 
-}

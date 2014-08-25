@@ -62,7 +62,7 @@
 
 <div id="links-tab">
 	<div>
-		<ul id="sortable">
+		<ul id="sortable-links">
 			<c:forEach items="${requestItem.inlinesAndRelations}" var="link">
 				<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
 					href="/cms/editor/${link.child.id}">${link}</a>
