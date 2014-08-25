@@ -16,6 +16,10 @@ public abstract class CmsBean {
 	
 	protected abstract CmsBean save();	
 	protected abstract void delete();
+	protected abstract boolean isDefined4Insert();	
+	
+	// The properties that should be assimilated are those which are specified in the update sql
+	protected abstract void assimilate(Object obj);	
 	
 	protected String compose(String template, Object ... params) {
 		return LogUtil.compose(template, params);

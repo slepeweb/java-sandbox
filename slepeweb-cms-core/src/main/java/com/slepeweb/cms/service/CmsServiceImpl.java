@@ -19,6 +19,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected FieldValueService fieldValueService;
 	@Autowired protected MediaService mediaService;
 	@Autowired protected TemplateService templateService;
+	@Autowired protected SiteConfigService siteConfigService;
 	
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {
@@ -71,6 +72,10 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public void setTemplateService(TemplateService templateService) {
 		this.templateService = templateService;
+	}
+
+	public SiteConfigService getSiteConfigService() {
+		return siteConfigService;
 	}
 
 }

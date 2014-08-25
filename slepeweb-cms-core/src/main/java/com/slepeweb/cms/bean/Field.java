@@ -29,12 +29,15 @@ public class Field extends CmsBean implements Serializable {
 		text, markup, integer, date, url;
 	}
 
-	public void assimilate(Field f) {
-		setName(f.getName());
-		setVariable(f.getVariable());
-		setHelp(f.getHelp());
-		setType(f.getType());
-		setSize(f.getSize());
+	public void assimilate(Object obj) {
+		if (obj instanceof Field) {
+			Field f = (Field) obj;
+			setName(f.getName());
+			setVariable(f.getVariable());
+			setHelp(f.getHelp());
+			setType(f.getType());
+			setSize(f.getSize());
+		}
 	}
 
 	public boolean isDefined4Insert() {

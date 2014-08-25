@@ -14,12 +14,15 @@ public class FieldValue extends CmsBean implements Serializable {
 	private Timestamp dateValue;
 	private Timestamp dateUpdated;
 	
-	public void assimilate(FieldValue fv) {
-		setItemId(fv.getItemId());
-		setField(fv.getField());
-		setStringValue(fv.getStringValue());
-		setIntegerValue(fv.getIntegerValue());
-		setDateValue(fv.getDateValue());
+	public void assimilate(Object obj) {
+		if (obj instanceof FieldValue) {
+			FieldValue fv = (FieldValue) obj;
+			setItemId(fv.getItemId());
+			setField(fv.getField());
+			setStringValue(fv.getStringValue());
+			setIntegerValue(fv.getIntegerValue());
+			setDateValue(fv.getDateValue());
+		}
 	}
 	
 	public boolean isDefined4Insert() {

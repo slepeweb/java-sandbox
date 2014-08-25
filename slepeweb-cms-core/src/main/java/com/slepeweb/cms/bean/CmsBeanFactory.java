@@ -63,6 +63,12 @@ public class CmsBeanFactory {
 		return fv;
 	}
 	
+	public static SiteConfig makeSiteConfig() {
+		SiteConfig sc = new SiteConfig();
+		sc.setCmsService(CMS);
+		return sc;
+	}
+	
 	public static Item makeHomepageItem(Site s) {
 		ItemType homepageType = makeHomepageType(s.getName());
 		return proveItem(s, homepageType, "Homepage", "", "/").save();

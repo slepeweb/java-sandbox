@@ -26,6 +26,9 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 				insertFieldForType(fft);
 			}
 		}
+		else {
+			LOG.error(compose("FieldForType not saved - insufficient data", fft));
+		}
 		
 		return fft;
 	}

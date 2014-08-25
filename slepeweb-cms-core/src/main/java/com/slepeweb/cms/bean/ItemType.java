@@ -14,9 +14,12 @@ public class ItemType extends CmsBean implements Serializable {
 	private String name, mimeType = PAGE_MIMETYPE;
 	private List<FieldForType> fieldsForType;
 	
-	public void assimilate(ItemType it) {
-		setName(it.getName());
-		setMimeType(it.getMimeType());
+	public void assimilate(Object obj) {
+		if (obj instanceof ItemType) {
+			ItemType it = (ItemType) obj;
+			setName(it.getName());
+			setMimeType(it.getMimeType());
+		}
 	}
 	
 	public boolean isDefined4Insert() {

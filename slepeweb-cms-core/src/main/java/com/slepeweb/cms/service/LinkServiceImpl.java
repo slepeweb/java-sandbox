@@ -37,6 +37,9 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 				insertLink(l);
 			}
 		}
+		else {
+			LOG.error(compose("Link not saved - insufficient data", l));
+		}
 		
 		return l;
 	}

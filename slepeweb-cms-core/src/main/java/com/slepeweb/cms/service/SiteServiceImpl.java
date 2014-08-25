@@ -28,6 +28,9 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 				insertSite(s);
 			}
 		}
+		else {
+			LOG.error(compose("Site not saved - insufficient data", s));
+		}
 		
 		return s;
 	}

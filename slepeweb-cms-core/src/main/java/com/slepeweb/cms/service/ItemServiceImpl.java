@@ -59,6 +59,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				saveMedia(i);
 			}
 		}
+		else {
+			LOG.error(compose("Item not saved - insufficient data", i));
+		}
 		
 		return i;
 	}

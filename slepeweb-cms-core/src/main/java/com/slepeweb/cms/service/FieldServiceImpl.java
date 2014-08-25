@@ -21,6 +21,9 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 				insertField(f);
 			}
 		}
+		else {
+			LOG.error(compose("Field not saved - insufficient data", f));
+		}
 		
 		return f;
 	}

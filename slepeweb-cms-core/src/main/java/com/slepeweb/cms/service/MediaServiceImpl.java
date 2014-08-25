@@ -26,6 +26,9 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 				insertMedia(i);
 			}
 		}
+		else {
+			LOG.error(compose("Media not saved - insufficient data", i));
+		}
 	}
 	
 	private void insertMedia(Item i) {

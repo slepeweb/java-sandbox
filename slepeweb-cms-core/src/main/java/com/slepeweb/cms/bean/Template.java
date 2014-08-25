@@ -2,10 +2,26 @@ package com.slepeweb.cms.bean;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Template extends CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String name, forward;
 	private Long id, siteId, itemTypeId;
+	
+	public void assimilate(Object obj) {
+		if (obj instanceof Template) {
+			Template t = (Template) obj;
+			setName(t.getName());
+			setForward(t.getForward());
+		}
+	}
+	
+	public boolean isDefined4Insert() {
+		return 
+			StringUtils.isNotBlank(getName()) &&
+			StringUtils.isNotBlank(getForward());
+	}
 	
 	public Template save() {
 		return getCmsService().getTemplateService().save(this);

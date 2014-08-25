@@ -16,6 +16,7 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Link.LinkType;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.bean.Template;
 
 public class RowMapperUtil {
@@ -151,13 +152,21 @@ public class RowMapperUtil {
 	
 	public static final class TemplateMapper implements RowMapper<Template> {
 		public Template mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Template t = CmsBeanFactory.makeTemplate().
+			return CmsBeanFactory.makeTemplate().
 					setId(rs.getLong("id")).
 					setName(rs.getString("name")).
 					setForward(rs.getString("forward")).
 					setSiteId(rs.getLong("siteid")).
 					setItemTypeId(rs.getLong("typeid"));
-			return t;
+		}
+	}
+	
+	public static final class SiteConfigMapper implements RowMapper<SiteConfig> {
+		public SiteConfig mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeSiteConfig().
+					setSiteId(rs.getLong("siteid")).
+					setName(rs.getString("name")).
+					setValue(rs.getString("value"));
 		}
 	}
 	

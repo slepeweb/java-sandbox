@@ -15,10 +15,13 @@ public class Link extends CmsBean implements Serializable {
 		binding, relation, inline, shortcut;
 	}
 	
-	public void assimilate(Link l) {
-		setName(l.getName());
-		setType(l.getType());
-		setOrdering(l.getOrdering());
+	public void assimilate(Object obj) {
+		if (obj instanceof Link) {
+			Link l = (Link) obj;
+			setName(l.getName());
+			setType(l.getType());
+			setOrdering(l.getOrdering());
+		}
 	}
 	
 	public boolean isDefined4Insert() {

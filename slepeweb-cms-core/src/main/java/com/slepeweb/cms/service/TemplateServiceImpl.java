@@ -14,11 +14,17 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 	private static Logger LOG = Logger.getLogger(TemplateServiceImpl.class);
 	
 	public Template save(Template t) {
-		if (getTemplate(t.getId()) != null) {
-			updateTemplate(t);
+		if (t.isDefined4Insert()) {
+			Template dbRecord = getTemplate(t.getSiteId(), t.getName());		
+			if (dbRecord != null) {
+				updateTemplate(dbRecord, t);
+			}
+			else {
+				insertTemplate(t);
+			}
 		}
 		else {
-			insertTemplate(t);
+			LOG.error(compose("Template not saved - insufficient data", t));
 		}
 		
 		return t;
@@ -33,12 +39,19 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 		LOG.info(compose("Added new template", t));
 	}
 
-	private void updateTemplate(Template t) {
-		this.jdbcTemplate.update(
-				"update template set name = ?, forward = ? where id = ?", 
-				t.getName(), t.getForward(), t.getId());
-		
-		LOG.info(compose("Updated template", t));
+	private void updateTemplate(Template dbRecord, Template t) {
+		if (! dbRecord.equals(t)) {
+			dbRecord.assimilate(t);
+			this.jdbcTemplate.update(
+					"update template set name = ?, forward = ? where id = ?", 
+					t.getName(), t.getForward(), t.getId());
+			
+			LOG.info(compose("Updated template", t));
+		}
+		else {
+			t.setId(dbRecord.getId());
+			LOG.info(compose("Template not modified", t));
+		}
 	}
 	
 	public void deleteTemplate(Long id) {

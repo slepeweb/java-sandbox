@@ -25,6 +25,9 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 				insertFieldValue(fv);
 			}
 		}
+		else {
+			LOG.error(compose("FieldValue not saved - insufficient data", fv));
+		}
 		
 		return fv;
 	}

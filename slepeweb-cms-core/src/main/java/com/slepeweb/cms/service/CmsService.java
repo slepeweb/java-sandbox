@@ -10,5 +10,6 @@ public interface CmsService {
 	FieldForTypeService getFieldForTypeService();
 	FieldValueService getFieldValueService();	
 	MediaService getMediaService();	
-	TemplateService getTemplateService();	
+	TemplateService getTemplateService();
+	SiteConfigService getSiteConfigService();
 }

@@ -10,9 +10,12 @@ public class Site extends CmsBean implements Serializable {
 	private String name, hostname;
 	private Long id;
 		
-	public void assimilate(Site s) {
-		setName(s.getName());
-		setHostname(s.getHostname());
+	public void assimilate(Object obj) {
+		if (obj instanceof Site) {
+			Site s = (Site) obj;
+			setName(s.getName());
+			setHostname(s.getHostname());
+		}
 	}
 	
 	public boolean isDefined4Insert() {

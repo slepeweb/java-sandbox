@@ -25,21 +25,24 @@ public class Item extends CmsBean implements Serializable {
 	private List<Link> links;
 	private String mediaUploadFilePath;
 	
-	public void assimilate(Item i) {
-		setName(i.getName());
-		setSimpleName(i.getSimpleName());
-		setPath(i.getPath());
-		setDateCreated(i.getDateCreated());
-		setDateUpdated(i.getDateUpdated());
-		setDeleted(i.isDeleted());
-		setSite(i.getSite());
-		setType(i.getType());
-		setTemplate(i.getTemplate());
-		setMediaUploadFilePath(i.getMediaUploadFilePath());
-		setPublished(i.isPublished());
-		
-		// Must assimilate fields and links too? 
-		// NO - fields and links are loaded when needed.
+	public void assimilate(Object obj) {
+		if (obj instanceof Item) {
+			Item i = (Item) obj;
+			setName(i.getName());
+			setSimpleName(i.getSimpleName());
+			setPath(i.getPath());
+			setDateCreated(i.getDateCreated());
+			setDateUpdated(i.getDateUpdated());
+			setDeleted(i.isDeleted());
+			setSite(i.getSite());
+			setType(i.getType());
+			setTemplate(i.getTemplate());
+			setMediaUploadFilePath(i.getMediaUploadFilePath());
+			setPublished(i.isPublished());
+			
+			// Must assimilate fields and links too? 
+			// NO - fields and links are loaded when needed.
+		}
 	}
 	
 	public boolean isDefined4Insert() {

@@ -27,6 +27,9 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			saveFieldsForType(it);
 			// TODO: need to remove old fields - similar to old links.
 		}
+		else {
+			LOG.error(compose("ItemType not saved - insufficient data", it));
+		}
 		
 		return it;
 	}

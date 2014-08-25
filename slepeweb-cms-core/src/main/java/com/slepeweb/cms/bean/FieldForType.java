@@ -9,11 +9,14 @@ public class FieldForType extends CmsBean implements Serializable {
 	private Long ordering;
 	private boolean mandatory;
 	
-	public void assimilate(FieldForType fft) {
-		setTypeId(fft.getTypeId());
-		setField(fft.getField());
-		setOrdering(fft.getOrdering());
-		setMandatory(fft.isMandatory());
+	public void assimilate(Object obj) {
+		if (obj instanceof FieldForType) {
+			FieldForType fft = (FieldForType) obj;
+			setTypeId(fft.getTypeId());
+			setField(fft.getField());
+			setOrdering(fft.getOrdering());
+			setMandatory(fft.isMandatory());
+		}
 	}
 	
 	public boolean isDefined4Insert() {
