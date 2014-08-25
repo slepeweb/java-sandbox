@@ -18,8 +18,8 @@ import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteService;
 
 @Controller
-@RequestMapping("/rest/cms")
-public class NavigationRestController extends BaseController {
+@RequestMapping("/rest")
+public class NavigationController extends BaseController {
 	
 	@Autowired private SiteService siteService;
 	@Autowired private ItemService itemService;

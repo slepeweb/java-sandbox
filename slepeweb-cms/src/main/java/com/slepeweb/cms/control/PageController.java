@@ -12,8 +12,8 @@ import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteService;
 
 @Controller
-@RequestMapping("/cms")
-public class EditorPageController extends BaseController {
+@RequestMapping("/page")
+public class PageController extends BaseController {
 	
 	@Autowired private SiteService siteService;
 	@Autowired private ItemService itemService;

@@ -33,15 +33,15 @@ import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.service.TemplateService;
 
 @Controller
-@RequestMapping("/rest/cms")
-public class EditorialRestController extends BaseController {
+@RequestMapping("/rest")
+public class RestController extends BaseController {
 	
 	@Autowired private SiteService siteService;
 	@Autowired private ItemService itemService;
 	@Autowired private ItemTypeService itemTypeService;
 	@Autowired private TemplateService templateService;
 	
-	@RequestMapping("/item-editor")
+	@RequestMapping("/item/editor")
 	public String doItemEditor(ModelMap model, @RequestParam(value="key", required=true) Long id) {	
 		model.put("requestItem", this.itemService.getItem(id));
 		return "cms.item.editor";		
