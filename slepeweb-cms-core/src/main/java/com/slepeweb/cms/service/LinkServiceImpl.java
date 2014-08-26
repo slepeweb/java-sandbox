@@ -14,7 +14,7 @@ import com.slepeweb.cms.utils.RowMapperUtil;
 public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	
 	private static Logger LOG = Logger.getLogger(LinkServiceImpl.class);
-	private static final String SELECTOR_TEMPLATE = 
+	private static final String SELECT_TEMPLATE = 
 			"select i.*, s.name as sitename, s.hostname, it.id as typeid, it.name as typename, it.mimetype, " +
 			"l.parentid, l.linktype, l.name as linkname, l.ordering, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
@@ -90,9 +90,9 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 			}
 		}		
 	}
-
+// return SELECT_TEMPLATE +  (this.config.isLiveDelivery() ? " and i.published = 1" : "");
 	public List<Link> getLinks(Long parentId) {
-		String sql = String.format(SELECTOR_TEMPLATE, "l.parentid = ?");
+		String sql = String.format(getSelectSql(SELECT_TEMPLATE), "l.parentid = ?");
 		return this.jdbcTemplate.query(sql, new Object[] {parentId}, new RowMapperUtil.LinkMapper());		 
 	}
 
@@ -109,12 +109,12 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	}
 
 	private List<Link> getLinks(Long parentId, String linkType) {
-		String sql = String.format(SELECTOR_TEMPLATE, "l.parentid = ? and l.linktype = ?");
+		String sql = String.format(getSelectSql(SELECT_TEMPLATE), "l.parentid = ? and l.linktype = ?");
 		return this.jdbcTemplate.query(sql, new Object[] {parentId, linkType}, new RowMapperUtil.LinkMapper());		 
 	}
 
 	public Link getLink(Long parentId, Long childId) {
-		String sql = String.format(SELECTOR_TEMPLATE, "l.parentid = ? and l.childid = ?");
+		String sql = String.format(getSelectSql(SELECT_TEMPLATE), "l.parentid = ? and l.childid = ?");
 		return (Link) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {parentId, childId}, 
 				new RowMapperUtil.LinkMapper()));
 	}
@@ -133,7 +133,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	}
 	
 	public Link getParent(Long childId) {
-		String sql = String.format(SELECTOR_TEMPLATE, "l.childid = ? and l.linktype = 'binding'");
+		String sql = String.format(SELECT_TEMPLATE, "l.childid = ? and l.linktype = 'binding'");
 		return (Link) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {childId}, 
 				new RowMapperUtil.LinkMapper()));
 	}

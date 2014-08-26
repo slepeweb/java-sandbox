@@ -15,6 +15,10 @@ public class BaseServiceImpl {
 	@Autowired protected JdbcTemplate jdbcTemplate;
 	@Autowired protected Config config;
 	
+	protected String getSelectSql(String sql) {
+		return sql +  (this.config.isLiveDelivery() ? " and i.published = 1" : "");
+	}
+	
 	protected Long getLastInsertId() {
 		return this.jdbcTemplate.queryForLong("select last_insert_id()");
 	}

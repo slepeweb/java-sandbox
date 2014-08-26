@@ -132,10 +132,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		
 	}
 	
-	private String getSelector() {
-		return SELECT_TEMPLATE +  (this.config.isLiveDelivery() ? " and i.published = 1" : "");
-	}
-	
 	public void saveFieldValues(List<FieldValue> fieldValues) {
 		if (fieldValues != null) {
 			for (FieldValue fv : fieldValues) {
@@ -239,19 +235,19 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 
 	public Item getItem(Long siteId, String path) {
 		return getItem(
-			String.format(getSelector(), "i.siteid=? and i.path=? and i.deleted=0"),
+			String.format(getSelectSql(SELECT_TEMPLATE), "i.siteid=? and i.path=? and i.deleted=0"),
 			new Object[]{siteId, path});
 	}
 
 	public Item getItem(Long id) {
 		return getItem(
-			String.format(getSelector(), "i.id=? and i.deleted=0"), 
+			String.format(getSelectSql(SELECT_TEMPLATE), "i.id=? and i.deleted=0"), 
 			new Object[]{id});
 	}
 	
 	public Item getItemFromBin(Long id) {
 		return getItem(
-			String.format(getSelector(), "i.id=? and i.deleted=1"), 
+			String.format(getSelectSql(SELECT_TEMPLATE), "i.id=? and i.deleted=1"), 
 			new Object[]{id});
 	}
 	
