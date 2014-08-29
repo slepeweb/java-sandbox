@@ -156,7 +156,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				fv = CmsBeanFactory.makeFieldValue().
 					setField(fft.getField()).
 					setItemId(i.getId()).
-					setValue(fft.getField().getDefaultValue()).
+					setValue(fft.getField().getDefaultValueObject()).
 					setDateUpdated(new Timestamp(System.currentTimeMillis()));
 				
 				fv.save();

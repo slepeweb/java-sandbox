@@ -110,7 +110,8 @@ public class RowMapperUtil {
 				setHelp(rs.getString("helptext")).
 				setType(FieldType.valueOf(rs.getString("fieldtype"))).
 				setSize(rs.getInt("size")).
-				setDefaultValue(rs.getString("dflt"));
+				setDefaultValue(rs.getString("dflt")).
+				setValidValues(rs.getString("valid"));
 	}
 	
 	@SuppressWarnings("unused")

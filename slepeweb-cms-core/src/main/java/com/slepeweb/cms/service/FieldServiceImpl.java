@@ -30,8 +30,8 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 	
 	private void insertField(Field f) {
 		this.jdbcTemplate.update(
-				"insert into field (name, variable, fieldtype, helptext, size, dflt) values (?, ?, ?, ?, ?, ?)", 
-				f.getName(), f.getVariable(), f.getType().name(), f.getHelp(), f.getSize(), f.getDefaultValue());				
+				"insert into field (name, variable, fieldtype, helptext, size, dflt, valid) values (?, ?, ?, ?, ?, ?, ?)", 
+				f.getName(), f.getVariable(), f.getType().name(), f.getHelp(), f.getSize(), f.getDefaultValue(), f.getValidValues());				
 		
 		f.setId(getLastInsertId());
 		LOG.info(compose("Inserted new field", f));
@@ -42,9 +42,9 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 			dbRecord.assimilate(field);
 			
 			this.jdbcTemplate.update(
-					"update field set name = ?, variable = ? fieldtype = ?, helptext = ?, size = ?, dflt = ? where id = ?", 
+					"update field set name = ?, variable = ? fieldtype = ?, helptext = ?, size = ?, dflt = ?, valid = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getVariable(), dbRecord.getType().name(), 
-					dbRecord.getHelp(), dbRecord.getSize(), dbRecord.getDefaultValue());
+					dbRecord.getHelp(), dbRecord.getSize(), dbRecord.getDefaultValue(), dbRecord.getValidValues(), dbRecord.getId());
 			
 			LOG.info(compose("Updated field", field));
 		}

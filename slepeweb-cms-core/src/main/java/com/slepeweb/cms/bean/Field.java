@@ -17,16 +17,20 @@ public class Field extends CmsBean implements Serializable {
 	private static Logger LOG = Logger.getLogger(Field.class);
 	private static final String INPUT_TAG = "input";
 	private static final String TEXT_AREA_TAG = "textarea";
+	private static final String SELECT_TAG = "select";
+	private static final String RADIO = "radio";
+	private static final String CHECKBOX = "checkbox";
+	private static final String TEXT = "text";
 	
 	private Long id;
 	private String name, variable, help;
 	private FieldType type;
 	private int size;
 	private String defaultValue;
-	// TODO: private String validValues; // pipe-delimited list
+	private String validValues; 
 	
 	public enum FieldType {
-		text, markup, integer, date, url;
+		text, markup, integer, date, url, radio, checkbox, select;
 	}
 
 	public void assimilate(Object obj) {
@@ -37,6 +41,8 @@ public class Field extends CmsBean implements Serializable {
 			setHelp(f.getHelp());
 			setType(f.getType());
 			setSize(f.getSize());
+			setDefaultValue(f.getDefaultValue());
+			setValidValues(f.getValidValues());
 		}
 	}
 
@@ -62,7 +68,7 @@ public class Field extends CmsBean implements Serializable {
 	
 	public String getInputTag(String value) {
 		StringBuilder sb = new StringBuilder("<");
-		String tag = null;
+		String tag = null, inputType = null;
 		String rows = null, cols = null;
 		
 		if (getType() == FieldType.integer || getType() == FieldType.date || getType() == FieldType.url) {
@@ -72,6 +78,7 @@ public class Field extends CmsBean implements Serializable {
 		else if (getType() == FieldType.text || getType() == FieldType.markup) {
 			if (getSize() > 0 && getSize() <= 120) {
 				tag = INPUT_TAG;
+				inputType = TEXT;
 			}
 			else {
 				tag = TEXT_AREA_TAG;
@@ -79,11 +86,36 @@ public class Field extends CmsBean implements Serializable {
 				rows = getSize() > 0 && getSize() <= 256 ? "4" : "10";
 			}
 		}
+		else if (getType() == FieldType.radio || getType() == FieldType.checkbox) {
+			tag = INPUT_TAG;
+			inputType = getType().name();
+		}
+		else if (getType() == FieldType.select) {
+			tag = SELECT_TAG;
+		}
+		
+		ValidValueList vvl = getValidValueListObject();
 		
 		if (tag.equals(INPUT_TAG)) {
-			sb.append(tag).append(String.format(" name=\"%s\" value=\"%s\" />", getVariable(), value));
+			if (inputType.equals(RADIO) || inputType.equals(CHECKBOX)) {
+				for (String vv : vvl.getValues()) {
+					sb.append(tag).append(String.format(" type=\"%s\" name=\"%s\" /><span class=\"option\">%s</span>", 
+							inputType, getVariable(), vv));
+				}
+			}
+			else {
+				sb.append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\" />", inputType, getVariable(), value));
+			}
 		}
-		else {
+		else if (tag.equals(SELECT_TAG)) {
+			sb.append(tag).append(String.format(" name=\"%s\" value=\"%s\">", getVariable(), value));
+			for (String vv : vvl.getValues()) {
+				sb.append(String.format("<option value=\"%s\"%s>%s</option>", 
+						vv, vvl.getDefaultValue().equals(vv) ? " selected" : "", vv));
+			}
+			sb.append("</").append(SELECT_TAG).append(">");
+		}
+		else if (tag.equals(TEXT_AREA_TAG)) {
 			sb.append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\">%s</%s>", 
 					getVariable(), cols, rows, value, tag));
 		}
@@ -145,7 +177,11 @@ public class Field extends CmsBean implements Serializable {
 		return this;
 	}
 
-	public Object getDefaultValue() {
+	public String getDefaultValue() {
+		return this.defaultValue;
+	}
+	
+	public Object getDefaultValueObject() {
 		if (getType() == FieldType.integer) {
 			return StringUtils.isNotBlank(this.defaultValue) ? Integer.valueOf(this.defaultValue) : 0;
 		}
@@ -170,26 +206,32 @@ public class Field extends CmsBean implements Serializable {
 		}
 	}
 
-	public Field setDefaultValue(Object value) {
-		if (value instanceof Integer && getType() == FieldType.integer) {
-			this.defaultValue = String.valueOf(value);
-		}
-		else if (value instanceof Timestamp && getType() == FieldType.date) {
-			// TODO: format the date to 0 millis
-			this.defaultValue = ((Timestamp) value).toString();
-		}
-		else {
-			// TODO: May needs codes to indicate eg. 2 weeks hence (for dates), eg now, +2w, etc
-			this.defaultValue = value != null ? value.toString() : "";
-		}
+//	public Field setDefaultValueObject(Object value) {
+//		if (value instanceof Integer && getType() == FieldType.integer) {
+//			this.defaultValue = String.valueOf(value);
+//		}
+//		else if (value instanceof Timestamp && getType() == FieldType.date) {
+//			// TODO: format the date to 0 millis
+//			this.defaultValue = ((Timestamp) value).toString();
+//		}
+//		else {
+//			// TODO: May needs codes to indicate eg. 2 weeks hence (for dates), eg now, +2w, etc
+//			this.defaultValue = value != null ? value.toString() : "";
+//		}
+//		return this;
+//	}
+
+	public Field setDefaultValue(String value) {
+		this.defaultValue = value;
 		return this;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
+		result = prime * result + ((validValues == null) ? 0 : validValues.hashCode());
 		result = prime * result + ((help == null) ? 0 : help.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + size;
@@ -211,6 +253,11 @@ public class Field extends CmsBean implements Serializable {
 			if (other.defaultValue != null)
 				return false;
 		} else if (!defaultValue.equals(other.defaultValue))
+			return false;
+		if (validValues == null) {
+			if (other.validValues != null)
+				return false;
+		} else if (!validValues.equals(other.validValues))
 			return false;
 		if (help == null) {
 			if (other.help != null)
@@ -234,4 +281,27 @@ public class Field extends CmsBean implements Serializable {
 		return true;
 	}
 
+	public String getValidValues() {
+		return validValues;
+	}
+
+	public Field setValidValues(String validValues) {
+		this.validValues = validValues;
+		return this;
+	}
+
+	public ValidValueList getValidValueListObject() {
+		if (getValidValues() != null) { 
+			ValidValueList vvl = new ValidValueList();
+			for (String s : getValidValues().split(", ")) {
+				if (s.startsWith("*")) {
+					s = s.substring(1);
+					vvl.setDefaultValue(s);
+				}
+				vvl.addValue(s);
+			}
+			return vvl;
+		}
+		return null;
+	}
 }
