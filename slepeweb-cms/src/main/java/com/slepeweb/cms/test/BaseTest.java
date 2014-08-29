@@ -50,7 +50,7 @@ public abstract class BaseTest {
 		return it;
 	}
 
-	protected Field addField(String name, String variable, String help, FieldType type, int size, Object dflt) {
+	protected Field addField(String name, String variable, String help, FieldType type, int size, String dflt) {
 		Field f = CmsBeanFactory.makeField().setName(name).setVariable(variable).setHelp(help).setType(type).
 				setSize(size).setDefaultValue(dflt);
 		f.save();

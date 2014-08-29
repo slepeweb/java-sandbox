@@ -86,6 +86,7 @@ create table field
    size int not null,
    helptext varchar(512),
    dflt varchar(64),
+   valid varchar(512),
    primary key (id),
    unique key idx_field_variable (variable)
 ) ENGINE=InnoDB;
