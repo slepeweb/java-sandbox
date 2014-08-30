@@ -13,31 +13,31 @@
 <div id="core-tab">
 	<form>
 		<div>
-			<label for="id">Id: </label><input disabled="disabled" value="${requestItem.id}" />
+			<label for="id">Id: </label><input disabled="disabled" value="${editingItem.id}" />
 		</div>
 		<div>
-			<label for="path">Path: </label><input disabled="disabled" value="${requestItem.path}" />
+			<label for="path">Path: </label><input disabled="disabled" value="${editingItem.path}" />
 		</div>
 		<div>
-			<label for="type">Type: </label><input disabled="disabled" value="${requestItem.type.name}" />
+			<label for="type">Type: </label><input disabled="disabled" value="${editingItem.type.name}" />
 		</div>
 		<div>
-		<c:choose><c:when test="${not empty requestItem.template}"><c:set var="templateName" 
-			value="${requestItem.template.name}" /></c:when><c:otherwise><c:set 
+		<c:choose><c:when test="${not empty editingItem.template}"><c:set var="templateName" 
+			value="${editingItem.template.name}" /></c:when><c:otherwise><c:set 
 				var="templateName" value="No template" /></c:otherwise></c:choose>
 			<label for="type">Template: </label><input disabled="disabled" value="${templateName}" />
 		</div>
 		<div>
-			<label for="dateupdated">Date last updated: </label><input disabled="disabled" value="${requestItem.dateUpdated}" />
+			<label for="dateupdated">Date last updated: </label><input disabled="disabled" value="${editingItem.dateUpdated}" />
 		</div>
 		<div>
-			<label for="name">Name: </label><input type="text" name="name" value="${requestItem.name}" />
+			<label for="name">Name: </label><input type="text" name="name" value="${editingItem.name}" />
 		</div>
 		<div>
-			<label for="simplename">Simple name: </label><input type="text" name="simplename" value="${requestItem.simpleName}" />
+			<label for="simplename">Simple name: </label><input type="text" name="simplename" value="${editingItem.simpleName}" />
 		</div>
 		<div>
-			<label for="published">Published? </label><input type="checkbox" name="published" <c:if test="${requestItem.published}">checked="checked"</c:if> />
+			<label for="published">Published? </label><input type="checkbox" name="published" <c:if test="${editingItem.published}">checked="checked"</c:if> />
 		</div>
 		<div>
 			<label>&nbsp;</label><button id="core-button" type="button">Update</button>
@@ -48,7 +48,7 @@
 
 <div id="field-tab">
 	<form id="field-form">
-	<c:forEach items="${requestItem.fieldValues}" var="fv">
+	<c:forEach items="${editingItem.fieldValues}" var="fv">
 		<div>
 			<label for="${fv.field.variable}">${fv.field.name}: </label>
 			${fv.inputTag}
@@ -63,7 +63,7 @@
 <div id="links-tab">
 	<div>
 		<ul id="sortable-links">
-			<c:forEach items="${requestItem.inlinesAndRelations}" var="link">
+			<c:forEach items="${editingItem.inlinesAndRelations}" var="link">
 				<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
 					href="${applicationContextPath}/page/editor/${link.child.id}">${link}</a>
 						<button class="remove-link float-right">Remove</button><span 
@@ -112,7 +112,7 @@
 			<label for="type">Template: </label>
 			<select name="template">
 				<option value="0">Choose ...</option>
-				<c:forEach items="${site.availableTemplates}" var="template">
+				<c:forEach items="${editingItem.site.availableTemplates}" var="template">
 					<option value="${template.id}">${template.name}</option>
 				</c:forEach>
 			</select>
@@ -121,7 +121,7 @@
 			<label for="type">Type: </label>
 			<select name="itemtype">
 				<option value="0">Choose ...</option>
-				<c:forEach items="${site.availableItemTypes}" var="it">
+				<c:forEach items="${editingItem.site.availableItemTypes}" var="it">
 					<option value="${it.id}">${it.name}</option>
 				</c:forEach>
 			</select>			
@@ -153,7 +153,7 @@
 </div>
 
 <div id="dialog-add-success" class="hide" title="New item created">
-  <p>choose
+  <p>
     <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
     You have successfully added a new item.
   </p>

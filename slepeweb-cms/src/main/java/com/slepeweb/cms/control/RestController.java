@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,26 +23,23 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Link.LinkType;
-import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemTypeService;
-import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.service.TemplateService;
 
 @Controller
 @RequestMapping("/rest")
 public class RestController extends BaseController {
 	
-	@Autowired private SiteService siteService;
 	@Autowired private ItemService itemService;
 	@Autowired private ItemTypeService itemTypeService;
 	@Autowired private TemplateService templateService;
 	
 	@RequestMapping("/item/editor")
 	public String doItemEditor(ModelMap model, @RequestParam(value="key", required=true) Long id) {	
-		model.put("requestItem", this.itemService.getItem(id));
+		model.put("editingItem", this.itemService.getItem(id));
 		return "cms.item.editor";		
 	}
 	
@@ -126,7 +122,7 @@ public class RestController extends BaseController {
 		Item parent = this.itemService.getItem(itemId);
 		 
 		Item i = CmsBeanFactory.makeItem().
-				setSite((Site) model.get("site")).
+				setSite(parent.getSite()).
 				setPath(String.format("%s/%s", parent.getPath(), simplename)).
 				setTemplate(t).
 				setType(it).
@@ -203,10 +199,5 @@ public class RestController extends BaseController {
 			return i.getName();
 		}
 		return "n/a";
-	}
-	
-	@ModelAttribute("site")
-	public Site getSite() {
-		return this.siteService.getSite("Integration Testing");
 	}
 }

@@ -56,6 +56,10 @@ input[type="checkbox"] {
 	margin-top: 20px;
 }
 
+#site-selector {
+	margin-left: 50px;
+}
+
 #trash-button {
 	background-color: red;
 	float: right;

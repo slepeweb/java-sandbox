@@ -21,9 +21,11 @@
 <script type="text/javascript">
 	// Application context 
 	var _ctx = "${applicationContextPath}";
+	var _siteId = <c:choose><c:when test="${not empty site}">${site.id}</c:when><c:otherwise>0</c:otherwise></c:choose>;
 	var _editingItemId = null;
 	<c:if test="${not empty editingItem}">
 		_editingItemId = ${editingItem.id};
+		_siteId = ${editingItem.site.id};
 	</c:if>
 </script>
 <script src="${applicationContextPath}/resources/js/editor.js" type="text/javascript"></script>

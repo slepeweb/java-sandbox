@@ -8,16 +8,21 @@ $(function() {
 		return result;
 	};
 	
-	var showDialog = function(id) {
+	var showDialog = function(id, relocate) {
 		$("#" + id).dialog({
 			modal: true,
 			buttons: {
 				Ok: function() {
 					$(this).dialog("close");
+					if (relocate) {
+						window.location = relocate;
+					}
 				}
 			}
 		});
 	};
+	
+	var pageEditorUrlPrefix = _ctx + "/page/editor/";
   
 	// (Re-)render the forms
 	var renderItemForms = function(nodeKey, activeTab) {
@@ -50,10 +55,10 @@ $(function() {
 						}, 
 						dataType: "json",
 						success: function(json, status, z) {
-							showDialog("#dialog-update-success");
+							showDialog("dialog-update-success");
 						},
 						error: function(json, status, z) {
-							showDialog("#dialog-update-error");
+							showDialog("dialog-update-error");
 						},
 					});
 				});
@@ -66,10 +71,10 @@ $(function() {
 						data: getFieldsFormInputData(), 
 						dataType: "json",
 						success: function(json, status, z) {
-							showDialog("#dialog-update-success");
+							showDialog("dialog-update-success");
 						},
 						error: function(json, status, z) {
-							showDialog("#dialog-update-error");
+							showDialog("dialog-update-error");
 						},
 					});
 				});
@@ -87,12 +92,10 @@ $(function() {
 						}, 
 						dataType: "json",
 						success: function(json, status, z) {
-							showDialog("#dialog-add-success");
-							window.location = _ctx + "/page/editor/" + json;
+							showDialog("dialog-add-success", pageEditorUrlPrefix + json);
 						},
 						error: function(json, status, z) {
-							showDialog("#dialog-add-error");
-							window.location = _ctx + "/page/editor/" + json;
+							showDialog("dialog-add-error", pageEditorUrlPrefix + json);
 						},
 					});
 				});
@@ -113,11 +116,11 @@ $(function() {
 									dataType: "json",
 									success: function(json, status, z) {
 										theDialog.dialog("close");
-										window.location = _ctx + "/page/editor/" + json;
+										window.location = pageEditorUrlPrefix + json;
 									},
 									error: function(json, status, z) {
 										theDialog.dialog("close");
-										window.location = _ctx + "/page/editor/" + json;
+										window.location = pageEditorUrlPrefix + json;
 									}
 								});
 							},
@@ -170,7 +173,7 @@ $(function() {
 								cache: false,
 								dataType: "text",
 								success: function(itemName, status, z) {
-									copy.find("a").attr("href", _ctx + "/page/editor/" + childId).html(linkType + " (" + linkName + "): " + itemName);
+									copy.find("a").attr("href", pageEditorUrlPrefix + childId).html(linkType + " (" + linkName + "): " + itemName);
 									copy.find("span.hide").html(parentId + "," + childId + "," + linkType + "," + linkName);
 									copy.appendTo(selector);
 								}
@@ -234,9 +237,12 @@ $(function() {
 	};
   
 	// Left navigation
-	var queryParams = {};
+	var queryParams = {site: _siteId};
 	if (_editingItemId) {
-		queryParams = {key: _editingItemId};
+		queryParams = {
+			key: _editingItemId,
+			site: _siteId
+		};
 	}
 		
 	$("#leftnav").fancytree({
@@ -283,11 +289,11 @@ $(function() {
 								dataType: "json",
 								success: function(json, status, z) {
 									theDialog.dialog("close");
-									window.location = _ctx + "/page/editor/" + json;
+									window.location = pageEditorUrlPrefix + json;
 								},
 								error: function(json, status, z) {
 									theDialog.dialog("close");
-									window.location = _ctx + "/page/editor/" + json;
+									window.location = pageEditorUrlPrefix + json;
 								}
 							});
 						},
@@ -306,7 +312,11 @@ $(function() {
 			else if (tabName == 'add-tab') {tabNum = 3;}
 			renderItemForms(data.node.key, tabNum);
 		}
-	});		
+	});	
+	
+	$("#site-selector").change(function(e){
+		window.location = _ctx + "/page/site/select/" + $(this).val();
+	});
 
 	if (_editingItemId) {
 		renderItemForms(_editingItemId);

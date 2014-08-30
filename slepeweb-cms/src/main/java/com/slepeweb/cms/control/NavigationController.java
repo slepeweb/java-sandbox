@@ -45,27 +45,39 @@ public class NavigationController extends BaseController {
 	
 	@RequestMapping(value="/leftnav/lazy/one", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
-	public List<Navigation.Node> doLazyNavOneLevel(@RequestParam(value="key", required=false) String key) {	
+	public List<Navigation.Node> doLazyNavOneLevel(
+			@RequestParam(value="key", required=false) Long itemId,
+			@RequestParam(value="site", required=false) Long siteId) {	
+		
 		List<Navigation.Node> level0 = new ArrayList<Navigation.Node>();
 		
-		if (key == null) {
-			Site site = this.siteService.getSite("Integration Testing");
-			level0.add(dive(site.getItem("/")));
-			level0.add(dive(site.getItem("/content")));
-			return level0;
+		if (itemId == null) {
+			Site site = this.siteService.getSite(siteId);
+			if (site != null) {				
+				level0.add(dive(site.getItem("/")));
+				level0.add(dive(site.getItem("/content")));
+				return level0;
+			}
+			else {
+				// User must choose site from header dropdown
+				return new ArrayList<Navigation.Node>();
+			}
 		}
 		
-		return dive(this.itemService.getItem(Long.parseLong(key)), 1).getChildren();		
+		return dive(this.itemService.getItem(itemId), 1).getChildren();		
 	}
 	
 	@RequestMapping(value="/leftnav/lazy/thread", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
-	public List<Navigation.Node> doLazyNavThread(@RequestParam(value="key", required=false) String key) {	
-		if (key == null) {
-			return doLazyNavOneLevel(key);
+	public List<Navigation.Node> doLazyNavThread(
+			@RequestParam(value="key", required=false) Long itemId,
+			@RequestParam(value="site", required=false) Long siteId) {	
+		
+		if (itemId == null) {
+			return doLazyNavOneLevel(itemId, siteId);
 		}
 		
-		Item item = this.itemService.getItem(Long.parseLong(key));
+		Item item = this.itemService.getItem(itemId);
 		String[] parts = item.getPath().substring(1).split("/");
 		final Vector<String> pathComponents = new Vector<String>(parts.length);
 		for (String s : parts) {
@@ -73,7 +85,7 @@ public class NavigationController extends BaseController {
 		}
 		
 		List<Navigation.Node> level0 = new ArrayList<Navigation.Node>();
-		Site site = this.siteService.getSite("Integration Testing");
+		Site site = item.getSite();
 		level0.add(dive(site.getItem("/"), pathComponents));
 		level0.add(dive(site.getItem("/content"), pathComponents));
 		return level0;		
