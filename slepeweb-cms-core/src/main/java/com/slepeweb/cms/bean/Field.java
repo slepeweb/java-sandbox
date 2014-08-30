@@ -68,7 +68,7 @@ public class Field extends CmsBean implements Serializable {
 	
 	public String getInputTag(String value) {
 		StringBuilder sb = new StringBuilder("<");
-		String tag = null, inputType = null;
+		String tag = null, inputType = "";
 		String rows = null, cols = null;
 		
 		if (getType() == FieldType.integer || getType() == FieldType.date || getType() == FieldType.url) {
