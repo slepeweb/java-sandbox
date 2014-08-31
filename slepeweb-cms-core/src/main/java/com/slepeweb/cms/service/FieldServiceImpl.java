@@ -42,7 +42,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 			dbRecord.assimilate(field);
 			
 			this.jdbcTemplate.update(
-					"update field set name = ?, variable = ? fieldtype = ?, helptext = ?, size = ?, dflt = ?, valid = ? where id = ?", 
+					"update field set name = ?, variable = ?, fieldtype = ?, helptext = ?, size = ?, dflt = ?, valid = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getVariable(), dbRecord.getType().name(), 
 					dbRecord.getHelp(), dbRecord.getSize(), dbRecord.getDefaultValue(), dbRecord.getValidValues(), dbRecord.getId());
 			

@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -246,6 +248,14 @@ public class Item extends CmsBean implements Serializable {
 	public Item setType(ItemType type) {
 		this.type = type;
 		return this;
+	}
+	
+	public Map<String, FieldValue> getFieldValuesMap() {
+		Map<String, FieldValue> map = new HashMap<String, FieldValue>();
+		for (FieldValue fv : getFieldValues()) {
+			map.put(fv.getField().getVariable(), fv);
+		}
+		return map;
 	}
 	
 	public List<FieldValue> getFieldValues() {

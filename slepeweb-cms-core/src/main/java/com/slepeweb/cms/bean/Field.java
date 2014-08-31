@@ -66,8 +66,12 @@ public class Field extends CmsBean implements Serializable {
 		getFieldService().deleteField(this);
 	}
 	
+	public String getInputTag() {
+		return getInputTag(null);
+	}
+	
 	public String getInputTag(String value) {
-		StringBuilder sb = new StringBuilder("<");
+		StringBuilder sb = new StringBuilder();
 		String tag = null, inputType = "";
 		String rows = null, cols = null;
 		
@@ -95,29 +99,44 @@ public class Field extends CmsBean implements Serializable {
 		}
 		
 		ValidValueList vvl = getValidValueListObject();
+		String notNullValue = value != null ? value : "";
 		
 		if (tag.equals(INPUT_TAG)) {
 			if (inputType.equals(RADIO) || inputType.equals(CHECKBOX)) {
 				for (String vv : vvl.getValues()) {
-					sb.append(tag).append(String.format(" type=\"%s\" name=\"%s\" /><span class=\"option\">%s</span>", 
+					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\" ", 
 							inputType, getVariable(), vv));
+					
+					if (value != null) {
+						for (String partValue : value.split("\\|")) {
+							if (partValue.equals(vv)) {
+								sb.append(" checked"); 
+							}
+						}
+					}
+					else if (getValidValueListObject().getDefaultValue().equals(vv)) {
+						sb.append(" checked"); 
+					}
+					
+					sb.append(String.format("/><span style=\"margin-right: 30px\">%s</span>", vv));
 				}
 			}
 			else {
-				sb.append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\" />", inputType, getVariable(), value));
+				sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\" />", 
+						inputType, getVariable(), notNullValue));
 			}
 		}
 		else if (tag.equals(SELECT_TAG)) {
-			sb.append(tag).append(String.format(" name=\"%s\" value=\"%s\">", getVariable(), value));
+			sb.append("<").append(tag).append(String.format(" name=\"%s\" value=\"%s\">", getVariable(), notNullValue));
 			for (String vv : vvl.getValues()) {
 				sb.append(String.format("<option value=\"%s\"%s>%s</option>", 
-						vv, vvl.getDefaultValue().equals(vv) ? " selected" : "", vv));
+						vv, notNullValue.equals(vv) ? " selected" : "", vv));
 			}
 			sb.append("</").append(SELECT_TAG).append(">");
 		}
 		else if (tag.equals(TEXT_AREA_TAG)) {
-			sb.append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\">%s</%s>", 
-					getVariable(), cols, rows, value, tag));
+			sb.append("<").append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\">%s</%s>", 
+					getVariable(), cols, rows, notNullValue, tag));
 		}
 		
 		return sb.toString();
@@ -201,6 +220,9 @@ public class Field extends CmsBean implements Serializable {
 			cal.add(Calendar.YEAR, 10);
 			return new Timestamp(cal.getTimeInMillis());
 		}
+		else if (getType() == FieldType.radio || getType() == FieldType.checkbox || getType() == FieldType.select) {
+			return getValidValueListObject().getDefaultValue();
+		}
 		else {
 			return StringUtils.isNotBlank(this.defaultValue) ? this.defaultValue : "";
 		}
@@ -235,7 +257,7 @@ public class Field extends CmsBean implements Serializable {
 		result = prime * result + ((help == null) ? 0 : help.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + size;
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.name().hashCode());
 		result = prime * result + ((variable == null) ? 0 : variable.hashCode());
 		return result;
 	}
@@ -293,9 +315,10 @@ public class Field extends CmsBean implements Serializable {
 	public ValidValueList getValidValueListObject() {
 		if (getValidValues() != null) { 
 			ValidValueList vvl = new ValidValueList();
-			for (String s : getValidValues().split(", ")) {
-				if (s.startsWith("*")) {
-					s = s.substring(1);
+			for (String s : getValidValues().split("/ ")) {
+				s = s.trim();
+				if (s.endsWith("*")) {
+					s = s.substring(0, s.length() - 1);
 					vvl.setDefaultValue(s);
 				}
 				vvl.addValue(s);

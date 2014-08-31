@@ -12,6 +12,8 @@ public class FieldValue extends CmsBean implements Serializable {
 	private String stringValue;
 	private Integer integerValue;
 	private Timestamp dateValue;
+	
+	// TODO: not currently in DB schema - do we want this?
 	private Timestamp dateUpdated;
 	
 	public void assimilate(Object obj) {
