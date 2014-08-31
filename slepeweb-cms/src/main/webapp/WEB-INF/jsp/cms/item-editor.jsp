@@ -48,10 +48,25 @@
 
 <div id="field-tab">
 	<form id="field-form">
-	<c:forEach items="${editingItem.fieldValues}" var="fv">
+	<c:set var="fvm" value="${editingItem.fieldValuesMap}" />
+	<c:forEach items="${editingItem.type.fieldsForType}" var="fft">
+		<c:set var="fv" value="${fvm[fft.field.variable]}" />
+		<c:choose>
+			<c:when test="${empty fv}">
+				<c:set var="variable" value="${fft.field.variable}" />
+				<c:set var="label" value="${fft.field.name}" />
+				<c:set var="inputTag" value="${fft.field.inputTag}" />
+			</c:when>
+			<c:otherwise>
+				<c:set var="fv" value="${fvm[fft.field.variable]}" />
+				<c:set var="variable" value="${fv.field.variable}" />
+				<c:set var="label" value="${fv.field.name}" />
+				<c:set var="inputTag" value="${fv.inputTag}" />
+			</c:otherwise>
+		</c:choose>
 		<div>
-			<label for="${fv.field.variable}">${fv.field.name}: </label>
-			${fv.inputTag}
+			<label for="${variable}">${label}: </label>
+			${inputTag}
 		</div>
 	</c:forEach>
 		<div>

@@ -13,13 +13,19 @@ import com.slepeweb.cms.setup.SiteSetup;
 @Controller
 public class SetupController extends BaseController {
 	
-	@Autowired private SiteSetup siteInit;
+	@Autowired private SiteSetup siteSetup;
 	
 	@RequestMapping(value="/setup", produces="text/text")	
 	@ResponseBody
 	public String initSite(@RequestParam(value="file", required=true) String fileName) {	
-		URL url = getClass().getClassLoader().getResource("/xls/" + fileName);
-		this.siteInit.load(url.getPath());
-		return "finished";
+		String resource = "/xls/" + fileName;
+		URL url = getClass().getClassLoader().getResource(resource);
+		if (url != null) {
+			this.siteSetup.load(url.getPath());
+			return "finished";
+		}
+		else {
+			return String.format("Resource not found [%s]", resource);
+		}
 	}	
 }

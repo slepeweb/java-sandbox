@@ -2,8 +2,32 @@ $(function() {
 	// Get form field names and values for forms on item-editor 
 	var getFieldsFormInputData = function() {
 		var result = {};
-		$("#field-form input, #field-form textarea").each(function(i, obj) {
-			result[$(obj).attr("name")] = $(obj).val();
+		$("#field-form input, #field-form textarea, #field-form select").each(function(i, obj) {
+			var ctrl = $(obj);
+			var type = ctrl.attr("type");
+			var param = ctrl.attr("name");
+			var str;
+			if (type == "radio") {
+				if (ctrl.is(':checked')) {
+					result[param] = ctrl.val();
+				}
+			}
+			else if (type == "checkbox") {
+				if (ctrl.is(':checked')) {
+					str = result[param];
+					if (! str) {
+						str = "";
+					}
+					if (str.length > 0) {
+						str += "|";
+					}
+					str += ctrl.val();
+					result[param] = str;
+				}
+			}
+			else {
+				result[param] = ctrl.val();
+			}
 		});
 		return result;
 	};

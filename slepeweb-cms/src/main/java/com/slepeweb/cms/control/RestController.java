@@ -3,6 +3,7 @@ package com.slepeweb.cms.control;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
@@ -72,18 +74,28 @@ public class RestController extends BaseController {
 		Item i = this.itemService.getItem(itemId);
 		String param, stringValue;
 		FieldType ft;
+		FieldValue fv;
+		Map<String, FieldValue> fieldValuesMap = i.getFieldValuesMap();
 		
-		for (FieldValue fv : i.getFieldValues()) {
-			param = fv.getField().getVariable();
-			ft = fv.getField().getType();
+		for (FieldForType fft : i.getType().getFieldsForType()) {
+			param = fft.getField().getVariable();
+			ft = fft.getField().getType();
 			stringValue = request.getParameter(param);
+			fv = fieldValuesMap.get(param);
 			
-			if (stringValue != null) {
+			if (stringValue != null) {			
+				if (fv == null) {
+					fv = CmsBeanFactory.makeFieldValue().
+							setField(fft.getField()).
+							setItemId(i.getId()).
+							setValue(fft.getField().getDefaultValueObject());
+				}
+				
 				if (ft == FieldType.integer) {
 					fv.setValue(Integer.parseInt(stringValue));
 				}
 				else if (ft == FieldType.date) {
-					// TODO: complete
+					// TODO: complete - convert date string to date object
 				}
 				else {
 					fv.setValue(stringValue);

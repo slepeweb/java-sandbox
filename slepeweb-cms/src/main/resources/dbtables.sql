@@ -82,7 +82,7 @@ create table field
    id int not null auto_increment,
    name varchar(64) not null,
    variable varchar(32) not null,
-   fieldtype enum ('text', 'markup', 'integer', 'date', 'url'),
+   fieldtype enum ('text', 'markup', 'integer', 'date', 'url', 'radio', 'checkbox', 'select'),
    size int not null,
    helptext varchar(512),
    dflt varchar(64),

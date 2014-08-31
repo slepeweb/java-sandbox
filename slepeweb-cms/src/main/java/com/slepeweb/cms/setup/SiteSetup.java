@@ -49,13 +49,13 @@ public class SiteSetup {
 		stopwatch.stop();
 		long sec = stopwatch.getTime() / 1000;
 
-		LOG.info("Rows processed       :" + result.getNumRowsProcessed());
-		LOG.info("XLS errors           :" + result.getNumXlsErrors());
-		LOG.info("XLS warnings         :" + result.getNumXlsWarnings());
-		LOG.info("Updateable sites     :" + result.getNumSiteUpdates());
-		LOG.info("Updateable fields    :" + result.getNumFieldUpdates());
-		LOG.info("Updateable item types:" + result.getNumItemTypeUpdates());
-		LOG.info("Updateable templates :" + result.getNumTemplateUpdates());
+		LOG.info("Rows processed    :" + result.getNumRowsProcessed());
+		LOG.info("XLS errors        :" + result.getNumXlsErrors());
+		LOG.info("XLS warnings      :" + result.getNumXlsWarnings());
+		LOG.info("Site updates      :" + result.getNumSiteUpdates());
+		LOG.info("Field updates     :" + result.getNumFieldUpdates());
+		LOG.info("Item type updates :" + result.getNumItemTypeUpdates());
+		LOG.info("Template updates  :" + result.getNumTemplateUpdates());
 		LOG.info("Took " + sec + " secs");
 		LOG.info("Finished");
 	}
@@ -81,13 +81,10 @@ public class SiteSetup {
 			return;
 		}
 
-		Site site = createSite(wb.getSheetAt(0).rowIterator(), stats);
-		
-		if (site != null) {
-			createFields(wb.getSheetAt(1).rowIterator(), stats);
-			createItemTypes(wb.getSheetAt(2).rowIterator(), stats);
-			createTemplates(wb.getSheetAt(3).rowIterator(), stats);
-		}
+		createSite(wb.getSheetAt(0).rowIterator(), stats);
+		createFields(wb.getSheetAt(1).rowIterator(), stats);
+		createItemTypes(wb.getSheetAt(2).rowIterator(), stats);
+		createTemplates(wb.getSheetAt(3).rowIterator(), stats);
 	}
 
 	private Site createSite(Iterator<Row> rowIter, SiteSetupStatistics stats) {
@@ -98,8 +95,6 @@ public class SiteSetup {
 		
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
-
-			// Ignore this row if it begins with a #
 			firstCell = SiteSetupUtils.getString(row.getCell(0));
 
 			if (firstCell.startsWith("###")) {
@@ -123,6 +118,9 @@ public class SiteSetup {
 						return s;
 					}
 				}
+				else {
+					LOG.info(LogUtil.compose("Site is not updateable", s));
+				}
 			}
 		}
 		
@@ -137,8 +135,6 @@ public class SiteSetup {
 
 		while (rowIter.hasNext()) {
 			row = (Row) rowIter.next();
-
-			// Ignore this row if it begins with a #
 			String firstCell = SiteSetupUtils.getString(row.getCell(0));
 
 			if (firstCell.startsWith("###")) {
@@ -154,13 +150,17 @@ public class SiteSetup {
 					f = CmsBeanFactory.makeField().
 							setName(SiteSetupUtils.getString(row.getCell(1))).
 							setVariable(SiteSetupUtils.getString(row.getCell(2))).
-							setType(getFieldType(SiteSetupUtils.getString(row.getCell(3)))).
+							setType(FieldType.valueOf(SiteSetupUtils.getString(row.getCell(3)))).
 							setSize(SiteSetupUtils.getInteger(row.getCell(4))).
 							setHelp(SiteSetupUtils.getString(row.getCell(5))).
-							setDefaultValue("").
+							setValidValues(SiteSetupUtils.getString(row.getCell(6))).
+							setDefaultValue(SiteSetupUtils.getString(row.getCell(7))).
 							save();
 					
 					stats.inc(ResultType.FIELD_UPDATED);
+				}
+				else {
+					LOG.info(LogUtil.compose("Field is not updateable", f));
 				}
 			}
 		}
@@ -174,11 +174,8 @@ public class SiteSetup {
 		Field f;
 		Map<String, Field> fieldCache = new HashMap<String, Field>();
 
-		// Now process the spreadhseet for the remainder
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
-
-			// Ignore this row if it begins with a #
 			String firstCell = SiteSetupUtils.getString(row.getCell(0));
 
 			if (firstCell.startsWith("###")) {
@@ -198,6 +195,8 @@ public class SiteSetup {
 					
 					if (it.getId() != null) {
 						stats.inc(ResultType.ITEMTYPE_UPDATED);
+						
+						// NOTE: This method does not remove fields from an item type - do this manually.
 						long count = 0;
 						for (String variable : SiteSetupUtils.getString(row.getCell(3)).split(", ")) {
 							variable = variable.trim();
@@ -217,6 +216,9 @@ public class SiteSetup {
 						}
 					}
 				}
+				else {
+					LOG.info(LogUtil.compose("Item type is not updateable", it));
+				}
 			}
 		}
 	}
@@ -232,11 +234,8 @@ public class SiteSetup {
 		Map<String, Long> siteCache = new HashMap<String, Long>();
 		Map<String, Long> itemTypeCache = new HashMap<String, Long>();
 
-		// Now process the spreadhseet for the remainder
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
-
-			// Ignore this row if it begins with a #
 			String firstCell = SiteSetupUtils.getString(row.getCell(0));
 
 			if (firstCell.startsWith("###")) {
@@ -255,6 +254,11 @@ public class SiteSetup {
 						siteId = s.getId();
 						siteCache.put(siteName, siteId);
 					}
+					else {
+						LOG.error(LogUtil.compose("Failed to recognise site name; template ignored", siteName, row.getRowNum()));
+						stats.inc(ResultType.XLS_ERROR);
+						continue;
+					}
 				}
 				
 				itemTypeName = SiteSetupUtils.getString(row.getCell(2));
@@ -264,6 +268,11 @@ public class SiteSetup {
 					if (it != null) {
 						itemTypeId = it.getId();
 						itemTypeCache.put(itemTypeName, itemTypeId);
+					}
+					else {
+						LOG.error(LogUtil.compose("Failed to recognise item type name; template ignored", itemTypeName, row.getRowNum()));
+						stats.inc(ResultType.XLS_ERROR);
+						continue;
 					}
 				}
 				
@@ -280,23 +289,11 @@ public class SiteSetup {
 						
 						stats.inc(ResultType.TEMPLATE_UPDATED);
 					}
+					else {
+						LOG.info(LogUtil.compose("Template is not updateable", t));
+					}
 				}
 			}
 		}
 	}
-
-	private FieldType getFieldType(String fieldTypeId) {
-		if (fieldTypeId.equalsIgnoreCase("markup")) {
-			return FieldType.markup;
-		} else if (fieldTypeId.equalsIgnoreCase("integer")) {
-			return FieldType.integer;
-		} else if (fieldTypeId.equalsIgnoreCase("date")) {
-			return FieldType.date;
-		} else if (fieldTypeId.equalsIgnoreCase("url")) {
-			return FieldType.url;
-		}
-
-		return FieldType.text;
-	}
-
 }

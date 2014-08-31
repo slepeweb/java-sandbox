@@ -18,8 +18,13 @@ input[disabled="disabled"] {
 	color: #909090;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
 	width: auto;
+}
+
+form div {
+	margin-top: 6px;
+	clear: both;
 }
 
 /* Compoundable styles */
