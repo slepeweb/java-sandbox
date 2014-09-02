@@ -37,14 +37,14 @@ public class FieldTest extends BaseTest {
 				
 				// 3010: Assert title field value update
 				Item checkItem = this.cmsService.getItemService().getItem(aboutItem.getId());
-				FieldValue titleFieldValue = checkItem.getFieldValue(TITLE_FIELD_NAME);
+				FieldValue titleFieldValue = checkItem.getFieldValueObj(TITLE_FIELD_NAME);
 				r = trs.execute(3010);
 				if (titleFieldValue == null || ! titleFieldValue.getStringValue().equals(title)) {
 					r.setNotes("Text field value update failed").fail();
 				}
 				
 				// 3020: Assert embargo field value update
-				FieldValue embargoFieldValue = checkItem.getFieldValue(EMBARGO_FIELD_NAME);
+				FieldValue embargoFieldValue = checkItem.getFieldValueObj(EMBARGO_FIELD_NAME);
 				r = trs.execute(3020);
 				if (embargoFieldValue == null || ! embargoFieldValue.getDateValue().equals(ts)) {
 					r.setNotes("Date value update failed").fail();
