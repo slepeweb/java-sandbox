@@ -13,10 +13,14 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js" type="text/javascript"></script>
 
-<!-- Include Fancytree skin and library -->
+<!-- Include Fancytree skin and library, and jquery file-upload -->
 <link href="${applicationContextPath}/resources/fancytree/skin-win8/ui.fancytree.min.css" rel="stylesheet" type="text/css">
 <script src="${applicationContextPath}/resources/fancytree/jquery.fancytree.min.js" type="text/javascript"></script>
 <script src="${applicationContextPath}/resources/fancytree/jquery.fancytree.dnd.js" type="text/javascript"></script>
+<%-- <script src="${applicationContextPath}/resources/fileupload/vendor/jquery.ui.widget.js"></script> --%>
+<%-- <script src="${applicationContextPath}/resources/fileupload/jquery.iframe-transport.js"></script> --%>
+<%-- <script src="${applicationContextPath}/resources/fileupload/jquery.fileupload.js"></script> --%>
+
 <!-- Initialize the tree when page is loaded -->
 <script type="text/javascript">
 	// Application context 

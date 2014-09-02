@@ -1,6 +1,7 @@
 package com.slepeweb.cms.test;
 
 import java.io.File;
+import java.io.FileInputStream;
 
 import org.springframework.stereotype.Service;
 
@@ -30,8 +31,10 @@ public class MediaTest extends BaseTest {
 
 				if (! imageItem.hasMedia()) {
 					int startCount = this.cmsService.getMediaService().getCount();
-					imageItem.setMediaUploadFilePath(sourceImageFilename);
-					this.cmsService.getMediaService().save(imageItem);
+					try { 
+						this.cmsService.getMediaService().save(imageItem.getId(), new FileInputStream(sourceImageFilename));
+					}
+					catch (Exception e) {}
 					
 					// 4010: Assert 1 new row has been added to the media table
 					int endCount = this.cmsService.getMediaService().getCount();

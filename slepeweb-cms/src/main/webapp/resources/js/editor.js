@@ -253,9 +253,58 @@ $(function() {
 					$(this).parent().remove();
 				});
 				
+				// Add behaviour to update media content 
+				function progressHandlingFunction(e){
+				    if(e.lengthComputable){
+				        $("progress").attr({value:e.loaded,max:e.total});
+				    }
+				}
+				
+				$("#media-button").click(function () {
+					var formData = new FormData($("#media-form")[0]);
+				    $.ajax({
+				        url: _ctx + "/rest/item/" + nodeKey + "/update/media",
+				        type: "POST",
+				        xhr: function() {
+				            var myXhr = $.ajaxSettings.xhr();
+				            if(myXhr.upload) {
+				                myXhr.upload.addEventListener("progress",progressHandlingFunction, false);
+				            }
+				            return myXhr;
+				        },
+				        success: function() {
+				        	showDialog("dialog-update-success");
+				        },
+				        error: function() {
+				        	showDialog("dialog-update-error");
+				        },
+				        data: formData,
+				        cache: false,
+				        contentType: false,
+				        processData: false
+				    });
+					
+//					$.ajax(_ctx + "/rest/item/" + nodeKey + "/update/media", {
+//						type: "POST",
+//						cache: false,
+//						contentType: "multipart/form-data",
+//						data: {
+//							media: $("#media-tab input[name='choose-media']").val(),
+//						}, 
+//						dataType: "json",
+//						success: function(json, status, z) {
+//							showDialog("dialog-update-success");
+//						},
+//						error: function(json, status, z) {
+//							showDialog("dialog-update-error");
+//						},
+//					});
+				});				
+				
 				// Initialise sortable links 
 				$( "#sortable-links" ).sortable();
 				$( "#sortable-links" ).disableSelection();
+				
 			}
 		});
 	};

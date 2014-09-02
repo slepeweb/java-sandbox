@@ -22,6 +22,10 @@ input[type="checkbox"], input[type="radio"] {
 	width: auto;
 }
 
+input[type="datetime-local"] {
+	width: 220px;
+}
+
 form div {
 	margin-top: 6px;
 	clear: both;

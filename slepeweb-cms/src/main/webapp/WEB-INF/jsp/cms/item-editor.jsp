@@ -7,6 +7,9 @@
 	<li><a href="#core-tab">Core</a></li>
 	<li><a href="#field-tab">Fields</a></li>
 	<li><a href="#links-tab">Links</a></li>
+	<c:if test="${editingItem.type.media}">
+		<li><a href="#media-tab">Media</a></li>
+	</c:if>
 	<li><a href="#add-tab">Add new</a></li>
 </ul>
 
@@ -120,6 +123,21 @@
 		</li>		
 	</ul>
 </div>
+
+<c:if test="${editingItem.type.media}">
+	<div id="media-tab">
+		<form id="media-form" enctype="multipart/form-data">
+			<div>
+				<label for="media">&nbsp;</label>
+				<input name="media" type="file" />
+			</div>
+			<div>
+				<label>&nbsp;</label><button id="media-button" type="button">Update media</button>
+			</div>
+			<label>&nbsp;</label><progress class="spacer10"></progress>		
+		</form>
+	</div>
+</c:if>
 
 <div id="add-tab">
 	<form>
