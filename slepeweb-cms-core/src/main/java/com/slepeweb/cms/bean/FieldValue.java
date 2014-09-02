@@ -13,9 +13,6 @@ public class FieldValue extends CmsBean implements Serializable {
 	private Integer integerValue;
 	private Timestamp dateValue;
 	
-	// TODO: not currently in DB schema - do we want this?
-	private Timestamp dateUpdated;
-	
 	public void assimilate(Object obj) {
 		if (obj instanceof FieldValue) {
 			FieldValue fv = (FieldValue) obj;
@@ -73,6 +70,10 @@ public class FieldValue extends CmsBean implements Serializable {
 		return this;
 	}
 	
+	public String getValue() {
+		return getStringValue();
+	}
+	
 	public String getStringValue() {
 		return stringValue;
 	}
@@ -114,20 +115,10 @@ public class FieldValue extends CmsBean implements Serializable {
 		return this;
 	}
 
-	public Timestamp getDateUpdated() {
-		return dateUpdated;
-	}
-
-	public FieldValue setDateUpdated(Timestamp dateUpdated) {
-		this.dateUpdated = dateUpdated;
-		return this;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((dateUpdated == null) ? 0 : dateUpdated.hashCode());
 		result = prime * result + ((dateValue == null) ? 0 : dateValue.hashCode());
 		result = prime * result + ((field == null) ? 0 : field.getId().hashCode());
 		result = prime * result + ((integerValue == null) ? 0 : integerValue.hashCode());
@@ -145,11 +136,6 @@ public class FieldValue extends CmsBean implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		FieldValue other = (FieldValue) obj;
-		if (dateUpdated == null) {
-			if (other.dateUpdated != null)
-				return false;
-		} else if (!dateUpdated.equals(other.dateUpdated))
-			return false;
 		if (dateValue == null) {
 			if (other.dateValue != null)
 				return false;

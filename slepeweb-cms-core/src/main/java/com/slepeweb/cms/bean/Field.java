@@ -21,6 +21,7 @@ public class Field extends CmsBean implements Serializable {
 	private static final String RADIO = "radio";
 	private static final String CHECKBOX = "checkbox";
 	private static final String TEXT = "text";
+	private static final String DATE = "datetime-local";
 	
 	private Long id;
 	private String name, variable, help;
@@ -78,6 +79,9 @@ public class Field extends CmsBean implements Serializable {
 		if (getType() == FieldType.integer || getType() == FieldType.date || getType() == FieldType.url) {
 			tag = INPUT_TAG;
 			rows = cols = null;
+			if (getType() == FieldType.date) {
+				inputType = DATE;
+			}
 		}
 		else if (getType() == FieldType.text || getType() == FieldType.markup) {
 			if (getSize() > 0 && getSize() <= 120) {
@@ -122,6 +126,10 @@ public class Field extends CmsBean implements Serializable {
 				}
 			}
 			else {
+				if (inputType.equals(DATE)) {
+					// Convert value from Timestamp string to T format
+					notNullValue = notNullValue.replace(" ", "T");
+				}
 				sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\" />", 
 						inputType, getVariable(), notNullValue));
 			}
@@ -227,21 +235,6 @@ public class Field extends CmsBean implements Serializable {
 			return StringUtils.isNotBlank(this.defaultValue) ? this.defaultValue : "";
 		}
 	}
-
-//	public Field setDefaultValueObject(Object value) {
-//		if (value instanceof Integer && getType() == FieldType.integer) {
-//			this.defaultValue = String.valueOf(value);
-//		}
-//		else if (value instanceof Timestamp && getType() == FieldType.date) {
-//			// TODO: format the date to 0 millis
-//			this.defaultValue = ((Timestamp) value).toString();
-//		}
-//		else {
-//			// TODO: May needs codes to indicate eg. 2 weeks hence (for dates), eg now, +2w, etc
-//			this.defaultValue = value != null ? value.toString() : "";
-//		}
-//		return this;
-//	}
 
 	public Field setDefaultValue(String value) {
 		this.defaultValue = value;

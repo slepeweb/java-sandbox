@@ -99,7 +99,7 @@ public class ItemType extends CmsBean implements Serializable {
 	}
 
 	public boolean isMedia() {
-		return getMimeType().equals(PAGE_MIMETYPE);
+		return ! getMimeType().equals(PAGE_MIMETYPE);
 	}
 
 	public String getMimeType() {

@@ -1,6 +1,5 @@
 package com.slepeweb.cms.service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +55,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			if (extendedSave) {
 				saveFieldValues(i.getFieldValues());
 				saveLinks(i, dbRecord);
-				saveMedia(i);
+//				saveMedia(i);
 			}
 		}
 		else {
@@ -140,11 +139,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
-	private void saveMedia(Item i) {
-		if (i.getMediaUploadFilePath() != null && i.getType().isMedia()) {
-			this.mediaService.save(i);
-		}
-	}
+//	private void saveMedia(Item i) {
+//		if (i.getMediaUploadFilePath() != null && i.getType().isMedia()) {
+//			this.mediaService.save(i);
+//		}
+//	}
 	
 	private void saveDefaultFieldValues(Item i) {
 		// If item has no field values, create them, with default values
@@ -156,8 +155,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				fv = CmsBeanFactory.makeFieldValue().
 					setField(fft.getField()).
 					setItemId(i.getId()).
-					setValue(fft.getField().getDefaultValueObject()).
-					setDateUpdated(new Timestamp(System.currentTimeMillis()));
+					setValue(fft.getField().getDefaultValueObject());
 				
 				fv.save();
 				i.getFieldValues().add(fv);

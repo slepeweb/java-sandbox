@@ -2,8 +2,8 @@ package com.slepeweb.cms.service;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.sql.Blob;
 
 import org.apache.log4j.Logger;
@@ -17,38 +17,33 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	
 	private static Logger LOG = Logger.getLogger(MediaServiceImpl.class);
 	
-	public void save(Item i) {
-		if (i.getType().isMedia() && i.getMediaUploadFilePath() != null) {
-			if (getMedia(i.getId()) != null) {
-				updateMedia(i);
-			}
-			else {
-				insertMedia(i);
-			}
+	public void save(Long itemId, InputStream is) {
+		if (getMedia(itemId) != null) {
+			updateMedia(itemId, is);
 		}
 		else {
-			LOG.error(compose("Media not saved - insufficient data", i));
+			insertMedia(itemId, is);
 		}
 	}
 	
-	private void insertMedia(Item i) {
+	private void insertMedia(Long itemId, InputStream is) {
 		this.jdbcTemplate.update(
 				"insert into media (itemid, data) values (?, ?)", 
-				i.getId(), getBytesFromFile(i.getMediaUploadFilePath()));
+				itemId, getBytesFromStream(is));
 		
-		LOG.info(compose("Added new media", i));
+		LOG.info(compose("Added new media", itemId));
 	}
 
-	private void updateMedia(Item i) {
+	private void updateMedia(Long itemId, InputStream is) {
 		this.jdbcTemplate.update(
-				"update media set data = ? where id = ?", 
-				getBytesFromFile(i.getMediaUploadFilePath()), i.getId());
+				"update media set data = ? where itemid = ?", 
+				getBytesFromStream(is), itemId);
 		
-		LOG.info(compose("Updated media", i));
+		LOG.info(compose("Updated media", itemId));
 	}
 	
 	public void deleteMedia(Long id) {
-		if (this.jdbcTemplate.update("delete from media where id = ?", id) > 0) {
+		if (this.jdbcTemplate.update("delete from media where itemid = ?", id) > 0) {
 			LOG.warn(compose("Deleted media", String.valueOf(id)));
 		}
 	}
@@ -102,11 +97,9 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 		return this.jdbcTemplate.queryForInt("select count(*) from media");
 	}
 
-	private byte[] getBytesFromFile(String filePath) {
-		FileInputStream fis = null;
+	private byte[] getBytesFromStream(InputStream fis) {
 		ByteArrayOutputStream baos = null;
 		try {
-			fis = new FileInputStream(filePath);
 			baos = new ByteArrayOutputStream(100);
 			byte[] buffer = new byte[100];
 			while (fis.read(buffer) > 0) {
@@ -125,4 +118,5 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 			catch (Exception e) {}
 		}
 	}
+
 }

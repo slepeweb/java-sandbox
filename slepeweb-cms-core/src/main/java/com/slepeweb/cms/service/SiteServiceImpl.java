@@ -89,6 +89,10 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		return getSite("select * from site where name = ?", new Object[]{name});
 	}
 
+	public Site getSiteByHostname(String hostname) {
+		return getSite("select * from site where hostname = ?", new Object[]{hostname});
+	}
+
 	public Site getSite(Long id) {
 		return getSite("select * from site where id = ?", new Object[]{id});
 	}

@@ -25,7 +25,6 @@ public class Item extends CmsBean implements Serializable {
 	private boolean deleted, published;
 	private Long id = -1L;
 	private List<Link> links;
-	private String mediaUploadFilePath;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Item) {
@@ -39,7 +38,6 @@ public class Item extends CmsBean implements Serializable {
 			setSite(i.getSite());
 			setType(i.getType());
 			setTemplate(i.getTemplate());
-			setMediaUploadFilePath(i.getMediaUploadFilePath());
 			setPublished(i.isPublished());
 			
 			// Must assimilate fields and links too? 
@@ -125,7 +123,7 @@ public class Item extends CmsBean implements Serializable {
 	}
 	
 	public Item setFieldValue(String variable, Object value) {
-		FieldValue fv = getFieldValue(variable);
+		FieldValue fv = getFieldValueObj(variable);
 		
 		// Field value already exists
 		if (fv != null) {
@@ -141,7 +139,6 @@ public class Item extends CmsBean implements Serializable {
 		return getItemService().save(child);
 	}
 	
-	// TODO: need a way to set ordering for links, eg 'end of list'
 	public Item addInline(Item inline) {
 		if (! getLinks().contains(inline)) {
 			getLinks().add(toChildLink(inline, LinkType.inline));
@@ -150,7 +147,6 @@ public class Item extends CmsBean implements Serializable {
 		return this;
 	}
 	
-	// TODO: need a way to set ordering for links, eg 'end of list'
 	public Item addRelation(Item relation) {
 		if (! getLinks().contains(relation)) {
 			getLinks().add(toChildLink(relation, LinkType.relation));
@@ -167,14 +163,13 @@ public class Item extends CmsBean implements Serializable {
 		return getLinks().remove(toChildLink(relation, LinkType.relation));
 	}
 	
-	// TODO: need a better way to handle ordering - currently hardcoding to 0
 	private Link toChildLink(Item i, LinkType lt) {
 		return CmsBeanFactory.makeLink().
 				setParentId(getId()).
 				setChild(i).
 				setType(lt).
 				setName("std").
-				setOrdering(0);
+				setOrdering(0); // Arbitrary value
 	}
 	
 	public final List<Item> getBoundItems() {
@@ -270,7 +265,46 @@ public class Item extends CmsBean implements Serializable {
 		return this.fieldValues;
 	}
 	
-	public FieldValue getFieldValue(String variable) {
+	public String getFieldValue(String variable) {
+		return getFieldValue(variable, "");
+	}
+	
+	public String getFieldValue(String variable, String dflt) {
+		FieldValue fv = getFieldValueObj(variable);
+		if (fv != null) {
+			return fv.getStringValue();
+		}
+		else if (dflt != null) {
+			return dflt;
+		}
+		return null;
+	}
+	
+	public Integer getIntFieldValue(String variable) {
+		return getIntFieldValue(variable, null);
+	}
+	
+	public Integer getIntFieldValue(String variable, Integer dflt) {
+		FieldValue fv = getFieldValueObj(variable);
+		if (fv != null) {
+			return fv.getIntegerValue();
+		}
+		return dflt;
+	}
+	
+	public Timestamp getDateFieldValue(String variable) {
+		return getDateFieldValue(variable, null);
+	}
+	
+	public Timestamp getDateFieldValue(String variable, Timestamp dflt) {
+		FieldValue fv = getFieldValueObj(variable);
+		if (fv != null) {
+			return fv.getDateValue();
+		}
+		return dflt;
+	}
+	
+	public FieldValue getFieldValueObj(String variable) {
 		if (getFieldValues() != null) {
 			for (FieldValue fv : getFieldValues()) {
 				if (fv.getField().getVariable().equals(variable)) {
@@ -480,14 +514,6 @@ public class Item extends CmsBean implements Serializable {
 			return false;
 		
 		return true;
-	}
-
-	public String getMediaUploadFilePath() {
-		return mediaUploadFilePath;
-	}
-
-	public void setMediaUploadFilePath(String mediaUploadFilePath) {
-		this.mediaUploadFilePath = mediaUploadFilePath;
 	}
 
 	public Item setPath(String path) {
