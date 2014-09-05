@@ -4,6 +4,8 @@ drop table fieldvalue;
 drop table fieldfortype;
 drop table field;
 drop table link;
+drop table linktype;
+drop table linkname;
 drop table item;
 drop table template;
 drop table itemtype;
@@ -64,17 +66,39 @@ create table item
 ) ENGINE=InnoDB;
 
 
+create table linktype
+(
+	id int not null auto_increment,
+	name varchar(24),
+	primary key (id),
+	unique key idx_linktype_name (name)
+) ENGINE=InnoDB;
+
+create table linkname
+(
+	id int not null auto_increment,
+	siteid int,
+	linktypeid int,
+	name varchar(64),
+	primary key (id),
+	unique key idx_linkname_site_type_name (siteid, linktypeid, name),
+	constraint foreign key (siteid) references site(id) on delete cascade,
+	constraint foreign key (linktypeid) references linktype(id) on delete cascade
+) ENGINE=InnoDB;
+
 create table link
 (
 	parentid int,
 	childid int,
-	linktype enum ('binding', 'relation', 'inline', 'shortcut'),
-	name varchar(64),
+	linktypeid int,
+	linknameid int,
 	ordering smallint,
 	primary key (parentid, childid),
 	index idx_link_child (childid),
 	constraint foreign key (parentid) references item(id) on delete cascade,
-	constraint foreign key (childid) references item(id) on delete cascade
+	constraint foreign key (childid) references item(id) on delete cascade,
+	constraint foreign key (linktypeid) references linktype(id) on delete cascade,
+	constraint foreign key (linknameid) references linkname(id) on delete cascade
 ) ENGINE=InnoDB;
 
 create table field

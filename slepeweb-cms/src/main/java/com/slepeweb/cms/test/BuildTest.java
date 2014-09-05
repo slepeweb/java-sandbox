@@ -8,6 +8,8 @@ import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.utils.LogUtil;
@@ -56,6 +58,11 @@ public class BuildTest extends BaseTest {
 			}
 		}
 		
+		// Create link types
+		LinkType bindingLinkType = addLinkType(LinkType.binding);
+		LinkType relationLinkType = addLinkType(LinkType.relation);
+		LinkType inlineLinkType = addLinkType(LinkType.inline);
+		LinkType componentLinkType = addLinkType(LinkType.component);
 		
 		// Create item types
 		ItemType cfolderType = addType(ItemType.CONTENT_FOLDER_TYPE_NAME);
@@ -117,6 +124,16 @@ public class BuildTest extends BaseTest {
 		r = trs.execute(2040);
 		if (site != null) {
 			r.setNotes(LogUtil.compose("Test site has been created", site.getName()));
+			
+			// Create link names
+			for (LinkType lt : new LinkType[] {bindingLinkType, inlineLinkType, relationLinkType, componentLinkType}) {
+				addLinkName(site, lt, LinkName.std);
+			}
+			
+			// Create more link names
+			for (String name : new String[] {"leftside", "rightside", "footer", "main"}) {
+				addLinkName(site, componentLinkType, name);
+			}
 			
 			Template newsTemplate = addTemplate(NEWS_TEMPLATE_NAME, "/page/news", site.getId(), newsType.getId());
 			

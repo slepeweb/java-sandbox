@@ -2,22 +2,18 @@
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="ehcache.xsd"
          updateCheck="true" monitoring="autodetect"
-         dynamicConfig="true" name="acmNavCache">
+         dynamicConfig="true" name="cacheManager">
 
-  <diskStore path="${user.home}/ms_work_jdx/navcache"/>
-  <!-- add/remove event listener  
-  <cacheManagerEventListenerFactory class="" properties=""/>
-  -->
-  
-  <defaultCache
-      maxElementsInMemory="10000"
-      eternal="false"
-      timeToLiveSeconds="3600"
-      overflowToDisk="true"
-      diskSpoolBufferSizeMB="30"
-      maxElementsOnDisk="10000"
-      diskPersistent="true" 
-      diskExpiryThreadIntervalSeconds="120"
-      memoryStoreEvictionPolicy="LRU"/>
-      
+  <cache name="serviceCache"
+         maxElementsInMemory="10000"
+         maxElementsOnDisk="0"
+         overflowToDisk="false"
+         diskPersistent="false" 
+         eternal="false"
+         timeToLiveSeconds="900"
+         timeToIdleSeconds="900"
+         memoryStoreEvictionPolicy="LFU">
+
+  </cache>
+   
 </ehcache>

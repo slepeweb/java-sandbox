@@ -81,7 +81,7 @@
 <div id="links-tab">
 	<div>
 		<ul id="sortable-links">
-			<c:forEach items="${editingItem.inlinesAndRelations}" var="link">
+			<c:forEach items="${editingItem.allLinksBarBindings}" var="link">
 				<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
 					href="${applicationContextPath}/page/editor/${link.child.id}">${link}</a>
 						<button class="remove-link float-right">Remove</button><span 
@@ -101,14 +101,16 @@
 				<label for="linktype">Link type: </label>
 				<select name="linktype">
 					<option value="unknown">Choose ...</option>
-					<c:forTokens items="inline,relation" delims="," var="type">
+					<c:forTokens items="inline,relation,component" delims="," var="type">
 						<option value="${type}">${type}</option>
 					</c:forTokens>
 				</select>	
 			</div>
 			<div>
 				<label for="linkname">Link name: </label>
-				<input name="linkname" value="std" />
+				<select name="linkname">
+					<option value="unknown">Choose ...</option>
+				</select>	
 			</div>
 		</div>		
 		<div id="linknav" class="inline"></div>
@@ -223,7 +225,7 @@
 <div id="dialog-choose-linktype" class="hide" title="Choose link type">
   <p>
     <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
-    Please select the type of link you wish to create.
+    Please select the type and name for link you wish to create.
   </p>
 </div>
 

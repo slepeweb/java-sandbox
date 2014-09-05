@@ -28,11 +28,14 @@ import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.bean.Link.LinkType;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemTypeService;
+import com.slepeweb.cms.service.LinkNameService;
+import com.slepeweb.cms.service.LinkTypeService;
 import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.TemplateService;
 import com.slepeweb.cms.utils.LogUtil;
@@ -46,6 +49,8 @@ public class RestController extends BaseController {
 	@Autowired private ItemTypeService itemTypeService;
 	@Autowired private TemplateService templateService;
 	@Autowired private MediaService mediaService;
+	@Autowired private LinkTypeService linkTypeService;
+	@Autowired private LinkNameService linkNameService;
 	
 	@RequestMapping("/item/editor")
 	public String doItemEditor(ModelMap model, @RequestParam(value="key", required=true) Long id) {	
@@ -216,9 +221,9 @@ public class RestController extends BaseController {
 		
 		Item mover = this.itemService.getItem(itemId);
 		Item target = this.itemService.getItem(targetId);
-		Item moved = mover.move(target, mode);
+		mover.move(target, mode);
 		
-		return moved.getId();
+		return mover.getId();
 	}
 	
 	@RequestMapping(value="/links/{parentId}/save", method=RequestMethod.POST, produces="application/json")
@@ -234,7 +239,7 @@ public class RestController extends BaseController {
 					setParentId(lp.getParentId()).
 					setName(lp.getName()).
 					setOrdering(lp.getOrdering()).
-					setType(LinkType.valueOf(lp.getType()));
+					setType(lp.getType());
 			
 			i = CmsBeanFactory.makeItem().
 					setId(lp.getChildId());
@@ -247,6 +252,28 @@ public class RestController extends BaseController {
 		parent.saveLinks();
 		
 		return "success";
+	}
+	
+	@RequestMapping(value="/linknames/{parentId}/{linkType}", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public List<String> getLinkNameOptions(
+			@PathVariable long parentId, @PathVariable String linkType, ModelMap model) {	
+		
+		List<String> names = new ArrayList<String>();
+		
+		if (! linkType.equals("unknown")) {
+			LinkType lt = this.linkTypeService.getLinkType(linkType);
+			
+			if (lt != null) {
+				Item parent = this.itemService.getItem(parentId);		
+			
+				for (LinkName ln : this.linkNameService.getLinkNames(parent.getSite().getId(), lt.getId())) {
+					names.add(ln.getName());
+				}
+			}
+		}
+		
+		return names;
 	}
 	
 	@RequestMapping(value="/item/{itemId}/name", method=RequestMethod.POST, produces="application/json")

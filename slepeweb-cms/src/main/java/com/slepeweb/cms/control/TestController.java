@@ -6,6 +6,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.test.BuildTest;
+import com.slepeweb.cms.test.CacheTest;
 import com.slepeweb.cms.test.FieldTest;
 import com.slepeweb.cms.test.ItemTest;
 import com.slepeweb.cms.test.MediaTest;
@@ -21,6 +22,7 @@ public class TestController extends BaseController {
 	@Autowired private ItemTest itemTest;
 	@Autowired private MediaTest mediaTest;
 	@Autowired private PurgeTest purgeTest;
+	@Autowired private CacheTest cacheTest;
 	
 	@RequestMapping("/test/build")
 	public String doBuild(ModelMap model) {
@@ -49,6 +51,12 @@ public class TestController extends BaseController {
 	@RequestMapping("/test/purge")
 	public String doPurge(ModelMap model) {
 		model.addAttribute("testResults", this.purgeTest.execute());
+		return TEST_VIEW;
+	}
+	
+	@RequestMapping("/test/cache")
+	public String doCache(ModelMap model) {
+		model.addAttribute("testResults", this.cacheTest.execute());
 		return TEST_VIEW;
 	}
 	

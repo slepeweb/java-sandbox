@@ -9,6 +9,8 @@ import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.service.CmsService;
@@ -45,16 +47,21 @@ public abstract class BaseTest {
 	}
 	
 	protected ItemType addType(String name, String mimeType) {
-		ItemType it = CmsBeanFactory.makeItemType().setName(name).setMimeType(mimeType);
-		it.save();
-		return it;
+		return CmsBeanFactory.makeItemType().
+				setName(name).
+				setMimeType(mimeType).
+				save();
 	}
 
 	protected Field addField(String name, String variable, String help, FieldType type, int size, String dflt) {
-		Field f = CmsBeanFactory.makeField().setName(name).setVariable(variable).setHelp(help).setType(type).
-				setSize(size).setDefaultValue(dflt);
-		f.save();
-		return f;
+		return CmsBeanFactory.makeField().
+				setName(name).
+				setVariable(variable).
+				setHelp(help).
+				setType(type).
+				setSize(size).
+				setDefaultValue(dflt).
+				save();
 	}
 	
 	protected Item addItem(Item parent, String name, String simplename, 
@@ -78,5 +85,29 @@ public abstract class BaseTest {
 				setSiteId(siteId).
 				setItemTypeId(typeId).
 				save();
+	}
+	
+	protected LinkType addLinkType(String name) {
+		LinkType lt = CmsBeanFactory.makeLinkType().
+				setName(name).
+				save();
+		
+		if (lt.getId() == null) {
+			lt = this.cmsService.getLinkTypeService().getLinkType(name);
+		}
+		return lt;
+	}
+	
+	protected LinkName addLinkName(Site s, LinkType lt, String name) {
+		LinkName ln =  CmsBeanFactory.makeLinkName().
+				setSiteId(s.getId()).
+				setLinkTypeId(lt.getId()).
+				setName(name).
+				save();
+		
+		if (ln.getId() == null) {
+			ln = this.cmsService.getLinkNameService().getLinkName(s.getId(), lt.getId(), name);
+		}
+		return ln;
 	}
 }

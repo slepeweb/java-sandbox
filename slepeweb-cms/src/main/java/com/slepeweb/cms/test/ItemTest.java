@@ -33,65 +33,69 @@ public class ItemTest extends BaseTest {
 		if (site != null) {
 			Item aboutSectionItem = site.getItem("/about");
 			Item newsSectionItem = site.getItem("/news");
+			Item rootItem = null;
 			
 			if (aboutSectionItem != null && newsSectionItem != null) {
 				
 				// Move the 'about' article item to the 'news' section
-				aboutSectionItem.move(newsSectionItem);
-				
-				// 4010: Assert news section now has 3 children
-				int count = newsSectionItem.getBoundItems().size();
-				r = trs.execute(4010);
-				if (count != 3) {
-					r.setNotes("News section has " + count + " children").fail();
-				}
-				
-				// 4020: Check path of article item has been updated
-				String articlePath = "/news/about/about-us";
-				aboutSectionItem = site.getItem("/news/about");
-				Item article = null;
-				for (Item child : aboutSectionItem.getBoundItems()) {
-					if (child.getPath().equals(articlePath)) {
-						article = child;
-						break;
-					}
-				}
-				
-				r = trs.execute(4020);
-				if (article == null) {
-					r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
-				}
-				
-				// Restore the links
-				Item rootItem = site.getItem("/");
-				
-				if (aboutSectionItem != null && rootItem != null) {
-					
-					// Move the 'about' article item back to its original location
-					aboutSectionItem.move(rootItem);
-					
-					// 4030: Assert news section has original 2 children
-					newsSectionItem = site.getItem("/news");
-					count = newsSectionItem.getBoundItems().size();
-					r = trs.execute(4030);
-					if (count != 2) {
+				if (aboutSectionItem.move(newsSectionItem)) {				
+					// 4010: Assert news section now has 3 children
+					int count = newsSectionItem.getBoundItems().size();
+					r = trs.execute(4010);
+					if (count != 3) {
 						r.setNotes("News section has " + count + " children").fail();
 					}
 					
-					// 4040: Re-check path of article item
-					aboutSectionItem = site.getItem("/about");
-					articlePath = "/about/about-us";
-					article = null;
-					for (Item child : aboutSectionItem.getBoundItems()) {
-						if (child.getPath().equals(articlePath)) {
-							article = child;
-							break;
+					// 4020: Check path of article item has been updated
+					String articlePath = "/news/about/about-us";
+					aboutSectionItem = site.getItem("/news/about");
+					Item article = null;
+					
+					if (aboutSectionItem != null) {
+						for (Item child : aboutSectionItem.getBoundItems()) {
+							if (child.getPath().equals(articlePath)) {
+								article = child;
+								break;
+							}
+						}
+						
+						r = trs.execute(4020);
+						if (article == null) {
+							r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
 						}
 					}
+				
+					// Restore the links
+					rootItem = site.getItem("/");
 					
-					r = trs.execute(4040);
-					if (article == null) {
-						r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
+					if (aboutSectionItem != null && rootItem != null) {
+						
+						// Move the 'about' article item back to its original location
+						if (aboutSectionItem.move(rootItem)) {						
+							// 4030: Assert news section has original 2 children
+							newsSectionItem = site.getItem("/news");
+							count = newsSectionItem.getBoundItems().size();
+							r = trs.execute(4030);
+							if (count != 2) {
+								r.setNotes("News section has " + count + " children").fail();
+							}
+							
+							// 4040: Re-check path of article item
+							aboutSectionItem = site.getItem("/about");
+							articlePath = "/about/about-us";
+							article = null;
+							for (Item child : aboutSectionItem.getBoundItems()) {
+								if (child.getPath().equals(articlePath)) {
+									article = child;
+									break;
+								}
+							}
+							
+							r = trs.execute(4040);
+							if (article == null) {
+								r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
+							}
+						}
 					}
 				}
 				

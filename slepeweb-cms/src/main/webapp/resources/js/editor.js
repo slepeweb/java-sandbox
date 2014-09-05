@@ -184,11 +184,11 @@ $(function() {
 					},
 					activate: function(event, data) {
 						var linkType = $("#addlinkdiv select[name='linktype']").val();
-						var linkName = $("#addlinkdiv input[name='linkname']").val();
+						var linkName = $("#addlinkdiv select[name='linkname']").val();
 						var parentId = nodeKey;
 						var childId = data.node.key;
 	 	   			
-						if (linkType != 'unknown') {
+						if (linkType != 'unknown' && linkName != 'unknown') {
 							var selector = $("#sortable-links");
 							var copy = $("#link-template li").clone(true);
 		 	 	   	  	
@@ -209,6 +209,25 @@ $(function() {
 					}
 				});
 	 	    
+				// Re-populate linkname options when link type is selected
+				$("#addlinkdiv select[name='linktype']").change(function(e) {
+					var selector = $("#addlinkdiv select[name='linkname']");
+					selector.empty();
+					var linkType = $(this).val();
+					
+					$.ajax(_ctx + "/rest/linknames/" + nodeKey + "/" + linkType, {
+						type: "POST",
+						cache: false,
+						dataType: "json",
+						success: function(result, status, z) {
+							selector.append("<option value='unknown'>Choose ...</option>");
+							for (var i=0; i<result.length; i++) {
+								selector.append("<option value='" + result[i] + "'>" + result[i] + "</option>");
+							}
+						}
+					});
+				});
+				
 				// Show link addition form when 'Add link' button is clicked
 				$("#addlink-button").click(function(e) {
 					$("#addlinkdiv").css("visibility", "visible");
