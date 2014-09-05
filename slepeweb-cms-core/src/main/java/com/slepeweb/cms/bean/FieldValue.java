@@ -1,11 +1,10 @@
 package com.slepeweb.cms.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class FieldValue extends CmsBean implements Serializable {
+public class FieldValue extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private Long itemId;
 	private Field field;

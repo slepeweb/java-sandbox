@@ -7,6 +7,8 @@ public interface CmsService {
 	FieldService getFieldService();
 	ItemService getItemService();
 	LinkService getLinkService();
+	LinkNameService getLinkNameService();
+	LinkTypeService getLinkTypeService();
 	FieldForTypeService getFieldForTypeService();
 	FieldValueService getFieldValueService();	
 	MediaService getMediaService();	

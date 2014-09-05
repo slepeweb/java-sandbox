@@ -1,6 +1,7 @@
 package com.slepeweb.cms.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Field;
@@ -64,10 +65,12 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 		deleteField(s.getId());
 	}
 
+	@Cacheable(value="serviceCache")
 	public Field getField(String name) {
 		return getField("select * from field where variable = ?", new Object[]{name});
 	}
 
+	@Cacheable(value="serviceCache")
 	public Field getField(Long id) {
 		return getField("select * from field where id = ?", new Object[]{id});
 	}

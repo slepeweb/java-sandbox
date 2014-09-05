@@ -1,17 +1,21 @@
 package com.slepeweb.cms.bean;
 
+import java.io.Serializable;
+
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.FieldForTypeService;
 import com.slepeweb.cms.service.FieldService;
 import com.slepeweb.cms.service.FieldValueService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemTypeService;
+import com.slepeweb.cms.service.LinkNameService;
 import com.slepeweb.cms.service.LinkService;
+import com.slepeweb.cms.service.LinkTypeService;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.utils.LogUtil;
 
-public abstract class CmsBean {
-	
+public abstract class CmsBean implements Serializable {
+	private static final long serialVersionUID = 1L;
 	protected transient CmsService cmsService;
 	
 	protected abstract CmsBean save();	
@@ -67,5 +71,13 @@ public abstract class CmsBean {
 	
 	public LinkService getLinkService() {
 		return this.cmsService.getLinkService();
+	}
+	
+	public LinkNameService getLinkNameService() {
+		return this.cmsService.getLinkNameService();
+	}
+	
+	public LinkTypeService getLinkTypeService() {
+		return this.cmsService.getLinkTypeService();
 	}
 }

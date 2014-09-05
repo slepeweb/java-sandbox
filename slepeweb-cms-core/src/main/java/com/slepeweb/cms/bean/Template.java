@@ -1,10 +1,8 @@
 package com.slepeweb.cms.bean;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.StringUtils;
 
-public class Template extends CmsBean implements Serializable {
+public class Template extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private String name, forward;
 	private Long id, siteId, itemTypeId;

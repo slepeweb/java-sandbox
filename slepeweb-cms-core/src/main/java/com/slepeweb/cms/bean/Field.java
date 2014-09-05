@@ -1,6 +1,5 @@
 package com.slepeweb.cms.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,7 +11,7 @@ import org.apache.log4j.Logger;
 import com.slepeweb.cms.utils.LogUtil;
 
 
-public class Field extends CmsBean implements Serializable {
+public class Field extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private static Logger LOG = Logger.getLogger(Field.class);
 	private static final String INPUT_TAG = "input";

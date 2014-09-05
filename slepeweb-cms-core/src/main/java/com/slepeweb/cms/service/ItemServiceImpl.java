@@ -13,7 +13,6 @@ import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.bean.Link.LinkType;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -90,7 +89,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				Link l = CmsBeanFactory.makeLink().
 					setParentId(parentItem.getId()).
 					setChild(childItem).
-					setType(LinkType.binding).
+					setType("binding").
 					setName("std").
 					setOrdering(ordering);
 				
@@ -184,7 +183,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private void removeStaleLinks(List<Link> dbRecordLinks, List<Link> updatedLinks) {
 		if (dbRecordLinks != null && updatedLinks != null) {
 			for (Link dbLink : dbRecordLinks) {
-				if (! updatedLinks.contains(dbLink) && dbLink.getType() != LinkType.binding) {
+				if (! updatedLinks.contains(dbLink) && ! dbLink.getType().equals("binding")) {
 					dbLink.delete();
 					LOG.info(compose("Deleted old inline/relation link", dbLink));
 				}
@@ -298,7 +297,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 //		return child;
 //	}
 
-	public Item move(Item mover, Item parent) {
+	public boolean move(Item mover, Item parent) {
 		return move(mover, parent, "over");
 	}
 	
@@ -306,7 +305,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 * This provides a relative move, ie before/after target.
 	 * If mode == "over", then target is effectively a new parent.
 	 */
-	public Item move(Item mover, Item target, String mode) {
+	public boolean move(Item mover, Item target, String mode) {
 		Link oldParentage = this.linkService.getParent(mover.getId());
 		Link moverLink = oldParentage;
 		
@@ -383,12 +382,14 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			
 			// Force newParent links to be re-calculated, since they have now changed
 			target.setLinks(null);
+			
+			return true;
 		}
 		else {
 			LOG.error(compose("Failed to identify parent of", mover.getPath()));
 		}
 		
-		return mover;
+		return false;
 	}
 	
 	private Item getItem(String sql, Object[] params) {

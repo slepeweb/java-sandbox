@@ -1,6 +1,5 @@
 package com.slepeweb.cms.bean;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,9 +10,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.slepeweb.cms.bean.Link.LinkType;
-
-public class Item extends CmsBean implements Serializable {
+public class Item extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private static Logger LOG = Logger.getLogger(Item.class);
 	private Site site;
@@ -163,11 +160,11 @@ public class Item extends CmsBean implements Serializable {
 		return getLinks().remove(toChildLink(relation, LinkType.relation));
 	}
 	
-	private Link toChildLink(Item i, LinkType lt) {
+	private Link toChildLink(Item i, String linkType) {
 		return CmsBeanFactory.makeLink().
 				setParentId(getId()).
 				setChild(i).
-				setType(lt).
+				setType(linkType).
 				setName("std").
 				setOrdering(0); // Arbitrary value
 	}
@@ -198,11 +195,11 @@ public class Item extends CmsBean implements Serializable {
 		return list;
 	}
 	
-	public Item move(Item target) {
+	public boolean move(Item target) {
 		return move(target, "over");
 	}
 	
-	public Item move(Item target, String mode) {
+	public boolean move(Item target, String mode) {
 		return getCmsService().getItemService().move(this, target, mode);
 	}
 	
@@ -439,19 +436,24 @@ public class Item extends CmsBean implements Serializable {
 		return filterLinks(LinkType.relation);
 	}
 	
-	private List<Link> filterLinks(LinkType type) {
+	public List<Link> getComponents() {
+		return filterLinks(LinkType.component);
+	}
+	
+	private List<Link> filterLinks(String type) {
 		List<Link> list = new ArrayList<Link>();
 		for (Link l : getLinks()) {
-			if (l.getType() == type) {
+			if (l.getType().equals(type)) {
 				list.add(l);
 			}
 		}
 		return list;
 	}
 
-	public List<Link> getInlinesAndRelations() {
+	public List<Link> getAllLinksBarBindings() {
 		List<Link> list = getInlines();
-		list.addAll(getRelations());		
+		list.addAll(getRelations());
+		list.addAll(getComponents());
 		return list;
 	}
 

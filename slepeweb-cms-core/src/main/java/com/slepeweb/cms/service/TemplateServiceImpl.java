@@ -3,6 +3,7 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Template;
@@ -60,6 +61,7 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 		}
 	}
 	
+	@Cacheable(value="serviceCache")
 	public Template getTemplate(Long id) {
 		return (Template) getFirstInList(
 			this.jdbcTemplate.query("select * from template where id = ?", 
@@ -67,6 +69,7 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 				new RowMapperUtil.TemplateMapper()));
 	}
 	
+	@Cacheable(value="serviceCache")
 	public Template getTemplate(Long siteId, String name) {
 		return (Template) getFirstInList(
 			this.jdbcTemplate.query("select * from template where siteid = ? and name = ?", 
@@ -74,6 +77,7 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 				new RowMapperUtil.TemplateMapper()));
 	}
 	
+	@Cacheable(value="serviceCache")
 	public List<Template> getAvailableTemplates(Long siteId) {
 		return (List<Template>) this.jdbcTemplate.query("select * from template where siteid = ? order by name", 
 				new Object[]{siteId},

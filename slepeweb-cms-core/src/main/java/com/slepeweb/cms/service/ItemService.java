@@ -17,8 +17,8 @@ public interface ItemService {
 	int getCount();
 	int getCount(String path);
 	int getCountByType(Long itemTypeId);
-	Item move(Item child, Item newParent);
-	Item move(Item child, Item target, String mode);
+	boolean move(Item child, Item newParent);
+	boolean move(Item child, Item target, String mode);
 	Item trashItem(Long id);
 	Item restoreItem(Long id);
 	int getBinCount();

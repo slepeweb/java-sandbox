@@ -14,7 +14,8 @@ import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.bean.Link.LinkType;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.bean.Template;
@@ -90,9 +91,27 @@ public class RowMapperUtil {
 			return CmsBeanFactory.makeLink().
 					setParentId(rs.getLong("parentid")).
 					setChild(mapItem(rs)).
-					setType(LinkType.valueOf(rs.getString("linktype"))).
+					setType(rs.getString("linktype")).
 					setName(rs.getString("linkname")).
 					setOrdering(rs.getInt("ordering"));
+		}
+	}
+	
+	public static final class LinkTypeMapper implements RowMapper<LinkType> {
+		public LinkType mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeLinkType().
+					setId(rs.getLong("id")).
+					setName(rs.getString("name"));
+		}
+	}
+	
+	public static final class LinkNameMapper implements RowMapper<LinkName> {
+		public LinkName mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeLinkName().
+					setId(rs.getLong("id")).
+					setSiteId(rs.getLong("siteid")).
+					setLinkTypeId(rs.getLong("linktypeid")).
+					setName(rs.getString("name"));
 		}
 	}
 	

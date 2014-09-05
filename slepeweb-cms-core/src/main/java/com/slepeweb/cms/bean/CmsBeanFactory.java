@@ -51,6 +51,18 @@ public class CmsBeanFactory {
 		return l;
 	}
 	
+	public static LinkType makeLinkType() {
+		LinkType lt = new LinkType();
+		lt.setCmsService(CMS);
+		return lt;
+	}
+	
+	public static LinkName makeLinkName() {
+		LinkName ln = new LinkName();
+		ln.setCmsService(CMS);
+		return ln;
+	}
+	
 	public static FieldForType makeFieldForType() {
 		FieldForType fft = new FieldForType();
 		fft.setCmsService(CMS);

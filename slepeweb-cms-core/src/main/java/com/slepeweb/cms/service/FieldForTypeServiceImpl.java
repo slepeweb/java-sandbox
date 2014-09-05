@@ -3,6 +3,7 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FieldForType;
@@ -63,6 +64,7 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 		}
 	}
 
+	@Cacheable(value="serviceCache")
 	public FieldForType getFieldForType(Long fieldId, Long itemTypeId) {
 		Object[] params = new Object[] {fieldId, itemTypeId};
 		
@@ -70,6 +72,7 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 		return (FieldForType) getFirstInList(this.jdbcTemplate.query(sql, params, new RowMapperUtil.FieldForTypeMapper()));
 	}
 
+	@Cacheable(value="serviceCache")
 	public List<FieldForType> getFieldsForType(Long itemTypeId) {
 		Object[] params = new Object[] {itemTypeId};
 		

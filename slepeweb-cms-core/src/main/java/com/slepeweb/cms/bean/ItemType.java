@@ -1,11 +1,10 @@
 package com.slepeweb.cms.bean;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class ItemType extends CmsBean implements Serializable {
+public class ItemType extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	public static final String CONTENT_FOLDER_TYPE_NAME = "Content Folder";
 	public static final String PAGE_MIMETYPE = "application/cms";

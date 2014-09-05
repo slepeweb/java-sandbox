@@ -3,6 +3,7 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.SiteConfig;
@@ -59,6 +60,7 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 		}
 	}
 
+	@Cacheable(value="serviceCache")
 	public SiteConfig getSiteConfig(Long siteId, String name) {
 		return (SiteConfig) getFirstInList(this.jdbcTemplate.query(
 				"select * from config where siteid = ? and name = ?", 
@@ -66,6 +68,7 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 				new RowMapperUtil.SiteConfigMapper()));
 	}
 
+	@Cacheable(value="serviceCache")
 	public List<SiteConfig> getSiteConfigs(Long siteId) {
 		return this.jdbcTemplate.query("select * from config where siteid = ? order by name", 
 				new Object[]{}, new RowMapperUtil.SiteConfigMapper());

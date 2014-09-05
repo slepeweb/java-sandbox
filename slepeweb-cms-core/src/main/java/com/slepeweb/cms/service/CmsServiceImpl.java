@@ -15,6 +15,8 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected FieldService fieldService;
 	@Autowired protected ItemService itemService;
 	@Autowired protected LinkService linkService;
+	@Autowired protected LinkNameService linkNameService;
+	@Autowired protected LinkTypeService linkTypeService;
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected FieldValueService fieldValueService;
 	@Autowired protected MediaService mediaService;
@@ -44,6 +46,14 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	
 	public LinkService getLinkService() {
 		return linkService;
+	}
+
+	public LinkNameService getLinkNameService() {
+		return linkNameService;
+	}
+
+	public LinkTypeService getLinkTypeService() {
+		return linkTypeService;
 	}
 
 	public FieldForTypeService getFieldForTypeService() {

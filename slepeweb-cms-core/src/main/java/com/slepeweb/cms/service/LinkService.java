@@ -12,6 +12,7 @@ public interface LinkService {
 	List<Link> getBindings(Long parentId);
 	List<Link> getInlines(Long parentId);
 	List<Link> getRelations(Long parentId);
+	List<Link> getComponents(Long parentId);
 	Link getLink(Long parentId, Long childId);
 	Link save(Link l);
 	int getCount();

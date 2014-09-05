@@ -3,6 +3,7 @@ package com.slepeweb.cms.bean;
 import org.apache.commons.lang3.StringUtils;
 
 public class SiteConfig extends CmsBean {
+	private static final long serialVersionUID = 1L;
 	private long siteId;
 	private String name, value;
 	

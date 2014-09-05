@@ -1,8 +1,7 @@
 package com.slepeweb.cms.bean;
 
-import java.io.Serializable;
 
-public class FieldForType extends CmsBean implements Serializable {
+public class FieldForType extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private Long typeId;
 	private Field field;

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
@@ -85,14 +86,17 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		}
 	}
 
+	@Cacheable(value="serviceCache")
 	public Site getSite(String name) {
 		return getSite("select * from site where name = ?", new Object[]{name});
 	}
 
+	@Cacheable(value="serviceCache")
 	public Site getSiteByHostname(String hostname) {
 		return getSite("select * from site where hostname = ?", new Object[]{hostname});
 	}
 
+	@Cacheable(value="serviceCache")
 	public Site getSite(Long id) {
 		return getSite("select * from site where id = ?", new Object[]{id});
 	}

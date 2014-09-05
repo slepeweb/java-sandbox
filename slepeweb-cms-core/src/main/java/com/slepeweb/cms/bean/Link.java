@@ -1,19 +1,13 @@
 package com.slepeweb.cms.bean;
 
-import java.io.Serializable;
 
-public class Link extends CmsBean implements Serializable {
+public class Link extends CmsBean {
 	private static final long serialVersionUID = 1L;
 
 	private Long parentId;
 	private Item child;
-	private LinkType type;
-	private String name;
+	private String name, type;
 	private Integer ordering;
-	
-	public enum LinkType {
-		binding, relation, inline, shortcut;
-	}
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Link) {
@@ -33,7 +27,7 @@ public class Link extends CmsBean implements Serializable {
 	
 	@Override
 	public String toString() {
-		return String.format("%s (%s): %s", getType().name(), getName(), getChild().getName());
+		return String.format("%s (%s): %s", getType(), getName(), getChild().getName());
 	}
 	
 	public Link save() {
@@ -71,11 +65,11 @@ public class Link extends CmsBean implements Serializable {
 		return this;
 	}
 
-	public LinkType getType() {
+	public String getType() {
 		return type;
 	}
 
-	public Link setType(LinkType type) {
+	public Link setType(String type) {
 		this.type = type;
 		return this;
 	}
@@ -130,7 +124,10 @@ public class Link extends CmsBean implements Serializable {
 				return false;
 		} else if (!parentId.equals(other.parentId))
 			return false;
-		if (type != other.type)
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
 			return false;
 		return true;
 	}

@@ -3,6 +3,7 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FieldForType;
@@ -77,10 +78,12 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 		}
 	}
 
+	@Cacheable(value="serviceCache")
 	public ItemType getItemType(String name) {
 		return getItemType("select * from itemtype where name = ?", new Object[]{name});
 	}
 
+	@Cacheable(value="serviceCache")
 	public ItemType getItemType(Long id) {
 		return getItemType("select * from itemtype where id = ?", new Object[]{id});
 	}
