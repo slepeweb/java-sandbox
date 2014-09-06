@@ -19,6 +19,7 @@ public class LinkNameServiceImpl extends BaseServiceImpl implements LinkNameServ
 			LinkName dbRecord = getLinkName(ln.getSiteId(), ln.getLinkTypeId(), ln.getName());		
 			if (dbRecord != null) {
 				updateLinkName(dbRecord, ln);
+				return dbRecord;
 			}
 			else {
 				insertLinkName(ln);
@@ -41,6 +42,7 @@ public class LinkNameServiceImpl extends BaseServiceImpl implements LinkNameServ
 	
 	private void updateLinkName(LinkName dbRecord, LinkName ln) {
 		if (! dbRecord.equals(ln)) {
+			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(ln);
 			
 			this.jdbcTemplate.update("update linkname set name = ? where id = ?", 
@@ -53,9 +55,10 @@ public class LinkNameServiceImpl extends BaseServiceImpl implements LinkNameServ
 		}
 	}
 
-	public void deleteLinkName(Long id) {
-		if (this.jdbcTemplate.update("delete from linkname where id = ?", id) > 0) {
-			LOG.warn(compose("Deleted linkname", String.valueOf(id)));
+	public void deleteLinkName(LinkName ln) {
+		if (this.jdbcTemplate.update("delete from linkname where id = ?", ln.getId()) > 0) {
+			LOG.warn(compose("Deleted linkname", String.valueOf(ln.getId())));
+			this.cacheEvictor.evict(ln);
 		}
 	}
 

@@ -57,6 +57,8 @@
 		class="org.springframework.cache.ehcache.EhCacheCacheManager"
 		p:cacheManager-ref="cacheManagerFactory" />
 
+	<bean id="cacheEvictor" class="com.slepeweb.cms.cache.CacheEvictor" init-method="init" />
+
 	<cache:annotation-driven key-generator="cmsKeyGenerator" />	
   	
 	<bean id="propertyConfigurer"

@@ -19,6 +19,7 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 			SiteConfig dbRecord = getSiteConfig(sc.getSiteId(), sc.getName());		
 			if (dbRecord != null) {
 				updateSiteConfig(dbRecord, sc);
+				return dbRecord;
 			}
 			else {
 				insertSiteConfig(sc);
@@ -41,6 +42,7 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 
 	private void updateSiteConfig(SiteConfig dbRecord, SiteConfig sc) {
 		if (! dbRecord.equals(sc)) {
+			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(sc);
 			
 			this.jdbcTemplate.update(
@@ -54,9 +56,11 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 		}
 	}
 	
-	public void deleteSiteConfig(Long siteId, String name) {
-		if (this.jdbcTemplate.update("delete from config where siteid = ? and name = ?", siteId, name) > 0) {
-			LOG.warn(compose("Deleted site configuration property", String.valueOf(siteId), name));
+	public void deleteSiteConfig(SiteConfig sc) {
+		if (this.jdbcTemplate.update("delete from config where siteid = ? and name = ?", 
+				sc.getSiteId(), sc.getName()) > 0) {
+			LOG.warn(compose("Deleted site configuration property", String.valueOf(sc.getSiteId()), sc.getName()));
+			this.cacheEvictor.evict(sc);
 		}
 	}
 

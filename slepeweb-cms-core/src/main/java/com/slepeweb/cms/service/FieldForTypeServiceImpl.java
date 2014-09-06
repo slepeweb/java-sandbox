@@ -22,6 +22,7 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 			FieldForType dbRecord = getFieldForType(fft.getField().getId(), fft.getTypeId());		
 			if (dbRecord != null) {
 				updateFieldForType(dbRecord, fft);
+				return dbRecord;
 			}
 			else {
 				insertFieldForType(fft);
@@ -45,6 +46,7 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 
 	private void updateFieldForType(FieldForType dbRecord, FieldForType fft) {
 		if (! dbRecord.equals(fft)) {
+			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(fft);
 			
 			this.jdbcTemplate.update(
@@ -58,12 +60,14 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 		}
 	}
 
-	public void deleteFieldForType(Long fieldId, Long itemTypeId) {
-		if (this.jdbcTemplate.update("delete from fieldfortype where fieldid = ? and itemtypeid = ?", fieldId, itemTypeId) > 0) {
+	public void deleteFieldForType(FieldForType fft) {
+		if (this.jdbcTemplate.update("delete from fieldfortype where fieldid = ? and itemtypeid = ?", 
+				fft.getField().getId(), fft.getTypeId()) > 0) {
 			LOG.warn(compose("Deleted field for type", ""));
+			this.cacheEvictor.evict(fft);
 		}
 	}
-
+	
 	@Cacheable(value="serviceCache")
 	public FieldForType getFieldForType(Long fieldId, Long itemTypeId) {
 		Object[] params = new Object[] {fieldId, itemTypeId};

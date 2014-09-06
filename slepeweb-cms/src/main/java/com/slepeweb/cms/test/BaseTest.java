@@ -38,8 +38,12 @@ public abstract class BaseTest {
 		return this.cmsService.getSiteService().getSite(TEST_SITE_NAME);
 	}
 
-	protected Site addSite(String name, String hostname, String homepageTypeName) {
-		return CmsBeanFactory.makeSite().setName(name).setHostname(hostname).save();	
+	protected Site addSite(String name, String hostname, String homepageTypeName, String shortname) {
+		return CmsBeanFactory.makeSite().
+				setName(name).
+				setHostname(hostname).
+				setShortname(shortname).
+				save();	
 	}
 	
 	protected ItemType addType(String name) {

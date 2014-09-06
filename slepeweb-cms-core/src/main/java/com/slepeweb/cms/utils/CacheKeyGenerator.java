@@ -11,7 +11,7 @@ public class CacheKeyGenerator implements KeyGenerator {
 		StringBuilder sb = new StringBuilder(method.getName());
 		
 		for (Object o : params) {
-			sb.append("-").append(o.toString());
+			sb.append("-").append(o == null ? "null" : o.toString());
 		}
 		
 		return sb.toString();

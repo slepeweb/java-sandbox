@@ -19,7 +19,9 @@ public class BuildTest extends BaseTest {
 	
 	public TestResultSet execute() {
 		
+		int count;		
 		TestResult r;
+		
 		TestResultSet trs = new TestResultSet("Test site build").
 			register(2010, "Check 6 item types have been created").
 			register(2020, "Check 5 fields have been created").
@@ -66,6 +68,7 @@ public class BuildTest extends BaseTest {
 		
 		// Create item types
 		ItemType cfolderType = addType(ItemType.CONTENT_FOLDER_TYPE_NAME);
+		count = this.cmsService.getItemTypeService().getCount();
 		ItemType sectionType = addType(SECTION_TYPE_NAME);
 		ItemType newsType = addType(NEWS_TYPE_NAME);
 		ItemType eventType = addType(EVENT_TYPE_NAME);
@@ -73,13 +76,14 @@ public class BuildTest extends BaseTest {
 		ItemType imageType = addType(IMAGE_TYPE_NAME, "image/jpeg");
 		
 		// 2010: Assert N types have been created
-		int numItemTypes = this.cmsService.getItemTypeService().getCount();
+		int numItemTypes = this.cmsService.getItemTypeService().getCount() - count;
 		r = trs.execute(2010).setNotes(numItemTypes + " items types have been created");
-		if (numItemTypes != 6) {
+		if (numItemTypes != 5) {
 			r.fail();
 		}
 		
 		// Create fields
+		count = this.cmsService.getFieldService().getCount();
 		Field titleField = addField("Title", TITLE_FIELD_NAME, "Page title - also used in links to this page", FieldType.text, 64, "");
 		Field teaserField = addField("Teaser", TEASER_FIELD_NAME, "Used in links to this page", FieldType.text, 256, "");
 		Field bodyField = addField("Body text", BODY_FIELD_NAME, "Main content for page", FieldType.markup, 0, "");
@@ -87,13 +91,14 @@ public class BuildTest extends BaseTest {
 		Field alttextField = addField("Alt text", ALTTEXT_FIELD_NAME, "Alt text for image", FieldType.text, 128, "*");
 		
 		// 2020: Assert N fields have been created
-		int numFields = this.cmsService.getFieldService().getCount();
+		int numFields = this.cmsService.getFieldService().getCount() - count;
 		r = trs.execute(2020).setNotes(numFields + " fields have been created");
 		if (numFields != 5) {
 			r.fail();
 		}
 		
 		// Define fields for all types
+		count = this.cmsService.getFieldForTypeService().getCount();
 		for (ItemType it : new ItemType[] {sectionType, newsType, eventType, articleType} ) {
 			it.addFieldForType(titleField, 1L, true);
 			it.addFieldForType(teaserField, 2L, false);
@@ -111,14 +116,14 @@ public class BuildTest extends BaseTest {
 		articleType.save();
 		
 		// 2030: Assert number of fieldfortype rows
-		int numFieldForTypes = this.cmsService.getFieldForTypeService().getCount();
+		int numFieldForTypes = this.cmsService.getFieldForTypeService().getCount() - count;
 		r = trs.execute(2030).setNotes(numFieldForTypes + " fieldfortype rows have been created");
 		if (numFieldForTypes != 15) {
 			r.fail();
 		}		
 				
 		// Create test site
-		site = addSite(TEST_SITE_NAME, "test.slepeweb.com", HOMEPAGE_TYPE_NAME);
+		site = addSite(TEST_SITE_NAME, "test.slepeweb.com", HOMEPAGE_TYPE_NAME, "z");
 		
 		// 2040: Assert site has been created
 		r = trs.execute(2040);

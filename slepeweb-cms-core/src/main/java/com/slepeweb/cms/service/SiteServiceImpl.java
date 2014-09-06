@@ -24,6 +24,7 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 			Site dbRecord = getSite(s.getName());		
 			if (dbRecord != null) {
 				updateSite(dbRecord, s);
+				return dbRecord;
 			}
 			else {
 				insertSite(s);
@@ -39,8 +40,8 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	private Site insertSite(Site s) {
 		
 		this.jdbcTemplate.update(
-				"insert into site (name, hostname) values (?, ?)", 
-				s.getName(), s.getHostname());
+				"insert into site (name, hostname, shortname) values (?, ?, ?)", 
+				s.getName(), s.getHostname(), s.getShortname());
 		
 		s.setId(getLastInsertId());	
 		
@@ -60,11 +61,12 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 
 	private void updateSite(Site dbRecord, Site site) {
 		if (! dbRecord.equals(site)) {
+			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(site);
 			
 			this.jdbcTemplate.update(
-					"update site set name = ?, hostname = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getHostname(), dbRecord.getId());
+					"update site set name = ?, hostname = ?, shortname = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getHostname(), dbRecord.getShortname(), dbRecord.getId());
 			
 			LOG.info(compose("Updated site", site));
 		}
@@ -74,17 +76,18 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		}
 	}
 
-	public void deleteSite(Long id) {
-		if (this.jdbcTemplate.update("delete from site where id = ?", id) > 0) {
-			LOG.warn(compose("Deleted site", String.valueOf(id)));
+	public void deleteSite(Site s) {
+		if (this.jdbcTemplate.update("delete from site where id = ?", s.getId()) > 0) {
+			LOG.warn(compose("Deleted site", s.getName()));
+			this.cacheEvictor.evict(s);
 		}
 	}
 
-	public void deleteSite(String name) {
-		if (this.jdbcTemplate.update("delete from site where name = ?", name) > 0) {
-			LOG.warn(compose("Deleted site", name));
-		}
-	}
+//	public void deleteSite(String name) {
+//		if (this.jdbcTemplate.update("delete from site where name = ?", name) > 0) {
+//			LOG.warn(compose("Deleted site", name));
+//		}
+//	}
 
 	@Cacheable(value="serviceCache")
 	public Site getSite(String name) {

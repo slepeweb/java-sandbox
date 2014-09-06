@@ -44,6 +44,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 			Link dbRecord = getLink(l.getParentId(), l.getChild().getId());		
 			if (dbRecord != null) {
 				updateLink(dbRecord, l);
+				return dbRecord;
 			}
 			else {
 				insertLink(l);

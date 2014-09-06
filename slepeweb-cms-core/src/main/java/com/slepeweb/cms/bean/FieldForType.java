@@ -24,6 +24,10 @@ public class FieldForType extends CmsBean {
 			getField() != null && getField().getId() != null;
 	}
 	
+	public Long getId() {
+		return NO_ID;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("TypeId=%d: %s", getTypeId(), getField());
@@ -34,7 +38,7 @@ public class FieldForType extends CmsBean {
 	}
 	
 	public void delete() {
-		getFieldForTypeService().deleteFieldForType(getField().getId(), getTypeId());
+		getFieldForTypeService().deleteFieldForType(this);
 	}
 	
 	public Field getField() {

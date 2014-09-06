@@ -17,8 +17,10 @@ create table site
 	id int not null auto_increment,
 	name varchar(255),
 	hostname varchar(255),
+	shortname varchar(8),
 	primary key (id),
 	unique key idx_site_name (name),
+	unique key idx_site_shortname (shortname),
 	unique key idx_site_hostname (hostname)
 ) ENGINE=InnoDB;
 

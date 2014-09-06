@@ -16,10 +16,13 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 	private static Logger LOG = Logger.getLogger(ItemTypeServiceImpl.class);
 	
 	public ItemType save(ItemType it) {
+		boolean updated = false;
+		
 		if (it.isDefined4Insert()) {
 			ItemType dbRecord = getItemType(it.getName());		
 			if (dbRecord != null) {
 				updateItemType(dbRecord, it);
+				updated = true;
 			}
 			else {
 				insertItemType(it);
@@ -28,6 +31,10 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			saveFieldsForType(it);
 			// TODO: need to remove old fields - similar to old links.
 			// But for the moment, consider field removal from an item type out of scope.
+			
+			if (updated) {
+				return dbRecord;
+			}
 		}
 		else {
 			LOG.error(compose("ItemType not saved - insufficient data", it));
@@ -47,6 +54,7 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 
 	private void updateItemType(ItemType dbRecord, ItemType it) {
 		if (! dbRecord.equals(it)) {
+			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(it);
 			
 			this.jdbcTemplate.update(
@@ -72,12 +80,21 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 		}
 	}
 
-	public void deleteItemType(Long id) {
-		if (this.jdbcTemplate.update("delete from itemtype where id = ?", id) > 0) {
-			LOG.warn(compose("Deleted item type", String.valueOf(id)));
+	public void deleteItemType(ItemType it) {
+		if (this.jdbcTemplate.update("delete from itemtype where id = ?", it.getId()) > 0) {
+			LOG.warn(compose("Deleted item type", it.getId()));
+			deepEvict(it);
 		}
 	}
-
+	
+	private void deepEvict(ItemType it) {
+		this.cacheEvictor.evict(it);
+		
+		for (FieldForType fft : it.getFieldsForType()) {
+			this.cacheEvictor.evict(fft);
+		}
+	}
+	
 	@Cacheable(value="serviceCache")
 	public ItemType getItemType(String name) {
 		return getItemType("select * from itemtype where name = ?", new Object[]{name});
@@ -93,6 +110,7 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			sql, params, new RowMapperUtil.ItemTypeMapper()));
 	}
 
+	@Cacheable(value="serviceCache")
 	public List<ItemType> getAvailableItemTypes() {
 		return this.jdbcTemplate.query("select * from itemtype order by name", 
 				new Object[]{}, new RowMapperUtil.ItemTypeMapper());

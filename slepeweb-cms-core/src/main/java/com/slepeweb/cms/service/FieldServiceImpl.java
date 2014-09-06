@@ -17,6 +17,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 			Field dbRecord = getField(f.getVariable());		
 			if (dbRecord != null) {
 				updateField(dbRecord, f);
+				return dbRecord;
 			}
 			else {
 				insertField(f);
@@ -40,6 +41,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 
 	private void updateField(Field dbRecord, Field field) {
 		if (! dbRecord.equals(field)) {
+			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(field);
 			
 			this.jdbcTemplate.update(
@@ -55,19 +57,16 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 		}
 	}
 
-	public void deleteField(Long id) {
-		if (this.jdbcTemplate.update("delete from field where id = ?", id) > 0) {
-			LOG.warn(compose("Deleted field", String.valueOf(id)));
+	public void deleteField(Field f) {
+		if (this.jdbcTemplate.update("delete from field where id = ?", f.getId()) > 0) {
+			LOG.warn(compose("Deleted field", f.getName()));
+			this.cacheEvictor.evict(f);
 		}
 	}
-
-	public void deleteField(Field s) {
-		deleteField(s.getId());
-	}
-
+	
 	@Cacheable(value="serviceCache")
-	public Field getField(String name) {
-		return getField("select * from field where variable = ?", new Object[]{name});
+	public Field getField(String variable) {
+		return getField("select * from field where variable = ?", new Object[]{variable});
 	}
 
 	@Cacheable(value="serviceCache")

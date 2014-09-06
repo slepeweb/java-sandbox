@@ -3,10 +3,12 @@ package com.slepeweb.cms.setup;
 public class SiteSetupStatistics {
 	private int numRowsProcessed, numXlsErrors, numXlsWarnings;
 	private int numSiteUpdates, numItemTypeUpdates, numFieldUpdates, numTemplateUpdates;
+	private int numLinkNameUpdates;
 
 	public enum ResultType {
 		ROWS_PROCESSED, XLS_ERROR, XLS_WARNING, 
-		SITE_UPDATED, FIELD_UPDATED, ITEMTYPE_UPDATED, TEMPLATE_UPDATED
+		SITE_UPDATED, FIELD_UPDATED, ITEMTYPE_UPDATED, TEMPLATE_UPDATED,
+		LINKNAME_UPDATED
 	}
 
 	public void inc(ResultType type) {
@@ -24,6 +26,8 @@ public class SiteSetupStatistics {
 			this.numFieldUpdates++;
 		} else if (type == ResultType.TEMPLATE_UPDATED) {
 			this.numTemplateUpdates++;
+		} else if (type == ResultType.LINKNAME_UPDATED) {
+			this.numLinkNameUpdates++;
 		}
 	}
 
@@ -53,5 +57,9 @@ public class SiteSetupStatistics {
 
 	public int getNumTemplateUpdates() {
 		return numTemplateUpdates;
+	}
+
+	public int getNumLinkNameUpdates() {
+		return numLinkNameUpdates;
 	}
 }

@@ -17,6 +17,7 @@ public class LinkTypeServiceImpl extends BaseServiceImpl implements LinkTypeServ
 			LinkType dbRecord = getLinkType(lt.getName());		
 			if (dbRecord != null) {
 				updateLinkType(dbRecord, lt);
+				return dbRecord;
 			}
 			else {
 				insertLinkType(lt);
@@ -38,6 +39,7 @@ public class LinkTypeServiceImpl extends BaseServiceImpl implements LinkTypeServ
 	
 	private void updateLinkType(LinkType dbRecord, LinkType lt) {
 		if (! dbRecord.equals(lt)) {
+			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(lt);
 			
 			this.jdbcTemplate.update(
@@ -51,9 +53,10 @@ public class LinkTypeServiceImpl extends BaseServiceImpl implements LinkTypeServ
 		}
 	}
 
-	public void deleteLinkType(Long id) {
-		if (this.jdbcTemplate.update("delete from linktype where id = ?", id) > 0) {
-			LOG.warn(compose("Deleted linktype", String.valueOf(id)));
+	public void deleteLinkType(LinkType lt) {
+		if (this.jdbcTemplate.update("delete from linktype where id = ?", lt.getId()) > 0) {
+			LOG.warn(compose("Deleted linktype", String.valueOf(lt.getId())));
+			this.cacheEvictor.evict(lt);
 		}
 	}
 

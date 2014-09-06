@@ -20,6 +20,7 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 			FieldValue dbRecord = getFieldValue(fv.getField().getId(), fv.getItemId());		
 			if (dbRecord != null) {
 				updateFieldValue(dbRecord, fv);
+				return dbRecord;
 			}
 			else {
 				insertFieldValue(fv);

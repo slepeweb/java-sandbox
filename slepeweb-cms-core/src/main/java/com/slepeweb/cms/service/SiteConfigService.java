@@ -6,7 +6,7 @@ import com.slepeweb.cms.bean.SiteConfig;
 
 
 public interface SiteConfigService {
-	void deleteSiteConfig(Long siteId, String key);
+	void deleteSiteConfig(SiteConfig sc);
 	SiteConfig getSiteConfig(Long siteId, String key);
 	List<SiteConfig> getSiteConfigs(Long siteId);
 	SiteConfig save(SiteConfig sc);

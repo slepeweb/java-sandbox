@@ -33,7 +33,7 @@ public class LinkType extends CmsBean {
 	}
 
 	public void delete() {
-		getLinkTypeService().deleteLinkType(getId());
+		getLinkTypeService().deleteLinkType(this);
 	}
 
 	public Long getId() {

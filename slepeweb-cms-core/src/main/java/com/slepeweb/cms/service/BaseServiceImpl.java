@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.slepeweb.cms.cache.CacheEvictor;
 import com.slepeweb.cms.component.Config;
 import com.slepeweb.cms.utils.LogUtil;
 
@@ -14,6 +15,8 @@ public class BaseServiceImpl {
 
 	@Autowired protected JdbcTemplate jdbcTemplate;
 	@Autowired protected Config config;
+	@Autowired protected CacheEvictor cacheEvictor;
+	
 	
 	protected String getSelectSql(String sql) {
 		return sql +  (this.config.isLiveDelivery() ? " and i.published = 1" : "");
@@ -30,7 +33,7 @@ public class BaseServiceImpl {
 		return null;
 
 	}
-	
+
 	protected String compose(String template, Object ... params) {
 		return LogUtil.compose(template, params);
 	}

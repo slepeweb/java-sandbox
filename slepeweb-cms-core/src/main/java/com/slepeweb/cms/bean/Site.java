@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Site extends CmsBean {
 	private static final long serialVersionUID = 1L;
-	private String name, hostname;
+	private String name, hostname, shortname;
 	private Long id;
 		
 	public void assimilate(Object obj) {
@@ -14,18 +14,20 @@ public class Site extends CmsBean {
 			Site s = (Site) obj;
 			setName(s.getName());
 			setHostname(s.getHostname());
+			setShortname(s.getShortname());
 		}
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
 			StringUtils.isNotBlank(getName()) &&
-			StringUtils.isNotBlank(getHostname());
+			StringUtils.isNotBlank(getHostname()) &&
+			StringUtils.isNotBlank(getShortname());
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("%s: %s", getName(), getHostname());
+		return String.format("%s: %s (%s)", getName(), getHostname(), getShortname());
 	}
 	
 	public Site save() {
@@ -33,7 +35,7 @@ public class Site extends CmsBean {
 	}
 	
 	public void delete() {
-		getSiteService().deleteSite(getId());
+		getSiteService().deleteSite(this);
 	}
 	
 	public Item getItem(String path) {
@@ -81,6 +83,7 @@ public class Site extends CmsBean {
 		int result = 1;
 		result = prime * result + ((hostname == null) ? 0 : hostname.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((shortname == null) ? 0 : shortname.hashCode());
 		return result;
 	}
 
@@ -103,7 +106,21 @@ public class Site extends CmsBean {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (shortname == null) {
+			if (other.shortname != null)
+				return false;
+		} else if (!shortname.equals(other.shortname))
+			return false;
 		return true;
+	}
+
+	public String getShortname() {
+		return shortname;
+	}
+
+	public Site setShortname(String shortname) {
+		this.shortname = shortname;
+		return this;
 	}
 
 }

@@ -25,6 +25,10 @@ public class Link extends CmsBean {
 			getType() != null;
 	}
 	
+	public Long getId() {
+		return NO_ID;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("%s (%s): %s", getType(), getName(), getChild().getName());

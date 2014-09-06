@@ -25,6 +25,10 @@ public class SiteConfig extends CmsBean {
 		return getCmsService().getSiteConfigService().save(this);
 	}
 	
+	public Long getId() {
+		return NO_ID;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("%s -> [%s]", getName(), getValue());

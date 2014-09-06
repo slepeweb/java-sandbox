@@ -19,6 +19,7 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 			Template dbRecord = getTemplate(t.getSiteId(), t.getName());		
 			if (dbRecord != null) {
 				updateTemplate(dbRecord, t);
+				return dbRecord;
 			}
 			else {
 				insertTemplate(t);

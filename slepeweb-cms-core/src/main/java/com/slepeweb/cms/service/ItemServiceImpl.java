@@ -42,10 +42,13 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	public Item save(Item i, boolean extendedSave) {
+		boolean updated = false;
+		
 		if (i.isDefined4Insert()) {
 			Item dbRecord = getItem(i.getId());		
 			if (dbRecord != null) {
 				updateItem(dbRecord, i);
+				updated = true;
 			}
 			else {
 				insertItem(i);
@@ -55,6 +58,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				saveFieldValues(i.getFieldValues());
 				saveLinks(i, dbRecord);
 //				saveMedia(i);
+			}
+			
+			if (updated) {
+				return dbRecord;
 			}
 		}
 		else {

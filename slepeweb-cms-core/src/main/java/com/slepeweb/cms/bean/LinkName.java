@@ -37,7 +37,7 @@ public class LinkName extends CmsBean {
 	}
 
 	public void delete() {
-		getLinkNameService().deleteLinkName(getId());
+		getLinkNameService().deleteLinkName(this);
 	}
 	
 	public String getName() {

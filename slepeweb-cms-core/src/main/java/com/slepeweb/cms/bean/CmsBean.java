@@ -16,10 +16,12 @@ import com.slepeweb.cms.utils.LogUtil;
 
 public abstract class CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
+	protected static final Long NO_ID = -1L;
 	protected transient CmsService cmsService;
 	
 	protected abstract CmsBean save();	
 	protected abstract void delete();
+	public abstract Long getId();
 	protected abstract boolean isDefined4Insert();	
 	
 	// The properties that should be assimilated are those which are specified in the update sql

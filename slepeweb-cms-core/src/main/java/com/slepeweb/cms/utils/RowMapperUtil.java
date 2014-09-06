@@ -27,7 +27,8 @@ public class RowMapperUtil {
 			return CmsBeanFactory.makeSite().
 					setId(rs.getLong("id")).
 					setName(rs.getString("name")).
-					setHostname(rs.getString("hostname"));
+					setHostname(rs.getString("hostname")).
+					setShortname(rs.getString("shortname"));
 		}
 	}
 	

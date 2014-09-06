@@ -51,7 +51,7 @@ public class ItemType extends CmsBean {
 	}
 	
 	public void delete() {
-		getItemTypeService().deleteItemType(getId());
+		getItemTypeService().deleteItemType(this);
 	}
 	
 	public Long getId() {

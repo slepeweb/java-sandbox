@@ -1,6 +1,7 @@
 package com.slepeweb.cms.setup;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,6 +19,8 @@ import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.service.CmsService;
@@ -29,6 +32,7 @@ public class SiteSetup {
 	private static Logger LOG = Logger.getLogger(SiteSetup.class);
 
 	@Autowired private CmsService cmsService;
+	private Site site;
 
 	public void load(String filePath) {
 		LOG.info(LogUtil.compose("Setting up site", filePath));
@@ -55,6 +59,7 @@ public class SiteSetup {
 		LOG.info("Site updates      :" + result.getNumSiteUpdates());
 		LOG.info("Field updates     :" + result.getNumFieldUpdates());
 		LOG.info("Item type updates :" + result.getNumItemTypeUpdates());
+		LOG.info("Link name updates :" + result.getNumLinkNameUpdates());
 		LOG.info("Template updates  :" + result.getNumTemplateUpdates());
 		LOG.info("Took " + sec + " secs");
 		LOG.info("Finished");
@@ -62,12 +67,14 @@ public class SiteSetup {
 
 
 	private void readCsv(String filePath, SiteSetupStatistics stats) {
+		InputStream is = null;
 		POIFSFileSystem fs;
 		HSSFWorkbook wb;
 
 		// open spreadsheet
 		try {
-			fs = new POIFSFileSystem(new FileInputStream(filePath));
+			is = new FileInputStream(filePath);
+			fs = new POIFSFileSystem(is);
 		} catch (Exception e) {
 			LOG.error("Failed to open spreadsheet", e);
 			return;
@@ -81,15 +88,25 @@ public class SiteSetup {
 			return;
 		}
 
-		createSite(wb.getSheetAt(0).rowIterator(), stats);
-		createFields(wb.getSheetAt(1).rowIterator(), stats);
-		createItemTypes(wb.getSheetAt(2).rowIterator(), stats);
-		createTemplates(wb.getSheetAt(3).rowIterator(), stats);
+		if ((this.site = createSite(wb.getSheetAt(0).rowIterator(), stats)) != null) {
+			createFields(wb.getSheetAt(1).rowIterator(), stats);
+			createItemTypes(wb.getSheetAt(2).rowIterator(), stats);
+			createLinkNames(wb.getSheetAt(3).rowIterator(), stats);
+			createTemplates(wb.getSheetAt(4).rowIterator(), stats);
+		}
+		
+		// close spreadsheet
+		try {
+			is.close();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private Site createSite(Iterator<Row> rowIter, SiteSetupStatistics stats) {
 		Row row;
-		Site s;
+		Site s = null;
 		String firstCell, name;
 		boolean updateable = false;
 		
@@ -110,6 +127,7 @@ public class SiteSetup {
 				if (s == null || updateable) {
 					s = CmsBeanFactory.makeSite().
 							setName(name).
+							setShortname(SiteSetupUtils.getString(row.getCell(2))).
 							setHostname(SiteSetupUtils.getString(row.getCell(3))).
 							save();
 					
@@ -119,7 +137,7 @@ public class SiteSetup {
 					}
 				}
 				else {
-					LOG.info(LogUtil.compose("Site is not updateable", s));
+					LOG.debug(LogUtil.compose("Site is not updateable", s));
 				}
 			}
 		}
@@ -160,7 +178,7 @@ public class SiteSetup {
 					stats.inc(ResultType.FIELD_UPDATED);
 				}
 				else {
-					LOG.info(LogUtil.compose("Field is not updateable", f));
+					LOG.debug(LogUtil.compose("Field is not updateable", f));
 				}
 			}
 		}
@@ -217,22 +235,62 @@ public class SiteSetup {
 					}
 				}
 				else {
-					LOG.info(LogUtil.compose("Item type is not updateable", it));
+					LOG.debug(LogUtil.compose("Item type is not updateable", it));
 				}
 			}
 		}
 	}
 
+	private void createLinkNames(Iterator<Row> rowIter, SiteSetupStatistics stats) {
+		Row row;
+		LinkType lt;
+		LinkName ln;
+		String firstCell, linkType, linkName;
+		boolean updateable = false;
+		
+		while (rowIter.hasNext()) {
+			row = rowIter.next();
+			firstCell = SiteSetupUtils.getString(row.getCell(0));
+
+			if (firstCell.startsWith("###")) {
+				break;
+			} else if (firstCell.startsWith("#") || StringUtils.isBlank(firstCell)) {
+				continue;
+			} else {
+				stats.inc(ResultType.ROWS_PROCESSED);
+				updateable = firstCell.equals("1");
+				linkType = SiteSetupUtils.getString(row.getCell(1));
+				linkName = SiteSetupUtils.getString(row.getCell(2));				
+				lt = this.cmsService.getLinkTypeService().getLinkType(linkType);
+				
+				if (lt != null) {
+					ln = this.cmsService.getLinkNameService().getLinkName(this.site.getId(), lt.getId(), linkName);
+					
+					if (ln == null || updateable) {
+						ln = CmsBeanFactory.makeLinkName().
+								setSiteId(this.site.getId()).
+								setLinkTypeId(lt.getId()).
+								setName(linkName).
+								save();
+						
+						if (ln.getId() != null) {
+							stats.inc(ResultType.LINKNAME_UPDATED);
+						}
+					}
+					else {
+						LOG.debug(LogUtil.compose("LinkName is not updateable", ln));
+					}
+				}
+			}
+		}
+	}
+	
 	private void createTemplates(Iterator<Row> rowIter, SiteSetupStatistics stats) {
 		Row row;
 		Template t = null;
 		boolean updateable = false;
-		String siteName, itemTypeName, templateName;
-		Site s;
+		String templateName;
 		ItemType it;
-		Long siteId, itemTypeId;
-		Map<String, Long> siteCache = new HashMap<String, Long>();
-		Map<String, Long> itemTypeCache = new HashMap<String, Long>();
 
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
@@ -244,53 +302,24 @@ public class SiteSetup {
 				continue;
 			} else {
 				stats.inc(ResultType.ROWS_PROCESSED);
-				updateable = firstCell.equals("1");
+				updateable = firstCell.equals("1");				
+				it = this.cmsService.getItemTypeService().getItemType(SiteSetupUtils.getString(row.getCell(1)));
 				
-				siteName = SiteSetupUtils.getString(row.getCell(1));
-				siteId = siteCache.get(siteName);
-				if (siteId == null) {
-					s = this.cmsService.getSiteService().getSite(siteName);
-					if (s != null) {
-						siteId = s.getId();
-						siteCache.put(siteName, siteId);
-					}
-					else {
-						LOG.error(LogUtil.compose("Failed to recognise site name; template ignored", siteName, row.getRowNum()));
-						stats.inc(ResultType.XLS_ERROR);
-						continue;
-					}
-				}
-				
-				itemTypeName = SiteSetupUtils.getString(row.getCell(2));
-				itemTypeId = itemTypeCache.get(itemTypeName);
-				if (itemTypeId == null) {
-					it = this.cmsService.getItemTypeService().getItemType(itemTypeName);
-					if (it != null) {
-						itemTypeId = it.getId();
-						itemTypeCache.put(itemTypeName, itemTypeId);
-					}
-					else {
-						LOG.error(LogUtil.compose("Failed to recognise item type name; template ignored", itemTypeName, row.getRowNum()));
-						stats.inc(ResultType.XLS_ERROR);
-						continue;
-					}
-				}
-				
-				if (siteId != null && itemTypeId != null) {
-					templateName = SiteSetupUtils.getString(row.getCell(3));
-					t = this.cmsService.getTemplateService().getTemplate(siteId, templateName);
+				if (it != null) {
+					templateName = SiteSetupUtils.getString(row.getCell(2));
+					t = this.cmsService.getTemplateService().getTemplate(this.site.getId(), templateName);
 					if (t == null || updateable) {
 						t = CmsBeanFactory.makeTemplate().
-								setSiteId(siteId).
-								setItemTypeId(itemTypeId).
+								setSiteId(this.site.getId()).
+								setItemTypeId(it.getId()).
 								setName(templateName).
-								setForward(SiteSetupUtils.getString(row.getCell(4))).
+								setForward(SiteSetupUtils.getString(row.getCell(3))).
 								save();
 						
 						stats.inc(ResultType.TEMPLATE_UPDATED);
 					}
 					else {
-						LOG.info(LogUtil.compose("Template is not updateable", t));
+						LOG.debug(LogUtil.compose("Template is not updateable", t));
 					}
 				}
 			}

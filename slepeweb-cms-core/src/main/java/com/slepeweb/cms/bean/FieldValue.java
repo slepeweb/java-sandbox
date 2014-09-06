@@ -29,6 +29,10 @@ public class FieldValue extends CmsBean {
 			getField() != null && getField().getId() != null;
 	}
 	
+	public Long getId() {
+		return NO_ID;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("itemId=%d: %s {%s}", getItemId(), getField(), StringUtils.abbreviate(getStringValue(), 64));
