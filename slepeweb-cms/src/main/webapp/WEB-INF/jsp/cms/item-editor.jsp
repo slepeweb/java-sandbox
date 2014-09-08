@@ -26,7 +26,7 @@
 		</div>
 		<div>
 		<c:choose><c:when test="${not empty editingItem.template}"><c:set var="templateName" 
-			value="${editingItem.template.name}" /></c:when><c:otherwise><c:set 
+			value="${editingItem.template}" /></c:when><c:otherwise><c:set 
 				var="templateName" value="No template" /></c:otherwise></c:choose>
 			<label for="type">Template: </label><input disabled="disabled" value="${templateName}" />
 		</div>

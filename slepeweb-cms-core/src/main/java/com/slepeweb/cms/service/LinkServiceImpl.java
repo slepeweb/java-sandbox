@@ -22,7 +22,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	private static List<Link> EMPTY_LIST = new ArrayList<Link>();
 	
 	private static final String SELECT_TEMPLATE = 
-			"select i.*, s.name as sitename, s.hostname, it.id as typeid, it.name as typename, it.mimetype, " +
+			"select i.*, s.name as sitename, s.hostname, s.shortname as site_shortname, it.id as typeid, it.name as typename, it.mimetype, " +
 			"l.parentid, lt.name as linktype, ln.name as linkname, l.ordering, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
 			"from item i " +

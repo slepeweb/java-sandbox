@@ -221,7 +221,12 @@ public class SiteSetup {
 							f = fieldCache.get(variable);
 							if (f == null) {
 								f = this.cmsService.getFieldService().getField(variable);
-								fieldCache.put(variable, f);
+								if (f != null) {
+									fieldCache.put(variable, f);
+								}
+								else {
+									LOG.error(LogUtil.compose("Field does not exist", variable));
+								}
 							}
 							
 							if (f != null) {

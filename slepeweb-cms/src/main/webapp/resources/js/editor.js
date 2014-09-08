@@ -79,7 +79,7 @@ $(function() {
 						}, 
 						dataType: "json",
 						success: function(json, status, z) {
-							showDialog("dialog-update-success");
+							showDialog("dialog-update-success", pageEditorUrlPrefix + nodeKey);
 						},
 						error: function(json, status, z) {
 							showDialog("dialog-update-error");

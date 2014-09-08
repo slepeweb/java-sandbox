@@ -60,16 +60,17 @@ public class FieldValue extends CmsBean {
 	}
 	
 	public FieldValue setValue(Object value) {
-		setStringValue(value.toString());
-		
-		if (value instanceof Integer) {
-			setIntegerValue((Integer) value);
-		}
-		else if (value instanceof Timestamp) {
-			setDateValue((Timestamp) value);
-			setStringValue(getDateValue().toString());
-		}
+		if (value != null) {
+			setStringValue(value.toString());
 
+			if (value instanceof Integer) {
+				setIntegerValue((Integer) value);
+			}
+			else if (value instanceof Timestamp) {
+				setDateValue((Timestamp) value);
+				setStringValue(getDateValue().toString());
+			}
+		}
 		return this;
 	}
 	

@@ -307,11 +307,16 @@ public class Field extends CmsBean {
 	public ValidValueList getValidValueListObject() {
 		if (getValidValues() != null) { 
 			ValidValueList vvl = new ValidValueList();
+			boolean isFirstValue = true;
 			for (String s : getValidValues().split("/ ")) {
 				s = s.trim();
 				if (s.endsWith("*")) {
 					s = s.substring(0, s.length() - 1);
 					vvl.setDefaultValue(s);
+				}
+				else if (isFirstValue) {
+					vvl.setDefaultValue(s);
+					isFirstValue = false;
 				}
 				vvl.addValue(s);
 			}

@@ -68,7 +68,8 @@ public class RowMapperUtil {
 		Site site = CmsBeanFactory.makeSite().
 				setId(rs.getLong("siteid")).
 				setName(rs.getString("sitename")).
-				setHostname(rs.getString("hostname"));
+				setHostname(rs.getString("hostname")).
+				setShortname(rs.getString("site_shortname"));
 		
 		item.setSite(site);
 		
