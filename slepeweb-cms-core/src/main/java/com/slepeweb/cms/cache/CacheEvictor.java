@@ -14,6 +14,7 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
+import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.utils.LogUtil;
 
 @Component
@@ -67,23 +68,31 @@ public class CacheEvictor {
 				compose("getItemType", it.getName()), 
 				compose("getItemType", it.getId()), 
 				compose("getAvailableItemTypes"));
+		
+		broadcast(it);
 	}
 
 	public void evict(LinkName ln) {
 		evict(
 				compose("getLinkName", ln.getSiteId(), ln.getLinkTypeId(), ln.getName()),
 				compose("getLinkNames", ln.getSiteId(), ln.getLinkTypeId()));		 
+		
+		broadcast(ln);
 	}
 	
 	public void evict(LinkType lt) {
 		evict(
 				compose("getLinkType", lt.getName()));		 
+		
+		broadcast(lt);
 	}
 
 	public void evict(SiteConfig sc) {
 		evict(
 				compose("getSiteConfig", sc.getSiteId(), sc.getName()),
 				compose("getSiteConfigs", sc.getSiteId()));
+		
+		broadcast(sc);
 	}
 
 	public void evict(Site s) {
@@ -91,9 +100,19 @@ public class CacheEvictor {
 				compose("getSite", s.getName()),
 				compose("getSiteByHostname", s.getHostname()),
 				compose("getSite", s.getId()));
-
+		
+		broadcast(s);
 	}
 	
+	public void evict(Template t) {
+		evict(
+				compose("getTemplate", t.getId()), 
+				compose("getTemplate", t.getSiteId(), t.getName()), 
+				compose("getAvailableTemplates", t.getSiteId()));
+		
+		broadcast(t);
+	}
+
 	private String compose(Object ... parts) {
 		if (parts.length == 1) {
 			return parts[0].toString();

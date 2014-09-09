@@ -250,7 +250,7 @@ public class SiteSetup {
 		Row row;
 		LinkType lt;
 		LinkName ln;
-		String firstCell, linkType, linkName;
+		String firstCell, linkType, linkNameStr;
 		boolean updateable = false;
 		
 		while (rowIter.hasNext()) {
@@ -265,25 +265,27 @@ public class SiteSetup {
 				stats.inc(ResultType.ROWS_PROCESSED);
 				updateable = firstCell.equals("1");
 				linkType = SiteSetupUtils.getString(row.getCell(1));
-				linkName = SiteSetupUtils.getString(row.getCell(2));				
+				linkNameStr = SiteSetupUtils.getString(row.getCell(2));				
 				lt = this.cmsService.getLinkTypeService().getLinkType(linkType);
 				
 				if (lt != null) {
-					ln = this.cmsService.getLinkNameService().getLinkName(this.site.getId(), lt.getId(), linkName);
-					
-					if (ln == null || updateable) {
-						ln = CmsBeanFactory.makeLinkName().
-								setSiteId(this.site.getId()).
-								setLinkTypeId(lt.getId()).
-								setName(linkName).
-								save();
+					for (String linkName : linkNameStr.split(", ")) {
+						ln = this.cmsService.getLinkNameService().getLinkName(this.site.getId(), lt.getId(), linkName);
 						
-						if (ln.getId() != null) {
-							stats.inc(ResultType.LINKNAME_UPDATED);
+						if (ln == null || updateable) {
+							ln = CmsBeanFactory.makeLinkName().
+									setSiteId(this.site.getId()).
+									setLinkTypeId(lt.getId()).
+									setName(linkName).
+									save();
+							
+							if (ln.getId() != null) {
+								stats.inc(ResultType.LINKNAME_UPDATED);
+							}
 						}
-					}
-					else {
-						LOG.debug(LogUtil.compose("LinkName is not updateable", ln));
+						else {
+							LOG.debug(LogUtil.compose("LinkName is not updateable", ln));
+						}
 					}
 				}
 			}

@@ -37,6 +37,7 @@ public class LinkNameServiceImpl extends BaseServiceImpl implements LinkNameServ
 				ln.getSiteId(), ln.getLinkTypeId(), ln.getName());
 		
 		ln.setId(getLastInsertId());
+		this.cacheEvictor.evict(ln);
 		LOG.info(compose("Added new link name", ln));
 	}
 	

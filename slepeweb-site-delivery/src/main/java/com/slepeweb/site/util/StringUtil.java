@@ -5,6 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 public class StringUtil {
 	
 	public static String toIdentifier(String s) {
-		return StringUtils.replace(s.toLowerCase(), "- ", "__");
+		return StringUtils.replaceChars(s.toLowerCase(), "- ", "__");
 	}
 }

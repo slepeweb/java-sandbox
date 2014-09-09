@@ -2,10 +2,25 @@ package com.slepeweb.site.model;
 
 import java.io.Serializable;
 
+import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
+
 public class Image implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private String title, src, alt;
+	public static final String BACKGROUND = "background";
+	
+	private String title, src, alt, type;
 	private int width, height;
+	
+	public Image() {}
+	
+	public Image(Link l) {
+		Item i = l.getChild();
+		setTitle(i.getFieldValue("title", ""));
+		setSrc(i.getPath());
+		setAlt(getTitle());
+		setType(l.getName());
+	}
 	
 	public String getTitle() {
 		return title;
@@ -49,6 +64,15 @@ public class Image implements Serializable {
 	
 	public Image setHeight(int height) {
 		this.height = height;
+		return this;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public Image setType(String type) {
+		this.type = type;
 		return this;
 	}
 }

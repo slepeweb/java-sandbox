@@ -41,6 +41,7 @@ public class PageController extends BaseController {
 				setTopNavigation(getTopNavigation(i));
 		
 		page.setHeading(page.getTitle());
+		//page.getHeader().getStylesheets().add("/resources/sws/css/slepeweb.css");
 		Sidebar rightSidebar = new Sidebar();
 		page.setRightSidebar(rightSidebar);
 		rightSidebar.setComponents(this.componentService.getComponents(i, "rightside"));

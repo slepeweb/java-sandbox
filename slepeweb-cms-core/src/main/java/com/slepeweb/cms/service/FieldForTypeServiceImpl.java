@@ -40,7 +40,10 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 				"insert into fieldfortype (fieldid, itemtypeid, fieldorder, mandatory) values (?, ?, ?, ?)", 
 				fft.getField().getId(), fft.getTypeId(), fft.getOrdering(), fft.isMandatory());
 		
-		// Note: No new key generated for this insert
+		// NOTE: No new key generated for this insert
+		// NOTE: Although this fft won't be cached, the object returned by getFieldsForType needs to be refreshed. So,
+		//       for convenience, do the lot.
+		this.cacheEvictor.evict(fft);
 		LOG.info(compose("Inserted new field for type", fft));
 	}
 

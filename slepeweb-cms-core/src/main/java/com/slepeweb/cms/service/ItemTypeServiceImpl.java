@@ -49,6 +49,7 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 				it.getName(), it.getMimeType());
 		
 		it.setId(getLastInsertId());
+		this.cacheEvictor.evict(it);
 		LOG.info(compose("Added new item type", it));
 	}
 

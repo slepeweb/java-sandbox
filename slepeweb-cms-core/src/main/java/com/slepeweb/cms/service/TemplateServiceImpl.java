@@ -38,12 +38,15 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 				t.getName(), t.getForward(), t.getSiteId(), t.getItemTypeId());
 
 		t.setId(getLastInsertId());
+		this.cacheEvictor.evict(t);
 		LOG.info(compose("Added new template", t));
 	}
 
 	private void updateTemplate(Template dbRecord, Template t) {
 		if (! dbRecord.equals(t)) {
+			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(t);
+			
 			this.jdbcTemplate.update(
 					"update template set name = ?, forward = ? where id = ?", 
 					t.getName(), t.getForward(), t.getId());

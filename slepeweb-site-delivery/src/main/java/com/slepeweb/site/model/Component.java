@@ -4,14 +4,13 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Link;
 import com.slepeweb.site.util.StringUtil;
 
 public class Component implements ComponentContainer, Serializable {
 	private static final long serialVersionUID = 1L;
 	private String type, heading, blurb, view;
+	private String cssClass;
 	private List<Component> components;
-	private List<Link> media;
 
 	public String getView() {
 		return view;
@@ -49,15 +48,6 @@ public class Component implements ComponentContainer, Serializable {
 		return this;
 	}
 
-	public List<Link> getMedia() {
-		return media;
-	}
-
-	public Component setMedia(List<Link> media) {
-		this.media = media;
-		return this;
-	}
-
 	public String getType() {
 		return type;
 	}
@@ -73,6 +63,14 @@ public class Component implements ComponentContainer, Serializable {
 							i.getFieldValue("component-type") : linkedItemType));
 
 		return this;
+	}
+
+	public String getCssClass() {
+		return cssClass;
+	}
+
+	public void setCssClass(String cssClass) {
+		this.cssClass = cssClass;
 	}
 
 }

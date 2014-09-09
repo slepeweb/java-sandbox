@@ -37,6 +37,7 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 				"insert into config (siteid, name, value) values (?, ?, ?)", 
 				sc.getSiteId(), sc.getName(), sc.getValue());
 		
+		this.cacheEvictor.evict(sc);
 		LOG.info(compose("Added new site configuration property", sc));
 	}
 

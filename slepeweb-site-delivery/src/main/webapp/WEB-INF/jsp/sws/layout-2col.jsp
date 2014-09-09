@@ -29,7 +29,9 @@
 					
 					<!-- Sidebar -->
 					<div class="3u">	
-						<tiles:insertAttribute name="right" />
+						<section>
+							<tiles:insertAttribute name="right" />
+						</section>
 					</div>
 				</div>
 			</div>

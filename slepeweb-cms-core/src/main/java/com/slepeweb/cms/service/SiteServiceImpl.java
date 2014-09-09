@@ -55,6 +55,7 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 			LOG.error(compose("Content folders could not be created", ItemType.CONTENT_FOLDER_TYPE_NAME));
 		}
 		
+		this.cacheEvictor.evict(s);
 		LOG.info(compose("Added new site", s));		
 		return s;
 	}

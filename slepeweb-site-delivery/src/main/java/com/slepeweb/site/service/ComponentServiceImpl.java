@@ -4,18 +4,25 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.site.model.Component;
+import com.slepeweb.site.model.Image;
+import com.slepeweb.site.model.LinkTarget;
+import com.slepeweb.site.model.SimpleBlockComponent;
 import com.slepeweb.site.util.StringUtil;
 
 @Service("componentService")
 public class ComponentServiceImpl implements ComponentService {
 	private static Logger LOG = Logger.getLogger(ComponentServiceImpl.class);
+	
+	@Autowired private RomeService romeService;
 
 	public List<Component> getComponents(Item i) {
 		return getComponents(i, null);
@@ -46,7 +53,7 @@ public class ComponentServiceImpl implements ComponentService {
 							components.add(c);
 						}
 					} catch (Exception e) {
-						LOG.warn(LogUtil.compose("Method not found", linkName), e);
+						LOG.warn(LogUtil.compose("Method not found", componentType), e);
 					}
 				}
 			}
@@ -62,15 +69,44 @@ public class ComponentServiceImpl implements ComponentService {
 		return StringUtil.toIdentifier(s);
 	}
 
-	public Component feature(Item i) {
-		LOG.info(LogUtil.compose("Running method", "feature"));
-		Component c = new Component().
-				setHeading(i.getFieldValue("heading")).
-				setBlurb(i.getFieldValue("blurb"));
+	public SimpleBlockComponent simple_block(Item i) {
+		LOG.info(LogUtil.compose("Running method", "simple_block"));
+		SimpleBlockComponent c = new SimpleBlockComponent();
+		c.setHeading(i.getFieldValue("heading"));
+		c.setBlurb(i.getFieldValue("blurb"));
+		c.setCssClass(i.getFieldValue("css"));
 		
-		// Any sub-components?
-		c.setComponents(getComponents(i));
+		// Images
+		c.setImages(new ArrayList<Image>());
+		for (Link l : i.getInlines()) {
+			if (! l.getName().equals(Image.BACKGROUND)) {
+				c.getImages().add(new Image(l));
+			}
+		}
+		
+		// Link targets
+		c.setTargets(new ArrayList<LinkTarget>());
+		for (Link l : i.getRelations()) {
+			c.getTargets().add(new LinkTarget(l.getChild()));
+		}
 		
 		return c;
 	}
+	
+	public SimpleBlockComponent rss_feed(Item i) {
+		LOG.info(LogUtil.compose("Running method", "rss_feed"));
+		
+		SimpleBlockComponent c = new SimpleBlockComponent();
+		c.setHeading(i.getFieldValue("title"));
+		c.setBlurb(i.getFieldValue("intro"));
+		c.setCssClass(i.getFieldValue("css"));
+		
+		String url = i.getFieldValue("url");		
+		if (StringUtils.isNotBlank(url)) {
+			c.setTargets(this.romeService.getFeed(url));
+		}
+		
+		return c;
+	}
+
 }
