@@ -1,17 +1,44 @@
 package com.slepeweb.site.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleBlockComponent extends Component {
+import com.slepeweb.cms.bean.Link;
+
+public class StandardComponent extends SimpleComponent {
 	private static final long serialVersionUID = 1L;
 	private List<Image> images;
 	private List<LinkTarget> targets;
 
+	public StandardComponent setup(Link l) {
+		super.setup(l);
+		
+		// Images
+		setImages(new ArrayList<Image>());
+		for (Link ll : l.getChild().getInlines()) {
+			if (! ll.getName().equals(Image.BACKGROUND)) {
+				getImages().add(new Image(ll));
+			}
+		}
+		
+		// Link targets
+		setTargets(new ArrayList<LinkTarget>());
+		for (Link ll : l.getChild().getRelations()) {
+			getTargets().add(new LinkTarget(ll.getChild()));
+		}
+		
+		return this;
+	}
+	
+	public String toString() {
+		return String.format("StandardComponent (%s): %s", getType(), getHeading());
+	}
+	
 	public List<Image> getImages() {
 		return images;
 	}
 
-	public SimpleBlockComponent setImages(List<Image> media) {
+	public StandardComponent setImages(List<Image> media) {
 		this.images = media;
 		return this;
 	}
@@ -20,8 +47,9 @@ public class SimpleBlockComponent extends Component {
 		return targets;
 	}
 
-	public void setTargets(List<LinkTarget> targets) {
+	public StandardComponent setTargets(List<LinkTarget> targets) {
 		this.targets = targets;
+		return this;
 	}
 
 	public Image getBackgroundImage() {

@@ -4,18 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 
-
-public class Page implements Serializable {
+public class Page implements Serializable, NestableComponent {
 	private static final long serialVersionUID = 1L;
-	private static Logger LOG = Logger.getLogger(Page.class);
+	//private static Logger LOG = Logger.getLogger(Page.class);
 	private String href;
 	private Header header;
 	private Footer footer;
 	private Sidebar leftSidebar, rightSidebar;
 	private String title, heading, body, view;
-	private List<Component> components;
+	private List<SimpleComponent> components;
 	private List<String> roles;
 	
 	public Page() {
@@ -23,7 +21,7 @@ public class Page implements Serializable {
 		this.footer = new Footer();
 		this.leftSidebar = new Sidebar();
 		this.rightSidebar = new Sidebar();
-		this.components = new ArrayList<Component>();
+		this.components = new ArrayList<SimpleComponent>();
 	}
 	
 	public Page addRole(String r) {
@@ -141,7 +139,7 @@ public class Page implements Serializable {
 		return this;
 	}
 	
-	public List<Component> getComponents() {
+	public List<SimpleComponent> getComponents() {
 		return components;
 	}
 
@@ -169,5 +167,9 @@ public class Page implements Serializable {
 
 	public void setRoles(List<String> roles) {
 		this.roles = roles;
+	}
+
+	public void setComponents(List<SimpleComponent> components) {
+		this.components = components;
 	}
 }

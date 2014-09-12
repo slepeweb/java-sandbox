@@ -26,19 +26,27 @@
 		<put-attribute name="left" value=""/>
 	</definition>
 	
-	<definition name="sws.layout.1col" template="/WEB-INF/jsp/layout-1col.jsp">
-		<put-attribute name="head" value="/WEB-INF/jsp/header.jsp"/>
+	<definition name="sws.layout.1col" template="/WEB-INF/jsp/sws/layout-1col.jsp">
 		<put-attribute name="body" value=""/>
-		<put-attribute name="foot" value="/WEB-INF/jsp/footer.jsp"/>
 	</definition>
 	
+	<definition name="sws.login" extends="sws.layout.2col">
+		<put-attribute name="body" value="/WEB-INF/jsp/sws/login.jsp"/>
+	</definition>	
+
 	<definition name="sws.home" extends="sws.layout.2col">
-		<put-attribute name="body" value="/WEB-INF/jsp/sws/title-and-bodytext.jsp"/>
+		<put-attribute name="body" value="/WEB-INF/jsp/sws/standard-page.jsp"/>
 		<put-attribute name="right" value="/WEB-INF/jsp/sws/news.jsp"/>
 	</definition>	
 
-	<definition name="sws.projects" extends="sws.layout.1col">
-		<put-attribute name="body" value="/WEB-INF/jsp/projects.jsp"/>
+	<definition name="sws.wide-article" extends="sws.layout.1col">
+		<put-attribute name="body" value="/WEB-INF/jsp/sws/standard-page.jsp"/>
+		<put-attribute name="right" value="/WEB-INF/jsp/sws/rightside-components.jsp"/>
+	</definition>	
+
+	<definition name="sws.article" extends="sws.layout.2col">
+		<put-attribute name="body" value="/WEB-INF/jsp/sws/standard-page.jsp"/>
+		<put-attribute name="right" value="/WEB-INF/jsp/sws/rightside-components.jsp"/>
 	</definition>	
 
 	<definition name="sws.sandbox.platform" extends="sws.layout.2col.left">
@@ -66,10 +74,10 @@
 		<put-attribute name="body" value="/WEB-INF/jsp/user/list.jsp"/>
 	</definition>	
 
-	<definition name="sws.login" extends="sws.layout.3col">
-		<put-attribute name="body" value="/WEB-INF/jsp/login.jsp"/>
-		<put-attribute name="left" value="/WEB-INF/jsp/key.jsp"/>
-	</definition>	
+<!-- 	<definition name="sws.login" extends="sws.layout.3col"> -->
+<!-- 		<put-attribute name="body" value="/WEB-INF/jsp/login.jsp"/> -->
+<!-- 		<put-attribute name="left" value="/WEB-INF/jsp/key.jsp"/> -->
+<!-- 	</definition>	 -->
 
 	<definition name="sws.contact" extends="sws.layout.3col">
 		<put-attribute name="body" value="/WEB-INF/jsp/contact.jsp"/>

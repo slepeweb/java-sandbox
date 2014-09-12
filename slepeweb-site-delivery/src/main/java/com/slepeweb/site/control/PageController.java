@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
@@ -32,9 +34,22 @@ public class PageController extends BaseController {
 		this.cmsDeliveryServlet.doGet(req, res, model);
 	}
 	
+	@RequestMapping(value="/spring/homepage")	
+	public String homepage(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortHostname") String shortHostname, 
+			ModelMap model) {	
+		
+		standardTemplate(i, shortHostname, model);
+		return getViewName(shortHostname, "home");
+	}
+
 	@RequestMapping(value="/spring/article")	
-	public String applyArticleTemplate(HttpServletRequest req, ModelMap model) {	
-		Item i = (Item) req.getAttribute("_item");
+	public String standardTemplate(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortHostname") String shortHostname, 
+			ModelMap model) {	
+		
 		Page page = new Page().
 				setTitle(i.getFieldValue("title")).
 				setBody(i.getFieldValue("bodytext", "")).
@@ -44,9 +59,45 @@ public class PageController extends BaseController {
 		//page.getHeader().getStylesheets().add("/resources/sws/css/slepeweb.css");
 		Sidebar rightSidebar = new Sidebar();
 		page.setRightSidebar(rightSidebar);
-		rightSidebar.setComponents(this.componentService.getComponents(i, "rightside"));
+		rightSidebar.setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
+		page.setComponents(this.componentService.getComponents(i.getComponents(), "main"));
+		
 		model.addAttribute("_page", page);
-		return "sws.home";
+		return getViewName(shortHostname, "article");
+	}
+
+	@RequestMapping(value="/spring/projects")
+	public String projects(
+		@ModelAttribute("_item") Item i, 
+		@ModelAttribute("_shortHostname") String shortHostname, 
+		@RequestParam(value = "error", required = false) String error,
+		@RequestParam(value = "logout", required = false) String logout,
+		ModelMap model) {
+ 
+		standardTemplate(i, shortHostname, model);
+		return getViewName(shortHostname, "wide-article");
+ 
+	}
+
+	@RequestMapping(value="/spring/login")
+	public String login(
+		@ModelAttribute("_item") Item i, 
+		@ModelAttribute("_shortHostname") String shortHostname, 
+		@RequestParam(value = "error", required = false) String error,
+		@RequestParam(value = "logout", required = false) String logout,
+		ModelMap model) {
+ 
+		standardTemplate(i, shortHostname, model);
+
+		if (error != null) {
+			model.addAttribute("error", "Invalid username and password!");
+		}
+ 
+		if (logout != null) {
+			model.addAttribute("msg", "You've been logged out successfully.");
+		}
+ 
+		return getViewName(shortHostname, "login"); 
 	}
 
 	private List<LinkTarget> getTopNavigation(Item requestItem) {

@@ -4,18 +4,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sidebar implements ComponentContainer, Serializable {
+public class Sidebar implements NestableComponent, Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<LinkTarget> navigation, relatedPages;
-	private List<Component> components;
+	private List<SimpleComponent> components;
 	
 	public Sidebar() {
 		this.navigation = new ArrayList<LinkTarget>();
 		this.relatedPages = new ArrayList<LinkTarget>();
-		this.components = new ArrayList<Component>();
+		this.components = new ArrayList<SimpleComponent>();
 	}
 	
-	public List<Component> getComponents() {
+	public List<SimpleComponent> getComponents() {
 		return components;
 	}
 	
@@ -35,7 +35,7 @@ public class Sidebar implements ComponentContainer, Serializable {
 		this.relatedPages = relatedPages;
 	}
 
-	public void setComponents(List<Component> components) {
+	public void setComponents(List<SimpleComponent> components) {
 		this.components = components;
 	}
 }

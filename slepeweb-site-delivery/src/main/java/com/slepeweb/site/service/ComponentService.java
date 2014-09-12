@@ -2,10 +2,10 @@ package com.slepeweb.site.service;
 
 import java.util.List;
 
-import com.slepeweb.cms.bean.Item;
-import com.slepeweb.site.model.Component;
+import com.slepeweb.cms.bean.Link;
+import com.slepeweb.site.model.SimpleComponent;
 
 public interface ComponentService {
-	List<Component> getComponents(Item i);
-	List<Component> getComponents(Item i, String linkName);
+	List<SimpleComponent> getComponents(List<Link> componentLinks);
+	List<SimpleComponent> getComponents(List<Link> componentLinks, String linkName);
 }

@@ -26,5 +26,3 @@
 	</c:if>
 	
 </div>
-
-<%-- <gen:insertComponentSet site="${_site}" owner="${_comp}" /> --%>

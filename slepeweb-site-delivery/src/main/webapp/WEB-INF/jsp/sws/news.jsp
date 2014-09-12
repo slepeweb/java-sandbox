@@ -3,7 +3,7 @@
   taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%><%@ 
 	taglib prefix="gen" tagdir="/WEB-INF/tags"%>
 
-<c:if test="${not empty _rss and fn:length(_rss) > 0}">
+<!-- jsp/sws/news.jsp -->
 <script>
 	$(document).ready(function(){
 		//Examples of how to assign the Colorbox event to elements
@@ -35,15 +35,4 @@
 	});
 </script>
 
-<section>
-	<h3>Technology news</h3>
-	<p>Latest stories from the BBC:</p>
-	<ul class="link-list">
-		<c:forEach items="${_rss}" var="link" end="3">
-			<li class="compact"><a class="iframe group2" href="${link.href}">${link.title}</a></li>
-		</c:forEach>
-	</ul>
-</section>
-</c:if>
-
-<gen:insertComponentSet site="${_item.site.shortname}" owner="${_page.rightSidebar}" />
+<gen:insertComponentSet site="${_item.site.shortname}" list="${_page.rightSidebar.components}" />
