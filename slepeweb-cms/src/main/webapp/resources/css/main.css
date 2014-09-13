@@ -65,6 +65,18 @@ form div {
 	margin-top: 20px;
 }
 
+.left-margin10 {
+	margin-left: 10px;
+}
+
+.left-margin20 {
+	margin-left: 20px;
+}
+
+.top-align {
+	vertical-align: top;
+}
+
 #site-selector {
 	margin-left: 50px;
 }

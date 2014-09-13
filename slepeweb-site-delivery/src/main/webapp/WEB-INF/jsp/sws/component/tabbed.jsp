@@ -3,7 +3,7 @@
   taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%><%@ 
 	taglib prefix="gen" tagdir="/WEB-INF/tags"%>
 
-<div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
+<%-- <div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>> --%>
 
 	<script>
 		$(function() {
@@ -27,4 +27,4 @@
 		</c:forEach>
 	</div>
 	
-</div>
+<!-- </div> -->

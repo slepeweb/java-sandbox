@@ -88,7 +88,7 @@ public class Item extends CmsBean {
 	public Item getParent() {
 		Link l = this.cmsService.getLinkService().getParent(getId());
 		if (l != null) {
-			return this.cmsService.getItemService().getItem(l.getParentId());
+			return l.getChild();
 		}
 		return null;
 	}

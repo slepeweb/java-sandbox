@@ -31,7 +31,7 @@ public class Link extends CmsBean {
 	
 	@Override
 	public String toString() {
-		return String.format("%s (%s): %s", getType(), getName(), getChild().getName());
+		return String.format("%s (%s): %d -> %s", getType(), getName(), getParentId(), getChild().getName());
 	}
 	
 	public Link save() {

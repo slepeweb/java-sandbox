@@ -272,38 +272,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
 	}
 	
-//	/*
-//	 * This method can be used if a child item moves to a different parent, but  
-//	 * NOT if the child's simplename has changed.
-//	 */
-//	public Item move(Item child, Item newParent) {
-//		Link parentLink = this.linkService.getParent(child.getId());
-//		if (parentLink != null) {
-//			// Un-link from current path
-//			this.linkService.deleteLinks(parentLink.getParentId(), child.getId());
-//			
-//			// Bind to new parent
-//			parentLink.setParentId(newParent.getId()).setOrdering(1);
-//			parentLink.save();
-//			
-//			// Update paths of descendant items
-//			String divider = newParent.isRoot() ? "" : "/";
-//			String newChildPath = newParent.getPath() + divider + child.getSimpleName();
-//			updateDescendantPaths(child.getPath(), newChildPath);
-//			
-//			// Update child item path
-//			updateItemPath(child.getId(), newChildPath);
-//			
-//			// Force newParent links to be re-calculated, since they have now changed
-//			newParent.setLinks(null);
-//		}
-//		else {
-//			LOG.error(compose("Failed to identify parent item", child.getPath()));
-//		}
-//		
-//		return child;
-//	}
-
 	public boolean move(Item mover, Item parent) {
 		return move(mover, parent, "over");
 	}
@@ -313,38 +281,38 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 * If mode == "over", then target is effectively a new parent.
 	 */
 	public boolean move(Item mover, Item target, String mode) {
-		Link oldParentage = this.linkService.getParent(mover.getId());
-		Link moverLink = oldParentage;
 		
-		if (oldParentage != null) {
-			Item targetParent = target.getParent();
+		LOG.debug(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mode.toUpperCase(), target));		
+		Item oldParent = mover.getParent();		
+		
+		if (oldParent != null) {
+			LOG.debug(compose("Old parent", oldParent));		
+			Item newParent = mode.equals(MOVE_OVER) ? target : target.getParent();
+			LOG.debug(compose("New parent", newParent));		
 			
-			// Break the parent link for the mover, even if it it is moving amongst its siblings
-			this.linkService.deleteLinks(oldParentage.getParentId(), mover.getId());
+			// Break the parent link for the mover, EVEN IF old-parent = new-parent
+			this.linkService.deleteLinks(oldParent.getId(), mover.getId());
+			LOG.debug("Removed links between mover and old parent");		
 			
-			// Bind to new parent - we'll save teh mover link later
+			// Bind to new parent - we'll save() the mover link later
+			Link moverLink = CmsBeanFactory.makeLink().
+					setParentId(newParent.getId()).
+					setChild(mover).
+					setType("binding").
+					setName("std");
+			
+			// Add mover to new parent's bindings
+			List<Link> bindings = this.linkService.getBindings(newParent.getId());
+			
 			if (mode.equals(MOVE_OVER)) {
-				moverLink.setParentId(target.getId());
-			}
-			else {
-				moverLink.setParentId(targetParent.getId());
-			}
-			
-			// Insert the mover alongside its siblings, in the correct order
-			List<Link> bindings;
-			if (mode.equals(MOVE_OVER)) {
-				// Append mover to end of list of children
-				bindings = this.linkService.getBindings(target.getId());
 				bindings.add(moverLink);
+				LOG.debug("Added mover to end of new parent's existing bindings");	
 			}
 			else {
-				// Append mover before/after target item
-				bindings = this.linkService.getBindings(targetParent.getId());
-				
-				// First identify the insertion point in the bindings list
+				// If mode is 'before' or 'after', identify insertions point and re-order all siblings
 				int cursor = -1;
 				for (Link l : bindings) {
-					if (l.getChild().getId() == target.getId()) {
+					if (l.getChild().getId().longValue() == target.getId().longValue()) {
 						cursor = bindings.indexOf(l);
 						break;
 					}
@@ -363,9 +331,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 							bindings.add(moverLink);
 						}
 					}
+					LOG.debug("Inserted mover into new parent's existing bindings");	
 				}
 				else {
 					bindings.add(moverLink);
+					LOG.warn("Failed to determine point of insertion - placed at end");	
 				}
 			}
 			
@@ -380,15 +350,15 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			}
 			
 			// Update paths of descendant items
-			String divider = target.isRoot() ? "" : "/";
-			String newChildPath = target.getPath() + divider + mover.getSimpleName();
+			String divider = newParent.isRoot() ? "" : "/";
+			String newChildPath = newParent.getPath() + divider + mover.getSimpleName();
 			updateDescendantPaths(mover.getPath(), newChildPath);
 			
 			// Update child item path
 			updateItemPath(mover.getId(), newChildPath);
 			
 			// Force newParent links to be re-calculated, since they have now changed
-			target.setLinks(null);
+			newParent.setLinks(null);
 			
 			return true;
 		}

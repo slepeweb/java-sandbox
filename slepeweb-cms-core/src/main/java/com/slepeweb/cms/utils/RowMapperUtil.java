@@ -99,6 +99,17 @@ public class RowMapperUtil {
 		}
 	}
 	
+	public static final class ParentLinkMapper implements RowMapper<Link> {
+		public Link mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeLink().
+					setParentId(rs.getLong("childid")).
+					setChild(mapItem(rs)).
+					setType(rs.getString("linktype")).
+					setName(rs.getString("linkname")).
+					setOrdering(rs.getInt("ordering"));
+		}
+	}
+	
 	public static final class LinkTypeMapper implements RowMapper<LinkType> {
 		public LinkType mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return CmsBeanFactory.makeLinkType().

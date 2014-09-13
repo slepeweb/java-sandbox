@@ -26,7 +26,9 @@ public class ItemTest extends BaseTest {
 			register(4080, "Revert simplename change", "First news item should be at /news/101").
 			register(4090, "Trash a branch and its descendants", "3 new items should appear in the bin").
 			register(4100, "Trashed branch should not appear as child of homepage", "Homepage should now have one less child").
-			register(4110, "Restore trashed branch", "the bin size should return to original");
+			register(4110, "Restore trashed branch", "the bin size should return to original").
+			register(4120, "Get parent of news item", "should be /news").
+			register(4130, "Get parent of news section", "should be /");
 		
 		Site site = getTestSite();
 		
@@ -205,6 +207,35 @@ public class ItemTest extends BaseTest {
 					if (finalBinCount != binCount) {
 						r.setNotes(String.format("Bin has %d remaining entries", finalBinCount)).fail();
 					}					
+				}
+			}
+			
+			// 4120
+			Item newsItem = site.getItem("/news/101");
+			if (newsItem != null) {
+				r = trs.execute(4120);
+				Item newsSection = newsItem.getParent();
+				
+				if (newsSection != null) {
+					if (! newsSection.getPath().equals("/news")) {
+						r.fail().setNotes(String.format("Parent path is [%s]", newsSection.getPath()));
+					}
+					else {
+						// 4130
+						r = trs.execute(4130);
+						Item root = newsSection.getParent();
+						if (root != null) {
+							if (! root.getPath().equals("/")) {
+								r.fail().setNotes(String.format("Parent path is [%s]", root.getPath()));
+							}
+						}
+						else {
+							r.fail().setNotes(String.format("Failed to identify parent of [%s]", newsSection));
+						}
+					}
+				}
+				else {
+					r.fail().setNotes(String.format("Failed to identify parent of [%s]", newsItem));
 				}
 			}
 		}
