@@ -75,6 +75,7 @@ $(function() {
 						data: {
 							name: $("#core-tab input[name='name']").val(),
 							simplename: $("#core-tab input[name='simplename']").val(),
+							template: $("#core-tab select[name='template']").val(),
 							published: $("#core-tab input[name='published']").is(':checked')
 						}, 
 						dataType: "json",

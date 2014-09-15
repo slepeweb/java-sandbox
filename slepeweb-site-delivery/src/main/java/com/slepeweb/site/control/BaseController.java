@@ -47,7 +47,7 @@ public class BaseController {
 		return req.getUserPrincipal();
 	}
 	
-	protected String getViewName(String shortHostName, String viewNameSuffix) {
+	protected String getFullyQualifiedViewName(String shortHostName, String viewNameSuffix) {
 		return shortHostName + "." + viewNameSuffix;
 	}
 }

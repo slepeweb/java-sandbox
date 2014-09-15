@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.cms.bean.Item;
 
 public class LinkTarget implements Serializable {
@@ -16,9 +18,14 @@ public class LinkTarget implements Serializable {
 	public LinkTarget() {}
 	
 	public LinkTarget(Item i) {
-		setTitle(i.getFieldValue("title"));
+		setTitle(StringUtils.isBlank(i.getFieldValue("navtitle")) ? 
+				i.getFieldValue("title") : i.getFieldValue("navtitle"));
 		setTeaser(i.getFieldValue("teaser"));
 		setHref(i.getPath());
+	}
+	
+	public String toString() {
+		return getHref();
 	}
 	
 	public String getTitle() {

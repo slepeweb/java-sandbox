@@ -10,6 +10,7 @@ public interface TemplateService {
 	Template getTemplate(Long id);
 	Template getTemplate(Long siteId, String name);
 	List<Template> getAvailableTemplates(Long siteId);
+	List<Template> getAvailableTemplates(Long siteId, Long itemTypeId);
 	Template save(Template i);
 	int getCount();
 }

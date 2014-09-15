@@ -25,13 +25,18 @@
 			<label for="type">Type: </label><input disabled="disabled" value="${editingItem.type.name}" />
 		</div>
 		<div>
-		<c:choose><c:when test="${not empty editingItem.template}"><c:set var="templateName" 
-			value="${editingItem.template}" /></c:when><c:otherwise><c:set 
-				var="templateName" value="No template" /></c:otherwise></c:choose>
-			<label for="type">Template: </label><input disabled="disabled" value="${templateName}" />
+			<label for="dateupdated">Date last updated: </label><input disabled="disabled" value="${editingItem.dateUpdated}" />
 		</div>
 		<div>
-			<label for="dateupdated">Date last updated: </label><input disabled="disabled" value="${editingItem.dateUpdated}" />
+			<label for="type">Template: </label>
+			<select name="template">
+				<option value="0">Choose ...</option>
+				<c:forEach items="${availableTemplatesForType}" var="template">
+					<option value="${template.id}"<c:if 
+						test="${not empty editingItem.template and 
+							template.id eq editingItem.template.id}"> selected</c:if>>${template.name}</option>
+				</c:forEach>
+			</select>
 		</div>
 		<div>
 			<label for="name">Name: </label><input type="text" name="name" value="${editingItem.name}" />

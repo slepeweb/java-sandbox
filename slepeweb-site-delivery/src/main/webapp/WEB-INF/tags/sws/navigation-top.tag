@@ -1,6 +1,7 @@
 <%@ tag %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
+<!-- tags/sws/navigation-top.tag -->
 <header class="container" id="site-header">
 	<div class="row">
 		<div class="12u">

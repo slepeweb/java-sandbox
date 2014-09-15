@@ -40,15 +40,11 @@ public class PageController extends BaseController {
 			@ModelAttribute("_shortHostname") String shortHostname, 
 			ModelMap model) {	
 		
-		standardTemplate(i, shortHostname, model);
-		return getViewName(shortHostname, "home");
+		standardTemplateRightSidebar(i, shortHostname, model);
+		return getFullyQualifiedViewName(shortHostname, "home");
 	}
 
-	@RequestMapping(value="/spring/article")	
-	public String standardTemplate(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortHostname") String shortHostname, 
-			ModelMap model) {	
+	private Page standardTemplate(Item i) {	
 		
 		Page page = new Page().
 				setTitle(i.getFieldValue("title")).
@@ -56,16 +52,62 @@ public class PageController extends BaseController {
 				setTopNavigation(getTopNavigation(i));
 		
 		page.setHeading(page.getTitle());
-		//page.getHeader().getStylesheets().add("/resources/sws/css/slepeweb.css");
-		Sidebar rightSidebar = new Sidebar();
-		page.setRightSidebar(rightSidebar);
-		rightSidebar.setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
 		page.setComponents(this.componentService.getComponents(i.getComponents(), "main"));
+		page.getHeader().setBreadcrumbs(i);
 		
-		model.addAttribute("_page", page);
-		return getViewName(shortHostname, "article");
+		return page;
 	}
 
+	@RequestMapping(value="/spring/article")	
+	public String standardTemplateRightSidebar(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortHostname") String shortHostname, 
+			ModelMap model) {	
+		
+		Page page = standardTemplate(i);
+		page.setRightSidebar(new Sidebar());
+		page.getRightSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
+		
+		model.addAttribute("_page", page);
+		return getFullyQualifiedViewName(shortHostname, "article");
+	}
+	
+	@RequestMapping(value="/spring/article/leftnav")	
+	public String standardTemplateLeftNav(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortHostname") String shortHostname, 
+			ModelMap model) {	
+		
+		Page page = standardTemplate(i);
+		
+		// Left navigation
+		if (page.getHeader().getBreadcrumbs().size() > 1) {
+			Item levelOneItem = page.getHeader().getBreadcrumbItems().get(1);
+			List<Item> levelOneBindings = levelOneItem.getBoundItems();
+			
+			if (levelOneBindings.size() > 0) {
+				List<LinkTarget> leftNav = page.getLeftSidebar().getNavigation();
+				LinkTarget levelOneTarget = new LinkTarget(levelOneItem).setSelected(true);
+				LinkTarget levelTwoTarget, levelThreeTarget;
+				leftNav.add(levelOneTarget);
+				
+				for (Item levelTwoItem : levelOneBindings) {
+					levelTwoTarget = new LinkTarget(levelTwoItem);
+					levelTwoTarget.setSelected(i.getPath().startsWith(levelTwoItem.getPath()));
+					levelOneTarget.getChildren().add(levelTwoTarget);
+					for (Item levelThreeItem : levelTwoItem.getBoundItems()) {
+						levelThreeTarget = new LinkTarget(levelThreeItem);
+						levelTwoTarget.getChildren().add(levelThreeTarget);
+						levelThreeTarget.setSelected(i.getPath().startsWith(levelThreeItem.getPath()));
+					}
+				}
+			}
+		}
+		
+		model.addAttribute("_page", page);
+		return getFullyQualifiedViewName(shortHostname, "article.leftnav");
+	}
+		
 	@RequestMapping(value="/spring/projects")
 	public String projects(
 		@ModelAttribute("_item") Item i, 
@@ -74,8 +116,8 @@ public class PageController extends BaseController {
 		@RequestParam(value = "logout", required = false) String logout,
 		ModelMap model) {
  
-		standardTemplate(i, shortHostname, model);
-		return getViewName(shortHostname, "wide-article");
+		standardTemplateRightSidebar(i, shortHostname, model);
+		return getFullyQualifiedViewName(shortHostname, "article.wide");
  
 	}
 
@@ -87,7 +129,7 @@ public class PageController extends BaseController {
 		@RequestParam(value = "logout", required = false) String logout,
 		ModelMap model) {
  
-		standardTemplate(i, shortHostname, model);
+		standardTemplateRightSidebar(i, shortHostname, model);
 
 		if (error != null) {
 			model.addAttribute("error", "Invalid username and password!");
@@ -97,15 +139,19 @@ public class PageController extends BaseController {
 			model.addAttribute("msg", "You've been logged out successfully.");
 		}
  
-		return getViewName(shortHostname, "login"); 
+		return getFullyQualifiedViewName(shortHostname, "login"); 
 	}
 
-	private List<LinkTarget> getTopNavigation(Item requestItem) {
+	private List<LinkTarget> getTopNavigation(Item i) {
 		List<LinkTarget> nav = new ArrayList<LinkTarget>();
-		Item root = this.cmsService.getItemService().getItem(requestItem.getSite().getId(), "/");
+		Item root = this.cmsService.getItemService().getItem(i.getSite().getId(), "/");
+		LinkTarget lt;
+		
 		if (root != null) {
 			for (Link l : root.getBindings()) {
-				nav.add(new LinkTarget(l.getChild()));
+				lt = new LinkTarget(l.getChild()).
+						setSelected(i.getPath().startsWith(l.getChild().getPath()));
+				nav.add(lt);
 			}
 		}
 		return nav;

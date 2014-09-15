@@ -29,8 +29,11 @@ public class PageController extends BaseController {
 	@RequestMapping(value="/editor/{itemId}")	
 	public String doWithItem(@PathVariable long itemId, ModelMap model) {	
 		Item i = this.itemService.getItem(itemId);
-		model.addAttribute("editingItem", i);
-		model.addAttribute("site", i.getSite());
+		if (i != null) {
+			model.addAttribute("editingItem", i);
+			model.addAttribute("site", i.getSite());
+			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
+		}
 		return "cms.editor";
 	}
 	

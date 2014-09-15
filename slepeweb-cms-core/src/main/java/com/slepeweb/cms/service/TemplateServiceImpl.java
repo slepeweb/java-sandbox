@@ -88,6 +88,13 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 				new RowMapperUtil.TemplateMapper());
 	}
 	
+	@Cacheable(value="serviceCache")
+	public List<Template> getAvailableTemplates(Long siteId, Long itemTypeId) {
+		return (List<Template>) this.jdbcTemplate.query("select * from template where siteid = ? and typeid = ? order by name", 
+				new Object[]{siteId, itemTypeId},
+				new RowMapperUtil.TemplateMapper());
+	}
+	
 	public int getCount() {
 		return this.jdbcTemplate.queryForInt("select count(*) from template");
 	}

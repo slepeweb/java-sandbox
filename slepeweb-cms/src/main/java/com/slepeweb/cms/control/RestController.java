@@ -54,7 +54,11 @@ public class RestController extends BaseController {
 	
 	@RequestMapping("/item/editor")
 	public String doItemEditor(ModelMap model, @RequestParam(value="key", required=true) Long id) {	
-		model.put("editingItem", this.itemService.getItem(id));
+		Item i = this.itemService.getItem(id);
+		if (i != null) {
+			model.put("editingItem", i);
+			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
+		}
 		return "cms.item.editor";		
 	}
 	
@@ -65,15 +69,19 @@ public class RestController extends BaseController {
 			@RequestParam("name") String name, 
 			@RequestParam("simplename") String simplename, 
 			@RequestParam("published") boolean published, 
+			@RequestParam("template") Long templateId, 
 			ModelMap model) {	
 		
 		Item i = this.itemService.getItem(itemId);
+		Template t = this.templateService.getTemplate(templateId);
+		
 		if (i != null) {
-			i.setName(name);
-			i.setSimpleName(simplename);
-			i.setDateUpdated(new Timestamp(System.currentTimeMillis()));
-			i.setPublished(published);
-			i.save();
+			i.setName(name).
+				setSimpleName(simplename).
+				setDateUpdated(new Timestamp(System.currentTimeMillis())).
+				setPublished(published).
+				setTemplate(t).
+				save();
 			
 			return true;
 		}

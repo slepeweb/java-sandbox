@@ -88,6 +88,7 @@ public class Item extends CmsBean {
 	public Item getParent() {
 		Link l = this.cmsService.getLinkService().getParent(getId());
 		if (l != null) {
+			// In this case, the 'child' IS the 'parent'
 			return l.getChild();
 		}
 		return null;
@@ -97,6 +98,15 @@ public class Item extends CmsBean {
 	public String toString() {
 		return String.format("(%s) %s: %s", getTemplate() != null ? getTemplate().getName() : "No template", 
 				getName(), getPath());
+	}
+	
+	public int getLevel() {
+		if (getPath().equals("/")) {
+			return 0;
+		}
+		else {
+			return getPath().substring(1).split("/").length;
+		}
 	}
 	
 	public Item save() {

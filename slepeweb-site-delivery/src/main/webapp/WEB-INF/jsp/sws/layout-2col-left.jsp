@@ -5,6 +5,7 @@
     taglib uri="http://www.springframework.org/tags" prefix="spring"%><%@ 
     taglib prefix="sw" tagdir="/WEB-INF/tags/sws"%><!DOCTYPE html>
 
+<!-- jsp/sws/layout-2col-left.jsp -->
 <html>
 	<head>
 		<sw:head />
