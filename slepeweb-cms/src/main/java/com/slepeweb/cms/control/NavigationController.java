@@ -86,7 +86,17 @@ public class NavigationController extends BaseController {
 		
 		List<Navigation.Node> level0 = new ArrayList<Navigation.Node>();
 		Site site = item.getSite();
+		
+		// pathComponents is relative to the pseudo root item, which in this case is '/'
 		level0.add(dive(site.getItem("/"), pathComponents));
+		
+		// The pseudo root for items in the 'Content' section is /content, so this
+		// component should NOT be in the pathComponents list, otherwise the main navigation
+		// will not open up correctly.
+		if (pathComponents.size() > 0 && pathComponents.get(0).equals("content")) {
+			pathComponents.remove(0);
+		}
+		
 		level0.add(dive(site.getItem("/content"), pathComponents));
 		return level0;		
 	}
