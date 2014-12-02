@@ -29,6 +29,7 @@ public class PageController extends BaseController {
 	@Autowired private CmsDeliveryServlet cmsDeliveryServlet;
 	@Autowired private ComponentService componentService;
 	
+	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
 		this.cmsDeliveryServlet.doGet(req, res, model);
@@ -58,7 +59,7 @@ public class PageController extends BaseController {
 		return page;
 	}
 
-	@RequestMapping(value="/spring/article")	
+	@RequestMapping(value="/spring/article/rightsidebar")	
 	public String standardTemplateRightSidebar(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortHostname") String shortHostname, 
@@ -69,7 +70,23 @@ public class PageController extends BaseController {
 		page.getRightSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
 		
 		model.addAttribute("_page", page);
-		return getFullyQualifiedViewName(shortHostname, "article");
+		return getFullyQualifiedViewName(shortHostname, "article-011");
+	}
+	
+	@RequestMapping(value="/spring/article/3col")	
+	public String standardTemplate3Col(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortHostname") String shortHostname, 
+			ModelMap model) {	
+		
+		Page page = standardTemplate(i);
+		page.setRightSidebar(new Sidebar());
+		page.getRightSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
+		page.setLeftSidebar(new Sidebar());
+		page.getLeftSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "leftside"));
+		
+		model.addAttribute("_page", page);
+		return getFullyQualifiedViewName(shortHostname, "article-111");
 	}
 	
 	@RequestMapping(value="/spring/article/leftnav")	
@@ -105,7 +122,7 @@ public class PageController extends BaseController {
 		}
 		
 		model.addAttribute("_page", page);
-		return getFullyQualifiedViewName(shortHostname, "article.leftnav");
+		return getFullyQualifiedViewName(shortHostname, "article-leftnav");
 	}
 		
 	@RequestMapping(value="/spring/projects")
@@ -117,7 +134,20 @@ public class PageController extends BaseController {
 		ModelMap model) {
  
 		standardTemplateRightSidebar(i, shortHostname, model);
-		return getFullyQualifiedViewName(shortHostname, "article.wide");
+		return getFullyQualifiedViewName(shortHostname, "article-010");
+ 
+	}
+
+	@RequestMapping(value="/spring/wsdemo")
+	public String wsdemo(
+		@ModelAttribute("_item") Item i, 
+		@ModelAttribute("_shortHostname") String shortHostname, 
+		ModelMap model) {
+ 
+		String view = standardTemplateLeftNav(i, shortHostname, model);
+		Page page = (Page) model.get("_page");
+		page.addJavascript("/resources/sws/js/sandbox.js");
+		return view;
  
 	}
 

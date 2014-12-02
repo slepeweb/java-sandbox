@@ -26,7 +26,7 @@ import com.slepeweb.cms.utils.LogUtil;
 public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
 	
-	private String[] bypassPatterns = ".*?\\.wsdl|.*?\\.dtd".split("\\|");
+	private String[] bypassPatterns = "/jaxws/.*|.*?\\.wsdl|.*?\\.dtd".split("\\|");
 	private final Object buffPoolLock = new Object();
 	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
 
@@ -78,7 +78,8 @@ public class CmsDeliveryServlet {
 		}
 		else {
 			LOG.debug(LogUtil.compose("Forwarding request to default servlet", path));
-			req.getRequestDispatcher("default").forward(req, res);
+			req.getServletContext().getNamedDispatcher("default").forward(req, res);
+//			req.getRequestDispatcher("default").forward(req, res);
 		}
 	}
 

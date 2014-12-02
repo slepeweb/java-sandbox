@@ -5,7 +5,7 @@ $(function() {
 	
 	$("#lotteryrefresh").click(function(e) {		
 		$.ajax({
-			url : "/ws/lotterynumbers/3",
+			url : "/spring/rest/ws/lotterynumbers/3",
 			dataType : "json",
 			cache : false
 		}).done(function(resp) {
@@ -32,7 +32,7 @@ $(function() {
 		var org = $("#password-org").val();
 		if (org) {
 			$.ajax({
-				url : "/ws/password?org=" + org,
+				url : "/spring/rest/ws/password?org=" + org,
 				contentType : "application/json",
 				dataType : "json",
 				cache : false

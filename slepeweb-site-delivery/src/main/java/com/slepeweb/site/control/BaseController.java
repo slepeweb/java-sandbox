@@ -48,6 +48,6 @@ public class BaseController {
 	}
 	
 	protected String getFullyQualifiedViewName(String shortHostName, String viewNameSuffix) {
-		return shortHostName + "." + viewNameSuffix;
+		return shortHostName + "/template/" + viewNameSuffix;
 	}
 }

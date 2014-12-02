@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.utils.LogUtil;
+import com.slepeweb.site.model.ImageComponent;
 import com.slepeweb.site.model.SimpleComponent;
 import com.slepeweb.site.model.StandardComponent;
 
@@ -40,6 +41,7 @@ public class ComponentServiceImpl implements ComponentService {
 	
 						if (obj != null) {
 							components.add((SimpleComponent) obj);
+							LOG.debug(String.format("Component: %s()", dummy.getType()));
 						}
 					} catch (Exception e) {
 						LOG.warn(LogUtil.compose("Method not found", dummy.getType()), e);
@@ -52,19 +54,16 @@ public class ComponentServiceImpl implements ComponentService {
 	}
 	
 	public SimpleComponent simple(Link l) {
-		LOG.debug("Component: simple()");
 		SimpleComponent c = new SimpleComponent().setup(l);
 		c.setComponents(getComponents(l.getChild().getBindings()));		
 		return c;	
 	}
 
 	public StandardComponent standard(Link l) {
-		LOG.debug("Component: standard()");
 		return new StandardComponent().setup(l);				
 	}
 	
 	public StandardComponent rss_feed(Link l) {
-		LOG.debug("Component: rss_feed()");
 		
 		StandardComponent c = standard(l);
 		
@@ -77,11 +76,34 @@ public class ComponentServiceImpl implements ComponentService {
 	}
 
 	public SimpleComponent tabbed(Link l) {
-		LOG.debug("Component: tabbed()");		
 		SimpleComponent c = simple(l);
 		return c;
 	}
-
+	
+	public SimpleComponent weather_report(Link l) {
+		SimpleComponent c = simple(l);
+		return c;
+	}
+	
+	public ImageComponent image_gif(Link l) {
+		return image(l);
+	}
+	
+	public ImageComponent image_jpg(Link l) {
+		return image(l);
+	}
+	
+	public ImageComponent image_png(Link l) {
+		return image(l);
+	}
+	
+	public ImageComponent image(Link l) {
+		ImageComponent c = new ImageComponent().setup(l);
+		c.setType("image");
+		c.setSrc(l.getChild().getPath());
+		return c;
+	}
+	
 //	private boolean isComponent(Item i) {
 //		return i.getType().getName().equals("Component");
 //	}

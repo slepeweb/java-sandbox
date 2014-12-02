@@ -24,27 +24,12 @@
 	<mvc:annotation-driven />	
 	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.site" />
 		
-	<!-- Tiles -->
-	<bean id="tilesViewResolver"
-		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
-		<property name="viewClass">
-			<value>
-				org.springframework.web.servlet.view.tiles2.TilesView
-            </value>
-		</property>
-		<property name="requestContextAttribute"><value>rc</value></property>
-		<property name="order"><value>0</value></property>
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
 	</bean>
-	
-	<bean id="tilesConfigurer"
-		class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
-		<property name="definitions">
-			<list>
-				<value>/WEB-INF/tiles.xml</value>
-			</list>
-		</property>
-	</bean>
-    			
+
   <!-- Ehcache -->
 	<bean id="cmsKeyGenerator" class="com.slepeweb.cms.utils.CacheKeyGenerator" />  
 	
@@ -95,5 +80,23 @@
 	</bean>
 
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+	
+	<bean id="globalWeatherSoapService" class="org.springframework.remoting.jaxws.JaxWsPortProxyFactoryBean">
+		<property name="wsdlDocumentUrl">
+			<value>http://www.webservicex.com/globalweather.asmx?WSDL</value>
+		</property>
+		<property name="namespaceUri">
+			<value>http://www.webserviceX.NET</value>
+		</property>
+		<property name="serviceName">									 			<!-- <wsdl:service name="GlobalWeather"> -->
+		 <value>GlobalWeather</value>
+		</property>
+		<property name="portName">													<!-- <wsdl:port name="GlobalWeatherSoap" binding="tns:GlobalWeatherSoap"> -->
+			<value>GlobalWeatherSoap</value>
+		</property>
+		<property name="serviceInterface">									<!-- <wsdl:portType name="GlobalWeatherSoap"> -->
+			<value>net.webservicex.GlobalWeatherSoap</value>	
+		</property>
+	</bean>
 	
 </beans>
