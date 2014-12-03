@@ -7,5 +7,5 @@
 
 <div>
 	<img src="${_comp.src}" alt="${_comp.alt}" />
-	<p class="img-caption tight-lines-1" style="margin-left: 5px">${_comp.caption}</p>
+	<c:if test="${not empty _comp.caption}"><p class="img-caption tight-lines-1" style="margin-left: 5px">${_comp.caption}</p></c:if>
 </div>

@@ -41,8 +41,7 @@ public class PageController extends BaseController {
 			@ModelAttribute("_shortHostname") String shortHostname, 
 			ModelMap model) {	
 		
-		standardTemplateRightSidebar(i, shortHostname, model);
-		return getFullyQualifiedViewName(shortHostname, "home");
+		return getFullyQualifiedViewName(shortHostname, "homepage");
 	}
 
 	private Page standardTemplate(Item i) {	
@@ -159,7 +158,11 @@ public class PageController extends BaseController {
 		@RequestParam(value = "logout", required = false) String logout,
 		ModelMap model) {
  
-		standardTemplateRightSidebar(i, shortHostname, model);
+		Page page = standardTemplate(i);
+		page.setLeftSidebar(new Sidebar());
+		page.getLeftSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "leftside"));
+		
+		model.addAttribute("_page", page);
 
 		if (error != null) {
 			model.addAttribute("error", "Invalid username and password!");

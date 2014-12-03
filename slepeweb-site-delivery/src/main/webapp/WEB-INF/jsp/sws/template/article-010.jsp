@@ -6,16 +6,11 @@
 <c:set var="_extraCss" scope="request"></c:set>
 
 <sw:standardLayout>
-	<gen:debug><!-- jsp/sws/article-leftnav.jsp --></gen:debug>
-	
-		<!-- Left Sidebar -->
-		<div class="3u">
-			<sw:navigation-left />
-		</div>
-		
-		<!-- Main content -->	
-		<div class="9u skel-cell-mainContent">	
-			<sw:standardBody />	
-		</div>					
-	
+	<gen:debug><!-- jsp/sws/article-010.jsp --></gen:debug>
+
+	<!-- Main content -->	
+	<div class="12u skel-cell-mainContent">	
+		<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
+	</div>					
+
 </sw:standardLayout>

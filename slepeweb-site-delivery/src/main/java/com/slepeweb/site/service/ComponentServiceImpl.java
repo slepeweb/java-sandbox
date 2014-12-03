@@ -76,7 +76,8 @@ public class ComponentServiceImpl implements ComponentService {
 	}
 
 	public SimpleComponent tabbed(Link l) {
-		SimpleComponent c = simple(l);
+		SimpleComponent c = simple(l);		
+		c.setComponents(getComponents(l.getChild().getBindings()));		
 		return c;
 	}
 	

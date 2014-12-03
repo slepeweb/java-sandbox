@@ -10,6 +10,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.slepeweb.cms.bean.Field.FieldType;
+
 public class Item extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private static Logger LOG = Logger.getLogger(Item.class);
@@ -257,6 +259,31 @@ public class Item extends CmsBean {
 		for (FieldValue fv : getFieldValues()) {
 			map.put(fv.getField().getVariable(), fv);
 		}
+		return map;
+	}
+	
+	/*
+	 * It's too verbose to work with FieldValue objects in JSPs, so this
+	 * Map should make it simpler.
+	 */
+	public Map<String, Object> getFields() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		Object o;
+		
+		for (FieldValue fv : getFieldValues()) {
+			if (fv.getField().getType() == FieldType.integer) {
+				o = fv.getIntegerValue();
+			}
+			else if (fv.getField().getType() == FieldType.date) {
+				o = fv.getDateValue();
+			}
+			else {
+				o = fv.getValue();
+			}
+			
+			map.put(fv.getField().getVariable(), o);
+		}
+
 		return map;
 	}
 	
