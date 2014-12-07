@@ -16,6 +16,7 @@
 		<!-- Main content -->	
 		<div class="9u skel-cell-mainContent">	
 			<sw:standardBody />	
+			<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
 		</div>					
 	
 </sw:standardLayout>

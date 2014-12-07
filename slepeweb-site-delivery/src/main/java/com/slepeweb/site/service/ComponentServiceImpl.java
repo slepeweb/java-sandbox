@@ -31,7 +31,7 @@ public class ComponentServiceImpl implements ComponentService {
 		SimpleComponent dummy = new SimpleComponent();
 
 		if (componentLinks != null && componentLinks.size() > 0) {
-			for (Link link : componentLinks) {
+			for (final Link link : componentLinks) {
 				if (targetLinkName == null || link.getName().equals(targetLinkName)) {
 					dummy.setup(link);
 										
@@ -41,7 +41,7 @@ public class ComponentServiceImpl implements ComponentService {
 	
 						if (obj != null) {
 							components.add((SimpleComponent) obj);
-							LOG.debug(String.format("Component: %s()", dummy.getType()));
+							LOG.debug(String.format("Component: %s() [%s]", dummy.getType(), link.getChild().getPath()));
 						}
 					} catch (Exception e) {
 						LOG.warn(LogUtil.compose("Method not found", dummy.getType()), e);
@@ -77,7 +77,6 @@ public class ComponentServiceImpl implements ComponentService {
 
 	public SimpleComponent tabbed(Link l) {
 		SimpleComponent c = simple(l);		
-		c.setComponents(getComponents(l.getChild().getBindings()));		
 		return c;
 	}
 	

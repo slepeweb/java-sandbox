@@ -1,6 +1,5 @@
 package com.slepeweb.site.control;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.model.Sidebar;
@@ -25,7 +22,6 @@ import com.slepeweb.site.servlet.CmsDeliveryServlet;
 @Controller
 public class PageController extends BaseController {
 	
-	@Autowired private CmsService cmsService;
 	@Autowired private CmsDeliveryServlet cmsDeliveryServlet;
 	@Autowired private ComponentService componentService;
 	
@@ -42,20 +38,6 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		return getFullyQualifiedViewName(shortHostname, "homepage");
-	}
-
-	private Page standardTemplate(Item i) {	
-		
-		Page page = new Page().
-				setTitle(i.getFieldValue("title")).
-				setBody(i.getFieldValue("bodytext", "")).
-				setTopNavigation(getTopNavigation(i));
-		
-		page.setHeading(page.getTitle());
-		page.setComponents(this.componentService.getComponents(i.getComponents(), "main"));
-		page.getHeader().setBreadcrumbs(i);
-		
-		return page;
 	}
 
 	@RequestMapping(value="/spring/article/rightsidebar")	
@@ -134,7 +116,6 @@ public class PageController extends BaseController {
  
 		standardTemplateRightSidebar(i, shortHostname, model);
 		return getFullyQualifiedViewName(shortHostname, "article-010");
- 
 	}
 
 	@RequestMapping(value="/spring/wsdemo")
@@ -175,18 +156,4 @@ public class PageController extends BaseController {
 		return getFullyQualifiedViewName(shortHostname, "login"); 
 	}
 
-	private List<LinkTarget> getTopNavigation(Item i) {
-		List<LinkTarget> nav = new ArrayList<LinkTarget>();
-		Item root = this.cmsService.getItemService().getItem(i.getSite().getId(), "/");
-		LinkTarget lt;
-		
-		if (root != null) {
-			for (Link l : root.getBindings()) {
-				lt = new LinkTarget(l.getChild()).
-						setSelected(i.getPath().startsWith(l.getChild().getPath()));
-				nav.add(lt);
-			}
-		}
-		return nav;
-	}
 }

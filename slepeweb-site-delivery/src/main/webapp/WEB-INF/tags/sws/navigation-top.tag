@@ -1,7 +1,7 @@
-<%@ tag %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 
-<!-- tags/sws/navigation-top.tag -->
+<gen:debug><!-- tags/sws/navigation-top.tag --></gen:debug>
+
 <header class="container" id="site-header">
 	<div class="row">
 		<div class="12u">

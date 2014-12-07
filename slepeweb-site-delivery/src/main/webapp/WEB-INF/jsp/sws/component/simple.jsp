@@ -5,6 +5,8 @@
 <div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
 	<c:if test="${not empty _comp.heading}"><h3>${_comp.heading}</h3></c:if>
 	<c:if test="${not empty _comp.blurb}"><div>${_comp.blurb}</div></c:if>	
+	<c:if test="${not empty _comp.js}"><script>${_comp.js}</script></c:if>	
+	
 	<c:if test="${fn:length(_comp.components) > 0}">
 		<div>
 			<site:insertComponents site="${_item.site.shortname}" list="${_comp.components}" /> 

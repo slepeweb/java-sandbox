@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.slepeweb.site.sws.orm">
+	<class name="User" table="user">
+	
+		<id name="id" column="user_id">
+			<generator class="org.hibernate.id.enhanced.SequenceStyleGenerator" />
+		</id>
+		
+		<property name="name" type="string" column="name" />
+		<property name="alias" type="string" column="alias" unique="true" />
+		<property name="encryptedPassword" type="string" column="password" />
+		<property name="demoUser" type="short" column="demo_user" />
+		<property name="enabled" type="short" column="enabled" />
+
+		<!-- 
+			A User has zero/many Role instances.
+			Equally, a Role is attributed to zero/many User instances.
+			This is modelled using a db join table, and requires a <many-to-many> hibernate association.
+		-->
+		<!-- 
+			Attributes on <set> element:
+				name: name of collection property on User pojo
+				table: name of db join table
+				cascade: 'refresh' stops the role table from being emptied! 			
+		-->
+    <set name="roles" table="user_role" cascade="refresh" lazy="false" fetch="join">
+    		<!-- column: name of column on 'user' table which serves as first column on join table -->
+        <key column="user_id"/>
+    		<!-- 
+    			Attributes on <many-to-many> element:
+    				column: name of column on 'role' table which serves as second column on join table 
+    				class: the name of the pojo class (Role) which is associated with this (User) class
+    		-->
+        <many-to-many column="role_id" class="Role"/>
+    </set>
+	</class>
+</hibernate-mapping>

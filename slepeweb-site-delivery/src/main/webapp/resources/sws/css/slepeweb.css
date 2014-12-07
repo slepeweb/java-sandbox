@@ -212,6 +212,12 @@ ul.level-1 {
 	border-top: none;
 }
 
+ul.level-2 {
+	margin-left: 3em;
+	font-size: 0.9em;
+	border-top: none;
+}
+
 li.selected {
 	font-weight: bold;
 }
