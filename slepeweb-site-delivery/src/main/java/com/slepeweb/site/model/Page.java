@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.core.userdetails.User;
+
+import com.slepeweb.cms.bean.Item;
+
 
 public class Page implements Serializable, NestableComponent {
 	private static final long serialVersionUID = 1L;
@@ -15,6 +19,8 @@ public class Page implements Serializable, NestableComponent {
 	private String title, heading, body, view;
 	private List<SimpleComponent> components;
 	private List<String> roles;
+	private Item item;
+	private User user;
 	
 	public Page() {
 		this.header = new Header(this);
@@ -60,11 +66,6 @@ public class Page implements Serializable, NestableComponent {
 //				getHref()));
 //		return false;
 //	}
-	
-	public Page setTopNavigation(List<LinkTarget> links) {
-		getHeader().setTopNavigation(links);
-		return this;
-	}
 	
 	public Page addStylesheet(String path) {
 		getHeader().getStylesheets().add(path);
@@ -172,4 +173,23 @@ public class Page implements Serializable, NestableComponent {
 	public void setComponents(List<SimpleComponent> components) {
 		this.components = components;
 	}
+
+	public Item getItem() {
+		return item;
+	}
+
+	public Page setItem(Item item) {
+		this.item = item;
+		return this;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public Page setUser(User user) {
+		this.user = user;
+		return this;
+	}
+
 }

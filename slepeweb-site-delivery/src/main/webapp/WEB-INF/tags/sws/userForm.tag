@@ -4,7 +4,7 @@
 
 <article class="first">
 	<h2>${_item.fields.title}</h2>
-	<jsp:include page="/WEB-INF/jsp/sws/template/user/flash-messages.jsp" />
+	<sw:flash-messages />
 	  
 	<form:form method="post" action="${submitAction}" commandName="userForm">
 	  

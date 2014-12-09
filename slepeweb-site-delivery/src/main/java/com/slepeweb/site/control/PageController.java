@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -46,7 +47,7 @@ public class PageController extends BaseController {
 			@ModelAttribute("_shortHostname") String shortHostname, 
 			ModelMap model) {	
 		
-		Page page = standardTemplate(i);
+		Page page = standardTemplate(i, (User) model.get("_user"));
 		page.setRightSidebar(new Sidebar());
 		page.getRightSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
 		
@@ -60,7 +61,7 @@ public class PageController extends BaseController {
 			@ModelAttribute("_shortHostname") String shortHostname, 
 			ModelMap model) {	
 		
-		Page page = standardTemplate(i);
+		Page page = standardTemplate(i, (User) model.get("_user"));
 		page.setRightSidebar(new Sidebar());
 		page.getRightSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
 		page.setLeftSidebar(new Sidebar());
@@ -76,7 +77,7 @@ public class PageController extends BaseController {
 			@ModelAttribute("_shortHostname") String shortHostname, 
 			ModelMap model) {	
 		
-		Page page = standardTemplate(i);
+		Page page = standardTemplate(i, (User) model.get("_user"));
 		
 		// Left navigation
 		if (page.getHeader().getBreadcrumbs().size() > 1) {
@@ -135,11 +136,11 @@ public class PageController extends BaseController {
 	public String login(
 		@ModelAttribute("_item") Item i, 
 		@ModelAttribute("_shortHostname") String shortHostname, 
-		@RequestParam(value = "error", required = false) String error,
-		@RequestParam(value = "logout", required = false) String logout,
+		@RequestParam(value="error", required = false) String error,
+		@RequestParam(value="logout", required = false) String logout,
 		ModelMap model) {
  
-		Page page = standardTemplate(i);
+		Page page = standardTemplate(i,  (User) model.get("_user"));
 		page.setLeftSidebar(new Sidebar());
 		page.getLeftSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "leftside"));
 		
@@ -150,7 +151,7 @@ public class PageController extends BaseController {
 		}
  
 		if (logout != null) {
-			model.addAttribute("msg", "You've been logged out successfully.");
+			model.addAttribute("msg", "You've been successfully logged out.");
 		}
  
 		return getFullyQualifiedViewName(shortHostname, "login"); 

@@ -1,21 +1,17 @@
 package com.slepeweb.site.control;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.component.Config;
-import com.slepeweb.cms.service.CmsService;
-import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.ComponentService;
 
@@ -24,7 +20,6 @@ public class BaseController {
 	
 	@Autowired protected Config config;
 	@Autowired private ComponentService componentService;
-	@Autowired private CmsService cmsService;
 
 	@ModelAttribute(value="config")
 	public Config getConfig() {
@@ -52,41 +47,52 @@ public class BaseController {
 	}
 	
 	@ModelAttribute(value="_user")
-	protected Principal getUser(HttpServletRequest req) {
-		return req.getUserPrincipal();
+	protected User getUser() {
+		Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (obj instanceof User) {
+			return (User) obj;
+		}
+		return null;
+	}
+	
+	
+	@ModelAttribute(value="_isGuest")
+	protected boolean isGuest(@ModelAttribute(value="_user") User u) {
+		return hasAuthority(u, "SWS_GUEST");
+	}
+	
+	@ModelAttribute(value="_isAdmin")
+	protected boolean isAdmin(@ModelAttribute(value="_user") User u) {
+		return hasAuthority(u, "SWS_ADMIN");
+	}
+	
+	private boolean hasAuthority(User u, String name) {
+		if (u != null) {
+			for (GrantedAuthority auth : u.getAuthorities()) {
+				if (auth.getAuthority().equals(name)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	protected String getFullyQualifiedViewName(String shortHostName, String viewNameSuffix) {
 		return shortHostName + "/template/" + viewNameSuffix;
 	}
 	
-	protected Page standardTemplate(Item i) {	
+	protected Page standardTemplate(Item i, @ModelAttribute("_user") User u) {	
 		
 		Page page = new Page().
 				setTitle(i.getFieldValue("title")).
 				setBody(i.getFieldValue("bodytext", "")).
-				setTopNavigation(getTopNavigation(i));
+				setItem(i).
+				setUser(u);
 		
 		page.setHeading(page.getTitle());
 		page.setComponents(this.componentService.getComponents(i.getComponents(), "main"));
-		page.getHeader().setBreadcrumbs(i);
 		
 		return page;
-	}
-
-	protected List<LinkTarget> getTopNavigation(Item i) {
-		List<LinkTarget> nav = new ArrayList<LinkTarget>();
-		Item root = this.cmsService.getItemService().getItem(i.getSite().getId(), "/");
-		LinkTarget lt;
-		
-		if (root != null) {
-			for (Link l : root.getBindings()) {
-				lt = new LinkTarget(l.getChild()).
-						setSelected(i.getPath().startsWith(l.getChild().getPath()));
-				nav.add(lt);
-			}
-		}
-		return nav;
 	}
 
 }

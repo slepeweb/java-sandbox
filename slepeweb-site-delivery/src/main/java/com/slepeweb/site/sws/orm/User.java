@@ -7,7 +7,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jasypt.util.password.BasicPasswordEncryptor;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
 public class User {
 	
@@ -60,10 +60,9 @@ public class User {
 		return false;
 	}
 	
-	public void encryptPasswordIfNotBlank() {
+	public void encryptPasswordIfNotBlank(StandardPasswordEncoder encoder) {
 		if (! StringUtils.isBlank(getPassword())) {
-			BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
-			setEncryptedPassword(passwordEncryptor.encryptPassword(getPassword()));
+			setEncryptedPassword(encoder.encode(getPassword()));
 		}
 	}
 	

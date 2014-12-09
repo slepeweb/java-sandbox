@@ -5,7 +5,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
 
 public class Header implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -17,14 +22,12 @@ public class Header implements Serializable {
 	public Header(Page page) {
 		this.stylesheets = new ArrayList<String>();
 		this.javascripts = new ArrayList<String>();
-		this.globalNavigation = new ArrayList<LinkTarget>();
-		this.topNavigation = new ArrayList<LinkTarget>();
-		this.breadcrumbItems = new ArrayList<Item>();
 		this.page = page;
 	}
 	
-	public void setBreadcrumbs(Item i) {
+	private void populateBreadcrumbs() {
 		this.breadcrumbItems = new ArrayList<Item>();
+		Item i = getPage().getItem();
 		
 		while (! i.getPath().equals("/")) {
 			this.breadcrumbItems.add(i);
@@ -36,6 +39,36 @@ public class Header implements Serializable {
 		Collections.reverse(this.breadcrumbItems);
 	}
 	
+	private void populateTopNavigation(Item i) {
+		this.topNavigation = new ArrayList<LinkTarget>();		
+		Item root = i.getCmsService().getItemService().getItem(i.getSite().getId(), "/");
+		LinkTarget lt;
+		
+		boolean swapLoginForLogout = false;
+		Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (obj instanceof User) {
+			User user = (User) obj;
+			for (GrantedAuthority auth : user.getAuthorities()) {
+				if (auth.getAuthority().equals("SWS_GUEST")) {
+					swapLoginForLogout = true;
+					break;
+				}
+			}
+		}
+		
+		if (root != null) {
+			for (Link l : root.getBindings()) {
+				lt = new LinkTarget(l.getChild()).
+						setSelected(i.getPath().startsWith(l.getChild().getPath()));
+				
+				if (swapLoginForLogout && lt.getHref().equals("/login")) {
+					lt.setHref("/j_spring_security_logout").setTitle("Logout");
+				}
+				this.topNavigation.add(lt);
+			}
+		}
+	}
+
 	public List<String> getStylesheets() {
 		return stylesheets;
 	}
@@ -48,16 +81,11 @@ public class Header implements Serializable {
 		return globalNavigation;
 	}
 	
-	public void setGlobalNavigation(List<LinkTarget> globalNavigation) {
-		this.globalNavigation = globalNavigation;
-	}
-	
 	public List<LinkTarget> getTopNavigation() {
-		return topNavigation;
-	}
-	
-	public void setTopNavigation(List<LinkTarget> topNavigation) {
-		this.topNavigation = topNavigation;
+		if (this.topNavigation == null) {
+			populateTopNavigation(getPage().getItem());
+		}
+		return this.topNavigation;
 	}
 	
 	public List<LinkTarget> getBreadcrumbs() {
@@ -77,6 +105,9 @@ public class Header implements Serializable {
 	}
 
 	public List<Item> getBreadcrumbItems() {
+		if (this.breadcrumbItems == null) {
+			populateBreadcrumbs();
+		}
 		return breadcrumbItems;
 	}
 }

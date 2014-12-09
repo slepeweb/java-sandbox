@@ -1,7 +1,7 @@
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
   
 <c:choose><c:when test="${empty _flashMsg and empty _flashError}">
-	<c:if test="${not userHasUserAdminRole}">
+	<c:if test="${not _isGuest and not _isAdmin}">
 		<p class="flash-msg orange compact">Please note: You can modify form data, but you do not have sufficient privileges to update the database.</p>
 	</c:if>
 </c:when><c:when test="${not empty _flashMsg}">

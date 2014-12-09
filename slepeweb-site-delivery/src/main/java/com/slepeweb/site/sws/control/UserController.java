@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -30,6 +31,7 @@ public class UserController extends PageController {
 
 	@Autowired private UserDao userDao;
 	@Autowired private CmsService cmsService;
+	@Autowired private StandardPasswordEncoder passwordEncoder;
 //	@Autowired private ComponentService componentService;
 	
 	@RequestMapping("list")
@@ -87,8 +89,7 @@ public class UserController extends PageController {
 		}
 		
 		if (! result.hasErrors()) {
-			userForm.encryptPasswordIfNotBlank();
-			
+			userForm.encryptPasswordIfNotBlank(this.passwordEncoder);			
 			selected2Roles(userForm);
 			this.userDao.addUser(userForm);
 			
@@ -117,7 +118,7 @@ public class UserController extends PageController {
 		 */
 		if (! result.hasErrors()) {
 			selected2Roles(userForm);
-			userForm.encryptPasswordIfNotBlank();
+			userForm.encryptPasswordIfNotBlank(this.passwordEncoder);
 			this.userDao.updateUser(userForm);
 							
 			rattr.addFlashAttribute("_flashMsg", 

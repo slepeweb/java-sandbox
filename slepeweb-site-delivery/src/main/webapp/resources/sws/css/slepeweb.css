@@ -94,6 +94,10 @@
 	line-height: 1.4em;
 }
 
+.underline {
+	text-decoration: underline;
+}
+
 .red {
 	color: red;
 }

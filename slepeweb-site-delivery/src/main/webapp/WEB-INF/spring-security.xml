@@ -10,7 +10,8 @@
 		<intercept-url pattern="/profile/projects" access="hasRole('SWS_GUEST')" />
 		<intercept-url pattern="/spring/user/add" access="hasRole('SWS_GUEST')" />
 		<intercept-url pattern="/spring/user/upd" access="hasRole('SWS_GUEST')" />
-		<intercept-url pattern="/spring/user/del/*" access="hasRole('SWS_GUEST')" />
+		<intercept-url pattern="/spring/user/del/*" access="hasRole('SWS_ADMIN')" />
+		
 		<form-login 
 		  login-page="/login" 
 		  default-target-url="/" 
@@ -19,11 +20,15 @@
 			password-parameter="password" />
 			
 		<logout logout-success-url="/login?logout" />	
+		
 	</http>
  
+	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder" />
+	
 	<authentication-manager>
 	  <authentication-provider>
-	    <jdbc-user-service data-source-ref="dataSource"
+			<password-encoder ref="passwordEncoder" />	    
+			<jdbc-user-service data-source-ref="dataSource"
 				users-by-username-query=
 			    "select alias, password, enabled from user where alias=?"
 			  authorities-by-username-query=
