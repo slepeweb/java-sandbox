@@ -6,19 +6,18 @@
 	<gen:debug><!-- jsp/sws/spizza/deliveryWarning.jsp --></gen:debug>
 	
 	<article>
-		<h2>Outside delivery area</h2>
-		<p>Hello, ${customer.name}. Your address (${customer.zipCode}) is outside of our delivery area.
-			Are you happy to collect it up yourself?</p>
+		<h2>${contentMap.heading}</h2>
+		<p>${fn:replace(fn:replace(contentMap.body, '[customer.name]', customer.name), '[customer.zipCode]', customer.zipCode)}</p>
 		
 		<form:form method="post" action="${flowExecutionUrl}">	  
 		    <table class="two-col-table">
 		    <tr>
 		        <td><input class="button" type="submit" name="_eventId_accept" value="Continue" /></td>
-		        <td>I'll collect the order myself</td>
+		        <td>${contentMap.response_A}</td>
 		    </tr>
 		    <tr>
 		        <td class="buttons"><input class="button" type="submit" name="_eventId_cancel" value="Never mind" /></td>
-		        <td>I can't collect today - perhaps another time!</td>
+		        <td>${contentMap.response_B}</td>
 		    </tr>
 				</table> 
 		</form:form>

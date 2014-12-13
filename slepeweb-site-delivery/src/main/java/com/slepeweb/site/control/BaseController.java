@@ -90,6 +90,7 @@ public class BaseController {
 				setItem(i).
 				setView(getFullyQualifiedViewName(shortSitename, viewNameSuffix));
 		
+		p.setComponents(this.componentService.getComponents(i.getComponents(), "main"));
 		p.getLeftSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "leftside"));
 		p.getRightSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
 		

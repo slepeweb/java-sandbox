@@ -6,8 +6,8 @@
 	<gen:debug><!-- jsp/sws/spizza/thankCustomer.jsp --></gen:debug>
 
 	<article>
-		<h2>Thank you</h2>
-		<p>Thanks for your order, ${order.customer.name} ! Your pizza is on it's way</p>
+		<h2>${contentMap.heading}</h2>
+		<p>${fn:replace(contentMap.body, '[customer.name]', order.customer.name)}</p>
 		
 		<table class="two-col-table">
 			<tr>

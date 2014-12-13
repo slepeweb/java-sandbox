@@ -11,6 +11,9 @@
 	</on-start>
 	
 	<view-state id="takePayment" view="sws/spizza/takePayment" model="paymentForm">
+		<on-entry>
+			<evaluate expression="spizzaFlowActions.parseContent('block5', flowRequestContext)" result="viewScope.contentMap" />
+		</on-entry>
 		<transition on="submitPayment" to="verifyPayment" />
 		<transition on="cancel" to="cancel" />
 	</view-state>

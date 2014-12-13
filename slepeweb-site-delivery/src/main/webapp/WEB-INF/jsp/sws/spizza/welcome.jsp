@@ -4,16 +4,11 @@
 	
 <sw:spizzaLayout>
 	<gen:debug><!-- jsp/sws/spizza/welcome.jsp --></gen:debug>
+	<c:set var="_replacement">${flowExecutionUrl}&_eventId=register</c:set>
 
 	<article class="first">
-		<h2>Pizza Spizza !</h2>
-
-		<p>
-			This is a Spring Webflow demonstration, based upon an example in a
-			book by Craig Walls <span class="italic">(Spring in Action)</span>. A
-			series of forms and user interactions are tied together by the Spring
-			Webflow framework, to simulate an online pizza ordering service.
-		</p>
+		<h2>${_page.item.fields.title}</h2>
+		<p>${contentMap.main}</p>
 
 		<form:form method="post" commandName="loginForm">
 			<c:set var="logonErrors">
@@ -23,19 +18,10 @@
 
 		<c:choose>
 			<c:when test="${empty logonErrors}">
-				<p>
-					If you have an account with us, then please use the form below to
-					log on and place an order. Otherwise, please <a
-						href="${flowExecutionUrl}&_eventId=register">register</a>.
-				</p>
+				<p>${fn:replace(contentMap.help_account, '[register.href]', _replacement)}</p>
 			</c:when>
 			<c:otherwise>
-				<p class="flash-msg orange">
-					For demo purposes, you can login as 'fred@flintstone.com' /
-					'rubble'. Otherwise, please <a
-						href="${flowExecutionUrl}&_eventId=register">register</a> a new
-					account.
-				</p>
+				<p class="flash-msg orange">${fn:replace(contentMap.help_login, '[register.href]', _replacement)}</p>
 			</c:otherwise>
 		</c:choose>
 

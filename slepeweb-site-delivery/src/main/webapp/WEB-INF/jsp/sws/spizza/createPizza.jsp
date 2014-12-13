@@ -6,8 +6,8 @@
 	<gen:debug><!-- jsp/sws/spizza/createPizza.jsp --></gen:debug>
 
 	<article>
-		<h2>Create Pizza</h2>
-		<p>Build a pizza to your taste, by selecting a base, size and any number of toppings.</p>
+		<h2>${contentMap.heading}</h2>
+		<p>${contentMap.body}</p>
 		
 		<form:form action="${flowExecutionUrl}" commandName="pizzaForm">
 			<table id="pizza-options-table" class="two-col-table">

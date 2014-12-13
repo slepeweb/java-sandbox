@@ -1,6 +1,10 @@
 package com.slepeweb.site.sws.spizza;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,6 +21,7 @@ import org.springframework.webflow.execution.RequestContext;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.sws.spizza.bean.Customer;
 import com.slepeweb.site.sws.spizza.bean.LoginForm;
@@ -31,6 +36,7 @@ import com.slepeweb.site.sws.spizza.bean.PizzaForm;
 @Component("spizzaFlowActions")
 public class SpizzaFlowActions extends MultiAction {
 	private static Logger LOG = Logger.getLogger(SpizzaFlowActions.class);
+	private static Pattern DATA_PATTERN = Pattern.compile("^\\[(\\w+)\\]\\:(.*)$", Pattern.DOTALL | Pattern.MULTILINE);
 	
 	@Autowired private CmsService cmsService;	
 	
@@ -64,6 +70,35 @@ public class SpizzaFlowActions extends MultiAction {
 	    
     	p.getItem().setCmsService(this.cmsService);
 	    return p;
+	}
+	
+	public Map<String, String> parseMainContent(RequestContext ctx) {
+		Map<String, String> map = parseContent(FieldName.BODYTEXT, ctx);		
+		String replacementHref = ctx.getFlowExecutionUrl() + "&_eventId=register";
+		String replacement;
+		
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			replacement = entry.getValue().replaceAll("\\[register\\.href\\]", replacementHref);
+			entry.setValue(replacement);
+		}
+				
+		return map;
+	}
+	
+	public Map<String, String> parseContent(String fieldName, RequestContext ctx) {
+		Map<String, String> map = new HashMap<String, String>();
+		Page p = (Page) ctx.getConversationScope().get("page");
+		String fieldValue = p.getItem().getFieldValue(fieldName, "");
+		Matcher m;
+		
+		for (String part : fieldValue.split("\\|")) {
+			m = DATA_PATTERN.matcher(part.trim());
+			if (m.matches()) {
+				map.put(m.group(1).trim(), m.group(2).trim());
+			}
+		}
+				
+		return map;
 	}
 	
 	public Event identifyCustomer(RequestContext ctx) throws Exception {

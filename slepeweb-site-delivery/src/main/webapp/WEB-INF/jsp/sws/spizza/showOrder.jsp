@@ -6,11 +6,10 @@
 	<gen:debug><!-- jsp/sws/spizza/showOrder.jsp --></gen:debug>
 
 	<article>
-		<h2>Your order so far</h2>
+		<h2>${contentMap.heading}</h2>
 		
-		<p><c:if test="${fn:length(order.pizzas) == 1}">
-			Mmm - good choice, ${order.customer.name} ! <br /></c:if>
-			Your order, number ${order.id}, totals: <span class="embolden">${order.totalFormatted}</span></p>
+		<p><c:if test="${fn:length(order.pizzas) == 1}">${fn:replace(contentMap.response_A, '[customer.name]', order.customer.name)}</c:if>
+			${fn:replace(fn:replace(contentMap.response_B, '[order.id]', order.id), '[order.total]', order.totalFormatted)}</p>
 		
 	
 		<form:form action="${flowExecutionUrl}">
@@ -30,7 +29,7 @@
 						<td>${pizza.toppingsAsString}</td>
 						<td>${pizza.priceFormatted}</td>
 						<td><a href="${flowExecutionUrl}&_eventId_remove&id=${status.count}"><img
-									src="/resources/images/delete-icon.jpg"
+									src="/resources/sws/images/delete-icon.jpg"
 									alt="Remove"
 									title="Remove"></a></td>
 					</tr>

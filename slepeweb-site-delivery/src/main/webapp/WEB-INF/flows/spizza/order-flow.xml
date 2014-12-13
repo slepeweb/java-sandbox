@@ -8,6 +8,7 @@
 	
 	<view-state id="createPizza" view="sws/spizza/createPizza" model="pizzaForm">
 		<on-entry>
+			<evaluate expression="spizzaFlowActions.parseContent('block3', flowRequestContext)" result="viewScope.contentMap" />
 			<set name="flowScope.pizzaForm" value="spizzaFlowActions.initPizzaForm()" />
 		</on-entry>
 		<transition on="addPizza" to="showOrder">
@@ -17,6 +18,9 @@
 	</view-state>
 	
 	<view-state id="showOrder" view="sws/spizza/showOrder">
+		<on-entry>
+			<evaluate expression="spizzaFlowActions.parseContent('block4', flowRequestContext)" result="viewScope.contentMap" />
+		</on-entry>
 		<transition on="createPizza" to="createPizza" />
 		<transition on="checkout" to="orderCreated" />
 		<transition on="cancel" to="cancel" />

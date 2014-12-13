@@ -8,6 +8,9 @@
 	<var name="customer" class="com.slepeweb.site.sws.spizza.bean.Customer" />
 
 	<view-state id="welcome" view="sws/spizza/welcome" model="loginForm">
+		<on-entry>
+			<evaluate expression="spizzaFlowActions.parseContent('bodytext', flowRequestContext)" result="viewScope.contentMap" />
+		</on-entry>
 		<transition on="login" to="authenticate" />
 		<transition on="register" to="registration" validate="false" />
 	</view-state>
@@ -19,6 +22,9 @@
 	</action-state>
 	
 	<view-state id="registration" view="sws/spizza/registrationForm" model="customer">
+		<on-entry>
+			<evaluate expression="spizzaFlowActions.parseContent('block1', flowRequestContext)" result="viewScope.contentMap" />
+		</on-entry>
 		<transition on="register" to="validateRegistration" />
 	</view-state>
 
@@ -35,6 +41,9 @@
 	</action-state>
 
 	<view-state id="deliveryWarning" view="sws/spizza/deliveryWarning">
+		<on-entry>
+			<evaluate expression="spizzaFlowActions.parseContent('block2', flowRequestContext)" result="viewScope.contentMap" />
+		</on-entry>
 		<transition on="accept" to="customerReady" />
 	</view-state>
 

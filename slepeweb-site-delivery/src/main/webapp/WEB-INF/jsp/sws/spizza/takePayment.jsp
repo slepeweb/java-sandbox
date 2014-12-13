@@ -6,7 +6,7 @@
 	<gen:debug><!-- jsp/sws/spizza/takePayment.jsp --></gen:debug>
 
 	<article>
-		<h2>Payment details</h2>
+		<h2>${contentMap.heading}</h2>
 		
 		<form:form method="post" commandName="paymentForm">
 			<table class="two-col-table">

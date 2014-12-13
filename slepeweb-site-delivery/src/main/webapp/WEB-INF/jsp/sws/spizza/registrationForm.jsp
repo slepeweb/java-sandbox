@@ -6,9 +6,8 @@
 	<gen:debug><!-- jsp/sws/spizza/registrationForm.jsp --></gen:debug>
 
 	<article class="first">
-		<h2>Registration</h2>
-		
-		<p>Please register your new account details:</p>
+		<h2>${contentMap.heading}</h2>		
+		<p>${contentMap.body}</p>
 			
 		<form:form method="post" commandName="customer">
 		  

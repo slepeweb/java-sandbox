@@ -41,6 +41,7 @@ public class UserController extends BaseController {
 			ModelMap model) {
 		
 		Page page = getStandardPage(i, shortSitename, "user/list", model);
+		page.setLeftNavigation();
 		model.addAttribute("userList", this.userDao.getAllUsers(true));		
 		return page.getView();
 	}
@@ -53,6 +54,7 @@ public class UserController extends BaseController {
 			ModelMap model) {
 		
 		Page page = getStandardPage(i, shortSitename, "user/form", model);
+		page.setLeftNavigation();
 		
 		if (userId == null) {
 			model.addAttribute("userForm", new User().setUserFormPageId(i.getId()));
