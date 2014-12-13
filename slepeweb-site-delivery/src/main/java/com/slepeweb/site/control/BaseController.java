@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.slepeweb.cms.bean.Item;
@@ -41,8 +42,8 @@ public class BaseController {
 		return null;
 	}
 	
-	@ModelAttribute(value="_shortHostname")
-	protected String getShortHostName(@ModelAttribute("_item") Item i) {
+	@ModelAttribute(value="_shortSitename")
+	protected String getShortSitename(@ModelAttribute("_item") Item i) {
 		return i != null && i.getSite() != null ? i.getSite().getShortname() : "";
 	}
 	
@@ -81,18 +82,19 @@ public class BaseController {
 		return shortHostName + "/template/" + viewNameSuffix;
 	}
 	
-	protected Page standardTemplate(Item i, @ModelAttribute("_user") User u) {	
-		
-		Page page = new Page().
+	protected Page getStandardPage(Item i, String shortSitename, String viewNameSuffix, ModelMap model) {			
+		Page p = new Page().
 				setTitle(i.getFieldValue("title")).
+				setHeading(i.getFieldValue("title")).
 				setBody(i.getFieldValue("bodytext", "")).
 				setItem(i).
-				setUser(u);
+				setView(getFullyQualifiedViewName(shortSitename, viewNameSuffix));
 		
-		page.setHeading(page.getTitle());
-		page.setComponents(this.componentService.getComponents(i.getComponents(), "main"));
+		p.getLeftSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "leftside"));
+		p.getRightSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
 		
-		return page;
+		model.addAttribute("_page", p);
+		return p;
 	}
 
 }

@@ -8,15 +8,26 @@ public class Sidebar implements NestableComponent, Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<LinkTarget> navigation, relatedPages;
 	private List<SimpleComponent> components;
+
+	private Page page;
+	private Sidebar.Type type;
 	
-	public Sidebar() {
-		this.navigation = new ArrayList<LinkTarget>();
-		this.relatedPages = new ArrayList<LinkTarget>();
+	public enum Type {
+		left, right;
+	}
+	
+	public Sidebar(Page page, Sidebar.Type type) {
+		this.page = page;
+		this.type = type;
 		this.components = new ArrayList<SimpleComponent>();
 	}
 	
 	public List<SimpleComponent> getComponents() {
 		return components;
+	}
+	
+	public void setComponents(List<SimpleComponent> components) {
+		this.components = components;
 	}
 	
 	public List<LinkTarget> getNavigation() {
@@ -35,7 +46,16 @@ public class Sidebar implements NestableComponent, Serializable {
 		this.relatedPages = relatedPages;
 	}
 
-	public void setComponents(List<SimpleComponent> components) {
-		this.components = components;
+	public Page getPage() {
+		return page;
+	}
+
+	public Sidebar.Type getType() {
+		return type;
+	}
+
+	public Sidebar setType(Sidebar.Type type) {
+		this.type = type;
+		return this;
 	}
 }

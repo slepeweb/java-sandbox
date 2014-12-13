@@ -16,6 +16,11 @@
 	<!-- Right sidebar -->
 	<div class="3u">	
 		<section>
+		<!-- 
+					_page:        [${_page}]
+					rightSidebar: [${_page.rightSidebar}]
+					components:   [${_page.rightSidebar.components}]
+		 -->
 			<site:insertComponents site="${_item.site.shortname}" list="${_page.rightSidebar.components}" /> 
 		</section>
 	</div>

@@ -1,0 +1,49 @@
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:flow="http://www.springframework.org/schema/webflow-config"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+			http://www.springframework.org/schema/webflow-config
+			http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.3.xsd"
+
+	default-autowire="byName">
+
+	<!-- 
+		The flowhandler mapping identifies URLs for flows, and 
+		tells the DispatcherServlet to ignores those URLs.
+		For example, a flow with id 'spizza' ia mapped to URL '/spizza'.
+	-->
+	<bean class="org.springframework.webflow.mvc.servlet.FlowHandlerMapping">
+		<property name="flowRegistry" ref="flowRegistry" />
+		
+		<!-- NOTE: this property ensures that the flow handler mappings take precedence -->
+		<property name="order" value="-1" />
+	</bean>
+	
+	<!-- The registry loads flow definitions -->
+	<flow:flow-registry id="flowRegistry" flow-builder-services="flowBuilderServices">
+		<flow:flow-location id="webflow/spizza" path="/WEB-INF/flows/spizza/spizza-flow.xml" />
+		<flow:flow-location id="webflow/spizza/customer" path="/WEB-INF/flows/spizza/identify-customer-flow.xml" />
+		<flow:flow-location id="webflow/spizza/order" path="/WEB-INF/flows/spizza/order-flow.xml" />
+		<flow:flow-location id="webflow/spizza/payment" path="/WEB-INF/flows/spizza/payment-flow.xml" />
+	</flow:flow-registry>
+	
+	<!-- The flow executor is responsible for managing flows -->
+	<flow:flow-executor id="flowExecutor" flow-registry="flowRegistry" />
+	
+	<!-- The flow handler adapter is effectively a controller for flow requests -->
+	<bean class="org.springframework.webflow.mvc.servlet.FlowHandlerAdapter">
+		<property name="flowExecutor" ref="flowExecutor" />
+	</bean>
+	
+	<flow:flow-builder-services id="flowBuilderServices" 
+		view-factory-creator="mvcViewFactoryCreator"
+		development="true"
+		validator="validator" />
+	
+	<bean id="mvcViewFactoryCreator" class="org.springframework.webflow.mvc.builder.MvcViewFactoryCreator">
+	    <property name="viewResolvers" ref="viewResolver" />
+	</bean>
+	
+</beans>

@@ -20,39 +20,39 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.service.CmsService;
-import com.slepeweb.site.control.PageController;
+import com.slepeweb.site.control.BaseController;
+import com.slepeweb.site.model.Page;
 import com.slepeweb.site.sws.orm.Role;
 import com.slepeweb.site.sws.orm.User;
 import com.slepeweb.site.sws.orm.UserDao;
 
 @Controller
 @RequestMapping(value = "/spring/user")
-public class UserController extends PageController {
+public class UserController extends BaseController {
 
 	@Autowired private UserDao userDao;
 	@Autowired private CmsService cmsService;
 	@Autowired private StandardPasswordEncoder passwordEncoder;
-//	@Autowired private ComponentService componentService;
 	
 	@RequestMapping("list")
 	public String listUsers(
 			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortHostname") String shortHostname, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
 			ModelMap model) {
 		
-		standardTemplateLeftNav(i, shortHostname, model);				
+		Page page = getStandardPage(i, shortSitename, "user/list", model);
 		model.addAttribute("userList", this.userDao.getAllUsers(true));		
-		return getFullyQualifiedViewName(shortHostname, "user/list");
+		return page.getView();
 	}
 	
 	@RequestMapping(value = "form", method = RequestMethod.GET)
 	public String showForm(
 			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortHostname") String shortHostname, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
 			@RequestParam(value="userId", required=false) Integer userId,
 			ModelMap model) {
 		
-		standardTemplateLeftNav(i, shortHostname, model);
+		Page page = getStandardPage(i, shortSitename, "user/form", model);
 		
 		if (userId == null) {
 			model.addAttribute("userForm", new User().setUserFormPageId(i.getId()));
@@ -65,7 +65,7 @@ public class UserController extends PageController {
 		}
 		
 		model.addAttribute("availableRoles", this.userDao.getAvailableRoles());
-		return getFullyQualifiedViewName(shortHostname, "user/form");
+		return page.getView();
 	}
 	
 	/*

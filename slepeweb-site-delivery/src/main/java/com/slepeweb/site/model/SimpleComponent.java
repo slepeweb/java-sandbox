@@ -43,9 +43,8 @@ public class SimpleComponent implements NestableComponent, Serializable {
 		return components;
 	}
 
-	public SimpleComponent setComponents(List<SimpleComponent> subComponents) {
+	public void setComponents(List<SimpleComponent> subComponents) {
 		this.components = subComponents;
-		return this;
 	}
 
 	public String getType() {

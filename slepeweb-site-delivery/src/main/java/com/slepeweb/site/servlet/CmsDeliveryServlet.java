@@ -26,26 +26,31 @@ import com.slepeweb.cms.utils.LogUtil;
 public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
 	
-	private String[] bypassPatterns = "/jaxws/.*|.*?\\.wsdl|.*?\\.dtd".split("\\|");
+	private String[] bypass2DefaultPatterns = new String[] {};	
 	private final Object buffPoolLock = new Object();
 	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
 
 	@Autowired private CmsService cmsService;
 
-	private boolean bypass(String path) {
-		for (String regex : this.bypassPatterns) {
+	public void setBypass2Default(String s) {
+		this.bypass2DefaultPatterns = s != null ? s.split("\\|") : new String[] {};
+	}
+	
+	private boolean bypass2Default(String path) {
+		for (String regex : this.bypass2DefaultPatterns) {
 			if (path.matches(regex)) {
 				return true;
 			}
 		}
 		return false;
 	}
-
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
-		// Forward to default servlet if path matches pattern
-		final String path = getItemPath(req);
-		if (! bypass(path)) {
+		String path = getItemPath(req);
+		boolean isBypass2Default = bypass2Default(path);
+		
+		if (! isBypass2Default) {
 			Site site = getSite(req);
 			if (site != null) {
 				Item item = site.getItem(path);
@@ -77,9 +82,9 @@ public class CmsDeliveryServlet {
 			}
 		}
 		else {
-			LOG.debug(LogUtil.compose("Forwarding request to default servlet", path));
-			req.getServletContext().getNamedDispatcher("default").forward(req, res);
-//			req.getRequestDispatcher("default").forward(req, res);
+				LOG.debug(LogUtil.compose("Forwarding request to default servlet", path));
+				req.getServletContext().getNamedDispatcher("default").forward(req, res);
+	//			req.getRequestDispatcher("default").forward(req, res);
 		}
 	}
 

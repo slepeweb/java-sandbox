@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.security.core.userdetails.User;
-
 import com.slepeweb.cms.bean.Item;
 
 
@@ -20,14 +18,44 @@ public class Page implements Serializable, NestableComponent {
 	private List<SimpleComponent> components;
 	private List<String> roles;
 	private Item item;
-	private User user;
 	
 	public Page() {
 		this.header = new Header(this);
 		this.footer = new Footer();
-		this.leftSidebar = new Sidebar();
-		this.rightSidebar = new Sidebar();
+		this.leftSidebar = new Sidebar(this, Sidebar.Type.left);
+		this.rightSidebar = new Sidebar(this, Sidebar.Type.right);
 		this.components = new ArrayList<SimpleComponent>();
+	}
+	
+	public void setLeftNavigation() {
+		List<LinkTarget> nav = new ArrayList<LinkTarget>();
+		
+		if (getHeader().getBreadcrumbs().size() > 1) {
+			
+			Item requestItem = getItem();
+			Item levelOneItem = getHeader().getBreadcrumbItems().get(1);
+			List<Item> levelOneBindings = levelOneItem.getBoundItems();
+			
+			if (levelOneBindings.size() > 0) {
+				nav = new ArrayList<LinkTarget>();
+				LinkTarget levelOneTarget = new LinkTarget(levelOneItem).setSelected(true);
+				LinkTarget levelTwoTarget, levelThreeTarget;
+				nav.add(levelOneTarget);
+				
+				for (Item levelTwoItem : levelOneBindings) {
+					levelTwoTarget = new LinkTarget(levelTwoItem);
+					levelTwoTarget.setSelected(requestItem.getPath().startsWith(levelTwoItem.getPath()));
+					levelOneTarget.getChildren().add(levelTwoTarget);
+					for (Item levelThreeItem : levelTwoItem.getBoundItems()) {
+						levelThreeTarget = new LinkTarget(levelThreeItem);
+						levelTwoTarget.getChildren().add(levelThreeTarget);
+						levelThreeTarget.setSelected(requestItem.getPath().startsWith(levelThreeItem.getPath()));
+					}
+				}
+			}
+		}
+		
+		getLeftSidebar().setNavigation(nav);
 	}
 	
 	public Page addRole(String r) {
@@ -37,35 +65,6 @@ public class Page implements Serializable, NestableComponent {
 		getRoles().add(r);
 		return this;
 	}
-	
-//	public boolean isAccessibleBy(User u) {
-//		if (u != null) {
-//			if (getRoles() == null) {
-//				LOG.debug(String.format("Page [%s] is not secured, so is always visible to public", getHref()));
-//				return true;
-//			}
-//			else {
-//				if (u.getRoles() != null) {
-//					List<String> userRoles = new ArrayList<String>(u.getRoles().size());
-//					for (Role r : u.getRoles()) {
-//						userRoles.add(r.getName());
-//					}
-//					boolean hasRole = ! Collections.disjoint(getRoles(), userRoles);
-//					LOG.debug(String.format("User [%s] is assigned to all roles required for page [%s]", 
-//							u.getAlias(), getHref()));
-//					return hasRole;
-//				}
-//				else {
-//					LOG.debug(String.format("User [%s] is not assigned to any roles, so cannot access [%s]", 
-//							u.getAlias(), getHref()));
-//				}
-//			}
-//		}
-//		
-//		LOG.debug(String.format("User requesting page [%s] is not identifiable, so cannot get access to page", 
-//				getHref()));
-//		return false;
-//	}
 	
 	public Page addStylesheet(String path) {
 		getHeader().getStylesheets().add(path);
@@ -144,6 +143,10 @@ public class Page implements Serializable, NestableComponent {
 		return components;
 	}
 
+	public void setComponents(List<SimpleComponent> components) {
+		this.components = components;
+	}
+
 	public String getHref() {
 		return href;
 	}
@@ -170,25 +173,12 @@ public class Page implements Serializable, NestableComponent {
 		this.roles = roles;
 	}
 
-	public void setComponents(List<SimpleComponent> components) {
-		this.components = components;
-	}
-
 	public Item getItem() {
 		return item;
 	}
 
 	public Page setItem(Item item) {
 		this.item = item;
-		return this;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public Page setUser(User user) {
-		this.user = user;
 		return this;
 	}
 

@@ -13,6 +13,7 @@ import com.slepeweb.cms.service.LinkService;
 import com.slepeweb.cms.service.LinkTypeService;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.utils.LogUtil;
+import com.slepeweb.cms.utils.SpringContext;
 
 public abstract class CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -40,7 +41,10 @@ public abstract class CmsBean implements Serializable {
 	}
 	
 	public CmsService getCmsService() {
-		return cmsService;
+		if (this.cmsService == null) {
+			this.cmsService = (CmsService) SpringContext.getApplicationContext().getBean("cmsService");
+		}
+		return this.cmsService;
 	}
 	
 	public void setCmsService(CmsService cmsService) {

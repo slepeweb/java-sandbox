@@ -3,7 +3,7 @@
   <display-name>com.slepeweb.sandbox</display-name>
   
   <servlet>
-    <servlet-name>slepeweb-site-spring</servlet-name>
+    <servlet-name>slepeweb-site</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
@@ -16,7 +16,7 @@
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
-			/WEB-INF/spring-security.xml, /WEB-INF/spring-database.xml
+			/WEB-INF/security-beans.xml, /WEB-INF/database-beans.xml
 		</param-value>
 	</context-param>
  
@@ -33,7 +33,7 @@
 	</filter-mapping>  
 	
   <servlet-mapping>
-    <servlet-name>slepeweb-site-spring</servlet-name>
+    <servlet-name>slepeweb-site</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
   

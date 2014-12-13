@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+		
+	<input name="order" required="true" />
+	
+	<on-start>
+		<evaluate expression="spizzaFlowActions.initPaymentForm()" result="flowScope.paymentForm"/>
+	</on-start>
+	
+	<view-state id="takePayment" view="sws/spizza/takePayment" model="paymentForm">
+		<transition on="submitPayment" to="verifyPayment" />
+		<transition on="cancel" to="cancel" />
+	</view-state>
+	
+	<action-state id="verifyPayment">
+		<evaluate expression="spizzaFlowActions.verifyPayment" />
+		<transition on="success" to="paymentTaken">
+			<evaluate expression="spizzaFlowActions.updateOrderWithPayment(order, flowScope.paymentForm)" />
+		</transition>
+		<transition on="error" to="takePayment" />
+	</action-state>
+	
+	<end-state id="cancel" />
+	<end-state id="paymentTaken" />
+</flow>

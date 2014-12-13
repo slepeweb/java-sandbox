@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+		
+	<input name="order" required="true" />
+	
+	<view-state id="createPizza" view="sws/spizza/createPizza" model="pizzaForm">
+		<on-entry>
+			<set name="flowScope.pizzaForm" value="spizzaFlowActions.initPizzaForm()" />
+		</on-entry>
+		<transition on="addPizza" to="showOrder">
+			<evaluate expression="order.addPizza(flowScope.pizzaForm)" />
+		</transition>
+		<transition on="cancel" to="showOrder" />
+	</view-state>
+	
+	<view-state id="showOrder" view="sws/spizza/showOrder">
+		<transition on="createPizza" to="createPizza" />
+		<transition on="checkout" to="orderCreated" />
+		<transition on="cancel" to="cancel" />
+		<transition on="remove" to="removePizza" />
+	</view-state>
+	
+	<action-state id="removePizza">
+		<evaluate expression="spizzaFlowActions.removePizza" />
+		<transition on="success" to="showOrder" />
+	</action-state>
+	
+	<end-state id="cancel" />
+	<end-state id="orderCreated" />
+</flow>

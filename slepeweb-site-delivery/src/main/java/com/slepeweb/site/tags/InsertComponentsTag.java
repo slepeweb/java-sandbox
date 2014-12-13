@@ -15,17 +15,19 @@ public class InsertComponentsTag extends ComponentTagSupport {
 	private List<SimpleComponent> list;
 
 	public void delegate() {
-		for (SimpleComponent c : this.list) {
-			pushComponent(c);
-			
-			try {
-				this.pageContext.include(identifyJspPath(c), false);
-			}
-			catch (Exception e) {
-				LOG.error(String.format("Failed to insert component [%s]", c), e);
-			}
-			finally {
-				popComponent();
+		if (this.list != null) {
+			for (SimpleComponent c : this.list) {
+				pushComponent(c);
+				
+				try {
+					this.pageContext.include(identifyJspPath(c), false);
+				}
+				catch (Exception e) {
+					LOG.error(String.format("Failed to insert component [%s]", c), e);
+				}
+				finally {
+					popComponent();
+				}
 			}
 		}
 	}
