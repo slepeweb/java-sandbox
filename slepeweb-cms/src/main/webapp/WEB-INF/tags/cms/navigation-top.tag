@@ -12,15 +12,10 @@
 						<option value="${_site.id}"<c:if 
 							test="${not empty editingItem and editingItem.site.id eq _site.id}"> selected</c:if>>${_site.name}</option>
 					</c:forEach>
-				</select></h1>
+				</select><c:if test="${not empty _user}"><span class="user-info">Hello 
+					${_user.username}&nbsp;&nbsp;&nbsp;[<a href="/cms/j_spring_security_logout">Logout</a>]</span>
+			</c:if></h1>
 			</div>
-<!-- 			<nav id="nav"> -->
-<!-- 				<ul> -->
-<%-- 					<c:forEach items="${_page.header.topNavigation}" var="link"> --%>
-<%-- 						<li<c:if test="${link.selected}"> class="current_page_item"</c:if>><a href="${link.href}">${link.title}</a></li> --%>
-<%-- 					</c:forEach> --%>
-<!-- 				</ul> -->
-<!-- 			</nav> -->
 			
 		</div>
 	</div>

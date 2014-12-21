@@ -1,5 +1,6 @@
 body {
 	font-size: 12px;
+	font-family: Verdana, Arial, sans-serif;
 }
 
 /* Form elements */
@@ -75,6 +76,46 @@ form div {
 
 .top-align {
 	vertical-align: top;
+}
+
+.underline {
+	text-decoration: underline;
+}
+
+.red {
+	color: red;
+}
+
+.green {
+	color: green;
+}
+
+#login .heading {
+	font-weight: bold;
+	text-align: left;
+}
+
+#login label {
+	width: 100px;
+}
+
+#login input {
+	width: 150px;
+}
+
+#login td {
+	padding: 0px 10px;
+}
+
+#login th {
+	padding: 0px 10px;
+	font-weight: bold;
+	text-align: left;
+}
+
+#login .button {
+	margin-left: 130px;
+	width: 100px;
 }
 
 #site-selector {
@@ -161,3 +202,8 @@ form div {
 	clear: both;
 }
 
+.user-info {
+	margin-left: 180px;
+	font-size: 0.6em;
+	font-weight: normal;
+}

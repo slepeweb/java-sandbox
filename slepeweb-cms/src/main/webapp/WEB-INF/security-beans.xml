@@ -1,0 +1,40 @@
+<beans:beans 
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+ 
+	<http auto-config="true" use-expressions="true">
+		<intercept-url pattern="/page/editor/**" access="hasRole('CMS_ADMIN')" />
+		<intercept-url pattern="/page/site/**" access="hasRole('CMS_ADMIN')" />
+		<intercept-url pattern="/rest/**" access="hasRole('CMS_ADMIN')" />
+		<intercept-url pattern="/setup" access="hasRole('CMS_ADMIN')" />
+		
+		<form-login 
+		  login-page="/page/login" 
+		  default-target-url="/page/editor" 
+			authentication-failure-url="/page/login?error" 
+			username-parameter="alias"
+			password-parameter="password" />
+			
+		<logout logout-success-url="/page/login?logout" />	
+		
+	</http>
+ 
+	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder" />
+	
+	<authentication-manager>
+	  <authentication-provider>
+			<password-encoder ref="passwordEncoder" />	    
+			<jdbc-user-service data-source-ref="dataSource"
+				users-by-username-query=
+			    "select alias, password, enabled from user where alias=?"
+			  authorities-by-username-query=
+			    "select u.alias, r.name from user u, role r, user_role ur where u.alias=? and u.user_id = ur.user_id and r.role_id = ur.role_id" />
+	  </authentication-provider>
+	</authentication-manager>
+ 
+</beans:beans>

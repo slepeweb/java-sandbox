@@ -8,6 +8,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
@@ -45,6 +46,23 @@ public class PageController extends BaseController {
 			model.addAttribute("editingItem", site.getItem("/"));
 		}
 		return "cms.editor";
+	}
+	
+	@RequestMapping(value="/login")
+	public String login(
+		@RequestParam(value="error", required = false) String error,
+		@RequestParam(value="logout", required = false) String logout,
+		ModelMap model) {
+ 
+		if (error != null) {
+			model.addAttribute("error", "Invalid username and password!");
+		}
+ 
+		if (logout != null) {
+			model.addAttribute("msg", "You've been successfully logged out.");
+		}
+ 
+		return "cms.login"; 
 	}
 	
 	@ModelAttribute("allSites")
