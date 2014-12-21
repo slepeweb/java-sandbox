@@ -5,27 +5,27 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.slepeweb.site.sws.bean.LotteryNumbersBean;
-import com.slepeweb.site.sws.bean.WeatherBean;
-import com.slepeweb.site.sws.service.WeatherService;
+import com.slepeweb.ws.bean.PasswordBean;
+import com.slepeweb.ws.bean.WeatherBean;
+import com.slepeweb.ws.client.PasswordJaxwsClient;
+import com.slepeweb.ws.client.WeatherJaxwsClient;
 
 @Controller
 @RequestMapping(value = "/ws")
 public class WebServicesController {
 
-//	@Autowired
-//	private PasswordService passwordService;
+	@Autowired private PasswordJaxwsClient passwordJaxwsClient;	
+	@Autowired private WeatherJaxwsClient weatherJaxwsClient;
 	
-	@Autowired
-	private WeatherService weatherService;
-	
-//	@RequestMapping(value="/password", method=RequestMethod.GET, produces={"application/json", "text/xml"})	
-//	@ResponseBody
-//	public PasswordBean doPassword(@RequestParam String org) {
-//		return this.passwordService.getPassword(org);
-//	}
+	@RequestMapping(value="/password", method=RequestMethod.GET, produces={"application/json", "text/xml"})	
+	@ResponseBody
+	public PasswordBean doPassword(@RequestParam String org) {
+		return this.passwordJaxwsClient.getPassword(org);
+	}
 		
 	@RequestMapping(value="/lotterynumbers/{howmany}", method=RequestMethod.GET, produces={"application/json", "text/xml"})	
 	@ResponseBody
@@ -36,6 +36,6 @@ public class WebServicesController {
 	@RequestMapping(value="/weather/{country}/{city}", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public WeatherBean doWeather(@PathVariable String country, @PathVariable String city) {
-		return this.weatherService.getWeather(country, city);
+		return this.weatherJaxwsClient.getWeather(country, city);
 	}	
 }

@@ -1,0 +1,52 @@
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p" 
+  xmlns:ws="http://jax-ws.dev.java.net/spring/core"
+  xmlns:wss="http://jax-ws.dev.java.net/spring/servlet"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    	http://jax-ws.dev.java.net/spring/core
+			http://jax-ws.dev.java.net/spring/core.xsd
+			http://jax-ws.dev.java.net/spring/servlet
+			http://jax-ws.dev.java.net/spring/servlet.xsd"
+
+	default-autowire="byName">
+
+	<bean id="passwordJaxwsProxy" class="org.springframework.remoting.jaxws.JaxWsPortProxyFactoryBean">
+		<property name="wsdlDocumentUrl">
+			<value>http://localhost:8081/wspub/password?wsdl</value>
+		</property>
+		<property name="namespaceUri">
+			<value>http://server.ws.slepeweb.com/</value>
+		</property>
+		<property name="serviceName">
+		 <value>PasswordServiceImplService</value>
+		</property>
+		<property name="portName">
+			<value>PasswordServiceImplPort</value>
+		</property>
+		<property name="serviceInterface">
+			<value>com.slepeweb.ws.server.PasswordService</value>	
+		</property>
+	</bean>
+	 
+	<bean id="globalWeatherSoapService" class="org.springframework.remoting.jaxws.JaxWsPortProxyFactoryBean">
+		<property name="wsdlDocumentUrl">
+			<value>http://www.webservicex.com/globalweather.asmx?WSDL</value>
+		</property>
+		<property name="namespaceUri">
+			<value>http://www.webserviceX.NET</value>
+		</property>
+		<property name="serviceName">									 			<!-- <wsdl:service name="GlobalWeather"> -->
+		 <value>GlobalWeather</value>
+		</property>
+		<property name="portName">													<!-- <wsdl:port name="GlobalWeatherSoap" binding="tns:GlobalWeatherSoap"> -->
+			<value>GlobalWeatherSoap</value>
+		</property>
+		<property name="serviceInterface">									<!-- <wsdl:portType name="GlobalWeatherSoap"> -->
+			<value>net.webservicex.GlobalWeatherSoap</value>	
+		</property>
+	</bean>
+			
+</beans>

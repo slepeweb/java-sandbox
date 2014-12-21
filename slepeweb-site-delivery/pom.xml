@@ -122,6 +122,22 @@
 		    <version>5.1.27</version>
 		</dependency>
 	
+		<!--  JAX-WS Runtime 
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+			<version>2.2.8-promoted-b146</version>
+		</dependency>
+		-->
+
+		<!-- JAX-WS Spring Support 
+		<dependency>
+			<groupId>org.jvnet.jax-ws-commons.spring</groupId>
+			<artifactId>jaxws-spring</artifactId>
+			<version>1.9</version>
+		</dependency>
+		-->
+
  		<dependency>
 			<groupId>quartz</groupId>
 			<artifactId>quartz</artifactId>

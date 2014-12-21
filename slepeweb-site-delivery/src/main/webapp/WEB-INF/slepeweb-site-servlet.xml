@@ -22,7 +22,7 @@
     default-autowire="byName">
 
 	<mvc:annotation-driven />	
-	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.site" />
+	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.site, com.slepeweb.ws" />
 		
 	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl" />
 	<bean id="springContext" class="com.slepeweb.cms.utils.SpringContext" />
@@ -72,24 +72,7 @@
 
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 	
-	<bean id="globalWeatherSoapService" class="org.springframework.remoting.jaxws.JaxWsPortProxyFactoryBean">
-		<property name="wsdlDocumentUrl">
-			<value>http://www.webservicex.com/globalweather.asmx?WSDL</value>
-		</property>
-		<property name="namespaceUri">
-			<value>http://www.webserviceX.NET</value>
-		</property>
-		<property name="serviceName">									 			<!-- <wsdl:service name="GlobalWeather"> -->
-		 <value>GlobalWeather</value>
-		</property>
-		<property name="portName">													<!-- <wsdl:port name="GlobalWeatherSoap" binding="tns:GlobalWeatherSoap"> -->
-			<value>GlobalWeatherSoap</value>
-		</property>
-		<property name="serviceInterface">									<!-- <wsdl:portType name="GlobalWeatherSoap"> -->
-			<value>net.webservicex.GlobalWeatherSoap</value>	
-		</property>
-	</bean>
-		
 	<import resource="hibernate-beans.xml" />
 	<import resource="webflow-beans.xml" />
+	<import resource="ws-beans.xml" />
 </beans>
