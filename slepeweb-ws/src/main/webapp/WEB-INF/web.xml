@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <display-name>com.slepeweb.sandbox.ws</display-name>
+  
+	<!-- For JAX-WS - this servlet publishes web services -->
+	<servlet>
+	    <servlet-name>jaxws-servlet</servlet-name>
+	    <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+	    <load-on-startup>3</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+	</listener>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/resources/*</url-pattern>
+  </servlet-mapping>
+  
+</web-app>

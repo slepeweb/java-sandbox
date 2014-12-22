@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints
+  xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime"
+  version="2.0">
+  
+  	<!-- 
+  		This specifies the interface & implementation class of the service.
+  		- The name attribute value comes from the wsdl: 
+  				<portType name="PasswordService">
+  		- The url-pattern attribute value is also in the wsdl: 
+  				<soap:address location="http://localhost:8081/wspub/password"/>
+  				(note that /wspub is the context for this webapp)
+  	-->
+	  <endpoint
+	      name="PasswordService"
+	      implementation="com.slepeweb.ws.server.PasswordServiceImpl"
+	      url-pattern="/password" />
+</endpoints>
