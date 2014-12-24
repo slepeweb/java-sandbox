@@ -21,14 +21,21 @@
 
     default-autowire="byName">
 
-	<mvc:annotation-driven />	
+	<mvc:annotation-driven />
+	
+<!-- 	<mvc:annotation-driven>  -->
+<!-- 		<mvc:argument-resolvers>  -->
+<!-- 			<bean class="org.springframework.security.web.bind.support.AuthenticationPrincipalArgu‌​mentResolver" />  -->
+<!-- 		</mvc:argument-resolvers> -->
+<!-- 	</mvc:annotation-driven>	 -->
+	
 	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.site, com.slepeweb.ws" />
 		
 	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl" />
 	<bean id="springContext" class="com.slepeweb.cms.utils.SpringContext" />
 
 	<bean id="cmsDeliveryServlet" class="com.slepeweb.site.servlet.CmsDeliveryServlet">
-		<property name="bypass2Default" value="/jaxws/.*|.*?\\.wsdl|.*?\\.dtd" />
+		<property name="bypass2Default" value="/jaxws/.*|.*?\\.wsdl|.*?\\.xsd|.*?\\.dtd" />
 	</bean>
 	
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">

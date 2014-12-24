@@ -2,6 +2,7 @@ package com.slepeweb.site.control;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,7 @@ import com.slepeweb.site.service.ComponentService;
 
 @Controller
 public class BaseController {
+	private static Logger LOG = Logger.getLogger(BaseController.class);
 	
 	@Autowired protected Config config;
 	@Autowired private ComponentService componentService;
@@ -30,30 +32,39 @@ public class BaseController {
 	
 	@ModelAttribute(value="_item")
 	public Item getRequestItem(HttpServletRequest req) {
-		return (Item) req.getAttribute("_item");
+		Item i = (Item) req.getAttribute("_item");
+		LOG.trace(String.format("Model attribute (_item): [%s]", i));
+		return i;
 	}
 	
 	@ModelAttribute(value="_site")
 	public Site getRequestSite(HttpServletRequest req) {
 		Item i = (Item) req.getAttribute("_item");
+		Site s = null;
 		if (i != null) {
-			return i.getSite();
+			s = i.getSite();
 		}
-		return null;
+
+		return s;
 	}
 	
 	@ModelAttribute(value="_shortSitename")
 	protected String getShortSitename(@ModelAttribute("_item") Item i) {
-		return i != null && i.getSite() != null ? i.getSite().getShortname() : "";
+		String site = i != null && i.getSite() != null ? i.getSite().getShortname() : "";
+		LOG.trace(String.format("Model attribute (_shortSitename): [%s]", site));
+		return site;
 	}
 	
 	@ModelAttribute(value="_user")
 	protected User getUser() {
 		Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User u = null;
 		if (obj instanceof User) {
-			return (User) obj;
+			u = (User) obj;
 		}
-		return null;
+		
+		LOG.trace(String.format("Model attribute (_user): [%s]", u));
+		return u;
 	}
 	
 	
@@ -79,7 +90,9 @@ public class BaseController {
 	}
 	
 	protected String getFullyQualifiedViewName(String shortHostName, String viewNameSuffix) {
-		return shortHostName + "/template/" + viewNameSuffix;
+		String view = shortHostName + "/template/" + viewNameSuffix;
+		LOG.trace(String.format("CMS page view: [%s]", view));
+		return view;
 	}
 	
 	protected Page getStandardPage(Item i, String shortSitename, String viewNameSuffix, ModelMap model) {			

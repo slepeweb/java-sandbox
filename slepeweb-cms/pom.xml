@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.slepeweb.sandbox.java</groupId>
-	<artifactId>web</artifactId>
+	<groupId>com.slepeweb</groupId>
+	<artifactId>cms</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Java Sandbox Webapp</name>
+	<name>Slepeweb CMS</name>
 	<url>http://maven.apache.org</url>
 
 	<dependencies>
@@ -15,6 +15,7 @@
 			<version>1.2</version>
 		</dependency>
 
+		<!-- Spring framework -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -155,12 +156,6 @@
 		    <version>1.1.0.Final</version>
 		</dependency>
 		
-<!--     <dependency> -->
-<!--         <groupId>org.springframework.webflow</groupId> -->
-<!--         <artifactId>spring-webflow</artifactId> -->
-<!--         <version>2.3.2.RELEASE</version> -->
-<!--     </dependency> -->
-
     <dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
@@ -183,7 +178,7 @@
 	</dependencies>
 	
 	<properties>
-		<spring.version>3.2.8.RELEASE</spring.version>
-		<spring.security.version>3.2.3.RELEASE</spring.security.version>
+		<spring.version>3.2.12.RELEASE</spring.version>
+		<spring.security.version>3.2.5.RELEASE</spring.security.version>
 	</properties>
 </project>

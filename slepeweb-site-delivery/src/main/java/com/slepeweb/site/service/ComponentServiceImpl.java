@@ -43,8 +43,12 @@ public class ComponentServiceImpl implements ComponentService {
 							components.add((SimpleComponent) obj);
 							LOG.debug(String.format("Component: %s() [%s]", dummy.getType(), link.getChild().getPath()));
 						}
-					} catch (Exception e) {
+					} 
+					catch (NoSuchMethodException e) {
 						LOG.warn(LogUtil.compose("Method not found", dummy.getType()), e);
+					}
+					catch (Exception e) {
+						LOG.warn(LogUtil.compose("Uncaught error", dummy.getType()), e);
 					}
 				}
 			}

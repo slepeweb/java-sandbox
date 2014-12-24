@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.slepeweb.sandbox.java</groupId>
-	<artifactId>web</artifactId>
+	<groupId>com.slepeweb</groupId>
+	<artifactId>sites</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Java Sandbox Webapp</name>
+	<name>Slepeweb Sites</name>
 	<url>http://maven.apache.org</url>
 
 	<dependencies>
@@ -122,22 +122,6 @@
 		    <version>5.1.27</version>
 		</dependency>
 	
-		<!--  JAX-WS Runtime 
-		<dependency>
-			<groupId>com.sun.xml.ws</groupId>
-			<artifactId>jaxws-rt</artifactId>
-			<version>2.2.8-promoted-b146</version>
-		</dependency>
-		-->
-
-		<!-- JAX-WS Spring Support 
-		<dependency>
-			<groupId>org.jvnet.jax-ws-commons.spring</groupId>
-			<artifactId>jaxws-spring</artifactId>
-			<version>1.9</version>
-		</dependency>
-		-->
-
  		<dependency>
 			<groupId>quartz</groupId>
 			<artifactId>quartz</artifactId>
@@ -196,7 +180,7 @@
 	</dependencies>
 	
 	<properties>
-		<spring.version>3.2.8.RELEASE</spring.version>
-		<spring.security.version>3.2.3.RELEASE</spring.security.version>
+		<spring.version>3.2.12.RELEASE</spring.version>
+		<spring.security.version>3.2.5.RELEASE</spring.security.version>
 	</properties>
 </project>

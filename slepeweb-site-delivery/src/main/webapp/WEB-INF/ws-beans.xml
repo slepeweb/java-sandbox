@@ -15,19 +15,19 @@
 
 	<bean id="passwordJaxwsProxy" class="org.springframework.remoting.jaxws.JaxWsPortProxyFactoryBean">
 		<property name="wsdlDocumentUrl">
-			<value>http://localhost:8081/wspub/password?wsdl</value>
+			<value>file:/var/local/password.wsdl</value>
 		</property>
 		<property name="namespaceUri">
-			<value>http://server.ws.slepeweb.com/</value>
+			<value>http://server.ws.slepeweb.com/</value>           <!-- see wsdl: xmlns:tns="http://server.ws.slepeweb.com/" -->
 		</property>
 		<property name="serviceName">
-		 <value>PasswordServiceImplService</value>
+		 <value>PasswordServiceImplService</value>								<!-- see wsdl: <service name="PasswordServiceImplService"> -->
 		</property>
 		<property name="portName">
-			<value>PasswordServiceImplPort</value>
+			<value>PasswordServiceImplPort</value>									<!-- see wsdl: <port name="PasswordServiceImplPort" ... -->
 		</property>
 		<property name="serviceInterface">
-			<value>com.slepeweb.ws.server.PasswordService</value>	
+			<value>com.slepeweb.ws.server.PasswordService</value>		<!-- see wsdl: <portType name="PasswordService"> -->
 		</property>
 	</bean>
 	 
