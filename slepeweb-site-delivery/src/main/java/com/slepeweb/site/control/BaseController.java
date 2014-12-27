@@ -10,10 +10,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.LoggerBean;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.component.Config;
+import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.ComponentService;
 
@@ -23,11 +26,25 @@ public class BaseController {
 	
 	@Autowired protected Config config;
 	@Autowired private ComponentService componentService;
+	@Autowired private CmsService cmsService;
 
 	@ModelAttribute(value="config")
 	public Config getConfig() {
 		this.config.setLiveDelivery(false);
 		return this.config;
+	}
+	
+	@ModelAttribute(value="_loglevel")
+	public boolean getLogLevelTrigger(@RequestParam(value="loglevel", required=false) String trigger) {
+		if (trigger != null) {
+			for (LoggerBean lb : this.cmsService.getLoglevelService().getAllLoggers()) {
+				LOG.debug(lb);
+			}
+			LOG.info("Updated logging levels");
+			return true;
+		}
+		
+		return false;
 	}
 	
 	@ModelAttribute(value="_item")
@@ -39,18 +56,14 @@ public class BaseController {
 	
 	@ModelAttribute(value="_site")
 	public Site getRequestSite(HttpServletRequest req) {
-		Item i = (Item) req.getAttribute("_item");
-		Site s = null;
-		if (i != null) {
-			s = i.getSite();
-		}
-
+		Site s = (Site) req.getAttribute("_site");
+		LOG.trace(String.format("Model attribute (_site): [%s]", s));
 		return s;
 	}
 	
 	@ModelAttribute(value="_shortSitename")
-	protected String getShortSitename(@ModelAttribute("_item") Item i) {
-		String site = i != null && i.getSite() != null ? i.getSite().getShortname() : "";
+	protected String getShortSitename(@ModelAttribute("_site") Site s) {
+		String site = s != null ? s.getShortname() : "";
 		LOG.trace(String.format("Model attribute (_shortSitename): [%s]", site));
 		return site;
 	}

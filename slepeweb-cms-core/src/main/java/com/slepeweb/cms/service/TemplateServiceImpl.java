@@ -95,6 +95,7 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 				new RowMapperUtil.TemplateMapper());
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getCount() {
 		return this.jdbcTemplate.queryForInt("select count(*) from template");
 	}

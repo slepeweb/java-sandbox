@@ -22,6 +22,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected MediaService mediaService;
 	@Autowired protected TemplateService templateService;
 	@Autowired protected SiteConfigService siteConfigService;
+	@Autowired protected LoglevelService loglevelService;
 	
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {
@@ -86,6 +87,10 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public SiteConfigService getSiteConfigService() {
 		return siteConfigService;
+	}
+
+	public LoglevelService getLoglevelService() {
+		return loglevelService;
 	}
 
 }

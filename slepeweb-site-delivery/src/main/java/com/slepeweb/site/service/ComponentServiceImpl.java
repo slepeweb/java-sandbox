@@ -45,7 +45,7 @@ public class ComponentServiceImpl implements ComponentService {
 						}
 					} 
 					catch (NoSuchMethodException e) {
-						LOG.warn(LogUtil.compose("Method not found", dummy.getType()), e);
+						LOG.warn(LogUtil.compose("Method not found", dummy.getType()));
 					}
 					catch (Exception e) {
 						LOG.warn(LogUtil.compose("Uncaught error", dummy.getType()), e);

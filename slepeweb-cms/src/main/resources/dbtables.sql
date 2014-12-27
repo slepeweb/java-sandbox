@@ -1,15 +1,16 @@
-drop table config;
-drop table media;
-drop table fieldvalue;
-drop table fieldfortype;
-drop table field;
-drop table link;
-drop table linktype;
-drop table linkname;
-drop table item;
-drop table template;
-drop table itemtype;
-drop table site;
+drop table if exists loglevel;
+drop table if exists config;
+drop table if exists media;
+drop table if exists fieldvalue;
+drop table if exists fieldfortype;
+drop table if exists field;
+drop table if exists link;
+drop table if exists linktype;
+drop table if exists linkname;
+drop table if exists item;
+drop table if exists template;
+drop table if exists itemtype;
+drop table if exists site;
 
 
 create table site
@@ -157,6 +158,13 @@ create table config
 	value varchar(1023),
 	primary key (siteid, name),
 	constraint foreign key (siteid) references site(id) on delete cascade
+) ENGINE=InnoDB;
+
+create table loglevel
+(
+	package varchar(512),
+  level enum ('TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'),
+	primary key (package)
 ) ENGINE=InnoDB;
 
 

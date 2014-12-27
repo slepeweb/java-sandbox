@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.User;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.site.constant.FieldName;
 
 public class Header implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -57,14 +58,19 @@ public class Header implements Serializable {
 		}
 		
 		if (root != null) {
+			Item child;
 			for (Link l : root.getBindings()) {
-				lt = new LinkTarget(l.getChild()).
-						setSelected(i.getPath().startsWith(l.getChild().getPath()));
+				child = l.getChild();
 				
-				if (swapLoginForLogout && lt.getHref().equals("/login")) {
-					lt.setHref("/j_spring_security_logout").setTitle("Logout");
+				if (! child.getFieldValue(FieldName.HIDE_FROM_NAV, "").equalsIgnoreCase("yes")) {
+					lt = new LinkTarget(child).
+							setSelected(i.getPath().startsWith(child.getPath()));
+					
+					if (swapLoginForLogout && lt.getHref().equals("/login")) {
+						lt.setHref("/j_spring_security_logout").setTitle("Logout");
+					}
+					this.topNavigation.add(lt);
 				}
-				this.topNavigation.add(lt);
 			}
 		}
 	}

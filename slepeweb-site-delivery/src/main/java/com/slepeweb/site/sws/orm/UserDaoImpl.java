@@ -1,5 +1,6 @@
 package com.slepeweb.site.sws.orm;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -62,8 +63,18 @@ public class UserDaoImpl implements UserDao {
 		 */
 		@SuppressWarnings("unchecked")
 		List<Object> rolesObj = this.sessionFactory.getCurrentSession().createQuery("from Role order by name").list();
-		String [] roles = new String[rolesObj.size()];
 		Role r;
+		
+		// HACK: remove CMS roles
+		Iterator<Object> iter = rolesObj.iterator();
+		while (iter.hasNext()) {
+			r = (Role) iter.next();
+			if (r.getName().toUpperCase().startsWith("CMS")) {
+				iter.remove();
+			}
+		}
+		
+		String [] roles = new String[rolesObj.size()];
 		int i = 0;
 		
 		for (Object o : rolesObj) {

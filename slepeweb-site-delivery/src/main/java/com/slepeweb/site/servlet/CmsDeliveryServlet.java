@@ -53,9 +53,12 @@ public class CmsDeliveryServlet {
 		if (! isBypass2Default) {
 			Site site = getSite(req);
 			if (site != null) {
+				req.setAttribute("_site", site);
+				LOG.debug(LogUtil.compose("Site ...", site));
 				Item item = site.getItem(path);
 				
 				if (item != null) {
+					LOG.debug(LogUtil.compose("Item ...", item));
 					req.setAttribute("_item", item);
 					
 					if (item.getType().isMedia()) {
@@ -69,29 +72,30 @@ public class CmsDeliveryServlet {
 							req.getRequestDispatcher(tmplt.getForward()).forward(req, res);
 						}
 						else {
-							notFound(res, "Item has no template", item);
+							notFound(req, res, "Item has no template", item);
 						}
 					}
 				}
 				else {
-					notFound(res, "Item not found", path);
+					notFound(req, res, "Item not found", path);
 				}
 			}
 			else {
-				notFound(res, "Site not found", req.getServerName());
+				LOG.error(LogUtil.compose("Site not registered here", req.getServerName()));
+				//notFound(req, res, "Site not found", req.getServerName());
 			}
 		}
 		else {
 				LOG.debug(LogUtil.compose("Forwarding request to default servlet", path));
 				req.getServletContext().getNamedDispatcher("default").forward(req, res);
-	//			req.getRequestDispatcher("default").forward(req, res);
 		}
 	}
 
-	private void notFound(HttpServletResponse res, String msg, Object arg) throws IOException
+	private void notFound(HttpServletRequest req, HttpServletResponse res, String msg, Object arg) throws Exception
     {
 		LOG.error(LogUtil.compose(msg, arg));
-		res.sendError(HttpServletResponse.SC_NOT_FOUND);
+		req.getRequestDispatcher("/notfound").forward(req, res);
+//		res.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 	
 	private Site getSite(HttpServletRequest req) {

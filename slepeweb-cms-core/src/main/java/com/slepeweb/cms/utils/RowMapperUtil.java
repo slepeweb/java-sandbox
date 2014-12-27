@@ -16,6 +16,7 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.bean.LoggerBean;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.bean.Template;
@@ -200,6 +201,14 @@ public class RowMapperUtil {
 					setSiteId(rs.getLong("siteid")).
 					setName(rs.getString("name")).
 					setValue(rs.getString("value"));
+		}
+	}
+	
+	public static final class LoglevelMapper implements RowMapper<LoggerBean> {
+		public LoggerBean mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new LoggerBean().
+					setPackag(rs.getString("package")).
+					setLevel(rs.getString("level"));
 		}
 	}
 	
