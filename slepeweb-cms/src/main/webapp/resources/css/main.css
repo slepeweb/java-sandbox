@@ -202,8 +202,17 @@ form div {
 	clear: both;
 }
 
-.user-info {
-	margin-left: 180px;
-	font-size: 0.6em;
-	font-weight: normal;
+h1.main-heading {
+	margin-bottom: 6px;
+}
+
+p.main-heading {
+	margin-top: 0px;
+}
+
+#status-block {
+	margin-left: 3em;
+	font-size: 1.3em;
+	/*font-weight: bold;*/
+	text-decoration: underline;
 }

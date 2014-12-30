@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.LoggerBean;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.component.Config;
-import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.cms.service.LoglevelUpdateService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.ComponentService;
 
@@ -26,7 +25,7 @@ public class BaseController {
 	
 	@Autowired protected Config config;
 	@Autowired private ComponentService componentService;
-	@Autowired private CmsService cmsService;
+	@Autowired private LoglevelUpdateService loglevelUpdateService;
 
 	@ModelAttribute(value="config")
 	public Config getConfig() {
@@ -35,11 +34,9 @@ public class BaseController {
 	}
 	
 	@ModelAttribute(value="_loglevel")
-	public boolean getLogLevelTrigger(@RequestParam(value="loglevel", required=false) String trigger) {
+	protected boolean getLogLevelTrigger(@RequestParam(value="loglevel", required=false) String trigger) {
 		if (trigger != null) {
-			for (LoggerBean lb : this.cmsService.getLoglevelService().getAllLoggers()) {
-				LOG.debug(lb);
-			}
+			this.loglevelUpdateService.updateLoglevels();
 			LOG.info("Updated logging levels");
 			return true;
 		}

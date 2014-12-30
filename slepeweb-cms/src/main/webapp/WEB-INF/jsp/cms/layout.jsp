@@ -36,5 +36,6 @@
 			<cms:footer />
 		</div>
 	
+		<cms:dialogs />
 	</body>
 </html>

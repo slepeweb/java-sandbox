@@ -8,13 +8,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.component.Config;
+import com.slepeweb.cms.service.LoglevelUpdateService;
 
 @Controller
 public class BaseController {
 	
 	@Autowired protected Config config;
+	@Autowired private LoglevelUpdateService loglevelUpdateService;
 	private String contextPath;
 
 	@ModelAttribute(value="applicationContextPath")
@@ -43,6 +46,16 @@ public class BaseController {
 	@ModelAttribute(value="_isAuthor")
 	protected boolean isAdmin(@ModelAttribute(value="_user") User u) {
 		return hasAuthority(u, "CMS_ADMIN");
+	}
+	
+	@ModelAttribute(value="_loglevel")
+	protected boolean getLogLevelTrigger(@RequestParam(value="loglevel", required=false) String trigger) {
+		if (trigger != null) {
+			this.loglevelUpdateService.updateLoglevels();
+			return true;
+		}
+		
+		return false;
 	}
 	
 	private boolean hasAuthority(User u, String name) {

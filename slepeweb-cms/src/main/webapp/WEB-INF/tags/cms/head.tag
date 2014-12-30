@@ -31,6 +31,12 @@
 		_editingItemId = ${editingItem.id};
 		_siteId = ${editingItem.site.id};
 	</c:if>
+	
+	// Flash messages passed through when window.location is set 
+	var _flashMessageCode = null;
+	var _flashErrorCode = null;	
+	<c:if test="${not empty param.msg}">_flashMessageCode = ${param.msg};</c:if>
+	<c:if test="${not empty param.err}">_flashErrorCode = ${param.err};</c:if>
 </script>
 <script src="${applicationContextPath}/resources/js/editor.js" type="text/javascript"></script>
 
