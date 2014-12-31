@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -66,10 +67,13 @@ public class BaseController {
 	
 	@ModelAttribute(value="_user")
 	protected User getUser() {
-		Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User u = null;
-		if (obj instanceof User) {
-			u = (User) obj;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			Object obj = auth.getPrincipal();
+			if (obj instanceof User) {
+				u = (User) obj;
+			}
 		}
 		
 		LOG.trace(String.format("Model attribute (_user): [%s]", u));

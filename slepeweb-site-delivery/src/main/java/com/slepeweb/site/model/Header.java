@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -46,13 +47,17 @@ public class Header implements Serializable {
 		LinkTarget lt;
 		
 		boolean swapLoginForLogout = false;
-		Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (obj instanceof User) {
-			User user = (User) obj;
-			for (GrantedAuthority auth : user.getAuthorities()) {
-				if (auth.getAuthority().equals("SWS_GUEST")) {
-					swapLoginForLogout = true;
-					break;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+		if (authentication != null) {
+			Object obj = authentication.getPrincipal();
+			if (obj instanceof User) {
+				User user = (User) obj;
+				for (GrantedAuthority auth : user.getAuthorities()) {
+					if (auth.getAuthority().equals("SWS_GUEST")) {
+						swapLoginForLogout = true;
+						break;
+					}
 				}
 			}
 		}

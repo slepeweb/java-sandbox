@@ -94,8 +94,8 @@ public class CmsDeliveryServlet {
 	private void notFound(HttpServletRequest req, HttpServletResponse res, String msg, Object arg) throws Exception
     {
 		LOG.error(LogUtil.compose(msg, arg));
-		req.getRequestDispatcher("/notfound").forward(req, res);
-//		res.sendError(HttpServletResponse.SC_NOT_FOUND);
+//		req.getRequestDispatcher("/notfound").forward(req, res);
+		res.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 	
 	private Site getSite(HttpServletRequest req) {
