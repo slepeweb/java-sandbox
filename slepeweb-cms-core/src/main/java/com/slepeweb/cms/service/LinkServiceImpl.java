@@ -147,7 +147,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 
 
 	public List<Link> getLinks(Long parentId) {
-		String sql = String.format(getSelectSql(CHILD_SELECT_TEMPLATE), "l.parentid = ?");
+		String sql = String.format(CHILD_SELECT_TEMPLATE, "l.parentid = ?" + getPublishedClause());
 		return this.jdbcTemplate.query(sql, new Object[] {parentId}, new RowMapperUtil.LinkMapper());		 
 	}
 
@@ -170,7 +170,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	private List<Link> getLinks(Long parentId, String linkType) {
 		LinkType lt = this.linkTypeService.getLinkType(linkType);
 		if (lt != null) {
-			String sql = String.format(getSelectSql(CHILD_SELECT_TEMPLATE), "l.parentid = ? and l.linktypeid = ?");
+			String sql = String.format(CHILD_SELECT_TEMPLATE, "l.parentid = ? and l.linktypeid = ?" + getPublishedClause());
 			return this.jdbcTemplate.query(sql, new Object[] {parentId, lt.getId()}, new RowMapperUtil.LinkMapper());	
 		}
 		else {
@@ -180,7 +180,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	}
 
 	public Link getLink(Long parentId, Long childId) {
-		String sql = String.format(getSelectSql(CHILD_SELECT_TEMPLATE), "l.parentid = ? and l.childid = ?");
+		String sql = String.format(CHILD_SELECT_TEMPLATE, "l.parentid = ? and l.childid = ?" + getPublishedClause());
 		return (Link) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {parentId, childId}, 
 				new RowMapperUtil.LinkMapper()));
 	}

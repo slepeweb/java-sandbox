@@ -18,8 +18,8 @@ public class BaseServiceImpl {
 	@Autowired protected CacheEvictor cacheEvictor;
 	
 	
-	protected String getSelectSql(String sql) {
-		return sql +  (this.config.isLiveDelivery() ? " and i.published = 1" : "");
+	protected String getPublishedClause() {
+		return this.config.isLiveDelivery() ? " and i.published = 1" : "";
 	}
 	
 	protected Long getLastInsertId() {

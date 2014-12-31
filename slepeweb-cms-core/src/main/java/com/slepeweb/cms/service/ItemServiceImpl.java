@@ -239,19 +239,19 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 
 	public Item getItem(Long siteId, String path) {
 		return getItem(
-			String.format(getSelectSql(SELECT_TEMPLATE), "i.siteid=? and i.path=? and i.deleted=0"),
+			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=? and i.deleted=0" + getPublishedClause()),
 			new Object[]{siteId, path});
 	}
 
 	public Item getItem(Long id) {
 		return getItem(
-			String.format(getSelectSql(SELECT_TEMPLATE), "i.id=? and i.deleted=0"), 
+			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=0" + getPublishedClause()), 
 			new Object[]{id});
 	}
 	
 	public Item getItemFromBin(Long id) {
 		return getItem(
-			String.format(getSelectSql(SELECT_TEMPLATE), "i.id=? and i.deleted=1"), 
+			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=1" + getPublishedClause()), 
 			new Object[]{id});
 	}
 	

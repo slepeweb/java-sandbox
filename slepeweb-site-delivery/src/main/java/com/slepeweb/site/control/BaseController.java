@@ -29,7 +29,6 @@ public class BaseController {
 
 	@ModelAttribute(value="config")
 	public Config getConfig() {
-		this.config.setLiveDelivery(false);
 		return this.config;
 	}
 	
