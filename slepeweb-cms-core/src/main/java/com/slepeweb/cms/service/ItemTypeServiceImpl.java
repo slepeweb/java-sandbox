@@ -45,8 +45,8 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 	
 	private void insertItemType(ItemType it) {
 		this.jdbcTemplate.update(
-				"insert into itemtype (name, mimetype) values (?, ?)", 
-				it.getName(), it.getMimeType());
+				"insert into itemtype (name, mimetype, privatecache, publiccache) values (?, ?, ?, ?)", 
+				it.getName(), it.getMimeType(), it.getPrivateCache(), it.getPublicCache());
 		
 		it.setId(getLastInsertId());
 		this.cacheEvictor.evict(it);
@@ -59,8 +59,9 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 			dbRecord.assimilate(it);
 			
 			this.jdbcTemplate.update(
-					"update itemtype set name = ?, mimetype = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getMimeType(), dbRecord.getId());
+					"update itemtype set name = ?, mimetype = ?, privatecache = ?, publiccache = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getMimeType(), 
+					dbRecord.getPrivateCache(), dbRecord.getPublicCache(), dbRecord.getId());
 			
 			LOG.info(compose("Updated item type", it));
 		}
@@ -117,6 +118,7 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 				new Object[]{}, new RowMapperUtil.ItemTypeMapper());
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getCount() {
 		return this.jdbcTemplate.queryForInt("select count(*) from itemtype");
 	}

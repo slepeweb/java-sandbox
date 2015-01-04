@@ -22,7 +22,8 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	private static List<Link> EMPTY_LIST = new ArrayList<Link>();
 	
 	private static String CHILD_SELECT_TEMPLATE = 
-			"select i.*, s.name as sitename, s.hostname, s.shortname as site_shortname, it.id as typeid, it.name as typename, it.mimetype, " +
+			"select i.*, s.name as sitename, s.hostname, s.shortname as site_shortname, " +
+			"it.id as typeid, it.name as typename, it.mimetype, it.privatecache, it.publiccache, " +
 			"l.parentid, lt.name as linktype, ln.name as linkname, l.ordering, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
 			"from item i " +
@@ -189,6 +190,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		return getCount(null);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getCount(Long parentId) {
 		if (parentId != null) {
 			return this.jdbcTemplate.queryForInt("select count(*) from link where parentid = ?", parentId);

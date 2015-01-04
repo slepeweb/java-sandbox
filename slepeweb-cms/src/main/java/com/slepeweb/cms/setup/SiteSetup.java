@@ -209,6 +209,8 @@ public class SiteSetup {
 					it = CmsBeanFactory.makeItemType().
 							setName(name).
 							setMimeType(SiteSetupUtils.getString(row.getCell(2))).
+							setPrivateCache(SiteSetupUtils.getLong(row.getCell(4))).
+							setPublicCache(SiteSetupUtils.getLong(row.getCell(5))).
 							save();
 					
 					if (it.getId() != null) {

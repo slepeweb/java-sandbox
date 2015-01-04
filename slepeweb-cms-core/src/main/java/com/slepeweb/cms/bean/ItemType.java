@@ -9,7 +9,7 @@ public class ItemType extends CmsBean {
 	public static final String CONTENT_FOLDER_TYPE_NAME = "Content Folder";
 	public static final String PAGE_MIMETYPE = "application/cms";
 	
-	private Long id;
+	private Long id, privateCache = 0L, publicCache = 0L;
 	private String name, mimeType = PAGE_MIMETYPE;
 	private List<FieldForType> fieldsForType;
 	
@@ -18,13 +18,17 @@ public class ItemType extends CmsBean {
 			ItemType it = (ItemType) obj;
 			setName(it.getName());
 			setMimeType(it.getMimeType());
+			setPrivateCache(it.getPrivateCache());
+			setPublicCache(it.getPublicCache());
 		}
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
 			StringUtils.isNotBlank(getName()) &&
-			StringUtils.isNotBlank(getMimeType());
+			StringUtils.isNotBlank(getMimeType()) &&
+			getPrivateCache() != null &&
+			getPublicCache() != null;
 	}
 	
 	public FieldForType addFieldForType(Field f, Long ordering, boolean mandatory) {
@@ -72,11 +76,31 @@ public class ItemType extends CmsBean {
 		return this;
 	}
 
+	public Long getPrivateCache() {
+		return privateCache;
+	}
+
+	public ItemType setPrivateCache(Long privateCache) {
+		this.privateCache = privateCache;
+		return this;
+	}
+
+	public Long getPublicCache() {
+		return publicCache;
+	}
+
+	public ItemType setPublicCache(Long publicCache) {
+		this.publicCache = publicCache;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((privateCache == null) ? 0 : privateCache.hashCode());
+		result = prime * result + ((publicCache == null) ? 0 : publicCache.hashCode());
 		return result;
 	}
 
@@ -93,6 +117,16 @@ public class ItemType extends CmsBean {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (privateCache == null) {
+			if (other.privateCache != null)
+				return false;
+		} else if (!privateCache.equals(other.privateCache))
+			return false;
+		if (publicCache == null) {
+			if (other.publicCache != null)
+				return false;
+		} else if (!publicCache.equals(other.publicCache))
 			return false;
 		return true;
 	}

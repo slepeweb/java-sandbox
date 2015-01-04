@@ -30,6 +30,8 @@ create table itemtype
 	id int not null auto_increment,
 	name varchar(255),
 	mimetype varchar(64),
+	privatecache int,
+	publiccache int,
 	primary key (id),
 	unique key idx_itemtype_name (name)
 ) ENGINE=InnoDB;

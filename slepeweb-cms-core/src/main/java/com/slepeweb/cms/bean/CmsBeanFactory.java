@@ -91,7 +91,9 @@ public class CmsBeanFactory {
 	}
 	
 	public static ItemType makeContentFolderType() {
-		return makeItemType().setName(ItemType.CONTENT_FOLDER_TYPE_NAME).save();
+		return makeItemType().
+				setName(ItemType.CONTENT_FOLDER_TYPE_NAME).
+				save();
 	}
 	
 	public static ItemType makeHomepageType(String siteName) {

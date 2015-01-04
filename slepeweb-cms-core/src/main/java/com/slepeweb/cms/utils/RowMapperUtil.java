@@ -38,7 +38,9 @@ public class RowMapperUtil {
 			return CmsBeanFactory.makeItemType().
 					setId(rs.getLong("id")).
 					setName(rs.getString("name")).
-					setMimeType(rs.getString("mimetype"));
+					setMimeType(rs.getString("mimetype")).
+					setPrivateCache(rs.getLong("privatecache")).
+					setPublicCache(rs.getLong("publiccache"));
 		}
 	}
 	
@@ -62,7 +64,9 @@ public class RowMapperUtil {
 		ItemType type = CmsBeanFactory.makeItemType().
 				setId(rs.getLong("typeid")).
 				setName(rs.getString("typename")).
-				setMimeType(rs.getString("mimetype"));
+				setMimeType(rs.getString("mimetype")).
+				setPrivateCache(rs.getLong("privatecache")).
+				setPublicCache(rs.getLong("publiccache"));
 		
 		item.setType(type);
 		

@@ -132,6 +132,35 @@ public class SiteSetupUtils {
 	}
 
 	/**
+	 * Get an long value from a spreadsheet cell, converting it from a string value if necessary.
+	 * 
+	 * @param cell
+	 * @return
+	 */
+	public static Long getLong(Cell cell, Long dflt) {
+		if (cell != null) {
+			int type = cell.getCellType();
+
+			if (type != Cell.CELL_TYPE_ERROR) {
+				if (type == Cell.CELL_TYPE_STRING) {
+					return Long.valueOf(cell.getStringCellValue());
+				} else if (type == Cell.CELL_TYPE_NUMERIC) {
+					return new Long(new Double(cell.getNumericCellValue()).longValue());
+				}
+			}
+		}
+		if (dflt != null) {
+			return dflt;
+		}
+
+		return new Long(-1);
+	}
+
+	public static Long getLong(Cell cell) {
+		return getLong(cell, null);
+	}
+
+	/**
 	 * Get an integer value from a spreadsheet cell, converting it from a string value if necessary.
 	 * 
 	 * @param cell

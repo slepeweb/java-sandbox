@@ -24,7 +24,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private static final String MOVE_OVER = "over";
 
 	private final static String SELECT_TEMPLATE = 
-			"select i.*, s.name as sitename, s.hostname, s.shortname as site_shortname, it.id as typeid, it.name as typename, it.mimetype, " +
+			"select i.*, s.name as sitename, s.hostname, s.shortname as site_shortname, " +
+			"it.id as typeid, it.name as typename, it.mimetype, it.privatecache, it.publiccache, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
 			"from item i " +
 			"join site s on i.siteid = s.id " +
@@ -198,6 +199,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getBinCount() {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where deleted = 1");
 	}
@@ -259,6 +261,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return getCount(null);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getCount(String path) {
 		if (StringUtils.isNotBlank(path)) {
 			return this.jdbcTemplate.queryForInt("select count(*) from item where path like ?", path + "%");
@@ -268,6 +271,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getCountByType(Long itemTypeId) {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
 	}

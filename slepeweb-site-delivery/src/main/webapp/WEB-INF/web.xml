@@ -7,6 +7,25 @@
 	
   <display-name>Slepeweb Sites</display-name>
   
+  <!-- Filter to apply cache times to static resources -->
+  <filter>
+    <filter-name>headerFilter</filter-name>
+    <filter-class>com.slepeweb.site.servlet.ResponseHeaderFilter</filter-class>
+    <init-param>
+      <param-name>cacheTime</param-name>
+      <param-value>86400</param-value>
+    </init-param>
+    <init-param>
+      <param-name>charSet</param-name>
+      <param-value>utf-8</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>headerFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
 	<!-- For Spring MVC -->
   <servlet>
     <servlet-name>slepeweb-site</servlet-name>
@@ -54,7 +73,7 @@
   </error-page>
   
   <error-page>
-  	<exception-type>java.lang.Throwable</exception-type>
+  	<error-code>500</error-code>
   	<location>/error</location>
 	</error-page>  
 </web-app>
