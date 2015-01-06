@@ -22,6 +22,7 @@ public class BaseServiceImpl {
 		return this.config.isLiveDelivery() ? " and i.published = 1" : "";
 	}
 	
+	@SuppressWarnings("deprecation")
 	protected Long getLastInsertId() {
 		return this.jdbcTemplate.queryForLong("select last_insert_id()");
 	}

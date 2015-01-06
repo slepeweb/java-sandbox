@@ -29,6 +29,10 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 		CmsBeanFactory.init(this);
 	}
 	
+	public boolean isLiveServer() {
+		return this.config.isLiveDelivery();
+	}
+	
 	public SiteService getSiteService() {
 		return siteService;
 	}

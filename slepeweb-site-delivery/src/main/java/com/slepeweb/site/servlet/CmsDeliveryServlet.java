@@ -13,6 +13,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.utils.LogUtil;
+import com.slepeweb.site.constant.FieldName;
 
 @Component
 public class CmsDeliveryServlet {
@@ -31,6 +33,7 @@ public class CmsDeliveryServlet {
 	private String[] bypass2DefaultPatterns = new String[] {};	
 	private final Object buffPoolLock = new Object();
 	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
+	private long defaultPrivateCacheTime, defaultPublicCacheTime;
 
 	@Autowired private CmsService cmsService;
 
@@ -49,8 +52,10 @@ public class CmsDeliveryServlet {
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
+		res.setContentType("text/html;charset=utf-8");
 		String path = getItemPath(req);
 		boolean isBypass2Default = bypass2Default(path);
+		long requestTime = System.currentTimeMillis();
 		
 		if (! isBypass2Default) {
 			Site site = getSite(req);
@@ -65,12 +70,13 @@ public class CmsDeliveryServlet {
 					
 					if (item.getType().isMedia()) {
 						LOG.debug(LogUtil.compose("Streaming binary content ...", item));
-						stream(item, req, res);
+						stream(item, req, res, requestTime);
 					}
 					else {
 						Template tmplt = item.getTemplate();
 						if (tmplt != null) {
 							LOG.debug(LogUtil.compose("Forwarding request to template", tmplt.getForward()));
+							setCacheHeaders(item, requestTime, res);
 							req.getRequestDispatcher(tmplt.getForward()).forward(req, res);
 						}
 						else {
@@ -89,6 +95,11 @@ public class CmsDeliveryServlet {
 		}
 		else {
 				LOG.debug(LogUtil.compose("Forwarding request to default servlet", path));
+				/* 
+				 * The default servlet must be writing its own response headers:
+				 * - any cache header written here get removed
+				 * - an ETag header is added
+				 */
 				req.getServletContext().getNamedDispatcher("default").forward(req, res);
 		}
 	}
@@ -96,7 +107,6 @@ public class CmsDeliveryServlet {
 	private void notFound(HttpServletRequest req, HttpServletResponse res, String msg, Object arg) throws Exception
     {
 		LOG.error(LogUtil.compose(msg, arg));
-//		req.getRequestDispatcher("/notfound").forward(req, res);
 		res.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 	
@@ -147,13 +157,14 @@ public class CmsDeliveryServlet {
 		}
 	}
 
-	private void stream(Item item, HttpServletRequest req, HttpServletResponse res)
+	private void stream(Item item, HttpServletRequest req, HttpServletResponse res, long requestTime)
 			throws ServletException, IOException {
 
 		long lastModified = item.getDateUpdated().getTime();
-		long requestTime = System.currentTimeMillis();
 		String method = req.getMethod();
 		
+		setCacheHeaders(item, requestTime, res);
+
 		if ("GET".equals(method) || "HEAD".equals(method)) {
 			// Idempotent methods.
 			long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
@@ -167,8 +178,6 @@ public class CmsDeliveryServlet {
 			}
 		}
 		
-		setCacheHeaders(requestTime, item, res);
-
 		Blob blob = this.cmsService.getMediaService().getMedia(item.getId());
 		if (blob != null) {
 			final ServletOutputStream out = res.getOutputStream();
@@ -208,49 +217,52 @@ public class CmsDeliveryServlet {
 			}
 		}
 	}
+	
+	private boolean isCacheable(Item i) {
+		return 
+				this.cmsService.isLiveServer() &&
+				i.isPublished() && 
+				! i.getFieldValue(FieldName.CACHEABLE, "yes").equalsIgnoreCase("no");
+	}
 
-	private void setCacheHeaders(long requestTime, Item item, HttpServletResponse res) {
+	private void setCacheHeaders(Item item, long requestTime, HttpServletResponse res) {
 
 		long lastModified = item.getDateUpdated().getTime();
-		long publicCacheTime = 20 * 60 * 1000L; // 20 minutes
-		long cacheTime = publicCacheTime;
+		long publicCacheTime, privateCacheTime;
+		
+		if (! isCacheable(item)) {
+			privateCacheTime = publicCacheTime = 0L;
+		}
+		else {
+			privateCacheTime = item.getType().getPrivateCache() * 1000;
+			publicCacheTime = item.getType().getPublicCache() * 1000;
+		}
+
+		setCacheHeaders(requestTime, lastModified, privateCacheTime, publicCacheTime, res);
+	}
+	
+	private void setCacheHeaders(long requestTime, long lastModified, 
+			long privateCacheTime, long publicCacheTime, HttpServletResponse res) {
+
 		long expireTime;
 		StringBuffer cacheControl = new StringBuffer();
-
-		if (0 == cacheTime && 0 == publicCacheTime) {
+		
+		if (0L == privateCacheTime && 0L == publicCacheTime) {
 			expireTime = requestTime;
 			cacheControl.append("no-cache, s-maxage=0, max-age=0");
 		} 
-		else {
-			long privateExpireTimeMillis;
-			long publicExpireTimeMillis;
-			
-			if (0 == cacheTime) {
-				privateExpireTimeMillis = requestTime;
-			} 
-			else {
-				privateExpireTimeMillis = ((((requestTime - lastModified) / cacheTime) + 1) * cacheTime)
-						+ lastModified;
-			}
-
-			if (0 == publicCacheTime) {
-				publicExpireTimeMillis = requestTime;
-			} else {
-				publicExpireTimeMillis = ((((requestTime - lastModified) / publicCacheTime) + 1) * publicCacheTime)
-						+ lastModified;
-			}
-
-			long privateCacheTimeSecs = (privateExpireTimeMillis - requestTime) / 1000L;
-
-			long publicCacheTimeSecs = (publicExpireTimeMillis - requestTime) / 1000L;
-			cacheControl.append("s-maxage=").append(publicCacheTimeSecs);
-			cacheControl.append(", max-age=").append(privateCacheTimeSecs);
-			expireTime = publicExpireTimeMillis;
+		else {			
+			cacheControl.
+				append("s-maxage=").append(publicCacheTime / 1000L).
+				append(", max-age=").append(privateCacheTime / 1000L);
+			expireTime = requestTime + publicCacheTime;
 		}
 
 		res.setHeader("Cache-Control", cacheControl.toString());
 		res.setDateHeader("Expires", expireTime);
-		res.setDateHeader("Last-Modified", lastModified);
+		if (lastModified > -1) {
+			res.setDateHeader("Last-Modified", lastModified);
+		}
 	}
 	
 	/**
@@ -280,6 +292,29 @@ public class CmsDeliveryServlet {
 			
 			return failed;
 		}
+	}
+	
+	private long toLong(String s) {
+		if (StringUtils.isNumeric(s)) {
+			return Long.parseLong(s);
+		}
+		return 0L;
+	}
+
+	public long getDefaultPrivateCacheTime() {
+		return defaultPrivateCacheTime;
+	}
+
+	public void setDefaultPrivateCacheTime(String s) {
+		this.defaultPrivateCacheTime = toLong(s);
+	}
+
+	public long getDefaultPublicCacheTime() {
+		return defaultPublicCacheTime;
+	}
+
+	public void setDefaultPublicCacheTime(String s) {
+		this.defaultPublicCacheTime = toLong(s);
 	}
 
 }

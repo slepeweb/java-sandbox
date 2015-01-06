@@ -4,8 +4,8 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,16 +34,12 @@ public class BaseController {
 	}
 	
 	@ModelAttribute(value="_user")
-	protected User getUser() {
-		Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (obj instanceof User) {
-			return (User) obj;
-		}
-		return null;
+	protected User getUser(@AuthenticationPrincipal User u) {
+		return u;
 	}
 	
 	@ModelAttribute(value="_isAuthor")
-	protected boolean isAdmin(@ModelAttribute(value="_user") User u) {
+	protected boolean isAdmin(@AuthenticationPrincipal User u) {
 		return hasAuthority(u, "CMS_ADMIN");
 	}
 	

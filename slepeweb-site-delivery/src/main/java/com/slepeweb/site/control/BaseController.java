@@ -4,10 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -66,30 +65,37 @@ public class BaseController {
 	}
 	
 	@ModelAttribute(value="_user")
-	protected User getUser() {
-		User u = null;
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null) {
-			Object obj = auth.getPrincipal();
-			if (obj instanceof User) {
-				u = (User) obj;
-			}
-		}
-		
+	protected User getUser(@AuthenticationPrincipal User u) {
 		LOG.trace(String.format("Model attribute (_user): [%s]", u));
 		return u;
 	}
 	
 	
 	@ModelAttribute(value="_isGuest")
-	protected boolean isGuest(@ModelAttribute(value="_user") User u) {
+	protected boolean isGuest(@AuthenticationPrincipal User u) {
 		return hasAuthority(u, "SWS_GUEST");
 	}
 	
 	@ModelAttribute(value="_isAdmin")
-	protected boolean isAdmin(@ModelAttribute(value="_user") User u) {
+	protected boolean isAdmin(@AuthenticationPrincipal User u) {
 		return hasAuthority(u, "SWS_ADMIN");
 	}
+	
+//	@ModelAttribute(value="_user")
+//	protected User getUser() {
+//		return null;
+//	}
+//	
+//	
+//	@ModelAttribute(value="_isGuest")
+//	protected boolean isGuest() {
+//		return hasAuthority(null, "SWS_GUEST");
+//	}
+//	
+//	@ModelAttribute(value="_isAdmin")
+//	protected boolean isAdmin() {
+//		return hasAuthority(null, "SWS_ADMIN");
+//	}
 	
 	private boolean hasAuthority(User u, String name) {
 		if (u != null) {
