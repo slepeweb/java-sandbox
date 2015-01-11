@@ -81,6 +81,12 @@ public class CmsBeanFactory {
 		return sc;
 	}
 	
+	public static Media makeMedia() {
+		Media m = new Media();
+		m.setCmsService(CMS);
+		return m;
+	}
+	
 	public static Item makeHomepageItem(Site s) {
 		ItemType homepageType = makeHomepageType(s.getName());
 		return proveItem(s, homepageType, "Homepage", "", "/").save();

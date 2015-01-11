@@ -4,12 +4,12 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.sql.Blob;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -17,51 +17,68 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	
 	private static Logger LOG = Logger.getLogger(MediaServiceImpl.class);
 	
-	public void save(Long itemId, InputStream is) {
-		if (getMedia(itemId) != null) {
-			updateMedia(itemId, is);
+	public Media save(Media m) {
+		if (m.isDefined4Insert()) {
+			Media dbRecord = getMedia(m.getItemId());
+			if (dbRecord != null) {
+				updateMedia(dbRecord, m);
+			}
+			else {
+				insertMedia(m);
+			}
 		}
 		else {
-			insertMedia(itemId, is);
+			LOG.error(compose("Media not saved - insufficient data", m));
+		}
+		
+		return m;
+	}
+	
+	private void insertMedia(Media m) {
+		this.jdbcTemplate.update(
+				"insert into media (itemid, data, size) values (?, ?, ?)", 
+				m.getItemId(), getBytesFromStream(m.getInputStream()), m.getSize());
+		
+		LOG.info(compose("Added new media", m.getItemId()));
+	}
+
+	private void updateMedia(Media dbRecord, Media m) {
+		if (! dbRecord.equals(m)) {
+			this.cacheEvictor.evict(dbRecord);
+			dbRecord.assimilate(m);
+			
+			this.jdbcTemplate.update(
+					"update media set data = ?, size = ? where itemid = ?", 
+					getBytesFromStream(m.getInputStream()), m.getSize(), m.getItemId());
+			
+			LOG.info(compose("Updated media", m.getItemId()));
+		}
+		else {
+			LOG.debug(compose("Media not changed", m));
 		}
 	}
 	
-	private void insertMedia(Long itemId, InputStream is) {
-		this.jdbcTemplate.update(
-				"insert into media (itemid, data) values (?, ?)", 
-				itemId, getBytesFromStream(is));
-		
-		LOG.info(compose("Added new media", itemId));
-	}
-
-	private void updateMedia(Long itemId, InputStream is) {
-		this.jdbcTemplate.update(
-				"update media set data = ? where itemid = ?", 
-				getBytesFromStream(is), itemId);
-		
-		LOG.info(compose("Updated media", itemId));
-	}
-	
-	public void deleteMedia(Long id) {
+	public void delete(Long id) {
 		if (this.jdbcTemplate.update("delete from media where itemid = ?", id) > 0) {
 			LOG.warn(compose("Deleted media", String.valueOf(id)));
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public boolean hasMedia(Item i) {
 		return this.jdbcTemplate.queryForInt("select count(*) from media where itemid = ?", i.getId()) > 0;
 
 	}
 
 	public void writeMedia(Long id, String outputFilePath) {
-		Blob blob = getMedia(id);
+		Media media = getMedia(id);
 		
-		if (blob != null) {
+		if (media != null) {
 			BufferedInputStream is = null;
 			FileOutputStream fos = null;
 			
 			try {
-				is = new BufferedInputStream(blob.getBinaryStream());
+				is = new BufferedInputStream(media.getBlob().getBinaryStream());
 				fos = new FileOutputStream(outputFilePath);
 				int bufflen = 1000;
 				byte[] buffer = new byte[bufflen];
@@ -86,13 +103,21 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 		}
 	}
 	
-	public Blob getMedia(Long id) {
-		return (Blob) getFirstInList(
-			this.jdbcTemplate.query("select data from media where itemid = ?", 
+	public Media getMedia(Long id) {
+		return (Media) getFirstInList(
+			this.jdbcTemplate.query("select itemid, data, size from media where itemid = ?", 
 				new Object[]{id},
 				new RowMapperUtil.MediaMapper()));
 	}
 	
+	public long getSize(Long id) {
+		return (Long) getFirstInList(
+			this.jdbcTemplate.query("select size from media where itemid = ?", 
+				new Object[]{id},
+				new RowMapperUtil.MediaSizeMapper()));
+	}
+	
+	@SuppressWarnings("deprecation")
 	public int getCount() {
 		return this.jdbcTemplate.queryForInt("select count(*) from media");
 	}

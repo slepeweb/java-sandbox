@@ -12,6 +12,7 @@ import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.bean.Template;
@@ -111,6 +112,10 @@ public class CacheEvictor {
 				compose("getAvailableTemplates", t.getSiteId()));
 		
 		broadcast(t);
+	}
+
+	public void evict(Media t) {
+		// TODO: Implement
 	}
 
 	private String compose(Object ... parts) {

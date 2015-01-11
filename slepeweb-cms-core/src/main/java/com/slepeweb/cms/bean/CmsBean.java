@@ -11,6 +11,7 @@ import com.slepeweb.cms.service.ItemTypeService;
 import com.slepeweb.cms.service.LinkNameService;
 import com.slepeweb.cms.service.LinkService;
 import com.slepeweb.cms.service.LinkTypeService;
+import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.cms.utils.SpringContext;
@@ -85,5 +86,9 @@ public abstract class CmsBean implements Serializable {
 	
 	public LinkTypeService getLinkTypeService() {
 		return this.cmsService.getLinkTypeService();
+	}
+	
+	public MediaService getMediaService() {
+		return this.cmsService.getMediaService();
 	}
 }

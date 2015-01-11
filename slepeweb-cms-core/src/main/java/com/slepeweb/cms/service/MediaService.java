@@ -1,16 +1,14 @@
 package com.slepeweb.cms.service;
 
-import java.io.InputStream;
-import java.sql.Blob;
-
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Media;
 
 
 public interface MediaService {
-	void deleteMedia(Long id);
-	Blob getMedia(Long id);
+	void delete(Long id);
+	Media getMedia(Long id);
 	void writeMedia(Long id, String outputFilePath);
-	void save(Long id, InputStream is);
+	Media save(Media m);
 	boolean hasMedia(Item i);
 	int getCount();
 }

@@ -2,11 +2,13 @@ package com.slepeweb.site.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Blob;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.service.CmsService;
@@ -34,6 +37,7 @@ public class CmsDeliveryServlet {
 	private final Object buffPoolLock = new Object();
 	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
 	private long defaultPrivateCacheTime, defaultPublicCacheTime;
+	private Map<Long, Long> lastDeliveryTable = new HashMap<Long, Long>(127);
 
 	@Autowired private CmsService cmsService;
 
@@ -52,7 +56,6 @@ public class CmsDeliveryServlet {
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
-		res.setContentType("text/html;charset=utf-8");
 		String path = getItemPath(req);
 		boolean isBypass2Default = bypass2Default(path);
 		long requestTime = System.currentTimeMillis();
@@ -61,26 +64,35 @@ public class CmsDeliveryServlet {
 			Site site = getSite(req);
 			if (site != null) {
 				req.setAttribute("_site", site);
-				LOG.debug(LogUtil.compose("Site ...", site));
+				LOG.trace(LogUtil.compose("Site ...", site));
 				Item item = site.getItem(path);
 				
 				if (item != null) {
-					LOG.info(LogUtil.compose("Item ...", item));
-					req.setAttribute("_item", item);
-					
-					if (item.getType().isMedia()) {
-						LOG.debug(LogUtil.compose("Streaming binary content ...", item));
-						stream(item, req, res, requestTime);
+					long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
+
+					if (isFresh(item, requestTime, ifModifiedSince,req.getMethod())) {
+						res.sendError(HttpServletResponse.SC_NOT_MODIFIED);
 					}
 					else {
-						Template tmplt = item.getTemplate();
-						if (tmplt != null) {
-							LOG.debug(LogUtil.compose("Forwarding request to template", tmplt.getForward()));
-							setCacheHeaders(item, requestTime, res);
-							req.getRequestDispatcher(tmplt.getForward()).forward(req, res);
+						req.setAttribute("_item", item);
+						setCacheHeaders(item, requestTime, res);
+						
+						if (item.getType().isMedia()) {
+							LOG.debug(LogUtil.compose("Streaming binary content ...", item));
+							stream(item, req, res, requestTime);
 						}
 						else {
-							notFound(req, res, "Item has no template", item);
+							res.setContentType("text/html;charset=utf-8");
+							Template tmplt = item.getTemplate();
+							
+							if (tmplt != null) {
+								LOG.debug(LogUtil.compose("Forwarding request to template", tmplt.getForward()));
+								req.getRequestDispatcher(tmplt.getForward()).forward(req, res);
+								this.lastDeliveryTable.put(item.getId(), zeroMillis(requestTime));
+							}
+							else {
+								notFound(req, res, "Item has no template", item);
+							}
 						}
 					}
 				}
@@ -94,16 +106,60 @@ public class CmsDeliveryServlet {
 			}
 		}
 		else {
-				LOG.debug(LogUtil.compose("Forwarding request to default servlet", path));
-				/* 
-				 * The default servlet must be writing its own response headers:
-				 * - any cache header written here get removed
-				 * - an ETag header is added
-				 */
-				req.getServletContext().getNamedDispatcher("default").forward(req, res);
+			LOG.debug(LogUtil.compose("Forwarding bypassed request to default servlet", path));
+			setCacheHeaders(requestTime, -1L, this.defaultPrivateCacheTime, this.defaultPublicCacheTime, res);
+			req.getServletContext().getNamedDispatcher("default").forward(req, res);
 		}
 	}
+	
+	private long zeroMillis(long millis) {
+		return (millis / 1000) * 1000;
+	}
 
+	private boolean isFresh(Item i, long requestTime, long ifModifiedSince, String method) {
+		boolean flag = false;
+		boolean isMedia = i.getType().isMedia();
+		long ttl = 0L;
+		
+		if (ifModifiedSince != -1L && ("GET".equals(method) || "HEAD".equals(method))) {
+			requestTime = zeroMillis(requestTime);
+			
+			if (isMedia) {
+				long lastModified = i.getDateUpdated().getTime();				
+				flag = lastModified <= ifModifiedSince && 
+						ifModifiedSince <= requestTime;
+			}
+			else {
+				long pageLastDelivered = getPageLastDeliveredDate(i, requestTime);
+				long pageExpiry = pageLastDelivered + (i.getType().getPublicCache() * 1000);
+				
+				if (pageLastDelivered > -1L) {
+					ttl = (pageExpiry - requestTime) / 1000;
+					flag = requestTime < pageExpiry;
+				}
+			}
+		}
+		
+		StringBuilder sb = new StringBuilder("Content [%s] is ").append(flag ? "fresh" : "stale");
+		if (! isMedia) {
+			sb.append(" (%d secs to live)");
+			LOG.debug(String.format(sb.toString(), i.getPath(), ttl));
+		}
+		else {
+			LOG.debug(String.format(sb.toString(), i.getPath()));
+		}
+
+		return flag;
+	}
+	
+	private long getPageLastDeliveredDate(Item i, long requestTime) {
+		Long l = this.lastDeliveryTable.get(i.getId());
+		if (l != null) {
+			return new Timestamp(l).getTime();
+		}
+		return -1L;
+	}
+	
 	private void notFound(HttpServletRequest req, HttpServletResponse res, String msg, Object arg) throws Exception
     {
 		LOG.error(LogUtil.compose(msg, arg));
@@ -160,38 +216,21 @@ public class CmsDeliveryServlet {
 	private void stream(Item item, HttpServletRequest req, HttpServletResponse res, long requestTime)
 			throws ServletException, IOException {
 
-		long lastModified = item.getDateUpdated().getTime();
-		String method = req.getMethod();
-		
-		setCacheHeaders(item, requestTime, res);
-
-		if ("GET".equals(method) || "HEAD".equals(method)) {
-			// Idempotent methods.
-			long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
-			if (
-					ifModifiedSince != -1 && 
-					lastModified <= ifModifiedSince && 
-					ifModifiedSince <= requestTime) {
-
-				res.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-				return;
-			}
+		Media media = this.cmsService.getMediaService().getMedia(item.getId());
+		if (media == null) {
+			LOG.error(String.format("No media found for item", item));
+			return;
 		}
 		
-		Blob blob = this.cmsService.getMediaService().getMedia(item.getId());
-		if (blob != null) {
+		res.setHeader("Content-Length", String.valueOf(media.getSize()));
+		res.setContentType(item.getType().getMimeType());
+		
+		if (media.getBlob() != null) {
 			final ServletOutputStream out = res.getOutputStream();
 			InputStream in = null;
 			
 			try {
-				in = blob.getBinaryStream();
-				res.setContentType(item.getType().getMimeType());
-				res.setContentLength((int) blob.length());
-		
-				if ("HEAD".equals(method)) {
-					// No point stream body, which will be discarded.
-					return;
-				}
+				in = media.getBlob().getBinaryStream();
 		
 				// We assume the JVM's memory management is efficient!
 				byte[] buff = getBuff();
@@ -260,7 +299,7 @@ public class CmsDeliveryServlet {
 
 		res.setHeader("Cache-Control", cacheControl.toString());
 		res.setDateHeader("Expires", expireTime);
-		if (lastModified > -1) {
+		if (lastModified > -1L) {
 			res.setDateHeader("Last-Modified", lastModified);
 		}
 	}

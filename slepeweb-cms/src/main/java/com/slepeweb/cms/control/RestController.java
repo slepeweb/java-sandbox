@@ -30,6 +30,7 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.ItemService;
@@ -101,7 +102,12 @@ public class RestController extends BaseController {
 			is = file.getInputStream();
 			Item i = this.itemService.getItem(itemId);
 			if (i != null) {
-				this.mediaService.save(itemId, is);
+				Media m = CmsBeanFactory.makeMedia().
+						setItemId(itemId).
+						setInputStream(is).
+						setSize(file.getSize());
+				
+				this.mediaService.save(m);
 				i.setDateUpdated(new Timestamp(System.currentTimeMillis()));
 				i.save();
 				return true;

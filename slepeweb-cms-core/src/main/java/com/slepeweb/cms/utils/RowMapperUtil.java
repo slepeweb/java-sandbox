@@ -1,6 +1,5 @@
 package com.slepeweb.cms.utils;
 
-import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -17,6 +16,7 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.LoggerBean;
+import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.bean.Template;
@@ -182,9 +182,18 @@ public class RowMapperUtil {
 		}
 	}
 	
-	public static final class MediaMapper implements RowMapper<Blob> {
-		public Blob mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return rs.getBlob("data");
+	public static final class MediaMapper implements RowMapper<Media> {
+		public Media mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeMedia().
+					setItemId(rs.getLong("itemid")).
+					setSize(rs.getLong("size")).
+					setBlob(rs.getBlob("data"));
+		}
+	}
+	
+	public static final class MediaSizeMapper implements RowMapper<Long> {
+		public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return rs.getLong("size");
 		}
 	}
 	

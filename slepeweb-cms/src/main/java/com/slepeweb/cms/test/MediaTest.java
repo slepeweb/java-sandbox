@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 
 @Service
@@ -32,7 +34,11 @@ public class MediaTest extends BaseTest {
 				if (! imageItem.hasMedia()) {
 					int startCount = this.cmsService.getMediaService().getCount();
 					try { 
-						this.cmsService.getMediaService().save(imageItem.getId(), new FileInputStream(sourceImageFilename));
+						Media m = CmsBeanFactory.makeMedia().
+								setItemId(imageItem.getId()).
+								setInputStream(new FileInputStream(sourceImageFilename)).
+								setSize(fileSize);
+						this.cmsService.getMediaService().save(m);
 					}
 					catch (Exception e) {}
 					
