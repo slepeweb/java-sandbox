@@ -15,10 +15,6 @@
       <param-name>cacheTime</param-name>
       <param-value>86400</param-value>
     </init-param>
-    <init-param>
-      <param-name>charSet</param-name>
-      <param-value>utf-8</param-value>
-    </init-param>
   </filter>
 
   <filter-mapping>

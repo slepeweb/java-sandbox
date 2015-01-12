@@ -6,7 +6,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -68,9 +70,10 @@ public class CmsDeliveryServlet {
 				Item item = site.getItem(path);
 				
 				if (item != null) {
+					logRequestHeaders(req);					
 					long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
 
-					if (isFresh(item, requestTime, ifModifiedSince,req.getMethod())) {
+					if (isFresh(item, requestTime, ifModifiedSince, req.getMethod())) {
 						res.sendError(HttpServletResponse.SC_NOT_MODIFIED);
 					}
 					else {
@@ -102,13 +105,38 @@ public class CmsDeliveryServlet {
 			}
 			else {
 				LOG.error(LogUtil.compose("Site not registered here", req.getServerName()));
-				//notFound(req, res, "Site not found", req.getServerName());
 			}
 		}
 		else {
 			LOG.debug(LogUtil.compose("Forwarding bypassed request to default servlet", path));
 			setCacheHeaders(requestTime, -1L, this.defaultPrivateCacheTime, this.defaultPublicCacheTime, res);
 			req.getServletContext().getNamedDispatcher("default").forward(req, res);
+		}
+		
+		logResponseHeaders(res);
+	}
+	
+	private void logRequestHeaders(HttpServletRequest req) {
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("REQUEST HEADERS >>>");
+			Enumeration<String> enumer = req.getHeaderNames();
+			String name;
+			while (enumer.hasMoreElements()) {
+				name = enumer.nextElement();
+				LOG.trace(String.format("   %-20s: [%s]", name, req.getHeader(name)));
+			}
+		}
+	}
+	
+	private void logResponseHeaders(HttpServletResponse res) {
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("RESPONSE HEADERS >>>");
+			Iterator<String> enumer = res.getHeaderNames().iterator();
+			String name;
+			while (enumer.hasNext()) {
+				name = enumer.next();
+				LOG.trace(String.format("   %-20s: [%s]", name, res.getHeader(name)));
+			}
 		}
 	}
 	
@@ -128,6 +156,8 @@ public class CmsDeliveryServlet {
 				long lastModified = i.getDateUpdated().getTime();				
 				flag = lastModified <= ifModifiedSince && 
 						ifModifiedSince <= requestTime;
+				LOG.trace(String.format("Media> isFresh: %s, lastModified: %d, ifModifiedSince: %d, requestTime: %d", 
+						flag, lastModified, ifModifiedSince, requestTime));
 			}
 			else {
 				long pageLastDelivered = getPageLastDeliveredDate(i, requestTime);
@@ -137,6 +167,9 @@ public class CmsDeliveryServlet {
 					ttl = (pageExpiry - requestTime) / 1000;
 					flag = requestTime < pageExpiry;
 				}
+				
+				LOG.trace(String.format("Page> isFresh: %s, pageLastDelivered: %d, pageExpiry: %d, requestTime: %d", 
+						flag, pageLastDelivered, pageExpiry, requestTime));
 			}
 		}
 		
