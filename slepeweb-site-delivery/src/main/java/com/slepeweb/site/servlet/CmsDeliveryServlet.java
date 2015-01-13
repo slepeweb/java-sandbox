@@ -73,7 +73,7 @@ public class CmsDeliveryServlet {
 					logRequestHeaders(req);					
 					long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
 
-					if (isFresh(item, requestTime, ifModifiedSince, req.getMethod())) {
+					if (isCacheable(item) && isFresh(item, requestTime, ifModifiedSince, req.getMethod())) {
 						res.sendError(HttpServletResponse.SC_NOT_MODIFIED);
 					}
 					else {

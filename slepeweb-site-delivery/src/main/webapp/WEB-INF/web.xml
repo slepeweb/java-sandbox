@@ -36,11 +36,18 @@
 	<!-- Loads Spring Security config file -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
+		<!-- For Production, using localhost database connection -->
 		<param-value>
 			/WEB-INF/security-beans.xml, /WEB-INF/database-beans.xml
 		</param-value>
+		
+		<!-- For remote database connection 
+		<param-value>
+			/WEB-INF/security-beans.xml, /WEB-INF/remote-database-beans.xml
+		</param-value>
+ 		-->
 	</context-param>
- 
+ 	
 	<!-- Spring Security -->
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>

@@ -224,7 +224,10 @@ public class Field extends CmsBean {
 			}
 			
 			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.YEAR, 10);
+			// Set default date to 7 days hence, in the absence of any other configuration rules.
+			// A future date would be useful if we had embargoing functionality.
+			// TODO: Implement rules for default dates, eg. '+7d' for 7 days hence
+			cal.add(Calendar.DATE, 7);
 			return new Timestamp(cal.getTimeInMillis());
 		}
 		else if (getType() == FieldType.radio || getType() == FieldType.checkbox || getType() == FieldType.select) {
