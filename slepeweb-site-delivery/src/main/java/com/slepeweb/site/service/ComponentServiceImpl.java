@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.utils.LogUtil;
+import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.model.ImageComponent;
 import com.slepeweb.site.model.SimpleComponent;
 import com.slepeweb.site.model.StandardComponent;
@@ -105,6 +106,12 @@ public class ComponentServiceImpl implements ComponentService {
 		ImageComponent c = new ImageComponent().setup(l);
 		c.setType("image");
 		c.setSrc(l.getChild().getPath());
+		
+		String s = l.getChild().getFieldValue(FieldName.MAX_WIDTH);
+		if (StringUtils.isNumeric(s)) {
+			c.setMaxWidth(Integer.valueOf(s));
+		}
+		
 		return c;
 	}
 	

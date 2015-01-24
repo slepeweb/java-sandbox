@@ -6,6 +6,7 @@
 <!-- jsp/sws/component/image.jsp -->
 
 <div>
-	<img src="${_comp.src}" alt="${_comp.alt}" />
-	<c:if test="${not empty _comp.caption}"><p class="img-caption tight-lines-1" style="margin-left: 5px">${_comp.caption}</p></c:if>
+	<img src="${_comp.src}" alt="${_comp.alt}" width="100%" <c:if test="${not empty _comp.maxWidth}"> 
+		style="max-width: ${_comp.maxWidth}px"</c:if> />
+	<c:if test="${not empty _comp.caption}"><p class="caption" style="margin-left: 5px">${_comp.caption}</p></c:if>
 </div>

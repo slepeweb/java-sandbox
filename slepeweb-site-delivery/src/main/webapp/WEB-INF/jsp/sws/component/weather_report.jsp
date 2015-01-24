@@ -8,7 +8,7 @@ $(function() {
 	var weather = {
 			error: "<tr><td></td><td>... not available right now.</td></tr>",
 			updateTable: function(html) {
-				var table = $("#weather-report");
+				var table = $("#weather-report table");
 				table.empty();
 				table.append(html);	
 			}
@@ -39,9 +39,9 @@ $(function() {
 });
 </script>  
 
-<div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
+<div id="weather-report" <c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
 	<c:if test="${not empty _comp.heading}"><h3>${_comp.heading}</h3></c:if>
 	<c:if test="${not empty _comp.blurb}"><div>${_comp.blurb}</div></c:if>	
 	
-	<table id="weather-report" class="compact"><tr><td></td><td>Please wait ...</td></tr></table>
+	<table><tr><td></td><td>Please wait ...</td></tr></table>
 </div>

@@ -2,33 +2,26 @@
 
 <gen:debug><!-- tags/sws/userList.tag --></gen:debug>
 
-<article class="first">
-	<h2>${_item.fields.title}</h2>
-	<sw:flash-messages />
+<h2>${_item.fields.title}</h2>
+<sw:flash-messages />
 
-	<c:choose><c:when test="${not empty userList}">
-		<table class="two-col-table user-table compact">
-		<c:forEach items="${userList}" var="user">
-		    <tr>
-		        <td>${user.alias}</td>
-		        <td>${user}</td>
-						<td><a href="/sandbox/hibernate/form?userId=${user.id}"><img
-								src="/resources/sws/images/pencil-icon.jpg"
-								alt="Update ${user.alias}"
-								title="Update ${user.alias}"></a></td>
-						<td><a class="delete-user-link" href="#delete-user-alert"
-							rel="${user.alias}|${user.id}"><img
-								src="/resources/sws/images/delete-icon.jpg"
-								alt="Delete ${user.alias}"
-								title="Delete ${user.alias}"></a></td>
-					</tr>
-		</c:forEach>
-		</table>
-	</c:when><c:otherwise>
-		<p>No users in the database.</p>
-	</c:otherwise></c:choose>
+<c:choose><c:when test="${not empty userList}">
+	<table class="alt">
+	<c:forEach items="${userList}" var="user">
+	    <tr>
+	        <td>${user.alias}</td>
+	        <td>${user}</td>
+					<td><a href="/sandbox/hibernate/form?userId=${user.id}" 
+						title="Update ${user.alias}"><i class="fa fa-pencil"></i></a></td>
+					<td><a class="delete-user-link" href="#delete-user-alert"
+						rel="${user.alias}|${user.id}" title="Delete ${user.alias}"><i class="fa fa-trash"></i></a></td>
+				</tr>
+	</c:forEach>
+	</table>
+</c:when><c:otherwise>
+	<p>No users in the database.</p>
+</c:otherwise></c:choose>
 	
-</article>
 
 <div style="display: none">
 	<div id="delete-user-alert">

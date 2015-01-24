@@ -32,8 +32,7 @@
 			</tr>
 		</table>
 		
-		<br />
-		<p><a href="${flowExecutionUrl}&_eventId=finished">Finish</a></p>
+		<p><a class="button special icon fa-level-up" href="${flowExecutionUrl}&_eventId=finished">Finish</a></p>
 	</article>
 	
 </sw:spizzaLayout>

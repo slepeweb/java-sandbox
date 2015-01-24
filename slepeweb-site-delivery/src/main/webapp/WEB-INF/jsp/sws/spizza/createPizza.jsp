@@ -2,7 +2,7 @@
 	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 	
-<sw:spizzaLayout>
+<sw:spizzaLayout mainCols="9u 12u(3) important(3)">
 	<gen:debug><!-- jsp/sws/spizza/createPizza.jsp --></gen:debug>
 
 	<article>
@@ -10,7 +10,7 @@
 		<p>${contentMap.body}</p>
 		
 		<form:form action="${flowExecutionUrl}" commandName="pizzaForm">
-			<table id="pizza-options-table" class="two-col-table">
+			<table>
 				<tr>
 					<td>
 					<h3>Base</h3>
@@ -33,13 +33,12 @@
 					</c:forEach>
 					</td>
 				</tr>
-	
-				<tr>
-					<td class="buttons"><input type="submit" class="button" name="_eventId_addPizza" value="Continue" /></td>
-					<td></td>
-					<td align="right"><input type="submit" class="button" name="_eventId_cancel" value="Cancel" /></td>
-				</tr>
 			</table>
+
+			<div class="row">
+				<div class="6u"><input type="submit" class="button small special" name="_eventId_addPizza" value="Continue" /></div>
+				<div class="6u"><input type="submit" class="button small special" name="_eventId_cancel" value="Cancel" /></div>
+			</div>
 		</form:form>
 	</article>
 

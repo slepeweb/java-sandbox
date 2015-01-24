@@ -41,9 +41,8 @@
 							cssClass="form-field-error compact" /></td>
 				</tr>
 			</table>
-			<br />
 
-			<input class="button" type="submit" name="_eventId_login"
+			<input class="button small special" type="submit" name="_eventId_login"
 				value="Login" />
 		</form:form>
 	</article>

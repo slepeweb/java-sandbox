@@ -9,7 +9,7 @@
 		<h2>${contentMap.heading}</h2>
 		
 		<form:form method="post" commandName="paymentForm">
-			<table class="two-col-table">
+			<table>
 	
 	      <tr>
 	      	<td class="heading">Total amount</td>
@@ -50,12 +50,16 @@
 	      	<td><form:input path="expiryDate" /></td>
 		      <td><form:errors path="expiryDate" cssClass="form-field-error compact" /></td>
 	      </tr>
-	      
-		    <tr>
-	        <td class="buttons"><input type="submit" class="button" name="_eventId_submitPayment" value="Take payment" /></td>
-	        <td><input type="submit" class="button" name="_eventId_cancel" value="Cancel" /></td>
-		    </tr>
 			</table> 
+	      
+	    <div class="row">
+	    	<div class="6u">
+	        <input type="submit" class="button small special" name="_eventId_submitPayment" value="Take payment" />
+        </div>
+	    	<div class="6u">
+	        <input type="submit" class="button small special" name="_eventId_cancel" value="Cancel" />
+        </div>
+	    </div>
 		</form:form>
 	</article>
 

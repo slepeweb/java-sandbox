@@ -2,26 +2,25 @@
 
 <gen:debug><!-- tags/sws/navigation-top.tag --></gen:debug>
 
-<header class="container" id="site-header">
-	<div class="row">
-		<div class="12u">
-			<div id="logo">
+<header id="header">
+	<div class="container">
+		<div class="row">
+			<div class="3u">
 				<h1><a href="/about">slepe web solutions</a></h1>
 			</div>
-			<nav id="nav">
-				<ul>
+			<nav class="9u" id="nav">
+				<ul class="fr">
 					<c:forEach items="${_page.header.topNavigation}" var="link">
-						<li<c:if test="${link.selected}"> class="current_page_item"</c:if>><a href="${link.href}">${link.title}</a></li>
+						<li<c:if test="${link.selected}"> class="selected"</c:if>><a href="${link.href}">${link.title}</a></li>
 					</c:forEach>
 				</ul>
+				
+				<%-- This bit is not cache-friendly 
+				<c:if test="${not empty _user}">
+					<span class="user-info">Logged in as: ${_user.username}</span>
+				</c:if>
+				--%>
 			</nav>
-			
-			<c:if test="${not empty _user}">
-				<div class="user-info">
-					<p>Logged in as: ${_user.username}</p>
-				</div>
-			</c:if>
 		</div>
 	</div>
 </header>
-

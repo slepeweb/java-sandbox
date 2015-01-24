@@ -12,11 +12,11 @@
 		<form:form method="post" action="${flowExecutionUrl}">	  
 		    <table class="two-col-table">
 		    <tr>
-		        <td><input class="button" type="submit" name="_eventId_accept" value="Continue" /></td>
+		        <td><input class="button small special" type="submit" name="_eventId_accept" value="Continue" /></td>
 		        <td>${contentMap.response_A}</td>
 		    </tr>
 		    <tr>
-		        <td class="buttons"><input class="button" type="submit" name="_eventId_cancel" value="Never mind" /></td>
+		        <td class="buttons"><input class="button small special" type="submit" name="_eventId_cancel" value="Never mind" /></td>
 		        <td>${contentMap.response_B}</td>
 		    </tr>
 				</table> 

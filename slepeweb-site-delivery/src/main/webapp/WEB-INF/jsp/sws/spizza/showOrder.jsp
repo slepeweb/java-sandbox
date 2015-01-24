@@ -13,7 +13,7 @@
 		
 	
 		<form:form action="${flowExecutionUrl}">
-			<table id="pizza-order-table">
+			<table>
 				<tr>
 					<th>Base</th>
 					<th>Size</th>
@@ -28,19 +28,17 @@
 						<td>${pizza.size.label}</td>
 						<td>${pizza.toppingsAsString}</td>
 						<td>${pizza.priceFormatted}</td>
-						<td><a href="${flowExecutionUrl}&_eventId_remove&id=${status.count}"><img
-									src="/resources/sws/images/delete-icon.jpg"
-									alt="Remove"
-									title="Remove"></a></td>
+						<td align="center"><a href="${flowExecutionUrl}&_eventId_remove&id=${status.count}"><i 
+							class="fa fa-trash" title="Remove"></i></a></td>
 					</tr>
 				</c:forEach>
-				
-		    <tr>
-		        <td class="buttons"><input type="submit" class="button" name="_eventId_createPizza" value="More pizza" /></td>
-		        <td><input type="submit" class="button" name="_eventId_checkout" value="Checkout" /></td>
-		        <td><input type="submit" class="button" name="_eventId_cancel" value="Cancel" /></td>
-		    </tr>
 			</table> 
+			
+			<div class="row">
+				<div class="4u"><input type="submit" class="button small special" name="_eventId_createPizza" value="More pizza" /></div>
+				<div class="4u"><input type="submit" class="button small special" name="_eventId_checkout" value="Checkout" /></div>
+				<div class="4u"><input type="submit" class="button small special" name="_eventId_cancel" value="Cancel" /></div>
+			</div>
 		</form:form>
 	</article>
 

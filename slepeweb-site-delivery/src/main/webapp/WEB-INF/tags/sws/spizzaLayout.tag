@@ -1,4 +1,6 @@
-<%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %><!DOCTYPE html>
+<%@ tag %><%@ 
+	attribute name="mainCols" required="false" rtexprvalue="true" %><%@ 
+	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %><!DOCTYPE html>
 
 <html>
 	
@@ -23,12 +25,13 @@
 				<div class="row">
 				
 					<!-- Left Sidebar -->
-					<div class="3u">
+					<div class="3u 6u(3)">
 						<sw:navigation-left />
 					</div>
 					
 					<!-- Main content -->	
-					<div class="9u skel-cell-mainContent">	
+					<c:if test="${empty mainCols}"><c:set var="mainCols" value="6u 9u(2) 12u(3) important(3)" /></c:if>
+					<div class="${mainCols}">	
 						<jsp:doBody />
 					</div>
 				</div>

@@ -11,11 +11,11 @@
 			<sw:navigation-top />
 		</div>
 	
-		<div id="main-wrapper" class="subpage">
-			<div class="container">
-				<div class="row">
-						<jsp:doBody />
-				</div>
+		<div id="main-wrapper">
+			<div id="main" class="container">
+					<div class="row">
+							<jsp:doBody />
+					</div>
 			</div>
 		</div>
 

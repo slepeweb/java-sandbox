@@ -17,7 +17,7 @@
 	
 	<c:if test="${not _isGuest and not _isAdmin}">	
 		<form method="post" action="<c:url value="/j_spring_security_check" />">
-			<table class="two-col-table">
+			<table>
 				<tr>
 					<td class="heading"><label for="alias">User name</label></td>
 					<td><input name="alias" size="32" /></td>
@@ -27,8 +27,7 @@
 					<td><input type="password" name="password" size="32" /></td>
 				</tr>
 			</table>
-			<br />
-			<input class="button" type="submit" name="Submit" />
+			<input class="button special small" type="submit" value="Login" />
 		</form>	
 	</c:if>
 	

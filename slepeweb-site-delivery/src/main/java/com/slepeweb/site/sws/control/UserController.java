@@ -57,13 +57,13 @@ public class UserController extends BaseController {
 		page.setLeftNavigation();
 		
 		if (userId == null) {
-			model.addAttribute("userForm", new User().setUserFormPageId(i.getId()));
+			model.addAttribute("user", new User().setUserFormPageId(i.getId()));
 		}
 		else {
 			User target = this.userDao.getUser(userId);
 			target.setUserFormPageId(i.getId());
 			roles2Selected(target);
-			model.addAttribute("userForm", target);
+			model.addAttribute("user", target);
 		}
 		
 		model.addAttribute("availableRoles", this.userDao.getAvailableRoles());
@@ -71,11 +71,46 @@ public class UserController extends BaseController {
 	}
 	
 	/*
+	private Page getFormPage(Item i, String shortSitename, Integer userId, ModelMap model) {
+		Page page = getStandardPage(i, shortSitename, "user/form", model);
+		page.setLeftNavigation();
+		
+		if (userId == null) {
+			model.addAttribute("user", new User().setUserFormPageId(i.getId()));
+		}
+		else {
+			User targ		Page page = getStandardPage(i, shortSitename, "user/form", model);
+		page.setLeftNavigation();
+		
+		if (userId == null) {
+			model.addAttribute("user", new User().setUserFormPageId(i.getId()));
+		}
+		else {
+			User target = this.userDao.getUser(userId);
+			target.setUserFormPageId(i.getId());
+			roles2Selected(target);
+			model.addAttribute("user", target);
+		}
+		
+		model.addAttribute("availableRoles", this.userDao.getAvailableRoles());
+		return page.getView();
+et = this.userDao.getUser(userId);
+			target.setUserFormPageId(i.getId());
+			roles2Selected(target);
+			model.addAttribute("user", target);
+		}
+		
+		model.addAttribute("availableRoles", this.userDao.getAvailableRoles());
+		return page;
+	}
+	*/
+	
+	/*
 	 * The BindingResult parameter MUST follow the object being (data-) bound.
 	 */
 	@RequestMapping(value = "add", method = RequestMethod.POST)
 	public String addUser(
-			@Valid @ModelAttribute("userForm") User userForm, BindingResult result, 
+			@Valid @ModelAttribute("user") User userForm, BindingResult result, 
 			ModelMap model, RedirectAttributes rattr) {
 		
 		// Need to validate user here, since it is optional when the form is used to update an existing user
@@ -102,7 +137,9 @@ public class UserController extends BaseController {
 		}
 		
 		Item i = this.cmsService.getItemService().getItem(new Long(userForm.getUserFormPageId()));
-		return showForm(i, i.getSite().getShortname(), null, model);
+		Page page = getStandardPage(i, i.getSite().getShortname(), "user/form", model);
+		page.setLeftNavigation();				
+		return page.getView();
 	}
 
 	/*
@@ -110,7 +147,7 @@ public class UserController extends BaseController {
 	 */
 	@RequestMapping(value="upd", method=RequestMethod.POST)
 	public String updateUser(
-			@Valid @ModelAttribute("userForm") User userForm, BindingResult result, 
+			@ModelAttribute("user") @Valid User userForm, BindingResult result, 
 			ModelMap model, RedirectAttributes rattr) {
 		
 		/*
@@ -130,7 +167,9 @@ public class UserController extends BaseController {
 		}
 		
 		Item i = this.cmsService.getItemService().getItem(new Long(userForm.getUserFormPageId()));
-		return showForm(i, i.getSite().getShortname(), userForm.getUserId(), model);
+		Page page = getStandardPage(i, i.getSite().getShortname(), "user/form", model);
+		page.setLeftNavigation();				
+		return page.getView();
 	}
 	
 	
