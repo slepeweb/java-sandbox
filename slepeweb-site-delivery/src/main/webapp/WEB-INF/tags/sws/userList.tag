@@ -14,7 +14,7 @@
 					<td><a href="/sandbox/hibernate/form?userId=${user.id}" 
 						title="Update ${user.alias}"><i class="fa fa-pencil"></i></a></td>
 					<td><a class="delete-user-link" href="#delete-user-alert"
-						rel="${user.alias}|${user.id}" title="Delete ${user.alias}"><i class="fa fa-trash"></i></a></td>
+						rel="${user.alias}|${user.id}" title="Delete ${user.alias}?"><i class="fa fa-trash"></i></a></td>
 				</tr>
 	</c:forEach>
 	</table>
@@ -25,10 +25,8 @@
 
 <div style="display: none">
 	<div id="delete-user-alert">
-		<p class="compact">
-			<strong>Template</strong><br />
-		</p>
-		<button type="button" class="button">Yes, I'm, sure</button>
+		<p><strong>Template</strong></p>
+		<button type="button" class="button small special">Yes, I'm sure</button>
 	</div>
 </div>
 
