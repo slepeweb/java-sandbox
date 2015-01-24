@@ -1,5 +1,7 @@
 package com.slepeweb.site.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.cms.bean.Link;
 
 public class ImageComponent extends SimpleComponent {
@@ -12,7 +14,12 @@ public class ImageComponent extends SimpleComponent {
 		super.setup(l);
 		setHeading(l.getChild().getFieldValue("alt"));
 		setBlurb(l.getChild().getFieldValue("caption"));
-		setMaxWidth(Integer.parseInt(l.getChild().getFieldValue("maxwidth")));
+		
+		String max = l.getChild().getFieldValue("maxwidth");
+		if (StringUtils.isNumeric(max)) {
+			setMaxWidth(Integer.valueOf(max));
+		}
+		
 		return this;
 	}
 

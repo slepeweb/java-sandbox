@@ -17,9 +17,10 @@
 <script src="/resources/sws/js/skel-layers.min.js"></script>
 <script src="/resources/sws/js/init.js"></script>
 <script src="/resources/sws/js/jquery.colorbox-min.js"></script>
-<link href="/resources/sws/css/slepeweb.css" rel="stylesheet" type="text/css">
+
 <sw:extraCSS />
 <sw:extraJS />
+
 <noscript>
 	<link rel="stylesheet" href="/resources/sws/css/skel.css" />
 	<link rel="stylesheet" href="/resources/sws/css/style.css" />
