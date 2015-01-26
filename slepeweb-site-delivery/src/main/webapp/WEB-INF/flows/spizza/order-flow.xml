@@ -14,7 +14,6 @@
 		<transition on="addPizza" to="showOrder">
 			<evaluate expression="order.addPizza(flowScope.pizzaForm)" />
 		</transition>
-		<transition on="cancel" to="showOrder" />
 	</view-state>
 	
 	<view-state id="showOrder" view="sws/spizza/showOrder">
@@ -34,4 +33,9 @@
 	
 	<end-state id="cancel" />
 	<end-state id="orderCreated" />
+	
+	<global-transitions>
+		<transition on="cancel" to="cancel" bind="false" validate="false" />
+	</global-transitions>
+	
 </flow>

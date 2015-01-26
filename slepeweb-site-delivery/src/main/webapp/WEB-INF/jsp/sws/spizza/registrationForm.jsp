@@ -47,12 +47,12 @@
 		        <td><form:password path="confirmPassword" /></td>
 		        <td><form:errors path="confirmPassword" cssClass="form-field-error compact" /></td>
 		    </tr>
-		    <tr>
-		        <td class="buttons"><input class="button" type="submit" name="_eventId_register" value="Register" /></td>
-		        <td align="right"><input class="button" type="submit" name="_eventId_cancel" value="Cancel" /></td>
-		        <td></td>
-		    </tr>
 				</table> 
+				
+		    <div class="row">
+					<div class="6u"><input class="button small special" type="submit" name="_eventId_register" value="Register" /></div>
+		      <div class="6u"><input class="button small special" type="submit" name="_eventId_cancel" value="Cancel" /></div>
+		    </div>
 		</form:form>
 	</article>
 

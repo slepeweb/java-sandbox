@@ -57,7 +57,7 @@
 	        <input type="submit" class="button small special" name="_eventId_submitPayment" value="Take payment" />
         </div>
 	    	<div class="6u">
-	        <input type="submit" class="button small special" name="_eventId_cancel" value="Cancel" />
+	        <input type="submit" class="button small special" name="_eventId_cancel" value="Cancel order" />
         </div>
 	    </div>
 		</form:form>

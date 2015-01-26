@@ -56,4 +56,5 @@
 	<global-transitions>
 		<transition on="cancel" to="cancel" bind="false" validate="false" />
 	</global-transitions>
+	
 </flow>

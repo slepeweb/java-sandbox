@@ -15,7 +15,7 @@
 			<evaluate expression="spizzaFlowActions.parseContent('block5', flowRequestContext)" result="viewScope.contentMap" />
 		</on-entry>
 		<transition on="submitPayment" to="verifyPayment" />
-		<transition on="cancel" to="cancel" />
+<!-- 		<transition on="cancel" to="cancel" /> -->
 	</view-state>
 	
 	<action-state id="verifyPayment">
@@ -28,4 +28,9 @@
 	
 	<end-state id="cancel" />
 	<end-state id="paymentTaken" />
+	
+	<global-transitions>
+		<transition on="cancel" to="cancel" bind="false" validate="false" />
+	</global-transitions>
+	
 </flow>

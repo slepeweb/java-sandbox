@@ -43,6 +43,6 @@
 	<end-state id="endState" />
 	
 	<global-transitions>
-		<transition on="cancel" to="endState" />
+		<transition on="cancel" to="endState" bind="false" validate="false" />
 	</global-transitions>
 </flow>
