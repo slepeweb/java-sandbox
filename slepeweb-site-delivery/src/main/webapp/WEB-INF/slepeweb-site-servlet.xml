@@ -37,7 +37,7 @@
 	<bean id="springContext" class="com.slepeweb.cms.utils.SpringContext" />
 
 	<bean id="cmsDeliveryServlet" class="com.slepeweb.site.servlet.CmsDeliveryServlet">
-		<property name="bypass2Default" value="/jaxws/.*|.*?\\.wsdl|.*?\\.xsd|.*?\\.dtd" />
+		<property name="bypass2Default" value="/google.*|/jaxws/.*|.*?\\.wsdl|.*?\\.xsd|.*?\\.dtd" />
 		<property name="defaultPrivateCacheTime" value="86400" />
 		<property name="defaultPublicCacheTime" value="86400" />
 	</bean>

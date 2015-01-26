@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.component.Config;
+import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.service.LoglevelUpdateService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.ComponentService;
@@ -23,12 +23,12 @@ import com.slepeweb.site.service.ComponentService;
 public class BaseController {
 	private static Logger LOG = Logger.getLogger(BaseController.class);
 	
-	@Autowired protected Config config;
+	@Autowired protected ServerConfig config;
 	@Autowired private ComponentService componentService;
 	@Autowired private LoglevelUpdateService loglevelUpdateService;
 
-	@ModelAttribute(value="config")
-	public Config getConfig() {
+	@ModelAttribute(value="_serverConfig")
+	public ServerConfig getConfig() {
 		return this.config;
 	}
 	
@@ -80,22 +80,6 @@ public class BaseController {
 	protected boolean isAdmin(@AuthenticationPrincipal User u) {
 		return hasAuthority(u, "SWS_ADMIN");
 	}
-	
-//	@ModelAttribute(value="_user")
-//	protected User getUser() {
-//		return null;
-//	}
-//	
-//	
-//	@ModelAttribute(value="_isGuest")
-//	protected boolean isGuest() {
-//		return hasAuthority(null, "SWS_GUEST");
-//	}
-//	
-//	@ModelAttribute(value="_isAdmin")
-//	protected boolean isAdmin() {
-//		return hasAuthority(null, "SWS_ADMIN");
-//	}
 	
 	private boolean hasAuthority(User u, String name) {
 		if (u != null) {

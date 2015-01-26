@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.slepeweb.cms.cache.CacheEvictor;
-import com.slepeweb.cms.component.Config;
+import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.utils.LogUtil;
 
 public class BaseServiceImpl {
@@ -14,7 +14,7 @@ public class BaseServiceImpl {
 	//private static Logger LOG = Logger.getLogger(BaseServiceImpl.class);
 
 	@Autowired protected JdbcTemplate jdbcTemplate;
-	@Autowired protected Config config;
+	@Autowired protected ServerConfig config;
 	@Autowired protected CacheEvictor cacheEvictor;
 	
 	

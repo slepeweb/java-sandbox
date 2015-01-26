@@ -10,13 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.slepeweb.cms.component.Config;
+import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.service.LoglevelUpdateService;
 
 @Controller
 public class BaseController {
 	
-	@Autowired protected Config config;
+	@Autowired protected ServerConfig config;
 	@Autowired private LoglevelUpdateService loglevelUpdateService;
 	private String contextPath;
 
@@ -28,8 +28,8 @@ public class BaseController {
 		return this.contextPath;
 	}
 	
-	@ModelAttribute(value="config")
-	public Config getConfig() {
+	@ModelAttribute(value="_serverConfig")
+	public ServerConfig getConfig() {
 		return this.config;
 	}
 	

@@ -3,7 +3,7 @@ package com.slepeweb.cms.component;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Config {
+public class ServerConfig {
 	private boolean liveDelivery = true;
 
 	public boolean isLiveDelivery() {
