@@ -7,7 +7,10 @@ var messages = [
   "Item(s) successfully trashed",
   "Failed to trash the item(s)",
   "Item successfully moved",
-  "Failed to move the item"
+  "Failed to move the item",
+  "Links successfully updated",
+  "Failed to update links",
+  "Failed to retrieve breadcrumb trail"
 ];
 
 var flashError = function(id) {
@@ -80,6 +83,18 @@ var gotoPage = function(suffix, code, status) {
 	}
 	
 	window.location = url; 
+};
+
+/* Nodes representing shortcuts in the FancyTree have '.s' appended to their standard key value,
+ * so that they are distinguishable from the node representing the 'real' item. This method
+ * identifies the numeric part preceding the '.s' suffix.
+*/
+var removeShortcutMarker = function(key) {
+	var cursor = key.indexOf(".s");
+	if (cursor > -1) {
+		return key.substring(0, cursor);
+	}
+	return key;
 };
 
 // (Re-)render the forms
@@ -309,10 +324,12 @@ var renderItemForms = function(nodeKey, activeTab) {
 					dataType: "text",
 					processData: false,
 					success: function(obj, status, z) {
-						flashSuccess(2);
+						// Need to refresh the page, to update the FancyTree,
+						// in case a shortcut link was added/removed
+						gotoPage(nodeKey, 9, 1);
 					},
 					error: function(obj, status, z) {
-						flashError(0);
+						gotoPage(nodeKey, 10, 0);
 					},
 				});
 			});
@@ -389,6 +406,9 @@ if (_editingItemId) {
 }
 	
 // All the things that can only be executed once the page has been fully loaded ...
+// For development purposes, expose a handle to the main FancyTree
+var _tree;
+
 $(function() {
 	$("body").click(function() {
 		$("#status-block").empty();
@@ -400,7 +420,14 @@ $(function() {
 			url: _ctx + "/rest/leftnav/lazy/thread",
 			data: queryParams,
 			cache: false,
-			checkbox: true
+			checkbox: true,
+			complete: function() {
+				// On completion of loading the tree, activate the node for the current item
+				_tree = $("#leftnav").fancytree("getTree");
+				var key = "" + _editingItemId;
+				var node = _tree.getNodeByKey(key);
+				_tree.activateKey(node.key);
+			}
 		},
 		lazyLoad: function(event, data) {
 			var node = data.node;
@@ -428,11 +455,13 @@ $(function() {
 					modal: true,
 					buttons: {
 						"Move item": function() {
-							$.ajax(_ctx + "/rest/item/" + data.otherNode.key + "/move", {
+							$.ajax(_ctx + "/rest/item/" + removeShortcutMarker(data.otherNode.key) + "/move", {
 								type: "POST",
 								cache: false,
 								data: {
 									targetId: node.key,
+									parentId: data.otherNode.parent.key,
+									shortcut: data.otherNode.data.shortcut,
 									mode: data.hitMode
 								}, 
 								dataType: "json",
@@ -454,12 +483,43 @@ $(function() {
 			}
 		},
 		activate: function(event, data) {
-			var tabName = $("li.ui-tabs-active").attr("aria-controls");
-			var tabNum = 0;
-			if (tabName == 'field-tab') {tabNum = 1;}
-			else if (tabName == 'links-tab') {tabNum = 2;}
-			else if (tabName == 'add-tab') {tabNum = 3;}
-			renderItemForms(data.node.key, tabNum);
+			if (! data.node.data.shortcut) {
+				// Update the item forms
+				var tabName = $("li.ui-tabs-active").attr("aria-controls");
+				var tabNum = 0;
+				if (tabName == 'field-tab') {tabNum = 1;}
+				else if (tabName == 'links-tab') {tabNum = 2;}
+				else if (tabName == 'add-tab') {tabNum = 3;}
+				renderItemForms(data.node.key, tabNum);
+			}
+			else {
+				// Do not allow the user to work with the shortcut item - automatically
+				// navigate to the real item
+				var key = removeShortcutMarker(data.node.key);
+				var node = _tree.getNodeByKey(key);
+				
+				if (node) {
+					_tree.activateKey(node.key);
+				}
+				else {
+					// The 'real' item hasn't been loaded yet - ask the server for the breadcrumb trail
+					$.ajax(_ctx + "/rest/breadcrumbs/" + key, {
+						cache: false,
+						dataType: "json",
+						mimeType: "application/json",
+						success: function(json, status, z) {
+							_tree.loadKeyPath(json, function(node, stats) {
+								if (stats === "ok") {
+								    node.setActive();
+								}
+							});
+						},
+						error: function(json, status, z) {
+							flashError(11);
+						}
+					});
+				}
+			}
 		}
 	});	
 	

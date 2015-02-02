@@ -3,6 +3,14 @@ body {
 	font-family: Verdana, Arial, sans-serif;
 }
 
+/* Special treatment for shortcut items in fancytree */
+span.fancytree-node.shortcut > span.fancytree-icon {
+	background-position: -64px -160px;
+}
+span.fancytree-node.shortcut > span.fancytree-expander {
+	display: none;
+}
+
 /* Form elements */
 
 label {

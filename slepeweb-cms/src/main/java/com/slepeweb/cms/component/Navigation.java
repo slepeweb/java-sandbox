@@ -27,10 +27,11 @@ public class Navigation {
 		this.nodes = nodes;
 	}
 	
+	/* This class represents a FancyTree node - see FancyTree documentation */
 	public static class Node {
 		private Node parentNode;
-		private String title, key;
-		private boolean folder, lazy = true, expanded, selected;
+		private String title, key, extraClasses;
+		private boolean folder, lazy = true, expanded, selected, shortcut;
 		private List<Node> children = new ArrayList<Node>();
 		
 		public Node addChild(Node n) {
@@ -95,25 +96,59 @@ public class Navigation {
 			return parentNode;
 		}
 
-		public void setParentNode(Node parent) {
+		public Node setParentNode(Node parent) {
 			this.parentNode = parent;
+			return this;
 		}
 
 		public boolean isExpanded() {
 			return expanded;
 		}
 
-		public void setExpanded(boolean expanded) {
+		public Node setExpanded(boolean expanded) {
 			this.expanded = expanded;
+			return this;
 		}
 
 		public boolean isSelected() {
 			return selected;
 		}
 
-		public void setSelected(boolean selected) {
+		public Node setSelected(boolean selected) {
 			this.selected = selected;
-		}		
+			return this;
+		}
+
+		public boolean isShortcut() {
+			return shortcut;
+		}
+
+		/*
+		 * If this node represents a shortcut, then modify the key, so that
+		 * it doesn't conflict with the key of the 'real' node.
+		 */
+		public Node setShortcut(boolean shortcut) {
+			this.shortcut = shortcut;
+			if (shortcut) {
+				this.key += ".s";
+				if (this.extraClasses == null) {
+					setExtraClasses("shortcut");
+				}
+				else {
+					setExtraClasses(getExtraClasses() + " shortcut");
+				}
+			}
+			return this;
+		}
+
+		public String getExtraClasses() {
+			return this.extraClasses;
+		}
+
+		public Node setExtraClasses(String extraClasses) {
+			this.extraClasses = extraClasses;
+			return this;
+		}
 	}
 
 }

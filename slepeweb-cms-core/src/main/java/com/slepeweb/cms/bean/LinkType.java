@@ -8,6 +8,7 @@ public class LinkType extends CmsBean {
 	public static final String relation = "relation";
 	public static final String inline = "inline";
 	public static final String component = "component";
+	public static final String shortcut = "shortcut";
 
 	private Long id;
 	private String name;

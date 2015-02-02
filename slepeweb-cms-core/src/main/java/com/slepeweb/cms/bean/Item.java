@@ -207,12 +207,16 @@ public class Item extends CmsBean {
 		return list;
 	}
 	
-	public boolean move(Item target) {
-		return move(target, "over");
+	/*
+	 * Shortcut items must be treated differently when subject to move. In 
+	 * particular, need to know which of possibly many parents is affected.
+	 */
+	public boolean move(Item currentParent, Item target, boolean shortcut) {
+		return move(currentParent, target, shortcut, "over");
 	}
 	
-	public boolean move(Item target, String mode) {
-		return getCmsService().getItemService().move(this, target, mode);
+	public boolean move(Item currentParent, Item target, boolean shortcut, String mode) {
+		return getCmsService().getItemService().move(this, currentParent, target, shortcut, mode);
 	}
 	
 	public String getParentPath() {
@@ -462,42 +466,45 @@ public class Item extends CmsBean {
 	}
 
 	public List<Link> getBindings() {
-		return filterLinks(LinkType.binding);
+		return filterLinks(new String[] {LinkType.binding, LinkType.shortcut});
 	}
 
 	public List<Link> getInlines() {
-		return filterLinks(LinkType.inline);
+		return filterLinks(new String[] {LinkType.inline});
 	}
 
 	public List<Link> getRelations() {
-		return filterLinks(LinkType.relation);
+		return filterLinks(new String[] {LinkType.relation});
 	}
 	
 	public List<Link> getComponents() {
-		return filterLinks(LinkType.component);
+		return filterLinks(new String[] {LinkType.component});
 	}
 	
-	private List<Link> filterLinks(String type) {
+	private List<Link> filterLinks(String[] types) {
 		List<Link> list = new ArrayList<Link>();
 		for (Link l : getLinks()) {
-			if (l.getType().equals(type)) {
-				list.add(l);
+			for (String type : types) {
+				if (l.getType().equals(type)) {
+					list.add(l);
+				}
 			}
 		}
 		return list;
 	}
 
 	public List<Link> getAllLinksBarBindings() {
-		List<Link> list = getInlines();
-		list.addAll(getRelations());
-		list.addAll(getComponents());
-		return list;
+		return filterLinks(new String[] {
+				LinkType.inline, 
+				LinkType.relation, 
+				LinkType.component, 
+				LinkType.shortcut});
 	}
 
 	public void setLinks(List<Link> links) {
 		this.links = links;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

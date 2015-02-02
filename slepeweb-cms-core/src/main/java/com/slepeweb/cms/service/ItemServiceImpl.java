@@ -13,6 +13,7 @@ import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -276,101 +277,94 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
 	}
 	
-	public boolean move(Item mover, Item parent) {
-		return move(mover, parent, "over");
+	public boolean move(Item mover, Item currentParent, Item newParent, boolean shortcut) {
+		return move(mover, currentParent, newParent, shortcut, "over");
 	}
 	
 	/*
 	 * This provides a relative move, ie before/after target.
 	 * If mode == "over", then target is effectively a new parent.
 	 */
-	public boolean move(Item mover, Item target, String mode) {
+	public boolean move(Item mover, Item currentParent, Item target, boolean isShortcut, String mode) {
 		
-		LOG.debug(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mode.toUpperCase(), target));		
-		Item oldParent = mover.getParent();		
+		LOG.debug(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mode.toUpperCase(), target));			
+		LOG.debug(compose("  Old parent", currentParent));		
+		Item newParent = mode.equals(MOVE_OVER) ? target : target.getParent();
+		LOG.debug(compose("  New parent", newParent));		
 		
-		if (oldParent != null) {
-			LOG.debug(compose("Old parent", oldParent));		
-			Item newParent = mode.equals(MOVE_OVER) ? target : target.getParent();
-			LOG.debug(compose("New parent", newParent));		
+		// Break the parent link for the mover, EVEN IF old-parent = new-parent
+		this.linkService.deleteLinks(currentParent.getId(), mover.getId());
+		LOG.debug("  Removed links between mover and old parent");		
+		
+		// Bind to new parent - we'll save() the mover link later
+		Link moverLink = CmsBeanFactory.makeLink().
+				setParentId(newParent.getId()).
+				setChild(mover).
+				setType(isShortcut ? LinkType.shortcut : LinkType.binding).
+				setName("std");
+		
+		// Add mover to new parent's bindings
+		List<Link> bindings = this.linkService.getBindings(newParent.getId());
+		
+		if (mode.equals(MOVE_OVER)) {
+			bindings.add(moverLink);
+			LOG.debug("  Added mover to end of new parent's existing bindings");	
+		}
+		else {
+			// If mode is 'before' or 'after', identify insertions point and re-order all siblings
+			int cursor = -1;
+			for (Link l : bindings) {
+				if (l.getChild().getId().longValue() == target.getId().longValue()) {
+					cursor = bindings.indexOf(l);
+					break;
+				}
+			}
 			
-			// Break the parent link for the mover, EVEN IF old-parent = new-parent
-			this.linkService.deleteLinks(oldParent.getId(), mover.getId());
-			LOG.debug("Removed links between mover and old parent");		
-			
-			// Bind to new parent - we'll save() the mover link later
-			Link moverLink = CmsBeanFactory.makeLink().
-					setParentId(newParent.getId()).
-					setChild(mover).
-					setType("binding").
-					setName("std");
-			
-			// Add mover to new parent's bindings
-			List<Link> bindings = this.linkService.getBindings(newParent.getId());
-			
-			if (mode.equals(MOVE_OVER)) {
-				bindings.add(moverLink);
-				LOG.debug("Added mover to end of new parent's existing bindings");	
+			// Now insert the mover into the bindings list
+			if (cursor > -1) {
+				if (mode.equals(MOVE_BEFORE)) {
+					bindings.add(cursor, moverLink);
+				}
+				else if (mode.equals(MOVE_AFTER)) {
+					if (cursor < bindings.size()) {
+						bindings.add(cursor + 1, moverLink);
+					}
+					else {
+						bindings.add(moverLink);
+					}
+				}
+				LOG.debug("  Inserted mover into new parent's existing bindings");	
 			}
 			else {
-				// If mode is 'before' or 'after', identify insertions point and re-order all siblings
-				int cursor = -1;
-				for (Link l : bindings) {
-					if (l.getChild().getId().longValue() == target.getId().longValue()) {
-						cursor = bindings.indexOf(l);
-						break;
-					}
-				}
-				
-				// Now insert the mover into the bindings list
-				if (cursor > -1) {
-					if (mode.equals(MOVE_BEFORE)) {
-						bindings.add(cursor, moverLink);
-					}
-					else if (mode.equals(MOVE_AFTER)) {
-						if (cursor < bindings.size()) {
-							bindings.add(cursor + 1, moverLink);
-						}
-						else {
-							bindings.add(moverLink);
-						}
-					}
-					LOG.debug("Inserted mover into new parent's existing bindings");	
-				}
-				else {
-					bindings.add(moverLink);
-					LOG.warn("Failed to determine point of insertion - placed at end");	
-				}
+				bindings.add(moverLink);
+				LOG.warn("  Failed to determine point of insertion - placed at end");	
 			}
-			
-			// Re-order bindings from 0, then save
-			int cursor = 0;
-			for (Link l : bindings) {
-				if (l.equals(moverLink) || l.getOrdering() != cursor) {
-					l.setOrdering(cursor);
-					l.save();
-				}
-				cursor++;
+		}
+		
+		// Re-order bindings from 0, then save
+		int cursor = 0;
+		for (Link l : bindings) {
+			if (l.equals(moverLink) || l.getOrdering() != cursor) {
+				l.setOrdering(cursor);
+				l.save();
 			}
-			
-			// Update paths of descendant items
+			cursor++;
+		}
+		
+		// Update paths of descendant items, but NOT for shortcuts
+		if (! isShortcut) {
 			String divider = newParent.isRoot() ? "" : "/";
 			String newChildPath = newParent.getPath() + divider + mover.getSimpleName();
 			updateDescendantPaths(mover.getPath(), newChildPath);
 			
 			// Update child item path
 			updateItemPath(mover.getId(), newChildPath);
-			
-			// Force newParent links to be re-calculated, since they have now changed
-			newParent.setLinks(null);
-			
-			return true;
-		}
-		else {
-			LOG.error(compose("Failed to identify parent of", mover.getPath()));
 		}
 		
-		return false;
+		// Force newParent links to be re-calculated, since they have now changed
+		newParent.setLinks(null);
+		
+		return true;
 	}
 	
 	private Item getItem(String sql, Object[] params) {

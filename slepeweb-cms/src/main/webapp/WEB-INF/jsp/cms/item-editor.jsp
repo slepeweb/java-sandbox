@@ -106,7 +106,7 @@
 				<label for="linktype">Link type: </label>
 				<select name="linktype">
 					<option value="unknown">Choose ...</option>
-					<c:forTokens items="inline,relation,component" delims="," var="type">
+					<c:forTokens items="inline,relation,component,shortcut" delims="," var="type">
 						<option value="${type}">${type}</option>
 					</c:forTokens>
 				</select>	

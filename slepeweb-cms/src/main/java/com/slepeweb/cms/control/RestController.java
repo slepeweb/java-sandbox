@@ -230,12 +230,15 @@ public class RestController extends BaseController {
 	public long moveItem(
 			@PathVariable long itemId,
 			@RequestParam(value="targetId", required=true) Long targetId,
+			@RequestParam(value="parentId", required=true) Long parentId,
+			@RequestParam(value="shortcut", required=true) boolean shortcut,
 			@RequestParam(value="mode", required=true) String mode,
 			ModelMap model) {	
 		
 		Item mover = this.itemService.getItem(itemId);
 		Item target = this.itemService.getItem(targetId);
-		mover.move(target, mode);
+		Item currentParent = this.itemService.getItem(parentId);
+		mover.move(currentParent, target, shortcut, mode);
 		
 		return mover.getId();
 	}

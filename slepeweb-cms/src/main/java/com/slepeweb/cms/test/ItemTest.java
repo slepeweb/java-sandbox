@@ -35,12 +35,12 @@ public class ItemTest extends BaseTest {
 		if (site != null) {
 			Item aboutSectionItem = site.getItem("/about");
 			Item newsSectionItem = site.getItem("/news");
-			Item rootItem = null;
+			Item rootItem = site.getItem("/");
 			
 			if (aboutSectionItem != null && newsSectionItem != null) {
 				
 				// Move the 'about' article item to the 'news' section
-				if (aboutSectionItem.move(newsSectionItem)) {				
+				if (aboutSectionItem.move(rootItem, newsSectionItem, false)) {				
 					// 4010: Assert news section now has 3 children
 					int count = newsSectionItem.getBoundItems().size();
 					r = trs.execute(4010);
@@ -68,12 +68,10 @@ public class ItemTest extends BaseTest {
 					}
 				
 					// Restore the links
-					rootItem = site.getItem("/");
-					
 					if (aboutSectionItem != null && rootItem != null) {
 						
 						// Move the 'about' article item back to its original location
-						if (aboutSectionItem.move(rootItem)) {						
+						if (aboutSectionItem.move(newsSectionItem, rootItem, false)) {						
 							// 4030: Assert news section has original 2 children
 							newsSectionItem = site.getItem("/news");
 							count = newsSectionItem.getBoundItems().size();
