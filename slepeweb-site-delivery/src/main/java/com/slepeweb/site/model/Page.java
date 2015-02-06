@@ -4,7 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.site.constant.FieldName;
 
 
 public class Page implements Serializable, NestableComponent {
@@ -163,6 +166,11 @@ public class Page implements Serializable, NestableComponent {
 	public Page setTitle(String title) {
 		this.title = title;
 		return this;
+	}
+	
+	public String getMetaTitle() {
+		String s = getItem().getFieldValue(FieldName.META_TITLE);
+		return StringUtils.isNotBlank(s) ? s : getTitle();
 	}
 
 	public List<String> getRoles() {

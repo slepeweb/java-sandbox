@@ -1,12 +1,8 @@
-<%@ tag %><%@ 
-	taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %><%@ 
-	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %><%@ 
-	taglib prefix="sw" tagdir="/WEB-INF/tags/sws"%>
+<%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 
-<title>slepe web solutions | ${_page.title}</title>
+<title>slepe web solutions | ${_page.metaTitle}</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta name="description" content="" />
-<meta name="keywords" content="" />
+<c:if test="${not empty _item.fields.metadescription}"><meta name="description" content="${_item.fields.metadescription}" /></c:if>
 <!--[if lte IE 8]><script src="/resources/sws/js/html5shiv.js"></script><![endif]-->
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic" rel="stylesheet" type="text/css">
@@ -26,3 +22,8 @@
 	<link rel="stylesheet" href="/resources/sws/css/style.css" />
 	<link rel="stylesheet" href="/resources/sws/css/style-xlarge.css" />
 </noscript>
+
+<%-- _requestPath is set in ResponseHeaderFilter --%>
+<c:if test="${_item.path eq '/about' and _requestPath ne _item.path}">
+	<link rel="canonical" href="/about" />
+</c:if>

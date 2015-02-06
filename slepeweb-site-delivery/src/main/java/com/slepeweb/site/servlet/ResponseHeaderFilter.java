@@ -9,6 +9,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class ResponseHeaderFilter implements Filter {
@@ -32,9 +33,12 @@ public class ResponseHeaderFilter implements Filter {
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) 
 			throws IOException, ServletException {
-		
-		HttpServletResponse resp = (HttpServletResponse) response;
-		
+				
+		// Tag on some extra functionality ... store request path
+		request.setAttribute("_requestPath", getItemPath((HttpServletRequest) request));
+
+		// Now the main business - apply cache headers where none already exist
+		HttpServletResponse resp = (HttpServletResponse) response;		
 		chain.doFilter(request, response);
 		
 		// Set missing cacheing headers if not present, unless the status code is 302
@@ -55,4 +59,12 @@ public class ResponseHeaderFilter implements Filter {
 		}
 	}
 
+	private String getItemPath(HttpServletRequest req) {
+		String servletPath = req.getServletPath();
+		servletPath = (servletPath == null) ? "" : servletPath;
+
+		String pathInfo = req.getPathInfo();
+		pathInfo = pathInfo != null ? servletPath + pathInfo : servletPath;
+		return pathInfo;
+	}
 }
