@@ -49,7 +49,7 @@
 	</bean>
 
   <!-- Ehcache -->
-	<bean id="cmsKeyGenerator" class="com.slepeweb.cms.utils.CacheKeyGenerator" />  
+	<bean id="cacheKeyGenerator" class="com.slepeweb.cms.utils.CacheKeyGenerator" />  
 	
 	<bean id="cacheManagerFactory"
 		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"
@@ -62,7 +62,7 @@
 
 	<bean id="cacheEvictor" class="com.slepeweb.cms.cache.CacheEvictor" init-method="init" />
 
-	<cache:annotation-driven key-generator="cmsKeyGenerator" />	
+	<cache:annotation-driven key-generator="cacheKeyGenerator" />	
 
 	<tx:advice id="txAdvice" transaction-manager="txManager">
 		<tx:attributes>
