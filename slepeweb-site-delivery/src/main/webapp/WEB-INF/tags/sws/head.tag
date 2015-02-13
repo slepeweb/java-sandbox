@@ -1,8 +1,9 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 
-<title>slepe web solutions | ${_page.metaTitle}</title>
+<title>slepe web solutions | ${_page.title}</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <c:if test="${not empty _item.fields.metadescription}"><meta name="description" content="${_item.fields.metadescription}" /></c:if>
+<c:if test="${not empty _item.fields.metatitle}"><meta name="title" content="${_item.fields.metatitle}" /></c:if>
 <!--[if lte IE 8]><script src="/resources/sws/js/html5shiv.js"></script><![endif]-->
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
 <link href="/resources/sws/css/colorbox.css" rel="stylesheet" type="text/css">
