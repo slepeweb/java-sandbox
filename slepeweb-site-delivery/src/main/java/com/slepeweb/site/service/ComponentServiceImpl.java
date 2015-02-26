@@ -15,12 +15,14 @@ import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.model.ImageComponent;
 import com.slepeweb.site.model.SimpleComponent;
 import com.slepeweb.site.model.StandardComponent;
+import com.slepeweb.site.model.TwitterComponent;
 
 @Service("componentService")
 public class ComponentServiceImpl implements ComponentService {
 	private static Logger LOG = Logger.getLogger(ComponentServiceImpl.class);
 	
 	@Autowired private RomeService romeService;
+	@Autowired private TwitterService twitterService;
 
 	public List<SimpleComponent> getComponents(List<Link> componentLinks) {
 		return getComponents(componentLinks, null);
@@ -77,6 +79,12 @@ public class ComponentServiceImpl implements ComponentService {
 			c.setTargets(this.romeService.getFeed(url));
 		}
 		
+		return c;
+	}
+
+	public TwitterComponent twitter(Link l) {		
+		TwitterComponent c = new TwitterComponent().setup(l);
+		c.setTweets(this.twitterService.getSyndicatedTweets(c.getAccounts(), c.getMax()));		
 		return c;
 	}
 

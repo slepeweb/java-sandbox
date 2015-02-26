@@ -1,5 +1,7 @@
 package com.slepeweb.site.control;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemFilter;
+import com.slepeweb.cms.bean.Site;
+import com.slepeweb.site.model.SiblingItemPager;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
 
@@ -28,12 +33,22 @@ public class PageController extends BaseController {
 	public String homepage(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute("_site") Site site, 
 			ModelMap model) {	
 		
-		// This view forwards to '/about'
-		// Doing the work in the JSP, which is site dependant, whereas this controller
+		// On SWS site, this view forwards to '/about'
+		// Doing the forward in the JSP, which is site dependant, whereas this controller
 		// might be used in multiple sites.
-		return getFullyQualifiedViewName(shortSitename, "homepage");
+		Page page = getStandardPage(i, shortSitename, "homepage", model);
+		
+		if (shortSitename.equals("ntc")) {
+			Item eventsItem = i.getItemService().getItem(site.getId(), "/news");
+			if (eventsItem != null) {
+				model.addAttribute("_newsEventsIndex", eventsItem.getBoundItems());
+			}
+		}
+		
+		return page.getView();
 	}
 
 	@RequestMapping(value="/spring/article/rightsidebar")	
@@ -127,4 +142,48 @@ public class PageController extends BaseController {
 		return "forward:/webflow/spizza";
 	}
 	
+	@RequestMapping(value="/spring/news-events/index")	
+	public String newsEventsIndex(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute("_site") Site site, 
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "newsEventsIndex", model);
+		model.addAttribute("_defaultThumb", site.getItem("/content/images/default-thumb"));
+		return page.getView();
+	}
+
+	@RequestMapping(value="/spring/event")	
+	public String eventDetail(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute("_site") Site site, 
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "eventDetail", model);
+		if (i.getImage() == null) {
+			i.addInline(site.getItem("/content/images/logo"));
+		}
+		
+		model.addAttribute("_siblingPager", getSiblings(i, new String[] {"News", "Event"}, 4));
+		return page.getView();
+	}	
+
+	@RequestMapping(value="/spring/news")	
+	public String newsDetail(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute("_site") Site site, 
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "newsDetail", model);
+		return page.getView();
+	}
+	
+	private SiblingItemPager getSiblings(Item i, String[] typesOfInterest, int max) {
+		ItemFilter f = new ItemFilter().setTypes(typesOfInterest);
+		List<Item> children = i.getParent().getBoundItems(f);		
+		return new SiblingItemPager(children, i, max);
+	}
 }

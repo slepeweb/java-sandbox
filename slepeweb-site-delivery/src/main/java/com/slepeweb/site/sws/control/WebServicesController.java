@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.slepeweb.site.sws.bean.LotteryNumbersBean;
 import com.slepeweb.ws.bean.PasswordBean;
 import com.slepeweb.ws.bean.WeatherBean;
+import com.slepeweb.ws.bean.WeatherBeanWrapper;
 import com.slepeweb.ws.client.PasswordJaxwsClient;
 import com.slepeweb.ws.client.WeatherJaxwsClient;
 
@@ -37,5 +38,11 @@ public class WebServicesController {
 	@ResponseBody
 	public WeatherBean doWeather(@PathVariable String country, @PathVariable String city) {
 		return this.weatherJaxwsClient.getWeather(country, city);
+	}	
+	
+	@RequestMapping(value="/weatherw/{country}/{city}", method=RequestMethod.GET, produces="application/json")	
+	@ResponseBody
+	public WeatherBeanWrapper doWeatherWrapper(@PathVariable String country, @PathVariable String city) {
+		return this.weatherJaxwsClient.getWeatherWrapper(country, city);
 	}	
 }

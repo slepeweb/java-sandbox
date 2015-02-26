@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.ws.bean.WeatherBean;
+import com.slepeweb.ws.bean.WeatherBeanWrapper;
 import com.slepeweb.ws.service.XmlMarshallingService;
 
 @Service("weatherService")
@@ -39,4 +40,8 @@ public class WeatherJaxwsClientImpl implements WeatherJaxwsClient {
 		return error;
 	}
 
+	@Cacheable(value="serviceCache", key="'weatherw-' + #country + '-' + #city")
+	public WeatherBeanWrapper getWeatherWrapper(String country, String city) {
+		return new WeatherBeanWrapper(getWeather(country, city));
+	}
 }
