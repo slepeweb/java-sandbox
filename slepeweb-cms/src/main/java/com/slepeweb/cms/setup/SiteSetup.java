@@ -32,7 +32,7 @@ public class SiteSetup {
 	private static Logger LOG = Logger.getLogger(SiteSetup.class);
 
 	@Autowired private CmsService cmsService;
-	private Site site;
+	private Map<String, Site> sites = new HashMap<String, Site>();
 
 	public void load(String filePath) {
 		LOG.info(LogUtil.compose("Setting up site", filePath));
@@ -88,9 +88,11 @@ public class SiteSetup {
 			return;
 		}
 
-		if ((this.site = createSite(wb.getSheetAt(0).rowIterator(), stats)) != null) {
-			createFields(wb.getSheetAt(1).rowIterator(), stats);
-			createItemTypes(wb.getSheetAt(2).rowIterator(), stats);
+		createSites(wb.getSheetAt(0).rowIterator(), stats);
+		createFields(wb.getSheetAt(1).rowIterator(), stats);
+		createItemTypes(wb.getSheetAt(2).rowIterator(), stats);
+		
+		if (this.sites.size() > 0) {
 			createLinkNames(wb.getSheetAt(3).rowIterator(), stats);
 			createTemplates(wb.getSheetAt(4).rowIterator(), stats);
 		}
@@ -104,7 +106,7 @@ public class SiteSetup {
 		}
 	}
 
-	private Site createSite(Iterator<Row> rowIter, SiteSetupStatistics stats) {
+	private void createSites(Iterator<Row> rowIter, SiteSetupStatistics stats) {
 		Row row;
 		Site s = null;
 		String firstCell, name;
@@ -133,7 +135,7 @@ public class SiteSetup {
 					
 					if (s.getId() != null) {
 						stats.inc(ResultType.SITE_UPDATED);
-						return s;
+						this.sites.put(s.getShortname(), s);
 					}
 				}
 				else {
@@ -141,8 +143,6 @@ public class SiteSetup {
 				}
 			}
 		}
-		
-		return null;
 	}
 	
 	private void createFields(Iterator<Row> rowIter, SiteSetupStatistics stats) {
@@ -253,6 +253,7 @@ public class SiteSetup {
 		LinkType lt;
 		LinkName ln;
 		String firstCell, linkType, linkNameStr;
+		Site s;
 		boolean updateable = false;
 		
 		while (rowIter.hasNext()) {
@@ -269,14 +270,16 @@ public class SiteSetup {
 				linkType = SiteSetupUtils.getString(row.getCell(1));
 				linkNameStr = SiteSetupUtils.getString(row.getCell(2));				
 				lt = this.cmsService.getLinkTypeService().getLinkType(linkType);
+				s = this.sites.get(SiteSetupUtils.getString(row.getCell(3)));				
 				
-				if (lt != null) {
+				if (s != null && lt != null) {
 					for (String linkName : linkNameStr.split(", ")) {
-						ln = this.cmsService.getLinkNameService().getLinkName(this.site.getId(), lt.getId(), linkName);
+						
+						ln = this.cmsService.getLinkNameService().getLinkName(s.getId(), lt.getId(), linkName);
 						
 						if (ln == null || updateable) {
 							ln = CmsBeanFactory.makeLinkName().
-									setSiteId(this.site.getId()).
+									setSiteId(s.getId()).
 									setLinkTypeId(lt.getId()).
 									setName(linkName).
 									save();
@@ -297,8 +300,9 @@ public class SiteSetup {
 	private void createTemplates(Iterator<Row> rowIter, SiteSetupStatistics stats) {
 		Row row;
 		Template t = null;
+		Site s;
 		boolean updateable = false;
-		String templateName;
+		String sitename, templateName;
 		ItemType it;
 
 		while (rowIter.hasNext()) {
@@ -316,19 +320,27 @@ public class SiteSetup {
 				
 				if (it != null) {
 					templateName = SiteSetupUtils.getString(row.getCell(2));
-					t = this.cmsService.getTemplateService().getTemplate(this.site.getId(), templateName);
-					if (t == null || updateable) {
-						t = CmsBeanFactory.makeTemplate().
-								setSiteId(this.site.getId()).
-								setItemTypeId(it.getId()).
-								setName(templateName).
-								setForward(SiteSetupUtils.getString(row.getCell(3))).
-								save();
-						
-						stats.inc(ResultType.TEMPLATE_UPDATED);
+					sitename = SiteSetupUtils.getString(row.getCell(4));
+					s = this.sites.get(sitename);
+					
+					if (s != null) {
+						t = this.cmsService.getTemplateService().getTemplate(s.getId(), templateName);
+						if (t == null || updateable) {
+							t = CmsBeanFactory.makeTemplate().
+									setSiteId(s.getId()).
+									setItemTypeId(it.getId()).
+									setName(templateName).
+									setForward(SiteSetupUtils.getString(row.getCell(3))).
+									save();
+							
+							stats.inc(ResultType.TEMPLATE_UPDATED);
+						}
+						else {
+							LOG.debug(LogUtil.compose("Template is not updateable", t));
+						}
 					}
 					else {
-						LOG.debug(LogUtil.compose("Template is not updateable", t));
+						LOG.debug(LogUtil.compose("Site shortname is not valid", sitename));
 					}
 				}
 			}
