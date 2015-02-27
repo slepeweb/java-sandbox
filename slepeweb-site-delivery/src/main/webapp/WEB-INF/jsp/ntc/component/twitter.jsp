@@ -9,12 +9,14 @@
 	<h2>${_comp.heading}</h2>
 	<c:if test="${not empty _comp.blurb}"><site:div>${_comp.blurb}</site:div></c:if>
 	
-	<ul class="link-list">
-		<c:forEach items="${_comp.tweets}" var="_tweet">
-			<li class="smaller">
-				<img src="${_tweet.account.iconPath}" title="${_tweet.account.name}" align="left" />
+	<c:forEach items="${_comp.tweets}" var="_tweet">
+		<div class="row tweet">
+			<div class="2u"><img src="${_tweet.account.iconPath}" title="${_tweet.account.name}" align="left" /></div>
+				
+			<div class="10u">
 				<span class="twitter-user">${_tweet.account.name}, ${_tweet.timeAgo}:</span> <br />
-				${_tweet.text}</li>
-		</c:forEach>
-	</ul>
+				${_tweet.text}
+			</div>
+		</div>
+	</c:forEach>
 </div>

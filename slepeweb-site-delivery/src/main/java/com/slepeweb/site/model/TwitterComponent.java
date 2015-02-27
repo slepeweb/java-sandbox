@@ -19,7 +19,7 @@ public class TwitterComponent extends SimpleComponent {
 
 	private List<Tweet> tweets;
 	private TwitterAccount[] accounts;
-	private int max;
+	private int maxPerAccount = 2, maxOverall;
 
 	public TwitterComponent setup(Link l) {
 		super.setup(l);
@@ -33,8 +33,15 @@ public class TwitterComponent extends SimpleComponent {
 			
 			try {
 				String line = reader.readLine();
-				if (StringUtils.isNumeric(line)) {
-					this.max = Integer.parseInt(line);
+				
+				if (line != null) {
+					parts = line.split("[, ]+");
+					
+					if (parts.length == 2 && 
+							StringUtils.isNumeric(parts[0]) && StringUtils.isNumeric(parts[1])) {
+						this.maxPerAccount = Integer.parseInt(parts[0]);
+						this.maxOverall = Integer.parseInt(parts[1]);
+					}
 				}
 				
 				while ((line = reader.readLine()) != null) {
@@ -76,11 +83,19 @@ public class TwitterComponent extends SimpleComponent {
 		this.accounts = accounts;
 	}
 
-	public int getMax() {
-		return max;
+	public int getMaxPerAccount() {
+		return maxPerAccount;
 	}
 
-	public void setMax(int max) {
-		this.max = max;
+	public void setMaxPerAccount(int max) {
+		this.maxPerAccount = max;
+	}
+
+	public int getMaxOverall() {
+		return maxOverall;
+	}
+
+	public void setMaxOverall(int maxOverall) {
+		this.maxOverall = maxOverall;
 	}	
 }

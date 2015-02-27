@@ -84,7 +84,8 @@ public class ComponentServiceImpl implements ComponentService {
 
 	public TwitterComponent twitter(Link l) {		
 		TwitterComponent c = new TwitterComponent().setup(l);
-		c.setTweets(this.twitterService.getSyndicatedTweets(c.getAccounts(), c.getMax()));		
+		c.setTweets(this.twitterService.getSyndicatedTweets(c.getAccounts(), 
+				c.getMaxPerAccount(), c.getMaxOverall()));		
 		return c;
 	}
 

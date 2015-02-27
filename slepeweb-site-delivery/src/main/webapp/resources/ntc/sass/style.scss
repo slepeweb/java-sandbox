@@ -999,12 +999,19 @@
 	}
 	
 	.twitter {
+		line-height: 1.2em;
+		font-size: 0.9em;
+		
 		.hashtag {
 			opacity: 0.5;
 		}
 		
 		img {
 			margin-right: 4px;
+		}
+		
+		.tweet {
+			margin-bottom: 1em;
 		}
 		
 		.twitter-user {

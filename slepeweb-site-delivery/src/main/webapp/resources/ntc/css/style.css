@@ -939,11 +939,18 @@ input[type="button"]:disabled,
   margin-bottom: 0.5em;
 }
 
+.twitter {
+  line-height: 1.2em;
+  font-size: 0.9em;
+}
 .twitter .hashtag {
   opacity: 0.5;
 }
 .twitter img {
   margin-right: 4px;
+}
+.twitter .tweet {
+  margin-bottom: 1em;
 }
 .twitter .twitter-user {
   font-weight: bold;

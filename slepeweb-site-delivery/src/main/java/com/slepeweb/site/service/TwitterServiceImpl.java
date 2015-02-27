@@ -36,7 +36,7 @@ public class TwitterServiceImpl implements TwitterService {
 	private static Pattern AT_PATTERN = Pattern.compile("@(\\S*)");
 
 	@Cacheable(value="serviceCache")
-	public List<Tweet> getSyndicatedTweets(TwitterAccount[] accounts, int max) {
+	public List<Tweet> getSyndicatedTweets(TwitterAccount[] accounts, int maxPerAccount, int maxOverall) {
 		LOG.info(String.format("Getting syndicated twitter feeds at $tH:$tM:$tS", System.currentTimeMillis()));
 
 		if (accounts != null) {
@@ -44,9 +44,12 @@ public class TwitterServiceImpl implements TwitterService {
 			Iterator<Status> iter;
 			Status status;
 			String msg;
-			List<Tweet> tweets = new ArrayList<Tweet>(23);
+			List<Tweet> allTweets = new ArrayList<Tweet>(maxPerAccount * accounts.length);
+			List<Tweet> tweets;
 	
 			for (TwitterAccount account : accounts) {
+				tweets = new ArrayList<Tweet>();
+				
 				try {
 					iter = twitter.getUserTimeline(account.getName()).iterator();
 					
@@ -61,21 +64,27 @@ public class TwitterServiceImpl implements TwitterService {
 				catch (Exception e) {
 					LOG.error(String.format("Failed to retrieve tweets for %s", account), e);
 				}
+				
+				if (maxPerAccount > 0 && maxPerAccount < tweets.size()) {
+					tweets = tweets.subList(0, maxPerAccount);
+				}
+				
+				allTweets.addAll(tweets);
 			}
 				
-			Collections.sort(tweets, new Comparator<Tweet>() {
+			Collections.sort(allTweets, new Comparator<Tweet>() {
 				@Override
 				public int compare(Tweet o1, Tweet o2) {
 					return o2.getCreatedAt().compareTo(o1.getCreatedAt());
 				}
 			});
 			
-			if (max > 0 && max < tweets.size()) {
-				tweets = tweets.subList(0, max);
+			if (maxOverall > 0 && maxOverall < allTweets.size()) {
+				allTweets = allTweets.subList(0, maxOverall);
 			}
 			
-			processLinks(tweets);			
-			return tweets;
+			processLinks(allTweets);			
+			return allTweets;
 		}
 		
 		return new ArrayList<Tweet>();
