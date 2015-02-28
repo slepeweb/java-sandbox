@@ -17,12 +17,14 @@ import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.site.model.SiblingItemPager;
 import com.slepeweb.site.model.Page;
+import com.slepeweb.site.ntc.service.CompetitionService;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
 
 @Controller
 public class PageController extends BaseController {
 	
 	@Autowired private CmsDeliveryServlet cmsDeliveryServlet;
+	@Autowired private CompetitionService competitionService;
 	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
@@ -46,6 +48,7 @@ public class PageController extends BaseController {
 			if (eventsItem != null) {
 				model.addAttribute("_newsEventsIndex", eventsItem.getBoundItems());
 			}
+			model.addAttribute("_competitionIndex", this.competitionService.getCompetitionIndex(site));
 		}
 		
 		return page.getView();

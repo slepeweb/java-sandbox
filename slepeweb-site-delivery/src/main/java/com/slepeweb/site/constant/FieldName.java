@@ -5,8 +5,10 @@ public class FieldName {
 	public static final String BODYTEXT = "bodytext";
 	public static final String CACHEABLE = "cacheable";
 	public static final String DATA = "data";
+	public static final String FIXTURES = "fixtures";
 	public static final String HIDE_FROM_NAV = "hidefromnav";
 	public static final String MAX_WIDTH = "maxwidth";
+	public static final String SQUAD = "squad";
 	public static final String TEASER = "teaser";
 	public static final String TITLE = "title";
 }

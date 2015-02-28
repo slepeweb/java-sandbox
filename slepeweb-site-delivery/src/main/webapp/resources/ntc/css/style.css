@@ -883,13 +883,30 @@ input[type="button"]:disabled,
   box-shadow: 3px 3px 5px #444;
   border: 1px solid #999;
   padding: 0.5em 1em 0.5em 1em;
-  height: 15em;
+  min-height: 15em;
   margin-bottom: 1em;
   background-color: #e6ffe6;
 }
 .raised-box li {
   line-height: 1.2em;
   margin-bottom: 0.75em;
+}
+.raised-box .twitter {
+  height: 20em;
+  line-height: 1.2em;
+  font-size: 0.9em;
+}
+.raised-box .twitter .hashtag {
+  opacity: 0.5;
+}
+.raised-box .twitter img {
+  margin-right: 4px;
+}
+.raised-box .twitter .tweet {
+  margin-bottom: 1em;
+}
+.raised-box .twitter .twitter-user {
+  font-weight: bold;
 }
 
 .two-column {
@@ -937,21 +954,4 @@ input[type="button"]:disabled,
 .sidebar > h2 {
   font-size: 1.4em;
   margin-bottom: 0.5em;
-}
-
-.twitter {
-  line-height: 1.2em;
-  font-size: 0.9em;
-}
-.twitter .hashtag {
-  opacity: 0.5;
-}
-.twitter img {
-  margin-right: 4px;
-}
-.twitter .tweet {
-  margin-bottom: 1em;
-}
-.twitter .twitter-user {
-  font-weight: bold;
 }

@@ -37,7 +37,7 @@ public class TwitterServiceImpl implements TwitterService {
 
 	@Cacheable(value="serviceCache")
 	public List<Tweet> getSyndicatedTweets(TwitterAccount[] accounts, int maxPerAccount, int maxOverall) {
-		LOG.info(String.format("Getting syndicated twitter feeds at $tH:$tM:$tS", System.currentTimeMillis()));
+		LOG.info(String.format("Getting syndicated twitter feeds at %1$tH:%1$tM:%1$tS", System.currentTimeMillis()));
 
 		if (accounts != null) {
 			Twitter twitter = new TwitterFactory().getInstance();

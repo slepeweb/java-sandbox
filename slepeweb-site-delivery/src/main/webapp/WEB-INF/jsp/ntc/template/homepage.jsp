@@ -32,8 +32,11 @@
 			<div class="raised-box">
 				<h2>Match results</h2>
 				<ul>
-					<li><a href="#">Senior Vets Mixed v. Histon</a></li>
-					<li><a href="#">Senior Vets Mixed v. Exning</a></li>
+					<c:forEach items="${_competitionIndex.recentResults}" var="_fixture">
+						<li><fmt:formatDate value="${_fixture.date}" pattern="MMM dd" />: 
+						<a href="${_fixture.competition.item.path}" 
+							class="tennis-result" title="${_fixture.competition.name}">${_fixture.result}</a></li>
+					</c:forEach>
 				</ul>
 			</div>
 		</div>
