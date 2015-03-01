@@ -19,15 +19,17 @@ public class Fixture {
 	private Integer scoreFor, scoreAgainst;
 	
 	public String getResult() {
+		String team = getCompetition().getTeam();
+		
 		if (getScoreFor() != null) {
 			return isHome() ? 
-					String.format("%s (%d) vs. %s (%d)", NTC, getScoreFor(), getOpponent(), getScoreAgainst()) :
-						String.format("%s (%d) vs. %s (%d)", getOpponent(), getScoreAgainst(), NTC, getScoreFor());
+					String.format("%s %s (%d) vs. %s (%d)", NTC, team, getScoreFor(), getOpponent(), getScoreAgainst()) :
+						String.format("%s (%d) vs. %s %s (%d)", getOpponent(), getScoreAgainst(), NTC, team, getScoreFor());
 		}
 		
 		return isHome() ? 
-				String.format("%s vs. %s", NTC, getOpponent()) :
-					String.format("%s vs. %s", getOpponent(), NTC);
+				String.format("%s %s vs. %s", NTC, team, getOpponent()) :
+					String.format("%s vs. %s %s", getOpponent(), NTC, team);
 	}
 	
 	@Override

@@ -31,8 +31,9 @@ public class CompetitionServiceImpl implements CompetitionService {
 		
 		for (Item i : compRoot.getBoundItems(f)) {
 			index.getCompetitions().add(new Competition().
-					setItem(i)	.
+					setItem(i).
 					setName(i.getFieldValue(FieldName.TITLE)).
+					setTeam(i.getFieldValue(FieldName.TEAM)).
 					setSquad(i.getFieldValue(FieldName.SQUAD)).
 					setFixtures(i.getFieldValue(FieldName.FIXTURES)));
 		}

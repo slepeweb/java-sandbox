@@ -11,7 +11,7 @@ import com.slepeweb.site.util.StringUtil;
 public class Competition {
 
 	private Item item;
-	private String name, tableUrl;
+	private String name, tableUrl, team;
 	private List<Fixture> fixtures;
 	private List<String> squad;
 	
@@ -26,6 +26,19 @@ public class Competition {
 		}
 		
 		return recentResults;
+	}
+	
+	public List<Fixture> getFutureMatches() {
+		List<Fixture> futureMatches = new ArrayList<Fixture>();
+		Date now = new Date();
+		
+		for (Fixture f : getFixtures()) {
+			if (f.getDate().after(now)) {
+				futureMatches.add(f);
+			}
+		}
+		
+		return futureMatches;
 	}
 	
 	public String getName() {
@@ -101,6 +114,15 @@ public class Competition {
 		setName(i.getFieldValue(FieldName.TITLE));
 		setSquad(i.getFieldValue(FieldName.SQUAD));
 		setFixtures(i.getFieldValue(FieldName.FIXTURES));
+		return this;
+	}
+
+	public String getTeam() {
+		return team;
+	}
+
+	public Competition setTeam(String team) {
+		this.team = team;
 		return this;
 	}		
 }

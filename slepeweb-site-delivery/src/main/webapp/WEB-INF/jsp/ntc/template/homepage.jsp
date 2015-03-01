@@ -19,10 +19,11 @@
 	<div class="row uniform">
 		<div class="4u 12u(3)">	
 			<div class="raised-box">
-				<h2><a href="/news">News &amp; Events</a></h2>
+				<h2><a href="${_eventsIndexItem.path}">${_eventsIndexItem.fields.title}</a></h2>
 				<ul>
-					<c:forEach items="${_newsEventsIndex}" var="_child" end="3">
-						<li><a href="${_child.path}">${_child.fields.title}</a></li>
+					<c:forEach items="${_eventsIndex}" var="_link">
+						<li><span><fmt:formatDate value="${_link.date}" pattern="MMM dd" />:</span>
+							<a href="${_link.href}">${_link.title}</a></li>
 					</c:forEach>
 				</ul>
 			</div>
@@ -30,12 +31,11 @@
 		
 		<div class="4u 12u(3)">	
 			<div class="raised-box">
-				<h2>Match results</h2>
+				<h2><a href="${_newsIndexItem.path}">${_newsIndexItem.fields.title}</a></h2>
 				<ul>
-					<c:forEach items="${_competitionIndex.recentResults}" var="_fixture">
-						<li><fmt:formatDate value="${_fixture.date}" pattern="MMM dd" />: 
-						<a href="${_fixture.competition.item.path}" 
-							class="tennis-result" title="${_fixture.competition.name}">${_fixture.result}</a></li>
+					<c:forEach items="${_newsIndex}" var="_link">
+						<li><span><fmt:formatDate value="${_link.date}" pattern="MMM dd" />:</span> 
+							<a href="${_link.href}" title="">${_link.title}</a></li>
 					</c:forEach>
 				</ul>
 			</div>

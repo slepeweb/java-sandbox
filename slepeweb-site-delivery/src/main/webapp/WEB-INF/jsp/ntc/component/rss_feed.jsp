@@ -28,8 +28,9 @@
 	<h2>${_comp.heading}</h2>
 	<div>${_comp.blurb}</div>
 	<ul class="link-list">
-		<c:forEach items="${_comp.targets}" var="link" end="3">
-			<li class="compact"><a href="${link.href}" class="iframe group2">${link.title}</a></li>
+		<c:forEach items="${_comp.targets}" var="_rssLink" end="3">
+			<li class="compact"><span>${_rssLink.timeAgo}:</span> <a 
+				href="${_rssLink.href}" class="iframe group2">${_rssLink.title}</a></li>
 		</c:forEach>
 	</ul>
 </div>

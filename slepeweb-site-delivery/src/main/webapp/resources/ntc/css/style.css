@@ -891,6 +891,9 @@ input[type="button"]:disabled,
   line-height: 1.2em;
   margin-bottom: 0.75em;
 }
+.raised-box li span {
+  font-size: 0.9em;
+}
 .raised-box .twitter {
   height: 20em;
   line-height: 1.2em;

@@ -5,10 +5,33 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.slepeweb.site.bean.DatedLinkTarget;
+
 public class CompetitionIndex {
 
 	private List<Competition> competitions = new ArrayList<Competition>();
 
+	public List<DatedLinkTarget> getRecentResultsAsLinks() {
+		return getFixturesAsLinks(getRecentResults());
+	}
+	
+	public List<DatedLinkTarget> getFutureMatchesAsLinks() {
+		return getFixturesAsLinks(getFutureMatches());
+	}
+	
+	private List<DatedLinkTarget> getFixturesAsLinks(List<Fixture> fixtures) {
+		List<DatedLinkTarget> list = new ArrayList<DatedLinkTarget>();
+		DatedLinkTarget lt;
+		
+		for (Fixture f : fixtures) {
+			lt = new DatedLinkTarget().setDate(f.getDate());
+			lt.setTitle(f.getResult()).setHref(f.getCompetition().getItem().getPath());
+			list.add(lt);
+		}
+		
+		return list;
+	}
+	
 	public List<Fixture> getRecentResults() {
 		List<Fixture> recentResults = new ArrayList<Fixture>();
 		for (Competition c : getCompetitions()) {
@@ -27,6 +50,26 @@ public class CompetitionIndex {
 		}
 		
 		return recentResults;
+	}
+	
+	public List<Fixture> getFutureMatches() {
+		List<Fixture> futureMatches = new ArrayList<Fixture>();
+		for (Competition c : getCompetitions()) {
+			futureMatches.addAll(c.getFutureMatches());
+		}
+		
+		Collections.sort(futureMatches, new Comparator<Fixture>() {
+			@Override
+			public int compare(Fixture f1, Fixture f2) {
+				return f1.getDate().compareTo(f2.getDate());
+			}
+		});
+		
+		if (futureMatches.size() > 2) {
+			futureMatches = futureMatches.subList(0, 2);
+		}
+		
+		return futureMatches;
 	}
 	
 	public Competition findCompetition(String path) {

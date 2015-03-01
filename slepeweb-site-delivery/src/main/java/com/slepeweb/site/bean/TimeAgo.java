@@ -38,7 +38,7 @@ public class TimeAgo {
 						}
 						else {
 							time.setQuantity(toHours(diff));
-							time.setUnit("hours");
+							time.setUnit("hrs");
 						}
 					}
 					else if (diff >= DAY && diff < 2 * DAY) {
@@ -55,7 +55,7 @@ public class TimeAgo {
 					}
 					else {
 						time.setQuantity(toMonths(diff));
-						time.setUnit("months");
+						time.setUnit("mnths");
 					}
 				}
 				else if (diff < 2 * YEAR) {
@@ -64,7 +64,7 @@ public class TimeAgo {
 				}
 				else {
 					time.setQuantity(toYears(diff));
-					time.setUnit("years");
+					time.setUnit("yrs");
 				}
 				
 				return time;

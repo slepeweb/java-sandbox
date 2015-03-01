@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.slepeweb.site.model.LinkTarget;
+import com.slepeweb.site.bean.DatedLinkTarget;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
@@ -19,10 +19,10 @@ public class RomeServiceImpl implements RomeService {
 	private static Logger LOG = Logger.getLogger(RomeServiceImpl.class);
 
 	@Cacheable(value="serviceCache")
-	public List<LinkTarget> getFeed(String url) {
+	public List<DatedLinkTarget> getFeed(String url) {
 		LOG.info(String.format("Getting RSS feed [%s] at %2$tH:%2$tM:%2$tS", url, System.currentTimeMillis()));
 
-		List<LinkTarget> links = new ArrayList<LinkTarget>();
+		List<DatedLinkTarget> links = new ArrayList<DatedLinkTarget>();
 		URL feedUrl = null;
 
 		try {
@@ -31,11 +31,13 @@ public class RomeServiceImpl implements RomeService {
 			SyndFeed feed = input.build(new XmlReader(feedUrl));
 			@SuppressWarnings("unchecked")
 			List<SyndEntryImpl> entries = feed.getEntries();
-			LinkTarget l;
+			DatedLinkTarget l;
 
 			for (SyndEntryImpl entry : entries) {
-				l = new LinkTarget().setTitle(entry.getTitle()).setTeaser(entry.getDescription().getValue())
-						.setHref(entry.getUri());
+				l = new DatedLinkTarget().setDate(entry.getPublishedDate());
+				l.setTitle(entry.getTitle()).
+					setTeaser(entry.getDescription().getValue()).
+					setHref(entry.getUri());
 				links.add(l);
 			}
 

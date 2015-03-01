@@ -1,15 +1,17 @@
 <%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 	
 <ntc:standardLayout>
-	<gen:debug><!-- jsp/ntc/newsEventsIndex.jsp --></gen:debug>
+	<gen:debug><!-- jsp/ntc/eventsIndex.jsp --></gen:debug>
 
 	<div class="row uniform">
 		<div class="7u 12u(3)">
 			<h2>${_item.fields.title}</h2>
 			<p>${_item.fields.bodytext}</p>
 								
+			<c:if test="${empty _item.boundItems}"><p>No club events to display right now.</p></c:if>
+
 			<c:forEach items="${_item.boundItems}" var="_child">
-				<c:if test="${_child.type eq 'News' or _child.type eq 'Event'}">
+				<c:if test="${_child.type eq 'Event'}">
 					<div class="row index">
 						<div class="3u">
 							<c:set var="_thumb" value="${_child.thumbnail}" />
