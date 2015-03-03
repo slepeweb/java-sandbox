@@ -1,17 +1,16 @@
 <%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
-
+	
 <ntc:standardLayout>
-	<gen:debug><!-- jsp/ntc/newsIndex.jsp --></gen:debug>
+	<gen:debug><!-- jsp/ntc/section.jsp --></gen:debug>
 
 	<div class="row uniform">
 		<div class="7u 12u(3)">
 			<h2>${_item.fields.title}</h2>
 			<p>${_item.fields.bodytext}</p>
-			
-			<c:if test="${empty _item.boundItems}"><p>No club news to display right now.</p></c:if>
 								
+			<c:if test="${empty _item.boundItems}"><p>Nothing in this section right now.</p></c:if>
+
 			<c:forEach items="${_item.boundItems}" var="_child">
-				<c:if test="${_child.type eq 'News' or _child.type eq 'PDF'}">
 					<div class="row index">
 						<div class="3u">
 							<c:set var="_thumb" value="${_child.thumbnail}" />
@@ -25,7 +24,6 @@
 							<p>${_child.fields.teaser}</p>
 						</div>
 					</div>
-				</c:if>
 			</c:forEach>
 		</div>
 		

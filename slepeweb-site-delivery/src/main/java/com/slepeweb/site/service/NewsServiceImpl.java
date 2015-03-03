@@ -11,8 +11,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.site.bean.DatedLinkTarget;
 import com.slepeweb.site.constant.FieldName;
+import com.slepeweb.site.constant.ItemTypeName;
 import com.slepeweb.site.ntc.bean.CompetitionIndex;
 import com.slepeweb.site.ntc.service.CompetitionService;
 
@@ -22,11 +24,12 @@ public class NewsServiceImpl implements NewsService {
 	
 	@Autowired private CompetitionService competitionService;
 
-	//@Cacheable(value="serviceCache")
+	@Cacheable(value="serviceCache")
 	public List<DatedLinkTarget> getCombinedNews(Item newsIndexItem) {
 		LOG.info(String.format("Getting events at %1$tH:%1$tM:%1$tS", System.currentTimeMillis()));
 
-		List<Item> newsList = newsIndexItem.getBoundItems();
+		ItemFilter f = new ItemFilter().setTypes(new String[] {ItemTypeName.NEWS, ItemTypeName.PDF});
+		List<Item> newsList = newsIndexItem.getBoundItems(f);
 		List<DatedLinkTarget> links = new ArrayList<DatedLinkTarget>(newsList.size());
 		DatedLinkTarget lt;
 		CompetitionIndex index = this.competitionService.getCompetitionIndex(newsIndexItem.getSite());
@@ -35,6 +38,11 @@ public class NewsServiceImpl implements NewsService {
 			for (Item news : newsList) {
 				lt = new DatedLinkTarget().setDate(news.getDateFieldValue(FieldName.DATE_PUBLISHED));
 				lt.setTitle(news.getFieldValue(FieldName.TITLE)).setHref(news.getPath());
+				
+				if (news.getType().getName().equals(ItemTypeName.PDF)) {
+					lt.setStyle("iframe");
+				}
+				
 				links.add(lt);
 			}
 			
@@ -43,7 +51,7 @@ public class NewsServiceImpl implements NewsService {
 
 				@Override
 				public int compare(DatedLinkTarget o1, DatedLinkTarget o2) {
-					return o1.getDate().compareTo(o2.getDate());
+					return o2.getDate().compareTo(o1.getDate());
 				}
 				
 			});

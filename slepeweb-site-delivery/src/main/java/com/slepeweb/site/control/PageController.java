@@ -167,6 +167,18 @@ public class PageController extends BaseController {
 		return "forward:/webflow/spizza";
 	}
 	
+	@RequestMapping(value="/spring/section")	
+	public String section(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute("_site") Site site, 
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "section", model);
+		model.addAttribute("_defaultThumb", site.getItem("/content/images/default-thumb"));
+		return page.getView();
+	}
+
 	@RequestMapping(value="/spring/event/index")	
 	public String eventsIndex(
 			@ModelAttribute("_item") Item i, 

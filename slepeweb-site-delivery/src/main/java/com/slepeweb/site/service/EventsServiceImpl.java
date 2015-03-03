@@ -22,7 +22,7 @@ public class EventsServiceImpl implements EventsService {
 	
 	@Autowired private CompetitionService competitionService;
 
-	//@Cacheable(value="serviceCache")
+	@Cacheable(value="serviceCache")
 	public List<DatedLinkTarget> getCombinedEvents(Item eventsIndexItem) {
 		LOG.info(String.format("Getting events at %1$tH:%1$tM:%1$tS", System.currentTimeMillis()));
 

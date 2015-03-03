@@ -35,7 +35,7 @@
 				<ul>
 					<c:forEach items="${_newsIndex}" var="_link">
 						<li><span><fmt:formatDate value="${_link.date}" pattern="MMM dd" />:</span> 
-							<a href="${_link.href}" title="">${_link.title}</a></li>
+							<a href="${_link.href}" class="${_link.style}">${_link.title}</a></li>
 					</c:forEach>
 				</ul>
 			</div>

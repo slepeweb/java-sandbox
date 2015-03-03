@@ -10,7 +10,7 @@ import com.slepeweb.cms.bean.Item;
 
 public class LinkTarget implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private String title, teaser, href;
+	private String title, teaser, href, style;
 	private Image thumbnail;
 	private boolean trusted, selected;
 	private List<LinkTarget> children = new ArrayList<LinkTarget>();
@@ -87,6 +87,15 @@ public class LinkTarget implements Serializable {
 
 	public LinkTarget setTeaser(String teaser) {
 		this.teaser = teaser;
+		return this;
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public LinkTarget setStyle(String style) {
+		this.style = style;
 		return this;
 	}
 }

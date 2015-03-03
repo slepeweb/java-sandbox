@@ -32,7 +32,7 @@ public class SiteSetup {
 	private static Logger LOG = Logger.getLogger(SiteSetup.class);
 
 	@Autowired private CmsService cmsService;
-	private Map<String, Site> sites = new HashMap<String, Site>();
+	private Map<String, Site> siteCache = new HashMap<String, Site>();
 
 	public void load(String filePath) {
 		LOG.info(LogUtil.compose("Setting up site", filePath));
@@ -43,7 +43,7 @@ public class SiteSetup {
 
 		if (filePath != null) {
 			LOG.info("Reading/validating spreadsheet");
-			readCsv(filePath, result);
+			processCsv(readCsv(filePath, result), result);
 		}
 
 		finish(result, stopwatch);
@@ -66,10 +66,9 @@ public class SiteSetup {
 	}
 
 
-	private void readCsv(String filePath, SiteSetupStatistics stats) {
+	private HSSFWorkbook readCsv(String filePath, SiteSetupStatistics stats) {
 		InputStream is = null;
 		POIFSFileSystem fs;
-		HSSFWorkbook wb;
 
 		// open spreadsheet
 		try {
@@ -77,32 +76,37 @@ public class SiteSetup {
 			fs = new POIFSFileSystem(is);
 		} catch (Exception e) {
 			LOG.error("Failed to open spreadsheet", e);
-			return;
+			return null;
 		}
 
 		// open workbook
 		try {
-			wb = new HSSFWorkbook(fs);
+			return new HSSFWorkbook(fs);
 		} catch (Exception e) {
 			LOG.error("Failed to open workbook", e);
-			return;
+			return null;
 		}
+		finally {
+			// close spreadsheet
+			try {
+				is.close();
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}		
+	}
 
-		createSites(wb.getSheetAt(0).rowIterator(), stats);
-		createFields(wb.getSheetAt(1).rowIterator(), stats);
-		createItemTypes(wb.getSheetAt(2).rowIterator(), stats);
-		
-		if (this.sites.size() > 0) {
-			createLinkNames(wb.getSheetAt(3).rowIterator(), stats);
-			createTemplates(wb.getSheetAt(4).rowIterator(), stats);
-		}
-		
-		// close spreadsheet
-		try {
-			is.close();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
+	private void processCsv(HSSFWorkbook wb, SiteSetupStatistics stats) {
+		if (wb != null) {
+			createSites(wb.getSheetAt(0).rowIterator(), stats);
+			createFields(wb.getSheetAt(1).rowIterator(), stats);
+			createItemTypes(wb.getSheetAt(2).rowIterator(), stats);
+			
+			if (this.siteCache.size() > 0) {
+				createLinkNames(wb.getSheetAt(3).rowIterator(), stats);
+				createTemplates(wb.getSheetAt(4).rowIterator(), stats);
+			}
 		}
 	}
 
@@ -110,7 +114,7 @@ public class SiteSetup {
 		Row row;
 		Site s = null;
 		String firstCell, name;
-		boolean updateable = false;
+		boolean updateable = false, exists;
 		
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
@@ -125,17 +129,22 @@ public class SiteSetup {
 				updateable = firstCell.equals("1");
 				name = SiteSetupUtils.getString(row.getCell(1));
 				s = this.cmsService.getSiteService().getSite(name);
+				exists = s != null;
 				
-				if (s == null || updateable) {
-					s = CmsBeanFactory.makeSite().
-							setName(name).
-							setShortname(SiteSetupUtils.getString(row.getCell(2))).
-							setHostname(SiteSetupUtils.getString(row.getCell(3))).
-							save();
+				if (! exists) {
+					s = CmsBeanFactory.makeSite();
+				}
+				
+				if (! exists || updateable) {
+					s.
+						setName(name).
+						setShortname(SiteSetupUtils.getString(row.getCell(2))).
+						setHostname(SiteSetupUtils.getString(row.getCell(3))).
+						save();
 					
 					if (s.getId() != null) {
 						stats.inc(ResultType.SITE_UPDATED);
-						this.sites.put(s.getShortname(), s);
+						this.siteCache.put(s.getShortname(), s);
 					}
 				}
 				else {
@@ -149,7 +158,7 @@ public class SiteSetup {
 		Row row;
 		Field f;
 		String variable;
-		boolean updateable = false;
+		boolean updateable = false, exists;
 
 		while (rowIter.hasNext()) {
 			row = (Row) rowIter.next();
@@ -164,16 +173,22 @@ public class SiteSetup {
 				updateable = firstCell.equals("1");
 				variable = SiteSetupUtils.getString(row.getCell(2));
 				f = this.cmsService.getFieldService().getField(variable);
-				if (f == null || updateable) {
-					f = CmsBeanFactory.makeField().
-							setName(SiteSetupUtils.getString(row.getCell(1))).
-							setVariable(SiteSetupUtils.getString(row.getCell(2))).
-							setType(FieldType.valueOf(SiteSetupUtils.getString(row.getCell(3)))).
-							setSize(SiteSetupUtils.getInteger(row.getCell(4))).
-							setHelp(SiteSetupUtils.getString(row.getCell(5))).
-							setValidValues(SiteSetupUtils.getString(row.getCell(6))).
-							setDefaultValue(SiteSetupUtils.getString(row.getCell(7))).
-							save();
+				exists = f != null;
+				
+				if (! exists) {
+					f = CmsBeanFactory.makeField();
+				}
+				
+				if (! exists || updateable) {
+					f.
+						setName(SiteSetupUtils.getString(row.getCell(1))).
+						setVariable(SiteSetupUtils.getString(row.getCell(2))).
+						setType(FieldType.valueOf(SiteSetupUtils.getString(row.getCell(3)))).
+						setSize(SiteSetupUtils.getInteger(row.getCell(4))).
+						setHelp(SiteSetupUtils.getString(row.getCell(5))).
+						setValidValues(SiteSetupUtils.getString(row.getCell(6))).
+						setDefaultValue(SiteSetupUtils.getString(row.getCell(7))).
+						save();
 					
 					stats.inc(ResultType.FIELD_UPDATED);
 				}
@@ -187,7 +202,7 @@ public class SiteSetup {
 	private void createItemTypes(Iterator<Row> rowIter, SiteSetupStatistics stats) {
 		Row row;
 		ItemType it = null;
-		boolean updateable = false;
+		boolean updateable = false, exists;
 		String name;
 		Field f;
 		Map<String, Field> fieldCache = new HashMap<String, Field>();
@@ -205,39 +220,48 @@ public class SiteSetup {
 				updateable = firstCell.equals("1");
 				name = SiteSetupUtils.getString(row.getCell(1));
 				it = this.cmsService.getItemTypeService().getItemType(name);
-				if (it == null || updateable) {
-					it = CmsBeanFactory.makeItemType().
-							setName(name).
-							setMimeType(SiteSetupUtils.getString(row.getCell(2))).
-							setPrivateCache(SiteSetupUtils.getLong(row.getCell(4))).
-							setPublicCache(SiteSetupUtils.getLong(row.getCell(5))).
-							save();
+				exists = it != null;
+				
+				if (! exists) {
+					it = CmsBeanFactory.makeItemType();
+				}
+				
+				if (! exists || updateable) {
+					it.
+						setName(name).
+						setMimeType(SiteSetupUtils.getString(row.getCell(2))).
+						setPrivateCache(SiteSetupUtils.getLong(row.getCell(4))).
+						setPublicCache(SiteSetupUtils.getLong(row.getCell(5))).
+						save();
 					
 					if (it.getId() != null) {
 						stats.inc(ResultType.ITEMTYPE_UPDATED);
+					}
+				}
 						
-						// NOTE: This method does not remove fields from an item type - do this manually.
-						long count = 0;
-						for (String variable : SiteSetupUtils.getString(row.getCell(3)).split(", ")) {
-							variable = variable.trim();
-							f = fieldCache.get(variable);
-							if (f == null) {
-								f = this.cmsService.getFieldService().getField(variable);
-								if (f != null) {
-									fieldCache.put(variable, f);
-								}
-								else {
-									LOG.error(LogUtil.compose("Field does not exist", variable));
-								}
-							}
-							
+				if (it.getId() != null) {
+					
+					// NOTE: This method does not remove fields from an item type - do this manually.
+					long count = 0;
+					for (String variable : SiteSetupUtils.getString(row.getCell(3)).split(", ")) {
+						variable = variable.trim();
+						f = fieldCache.get(variable);
+						if (f == null) {
+							f = this.cmsService.getFieldService().getField(variable);
 							if (f != null) {
-								CmsBeanFactory.makeFieldForType().
-										setField(f).
-										setTypeId(it.getId()).
-										setOrdering(count++).
-										save();
+								fieldCache.put(variable, f);
 							}
+							else {
+								LOG.error(LogUtil.compose("Field does not exist", variable));
+							}
+						}
+						
+						if (f != null) {
+							CmsBeanFactory.makeFieldForType().
+									setField(f).
+									setTypeId(it.getId()).
+									setOrdering(count++).
+									save();
 						}
 					}
 				}
@@ -254,7 +278,7 @@ public class SiteSetup {
 		LinkName ln;
 		String firstCell, linkType, linkNameStr;
 		Site s;
-		boolean updateable = false;
+		boolean updateable = false, exists;
 		
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
@@ -270,19 +294,24 @@ public class SiteSetup {
 				linkType = SiteSetupUtils.getString(row.getCell(1));
 				linkNameStr = SiteSetupUtils.getString(row.getCell(2));				
 				lt = this.cmsService.getLinkTypeService().getLinkType(linkType);
-				s = this.sites.get(SiteSetupUtils.getString(row.getCell(3)));				
+				s = this.siteCache.get(SiteSetupUtils.getString(row.getCell(3)));
 				
 				if (s != null && lt != null) {
 					for (String linkName : linkNameStr.split(", ")) {
 						
 						ln = this.cmsService.getLinkNameService().getLinkName(s.getId(), lt.getId(), linkName);
+						exists = ln != null;
 						
-						if (ln == null || updateable) {
-							ln = CmsBeanFactory.makeLinkName().
-									setSiteId(s.getId()).
-									setLinkTypeId(lt.getId()).
-									setName(linkName).
-									save();
+						if (! exists) {
+							ln = CmsBeanFactory.makeLinkName();
+						}
+						
+						if (! exists || updateable) {
+							ln.
+								setSiteId(s.getId()).
+								setLinkTypeId(lt.getId()).
+								setName(linkName).
+								save();
 							
 							if (ln.getId() != null) {
 								stats.inc(ResultType.LINKNAME_UPDATED);
@@ -301,7 +330,7 @@ public class SiteSetup {
 		Row row;
 		Template t = null;
 		Site s;
-		boolean updateable = false;
+		boolean updateable = false, exists;
 		String sitename, templateName;
 		ItemType it;
 
@@ -321,17 +350,23 @@ public class SiteSetup {
 				if (it != null) {
 					templateName = SiteSetupUtils.getString(row.getCell(2));
 					sitename = SiteSetupUtils.getString(row.getCell(4));
-					s = this.sites.get(sitename);
+					s = this.siteCache.get(sitename);
 					
 					if (s != null) {
 						t = this.cmsService.getTemplateService().getTemplate(s.getId(), templateName);
-						if (t == null || updateable) {
-							t = CmsBeanFactory.makeTemplate().
-									setSiteId(s.getId()).
-									setItemTypeId(it.getId()).
-									setName(templateName).
-									setForward(SiteSetupUtils.getString(row.getCell(3))).
-									save();
+						exists = t != null;
+						
+						if (! exists) {
+							t = CmsBeanFactory.makeTemplate();
+						}
+						
+						if (! exists || updateable) {
+							t.
+								setSiteId(s.getId()).
+								setItemTypeId(it.getId()).
+								setName(templateName).
+								setForward(SiteSetupUtils.getString(row.getCell(3))).
+								save();
 							
 							stats.inc(ResultType.TEMPLATE_UPDATED);
 						}
