@@ -1,0 +1,16 @@
+/* skel-baseline v2.0.1 | (c) n33 | getskel.com | MIT licensed */
+/* Basic */
+/* line 8, ../sass/style-large.scss */
+body, input, select, textarea {
+  font-size: 11pt;
+}
+
+/* Banner */
+/* line 14, ../sass/style-large.scss */
+#banner {
+  padding: 5em 0;
+}
+/* line 17, ../sass/style-large.scss */
+#banner h2 {
+  font-size: 3.5em;
+}

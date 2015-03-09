@@ -102,6 +102,24 @@ public class Item extends CmsBean {
 				getName(), getPath());
 	}
 	
+	public Item getImage() {
+		return getImage("std");
+	}
+	
+	// TODO: if no thumbnail, should we scale the main image?
+	public Item getThumbnail() {
+		return getImage("thumb");
+	}
+		
+	private Item getImage(String classification) {
+		ItemFilter f = new ItemFilter().setLinkNames(new String[] {classification});
+		List<Item> images = getInlineItems(f);
+		if (images.size() > 0) {
+			return images.get(0);
+		}
+		return null;
+	}
+	
 	public int getLevel() {
 		if (getPath().equals("/")) {
 			return 0;
@@ -181,32 +199,6 @@ public class Item extends CmsBean {
 				setOrdering(0); // Arbitrary value
 	}
 	
-	public final List<Item> getBoundItems() {
-		return getBoundItems(null);
-	}
-	
-	public final List<Item> getBoundItems(String linkName) {
-		return toItems(getBindings(), linkName);
-	}
-	
-	public final List<Item> getRelatedItems(String linkName) {
-		return toItems(getRelations(), linkName);
-	}
-	
-	public final List<Item> getInlineItems(String linkName) {
-		return toItems(getInlines(), linkName);
-	}
-	
-	private final List<Item> toItems(List<Link> links, String linkName) {
-		List<Item> list = new ArrayList<Item>();
-		for (Link l : links) {
-			if (linkName == null || l.getName().equals(linkName)) {
-				list.add(l.getChild());
-			}
-		}
-		return list;
-	}
-	
 	/*
 	 * Shortcut items must be treated differently when subject to move. In 
 	 * particular, need to know which of possibly many parents is affected.
@@ -219,6 +211,7 @@ public class Item extends CmsBean {
 		return getCmsService().getItemService().move(this, currentParent, target, shortcut, mode);
 	}
 	
+	// TODO: Review this code, in the context of shortcuts
 	public String getParentPath() {
 		if (! isRoot()) {
 			int c = getPath().lastIndexOf("/");
@@ -234,14 +227,6 @@ public class Item extends CmsBean {
 
 	public boolean hasMedia() {
 		return getCmsService().getMediaService().hasMedia(this);
-	}
-	
-	public List<Item> getRelatedItems() {
-		return getRelatedItems(null);
-	}
-	
-	public List<Item> getInlineItems() {
-		return getInlineItems(null);
 	}
 	
 	public boolean isSiteRoot() {
@@ -503,6 +488,71 @@ public class Item extends CmsBean {
 
 	public void setLinks(List<Link> links) {
 		this.links = links;
+	}
+	
+	public final List<Item> getBoundItems() {
+		return getBoundItems(null);
+	}
+	
+	public List<Item> getRelatedItems() {
+		return getRelatedItems(null);
+	}
+	
+	public List<Item> getInlineItems() {
+		return getInlineItems(null);
+	}
+	
+	public final List<Item> getBoundItems(ItemFilter filter) {
+		return toItems(getBindings(), filter);
+	}
+	
+	public final List<Item> getRelatedItems(ItemFilter filter) {
+		return toItems(getRelations(), filter);
+	}
+	
+	public final List<Item> getInlineItems(ItemFilter filter) {
+		return toItems(getInlines(), filter);
+	}
+	
+	// TODO: Method has not been tested fully.
+	private final List<Item> toItems(List<Link> links, ItemFilter filter) {
+		List<Item> list = new ArrayList<Item>();
+		boolean linkNameMatch, itemTypeMatch;
+
+		for (Link l : links) {
+			if (filter != null) {
+				linkNameMatch = itemTypeMatch = true;
+
+				if (filter.getLinkNames() != null) {
+					linkNameMatch = matches(filter.getLinkNames(), l.getName());
+				}
+
+				if (filter.getTypes() != null) {
+					itemTypeMatch = matches(filter.getTypes(), l.getChild().getType().getName());
+				}
+
+				if (linkNameMatch && itemTypeMatch) {
+					list.add(l.getChild());
+				}
+			} 
+			else {
+				list.add(l.getChild());
+			}
+		}
+
+		return list;
+	}
+	
+	private <T> boolean matches(T[] arr, T target) {
+		// Must match ANY element in the array
+		for (T ele : arr) {
+			if (ele.equals(target)) {
+				return true;
+			}
+		}
+		
+		// There were NO matching elements in the array
+		return false;
 	}
 	
 	@Override
