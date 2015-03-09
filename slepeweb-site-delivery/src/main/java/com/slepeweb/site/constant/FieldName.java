@@ -14,4 +14,5 @@ public class FieldName {
 	public static final String TEASER = "teaser";
 	public static final String TEAM = "team";
 	public static final String TITLE = "title";
+	public static final String URL = "url";
 }

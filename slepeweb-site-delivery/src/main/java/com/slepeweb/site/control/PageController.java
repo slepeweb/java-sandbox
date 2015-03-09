@@ -19,8 +19,8 @@ import com.slepeweb.site.model.Page;
 import com.slepeweb.site.model.SiblingItemPager;
 import com.slepeweb.site.ntc.bean.CompetitionIndex;
 import com.slepeweb.site.ntc.service.CompetitionService;
+import com.slepeweb.site.ntc.service.NtcNewsService;
 import com.slepeweb.site.service.EventsService;
-import com.slepeweb.site.service.NewsService;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
 
 @Controller
@@ -29,7 +29,7 @@ public class PageController extends BaseController {
 	@Autowired private CmsDeliveryServlet cmsDeliveryServlet;
 	@Autowired private CompetitionService competitionService;
 	@Autowired private EventsService eventsService;
-	@Autowired private NewsService newsService;
+	@Autowired private NtcNewsService newsService;
 	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		

@@ -13,6 +13,7 @@
 <script src="/resources/ntc/js/skel-layers.min.js"></script>
 <script src="/resources/ntc/js/init.js"></script>
 <script src="/resources/js/jquery.colorbox-min.js"></script>
+<script src="/resources/ntc/js/colorbox-impl.js"></script>
 
 <gen:extraCSS />
 <gen:extraJS />

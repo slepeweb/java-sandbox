@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.util.StringUtil;
@@ -12,8 +14,14 @@ public class Competition {
 
 	private Item item;
 	private String name, tableUrl, team;
+	private Organiser organiser;
+	private Integer tableId;
 	private List<Fixture> fixtures;
 	private List<String> squad;
+	
+	public enum Organiser {
+		CAMBS, HUNTS
+	}
 	
 	public List<Fixture> getRecentResults() {
 		List<Fixture> recentResults = new ArrayList<Fixture>();
@@ -114,6 +122,24 @@ public class Competition {
 		setName(i.getFieldValue(FieldName.TITLE));
 		setSquad(i.getFieldValue(FieldName.SQUAD));
 		setFixtures(i.getFieldValue(FieldName.FIXTURES));
+		setTeam(i.getFieldValue(FieldName.TEAM));
+		setTableUrl(i.getFieldValue(FieldName.URL));
+		
+		String[] data = i.getFieldValue(FieldName.DATA).split("[ ,]+");
+		
+		if (data.length > 0) {
+			if (data[0].matches("cambs|hunts")) {
+				setOrganiser(Organiser.valueOf(data[0].toUpperCase()));
+			}
+		}
+		
+		if (data.length > 1) {
+			String str = data[1];
+			if (StringUtils.isNumeric(str)) {
+				setTableId(Integer.valueOf(str));
+			}
+		}
+
 		return this;
 	}
 
@@ -124,5 +150,30 @@ public class Competition {
 	public Competition setTeam(String team) {
 		this.team = team;
 		return this;
-	}		
+	}
+
+	public Integer getTableId() {
+		return this.tableId == null ? 0 : this.tableId;
+	}
+
+	public void setTableId(Integer tableIndex) {
+		this.tableId = tableIndex;
+	}	
+	
+	public Integer getOrganiserId() {
+		return this.organiser.ordinal() + 1;
+	}
+
+	public Organiser getOrganiser() {
+		return organiser;
+	}
+
+	public void setOrganiser(Organiser organiser) {
+		this.organiser = organiser;
+	}
+	
+	public String getOrganiserStr() {
+		return this.organiser.name();
+	}
+
 }

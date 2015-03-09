@@ -543,7 +543,7 @@ table tbody tr:nth-child(2n + 1) {
   background-color: rgba(144, 144, 144, 0.075);
 }
 table td {
-  padding: 0.75em 0.75em;
+  padding: 0.5em 0.2em 0.5em 0.2em;
 }
 table th {
   color: #666;
@@ -577,6 +577,9 @@ table.alt thead {
 }
 table.alt tfoot {
   border-top: 0;
+}
+table.fixtures thead td {
+  font-weight: bold;
 }
 
 /* Button */
@@ -749,6 +752,7 @@ input[type="button"]:disabled,
   right: 1.25em;
   top: 0;
   vertical-align: middle;
+  font-size: 1.1em;
 }
 #header nav > ul {
   list-style: none;
@@ -911,6 +915,15 @@ input[type="button"]:disabled,
 .raised-box .twitter .twitter-user {
   font-weight: bold;
 }
+.raised-box.plain {
+  background-color: #fff;
+}
+.raised-box.deeper {
+  box-shadow: 5px 5px 15px #444;
+}
+.raised-box.variable-height {
+  min-height: 1em;
+}
 
 .two-column {
   -moz-column-count: 2;
@@ -957,4 +970,19 @@ input[type="button"]:disabled,
 .sidebar > h2 {
   font-size: 1.4em;
   margin-bottom: 0.5em;
+}
+
+#league-table caption {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+#league-table td.separator {
+  padding: 0em 0em;
+}
+#league-table thead td {
+  text-align: center;
+  font-weight: bold;
+}
+#league-table tbody tr.selected {
+  font-weight: bold;
 }

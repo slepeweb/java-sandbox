@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.slepeweb.site.ntc.service.NtcHtmlScraperService;
 import com.slepeweb.site.sws.bean.LotteryNumbersBean;
 import com.slepeweb.ws.bean.PasswordBean;
 import com.slepeweb.ws.bean.WeatherBean;
@@ -21,6 +22,8 @@ public class WebServicesController {
 
 	@Autowired private PasswordJaxwsClient passwordJaxwsClient;	
 	@Autowired private WeatherJaxwsClient weatherJaxwsClient;
+	@Autowired private NtcHtmlScraperService scraperService;
+	
 	
 	@RequestMapping(value="/password", method=RequestMethod.GET, produces={"application/json", "text/xml"})	
 	@ResponseBody
@@ -44,5 +47,12 @@ public class WebServicesController {
 	@ResponseBody
 	public WeatherBeanWrapper doWeatherWrapper(@PathVariable String country, @PathVariable String city) {
 		return this.weatherJaxwsClient.getWeatherWrapper(country, city);
+	}	
+	
+	@RequestMapping(value="/scrape/{organiserId}/{tableId}", method=RequestMethod.POST, produces="text/html")	
+	@ResponseBody
+	public String scrape(@RequestParam String url, @PathVariable Integer organiserId, 
+			@PathVariable Integer tableId) {
+		return this.scraperService.scrape(url, organiserId, tableId);
 	}	
 }

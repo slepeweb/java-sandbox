@@ -23,13 +23,39 @@ public class Fixture {
 		
 		if (getScoreFor() != null) {
 			return isHome() ? 
-					String.format("%s %s (%d) vs. %s (%d)", NTC, team, getScoreFor(), getOpponent(), getScoreAgainst()) :
-						String.format("%s (%d) vs. %s %s (%d)", getOpponent(), getScoreAgainst(), NTC, team, getScoreFor());
+					String.format("%s %s v. %s (%d-%d)", NTC, team, getOpponent(), getScoreFor(), getScoreAgainst()) :
+						String.format("%s v. %s %s (%d-%d)", getOpponent(), NTC, team, getScoreFor(), getScoreAgainst());
 		}
 		
+		return getTie();
+	}
+	
+	public String getTie() {
+		String team = getCompetition().getTeam();
 		return isHome() ? 
-				String.format("%s %s vs. %s", NTC, team, getOpponent()) :
-					String.format("%s vs. %s %s", getOpponent(), NTC, team);
+				String.format("%s %s v. %s", NTC, team, getOpponent()) :
+					String.format("%s v. %s %s", getOpponent(), NTC, team);
+	}
+	
+	public String getResultHeadline() {
+		String result = null;
+		
+		if (getScoreFor() != null) {
+			if (getScoreFor() > getScoreAgainst()) {
+				result = isHome() ? "WIN" : "LOSS";
+			}
+			else if (getScoreFor() < getScoreAgainst()) {
+				result = isHome() ? "LOSS" : "WIN";
+			}
+			else {
+				result = "DRAW";
+			}
+			
+			return String.format("%s v. %s (%d-%d)", result, getOpponent(), 
+					getScoreFor(), getScoreAgainst());
+		}
+		
+		return null;
 	}
 	
 	@Override

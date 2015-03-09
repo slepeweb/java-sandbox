@@ -1,12 +1,12 @@
 package com.slepeweb.site.ntc.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.ntc.bean.Competition;
 import com.slepeweb.site.ntc.bean.CompetitionIndex;
 
@@ -14,7 +14,7 @@ import com.slepeweb.site.ntc.bean.CompetitionIndex;
 public class CompetitionServiceImpl implements CompetitionService {
 	private static Logger LOG = Logger.getLogger(CompetitionServiceImpl.class);
 	
-	//@Cacheable(value="serviceCache")
+	@Cacheable(value="serviceCache")
 	public CompetitionIndex getCompetitionIndex(Site s) {
 		LOG.info(String.format("Getting Competition at %1$tH:%1$tM:%1$tS", System.currentTimeMillis()));
 		
@@ -30,12 +30,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 		ItemFilter f = new ItemFilter().setTypes(new String[] {"Competition"});
 		
 		for (Item i : compRoot.getBoundItems(f)) {
-			index.getCompetitions().add(new Competition().
-					setItem(i).
-					setName(i.getFieldValue(FieldName.TITLE)).
-					setTeam(i.getFieldValue(FieldName.TEAM)).
-					setSquad(i.getFieldValue(FieldName.SQUAD)).
-					setFixtures(i.getFieldValue(FieldName.FIXTURES)));
+			index.getCompetitions().add(new Competition().setItem(i));
 		}
 		
 		return index;

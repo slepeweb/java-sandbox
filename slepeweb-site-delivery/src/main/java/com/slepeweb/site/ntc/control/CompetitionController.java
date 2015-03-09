@@ -27,6 +27,7 @@ public class CompetitionController extends BaseController {
 		
 		Page page = getStandardPage(i, shortSitename, "competition-index", model);
 		model.addAttribute("_competitionIndex", this.competitionService.getCompetitionIndex(site));
+		model.addAttribute("_defaultThumb", site.getItem("/content/images/default-thumb"));
 		return page.getView();
 	}
 

@@ -12,20 +12,27 @@ public class CompetitionIndex {
 	private List<Competition> competitions = new ArrayList<Competition>();
 
 	public List<DatedLinkTarget> getRecentResultsAsLinks() {
-		return getFixturesAsLinks(getRecentResults());
+		return getFixturesAsLinks(getRecentResults(), true);
 	}
 	
 	public List<DatedLinkTarget> getFutureMatchesAsLinks() {
-		return getFixturesAsLinks(getFutureMatches());
+		return getFixturesAsLinks(getFutureMatches(), false);
 	}
 	
-	private List<DatedLinkTarget> getFixturesAsLinks(List<Fixture> fixtures) {
+	private List<DatedLinkTarget> getFixturesAsLinks(List<Fixture> fixtures, boolean forResults) {
 		List<DatedLinkTarget> list = new ArrayList<DatedLinkTarget>();
 		DatedLinkTarget lt;
 		
 		for (Fixture f : fixtures) {
 			lt = new DatedLinkTarget().setDate(f.getDate());
-			lt.setTitle(f.getResult()).setHref(f.getCompetition().getItem().getPath());
+			if (forResults) {
+				lt.setTitle(f.getResultHeadline());
+			}
+			else {
+				lt.setTitle(f.getTie());
+			}
+			
+			lt.setHref(f.getCompetition().getItem().getPath());
 			list.add(lt);
 		}
 		

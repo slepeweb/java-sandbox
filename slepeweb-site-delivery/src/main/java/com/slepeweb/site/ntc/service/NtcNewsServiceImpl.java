@@ -1,4 +1,4 @@
-package com.slepeweb.site.service;
+package com.slepeweb.site.ntc.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,11 +16,10 @@ import com.slepeweb.site.bean.DatedLinkTarget;
 import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.constant.ItemTypeName;
 import com.slepeweb.site.ntc.bean.CompetitionIndex;
-import com.slepeweb.site.ntc.service.CompetitionService;
 
 @Service("newsService")
-public class NewsServiceImpl implements NewsService {
-	private static Logger LOG = Logger.getLogger(NewsServiceImpl.class);
+public class NtcNewsServiceImpl implements NtcNewsService {
+	private static Logger LOG = Logger.getLogger(NtcNewsServiceImpl.class);
 	
 	@Autowired private CompetitionService competitionService;
 
@@ -56,6 +55,11 @@ public class NewsServiceImpl implements NewsService {
 				
 			});
 		}
+		
+		if (links.size() > 4) {
+			links = links.subList(0, 4);
+		}
+		
 		return links;
 	}
 
