@@ -34,6 +34,7 @@ public class LinkTypeServiceImpl extends BaseServiceImpl implements LinkTypeServ
 		this.jdbcTemplate.update("insert into linktype (name) values (?)", lt.getName());
 		
 		lt.setId(getLastInsertId());
+		this.cacheEvictor.evict(lt);
 		LOG.info(compose("Added new link type", lt));
 	}
 	

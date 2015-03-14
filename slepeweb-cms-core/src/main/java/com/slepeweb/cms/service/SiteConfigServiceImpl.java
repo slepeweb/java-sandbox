@@ -79,6 +79,7 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 				new Object[]{}, new RowMapperUtil.SiteConfigMapper());
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getCount() {
 		return this.jdbcTemplate.queryForInt("select count(*) from config");
 	}

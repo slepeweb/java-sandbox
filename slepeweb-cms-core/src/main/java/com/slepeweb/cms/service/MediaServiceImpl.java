@@ -39,6 +39,7 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 				"insert into media (itemid, data, size) values (?, ?, ?)", 
 				m.getItemId(), getBytesFromStream(m.getInputStream()), m.getSize());
 		
+		this.cacheEvictor.evict(m);
 		LOG.info(compose("Added new media", m.getItemId()));
 	}
 

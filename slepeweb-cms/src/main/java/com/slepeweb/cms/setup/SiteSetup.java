@@ -133,6 +133,7 @@ public class SiteSetup {
 				
 				if (! exists) {
 					s = CmsBeanFactory.makeSite();
+					LOG.info(String.format("Creating new site [%s]", name));
 				}
 				
 				if (! exists || updateable) {
@@ -143,6 +144,7 @@ public class SiteSetup {
 						save();
 					
 					if (s.getId() != null) {
+						LOG.info(String.format("Updated site [%s]", name));
 						stats.inc(ResultType.SITE_UPDATED);
 						this.siteCache.put(s.getShortname(), s);
 					}
@@ -177,6 +179,7 @@ public class SiteSetup {
 				
 				if (! exists) {
 					f = CmsBeanFactory.makeField();
+					LOG.info(String.format("Creating new field [%s]", variable));
 				}
 				
 				if (! exists || updateable) {
@@ -190,6 +193,7 @@ public class SiteSetup {
 						setDefaultValue(SiteSetupUtils.getString(row.getCell(7))).
 						save();
 					
+					LOG.info(String.format("Field saved [%s]", variable));
 					stats.inc(ResultType.FIELD_UPDATED);
 				}
 				else {
@@ -224,6 +228,7 @@ public class SiteSetup {
 				
 				if (! exists) {
 					it = CmsBeanFactory.makeItemType();
+					LOG.info(String.format("Creating new item type [%s]", name));
 				}
 				
 				if (! exists || updateable) {
@@ -235,6 +240,7 @@ public class SiteSetup {
 						save();
 					
 					if (it.getId() != null) {
+						LOG.info(String.format("Item type saved [%s]", name));
 						stats.inc(ResultType.ITEMTYPE_UPDATED);
 					}
 				}
@@ -262,6 +268,8 @@ public class SiteSetup {
 									setTypeId(it.getId()).
 									setOrdering(count++).
 									save();
+							
+							LOG.info(String.format("Added field '%s' to type '%s'", variable, name));
 						}
 					}
 				}
@@ -304,6 +312,7 @@ public class SiteSetup {
 						
 						if (! exists) {
 							ln = CmsBeanFactory.makeLinkName();
+							LOG.info(String.format("Creating new linkname [%s]", linkName));
 						}
 						
 						if (! exists || updateable) {
@@ -314,6 +323,7 @@ public class SiteSetup {
 								save();
 							
 							if (ln.getId() != null) {
+								LOG.info(String.format("Updated linkname [%s]", linkName));
 								stats.inc(ResultType.LINKNAME_UPDATED);
 							}
 						}
@@ -358,6 +368,7 @@ public class SiteSetup {
 						
 						if (! exists) {
 							t = CmsBeanFactory.makeTemplate();
+							LOG.info(String.format("Creating new template [%s]", templateName));
 						}
 						
 						if (! exists || updateable) {
@@ -368,6 +379,7 @@ public class SiteSetup {
 								setForward(SiteSetupUtils.getString(row.getCell(3))).
 								save();
 							
+							LOG.info(String.format("Updated template [%s]", templateName));
 							stats.inc(ResultType.TEMPLATE_UPDATED);
 						}
 						else {
