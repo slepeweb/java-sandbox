@@ -36,6 +36,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 				f.getName(), f.getVariable(), f.getType().name(), f.getHelp(), f.getSize(), f.getDefaultValue(), f.getValidValues());				
 		
 		f.setId(getLastInsertId());
+		this.cacheEvictor.evict(f);
 		LOG.info(compose("Inserted new field", f));
 	}
 
@@ -79,6 +80,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 			sql, params, new RowMapperUtil.FieldMapper()));
 	}
 
+	@SuppressWarnings("deprecation")
 	public int getCount() {
 		return this.jdbcTemplate.queryForInt("select count(*) from field");
 	}

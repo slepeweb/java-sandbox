@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,8 @@ import com.slepeweb.site.constant.FieldName;
 
 public class Header implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static Logger LOG = Logger.getLogger(Header.class);
+	
 	private List<String> stylesheets, javascripts;
 	private List<LinkTarget> globalNavigation, topNavigation;
 	private List<Item> breadcrumbItems;
@@ -44,7 +47,6 @@ public class Header implements Serializable {
 	private void populateTopNavigation(Item i) {
 		this.topNavigation = new ArrayList<LinkTarget>();		
 		Item root = i.getCmsService().getItemService().getItem(i.getSite().getId(), "/");
-		LinkTarget lt;
 		
 		boolean swapLoginForLogout = false;
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -63,21 +65,44 @@ public class Header implements Serializable {
 		}
 		
 		if (root != null) {
-			Item child;
-			for (Link l : root.getBindings()) {
-				child = l.getChild();
-				
-				if (! child.getFieldValue(FieldName.HIDE_FROM_NAV, "").equalsIgnoreCase("yes")) {
-					lt = new LinkTarget(child).
-							setSelected(i.getPath().startsWith(child.getPath()));
-					
-					if (swapLoginForLogout && lt.getHref().equals("/login")) {
-						lt.setHref("/j_spring_security_logout").setTitle("Logout");
+			this.topNavigation.addAll(drillDown(root, 1, swapLoginForLogout, i.getPath()).getChildren());
+			LOG.debug(String.format("Top navigation has %d entries", this.topNavigation.size()));
+		}
+	}
+	
+	private LinkTarget drillDown(Item parent, int numLevels, boolean swapLoginForLogout, String currentItemPath) {
+		LinkTarget parentTarget = createLinkTarget(parent, currentItemPath, swapLoginForLogout);
+		
+		if (parentTarget != null && numLevels-- > 0) {
+			LinkTarget childTarget;
+			
+			if (! parent.getFieldValue(FieldName.HIDE_CHILDREN_FROM_NAV, "").equalsIgnoreCase("yes")) {
+				for (Link l : parent.getBindings()) {
+					childTarget = drillDown(l.getChild(), numLevels, swapLoginForLogout, currentItemPath);
+					if (childTarget != null) {
+						parentTarget.getChildren().add(childTarget);
 					}
-					this.topNavigation.add(lt);
 				}
 			}
 		}
+
+		return parentTarget;
+	}
+	
+	private LinkTarget createLinkTarget(Item child, String currentItemPath, boolean swapLoginForLogout) {
+		
+		if (! child.getFieldValue(FieldName.HIDE_FROM_NAV, "").equalsIgnoreCase("yes")) {
+			LinkTarget lt = new LinkTarget(child).
+					setSelected(currentItemPath.startsWith(child.getPath()));
+			
+			if (swapLoginForLogout && lt.getHref().equals("/login")) {
+				lt.setHref("/j_spring_security_logout").setTitle("Logout");
+			}
+			
+			return lt;
+		}
+		
+		return null;
 	}
 
 	public List<String> getStylesheets() {

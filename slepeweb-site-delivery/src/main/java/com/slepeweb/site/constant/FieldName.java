@@ -8,6 +8,7 @@ public class FieldName {
 	public static final String DATE_PUBLISHED = "datepublished";
 	public static final String FIXTURES = "fixtures";
 	public static final String HIDE_FROM_NAV = "hidefromnav";
+	public static final String HIDE_CHILDREN_FROM_NAV = "hidechildrenfromnav";
 	public static final String MAX_WIDTH = "maxwidth";
 	public static final String META_DESCRIPTION = "metadescription";
 	public static final String META_TITLE = "metatitle";

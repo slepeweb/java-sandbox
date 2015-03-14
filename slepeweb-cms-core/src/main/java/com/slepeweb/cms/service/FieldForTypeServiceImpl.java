@@ -91,6 +91,7 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 		return getCount(null);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getCount(Long itemTypeId) {
 		if (itemTypeId != null) {
 			return this.jdbcTemplate.queryForInt("select count(*) from fieldfortype where itemtypeid = ?", itemTypeId);

@@ -82,6 +82,7 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 		return getCount(null);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getCount(Long itemId) {
 		if (itemId != null) {
 			return this.jdbcTemplate.queryForInt("select count(*) from fieldvalue where itemid = ?", itemId);
