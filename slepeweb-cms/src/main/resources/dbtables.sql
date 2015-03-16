@@ -1,3 +1,4 @@
+drop table if exists tag;
 drop table if exists loglevel;
 drop table if exists config;
 drop table if exists media;
@@ -170,4 +171,12 @@ create table loglevel
 	primary key (package)
 ) ENGINE=InnoDB;
 
+create table tag
+(
+   itemid int,
+   value varchar(256),
+   primary key (itemid, value),
+   index idx_tag_value (value),
+	 constraint foreign key (itemid) references item(id) on delete cascade
+) ENGINE=InnoDB;
 

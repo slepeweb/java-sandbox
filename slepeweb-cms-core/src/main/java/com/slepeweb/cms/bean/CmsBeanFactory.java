@@ -87,6 +87,12 @@ public class CmsBeanFactory {
 		return m;
 	}
 	
+	public static Tag makeTag() {
+		Tag tag = new Tag();
+		tag.setCmsService(CMS);
+		return tag;
+	}
+	
 	public static Item makeHomepageItem(Site s) {
 		ItemType homepageType = makeHomepageType(s.getName());
 		return proveItem(s, homepageType, "Homepage", "", "/").save();

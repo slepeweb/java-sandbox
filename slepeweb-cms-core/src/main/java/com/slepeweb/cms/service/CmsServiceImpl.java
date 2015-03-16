@@ -23,6 +23,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected TemplateService templateService;
 	@Autowired protected SiteConfigService siteConfigService;
 	@Autowired protected LoglevelService loglevelService;
+	@Autowired protected TagService tagService;
 	
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {
@@ -97,4 +98,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 		return loglevelService;
 	}
 
+	public TagService getTagService() {
+		return tagService;
+	}
 }

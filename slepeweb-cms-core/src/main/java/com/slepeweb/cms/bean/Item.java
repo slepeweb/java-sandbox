@@ -24,6 +24,7 @@ public class Item extends CmsBean {
 	private boolean deleted, published;
 	private Long id = -1L;
 	private List<Link> links;
+	private List<String> tags;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Item) {
@@ -633,5 +634,16 @@ public class Item extends CmsBean {
 	public Item setPublished(boolean published) {
 		this.published = published;
 		return this;
+	}
+
+	public List<String> getTags() {
+		if (this.tags == null) {
+			this.tags = getTagService().getTagValues(getId());
+		}
+		return this.tags;
+	}
+
+	public String getTagsAsString() {
+		return StringUtils.join(getTags(), ",").replaceAll(",", ", ");
 	}
 }

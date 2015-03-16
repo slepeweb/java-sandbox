@@ -1,15 +1,20 @@
 package com.slepeweb.cms.test;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.utils.LogUtil;
 
 @Service
 public class ItemTest extends BaseTest {
+	
+	@Autowired TagService tagService;
 	
 	public TestResultSet execute() {
 		
@@ -28,7 +33,10 @@ public class ItemTest extends BaseTest {
 			register(4100, "Trashed branch should not appear as child of homepage", "Homepage should now have one less child").
 			register(4110, "Restore trashed branch", "the bin size should return to original").
 			register(4120, "Get parent of news item", "should be /news").
-			register(4130, "Get parent of news section", "should be /");
+			register(4130, "Get parent of news section", "should be /").
+			register(4140, "Tag item", "tags should be 'football' and 'cricket'").
+			register(4150, "Update tags", "tag should be 'tennis' only").
+			register(4160, "Get item by tag value", "item path should be /news/101");
 		
 		Site site = getTestSite();
 		
@@ -236,6 +244,52 @@ public class ItemTest extends BaseTest {
 					r.fail().setNotes(String.format("Failed to identify parent of [%s]", newsItem));
 				}
 			}
+			
+			// 4140
+			List<String> tagsIn, tagsOut;
+			newsItem = site.getItem("/news/101");
+			if (newsItem != null) {
+				r = trs.execute(4140);
+				this.tagService.deleteTags(newsItem.getId());
+				
+				tagsIn = Arrays.asList("football", "cricket");
+				this.tagService.save(newsItem.getId(), tagsIn);
+				tagsOut = newsItem.getTags();
+				if (tagsOut.size() != 2 || ! tagsOut.containsAll(tagsIn)) {
+					r.fail().setNotes(String.format("Item incorrectly tagged [%s]", newsItem));
+				}
+				
+			}
+			
+			// 4150
+			newsItem = site.getItem("/news/101");
+			String tennis = "tennis";
+			if (newsItem != null) {
+				r = trs.execute(4150);
+				this.tagService.deleteTags(newsItem.getId());
+				
+				tagsIn = Arrays.asList(tennis);
+				this.tagService.save(newsItem.getId(), tagsIn);
+				tagsOut = newsItem.getTags();
+				if (tagsOut.size() != 1 || ! tagsOut.containsAll(tagsIn)) {
+					r.fail().setNotes(String.format("Item incorrectly tagged [%s]", newsItem));
+				}
+			}
+			
+			// 4160
+			newsItem = site.getItem("/news/101");
+			if (newsItem != null) {
+				r = trs.execute(4160);
+				Item taggedItem = this.tagService.getTaggedItem(tennis);
+				
+				if (taggedItem == null) {
+					r.fail().setNotes(String.format("Item not found with tag [%s]", tennis));
+				}
+				else if (! taggedItem.getPath().equals("/news/101")) {
+					r.fail().setNotes(String.format("Item found has different path [%s]", taggedItem.getPath()));
+				}
+			}
+
 		}
 				
 		return trs;

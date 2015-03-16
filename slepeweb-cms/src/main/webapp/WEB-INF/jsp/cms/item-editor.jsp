@@ -45,6 +45,9 @@
 			<label for="simplename">Simple name: </label><input type="text" name="simplename" value="${editingItem.simpleName}" />
 		</div>
 		<div>
+			<label for="tags">Tags: </label><input type="text" name="tags" value="${editingItem.tagsAsString}" />
+		</div>
+		<div>
 			<label for="published">Published? </label><input type="checkbox" name="published" <c:if test="${editingItem.published}">checked="checked"</c:if> />
 		</div>
 		<div>

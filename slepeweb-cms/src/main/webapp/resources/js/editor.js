@@ -125,7 +125,8 @@ var renderItemForms = function(nodeKey, activeTab) {
 						name: $("#core-tab input[name='name']").val(),
 						simplename: $("#core-tab input[name='simplename']").val(),
 						template: $("#core-tab select[name='template']").val(),
-						published: $("#core-tab input[name='published']").is(':checked')
+						published: $("#core-tab input[name='published']").is(':checked'),
+						tags: $("#core-tab input[name='tags']").val()
 					}, 
 					dataType: "json",
 					success: function(json, status, z) {

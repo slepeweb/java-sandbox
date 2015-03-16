@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import com.slepeweb.cms.service.ItemTypeService;
 import com.slepeweb.cms.service.LinkNameService;
 import com.slepeweb.cms.service.LinkTypeService;
 import com.slepeweb.cms.service.MediaService;
+import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.service.TemplateService;
 import com.slepeweb.cms.utils.LogUtil;
 
@@ -52,6 +54,7 @@ public class RestController extends BaseController {
 	@Autowired private MediaService mediaService;
 	@Autowired private LinkTypeService linkTypeService;
 	@Autowired private LinkNameService linkNameService;
+	@Autowired private TagService tagService;
 	
 	@RequestMapping("/item/editor")
 	public String doItemEditor(ModelMap model, @RequestParam(value="key", required=true) Long id) {	
@@ -71,19 +74,25 @@ public class RestController extends BaseController {
 			@RequestParam("simplename") String simplename, 
 			@RequestParam("published") boolean published, 
 			@RequestParam("template") Long templateId, 
+			@RequestParam("tags") String tagStr, 
 			ModelMap model) {	
 		
 		Item i = this.itemService.getItem(itemId);
 		Template t = this.templateService.getTemplate(templateId);
 		
 		if (i != null) {
-			i.setName(name).
+			i = i.setName(name).
 				setSimpleName(simplename).
 				setDateUpdated(new Timestamp(System.currentTimeMillis())).
 				setPublished(published).
 				setTemplate(t).
 				save();
 			
+			List<String> existingTags = i.getTags();
+			List<String> latestTags = Arrays.asList(tagStr.split("[ ,]+"));
+			if (existingTags.size() != latestTags.size() || ! existingTags.containsAll(latestTags)) {
+				this.tagService.save(i.getId(), tagStr);
+			}
 			return true;
 		}
 		return false;		

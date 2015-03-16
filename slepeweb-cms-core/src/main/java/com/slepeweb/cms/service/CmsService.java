@@ -16,4 +16,5 @@ public interface CmsService {
 	TemplateService getTemplateService();
 	SiteConfigService getSiteConfigService();
 	LoglevelService getLoglevelService();
+	TagService getTagService();
 }

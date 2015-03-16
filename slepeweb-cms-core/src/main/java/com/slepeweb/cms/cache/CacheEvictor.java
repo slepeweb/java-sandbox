@@ -15,6 +15,7 @@ import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
+import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.utils.LogUtil;
 
@@ -116,6 +117,13 @@ public class CacheEvictor {
 
 	public void evict(Media t) {
 		// TODO: Implement
+	}
+
+	public void evict(Tag t) {
+		evict(
+				compose("getTaggedItem", t.getValue()));
+		
+		broadcast(t);
 	}
 
 	private String compose(Object ... parts) {

@@ -19,6 +19,7 @@ import com.slepeweb.cms.bean.LoggerBean;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
+import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.Template;
 
 public class RowMapperUtil {
@@ -222,6 +223,14 @@ public class RowMapperUtil {
 			return new LoggerBean().
 					setPackag(rs.getString("package")).
 					setLevel(rs.getString("level"));
+		}
+	}
+	
+	public static final class TagMapper implements RowMapper<Tag> {
+		public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeTag().
+					setItem(mapItem(rs)).
+					setValue(rs.getString("tagvalue"));
 		}
 	}
 	
