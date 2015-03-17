@@ -121,7 +121,7 @@ public class CacheEvictor {
 
 	public void evict(Tag t) {
 		evict(
-				compose("getTaggedItem", t.getValue()));
+				compose("getTaggedItem", t.getItem().getSite().getId(), t.getValue()));
 		
 		broadcast(t);
 	}

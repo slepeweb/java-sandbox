@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Item;
@@ -92,7 +93,7 @@ public class TagServiceImpl extends BaseServiceImpl implements TagService {
 	 * to be assigned to one item. These responses are cached, and the cache needs
 	 * to be cleared should the tags corresponding to a matched item get updated.
 	 */
-	//@Cacheable(value="serviceCache")
+	@Cacheable(value="serviceCache")
 	public Item getTaggedItem(Long siteId, String value) {
 		Tag tag =  (Tag) getFirstInList(getTags(siteId, value));		
 		if (tag != null) {
