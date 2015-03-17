@@ -253,7 +253,7 @@ public class ItemTest extends BaseTest {
 				this.tagService.deleteTags(newsItem.getId());
 				
 				tagsIn = Arrays.asList("football", "cricket");
-				this.tagService.save(newsItem.getId(), tagsIn);
+				this.tagService.save(newsItem, tagsIn);
 				tagsOut = newsItem.getTags();
 				if (tagsOut.size() != 2 || ! tagsOut.containsAll(tagsIn)) {
 					r.fail().setNotes(String.format("Item incorrectly tagged [%s]", newsItem));
@@ -269,7 +269,7 @@ public class ItemTest extends BaseTest {
 				this.tagService.deleteTags(newsItem.getId());
 				
 				tagsIn = Arrays.asList(tennis);
-				this.tagService.save(newsItem.getId(), tagsIn);
+				this.tagService.save(newsItem, tagsIn);
 				tagsOut = newsItem.getTags();
 				if (tagsOut.size() != 1 || ! tagsOut.containsAll(tagsIn)) {
 					r.fail().setNotes(String.format("Item incorrectly tagged [%s]", newsItem));
@@ -280,7 +280,7 @@ public class ItemTest extends BaseTest {
 			newsItem = site.getItem("/news/101");
 			if (newsItem != null) {
 				r = trs.execute(4160);
-				Item taggedItem = this.tagService.getTaggedItem(tennis);
+				Item taggedItem = this.tagService.getTaggedItem(site.getId(), tennis);
 				
 				if (taggedItem == null) {
 					r.fail().setNotes(String.format("Item not found with tag [%s]", tennis));

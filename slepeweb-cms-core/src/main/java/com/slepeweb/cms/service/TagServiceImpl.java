@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Item;
@@ -27,28 +26,28 @@ public class TagServiceImpl extends BaseServiceImpl implements TagService {
 			"where %s and i.deleted=0 ";
 
 	
-	public void save(Long itemId, String valueStr) {
-		deleteTags(itemId);
+	public void save(Item i, String valueStr) {
+		deleteTags(i.getId());
 		
 		for (String value : valueStr.split("[ ,]+")) {
-			insert(itemId, value);
+			insert(i, value);
 		}
 	}
 	
-	public void save(Long itemId, List<String> values) {
-		deleteTags(itemId);
+	public void save(Item i, List<String> values) {
+		deleteTags(i.getId());
 		
 		for (String value : values) {
-			insert(itemId, value);
+			insert(i, value);
 		}
 	}
 	
-	private void insert(Long itemId, String value) {
+	private void insert(Item i, String value) {
 		this.jdbcTemplate.update(
-			"insert into tag (itemid, value) values (?, ?)", 
-			itemId, value);
+			"insert into tag (siteid, itemid, value) values (?, ?, ?)", 
+			i.getSite().getId(), i.getId(), value);
 		
-		LOG.info(String.format("Tagged item %d [%s]", itemId, value));
+		LOG.info(String.format("Tagged item '%s' [%s]", i, value));
 	}
 
 	/*
@@ -75,9 +74,9 @@ public class TagServiceImpl extends BaseServiceImpl implements TagService {
 				new RowMapperUtil.TagMapper());
 	}
 	
-	public List<Tag> getTags(String value) {
-		return this.jdbcTemplate.query(String.format(SELECT_TEMPLATE, "tg.value = ?"), 
-				new Object[]{value},
+	public List<Tag> getTags(Long siteId, String value) {
+		return this.jdbcTemplate.query(String.format(SELECT_TEMPLATE, "tg.siteid = ? and tg.value = ?"), 
+				new Object[]{siteId, value},
 				new RowMapperUtil.TagMapper());
 	}
 	
@@ -93,17 +92,17 @@ public class TagServiceImpl extends BaseServiceImpl implements TagService {
 	 * to be assigned to one item. These responses are cached, and the cache needs
 	 * to be cleared should the tags corresponding to a matched item get updated.
 	 */
-	@Cacheable(value="serviceCache")
-	public Item getTaggedItem(String value) {
-		Tag tag =  (Tag) getFirstInList(getTags(value));		
+	//@Cacheable(value="serviceCache")
+	public Item getTaggedItem(Long siteId, String value) {
+		Tag tag =  (Tag) getFirstInList(getTags(siteId, value));		
 		if (tag != null) {
 			return tag.getItem();
 		}		
 		return null;
 	}
 
-	public List<Item> getTaggedItems(String value) {
-		List<Tag> tags = getTags(value);		
+	public List<Item> getTaggedItems(Long siteId, String value) {
+		List<Tag> tags = getTags(siteId, value);		
 		List<Item> items = new ArrayList<Item>(tags.size());
 		for (Tag tag : tags) {
 			items.add(tag.getItem());

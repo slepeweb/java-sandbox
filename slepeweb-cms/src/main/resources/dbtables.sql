@@ -173,10 +173,11 @@ create table loglevel
 
 create table tag
 (
+   siteid int,
    itemid int,
    value varchar(256),
    primary key (itemid, value),
-   index idx_tag_value (value),
+   index idx_tag_site_value (siteid, value),
 	 constraint foreign key (itemid) references item(id) on delete cascade
 ) ENGINE=InnoDB;
 

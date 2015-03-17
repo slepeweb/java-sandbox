@@ -1,4 +1,4 @@
-package com.slepeweb.site.service;
+package com.slepeweb.site.ntc.service;
 
 import java.util.List;
 

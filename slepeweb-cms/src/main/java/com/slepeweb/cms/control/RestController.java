@@ -91,7 +91,7 @@ public class RestController extends BaseController {
 			List<String> existingTags = i.getTags();
 			List<String> latestTags = Arrays.asList(tagStr.split("[ ,]+"));
 			if (existingTags.size() != latestTags.size() || ! existingTags.containsAll(latestTags)) {
-				this.tagService.save(i.getId(), tagStr);
+				this.tagService.save(i, tagStr);
 			}
 			return true;
 		}

@@ -19,8 +19,8 @@ import com.slepeweb.site.model.Page;
 import com.slepeweb.site.model.SiblingItemPager;
 import com.slepeweb.site.ntc.bean.CompetitionIndex;
 import com.slepeweb.site.ntc.service.CompetitionService;
+import com.slepeweb.site.ntc.service.EventsService;
 import com.slepeweb.site.ntc.service.NtcNewsService;
-import com.slepeweb.site.service.EventsService;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
 
 @Controller

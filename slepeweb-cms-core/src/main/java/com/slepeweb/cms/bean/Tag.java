@@ -35,7 +35,7 @@ public class Tag extends CmsBean {
 
 	@Override
 	protected CmsBean save() {
-		getTagService().save(getItem().getId(), Arrays.asList(getValue()));
+		getTagService().save(getItem(), Arrays.asList(getValue()));
 		return getTagService().getTag(getItem().getId(), getValue());
 	}
 
