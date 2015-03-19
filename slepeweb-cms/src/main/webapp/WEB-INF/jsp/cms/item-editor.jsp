@@ -76,7 +76,7 @@
 			</c:otherwise>
 		</c:choose>
 		<div>
-			<label for="${variable}">${label}: </label>
+			<label for="${variable}">${label} : </label>
 			${inputTag}
 		</div>
 	</c:forEach>

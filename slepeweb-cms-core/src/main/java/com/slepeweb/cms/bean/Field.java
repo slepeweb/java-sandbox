@@ -107,8 +107,8 @@ public class Field extends CmsBean {
 		if (tag.equals(INPUT_TAG)) {
 			if (inputType.equals(RADIO) || inputType.equals(CHECKBOX)) {
 				for (String vv : vvl.getValues()) {
-					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\" ", 
-							inputType, getVariable(), vv));
+					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s ", 
+							inputType, getVariable(), vv, getTooltip()));
 					
 					if (value != null) {
 						for (String partValue : value.split("\\|")) {
@@ -129,12 +129,14 @@ public class Field extends CmsBean {
 					// Convert value from Timestamp string to T format
 					notNullValue = notNullValue.replace(" ", "T");
 				}
-				sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\" />", 
-						inputType, getVariable(), notNullValue));
+				sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s />", 
+						inputType, getVariable(), notNullValue, getTooltip()));
 			}
 		}
 		else if (tag.equals(SELECT_TAG)) {
-			sb.append("<").append(tag).append(String.format(" name=\"%s\" value=\"%s\">", getVariable(), notNullValue));
+			sb.append("<").append(tag).append(String.format(" name=\"%s\" value=\"%s\"%s>", 
+					getVariable(), notNullValue, getTooltip()));
+			
 			for (String vv : vvl.getValues()) {
 				sb.append(String.format("<option value=\"%s\"%s>%s</option>", 
 						vv, notNullValue.equals(vv) ? " selected" : "", vv));
@@ -142,8 +144,8 @@ public class Field extends CmsBean {
 			sb.append("</").append(SELECT_TAG).append(">");
 		}
 		else if (tag.equals(TEXT_AREA_TAG)) {
-			sb.append("<").append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\">%s</%s>", 
-					getVariable(), cols, rows, notNullValue, tag));
+			sb.append("<").append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\"%s>%s</%s>", 
+					getVariable(), cols, rows, getTooltip(), notNullValue, tag));
 		}
 		
 		return sb.toString();
@@ -236,6 +238,11 @@ public class Field extends CmsBean {
 		else {
 			return StringUtils.isNotBlank(this.defaultValue) ? this.defaultValue : "";
 		}
+	}
+	
+	public String getTooltip() {
+		return StringUtils.isNotBlank(getHelp()) ? 
+				String.format(" title=\"%s\"", getHelp().replaceAll("\"", "'").replaceAll("<", "")) : "";
 	}
 
 	public Field setDefaultValue(String value) {

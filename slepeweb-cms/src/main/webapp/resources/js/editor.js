@@ -116,6 +116,22 @@ var renderItemForms = function(nodeKey, activeTab) {
 			}
 			$("#item-editor").tabs({active: activeTab});
 			
+			// Identify tooltips
+			$("input,select,textarea").tooltip({
+				position: {
+					my: "center bottom-20",
+					at: "center top",
+					using: function( position, feedback ) {
+						$( this ).css( position );
+						$( "<div>" )
+						.addClass( "arrow" )
+						.addClass( feedback.vertical )
+						.addClass( feedback.horizontal )
+						.appendTo( this );
+					}
+				}
+			});
+			
 			// Add behaviour to submit core item updates 
 			$("#core-button").click(function () {
 				$.ajax(_ctx + "/rest/item/" + nodeKey + "/update/core", {
