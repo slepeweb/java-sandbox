@@ -225,19 +225,23 @@ p.main-heading {
 	text-decoration: underline;
 }
 
+/* tooltips */
 .ui-tooltip,.arrow:after {
 	background: black;
 	border: 2px solid white;
 }
 
-/* tooltips */
 .ui-tooltip {
 	padding: 10px 20px;
 	color: white;
 	border-radius: 20px;
 	font: bold 14px "Helvetica Neue", Sans-Serif;
 	box-shadow: 0 0 7px black;
-	background-color: #acdd4a;
+}
+
+.ui-tooltip-content {
+	background-color: rgba(92, 184, 230, 0.5);
+	padding: 1em;
 }
 
 .arrow {
