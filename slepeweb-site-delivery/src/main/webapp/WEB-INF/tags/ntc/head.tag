@@ -14,6 +14,11 @@
 <script src="/resources/ntc/js/init.js"></script>
 <script src="/resources/js/jquery.colorbox-min.js"></script>
 <script src="/resources/ntc/js/colorbox-impl.js"></script>
+<%-- 
+	Failed attempt to implement menu drop-downs - from apycom
+	<link href="/resources/css/menu.css" rel="stylesheet" type="text/css"> 
+	<script src="/resources/js/menu.js"></script> 
+--%>
 
 <gen:extraCSS />
 <gen:extraJS />

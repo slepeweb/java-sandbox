@@ -232,7 +232,7 @@ p.main-heading {
 }
 
 .ui-tooltip {
-	padding: 10px 20px;
+/* 	padding: 10px 20px; Can't see what this does */
 	color: white;
 	border-radius: 20px;
 	font: bold 14px "Helvetica Neue", Sans-Serif;

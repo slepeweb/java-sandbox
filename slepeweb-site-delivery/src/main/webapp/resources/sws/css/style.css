@@ -1,5 +1,5 @@
 @charset "UTF-8";
-@import url(font-awesome.min.css);
+@import url(../../css/font-awesome.min.css);
 /* skel-baseline v2.0.1 | (c) n33 | getskel.com | MIT licensed */
 /* Basic */
 body {
@@ -983,35 +983,6 @@ input[type="button"]:disabled,
 
 #lotterynumbers tr {
   border: none;
-}
-
-#pizza-order-table {
-  /*
-  tr:last-child td {
-  	border-style: none;
-  }
-  */
-}
-#pizza-order-table th {
-  font-weight: bold;
-  text-align: left;
-  padding-left: 1em;
-  padding-right: 1em;
-  border-style: solid;
-  border-left-width: 2px;
-  border-right-width: 2px;
-  border-color: #cccccc;
-}
-#pizza-order-table td {
-  padding-left: 1em;
-  padding-right: 1em;
-  border-style: solid;
-  border-left-width: 2px;
-  border-right-width: 2px;
-  border-color: #cccccc;
-}
-#pizza-order-table td.buttons {
-  margin-top: 1em;
 }
 
 .user-table td {
