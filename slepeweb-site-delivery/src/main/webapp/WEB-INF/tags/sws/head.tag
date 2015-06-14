@@ -14,6 +14,7 @@
 <script src="/resources/sws/js/skel-layers.min.js"></script>
 <script src="/resources/sws/js/init.js"></script>
 <script src="/resources/js/jquery.colorbox-min.js"></script>
+<script src="/resources/sws/js/colorbox-impl.js"></script>
 
 <gen:extraCSS />
 <gen:extraJS />
