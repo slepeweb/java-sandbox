@@ -1,6 +1,8 @@
 package com.slepeweb.site.sws.control;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,4 +57,10 @@ public class WebServicesController {
 			@PathVariable Integer tableId) {
 		return this.scraperService.scrape(url, organiserId, tableId);
 	}	
+	
+	@RequestMapping(value="/login/user", method=RequestMethod.GET, produces="application/json")	
+	@ResponseBody
+	public User getUser(@AuthenticationPrincipal User u) {
+		return u;
+	}
 }

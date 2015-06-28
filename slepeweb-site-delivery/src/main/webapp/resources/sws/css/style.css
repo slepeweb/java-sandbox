@@ -768,6 +768,7 @@ input[type="button"]:disabled,
   top: 0;
   width: 100%;
   z-index: 10000;
+  visibility: hidden;
 }
 #header h1 {
   color: #fff;
@@ -800,6 +801,7 @@ input[type="button"]:disabled,
   display: inline-block;
   margin-left: 1em;
   padding-left: 0;
+  /*min-width: 4em;*/
 }
 #header nav > ul > li a {
   -moz-transition: color 0.2s ease-in-out;

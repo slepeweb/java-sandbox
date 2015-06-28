@@ -6,10 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
@@ -48,37 +44,21 @@ public class Header implements Serializable {
 		this.topNavigation = new ArrayList<LinkTarget>();		
 		Item root = i.getCmsService().getItemService().getItem(i.getSite().getId(), "/");
 		
-		boolean swapLoginForLogout = false;
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-		if (authentication != null) {
-			Object obj = authentication.getPrincipal();
-			if (obj instanceof User) {
-				User user = (User) obj;
-				for (GrantedAuthority auth : user.getAuthorities()) {
-					if (auth.getAuthority().equals("SWS_GUEST")) {
-						swapLoginForLogout = true;
-						break;
-					}
-				}
-			}
-		}
-		
 		if (root != null) {
-			this.topNavigation.addAll(drillDown(root, 1, swapLoginForLogout, i.getPath()).getChildren());
+			this.topNavigation.addAll(drillDown(root, 1, i.getPath()).getChildren());
 			LOG.debug(String.format("Top navigation has %d entries", this.topNavigation.size()));
 		}
 	}
 	
-	private LinkTarget drillDown(Item parent, int numLevels, boolean swapLoginForLogout, String currentItemPath) {
-		LinkTarget parentTarget = createLinkTarget(parent, currentItemPath, swapLoginForLogout);
+	private LinkTarget drillDown(Item parent, int numLevels, String currentItemPath) {
+		LinkTarget parentTarget = createLinkTarget(parent, currentItemPath);
 		
 		if (parentTarget != null && numLevels-- > 0) {
 			LinkTarget childTarget;
 			
 			if (! parent.getFieldValue(FieldName.HIDE_CHILDREN_FROM_NAV, "").equalsIgnoreCase("yes")) {
 				for (Link l : parent.getBindings()) {
-					childTarget = drillDown(l.getChild(), numLevels, swapLoginForLogout, currentItemPath);
+					childTarget = drillDown(l.getChild(), numLevels, currentItemPath);
 					if (childTarget != null) {
 						parentTarget.getChildren().add(childTarget);
 					}
@@ -89,16 +69,11 @@ public class Header implements Serializable {
 		return parentTarget;
 	}
 	
-	private LinkTarget createLinkTarget(Item child, String currentItemPath, boolean swapLoginForLogout) {
+	private LinkTarget createLinkTarget(Item child, String currentItemPath) {
 		
 		if (! child.getFieldValue(FieldName.HIDE_FROM_NAV, "").equalsIgnoreCase("yes")) {
 			LinkTarget lt = new LinkTarget(child).
 					setSelected(currentItemPath.startsWith(child.getPath()));
-			
-			if (swapLoginForLogout && lt.getHref().equals("/login")) {
-				lt.setHref("/j_spring_security_logout").setTitle("Logout");
-			}
-			
 			return lt;
 		}
 		
