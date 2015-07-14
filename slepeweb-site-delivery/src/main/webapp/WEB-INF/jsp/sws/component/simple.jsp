@@ -8,7 +8,7 @@
 	<c:if test="${not empty _comp.js}"><script>${_comp.js}</script></c:if>	
 	
 	<c:if test="${fn:length(_comp.components) > 0}">
-		<div>
+		<div class="row">
 			<site:insertComponents site="${_item.site.shortname}" list="${_comp.components}" /> 
 		</div>
 	</c:if>

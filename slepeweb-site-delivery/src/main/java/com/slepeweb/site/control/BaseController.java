@@ -22,6 +22,9 @@ import com.slepeweb.site.service.ComponentService;
 @Controller
 public class BaseController {
 	private static Logger LOG = Logger.getLogger(BaseController.class);
+	public static final String USER = "_user";
+	public static final String ITEM = "_item";
+	public static final String SITE = "_site";
 	
 	@Autowired protected ServerConfig config;
 	@Autowired private ComponentService componentService;
@@ -43,14 +46,14 @@ public class BaseController {
 		return false;
 	}
 	
-	@ModelAttribute(value="_item")
+	@ModelAttribute(value=ITEM)
 	public Item getRequestItem(HttpServletRequest req) {
 		Item i = (Item) req.getAttribute("_item");
 		LOG.trace(String.format("Model attribute (_item): [%s]", i));
 		return i;
 	}
 	
-	@ModelAttribute(value="_site")
+	@ModelAttribute(value=SITE)
 	public Site getRequestSite(HttpServletRequest req) {
 		Site s = (Site) req.getAttribute("_site");
 		LOG.trace(String.format("Model attribute (_site): [%s]", s));
@@ -64,7 +67,7 @@ public class BaseController {
 		return site;
 	}
 	
-	@ModelAttribute(value="_user")
+	@ModelAttribute(value=USER)
 	protected User getUser(@AuthenticationPrincipal User u) {
 		LOG.trace(String.format("Model attribute (_user): [%s]", u));
 		return u;
