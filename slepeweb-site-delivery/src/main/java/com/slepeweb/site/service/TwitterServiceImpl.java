@@ -1,12 +1,15 @@
 package com.slepeweb.site.service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +21,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -31,10 +35,12 @@ import com.slepeweb.site.bean.TwitterAccount;
 @Service("twitterService")
 public class TwitterServiceImpl implements TwitterService {
 	private static Logger LOG = Logger.getLogger(TwitterServiceImpl.class);
-	private static Pattern LINK_PATTERN = Pattern.compile("(http:\\S*)", Pattern.CASE_INSENSITIVE);
+	private static Pattern LINK_PATTERN = Pattern.compile("(https?:\\S*)", Pattern.CASE_INSENSITIVE);
 	private static Pattern HASH_PATTERN = Pattern.compile("#(\\S*)");
 	private static Pattern AT_PATTERN = Pattern.compile("@(\\S*)");
 
+	@Autowired private HttpService httpService;
+	
 	@Cacheable(value="serviceCache")
 	public List<Tweet> getSyndicatedTweets(TwitterAccount[] accounts, int maxPerAccount, int maxOverall) {
 		LOG.info(String.format("Getting syndicated twitter feeds at %1$tH:%1$tM:%1$tS", System.currentTimeMillis()));
@@ -98,12 +104,11 @@ public class TwitterServiceImpl implements TwitterService {
 			text = tweet.getText();
 			
 			// match any links
-			m = LINK_PATTERN.matcher(text);
-			text = m.replaceAll("<a href=\"$1\" target=\"_blank\">$1</a>");
+			m = LINK_PATTERN.matcher(text);			
+			text = disableUnsuitableLinks(m);
 			
 			// match any hashTags
 			m = HASH_PATTERN.matcher(text);
-			//text = hashTagMatcher.replaceAll("<a href=\"http://twitter.com/#!/search?q=%23$1\">#$1</a>");
 			text = m.replaceAll("<span class=\"hashtag\">#$1</span>");
 	
 			m = AT_PATTERN.matcher(text);
@@ -111,6 +116,47 @@ public class TwitterServiceImpl implements TwitterService {
 	
 			tweet.setText(text);
 		}
+	}
+	
+	private String disableUnsuitableLinks(Matcher m) {
+		StringBuffer sb = new StringBuffer();
+		Map<String,String> headers;
+		String url, header;
+
+		while (m.find()) {
+			url = m.group(1);
+			headers = this.httpService.getHeaders(url);
+			
+			if (headers != null) {
+				header = headers.get("X-Frame-Options");
+				
+				if (header != null && header.equals("DENY")) {
+					disableLink(m, sb);
+				}
+				else {
+					retainLink(m, sb);
+				}
+			}
+			else {
+				retainLink(m, sb);
+			}
+		}
+		
+		m.appendTail(sb);
+		return sb.toString();
+	}
+	
+	private void retainLink(Matcher m, StringBuffer sb) {
+		String url = null;
+		try {
+			url = URLEncoder.encode(m.group(1), "utf-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+		m.appendReplacement(sb, String.format("<a href=\"/proxy?u=%s\" class=\"iframe group3\">%s</a>", url, m.group(1)));
+	}
+	
+	private void disableLink(Matcher m, StringBuffer sb) {
+		m.appendReplacement(sb, String.format("<span class=\"link\">%s</span>", m.group(1)));
 	}
 	
 	// Turns out that redirects were not the problem. Keep this code for the moment.

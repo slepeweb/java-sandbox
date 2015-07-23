@@ -6,6 +6,6 @@
 <div>${_comp.blurb}</div>
 <ul class="link-list">
 <c:forEach items="${_comp.targets}" var="link" end="3">
-	<li class="compact"><a href="${link.href}" class="iframe group2 cboxElement">${link.title}</a>
+	<li class="compact"><a href="${link.href}" class="iframe group2">${link.title}</a>
 </c:forEach>
 </ul>

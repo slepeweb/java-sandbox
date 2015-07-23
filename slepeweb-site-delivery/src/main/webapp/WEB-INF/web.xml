@@ -29,6 +29,12 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   
+  <servlet>
+    <servlet-name>slepeweb-http-proxy</servlet-name>
+    <servlet-class>com.slepeweb.site.servlet.HttpProxyServlet</servlet-class>
+    <load-on-startup>5</load-on-startup>
+  </servlet>
+
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
@@ -63,6 +69,11 @@
   <servlet-mapping>
     <servlet-name>slepeweb-site</servlet-name>
     <url-pattern>/</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>slepeweb-http-proxy</servlet-name>
+    <url-pattern>/proxy</url-pattern>
   </servlet-mapping>
   
   <servlet-mapping>

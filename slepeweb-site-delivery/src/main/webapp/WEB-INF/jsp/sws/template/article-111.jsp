@@ -13,6 +13,7 @@
 	<!-- Main content -->	
 	<div class="6u 6u(2) 12u(3) important(3)">	
 		<sw:standardBody />	
+		<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
 	</div>
 	
 	<!-- Right sidebar -->

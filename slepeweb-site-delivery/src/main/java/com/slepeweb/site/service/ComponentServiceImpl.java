@@ -17,6 +17,7 @@ import com.slepeweb.site.model.RssComponent;
 import com.slepeweb.site.model.SimpleComponent;
 import com.slepeweb.site.model.StandardComponent;
 import com.slepeweb.site.model.TwitterComponent;
+import com.slepeweb.site.sws.service.DilbertService;
 
 @Service("componentService")
 public class ComponentServiceImpl implements ComponentService {
@@ -24,6 +25,7 @@ public class ComponentServiceImpl implements ComponentService {
 	
 	@Autowired private RomeService romeService;
 	@Autowired private TwitterService twitterService;
+	@Autowired private DilbertService dilbertService;
 
 	public List<SimpleComponent> getComponents(List<Link> componentLinks) {
 		return getComponents(componentLinks, null);
@@ -125,11 +127,14 @@ public class ComponentServiceImpl implements ComponentService {
 		return c;
 	}
 	
-//	private boolean isComponent(Item i) {
-//		return i.getType().getName().equals("Component");
-//	}
-//
-//	private boolean isType(Item i, String typeName) {
-//		return isComponent(i) && i.getFieldValue("component-type", "").equals(typeName);
-//	}
+	public SimpleComponent dilbert(Link l) {
+		SimpleComponent c = simple(l);
+		c.setType("simple");
+		String url = l.getChild().getFieldValue(FieldName.DATA);
+		if (url != null) {
+			c.setBlurb(this.dilbertService.getTodaysDilbert(url));
+		}
+		return c;
+	}
+	
 }

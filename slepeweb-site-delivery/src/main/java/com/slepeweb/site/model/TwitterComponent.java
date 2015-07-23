@@ -24,6 +24,17 @@ public class TwitterComponent extends SimpleComponent {
 	public TwitterComponent setup(Link l) {
 		super.setup(l);
 		
+		/*
+		 * Example data field value:
+		 	2, 8
+			andy_murray, /content/images/icon/murray
+			rogerfederer, /content/images/icon/federer
+			DjokerNole, /content/images/icon/djokovic
+			RafaelNadal, /content/images/icon/nadal
+			
+			2 == this.maxPerAccount
+			8 == this.maxOverall
+		 */
 		String data = l.getChild().getFieldValue("data");
 		List<TwitterAccount> accountsList = new ArrayList<TwitterAccount>();
 		String[] parts;

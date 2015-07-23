@@ -8,6 +8,7 @@
 	<!-- Main content -->	
 	<div class="8u 12u(3)">	
 		<sw:standardBody />	
+		<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
 	</div>
 	
 	<!-- Right sidebar -->

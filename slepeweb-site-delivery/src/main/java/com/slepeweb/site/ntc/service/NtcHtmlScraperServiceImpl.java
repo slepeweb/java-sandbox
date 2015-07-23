@@ -1,16 +1,8 @@
 package com.slepeweb.site.ntc.service;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Attributes;
@@ -19,9 +11,11 @@ import org.jsoup.nodes.Element;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.site.service.HttpServiceImpl;
+
 @Service("htmlScraperService")
-public class NtcHtmlScraperServiceImpl implements NtcHtmlScraperService {
-	private static Logger LOG = Logger.getLogger(NtcHtmlScraperServiceImpl.class);
+public class NtcHtmlScraperServiceImpl extends HttpServiceImpl implements NtcHtmlScraperService {
+	//private static Logger LOG = Logger.getLogger(NtcHtmlScraperServiceImpl.class);
 	
 	@Cacheable(value="serviceCache")
 	public String scrape(String url, Integer organiserId, Integer tableId) {
@@ -185,37 +179,4 @@ public class NtcHtmlScraperServiceImpl implements NtcHtmlScraperService {
 	    }
 	}
 	
-	private String getResource(String url) {
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpGet httpGet = new HttpGet(url);
-		CloseableHttpResponse res = null;
-		
-		try {
-			res = client.execute(httpGet);
-		}
-		catch (Exception e) {
-			LOG.error(String.format("Failed to retrieve page [%s]", url), e);
-			return null;
-		}
-		
-		// In order to ensure correct deallocation of system resources
-		// the user MUST call CloseableHttpResponse#close() from a finally clause.
-		// Please note that if response content is not fully consumed the underlying
-		// connection cannot be safely re-used and will be shut down and discarded
-		// by the connection manager. 
-		try {
-			try {
-			    LOG.info(String.format("Retrieved resource [%s] with status [%s]", url, res.getStatusLine()));
-			    HttpEntity entity = res.getEntity();
-			    return EntityUtils.toString(entity);
-			} finally {
-			    res.close();
-			}
-		}
-		catch (IOException e) {
-			LOG.error(String.format("Failed to consume resource [%s]", url), e);
-		}
-		
-		return null;
-	}
 }

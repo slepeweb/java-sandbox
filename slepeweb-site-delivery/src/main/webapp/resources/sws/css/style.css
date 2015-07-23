@@ -801,7 +801,6 @@ input[type="button"]:disabled,
   display: inline-block;
   margin-left: 1em;
   padding-left: 0;
-  /*min-width: 4em;*/
 }
 #header nav > ul > li a {
   -moz-transition: color 0.2s ease-in-out;
@@ -1039,4 +1038,26 @@ input[type="button"]:disabled,
 .jaxws-table {
   width: 50%;
   min-width: 300px;
+}
+
+.twitter-side {
+  line-height: 1.2em;
+  margin-bottom: 10px;
+}
+.twitter-side div:nth-child(2) {
+  margin-left: 1.5em;
+}
+.twitter-side span {
+  font-weight: bold;
+  color: #24604e;
+}
+.twitter-side span.hashtag {
+  font-weight: normal;
+}
+.twitter-side span.link {
+  font-weight: normal;
+}
+
+.dilbert {
+  margin-top: 5em;
 }

@@ -1107,3 +1107,29 @@
 	width: 50%;
 	min-width: 300px;
 }
+
+.twitter-side {
+	line-height: 1.2em;
+	margin-bottom: 10px;
+	
+	div:nth-child(2) {
+	 	margin-left: 1.5em;
+	}
+	
+	span {
+		font-weight: bold;
+		color: $color-accent-bg;
+		
+		&.hashtag {
+			font-weight: normal;
+		}
+		
+		&.link {
+			font-weight: normal;
+		}
+	}
+}
+
+.dilbert {
+	margin-top: 5em;
+}
