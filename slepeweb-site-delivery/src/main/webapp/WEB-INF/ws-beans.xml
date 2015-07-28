@@ -33,7 +33,8 @@
 	 
 	<bean id="globalWeatherSoapService" class="org.springframework.remoting.jaxws.JaxWsPortProxyFactoryBean">
 		<property name="wsdlDocumentUrl">
-			<value>http://www.webservicex.com/globalweather.asmx?WSDL</value>
+<!-- 			<value>http://www.webservicex.com/globalweather.asmx?WSDL</value> -->
+			<value>file:/var/local/weather.wsdl</value>
 		</property>
 		<property name="namespaceUri">
 			<value>http://www.webserviceX.NET</value>

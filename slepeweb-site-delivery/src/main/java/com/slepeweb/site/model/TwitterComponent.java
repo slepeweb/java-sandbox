@@ -20,9 +20,11 @@ public class TwitterComponent extends SimpleComponent {
 	private List<Tweet> tweets;
 	private TwitterAccount[] accounts;
 	private int maxPerAccount = 2, maxOverall;
+	private long created;
 
 	public TwitterComponent setup(Link l) {
 		super.setup(l);
+		setCreated(System.currentTimeMillis());
 		
 		/*
 		 * Example data field value:
@@ -108,5 +110,13 @@ public class TwitterComponent extends SimpleComponent {
 
 	public void setMaxOverall(int maxOverall) {
 		this.maxOverall = maxOverall;
+	}
+
+	public long getCreated() {
+		return created;
+	}
+
+	public void setCreated(long created) {
+		this.created = created;
 	}	
 }

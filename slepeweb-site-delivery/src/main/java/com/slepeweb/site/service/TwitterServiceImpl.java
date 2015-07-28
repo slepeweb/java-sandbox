@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +22,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import twitter4j.Status;
@@ -31,6 +30,7 @@ import twitter4j.TwitterFactory;
 
 import com.slepeweb.site.bean.Tweet;
 import com.slepeweb.site.bean.TwitterAccount;
+import com.slepeweb.site.model.TwitterComponent;
 
 @Service("twitterService")
 public class TwitterServiceImpl implements TwitterService {
@@ -38,22 +38,28 @@ public class TwitterServiceImpl implements TwitterService {
 	private static Pattern LINK_PATTERN = Pattern.compile("(https?:\\S*)", Pattern.CASE_INSENSITIVE);
 	private static Pattern HASH_PATTERN = Pattern.compile("#(\\S*)");
 	private static Pattern AT_PATTERN = Pattern.compile("@(\\S*)");
+	private static final long CACHE_TTL = 300 * 1000; // 5 mins
 
-	@Autowired private HttpService httpService;
+	private Map<Long, TwitterComponent> cache = new HashMap<Long, TwitterComponent>();
 	
-	@Cacheable(value="serviceCache")
-	public List<Tweet> getSyndicatedTweets(TwitterAccount[] accounts, int maxPerAccount, int maxOverall) {
+	public TwitterComponent getSyndicatedTweets(TwitterComponent c) {
+		TwitterComponent cached = this.cache.get(c.getId());
+		long now = System.currentTimeMillis();
+		if (cached != null && (now - cached.getCreated()) < CACHE_TTL) {
+			return cached;
+		}
+		
 		LOG.info(String.format("Getting syndicated twitter feeds at %1$tH:%1$tM:%1$tS", System.currentTimeMillis()));
 
-		if (accounts != null) {
+		if (c.getAccounts() != null) {
 			Twitter twitter = new TwitterFactory().getInstance();
 			Iterator<Status> iter;
 			Status status;
 			String msg;
-			List<Tweet> allTweets = new ArrayList<Tweet>(maxPerAccount * accounts.length);
+			List<Tweet> allTweets = new ArrayList<Tweet>(c.getMaxPerAccount() * c.getAccounts().length);
 			List<Tweet> tweets;
 	
-			for (TwitterAccount account : accounts) {
+			for (TwitterAccount account : c.getAccounts()) {
 				tweets = new ArrayList<Tweet>();
 				
 				try {
@@ -71,8 +77,8 @@ public class TwitterServiceImpl implements TwitterService {
 					LOG.error(String.format("Failed to retrieve tweets for %s", account), e);
 				}
 				
-				if (maxPerAccount > 0 && maxPerAccount < tweets.size()) {
-					tweets = tweets.subList(0, maxPerAccount);
+				if (c.getMaxPerAccount() > 0 && c.getMaxPerAccount() < tweets.size()) {
+					tweets = tweets.subList(0, c.getMaxPerAccount());
 				}
 				
 				allTweets.addAll(tweets);
@@ -85,15 +91,18 @@ public class TwitterServiceImpl implements TwitterService {
 				}
 			});
 			
-			if (maxOverall > 0 && maxOverall < allTweets.size()) {
-				allTweets = allTweets.subList(0, maxOverall);
+			if (c.getMaxOverall() > 0 && c.getMaxOverall() < allTweets.size()) {
+				allTweets = allTweets.subList(0, c.getMaxOverall());
 			}
 			
-			processLinks(allTweets);			
-			return allTweets;
+			processLinks(allTweets);
+			c.setTweets(allTweets);
+			c.setCreated(now);
+			this.cache.put(c.getId(), c);
+			return c;
 		}
 		
-		return new ArrayList<Tweet>();
+		return null;
 	}
 
 	private void processLinks(List<Tweet> tweets) {
@@ -120,26 +129,10 @@ public class TwitterServiceImpl implements TwitterService {
 	
 	private String disableUnsuitableLinks(Matcher m) {
 		StringBuffer sb = new StringBuffer();
-		Map<String,String> headers;
-		String url, header;
-
+		
+		// Retain all links, regardless of response headers such as "X-Frame-Options"
 		while (m.find()) {
-			url = m.group(1);
-			headers = this.httpService.getHeaders(url);
-			
-			if (headers != null) {
-				header = headers.get("X-Frame-Options");
-				
-				if (header != null && header.equals("DENY")) {
-					disableLink(m, sb);
-				}
-				else {
-					retainLink(m, sb);
-				}
-			}
-			else {
-				retainLink(m, sb);
-			}
+			retainLink(m, sb);
 		}
 		
 		m.appendTail(sb);
@@ -155,6 +148,7 @@ public class TwitterServiceImpl implements TwitterService {
 		m.appendReplacement(sb, String.format("<a href=\"/proxy?u=%s\" class=\"iframe group3\">%s</a>", url, m.group(1)));
 	}
 	
+	@SuppressWarnings("unused")
 	private void disableLink(Matcher m, StringBuffer sb) {
 		m.appendReplacement(sb, String.format("<span class=\"link\">%s</span>", m.group(1)));
 	}

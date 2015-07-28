@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(function(){
 	//Examples of how to assign the Colorbox event to elements
 	//$(".group1").colorbox({rel:'group1'});
 	$(".group2").colorbox({rel:'group2', transition:"none", current:'Story {current} of {total}'});

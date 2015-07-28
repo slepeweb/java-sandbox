@@ -13,10 +13,12 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	private String name, heading, blurb;
 	private String type, view;
 	private String cssClass, js;
+	private Long id;
 	private List<SimpleComponent> components = new ArrayList<SimpleComponent>();
 
 	public SimpleComponent setup(Link l) {
 		setView(StringUtil.toIdentifier(l.getName()));
+		setId(l.getChild().getId());
 		setType(l.getChild());
 		setCssClass(l.getChild().getFieldValue("css"));	
 		setJs(l.getChild().getFieldValue("js"));
@@ -105,6 +107,14 @@ public class SimpleComponent implements NestableComponent, Serializable {
 
 	public void setJs(String js) {
 		this.js = js;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 }

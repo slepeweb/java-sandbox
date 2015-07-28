@@ -1,7 +1,4 @@
-<%@ 
-	taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%><%@ 
-  taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%><%@ 
-	taglib prefix="gen" tagdir="/WEB-INF/tags"%>
+<%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 
 <div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
 

@@ -6,7 +6,7 @@ public class Link extends CmsBean {
 
 	private Long parentId;
 	private Item child;
-	private String name, type;
+	private String name = "na", type;
 	private Integer ordering;
 	
 	public void assimilate(Object obj) {

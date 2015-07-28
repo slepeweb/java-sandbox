@@ -13,7 +13,7 @@
 	
 	<!-- Right sidebar -->
 	<div class="4u 12u(3)">	
-		<section class="smaller right-sidebar">
+		<section class="smaller">
 			<site:insertComponents site="${_item.site.shortname}" list="${_page.rightSidebar.components}" /> 
 		</section>
 	</div>

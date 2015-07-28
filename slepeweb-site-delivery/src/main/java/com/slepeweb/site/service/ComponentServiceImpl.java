@@ -9,10 +9,14 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.site.constant.FieldName;
+import com.slepeweb.site.constant.ItemTypeName;
 import com.slepeweb.site.model.ImageComponent;
+import com.slepeweb.site.model.LogozerComponent;
 import com.slepeweb.site.model.RssComponent;
 import com.slepeweb.site.model.SimpleComponent;
 import com.slepeweb.site.model.StandardComponent;
@@ -24,7 +28,6 @@ public class ComponentServiceImpl implements ComponentService {
 	private static Logger LOG = Logger.getLogger(ComponentServiceImpl.class);
 	
 	@Autowired private RomeService romeService;
-	@Autowired private TwitterService twitterService;
 	@Autowired private DilbertService dilbertService;
 
 	public List<SimpleComponent> getComponents(List<Link> componentLinks) {
@@ -86,9 +89,11 @@ public class ComponentServiceImpl implements ComponentService {
 	}
 
 	public TwitterComponent twitter(Link l) {		
+		/*
+		 * Tweets are retrieved by a rest service. This component is returned
+		 * mainly to provide a component item id to the service.
+		 */
 		TwitterComponent c = new TwitterComponent().setup(l);
-		c.setTweets(this.twitterService.getSyndicatedTweets(c.getAccounts(), 
-				c.getMaxPerAccount(), c.getMaxOverall()));		
 		return c;
 	}
 
@@ -134,6 +139,28 @@ public class ComponentServiceImpl implements ComponentService {
 		if (url != null) {
 			c.setBlurb(this.dilbertService.getTodaysDilbert(url));
 		}
+		return c;
+	}
+	
+	public LogozerComponent logozer(Link l) {
+		LogozerComponent c = new LogozerComponent().setup(l).
+				setNumCells(8).
+				setNumUsPerCell(12).
+				setFadeInterval(2000L).
+				setImageReplacementInterval(8000L);
+		
+		String[] imageTypes = new String[] {ItemTypeName.IMAGE_GIF, ItemTypeName.IMAGE_JPG, ItemTypeName.IMAGE_PNG};
+		ItemFilter filter = new ItemFilter().setTypes(imageTypes);
+		Link dummy = new Link();
+		for (Item i : l.getChild().getBoundItems(filter)) {
+			dummy.setChild(i);
+			c.getComponents().add(image(dummy));
+		}
+		
+		if (c.getComponents().size() > c.getNumCells()) {
+			c.setNumCells(c.getComponents().size());
+		}
+		
 		return c;
 	}
 	

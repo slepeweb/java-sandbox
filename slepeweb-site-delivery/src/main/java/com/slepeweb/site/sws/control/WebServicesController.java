@@ -10,7 +10,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.service.ItemService;
+import com.slepeweb.site.model.TwitterComponent;
 import com.slepeweb.site.ntc.service.NtcHtmlScraperService;
+import com.slepeweb.site.service.TwitterService;
 import com.slepeweb.site.sws.bean.LotteryNumbersBean;
 import com.slepeweb.ws.bean.PasswordBean;
 import com.slepeweb.ws.bean.WeatherBean;
@@ -25,7 +30,8 @@ public class WebServicesController {
 	@Autowired private PasswordJaxwsClient passwordJaxwsClient;	
 	@Autowired private WeatherJaxwsClient weatherJaxwsClient;
 	@Autowired private NtcHtmlScraperService scraperService;
-	
+	@Autowired private TwitterService twitterService;
+	@Autowired private ItemService itemService;
 	
 	@RequestMapping(value="/password", method=RequestMethod.GET, produces={"application/json", "text/xml"})	
 	@ResponseBody
@@ -62,5 +68,15 @@ public class WebServicesController {
 	@ResponseBody
 	public User getUser(@AuthenticationPrincipal User u) {
 		return u;
+	}
+	
+	@RequestMapping(value="/tweets/{componentId}", method=RequestMethod.GET, produces="application/json")	
+	@ResponseBody
+	public TwitterComponent getTweets(@PathVariable(value="componentId") Long id) {
+		Item child = this.itemService.getItem(id);
+		Link dummy = new Link().setName("std").setChild(child);
+		TwitterComponent c = new TwitterComponent().setup(dummy);
+		c = this.twitterService.getSyndicatedTweets(c);		
+		return c;
 	}
 }
