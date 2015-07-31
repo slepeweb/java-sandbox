@@ -8,20 +8,20 @@ var logozer = {
 		numCells: ${_comp.numCells},
 		fadeInterval: ${_comp.fadeInterval},
 		imageReplacementInterval: ${_comp.imageReplacementInterval},
+		nextCellOffset: ${_comp.nextCellOffset},
 
 		randomCell: function(last) {
 			var num;
 			do {
 				num = Math.floor(Math.random() * logozer.numCells) + 1;
 			}
-			while (num == last);
+			while (Math.abs(num - last) < logozer.nextCellOffset);
 			return num;
 		},
 		
 		render: function(previous) {
-			var divId, imgId, div, img, prevImg = previous.img;
-			
-			divId = logozer.randomCell(previous.divId);
+			var divId, imgId, div, img;
+			divId = previous.divId == -1 ? 1 : logozer.randomCell(previous.divId);
 			imgId = previous.imgId + 1;
 			if (imgId > logozer.numImages) {
 				imgId = 1;
@@ -31,13 +31,16 @@ var logozer = {
 			img = $("#img_" + imgId);
 			div.append(img);
 			
-			if (prevImg) {
-				prevImg.fadeOut({duration: logozer.fadeInterval, complete: function() {
+			if (previous.img) {
+				previous.img.fadeOut({duration: logozer.fadeInterval, always: function() {
+					logozer.log("Faded-out img " + previous.imgId + " [" + previous.img.attr("id") + "]");
 					img.fadeIn(logozer.fadeInterval);
+					logozer.log("Faded img " + imgId + " [" + img.attr("id") + "] into div " + divId + "[" + div.attr("id") + "]");
 				}});
 			}
 			else {
 				img.fadeIn(logozer.fadeInterval);
+				logozer.log("Faded img " + imgId + " into div " + divId);
 			}
 			
 			return {divId: divId, imgId: imgId, img: img};
@@ -47,25 +50,33 @@ var logozer = {
 			setInterval(function(){
 				prev = logozer.render(prev);
 			}, logozer.imageReplacementInterval);
+		},
+		
+		log: function(s) {
+			if (console) {
+				console.log(s);
+			}
 		}
 };
 
 $(function(){
-	var divId = logozer.randomCell(-1);
+	var divId = -1;
 	var prev = logozer.render({divId: divId, imgId: 1, img: null});
 	logozer.cycle(prev);
 });
 </script>
 
 <div class="row">
-	<c:forEach items="${_comp.components}" var="_img" varStatus="_status">
-		<div id="div_${_status.count}" class="${_comp.numUsPerCell}u$ logozer">
-			<img id="img_${_status.count}" src="${_img.src}" />
-		</div>
-	</c:forEach>
-	
-	<c:forEach items="${_comp.emptyCells}" var="_cell">
-		<div id="div_${_cell}" class="${_comp.numUsPerCell}u$ logozer">
+	<c:forEach items="${_comp.cellIds}" var="_cellId" varStatus="_status">
+		<div id="div_${_cellId}" class="${_comp.cellClass} logozer">
+			<c:if test="${_cellId le _comp.numImages}">
+				<img id="img_${_cellId}" src="${_comp.components[_cellId - 1].src}" />
+			</c:if>
+			<c:if test="${_status.last and _cellId < _comp.numImages}">
+				<c:forEach items="${_comp.imageIds}" var="_imgId" begin="${_cellId}">
+					<img id="img_${_imgId}" src="${_comp.components[_imgId - 1].src}" />
+				</c:forEach>
+			</c:if>
 		</div>
 	</c:forEach>
 </div>

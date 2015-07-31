@@ -6,8 +6,9 @@ public class LogozerComponent extends SimpleComponent {
 	private static final long serialVersionUID = 1L;
 	//private static Logger LOG = Logger.getLogger(LogozerComponent.class);
 
-	private int numCells = 8, numUsPerCell = 6;
-	private long fadeInterval, imageReplacementInterval;
+	private int numCells = 8;
+	private long fadeInterval, imageReplacementInterval, nextCellOffset;
+	private String cellClass;
 
 	public LogozerComponent setup(Link l) {
 		super.setup(l);		
@@ -18,13 +19,20 @@ public class LogozerComponent extends SimpleComponent {
 		return getComponents().size();
 	}
 	
-	public Integer[] getEmptyCells() {
-		Integer[] emptyCells = new Integer[this.numCells - getComponents().size()];
-		int start = getComponents().size() + 1;
-		for (int i = 0; (i + start) <= this.numCells; i++) {
-			emptyCells[i] = start + i;
+	public Integer[] getCellIds() {
+		return toIdList(this.numCells);
+	}
+	
+	public Integer[] getImageIds() {
+		return toIdList(getComponents().size());
+	}
+	
+	private Integer[] toIdList(int num) {
+		Integer[] ids = new Integer[num];
+		for (int i = 0; i < num; i++) {
+			ids[i] = i + 1;
 		}
-		return emptyCells;
+		return ids;
 	}
 	
 	@Override
@@ -38,15 +46,6 @@ public class LogozerComponent extends SimpleComponent {
 
 	public LogozerComponent setNumCells(int numCells) {
 		this.numCells = numCells;
-		return this;
-	}
-
-	public int getNumUsPerCell() {
-		return numUsPerCell;
-	}
-
-	public LogozerComponent setNumUsPerCell(int numUsPerCell) {
-		this.numUsPerCell = numUsPerCell;
 		return this;
 	}
 
@@ -65,6 +64,24 @@ public class LogozerComponent extends SimpleComponent {
 
 	public LogozerComponent setImageReplacementInterval(long imageReplacementInterval) {
 		this.imageReplacementInterval = imageReplacementInterval;
+		return this;
+	}
+
+	public String getCellClass() {
+		return cellClass;
+	}
+
+	public LogozerComponent setCellClass(String cellClass) {
+		this.cellClass = cellClass;
+		return this;
+	}
+
+	public long getNextCellOffset() {
+		return nextCellOffset;
+	}
+
+	public LogozerComponent setNextCellOffset(long nextCellOffset) {
+		this.nextCellOffset = nextCellOffset;
 		return this;
 	}
 

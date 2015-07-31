@@ -36,3 +36,10 @@ body, input, select, textarea {
 #left-nav {
   margin-top: 3em;
 }
+
+.logozer {
+  height: 0px;
+}
+.logozer img {
+  margin-left: 1em;
+}

@@ -142,25 +142,24 @@ public class ComponentServiceImpl implements ComponentService {
 		return c;
 	}
 	
-	public LogozerComponent logozer(Link l) {
+	public LogozerComponent logo_randomizer(Link l) {
+		Item i = l.getChild();
 		LogozerComponent c = new LogozerComponent().setup(l).
-				setNumCells(8).
-				setNumUsPerCell(12).
-				setFadeInterval(2000L).
-				setImageReplacementInterval(8000L);
+				setNumCells(i.getIntFieldValue("numcells", 4)).
+				setCellClass(i.getFieldValue("cellclass")).
+				setFadeInterval(i.getIntFieldValue("fadeinterval", 2000)).
+				setImageReplacementInterval(i.getIntFieldValue("replacementinterval", 8000)).
+				setNextCellOffset(i.getIntFieldValue("nextcelloffset", 1));
 		
 		String[] imageTypes = new String[] {ItemTypeName.IMAGE_GIF, ItemTypeName.IMAGE_JPG, ItemTypeName.IMAGE_PNG};
 		ItemFilter filter = new ItemFilter().setTypes(imageTypes);
 		Link dummy = new Link();
-		for (Item i : l.getChild().getBoundItems(filter)) {
-			dummy.setChild(i);
+		for (Item j : l.getChild().getBoundItems(filter)) {
+			dummy.setChild(j);
 			c.getComponents().add(image(dummy));
 		}
 		
-		if (c.getComponents().size() > c.getNumCells()) {
-			c.setNumCells(c.getComponents().size());
-		}
-		
+		c.setType("logozer");
 		return c;
 	}
 	
