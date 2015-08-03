@@ -87,3 +87,7 @@ body, input, select, textarea {
 .right-sidebar {
   float: none;
 }
+
+.logozer img {
+  margin-left: 0em;
+}

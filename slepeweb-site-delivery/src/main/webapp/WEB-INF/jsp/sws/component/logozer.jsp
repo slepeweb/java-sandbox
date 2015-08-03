@@ -53,9 +53,11 @@ var logozer = {
 		},
 		
 		log: function(s) {
+			/*
 			if (console) {
 				console.log(s);
 			}
+			*/
 		}
 };
 
