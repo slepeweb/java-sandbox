@@ -29,7 +29,7 @@ public class TwitterComponent extends SimpleComponent {
 		/*
 		 * Example data field value:
 		 	2, 8
-			andy_murray, /content/images/icon/murray
+			andy_murray, /content/images/icon/murray [, 3]
 			rogerfederer, /content/images/icon/federer
 			DjokerNole, /content/images/icon/djokovic
 			RafaelNadal, /content/images/icon/nadal
@@ -57,10 +57,16 @@ public class TwitterComponent extends SimpleComponent {
 					}
 				}
 				
+				TwitterAccount ta;
+				
 				while ((line = reader.readLine()) != null) {
 					parts = line.split("[, ]+");
-					if (parts.length == 2) {
-						accountsList.add(new TwitterAccount().setName(parts[0]).setIconPath(parts[1]));
+					if (parts.length >= 2) {
+						ta = new TwitterAccount().setName(parts[0]).setIconPath(parts[1]).setNumTweets(this.maxPerAccount);
+						accountsList.add(ta);
+						if (parts.length >= 3 && StringUtils.isNumeric(parts[2])) {
+							ta.setNumTweets(Integer.parseInt(parts[2]));
+						}
 					}
 				}
 			}

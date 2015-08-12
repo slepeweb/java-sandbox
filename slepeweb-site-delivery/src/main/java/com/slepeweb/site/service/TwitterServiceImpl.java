@@ -56,16 +56,18 @@ public class TwitterServiceImpl implements TwitterService {
 			Iterator<Status> iter;
 			Status status;
 			String msg;
-			List<Tweet> allTweets = new ArrayList<Tweet>(c.getMaxPerAccount() * c.getAccounts().length);
+			List<Tweet> allTweets = new ArrayList<Tweet>();
 			List<Tweet> tweets;
+			int max;
 	
 			for (TwitterAccount account : c.getAccounts()) {
 				tweets = new ArrayList<Tweet>();
 				
 				try {
 					iter = twitter.getUserTimeline(account.getName()).iterator();
+					max = account.getNumTweets();
 					
-					while (iter.hasNext()) {
+					while (iter.hasNext() && tweets.size() < max) {
 						status = iter.next();
 						msg = status.getText();
 						if (! msg.startsWith("RT ")) {
@@ -75,10 +77,6 @@ public class TwitterServiceImpl implements TwitterService {
 				}
 				catch (Exception e) {
 					LOG.error(String.format("Failed to retrieve tweets for %s", account), e);
-				}
-				
-				if (c.getMaxPerAccount() > 0 && c.getMaxPerAccount() < tweets.size()) {
-					tweets = tweets.subList(0, c.getMaxPerAccount());
 				}
 				
 				allTweets.addAll(tweets);

@@ -13,10 +13,14 @@ var logozer = {
 		randomCell: function(last) {
 			var num;
 			do {
-				num = Math.floor(Math.random() * logozer.numCells) + 1;
+				num = logozer.random(logozer.numCells);
 			}
 			while (Math.abs(num - last) < logozer.nextCellOffset);
 			return num;
+		},
+		
+		random: function(range) {
+			return Math.floor(Math.random() * range) + 1;
 		},
 		
 		render: function(previous) {
@@ -62,8 +66,12 @@ var logozer = {
 };
 
 $(function(){
-	var divId = -1;
-	var prev = logozer.render({divId: divId, imgId: 1, img: null});
+	var prev = logozer.render({
+		divId: logozer.randomCell(-1), 
+		imgId: logozer.random(logozer.numImages), 
+		img: null
+	});
+	
 	logozer.cycle(prev);
 });
 </script>
