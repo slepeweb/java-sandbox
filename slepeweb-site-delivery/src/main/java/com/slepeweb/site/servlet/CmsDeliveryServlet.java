@@ -56,6 +56,10 @@ public class CmsDeliveryServlet {
 		return false;
 	}
 	
+	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
+		doGet(req, res, model);
+	}
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
 		String path = getItemPath(req);
@@ -160,6 +164,7 @@ public class CmsDeliveryServlet {
 						flag, lastModified, ifModifiedSince, requestTime));
 			}
 			else {
+				/*
 				long pageLastDelivered = getPageLastDeliveredDate(i, requestTime);
 				long pageExpiry = pageLastDelivered + (i.getType().getPublicCache() * 1000);
 				
@@ -170,6 +175,13 @@ public class CmsDeliveryServlet {
 				
 				LOG.trace(String.format("Page> isFresh: %s, pageLastDelivered: %d, pageExpiry: %d, requestTime: %d", 
 						flag, pageLastDelivered, pageExpiry, requestTime));
+				*/
+				
+				/* 
+				 * A page can never be considered fresh, since it's nigh-impossible to easily determine whether
+				 * all its components are fresh.
+				 */
+				flag = false;
 			}
 		}
 		
@@ -185,6 +197,7 @@ public class CmsDeliveryServlet {
 		return flag;
 	}
 	
+	@SuppressWarnings("unused")
 	private long getPageLastDeliveredDate(Item i, long requestTime) {
 		Long l = this.lastDeliveryTable.get(i.getId());
 		if (l != null) {
