@@ -36,8 +36,8 @@ import com.slepeweb.site.model.TwitterComponent;
 public class TwitterServiceImpl implements TwitterService {
 	private static Logger LOG = Logger.getLogger(TwitterServiceImpl.class);
 	private static Pattern LINK_PATTERN = Pattern.compile("(https?:\\S*)", Pattern.CASE_INSENSITIVE);
-	private static Pattern HASH_PATTERN = Pattern.compile("#(\\S*)");
-	private static Pattern AT_PATTERN = Pattern.compile("@(\\S*)");
+	private static Pattern HASH_PATTERN = Pattern.compile("#(\\w*)");
+	private static Pattern AT_PATTERN = Pattern.compile("@(\\w*)");
 	private static final long CACHE_TTL = 300 * 1000; // 5 mins
 
 	private Map<Long, TwitterComponent> cache = new HashMap<Long, TwitterComponent>();
@@ -76,7 +76,7 @@ public class TwitterServiceImpl implements TwitterService {
 					}
 				}
 				catch (Exception e) {
-					LOG.error(String.format("Failed to retrieve tweets for %s", account), e);
+					LOG.error(String.format("Failed to retrieve tweets for [%s] (%s)", account.getName(), e.getMessage()));
 				}
 				
 				allTweets.addAll(tweets);
