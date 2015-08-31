@@ -52,6 +52,7 @@ public class WeatherBean {
 			//cal.set(Calendar.AM_PM, m.group(3).equals("AM") ? Calendar.AM : Calendar.PM);
 			cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(m.group(4)));
 			cal.set(Calendar.MINUTE, Integer.parseInt(m.group(5)));
+			cal.setTimeZone(TimeZone.getTimeZone("GMT"));
 			
 			DateFormat df = new SimpleDateFormat("MMM dd, yyyy HH:mm a z");
 			String reformatted = df.format(cal.getTime());
