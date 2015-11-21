@@ -1,5 +1,6 @@
 package com.slepeweb.site.sws.service;
 
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,6 +13,7 @@ import com.slepeweb.site.service.HttpService;
 @Service("dilbertService")
 public class DilbertServiceImpl implements DilbertService {
 	
+	private static Logger LOG = Logger.getLogger(DilbertServiceImpl.class);
 	@Autowired HttpService httpService;
 
 	@Cacheable(value="serviceCache")
@@ -19,9 +21,21 @@ public class DilbertServiceImpl implements DilbertService {
 		String res = this.httpService.getResource(url);
 		if (res != null) {
 			Document doc = Jsoup.parse(res);
-		    Element div = doc.select("#articleBody").first();
-		    Element para = div.select("p").first();
-		    return para.html();
+			
+			if (doc != null) {
+				String elementId = "#content-body .about-section-inner";
+			    Element div = doc.select(elementId).first();
+			    
+			    if (div != null) {
+				    Element para = div.select("p").first();
+				    return para.html();
+			    }
+			    else {
+			    	LOG.error(String.format("Failed to select element [%s]", elementId));
+			    }
+			}
+		    
+		    return "";
 		}
 		return null;
 	}

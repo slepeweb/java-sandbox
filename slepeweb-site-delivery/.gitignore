@@ -1,0 +1,8 @@
+*.class
+target/
+.classpath
+.sass-cache
+.project
+.settings/
+classes/
+/.gitignore

@@ -235,6 +235,17 @@ public class PageController extends BaseController {
 		return page.getView();
 	}
 	
+	@RequestMapping(value="/spring/angular-spa")	
+	public String angularSpa(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "angular-spa", model);
+		page.setLeftNavigation();
+		return page.getView();
+	}
+
 	private SiblingItemPager getSiblings(Item i, String[] typesOfInterest, int max) {
 		ItemFilter f = new ItemFilter().setTypes(typesOfInterest);
 		List<Item> children = i.getParent().getBoundItems(f);		
