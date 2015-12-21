@@ -312,7 +312,10 @@ public class CmsDeliveryServlet {
 
 	private void setCacheHeaders(Item item, long requestTime, HttpServletResponse res) {
 
-		long lastModified = item.getDateUpdated().getTime();
+		long lastModified = item.getType().isMedia() ? 
+				item.getDateUpdated().getTime() :
+				requestTime;
+				
 		long publicCacheTime, privateCacheTime;
 		
 		if (! isCacheable(item)) {
