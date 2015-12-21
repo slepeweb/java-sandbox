@@ -9,6 +9,7 @@ body, input, select, textarea {
 }
 #header .container h1 {
   left: 3em;
+  font-size: 1.6em;
 }
 
 /* Banner */

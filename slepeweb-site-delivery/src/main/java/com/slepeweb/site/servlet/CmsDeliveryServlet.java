@@ -74,7 +74,7 @@ public class CmsDeliveryServlet {
 				Item item = site.getItem(path);
 				
 				if (item != null) {
-					logRequestHeaders(req);					
+					logRequestHeaders(req, path);					
 					long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
 
 					if (isCacheable(item) && isFresh(item, requestTime, ifModifiedSince, req.getMethod())) {
@@ -117,31 +117,44 @@ public class CmsDeliveryServlet {
 			req.getServletContext().getNamedDispatcher("default").forward(req, res);
 		}
 		
-		logResponseHeaders(res);
+		logResponseHeaders(res, path);
 	}
 	
-	private void logRequestHeaders(HttpServletRequest req) {
+	private void logRequestHeaders(HttpServletRequest req, String path) {
 		if (LOG.isTraceEnabled()) {
-			LOG.trace("REQUEST HEADERS >>>");
+			LOG.trace(String.format("REQUEST HEADERS (%s) >>>", path));
 			Enumeration<String> enumer = req.getHeaderNames();
 			String name;
 			while (enumer.hasMoreElements()) {
 				name = enumer.nextElement();
-				LOG.trace(String.format("   %-20s: [%s]", name, req.getHeader(name)));
+				if (matches(name, "pragma,cache-control,if-modified-since")) {
+					LOG.trace(String.format("   %-20s: [%s]", name, req.getHeader(name)));
+				}
 			}
 		}
 	}
 	
-	private void logResponseHeaders(HttpServletResponse res) {
+	private void logResponseHeaders(HttpServletResponse res, String path) {
 		if (LOG.isTraceEnabled()) {
-			LOG.trace("RESPONSE HEADERS >>>");
+			LOG.trace(String.format("RESPONSE HEADERS (%s) >>>", path));
 			Iterator<String> enumer = res.getHeaderNames().iterator();
 			String name;
 			while (enumer.hasNext()) {
 				name = enumer.next();
-				LOG.trace(String.format("   %-20s: [%s]", name, res.getHeader(name)));
+				if (matches(name, "cache-control,expires,last-modified,content-type")) {
+					LOG.trace(String.format("   %-20s: [%s]", name, res.getHeader(name)));
+				}
 			}
 		}
+	}
+	
+	private boolean matches(String name, String delimited) {
+		for (String target : delimited.split(",")) {
+			if (name.toLowerCase().equals(target.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private long zeroMillis(long millis) {
