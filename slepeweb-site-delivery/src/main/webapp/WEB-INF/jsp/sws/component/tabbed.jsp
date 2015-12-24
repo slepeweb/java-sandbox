@@ -10,16 +10,18 @@
 	});
 </script>
 
-<div id="tabs">
-	<ul>
+<div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
+	<div id="tabs">
+		<ul>
+			<c:forEach items="${_comp.components}" var="component" varStatus="status">
+				<li><a href="#tabs-${status.count}">${component.name}</a></li>
+			</c:forEach>
+		</ul>
+	
 		<c:forEach items="${_comp.components}" var="component" varStatus="status">
-			<li><a href="#tabs-${status.count}">${component.name}</a></li>
+			<div id="tabs-${status.count}" class="compact">
+				<site:insertComponent site="${_item.site.shortname}" component="${component}" /> 
+			</div>
 		</c:forEach>
-	</ul>
-
-	<c:forEach items="${_comp.components}" var="component" varStatus="status">
-		<div id="tabs-${status.count}" class="compact">
-			<site:insertComponent site="${_item.site.shortname}" component="${component}" /> 
-		</div>
-	</c:forEach>
+	</div>
 </div>

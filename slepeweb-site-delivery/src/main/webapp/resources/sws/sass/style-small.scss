@@ -49,15 +49,17 @@
 		}
 	}
 	
-	#left-nav {
-		margin-top: 3em;
+	#left-nav {		
+		h3:first-child {
+			margin-top: 1em;
+		}		
 	}
 
-.logozer {
-	height: 0px;
-	
-	img {
-		margin-left: 1em;
+	.logozer {
+		height: 130px;
 	}
-}
+	
+	.dilbert {
+		display:none;
+	}
 	

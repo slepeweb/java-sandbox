@@ -968,6 +968,14 @@ input[type="button"]:disabled,
 #left-nav ul li.unselected {
   font-weight: normal;
 }
+#left-nav h3:first-child {
+  margin-top: 3em;
+}
+
+.dilbert img {
+  width: 100%;
+  max-width: 600px;
+}
 
 .project-list {
   font-weight: bold;

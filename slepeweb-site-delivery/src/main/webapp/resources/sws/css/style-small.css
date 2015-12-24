@@ -34,13 +34,14 @@ body, input, select, textarea {
   display: block;
 }
 
-#left-nav {
-  margin-top: 3em;
+#left-nav h3:first-child {
+  margin-top: 1em;
 }
 
 .logozer {
-  height: 0px;
+  height: 130px;
 }
-.logozer img {
-  margin-left: 1em;
+
+.dilbert {
+  display: none;
 }

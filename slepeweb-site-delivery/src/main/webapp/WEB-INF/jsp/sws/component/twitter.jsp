@@ -55,4 +55,6 @@ $(function() {
 });
 </script>  
 
-<div id="twitter-feed">Please wait for latest tweets ...</div>
+<div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
+	<div id="twitter-feed">Please wait for latest tweets ...</div>
+</div>

@@ -39,9 +39,11 @@ $(function() {
 });
 </script>  
 
-<div id="weather-report" <c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
-	<c:if test="${not empty _comp.heading}"><h3>${_comp.heading}</h3></c:if>
-	<c:if test="${not empty _comp.blurb}"><div>${_comp.blurb}</div></c:if>	
-	
-	<table><tr><td></td><td>Please wait ...</td></tr></table>
+<div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
+	<div id="weather-report" <c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
+		<c:if test="${not empty _comp.heading}"><h3>${_comp.heading}</h3></c:if>
+		<c:if test="${not empty _comp.blurb}"><div>${_comp.blurb}</div></c:if>	
+		
+		<table><tr><td></td><td>Please wait ...</td></tr></table>
+	</div>
 </div>

@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /sandbox/hibernate/list
+Disallow: /sandbox/hibernate/form

@@ -13,7 +13,10 @@
 		<!-- Main content -->	
 		<div class="9u 12u(3) important(3)">	
 			<sw:standardBody />	
-			<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
+			
+			<site:insertComponents site="${_item.site.shortname}" 
+				list="${_page.components}" 
+				view="main" /> 
 		</div>					
 	
 </sw:standardLayout>

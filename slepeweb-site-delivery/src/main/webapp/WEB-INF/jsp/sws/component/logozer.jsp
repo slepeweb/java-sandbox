@@ -9,13 +9,16 @@ var logozer = {
 		fadeInterval: ${_comp.fadeInterval},
 		imageReplacementInterval: ${_comp.imageReplacementInterval},
 		nextCellOffset: ${_comp.nextCellOffset},
+		first: true,
 
 		randomCell: function(last) {
-			var num;
-			do {
-				num = logozer.random(logozer.numCells);
+			var num = 1;
+			if (logozer.numCells > 1) {
+				do {
+					num = logozer.random(logozer.numCells);
+				}
+				while (Math.abs(num - last) < logozer.nextCellOffset);
 			}
-			while (Math.abs(num - last) < logozer.nextCellOffset);
 			return num;
 		},
 		
@@ -43,8 +46,14 @@ var logozer = {
 				}});
 			}
 			else {
-				img.fadeIn(logozer.fadeInterval);
-				logozer.log("Faded img " + imgId + " into div " + divId);
+				if (logozer.first) {
+					img.css("display", "inline");
+					logozer.first = false;
+				}
+				else {
+					img.fadeIn(logozer.fadeInterval);
+					logozer.log("Faded img " + imgId + " into div " + divId);
+				}
 			}
 			
 			return {divId: divId, imgId: imgId, img: img};
@@ -76,9 +85,9 @@ $(function(){
 });
 </script>
 
-<div class="row">
+<div<c:if test="${not empty _comp.cellClass}"> class="${_comp.cellClass}"</c:if>>
 	<c:forEach items="${_comp.cellIds}" var="_cellId" varStatus="_status">
-		<div id="div_${_cellId}" class="${_comp.cellClass} logozer">
+		<div id="div_${_cellId}" class="logozer">
 			<c:if test="${_cellId le _comp.numImages}">
 				<img id="img_${_cellId}" src="${_comp.components[_cellId - 1].src}" />
 			</c:if>
@@ -87,6 +96,6 @@ $(function(){
 					<img id="img_${_imgId}" src="${_comp.components[_imgId - 1].src}" />
 				</c:forEach>
 			</c:if>
-		</div>
+		
 	</c:forEach>
 </div>

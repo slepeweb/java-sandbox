@@ -35,7 +35,7 @@ import com.slepeweb.site.constant.FieldName;
 public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
 	
-	private String[] bypass2DefaultPatterns = new String[] {};	
+	//private String[] bypass2DefaultPatterns = new String[] {};	
 	private final Object buffPoolLock = new Object();
 	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
 	private long defaultPrivateCacheTime, defaultPublicCacheTime;
@@ -44,15 +44,22 @@ public class CmsDeliveryServlet {
 	@Autowired private CmsService cmsService;
 
 	public void setBypass2Default(String s) {
-		this.bypass2DefaultPatterns = s != null ? s.split("\\|") : new String[] {};
+		// This method should be called when Spring does its injection stuff, 
+		// but it has been disabled for the foreseeable future.
+		//this.bypass2DefaultPatterns = s != null ? s.split("\\|") : new String[] {};
 	}
 	
 	private boolean bypass2Default(String path) {
+		/*
+		 * Forwarding the request to the default servlet is not working in this Spring
+		 * environment, thereby breaking this bypass functionality.
+		 * 
 		for (String regex : this.bypass2DefaultPatterns) {
 			if (path.matches(regex)) {
 				return true;
 			}
 		}
+		*/
 		return false;
 	}
 	
@@ -112,6 +119,11 @@ public class CmsDeliveryServlet {
 			}
 		}
 		else {
+			/*
+			 * The bypass functionality has been effectively disabled, so this block of code
+			 * should never get executed. It has been disabled, because forwarding to Tomcat's default
+			 * servlet has been 'broken' by Spring's use of the 'default' servlet.
+			 */
 			LOG.debug(LogUtil.compose("Forwarding bypassed request to default servlet", path));
 			setCacheHeaders(requestTime, -1L, this.defaultPrivateCacheTime, this.defaultPublicCacheTime, res);
 			req.getServletContext().getNamedDispatcher("default").forward(req, res);

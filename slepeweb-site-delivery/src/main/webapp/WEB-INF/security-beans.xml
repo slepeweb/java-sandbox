@@ -9,7 +9,7 @@
  
 	<http auto-config="true" use-expressions="true">
 		<intercept-url pattern="/member/**" access="hasRole('NTC_GUEST')" />
-		<intercept-url pattern="/profile/projects" access="hasRole('SWS_GUEST')" />
+		<intercept-url pattern="/content/secure/**" access="hasRole('SWS_GUEST')" />
 		<intercept-url pattern="/spring/user/add" access="hasRole('SWS_GUEST')" />
 		<intercept-url pattern="/spring/user/upd" access="hasRole('SWS_GUEST')" />
 		<intercept-url pattern="/spring/user/del/*" access="hasRole('SWS_ADMIN')" />
