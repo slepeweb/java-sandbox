@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.slepeweb.cms.bean.Item;
+
 public class Sidebar implements NestableComponent, Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<LinkTarget> navigation, relatedPages;
@@ -22,6 +24,17 @@ public class Sidebar implements NestableComponent, Serializable {
 		this.components = new ArrayList<SimpleComponent>();
 	}
 	
+	public void populateNavigation() {
+		List<LinkTarget> nav = new ArrayList<LinkTarget>();
+		
+		if (this.page.getHeader().getBreadcrumbs().size() > 1) {
+			Item levelOneItem = this.page.getHeader().getBreadcrumbItems().get(1);
+			nav.add(this.page.getNavigationService().drillDown(levelOneItem, 3, this.page.getItem().getPath()));
+		}
+		
+		setNavigation(nav);
+	}
+	
 	public List<SimpleComponent> getComponents() {
 		return components;
 	}
@@ -31,6 +44,9 @@ public class Sidebar implements NestableComponent, Serializable {
 	}
 	
 	public List<LinkTarget> getNavigation() {
+		if (this.navigation == null) {
+			populateNavigation();
+		}
 		return navigation;
 	}
 	

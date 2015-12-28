@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.site.constant.FieldName;
+import com.slepeweb.site.service.NavigationService;
 
 
 public class Page implements Serializable, NestableComponent {
@@ -21,44 +22,15 @@ public class Page implements Serializable, NestableComponent {
 	private List<SimpleComponent> components;
 	private List<String> roles;
 	private Item item;
+	private NavigationService navigationService;
 	
-	public Page() {
+	public Page(NavigationService svc) {
+		this.navigationService = svc;
 		this.header = new Header(this);
 		this.footer = new Footer();
 		this.leftSidebar = new Sidebar(this, Sidebar.Type.left);
 		this.rightSidebar = new Sidebar(this, Sidebar.Type.right);
 		this.components = new ArrayList<SimpleComponent>();
-	}
-	
-	public void setLeftNavigation() {
-		List<LinkTarget> nav = new ArrayList<LinkTarget>();
-		
-		if (getHeader().getBreadcrumbs().size() > 1) {
-			
-			Item requestItem = getItem();
-			Item levelOneItem = getHeader().getBreadcrumbItems().get(1);
-			List<Item> levelOneBindings = levelOneItem.getBoundItems();
-			
-			if (levelOneBindings.size() > 0) {
-				nav = new ArrayList<LinkTarget>();
-				LinkTarget levelOneTarget = new LinkTarget(levelOneItem).setSelected(true);
-				LinkTarget levelTwoTarget, levelThreeTarget;
-				nav.add(levelOneTarget);
-				
-				for (Item levelTwoItem : levelOneBindings) {
-					levelTwoTarget = new LinkTarget(levelTwoItem);
-					levelTwoTarget.setSelected(requestItem.getPath().startsWith(levelTwoItem.getPath()));
-					levelOneTarget.getChildren().add(levelTwoTarget);
-					for (Item levelThreeItem : levelTwoItem.getBoundItems()) {
-						levelThreeTarget = new LinkTarget(levelThreeItem);
-						levelTwoTarget.getChildren().add(levelThreeTarget);
-						levelThreeTarget.setSelected(requestItem.getPath().startsWith(levelThreeItem.getPath()));
-					}
-				}
-			}
-		}
-		
-		getLeftSidebar().setNavigation(nav);
 	}
 	
 	public Page addRole(String r) {
@@ -190,4 +162,7 @@ public class Page implements Serializable, NestableComponent {
 		return this;
 	}
 
+	public NavigationService getNavigationService() {
+		return navigationService;
+	}
 }

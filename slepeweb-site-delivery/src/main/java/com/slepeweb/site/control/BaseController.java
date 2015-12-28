@@ -18,6 +18,7 @@ import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.service.LoglevelUpdateService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.ComponentService;
+import com.slepeweb.site.service.NavigationService;
 
 @Controller
 public class BaseController {
@@ -29,6 +30,7 @@ public class BaseController {
 	@Autowired protected ServerConfig config;
 	@Autowired private ComponentService componentService;
 	@Autowired private LoglevelUpdateService loglevelUpdateService;
+	@Autowired private NavigationService navigationService;	
 
 	@ModelAttribute(value="_serverConfig")
 	public ServerConfig getConfig() {
@@ -102,7 +104,7 @@ public class BaseController {
 	}
 	
 	protected Page getStandardPage(Item i, String shortSitename, String viewNameSuffix, ModelMap model) {			
-		Page p = new Page().
+		Page p = new Page(this.navigationService).
 				setTitle(i.getFieldValue("title")).
 				setHeading(i.getFieldValue("title")).
 				setBody(i.getFieldValue("bodytext", "")).

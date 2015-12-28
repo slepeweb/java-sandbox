@@ -103,7 +103,6 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "article-leftnav", model);
-		page.setLeftNavigation();
 		return page.getView();
 	}
 		
@@ -160,7 +159,6 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "dummy", model);
-		page.setLeftNavigation();
 		req.setAttribute("_page", page);
 		
 		// Now hand-off the request to spring webflow
@@ -242,7 +240,6 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "angular-spa", model);
-		page.setLeftNavigation();
 		return page.getView();
 	}
 

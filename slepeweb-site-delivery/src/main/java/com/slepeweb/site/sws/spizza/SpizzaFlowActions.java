@@ -23,6 +23,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.model.Page;
+import com.slepeweb.site.service.NavigationService;
 import com.slepeweb.site.sws.spizza.bean.Customer;
 import com.slepeweb.site.sws.spizza.bean.LoginForm;
 import com.slepeweb.site.sws.spizza.bean.Order;
@@ -39,6 +40,7 @@ public class SpizzaFlowActions extends MultiAction {
 	private static Pattern DATA_PATTERN = Pattern.compile("^\\[(\\w+)\\]\\:(.*)$", Pattern.DOTALL | Pattern.MULTILINE);
 	
 	@Autowired private CmsService cmsService;	
+	@Autowired private NavigationService navigationService;	
 	
 	/*
 	 * This pulls the Page object from the native request. The main flow definition calls this method,
@@ -59,13 +61,11 @@ public class SpizzaFlowActions extends MultiAction {
 	    if (p == null) {
 	    	Site s = this.cmsService.getSiteService().getSite("Slepeweb");
 	    	Item i = s.getItem("/sandbox/spizza");
-			p = new Page().
+			p = new Page(this.navigationService).
 					setTitle(i.getFieldValue("title")).
 					setHeading(i.getFieldValue("title")).
 					setBody(i.getFieldValue("bodytext", "")).
 					setItem(i);
-			
-			p.setLeftNavigation();
 	    }
 	    
     	p.getItem().setCmsService(this.cmsService);
