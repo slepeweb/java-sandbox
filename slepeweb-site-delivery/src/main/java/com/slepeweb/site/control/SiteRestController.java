@@ -77,6 +77,7 @@ public class SiteRestController extends BaseController {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Sitemap: http://www.slepeweb.com/rest/sitemap/sws.txt\n");
 		sb.append("User-agent: *\n");
+		sb.append("Disallow: /proxy\n");
 		
 		for (Item i : this.tagService.getTaggedItems(s.getId(), NOCRAWL)) {
 			sb.append(String.format("Disallow: %s\n", i.getPath()));
