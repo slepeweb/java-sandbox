@@ -1,3 +1,5 @@
+#!/usr/bin/python
+#
 import re, dropbox, os, subprocess, datetime, filecmp
 
 # Calculate a timestamp for use with sqldump files
