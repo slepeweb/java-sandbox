@@ -1,0 +1,133 @@
+import re, dropbox, os, subprocess, datetime, filecmp
+
+# Calculate a timestamp for use with sqldump files
+def fileQualifier(d):
+    fq = str(d.year) + pad(d.month) + pad(d.day) + "_"
+    fq += pad(d.hour) + pad(d.minute) + pad(d.second)
+    return fq
+    
+# Prefix integers less than 10 with a '0'
+def pad(v):
+    if v < 10:
+        return "0" + str(v)
+    return str(v)
+
+# Copy source_file to dropbox folder
+def backup(source_file_path, dropbox_client):
+    file_parts = source_file_path.split("/")
+    source_file = file_parts[-1]
+    dest_file_path = '/' + source_file
+    
+    try:
+        f = open(source_file_path, 'rb')
+        resp = dropbox_client.put_file(dest_file_path, f)
+        print ('Uploaded %s to dropbox path %s (%d bytes)' % (source_file_path, dest_file_path, resp['bytes']))
+    except Exception as err:
+        print("Failed to upload %s\n%s" % (source_file_path, err))
+
+# Delete earlier backup from dropbox
+def unbackup(dest_file_path, dropbox_client):
+    try:
+        dropbox_client.file_delete(dest_file_path)
+        print ('Deleted %s from dropbox' % dest_file_path)
+    except Exception as err:
+        print("Failed to delete %s from dropbox\n%s" % (dest_file_path, err))
+        
+# Compine filename with parent folder to produce full URL
+def to_path(filename, folder):
+    return None if filename == None else folder + '/' + filename
+
+# Determine whether 2 files are identical, allowing for different last lines
+def files_match(file1, file2):
+    # The last line in each file is a datestamp - this needs removing before comparisons are made.
+    subprocess.call("sed -e '$d' < %s > %s.tmp" % (file1, file1), shell=True)
+    subprocess.call("sed -e '$d' < %s > %s.tmp" % (file2, file2), shell=True)
+    b = filecmp.cmp(file1 + ".tmp", file2 + ".tmp", False)
+    
+    # Remove temporary files
+    remove_file_locally("%s.tmp" % file1, False)
+    remove_file_locally("%s.tmp" % file2, False)
+    return b
+
+# Remove sqldump from local filesystem
+def remove_file_locally(f, verbose=True):
+    try:
+        os.remove(f)
+        if verbose:
+            print("Removed local file [%s]" % f)
+    except:
+        print("Failed to delete local file [%s]" % f)
+        
+# Count the number of sqldumps stored remotely
+def count_remote_files(dropbox_client):
+    meta = dropbox_client.metadata("/")
+    count = 0
+    for file_meta in meta['contents']:
+        m = re.search("/" + file_prefix + "\d{8}_\d{6}\.sql$", file_meta['path'])
+        if (m):
+            count += 1
+    return count
+
+    
+source_folder = "/home/george"
+dest_folder = "/"
+file_prefix = "slepeweb-cms-"
+file_list = []
+access_token = '4wPGw33d4lcAAAAAAAAAfVl873ag8OxmIoay_NNAGqol8rtv8QH3oPEADSSHiLhf'
+dropbox_client = dropbox.client.DropboxClient(access_token)
+
+# Identify the latest_backup_path backup
+for f in os.listdir(source_folder):
+    m = re.search(file_prefix + "\d{8}_\d{6}\.sql$", f)
+    if (m):
+        file_list.append(f)
+
+print(">>>\nFound %d earlier dump(s)" % len(file_list))
+
+fq = fileQualifier(datetime.datetime.now())
+ordered_files = sorted(file_list)
+num_local_files = len(ordered_files)
+most_recent_backup = ordered_files[-1] if num_local_files > 0 else None
+most_recent_backup_path = to_path(most_recent_backup, source_folder)
+latest_backup = file_prefix + fq + ".sql"
+latest_backup_path = to_path(latest_backup, source_folder)
+
+# Dump the database
+cmd = "mysqldump -u root slepeweb_cms > " + latest_backup_path;
+size0 = -1
+retained_dump = False
+
+if subprocess.call(cmd, shell=True) == 0:
+    print("Dumped tables to [%s]" % latest_backup_path)
+    
+    if most_recent_backup_path == None:
+        # First ever sqldump - copy to dropbox
+        backup(latest_backup_path, dropbox_client)
+        retained_dump = True
+    elif files_match(latest_backup_path, most_recent_backup_path) != True:
+        # Latest sqldump is different to most recent - copy to dropbox
+        backup(latest_backup_path, dropbox_client)
+        retained_dump = True
+    else:
+        # No change to database - delete latest sqldump
+        print("Duplicate backup!")
+        remove_file_locally(latest_backup_path)
+
+if retained_dump == True:
+    ordered_files.append(latest_backup)
+    num_local_files += 1
+
+# Simple file sync check on local and remote stores    
+num_remote_files = count_remote_files(dropbox_client)
+if num_remote_files != num_local_files:
+    print("*** Warning: dropbox folder has %d files, whilst local folder has %d" % (num_remote_files, num_local_files))
+    
+# Remove old dumps, both locally and remote
+max_files_to_keep = 7
+if most_recent_backup_path != None and num_local_files > max_files_to_keep:
+    print("---")
+    for i in range(0, num_local_files - max_files_to_keep):
+        f = ordered_files[i]
+        remove_file_locally(to_path(f, source_folder))
+        unbackup(to_path(f, ""), dropbox_client)
+        

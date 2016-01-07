@@ -1,0 +1,13 @@
+sudo service tomcat7 stop
+
+sudo rm -r ~/webapps/site/*
+sudo rm -r ~/webapps/cms/*
+sudo rm -r ~/webapps/ws/*
+sudo rm -r /var/lib/tomcat7/work/Catalina/localhost/*
+
+sudo unzip ~/slepeweb-site-delivery.war -d ~/webapps/site
+sudo unzip ~/slepeweb-cms.war -d ~/webapps/cms
+sudo unzip ~/slepeweb-ws.war -d ~/webapps/ws
+
+sudo service tomcat7 start
+

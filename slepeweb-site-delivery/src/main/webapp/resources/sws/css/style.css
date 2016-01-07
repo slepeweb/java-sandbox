@@ -570,6 +570,7 @@ table th {
   font-weight: bold;
   padding: 0 0.75em 0.75em 0.75em;
   text-align: left;
+  width: 25%;
 }
 table thead {
   border-bottom: solid 2px rgba(144, 144, 144, 0.25);
