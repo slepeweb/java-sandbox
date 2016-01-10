@@ -1,7 +1,12 @@
 #!/usr/bin/python
 #
-import re, dropbox, os, subprocess, datetime, filecmp
+import re, dropbox, os, subprocess, datetime, filecmp, sys
 
+numArgs = len(sys.argv)
+if numArgs < 2:
+    print("\n***\nUsage: db-backup <folder> \n\n")
+    sys.exit()
+    
 # Calculate a timestamp for use with sqldump files
 def fileQualifier(d):
     fq = str(d.year) + pad(d.month) + pad(d.day) + "_"
@@ -71,7 +76,7 @@ def count_remote_files(dropbox_client):
     return count
 
     
-source_folder = "/home/george"
+source_folder = sys.argv[1] if sys.argv[1][-1] != '/' else sys.argv[1][0:-1]
 dest_folder = "/"
 file_prefix = "slepeweb-cms-"
 file_list = []
