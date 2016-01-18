@@ -5,6 +5,6 @@
 <c:set var="_root" value="${_page.leftSidebar.navigation[0]}" />
 
 <nav id="left-nav">
-	<h3>In this section</h3>
+	<h3><a href="${_page.leftSidebar.navigation[0].href}">In this section</a></h3>
 	<sw:navigation-level list="${_root.children}" level="1" />
 </nav>

@@ -45,3 +45,7 @@ body, input, select, textarea {
 .dilbert {
   display: none;
 }
+
+img.markup {
+  max-width: 100%;
+}

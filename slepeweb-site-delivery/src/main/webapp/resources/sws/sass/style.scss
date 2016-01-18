@@ -1148,3 +1148,18 @@
 		margin-left: 5em;
 	}
 }
+
+img.markup {
+		top: 0.25em;
+		max-width: 50%;
+		
+		&.left {
+			float: left;
+			padding: 0.25em 1em 1em 0em;
+		}
+
+		&.right {
+			float: right;
+			padding: 0.25em 0em 1em 1em;
+		}
+}

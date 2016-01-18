@@ -1,14 +1,26 @@
 package com.slepeweb.cms.bean;
 
 import java.sql.Timestamp;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.slepeweb.cms.bean.Field.FieldType;
+
 public class FieldValue extends CmsBean {
 	private static final long serialVersionUID = 1L;
+	private static String LINK_PATTERN_STR = "\\$_(\\d+)";
+	private static Pattern ANCHOR_PATTERN = 
+			Pattern.compile(String.format("(<a href=\")%s(\".*?>)(.*?)(</a>)", LINK_PATTERN_STR), 
+					Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+	private static Pattern IMAGE_PATTERN = 
+			Pattern.compile(String.format("(<img src=\")%s(\".*?>(.*?)>)", LINK_PATTERN_STR), 
+					Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+	
 	private Long itemId;
 	private Field field;
-	private String stringValue;
+	private String stringValue, stringValueResolved;
 	private Integer integerValue;
 	private Timestamp dateValue;
 	
@@ -119,6 +131,68 @@ public class FieldValue extends CmsBean {
 		return this;
 	}
 
+	public String getStringValueResolved() {
+		if (this.stringValueResolved == null) {
+			if (this.field.getType() == FieldType.markup) {
+				this.stringValueResolved = resolveLinks(this.stringValue);
+			}
+			else {
+				this.stringValueResolved = "";
+			}
+		}
+		return this.stringValueResolved;
+	}
+
+	public void setStringValueResolved(String stringValueResolved) {
+		this.stringValueResolved = stringValueResolved;
+	}
+
+	private String resolveLinks(String s) {
+		if (s.indexOf("$_") > -1) {
+			String replacement = resolveLinks(ANCHOR_PATTERN.matcher(s));
+			return resolveLinks(IMAGE_PATTERN.matcher(replacement));
+		}
+		return s;
+	}
+	
+	private String resolveLinks(Matcher m) {
+		StringBuffer sb = new StringBuffer();
+		String id;
+		Item i;
+		String r = null;
+
+		while (m.find()) {
+			id = m.group(2);
+			i = getCmsService().getItemService().getItem(Long.parseLong(id));
+
+			if (m.pattern().equals(ANCHOR_PATTERN)) {
+				if (i != null) {
+					// Replace link ref with item path
+					r = m.group(1) + i.getPath() + m.group(3) + m.group(4) + m.group(5);
+				}
+				else {
+					// Remove surrounding <a> tag, and leave behind the body.
+					r = m.group(4);
+				}
+			}
+			else if (m.pattern().equals(IMAGE_PATTERN)) {
+				if (i != null) {
+					// Replace link ref with item path
+					r = m.group(1) + i.getPath() + m.group(3);
+				}
+				else {
+					// Remove <img> tag.
+					r = "";
+				}
+			}
+			
+			m.appendReplacement(sb, r);
+		}
+		
+		m.appendTail(sb);
+		return sb.toString();
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

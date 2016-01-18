@@ -1073,3 +1073,16 @@ input[type="button"]:disabled,
   display: none;
   margin-left: 5em;
 }
+
+img.markup {
+  top: 0.25em;
+  max-width: 50%;
+}
+img.markup.left {
+  float: left;
+  padding: 0.25em 1em 1em 0em;
+}
+img.markup.right {
+  float: right;
+  padding: 0.25em 0em 1em 1em;
+}

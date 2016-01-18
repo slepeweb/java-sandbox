@@ -293,10 +293,25 @@ public class Item extends CmsBean {
 		return getFieldValue(variable, "");
 	}
 	
+	public String getFieldValueResolved(String variable) {
+		return getFieldValueResolved(variable, "");
+	}
+	
 	public String getFieldValue(String variable, String dflt) {
 		FieldValue fv = getFieldValueObj(variable);
 		if (fv != null) {
 			return fv.getStringValue();
+		}
+		else if (dflt != null) {
+			return dflt;
+		}
+		return null;
+	}
+	
+	public String getFieldValueResolved(String variable, String dflt) {
+		FieldValue fv = getFieldValueObj(variable);
+		if (fv != null) {
+			return fv.getStringValueResolved();
 		}
 		else if (dflt != null) {
 			return dflt;

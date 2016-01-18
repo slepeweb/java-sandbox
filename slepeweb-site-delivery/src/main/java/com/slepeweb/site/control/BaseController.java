@@ -107,7 +107,7 @@ public class BaseController {
 		Page p = new Page(this.navigationService).
 				setTitle(i.getFieldValue("title")).
 				setHeading(i.getFieldValue("title")).
-				setBody(i.getFieldValue("bodytext", "")).
+				setBody(i.getFieldValueResolved("bodytext", "")).
 				setItem(i).
 				setView(getFullyQualifiedViewName(shortSitename, viewNameSuffix));
 		
