@@ -28,11 +28,11 @@ $(function() {
 			}
 			
 			for (var i = 0; i < resp.tweets.length; i++) {
-				html += '<div class="row twitter-side"><div class="1u"><img width="40px" src="';
+				html += '<div class="row twitter-side"><div class="2u"><img width="40px" src="';
 				html += resp.tweets[i].account.iconPath;
 				html += '" title="';
 				html += resp.tweets[i].account.name;
-				html += '" align="left" /></div><div class="10u"><span>';
+				html += '" align="left" /></div><div class="9u"><span>';
 				html += resp.tweets[i].account.name;
 				html += ', ';
 				html += resp.tweets[i].timeAgo.quantity + resp.tweets[i].timeAgo.unit + " ago";

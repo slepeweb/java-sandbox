@@ -1047,10 +1047,12 @@ input[type="button"]:disabled,
 
 .twitter-side {
   line-height: 1.2em;
-  margin-bottom: 10px;
-}
-.twitter-side div:nth-child(2) {
-  margin-left: 1.5em;
+  margin-bottom: 1em;
+  /*
+  div:nth-child(2) {
+   	margin-left: 1.5em;
+  }
+  */
 }
 .twitter-side span {
   font-weight: bold;
