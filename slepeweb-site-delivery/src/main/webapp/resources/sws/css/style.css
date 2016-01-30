@@ -1088,3 +1088,21 @@ img.markup.right {
   float: right;
   padding: 0.25em 0em 1em 1em;
 }
+
+.grey-gradient {
+  background: #cccccc;
+  min-height: 20em;
+  margin-bottom: 1em;
+}
+.grey-gradient.left2right {
+  background: -webkit-linear-gradient(left, #ccc, rgba(204, 204, 204, 0));
+  background: -o-linear-gradient(right, #ccc, rgba(204, 204, 204, 0));
+  background: -moz-linear-gradient(right, #ccc, rgba(204, 204, 204, 0));
+  background: linear-gradient(to right, #ccc, rgba(204, 204, 204, 0));
+}
+.grey-gradient.right2left {
+  background: -webkit-linear-gradient(left, rgba(204, 204, 204, 0), #ccc);
+  background: -o-linear-gradient(right, rgba(204, 204, 204, 0), #ccc);
+  background: -moz-linear-gradient(right, rgba(204, 204, 204, 0), #ccc);
+  background: linear-gradient(to right, rgba(204, 204, 204, 0), #ccc);
+}

@@ -1165,3 +1165,23 @@ img.markup {
 			padding: 0.25em 0em 1em 1em;
 		}
 }
+
+.grey-gradient {
+	background: rgba(204,204,204,1);
+	min-height: 20em;	
+	margin-bottom: 1em;
+	
+	&.left2right {
+		background: -webkit-linear-gradient(left,$left2right-gradient);
+		background: -o-linear-gradient(right,$left2right-gradient);
+		background: -moz-linear-gradient(right,$left2right-gradient);
+		background: linear-gradient(to right,$left2right-gradient);
+	}
+	
+	&.right2left {
+		background: -webkit-linear-gradient(left,$right2left-gradient);
+		background: -o-linear-gradient(right,$right2left-gradient);
+		background: -moz-linear-gradient(right,$right2left-gradient);
+		background: linear-gradient(to right,$right2left-gradient);
+	}
+}

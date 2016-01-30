@@ -6,7 +6,7 @@
 	<gen:debug><!-- jsp/sws/template/user/list.jsp --></gen:debug>
  
 	<!-- Left Sidebar -->
-	<div class="3u 6u(3)">
+	<div class="3u 6u(3) grey-gradient left2right">
 		<sw:navigation-left />
 	</div>
 	
