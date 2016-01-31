@@ -1093,6 +1093,10 @@ img.markup.right {
   background: #cccccc;
   min-height: 20em;
   margin-bottom: 1em;
+  line-height: 1.2em;
+}
+.grey-gradient li {
+  margin-bottom: 0.7em;
 }
 .grey-gradient.left2right {
   background: -webkit-linear-gradient(left, #ccc, rgba(204, 204, 204, 0));

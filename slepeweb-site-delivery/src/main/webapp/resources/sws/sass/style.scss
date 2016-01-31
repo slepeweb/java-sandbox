@@ -1170,6 +1170,11 @@ img.markup {
 	background: rgba(204,204,204,1);
 	min-height: 20em;	
 	margin-bottom: 1em;
+	line-height: 1.2em;
+	
+	li {
+		margin-bottom: 0.7em;
+	}
 	
 	&.left2right {
 		background: -webkit-linear-gradient(left,$left2right-gradient);
