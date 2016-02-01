@@ -28,7 +28,7 @@ $(function() {
 			}
 			
 			for (var i = 0; i < resp.tweets.length; i++) {
-				html += '<div class="row twitter-side"><div class="2u"><img width="40px" src="';
+				html += '<div class="row twitter-side"><div class="2u"><img src="';
 				html += resp.tweets[i].account.iconPath;
 				html += '" title="';
 				html += resp.tweets[i].account.name;
