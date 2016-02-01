@@ -1048,11 +1048,10 @@ input[type="button"]:disabled,
 .twitter-side {
   line-height: 1.2em;
   margin-bottom: 1em;
-  /*
-  div:nth-child(2) {
-   	margin-left: 1.5em;
-  }
-  */
+}
+.twitter-side img {
+  width: 180%;
+  max-width: 40px;
 }
 .twitter-side span {
   font-weight: bold;
