@@ -106,7 +106,12 @@ def head(req):
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>  
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Webcam Access</title>
+    <title>Security camera application</title>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
+    <link rel="stylesheet" href="/secam/app/style.css" />
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+    <script src="/secam/app/secam.js"></script>
   </head> 
   <body>
     """
@@ -115,6 +120,12 @@ def head(req):
 
 def tail(req):
     s = """
+        <div id="dialog-trash-confirm" class="hide" title="Delete file?">
+            <p>
+                <span class="ui-icon ui-icon-alert"></span>
+                Are you sure you want to delete this file?
+            </p>
+        </div>
   </body> 
 </html>
     """
