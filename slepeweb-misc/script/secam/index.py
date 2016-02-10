@@ -1,16 +1,19 @@
 import os, secam 
 from operator import attrgetter
 
-def delete_file(filename):
+def delete_file(file_list):
+    count = 0
+    files = file_list.split(",")
     for d in secam.get_videos():
-        if d.filename == filename:
-            try:
-                os.remove(secam.video_folder + filename)
-                return "File successfully deleted [%s]" % filename, True
-            except:
-                return "Failed to delete file [%s]" % filename, False
+        for filename in files:
+            if d.filename == filename:
+                try:
+                    os.remove(secam.video_folder + filename)
+                    count += 1
+                except:
+                    return "Failed to delete file [%s]" % filename, False
             
-    return "File not found [%s]" % filename, False
+    return "Deleted %d file(s)" % count, count == len(files)
     
 # param d: name of file for deletion
 # param b: name of fo;e for backup to dropbox
@@ -45,7 +48,7 @@ def index(req, d="", b=""):
             <th>Time</th>
             <th>Video</th>
             <th>Size</th>
-            <th>Delete?</th>
+            <th><span class="del-check">Delete?</span></th>
             <th>Backup?</th>
         </tr>"""
         
@@ -56,7 +59,7 @@ def index(req, d="", b=""):
         row = """<tr><td>%s</td><td>%s</td><td>%s</td>""" % (d.event, d.date.strftime("%d/%m/%y"), d.date.strftime("%H:%M:%S"))
         url = secam.app + secam.video_subfolder + d.filename
         row += """<td><a href="%s">%s</a></td><td>%s</td>""" % (url, "View", d.size)
-        row += """<td><span class="del-check" data-f="%s">Delete</span></td>""" % d.filename 
+        row += """<td><input class="deleteable-video" type="checkbox" value="%s" /></td>""" % d.filename 
         
         s = "Done" if d.backedup else """<a href="%sindex.py?b=%s">Backup</a>""" % (secam.app, d.filename)
         row += """<td>%s</td>""" % s 

@@ -123,7 +123,7 @@ def tail(req):
         <div id="dialog-trash-confirm" class="hide" title="Delete file?">
             <p>
                 <span class="ui-icon ui-icon-alert"></span>
-                Are you sure you want to delete this file?
+                Are you sure you want to delete <span id="num-files-target"></span> file(s)?
             </p>
         </div>
   </body> 
