@@ -1,7 +1,7 @@
 import re, os, dropbox
 from datetime import datetime
 
-videotype = "avi"
+videotype = "mp4"
 ctx = "/secam/"
 app = ctx + "app/"
 webroot = "/var/www/html/"
@@ -27,7 +27,7 @@ def backup_file(source_file):
         if d.filename == source_file:
             file_exists = True
             
-    if file_exists == False:
+    if not file_exists:
         return "File not found [%s]" % source_file, False 
 
     access_token = '4wPGw33d4lcAAAAAAAAAfVl873ag8OxmIoay_NNAGqol8rtv8QH3oPEADSSHiLhf'
@@ -82,7 +82,7 @@ class Document:
         self.filename = filename
         self.path = video_folder + filename
         self.backedup = False
-        m = re.search("(\d{2})-(\d{14})\.%s" % videotype, filename)
+        m = re.search("(\d{1,})-(\d{14})\.%s" % videotype, filename)
         if m:
             self.timestamp = m.group(2)
             self.date = datetime.strptime(self.timestamp, '%Y%m%d%H%M%S')
