@@ -1,4 +1,6 @@
-import secam, time, datetime, subprocess, smtplib, picamera
+#!/usr/bin/python
+#
+import secam, time, datetime, os, subprocess, threading, smtplib, picamera
 import RPi.GPIO as GPIO
 from email.mime.text import MIMEText
 
@@ -12,36 +14,38 @@ A security alarm (#%d) has been raised @ %s.
 Please investigate further @ %s
 """
 
-def get_filename_prefix(j, time_mark):
-    return "%d-%s" % (j, time_mark.strftime("%Y%m%d%H%M%S"))
+def get_filename_prefix(event_id, time_mark):
+    return "%d-%s" % (event_id, time_mark.strftime("%Y%m%d%H%M%S"))
 
-# def photo(camera, j):
-#     print('%d) Motion detected! ...' % j)
+# def photo(camera, event_id):
+#     print('%d) Motion detected! ...' % event_id)
 #     for i in range(1,3):
-#         capturename = ''.join(["/home/pi/spibox/capture/", get_filename_prefix(j), "-", str(j), "-", str(i), ".jpg"])
+#         capturename = ''.join(["/home/pi/spibox/capture/", get_filename_prefix(event_id), "-", str(event_id), "-", str(i), ".jpg"])
 #         print('... ' + capturename)
 #         camera.capture(capturename)
 #         time.sleep(0.5)
 
-def record_video(camera, j, time_mark):
-    print("%d) Motion detected! ..." % j)
-    video_file_path = ''.join([secam.video_folder, get_filename_prefix(j, time_mark), ".h264"])
-    out("recording to [%s]" % video_file_path)
-    camera.start_recording(video_file_path, quality=23)
-    camera.wait_recording(15)
+def record_video(camera, event_id, time_mark):
+    print("%d) Motion detected! ..." % event_id)
+    h264_path = ''.join([secam.video_folder, get_filename_prefix(event_id, time_mark), ".h264"])
+    out(event_id, "recording to [%s]" % h264_path)
+    camera.start_recording(h264_path, quality=23)
+    camera.wait_recording(20)
     camera.stop_recording()    
-    return convert2mp4(video_file_path)
+    return h264_path
 
-def convert2mp4(infile_path):
-    outfile_path = infile_path.replace("h264", "mp4")
-    out("converting to [%s]" % outfile_path)
+def convert2mp4(event_id, h264_path):
+    mp4_path = h264_path.replace("h264", "mp4")
+    out(event_id, "converting to [%s]" % mp4_path)
     try:
-        subprocess.check_call(["/usr/bin/MP4Box", "-add", infile_path, outfile_path])
-        out("video conversion complete")
+        subprocess.check_call(["/usr/bin/MP4Box", "-add", h264_path, mp4_path], stdout=FNULL, stderr=FNULL)
+        out(event_id, "video conversion complete")
+        os.remove(h264_path)
+        out(event_id, "deleted h264 file")
     except subprocess.CalledProcessError as e:
-        out("*** error converting record_video file [%s]" % e)
+        out(event_id, "*** error converting record_video file [%s]" % e)
     
-    return outfile_path
+    return mp4_path
 
 def send_mail(event_id, time_mark):
     event_time = time_mark.strftime("%Y/%m/%d %H:%M:%S")
@@ -52,14 +56,14 @@ def send_mail(event_id, time_mark):
     server = None
     
     try:
-        out("sending mail")
+        out(event_id, "sending mail")
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login("george.buttigieg@gmail.com", "br1cktop1")
         server.sendmail(mail_from, [mail_to], msg.as_string())
-        out("mail sent ok")
+        out(event_id, "mail sent ok")
     except:
-        out("*** problem sending mail")
+        out(event_id, "*** problem sending mail")
         
     finally:
         if server != None:
@@ -68,7 +72,7 @@ def send_mail(event_id, time_mark):
 def initialise_pir():
     start_time = time.time()
     
-    while GPIO.input(PIR) == 1:
+    while GPIO.input(PIR) == GPIO.HIGH:
         time.sleep(0.1)
         
     stop_time = time.time()
@@ -96,33 +100,43 @@ def initialise_camera():
     c.start_preview()
     return c
 
+def send_mail_and_backup_video(event_id, time_mark, h264_path):
+    send_mail(event_id, time_mark)    
+    mp4_path = convert2mp4(event_id, h264_path)    
+    msg, ok = secam.backup_file(file_part(mp4_path))
+    out(event_id, msg)
+
+def spawn_remaining_tasks(event_id, time_mark, h264_path):
+    fred = threading.Thread(target=send_mail_and_backup_video, args=[event_id, time_mark, h264_path])
+    #fred.daemon = True
+    fred.start()        
+
 def file_part(file_path):
     return file_path.split("/")[-1]
 
-def out(s):
-    print("... %s" % s)
+def out(event_id, str):
+    print("%d) ... %s" % (event_id, str))
 
 PIR = 4
-counter = 0
+event_counter = 0
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(PIR, GPIO.IN, GPIO.PUD_DOWN)
 camera = None
+FNULL = open(os.devnull, 'w')
 
 try:
     initialise_pir()
     camera = initialise_camera()
     
     while True:
-        GPIO.wait_for_edge(PIR, GPIO.RISING)
-        time_mark = datetime.datetime.now()
-        video_file_path = record_video(camera, counter, time_mark)        
-        send_mail(counter, time_mark)
+        #GPIO.wait_for_edge(PIR, GPIO.RISING)
+        if GPIO.input(PIR) == GPIO.HIGH:
+            time_mark = datetime.datetime.now()
+            h264_path = record_video(camera, event_counter, time_mark)
+            spawn_remaining_tasks(event_counter, time_mark, h264_path)
+            event_counter += 1
         
-        msg, ok = secam.backup_file(file_part(video_file_path))
-        out(msg)
-            
-        counter += 1
-        initialise_pir()
+        time.sleep(0.1)
 
 except KeyboardInterrupt:
     print "  Bye for now"
