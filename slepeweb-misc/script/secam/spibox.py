@@ -1,37 +1,61 @@
 #!/usr/bin/python
 #
-import secam, time, datetime, os, subprocess, threading, smtplib, picamera
-import RPi.GPIO as GPIO
+import secam, secamctrl, time, datetime, os, subprocess, smtplib
+import logging
+import RPi.GPIO as GPIO, picamera
 from email.mime.text import MIMEText
+from thread import *
 
-mail_from = "george@slepeweb.com"
-mail_to = "george@buttigieg.org.uk"
-mail_subject = "Security Alarm"
-web_page = "http://www.slepeweb.com/secam/app/index.py"
-mail_body = """
+
+# TODO: harden code - need to check CAMERA is set ???
+#       or, are we sure camera will never be invoked when RUN_STATUS == 'stop'?
+
+USER = "georgeb"
+PWD = "giga8yte"
+PIR = 4
+EVENT_COUNTER = 0
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(PIR, GPIO.IN, GPIO.PUD_DOWN)
+CAMERA = None
+FNULL = open(os.devnull, 'w')
+
+MAIL_FROM = "george@slepeweb.com"
+MAIL_TO = "george@buttigieg.org.uk"
+MAIL_SUBJECT = "Security Alarm"
+WEB_PAGE = "http://www.slepeweb.com/secam/app/index.py"
+MAIL_BODY = """
 A security alarm (#%d) has been raised @ %s.
 
 Please investigate further @ %s
 """
 
+RUN_STATUS = secamctrl.GO
+logging.info("====================================================================")
+
+logging.basicConfig(filename="/home/pi/spibox.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.info("Spibox application started")
+    
 def get_filename_prefix(event_id, time_mark):
     return "%d-%s" % (event_id, time_mark.strftime("%Y%m%d%H%M%S"))
 
-# def photo(camera, event_id):
+# def photo(CAMERA, event_id):
 #     print('%d) Motion detected! ...' % event_id)
 #     for i in range(1,3):
 #         capturename = ''.join(["/home/pi/spibox/capture/", get_filename_prefix(event_id), "-", str(event_id), "-", str(i), ".jpg"])
 #         print('... ' + capturename)
-#         camera.capture(capturename)
+#         CAMERA.capture(capturename)
 #         time.sleep(0.5)
 
-def record_video(camera, event_id, time_mark):
-    print("%d) Motion detected! ..." % event_id)
+def record_video(event_id, time_mark):
+    global CAMERA
+    logging.info("%d) Motion detected! ..." % event_id)
     h264_path = ''.join([secam.video_folder, get_filename_prefix(event_id, time_mark), ".h264"])
     out(event_id, "recording to [%s]" % h264_path)
-    camera.start_recording(h264_path, quality=23)
-    camera.wait_recording(20)
-    camera.stop_recording()    
+    CAMERA.start_recording(h264_path, quality=23)
+    CAMERA.wait_recording(15)
+    CAMERA.stop_recording()    
     return h264_path
 
 def convert2mp4(event_id, h264_path):
@@ -49,10 +73,10 @@ def convert2mp4(event_id, h264_path):
 
 def send_mail(event_id, time_mark):
     event_time = time_mark.strftime("%Y/%m/%d %H:%M:%S")
-    msg = MIMEText(mail_body % (event_id, event_time, web_page))
-    msg['Subject'] = mail_subject
-    msg['From'] = mail_from
-    msg['To'] = mail_to
+    msg = MIMEText(MAIL_BODY % (event_id, event_time, WEB_PAGE))
+    msg['Subject'] = MAIL_SUBJECT
+    msg['From'] = MAIL_FROM
+    msg['To'] = MAIL_TO
     server = None
     
     try:
@@ -60,7 +84,7 @@ def send_mail(event_id, time_mark):
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login("george.buttigieg@gmail.com", "br1cktop1")
-        server.sendmail(mail_from, [mail_to], msg.as_string())
+        server.sendmail(MAIL_FROM, [MAIL_TO], msg.as_string())
         out(event_id, "mail sent ok")
     except:
         out(event_id, "*** problem sending mail")
@@ -69,6 +93,54 @@ def send_mail(event_id, time_mark):
         if server != None:
             server.quit() 
 
+def take_photo(time_mark):
+    global CAMERA
+    file_path = ''.join([secam.video_folder, get_filename_prefix(-1, time_mark), ".jpg"])
+    CAMERA.capture(file_path)    
+
+def check_action_messages():
+    global CAMERA, CTRL
+    msg = CTRL.get_message()
+    not_recognized = "Message not recognized [%s]" % msg
+    error = False
+    
+    if msg:
+        if len(msg) > 1:
+            # TODO: message id won't always be a single digit
+            parts = msg.split(",")
+            if len(parts) != 2:
+                error = True
+            else:
+                action = parts[1]
+                
+                if action == "photo":
+                    if CAMERA:
+                        time_mark = datetime.datetime.now()
+                        take_photo(time_mark)
+                        logging.info("Photo-taken; confirmation sent")
+                    else:
+                        logging.warn("Camera is paused - cannot take snapshot")
+                elif action == secamctrl.STOP:
+                    RUN_STATUS = action
+                    CTRL.set_status(action)
+                    CAMERA.close()
+                    logging.info("STOP message received")
+                elif action == secamctrl.GO:
+                    RUN_STATUS = action
+                    CTRL.set_status(action)
+                    CAMERA = initialise_camera()
+                    logging.info("GO message received")
+                else:
+                    error = True
+    
+                CTRL.dequeue_message(msg)
+        else:
+            error = True     
+    
+        if error:
+            logging.info(not_recognized)     
+                
+    
 def initialise_pir():
     start_time = time.time()
     
@@ -76,29 +148,34 @@ def initialise_pir():
         time.sleep(0.1)
         
     stop_time = time.time()
-    print ("Sensor reset took: %0.1f secs" % ((stop_time-start_time)))
+    logging.info("Sensor reset took: %0.1f secs" % (stop_time - start_time))
     
 def initialise_camera():
-    c = picamera.PiCamera()
-    c.resolution = (1280, 720)
-    c.vflip = True
-    # c.iso = 100 for daytime, 4-800 for low light (sensitivity)
-    #
-    # For daylight conditions:
-    # camera.shutter_speed = camera.exposure_speed
-    # camera.exposure_mode = 'off'
-    # g = camera.awb_gains
-    # camera.awb_mode = 'off'
-    # camera.awb_gains = g
-    #
-    # For low-light conditions:
-    # camera.framerate = Fraction(1, 6)
-    # camera.shutter_speed = 6000000
-    # camera.exposure_mode = 'off'
-    # camera.iso = 800
-
-    c.start_preview()
-    return c
+    try:
+        c = picamera.PiCamera()
+        c.resolution = (1280, 720)
+        c.vflip = True
+        # c.iso = 100 for daytime, 4-800 for low light (sensitivity)
+        #
+        # For daylight conditions:
+        # CAMERA.shutter_speed = CAMERA.exposure_speed
+        # CAMERA.exposure_mode = 'off'
+        # g = CAMERA.awb_gains
+        # CAMERA.awb_mode = 'off'
+        # CAMERA.awb_gains = g
+        #
+        # For low-light conditions:
+        # CAMERA.framerate = Fraction(1, 6)
+        # CAMERA.shutter_speed = 6000000
+        # CAMERA.exposure_mode = 'off'
+        # CAMERA.iso = 800
+    
+        c.start_preview()
+        logging.info("Camera initialised")
+        return c
+    except:
+        logging.info("Failed to initialise the camera")
+        return None
 
 def send_mail_and_backup_video(event_id, time_mark, h264_path):
     send_mail(event_id, time_mark)    
@@ -106,42 +183,51 @@ def send_mail_and_backup_video(event_id, time_mark, h264_path):
     msg, ok = secam.backup_file(file_part(mp4_path))
     out(event_id, msg)
 
-def spawn_remaining_tasks(event_id, time_mark, h264_path):
-    fred = threading.Thread(target=send_mail_and_backup_video, args=[event_id, time_mark, h264_path])
-    #fred.daemon = True
-    fred.start()        
+# def spawn_remaining_tasks(event_id, time_mark, h264_path):
+#     task = threading.Thread(target=send_mail_and_backup_video, args=[event_id, time_mark, h264_path])
+#     task.start()        
+
+
+def spawn_secam_controller(ctrl):
+    ctrl.start()        
 
 def file_part(file_path):
     return file_path.split("/")[-1]
 
-def out(event_id, str):
-    print("%d) ... %s" % (event_id, str))
-
-PIR = 4
-event_counter = 0
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(PIR, GPIO.IN, GPIO.PUD_DOWN)
-camera = None
-FNULL = open(os.devnull, 'w')
-
-try:
-    initialise_pir()
-    camera = initialise_camera()
+def out(event_id, s):
+    logging.info("%d) ... %s" % (event_id, s))
     
+    
+CTRL = secamctrl.SecamController()
+start_new_thread(spawn_secam_controller, (CTRL,))     
+
+initialise_pir()
+CAMERA = initialise_camera()
+TIMER = 0
+SMALL_SLEEP = 0.2
+BIG_SLEEP = 2
+
+try:    
     while True:
-        #GPIO.wait_for_edge(PIR, GPIO.RISING)
-        if GPIO.input(PIR) == GPIO.HIGH:
-            time_mark = datetime.datetime.now()
-            h264_path = record_video(camera, event_counter, time_mark)
-            spawn_remaining_tasks(event_counter, time_mark, h264_path)
-            event_counter += 1
-        
-        time.sleep(0.1)
+        if RUN_STATUS == secamctrl.GO:
+            if GPIO.input(PIR) == GPIO.HIGH:        
+                time_mark = datetime.datetime.now()
+                h264_path = record_video(EVENT_COUNTER, time_mark)
+                #spawn_remaining_tasks(EVENT_COUNTER, time_mark, h264_path)
+                start_new_thread(send_mail_and_backup_video, (EVENT_COUNTER, time_mark, h264_path))
+                EVENT_COUNTER += 1
+            
+        if TIMER >= BIG_SLEEP:
+            TIMER = 0
+            check_action_messages()
+            
+        time.sleep(SMALL_SLEEP)
+        TIMER += SMALL_SLEEP
 
 except KeyboardInterrupt:
-    print "  Bye for now"
+    logging.info("Secam application finished")
     GPIO.cleanup()
 
 finally:
-    if camera != None:
-        camera.close()
+    if CAMERA != None:
+        CAMERA.close()

@@ -1,9 +1,12 @@
 import re, os, dropbox
 from datetime import datetime
 
+# Constants
 videotype = "mp4"
+imagetype = "jpg"
 ctx = "/secam/"
 app = ctx + "app/"
+index_page_path = app + "index.py"
 webroot = "/var/www/html/"
 video_subfolder = "video/"
 video_folder = webroot + video_subfolder
@@ -53,18 +56,18 @@ def update_backup_register(backup_filename):
     # Identify files previously backed up that are still resident on the web server
     register = get_backup_register()
     for old_backup_filename in register:
-        d = videos_stored_locally.get(old_backup_filename)
+        d = videos_stored_locally.get_message(old_backup_filename)
         if d != None:
             d.backedup = True
     
     # Mark this latest file as backed up        
-    d = videos_stored_locally.get(backup_filename)
+    d = videos_stored_locally.get_message(backup_filename)
     d.backedup = True 
     
     # Re-write the register file
     with open(webroot + backup_register, 'w') as f:
         for key in videos_stored_locally:
-            d = videos_stored_locally.get(key)
+            d = videos_stored_locally.get_message(key)
             if d.backedup:
                 f.write(d.filename + "\n")
                 
@@ -82,7 +85,7 @@ class Document:
         self.filename = filename
         self.path = video_folder + filename
         self.backedup = False
-        m = re.search("(\d{1,})-(\d{14})\.%s" % videotype, filename)
+        m = re.search("(-?\d{1,})-(\d{14})\.[%s|%s]" % (videotype, imagetype), filename)
         if m:
             self.timestamp = m.group(2)
             self.date = datetime.strptime(self.timestamp, '%Y%m%d%H%M%S')
@@ -100,33 +103,4 @@ class Document:
             return "%d Kb" % (l/thousand)
         else:
             return "%d Mb" % (l/million)
-    
-def head(req): 
-    s = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>  
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Security camera application</title>
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
-    <link rel="stylesheet" href="/secam/app/style.css" />
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
-    <script src="/secam/app/secam.js"></script>
-  </head> 
-  <body>
-    """
-    return s
-
-
-def tail(req):
-    s = """
-        <div id="dialog-trash-confirm" class="hide" title="Delete file?">
-            <p>
-                <span class="ui-icon ui-icon-alert"></span>
-                Are you sure you want to delete <span id="num-files-target"></span> file(s)?
-            </p>
-        </div>
-  </body> 
-</html>
-    """
-    return s
+        
