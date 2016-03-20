@@ -178,15 +178,6 @@ table.alt tfoot {
   border-top: 0;
 }
 
-.flash-msg {
-  border-style: solid;
-  border-width: 2px;
-  margin-left: 20px;
-  margin-bottom: 12px;
-  padding: 2px;
-  line-height: 1.4em;
-}
-
 .red {
   color: red;
 }
@@ -209,4 +200,17 @@ table.alt tfoot {
 
 #video-index-table th, td {
 	border: 1px black solid;
+}
+
+td.flash {
+	/*
+  border-style: solid;
+  border-width: 2px;
+  margin-left: 20px;
+  margin-bottom: 12px;
+  */
+  padding: 6px;
+  line-height: 1.4em;
+  color: green;
+  width: 25%;
 }

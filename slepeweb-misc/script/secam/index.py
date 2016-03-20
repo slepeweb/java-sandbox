@@ -14,6 +14,21 @@ MESSAGE_BODY = """
 
 CTRL = SecamControllerClient()
 
+def send_message(msg):
+    global CTRL
+    
+    if CTRL:
+        return CTRL.send_message(msg)
+    
+    return 0
+    
+def alert(msg):
+    if msg == -1:  
+        return MESSAGE_BODY % ("Messaging server is not available", secam.index_page_path);  
+    else:
+        return MESSAGE_BODY % (msg, secam.index_page_path);
+
+     
 def delete_file(file_list):
     count = 0
     files = file_list.split(",")
@@ -29,25 +44,27 @@ def delete_file(file_list):
     return "Deleted %d file(s)" % count, count == len(files)
     
 def putm(req, msg):
-    CTRL.send_message("q|" + msg)
-    h = head(req) 
-    t = tail(req)
-    b = MESSAGE_BODY % (msg, secam.index_page_path)
-    return " ".join([h, b, t])
+    req.content_type="Content-Type: text/plain"
+    return msg if send_message("q|" + msg) else "FAILED"
+    
+def status(req):
+    req.content_type="Content-Type: text/plain"
+    return send_message("status")
     
 def clrm(req):
     s = "Message queue cleared"
     logging.info(s)
-    CTRL.send_message("clrq")
+    b = alert(s) if send_message("clrq") else alert(-1)
     h = head(req) 
     t = tail(req)
-    b = MESSAGE_BODY % (s, secam.index_page_path)
     return " ".join([h, b, t])
     
 def get_q_status():
-    q = CTRL.send_message("getq")
-    a = q.split("|")
-    return "Message queue has %d entries %s" % (len(a), q)
+    resp = send_message("getq")
+    if resp:
+        a = resp.split("|")
+        return "Message queue has %d entries %s" % (len(a), resp)
+    return 
 
 # param d: name of file for deletion
 # param b: name of file for backup to dropbox
@@ -125,22 +142,13 @@ def head(req):
     return s
 
 
-def tail(req):
-    stop_start_param = "stop"
-    stop_start_label = "Stop camera"
-    snapshot_link = """<a href="%s/putm?msg=photo">Take snaphshot</a>""" % secam.index_page_path
-    
-    status = CTRL.send_message("status")
-    if status == "stop":
-        stop_start_param = "go"
-        stop_start_label = "Re-start camera"
-        snapshot_link = "(Take snaphshot)"
-    
+def tail(req):    
     s = """
         <table><tr>
-            <td>%s</td>
-            <td><a href="%s/clrm">Clear messages</a></td>
-            <td><a href="%s/putm?msg=%s">%s</a></td>
+            <td><button id="button-photo" value="photo">Take photo</button></td>
+            <td><button id="button-stopgo" value="stop">Pause surveillance</button></td></td>
+            <td><button id="button-refresh">Refresh</button></td>
+            <td class="flash"></td>
         </tr></table>
         <p></p>
         <div id="dialog-trash-confirm" class="hide" title="Delete file?">
@@ -149,7 +157,8 @@ def tail(req):
                 Are you sure you want to delete <span id="num-files-target"></span> file(s)?
             </p>
         </div>
+        <div id="bop"></div>
   </body> 
 </html>
-    """ % (snapshot_link, secam.index_page_path, secam.index_page_path, stop_start_param, stop_start_label)
+    """
     return s

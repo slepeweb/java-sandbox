@@ -99,14 +99,13 @@ def take_photo(time_mark):
     CAMERA.capture(file_path)    
 
 def check_action_messages():
-    global CAMERA, CTRL
+    global CAMERA, CTRL, RUN_STATUS
     msg = CTRL.get_message()
     not_recognized = "Message not recognized [%s]" % msg
     error = False
     
     if msg:
         if len(msg) > 1:
-            # TODO: message id won't always be a single digit
             parts = msg.split(",")
             if len(parts) != 2:
                 error = True
@@ -114,22 +113,28 @@ def check_action_messages():
                 action = parts[1]
                 
                 if action == "photo":
-                    if CAMERA:
+                    if RUN_STATUS == secamctrl.GO and CAMERA:
                         time_mark = datetime.datetime.now()
                         take_photo(time_mark)
                         logging.info("Photo-taken; confirmation sent")
                     else:
                         logging.warn("Camera is paused - cannot take snapshot")
                 elif action == secamctrl.STOP:
-                    RUN_STATUS = action
-                    CTRL.set_status(action)
-                    CAMERA.close()
-                    logging.info("STOP message received")
+                    if RUN_STATUS == secamctrl.GO:
+                        RUN_STATUS = action
+                        CTRL.set_status(action)
+                        CAMERA.close()
+                        logging.info("STOP message received")
+                    else:
+                        logging.warn("Current status is already STOP")
                 elif action == secamctrl.GO:
-                    RUN_STATUS = action
-                    CTRL.set_status(action)
-                    CAMERA = initialise_camera()
-                    logging.info("GO message received")
+                    if RUN_STATUS == secamctrl.STOP:
+                        RUN_STATUS = action
+                        CTRL.set_status(action)
+                        CAMERA = initialise_camera()
+                        logging.info("GO message received")
+                    else:
+                        logging.warn("Current status is already GO")
                 else:
                     error = True
     
@@ -207,16 +212,29 @@ TIMER = 0
 SMALL_SLEEP = 0.2
 BIG_SLEEP = 2
 
+pin_start_high = 0
+pin_end_high = 0
+
 try:    
     while True:
         if RUN_STATUS == secamctrl.GO:
-            if GPIO.input(PIR) == GPIO.HIGH:        
+            if GPIO.input(PIR) == GPIO.HIGH and CAMERA:        
                 time_mark = datetime.datetime.now()
-                h264_path = record_video(EVENT_COUNTER, time_mark)
-                #spawn_remaining_tasks(EVENT_COUNTER, time_mark, h264_path)
-                start_new_thread(send_mail_and_backup_video, (EVENT_COUNTER, time_mark, h264_path))
+                if not pin_start_high:
+                    pin_start_high = time_mark
+                #logging.info("GPIO pin is HIGH @ %s" % time_mark.strftime("%Y/%m/%d %H:%M:%S"))
+                #h264_path = record_video(EVENT_COUNTER, time_mark)
+                # spawn remaining tasks
+                #start_new_thread(send_mail_and_backup_video, (EVENT_COUNTER, time_mark, h264_path))
                 EVENT_COUNTER += 1
-            
+            else:
+                pin_end_high = datetime.datetime.now()
+                
+        if pin_start_high and pin_end_high:
+            logging.info("GPIO went HIGH @ %s, and went LOW %d secs later" % (pin_start_high.strftime("%Y/%m/%d %H:%M:%S"), (pin_end_high - pin_start_high) / 1000))
+            pin_start_high = 0
+            pin_end_high = 0
+           
         if TIMER >= BIG_SLEEP:
             TIMER = 0
             check_action_messages()
