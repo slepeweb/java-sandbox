@@ -6,10 +6,6 @@ import RPi.GPIO as GPIO, picamera
 from email.mime.text import MIMEText
 from thread import *
 
-
-# TODO: harden code - need to check CAMERA is set ???
-#       or, are we sure camera will never be invoked when RUN_STATUS == 'stop'?
-
 USER = "georgeb"
 PWD = "giga8yte"
 PIR = 4
@@ -54,7 +50,8 @@ def record_video(event_id, time_mark):
     h264_path = ''.join([secam.video_folder, get_filename_prefix(event_id, time_mark), ".h264"])
     out(event_id, "recording to [%s]" % h264_path)
     CAMERA.start_recording(h264_path, quality=23)
-    CAMERA.wait_recording(15)
+    # PIR stays high for 8 secs, then low for 8 secs; cycle is 16 secs
+    CAMERA.wait_recording(16)
     CAMERA.stop_recording()    
     return h264_path
 
@@ -215,23 +212,26 @@ BIG_SLEEP = 2
 pin_start_high = 0
 pin_end_high = 0
 
+# From observation, it seems that the PIR will go LOW after being HIGH for 8 seconds,
+# then will not go high again for another 8 seconds. This means that there will always
+# be 8 second gaps in videos taken during a long event.
+
 try:    
     while True:
-        if RUN_STATUS == secamctrl.GO:
-            if GPIO.input(PIR) == GPIO.HIGH and CAMERA:        
-                time_mark = datetime.datetime.now()
-                if not pin_start_high:
+        if RUN_STATUS == secamctrl.GO and CAMERA:
+            if GPIO.input(PIR) == GPIO.HIGH: 
+                if not pin_start_high:       
+                    time_mark = datetime.datetime.now()
                     pin_start_high = time_mark
-                #logging.info("GPIO pin is HIGH @ %s" % time_mark.strftime("%Y/%m/%d %H:%M:%S"))
-                #h264_path = record_video(EVENT_COUNTER, time_mark)
-                # spawn remaining tasks
-                #start_new_thread(send_mail_and_backup_video, (EVENT_COUNTER, time_mark, h264_path))
-                EVENT_COUNTER += 1
+                    h264_path = record_video(EVENT_COUNTER, time_mark)
+                    start_new_thread(send_mail_and_backup_video, (EVENT_COUNTER, time_mark, h264_path))
+                    EVENT_COUNTER += 1
             else:
-                pin_end_high = datetime.datetime.now()
+                if pin_start_high:
+                    pin_end_high = datetime.datetime.now()
                 
         if pin_start_high and pin_end_high:
-            logging.info("GPIO went HIGH @ %s, and went LOW %d secs later" % (pin_start_high.strftime("%Y/%m/%d %H:%M:%S"), (pin_end_high - pin_start_high) / 1000))
+            logging.info("%d) GPIO went HIGH @ %s, and went LOW %d secs later" % (EVENT_COUNTER - 1, pin_start_high.strftime("%Y/%m/%d %H:%M:%S"), (pin_end_high - pin_start_high).seconds))
             pin_start_high = 0
             pin_end_high = 0
            

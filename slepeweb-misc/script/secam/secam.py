@@ -56,18 +56,18 @@ def update_backup_register(backup_filename):
     # Identify files previously backed up that are still resident on the web server
     register = get_backup_register()
     for old_backup_filename in register:
-        d = videos_stored_locally.get_message(old_backup_filename)
+        d = videos_stored_locally.get(old_backup_filename)
         if d != None:
             d.backedup = True
     
     # Mark this latest file as backed up        
-    d = videos_stored_locally.get_message(backup_filename)
+    d = videos_stored_locally.get(backup_filename)
     d.backedup = True 
     
     # Re-write the register file
     with open(webroot + backup_register, 'w') as f:
         for key in videos_stored_locally:
-            d = videos_stored_locally.get_message(key)
+            d = videos_stored_locally.get(key)
             if d.backedup:
                 f.write(d.filename + "\n")
                 

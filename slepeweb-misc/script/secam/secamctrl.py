@@ -133,5 +133,5 @@ class SecamController:
     def get_status(self):
         return self.status
 
-if __name__ == "__main__":
-    SecamController()
+#if __name__ == "__main__":
+#    SecamController()
