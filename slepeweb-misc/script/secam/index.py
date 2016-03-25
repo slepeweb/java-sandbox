@@ -51,13 +51,17 @@ def status(req):
     req.content_type="Content-Type: text/plain"
     return send_message("status")
     
-def clrm(req):
-    s = "Message queue cleared"
+def delete(req, files=""):
+    req.content_type="Content-Type: text/plain"
+    s, ok = delete_file(files)
     logging.info(s)
-    b = alert(s) if send_message("clrq") else alert(-1)
-    h = head(req) 
-    t = tail(req)
-    return " ".join([h, b, t])
+    return s
+    
+def backup(req, plik=""):
+    req.content_type="Content-Type: text/plain"
+    s, ok = secam.backup_file(file)
+    logging.info(s)
+    return s
     
 def get_q_status():
     resp = send_message("getq")
@@ -66,36 +70,11 @@ def get_q_status():
         return "Message queue has %d entries %s" % (len(a), resp)
     return 
 
-# param d: name of file for deletion
-# param b: name of file for backup to dropbox
-def index(req, d="", b=""):
-    msg = s = heading = None
-    ok = True
-    
-    if d:
-        # File deltion request
-        heading = "File deletion"
-        s, ok = delete_file(d)
-    elif b:
-        # File backup request
-        heading = "File backup"
-        s, ok = secam.backup_file(b)
-#     elif mp:
-#         secam.MESSAGE_STACK.append(mp)
-        
-    h = head(req) 
-    t = tail(req)
-    
-    if d or b:
-        h1 = "<h1>%s</h1>" % heading
-        msg = """<h2 class="%s">%s</h2>""" % ("green" if ok else "red", s)
-        rtn = """<a href="%sindex.py">Return to index</a>""" % secam.app
-        return " ".join([h, h1, msg, rtn, t])
-
-    h1 = "<h1>Video index</h1>"
+def table(req):
+    h1 = """<div id="main"><h1>Video index</h1>"""
     a = secam.get_videos()
     if len(a) == 0:
-        return " ".join([h, h1, "<h2>No media items found</h2>", t])
+        return " ".join([h1, "<h2>No media items found</h2>"])
     
     b_start = """<table id="video-index-table"><tr>
             <th>Event id</th>
@@ -115,15 +94,20 @@ def index(req, d="", b=""):
         url = secam.app + secam.video_subfolder + d.filename
         row += """<td><a href="%s">%s</a></td><td>%s</td>""" % (url, "View", d.size)
         row += """<td><input class="deleteable-video" type="checkbox" value="%s" /></td>""" % d.filename 
-        
-        s = "Done" if d.backedup else """<a href="%sindex.py?b=%s">Backup</a>""" % (secam.app, d.filename)
-        row += """<td>%s</td>""" % s 
+        row += "<td>Done</td>" if d.backedup else """<td><button class="backup-button" value="%s">Backup</button></td>""" % d.filename 
         row += "</tr>"
         rows.append(row)
 
-    b_end = "</table></body>"
+    b_end = "</table></div>"
+    return " ".join([h1, b_start, ' '.join(rows), b_end])
 
-    return " ".join([h, h1, b_start, ' '.join(rows), b_end, t])
+
+def index(req):
+    h = head(req) 
+    t = tail(req)
+    b = table(req)
+    return " ".join([h, b, t])
+
 
 def head(req): 
     s = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

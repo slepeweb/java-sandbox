@@ -11,7 +11,32 @@ function manageButtons(msg) {
 	}
 }
 
+function reloadTable() {
+	$.ajax({
+		url : "/secam/app/index.py/table",
+		cache : false
+	}).done(function(resp) {
+		$("#main").empty().append(resp);
+	}).fail(function(jqXHR, status) {
+		//console.log(status);
+	});		
+}
+
 $(function() {
+	$(".backup-button").click(function() {
+		var filename = $(this).attr("value");
+		$.ajax({
+			url : "/secam/app/index.py/backup?plik=" + filename,
+			dataType : "text",
+			cache : false
+		}).done(function(resp) {
+			$(".flash").empty().append(resp);
+			reloadTable();
+		}).fail(function(jqXHR, status) {
+			//console.log(status);
+		});		
+	});
+
 	$(".del-check").click(function() {
 		var file_list = "";
 		$(".deleteable-video:checked").each(function(index, element){
@@ -30,8 +55,18 @@ $(function() {
 				modal: true,
 				buttons: {
 					"Delete file(s)": function() {
-						$(this).dialog("close");
-						window.location = "/secam/app/index.py?d=" + file_list;
+						$.ajax({
+							url : "/secam/app/index.py/delete?files=" + file_list,
+							dataType : "text",
+							cache : false
+						}).done(function(resp) {
+							$(".flash").empty().append(resp);
+							reloadTable();
+							$("#dialog-trash-confirm").dialog("close");
+						}).fail(function(jqXHR, status) {
+							//console.log(status);
+							$("#dialog-trash-confirm").dialog("close");
+						});		
 					},
 					Cancel: function() {
 						$(this).dialog("close");
