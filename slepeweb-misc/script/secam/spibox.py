@@ -18,7 +18,7 @@ FNULL = open(os.devnull, 'w')
 MAIL_FROM = "george@slepeweb.com"
 MAIL_TO = "george@buttigieg.org.uk"
 MAIL_SUBJECT = "Security Alarm"
-WEB_PAGE = "http://www.slepeweb.com/secam/app/index.py"
+WEB_PAGE = "http://www.slepeweb.com/secam/app/py/index.py"
 MAIL_BODY = """
 A security alarm (#%d) has been raised @ %s.
 
@@ -28,13 +28,13 @@ Please investigate further @ %s
 RUN_STATUS = secamctrl.GO
 logging.info("====================================================================")
 
-logging.basicConfig(filename="/home/pi/spibox.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
+logging.basicConfig(filename="/var/www/html/log/spibox.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.info("Spibox application started")
     
 def get_filename_prefix(event_id, time_mark):
-    return "%d-%s" % (event_id, time_mark.strftime("%Y%m%d%H%M%S"))
+    return "%s-%s" % (event_id, time_mark.strftime("%Y%m%d%H%M%S"))
 
 # def photo(CAMERA, event_id):
 #     print('%d) Motion detected! ...' % event_id)
@@ -92,7 +92,7 @@ def send_mail(event_id, time_mark):
 
 def take_photo(time_mark):
     global CAMERA
-    file_path = ''.join([secam.video_folder, get_filename_prefix(-1, time_mark), ".jpg"])
+    file_path = ''.join([secam.video_folder, get_filename_prefix("P", time_mark), ".jpg"])
     CAMERA.capture(file_path)    
 
 def check_action_messages():

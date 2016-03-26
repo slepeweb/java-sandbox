@@ -15,7 +15,7 @@ STAT = "status"
 HOST = ''   # Symbolic name, meaning all available interfaces
 PORT = 8888 # Arbitrary non-privileged port    
 
-logging.basicConfig(filename="/home/pi/secamctrl.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
+logging.basicConfig(filename="/var/www/html/log/secamctrl.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
 
 class SecamControllerClient:
     def send_message(self, msg):

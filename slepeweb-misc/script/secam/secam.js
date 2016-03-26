@@ -1,4 +1,5 @@
 var status = null;
+var indexPath = "/secam/app/py/index.py";
 
 function manageButtons(msg) {
 	if (msg == "stop") {
@@ -13,7 +14,7 @@ function manageButtons(msg) {
 
 function reloadTable() {
 	$.ajax({
-		url : "/secam/app/index.py/table",
+		url : indexPath + "/table",
 		cache : false
 	}).done(function(resp) {
 		$("#main").empty().append(resp);
@@ -26,11 +27,11 @@ $(function() {
 	$(".backup-button").click(function() {
 		var filename = $(this).attr("value");
 		$.ajax({
-			url : "/secam/app/index.py/backup?plik=" + filename,
+			url : indexPath + "/backup?plik=" + filename,
 			dataType : "text",
 			cache : false
 		}).done(function(resp) {
-			$(".flash").empty().append(resp);
+			$(".flash").empty().append("File " + filename + " backed up");
 			reloadTable();
 		}).fail(function(jqXHR, status) {
 			//console.log(status);
@@ -56,7 +57,7 @@ $(function() {
 				buttons: {
 					"Delete file(s)": function() {
 						$.ajax({
-							url : "/secam/app/index.py/delete?files=" + file_list,
+							url : indexPath + "/delete?files=" + file_list,
 							dataType : "text",
 							cache : false
 						}).done(function(resp) {
@@ -90,7 +91,7 @@ $(function() {
 	$("#button-photo,#button-stopgo").click(function() {	
 		var msg = $(this).attr("value");
 		$.ajax({
-			url : "/secam/app/index.py/putm?msg=" + msg,
+			url : indexPath + "/putm?msg=" + msg,
 			dataType : "text",
 			cache : false
 		}).done(function(resp) {

@@ -2,7 +2,7 @@ import os, secam, logging
 from operator import attrgetter
 from secamctrl import SecamControllerClient
 
-logging.basicConfig(filename="/home/pi/index.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.INFO)
+logging.basicConfig(filename="/var/www/html/log/index.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.info("Index page loaded")
 
@@ -59,7 +59,7 @@ def delete(req, files=""):
     
 def backup(req, plik=""):
     req.content_type="Content-Type: text/plain"
-    s, ok = secam.backup_file(file)
+    s, ok = secam.backup_file(plik)
     logging.info(s)
     return s
     
@@ -116,10 +116,10 @@ def head(req):
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Security camera application</title>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
-    <link rel="stylesheet" href="/secam/app/style.css" />
+    <link rel="stylesheet" href="/secam/app/resource/style.css" />
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
-    <script src="/secam/app/secam.js"></script>
+    <script src="/secam/app/resource/secam.js"></script>
   </head> 
   <body>
     """

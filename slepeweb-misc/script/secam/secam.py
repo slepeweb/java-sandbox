@@ -10,7 +10,7 @@ index_page_path = app + "index.py"
 webroot = "/var/www/html/"
 video_subfolder = "video/"
 video_folder = webroot + video_subfolder
-backup_register = ".backup-register"
+backup_register = "resource/backup-register"
 
 def get_videos():
     a = []  
@@ -29,6 +29,7 @@ def backup_file(source_file):
     for d in get_videos():
         if d.filename == source_file:
             file_exists = True
+            break
             
     if not file_exists:
         return "File not found [%s]" % source_file, False 
@@ -85,7 +86,7 @@ class Document:
         self.filename = filename
         self.path = video_folder + filename
         self.backedup = False
-        m = re.search("(-?\d{1,})-(\d{14})\.[%s|%s]" % (videotype, imagetype), filename)
+        m = re.search("(P|\d{1,})-(\d{14})\.[%s|%s]" % (videotype, imagetype), filename)
         if m:
             self.timestamp = m.group(2)
             self.date = datetime.strptime(self.timestamp, '%Y%m%d%H%M%S')
