@@ -2,7 +2,7 @@ import os, secam, logging
 from operator import attrgetter
 from secamctrl import SecamControllerClient
 
-logging.basicConfig(filename="/var/www/html/log/index.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.INFO)
+logging.basicConfig(filename="/var/www/html/log/secam.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.info("Index page loaded")
 
@@ -71,7 +71,7 @@ def get_q_status():
     return 
 
 def table(req):
-    h1 = """<div id="main"><h1>Video index</h1>"""
+    h1 = """<h1>Video index</h1>"""
     a = secam.get_videos()
     if len(a) == 0:
         return " ".join([h1, "<h2>No media items found</h2>"])
@@ -98,7 +98,7 @@ def table(req):
         row += "</tr>"
         rows.append(row)
 
-    b_end = "</table></div>"
+    b_end = "</table>"
     return " ".join([h1, b_start, ' '.join(rows), b_end])
 
 
@@ -122,12 +122,14 @@ def head(req):
     <script src="/secam/app/resource/secam.js"></script>
   </head> 
   <body>
+      <div id="main">
     """
     return s
 
 
 def tail(req):    
     s = """
+        </div>
         <table><tr>
             <td><button id="button-photo" value="photo">Take photo</button></td>
             <td><button id="button-stopgo" value="stop">Pause surveillance</button></td></td>

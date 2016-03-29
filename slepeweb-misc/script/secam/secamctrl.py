@@ -15,7 +15,7 @@ STAT = "status"
 HOST = ''   # Symbolic name, meaning all available interfaces
 PORT = 8888 # Arbitrary non-privileged port    
 
-logging.basicConfig(filename="/var/www/html/log/secamctrl.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
+logging.basicConfig(filename="/var/www/html/log/secam.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
 
 class SecamControllerClient:
     def send_message(self, msg):
@@ -37,7 +37,7 @@ class SecamController:
     
     def __init__(self):
         self.server = None
-        self.status = GO
+        self.status = STOP
         self.queue = []
         self.counter = 0
      
@@ -69,6 +69,9 @@ class SecamController:
         finally:
             self.server.close()
                  
+    def close(self):
+        self.server.close()
+        
     def service(self, conn):
         while True:
             # Blocking call: Wait for a) message from client, or b) closed connection
@@ -132,6 +135,3 @@ class SecamController:
         
     def get_status(self):
         return self.status
-
-#if __name__ == "__main__":
-#    SecamController()

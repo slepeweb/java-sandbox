@@ -1,4 +1,4 @@
-import re, os, dropbox
+import re, os, dropbox, logging, picamera
 from datetime import datetime
 
 # Constants
@@ -11,6 +11,8 @@ webroot = "/var/www/html/"
 video_subfolder = "video/"
 video_folder = webroot + video_subfolder
 backup_register = "resource/backup-register"
+
+logging.basicConfig(filename="/var/www/html/log/secam.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
 
 def get_videos():
     a = []  
@@ -104,4 +106,45 @@ class Document:
             return "%d Kb" % (l/thousand)
         else:
             return "%d Mb" % (l/million)
+        
+
+class Secam:
+    def __init__(self):
+        self.recording = False
+        
+    def record_video(self, file_path, duration):
+        if not self.recording:
+            self.recording = True
+            
+            with picamera.PiCamera() as camera:
+                self.prepare(camera)
+                camera.start_recording(file_path, quality=23)
+                camera.wait_recording(duration)
+                camera.stop_recording() 
+                self.complete(camera)
+                logging.info("Video recording completed")
+                
+            self.recording = False
+        else:
+            logging.warn("Camera is already recording")
+               
+        return file_path
+
+    def capture_photo(self, file_path):
+        with picamera.PiCamera() as camera:
+            self.prepare(camera)
+            camera.capture(file_path)
+            self.complete(camera)
+            logging.info("Photo taken")
+               
+        return file_path
+
+    def prepare(self, camera):
+        camera.resolution = (1280, 720)
+        camera.vflip = True
+        camera.start_preview()
+
+    def complete(self, camera):
+        camera.stop_preview()
+        camera.close()
         
