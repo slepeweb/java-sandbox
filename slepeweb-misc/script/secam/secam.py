@@ -111,6 +111,10 @@ class Document:
 class Secam:
     def __init__(self):
         self.recording = False
+        self.brightness = 50
+        self.contrast = 0
+        self.mode = 'auto'
+        self.iso = 0
         
     def record_video(self, file_path, duration):
         if not self.recording:
@@ -142,9 +146,12 @@ class Secam:
     def prepare(self, camera):
         camera.resolution = (1280, 720)
         camera.vflip = True
+        camera.brightness = self.brightness
+        camera.contrast = self.contrast
+        camera.exposure_mode = self.mode
+        camera.iso = self.iso
         camera.start_preview()
 
     def complete(self, camera):
         camera.stop_preview()
         camera.close()
-        

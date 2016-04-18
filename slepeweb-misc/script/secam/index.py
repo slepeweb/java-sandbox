@@ -136,6 +136,14 @@ def tail(req):
             <td><button id="button-refresh">Refresh</button></td>
             <td class="flash"></td>
         </tr></table>
+        
+        <table>
+            <tr><td>Brightness</td><td><select class="ctrl" id="brightness">%s</select></td></tr>
+            <tr><td>Contrast</td><td><select class="ctrl" id="contrast">%s</select></td></tr>
+            <tr><td>Mode</td><td><select class="ctrl" id="mode">%s</select></td></tr>
+            <tr><td>ISO</td><td><select class="ctrl" id="iso">%s</select></td></tr>
+        </table>
+        
         <p></p>
         <div id="dialog-trash-confirm" class="hide" title="Delete file?">
             <p>
@@ -146,5 +154,23 @@ def tail(req):
         <div id="bop"></div>
   </body> 
 </html>
-    """
+    """ % (int_options_stepped(10, 100, 10), int_options_stepped(-80, 100, 20), str_options_arr(["auto", "night"]), int_options_arr([0, 100, 200, 400, 800]))
+    return s
+
+def int_options_stepped(start, end, step):
+    s = ""
+    for i in range(start, end, step):
+        s += """<option value="%d">%d</option>""" % (i, i)
+    return s
+
+def str_options_arr(lis):
+    s = ""
+    for ss in lis:
+        s += """<option value="%s">%s</option>""" % (ss, ss)
+    return s
+
+def int_options_arr(lis):
+    s = ""
+    for i in lis:
+        s += """<option value="%d">%d</option>""" % (i, i)
     return s

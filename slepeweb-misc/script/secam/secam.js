@@ -1,13 +1,18 @@
 var status = null;
 var indexPath = "/secam/app/py/index.py";
 
-function manageButtons(msg) {
-	if (msg == "stop") {
-		$("#button-stopgo").val("go").empty().append("Continue surveillance")
+function manageButtons(map) {
+	if (map["status"] == "stop") {
+		$("#button-stopgo").val("go").empty().append("Continue surveillance");
 	}
-	else if (msg == "go") {
-		$("#button-stopgo").val("stop").empty().append("Pause surveillance")
+	else if (map["status"] == "go") {
+		$("#button-stopgo").val("stop").empty().append("Pause surveillance");
 	}
+	
+	$("#brightness option[value=" + map["brightness"] + "]").attr("selected", "selected");
+	$("#contrast option[value=" + map["contrast"] + "]").attr("selected", "selected");
+	$("#mode option[value=" + map["mode"] + "]").attr("selected", "selected");
+	$("#iso option[value=" + map["iso"] + "]").attr("selected", "selected");
 }
 
 function reloadTable() {
@@ -18,6 +23,8 @@ function reloadTable() {
 		$("#main").empty().append(resp);
 		
 		// Parse page to add behaviour
+		
+		// Backup files to dropbox
 		$(".backup-button").click(function() {
 			var filename = $(this).attr("value");
 			$.ajax({
@@ -32,6 +39,7 @@ function reloadTable() {
 			});		
 		});
 
+		// Delete files
 		$(".del-check").click(function() {
 			var file_list = "";
 			$(".deleteable-video:checked").each(function(index, element){
@@ -71,6 +79,7 @@ function reloadTable() {
 			}
 		});
 		
+		// Send contro messages to camera (spibox.py)
 		$("#button-photo,#button-stopgo").click(function() {	
 			var msg = $(this).attr("value");
 			$.ajax({
@@ -85,6 +94,22 @@ function reloadTable() {
 			});		
 		});
 
+		// Send more control messages to camera (spibox.py)
+		$(".ctrl").change(function() {	
+			var ctrl = $(this).attr("id");
+			var value = $(this).find(":selected").text();
+			var msg = ctrl + "," + value;
+			$.ajax({
+				url : indexPath + "/putm?msg=" + msg,
+				dataType : "text",
+				cache : false
+			}).done(function(resp) {
+				$(".flash").empty().append("'" + msg + "' message sent");
+			}).fail(function(jqXHR, status) {
+				//console.log(status);
+			});		
+		});
+
 		$("#button-refresh").click(function(e) {	
 			location.reload(true);
 		});
@@ -93,18 +118,32 @@ function reloadTable() {
 	});		
 }
 
+function toMap(s) {
+	var pair;
+	var map = {};
+	var parts = s.split(",");
+	for (var i = 0; i < parts.length; i++) {
+		pair = parts[i].split("=");
+		if (pair.length == 2) {
+			map[pair[0]] = pair[1];
+		}
+	}
+	return map;
+}
+
 $(function() {	
 	$.ajax({
 		url : indexPath + "/status",
 		dataType : "text",
 		cache : false
 	}).done(function(resp) {
-		$(".flash").empty().append("Status: " + resp);
+		var map = toMap(resp);
+		$(".flash").empty().append("Status: " + map["status"]);
 		reloadTable();
-		manageButtons(resp);
+		manageButtons(map);
 	}).fail(function(jqXHR, status) {
 		//console.log(status);
 	});		
 		
-	$("html", "body").scrollTo("#bop");
+	//$("html", "body").scrollTo("#bop");
 });

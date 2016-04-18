@@ -82,7 +82,7 @@ def check_action_messages(camera, ctrl):
     if msg:
         if len(msg) > 1:
             parts = msg.split(",")
-            if len(parts) != 2:
+            if len(parts) < 2:
                 error = True
             else:
                 action = parts[1]
@@ -103,6 +103,29 @@ def check_action_messages(camera, ctrl):
                         logging.info("GO message received")
                     else:
                         logging.warn("Current status is already GO")
+                elif len(parts) == 3:
+                    arg = parts[2]
+                    if action == secamctrl.BRIGHTNESS:
+                        logging.info("Brightness was set to %s" % camera.brightness)
+                        camera.brightness = int(arg)
+                        ctrl.set_brightness(int(arg))
+                        logging.info("Brightness changed to %s" % arg)
+                    elif action == secamctrl.CONTRAST:
+                        logging.info("Contrast was set to %s" % camera.contrast)
+                        camera.contrast = int(arg)
+                        ctrl.set_contrast(camera.contrast)
+                        logging.info("Contrast changed to %s" % arg)
+                    elif action == secamctrl.EXPOSURE_MODE:
+                        logging.info("Exposure mode was set to %s" % camera.exposure_mode)
+                        camera.exposure_mode = arg
+                        ctrl.set_exposure_mode(camera.exposure_mode)
+                        logging.info("Exposure mode changed to %s" % arg)
+                    elif action == secamctrl.ISO:
+                        logging.info("ISO sensitivity was set to %s" % camera.iso)
+                        camera.iso = int(arg)
+                        ctrl.set_iso(camera.iso)
+                        logging.info("ISO sensitivity changed to %s" % arg)
+                        
                 else:
                     error = True
     

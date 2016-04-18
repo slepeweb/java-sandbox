@@ -3,6 +3,11 @@ from thread import *
 
 GO = "go"
 STOP = "stop"
+SETTINGS = "settings"
+BRIGHTNESS = "brightness"
+CONTRAST = "contrast"
+ISO = "iso"
+EXPOSURE_MODE = "mode"
 OK = "ok"
 Q = "q"
 DQ = "dq"
@@ -40,6 +45,7 @@ class SecamController:
         self.status = STOP
         self.queue = []
         self.counter = 0
+        self.settings = {BRIGHTNESS: 50, CONTRAST: 0, EXPOSURE_MODE: 'auto', ISO: 0}
      
     def start(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -82,7 +88,9 @@ class SecamController:
             data = dirty.strip(" \t\n\r")
             
             if data == STAT:
-                conn.sendall(self.get_status())
+                status_map = self.get_settings()
+                status_map[STAT]=self.get_status()
+                conn.sendall(self.get_settings_str(status_map))
             elif data == GETQ:
                 r = "|".join(self.queue) if len(self.queue) > 0 else NR
                 conn.sendall(r)
@@ -92,7 +100,7 @@ class SecamController:
             else:
                 parts = data.split("|")
             
-                if len(parts) == 2:
+                if len(parts) > 1:
                     if parts[0] == Q:                    
                         response = self.queue_message(parts[1])           
                     else:
@@ -135,3 +143,38 @@ class SecamController:
         
     def get_status(self):
         return self.status
+
+    def set_brightness(self, value):
+        self.settings[BRIGHTNESS] = value
+
+    def get_brightness(self):
+        return self.settings[BRIGHTNESS]
+
+    def set_contrast(self, value):
+        self.settings[CONTRAST] = value
+
+    def get_contrast(self):
+        return self.settings[CONTRAST]
+
+    def set_exposure_mode(self, value):
+        self.settings[EXPOSURE_MODE] = value
+
+    def get_exposure_mode(self):
+        return self.settings[EXPOSURE_MODE]
+
+    def set_iso(self, value):
+        self.settings[ISO] = value
+
+    def get_iso(self):
+        return self.settings[ISO]
+    
+    def get_settings(self):
+        return self.settings
+
+    def get_settings_str(self, m):
+        s = ""
+        for key in m:
+            if len(s) > 0:
+                s += ','
+            s += "%s=%s" % (key, m[key])
+        return s
