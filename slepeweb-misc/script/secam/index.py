@@ -1,79 +1,44 @@
-import os, secam, logging
+import logging, secam
 from operator import attrgetter
-from secamctrl import SecamControllerClient
 
 logging.basicConfig(filename="/var/www/html/log/secam.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.info("Index page loaded")
 
-MESSAGE_BODY = """
+_message_body = """
 <h1>Messaging</h1>
 <p>Message received: '%s'</p>
 <a href="%s">Return to index</a>
 """
 
-CTRL = SecamControllerClient()
+_const = secam.Constants()
 
-def send_message(msg):
-    global CTRL
+def send_message(action, argsObject, return_json=False):
+    ctrl = secam.SecamControllerClient()
+    return ctrl.send_message({"action": action, "args": argsObject}, return_json)
     
-    if CTRL:
-        return CTRL.send_message(msg)
-    
-    return 0
-    
-def alert(msg):
-    if msg == -1:  
-        return MESSAGE_BODY % ("Messaging server is not available", secam.index_page_path);  
-    else:
-        return MESSAGE_BODY % (msg, secam.index_page_path);
-
-     
-def delete_file(file_list):
-    count = 0
-    files = file_list.split(",")
-    for d in secam.get_videos():
-        for filename in files:
-            if d.filename == filename:
-                try:
-                    os.remove(secam.video_folder + filename)
-                    count += 1
-                except:
-                    return "Failed to delete file [%s]" % filename, False
-            
-    return "Deleted %d file(s)" % count, count == len(files)
-    
-def putm(req, msg):
+def putm(req, msg, json=False):
     req.content_type="Content-Type: text/plain"
-    return msg if send_message("q|" + msg) else "FAILED"
-    
-def status(req):
+    return send_message(msg, {}, json)
+        
+def camera(req, ctrl, value):
     req.content_type="Content-Type: text/plain"
-    return send_message("status")
-    
+    return send_message("camera", {"ctrl": ctrl, "value": value}, True)
+        
 def delete(req, files=""):
     req.content_type="Content-Type: text/plain"
-    s, ok = delete_file(files)
-    logging.info(s)
-    return s
+    return send_message("delete", {"files": files})
     
 def backup(req, plik=""):
     req.content_type="Content-Type: text/plain"
-    s, ok = secam.backup_file(plik)
-    logging.info(s)
-    return s
+    return send_message("backup", {"plik": plik})
     
-def get_q_status():
-    resp = send_message("getq")
-    if resp:
-        a = resp.split("|")
-        return "Message queue has %d entries %s" % (len(a), resp)
-    return 
-
 def table(req):
     h1 = """<h1>Video index</h1>"""
-    a = secam.get_videos()
-    if len(a) == 0:
+    
+    # results is an array of objects. Each object has keys 'filename' and 'backedup'
+    results = send_message("get_file_register", {})
+    if len(results) == 0:
         return " ".join([h1, "<h2>No media items found</h2>"])
     
     b_start = """<table id="video-index-table"><tr>
@@ -85,15 +50,23 @@ def table(req):
             <th><span class="del-check">Delete?</span></th>
             <th>Backup?</th>
         </tr>"""
+    
+    # Convert list of objects into list of Document objects
+    docs = []
+    for obj in results:
+        d = secam.Document(obj['filename'], _const)
+        d.backedup = obj['backedup']
+        docs.append(d)
         
-    a = sorted(a, key=attrgetter("timestamp"))
+    # Now sort the documents into date order
+    results = sorted(docs, key=attrgetter("timestamp"))    
     rows = []
 
-    for d in a: 
-        row = """<tr><td>%s</td><td>%s</td><td>%s</td>""" % (d.event, d.date.strftime("%d/%m/%y"), d.date.strftime("%H:%M:%S"))
-        url = secam.app + secam.video_subfolder + d.filename
+    for d in results:         
+        row = """<tr><td>%s</td><td>%s</td><td>%s</td>""" % (d.event, d.get_date().strftime("%d/%m/%y"), d.get_date().strftime("%H:%M:%S"))
+        url = _const.app + _const.video_subfolder + d.filename
         row += """<td><a href="%s">%s</a></td><td>%s</td>""" % (url, "View", d.size)
-        row += """<td><input class="deleteable-video" type="checkbox" value="%s" /></td>""" % d.filename 
+        row += """<td><input class="deleteable-video" type="checkbox" value="%s" /></td>""" % d.filename
         row += "<td>Done</td>" if d.backedup else """<td><button class="backup-button" value="%s">Backup</button></td>""" % d.filename 
         row += "</tr>"
         rows.append(row)
@@ -137,7 +110,7 @@ def tail(req):
             <td class="flash"></td>
         </tr></table>
         
-        <table>
+        <table id="controls">
             <tr><td>Brightness</td><td><select class="ctrl" id="brightness">%s</select></td></tr>
             <tr><td>Contrast</td><td><select class="ctrl" id="contrast">%s</select></td></tr>
             <tr><td>Mode</td><td><select class="ctrl" id="mode">%s</select></td></tr>

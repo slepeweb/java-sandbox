@@ -2,17 +2,24 @@ var status = null;
 var indexPath = "/secam/app/py/index.py";
 
 function manageButtons(map) {
-	if (map["status"] == "stop") {
+	if (map.status == "stop") {
 		$("#button-stopgo").val("go").empty().append("Continue surveillance");
 	}
-	else if (map["status"] == "go") {
+	else if (map.status == "go") {
 		$("#button-stopgo").val("stop").empty().append("Pause surveillance");
 	}
 	
-	$("#brightness option[value=" + map["brightness"] + "]").attr("selected", "selected");
-	$("#contrast option[value=" + map["contrast"] + "]").attr("selected", "selected");
-	$("#mode option[value=" + map["mode"] + "]").attr("selected", "selected");
-	$("#iso option[value=" + map["iso"] + "]").attr("selected", "selected");
+	var sel = "#brightness option[value=" + map.settings.brightness + "]";
+	$(sel).attr("selected", "selected");
+	
+	sel = "#contrast option[value=" + map.settings.contrast + "]";
+	$(sel).attr("selected", "selected");
+	
+	sel = "#mode option[value=" + map.settings.mode + "]";
+	$(sel).attr("selected", "selected");
+	
+	sel = "#iso option[value=" + map.settings.iso + "]";
+	$(sel).attr("selected", "selected");
 }
 
 function reloadTable() {
@@ -35,7 +42,7 @@ function reloadTable() {
 				$(".flash").empty().append("File " + filename + " backed up");
 				reloadTable();
 			}).fail(function(jqXHR, status) {
-				//console.log(status);
+				console.log(status);
 			});		
 		});
 
@@ -67,7 +74,7 @@ function reloadTable() {
 								reloadTable();
 								$("#dialog-trash-confirm").dialog("close");
 							}).fail(function(jqXHR, status) {
-								//console.log(status);
+								console.log(status);
 								$("#dialog-trash-confirm").dialog("close");
 							});		
 						},
@@ -83,14 +90,15 @@ function reloadTable() {
 		$("#button-photo,#button-stopgo").click(function() {	
 			var msg = $(this).attr("value");
 			$.ajax({
-				url : indexPath + "/putm?msg=" + msg,
+				url : indexPath + "/putm?msg=" + msg + "&json=1",
 				dataType : "text",
 				cache : false
 			}).done(function(resp) {
-				$(".flash").empty().append("'" + msg + "' message sent");
-				manageButtons(msg);
+				var obj = $.parseJSON(resp)
+				$(".flash").empty().append("Status: " + obj["status"]);
+				manageButtons(obj);
 			}).fail(function(jqXHR, status) {
-				//console.log(status);
+				console.log(status);
 			});		
 		});
 
@@ -100,13 +108,15 @@ function reloadTable() {
 			var value = $(this).find(":selected").text();
 			var msg = ctrl + "," + value;
 			$.ajax({
-				url : indexPath + "/putm?msg=" + msg,
+				url : indexPath + "/camera?ctrl=" + ctrl + "&value=" + value,
 				dataType : "text",
 				cache : false
 			}).done(function(resp) {
-				$(".flash").empty().append("'" + msg + "' message sent");
+				var obj = $.parseJSON(resp)
+				$(".flash").empty().append("Status: " + obj["status"]);
+				manageButtons(obj);
 			}).fail(function(jqXHR, status) {
-				//console.log(status);
+				console.log(status);
 			});		
 		});
 
@@ -114,35 +124,22 @@ function reloadTable() {
 			location.reload(true);
 		});
 	}).fail(function(jqXHR, status) {
-		//console.log(status);
+		console.log(status);
 	});		
-}
-
-function toMap(s) {
-	var pair;
-	var map = {};
-	var parts = s.split(",");
-	for (var i = 0; i < parts.length; i++) {
-		pair = parts[i].split("=");
-		if (pair.length == 2) {
-			map[pair[0]] = pair[1];
-		}
-	}
-	return map;
 }
 
 $(function() {	
 	$.ajax({
-		url : indexPath + "/status",
+		url : indexPath + "/putm?msg=status&json=1",
 		dataType : "text",
 		cache : false
 	}).done(function(resp) {
-		var map = toMap(resp);
-		$(".flash").empty().append("Status: " + map["status"]);
+		var obj = $.parseJSON(resp)
+		$(".flash").empty().append("Status: " + obj["status"]);
 		reloadTable();
-		manageButtons(map);
+		manageButtons(obj);
 	}).fail(function(jqXHR, status) {
-		//console.log(status);
+		console.log(status);
 	});		
 		
 	//$("html", "body").scrollTo("#bop");

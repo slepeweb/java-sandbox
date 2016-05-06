@@ -214,3 +214,7 @@ td.flash {
   color: green;
   width: 25%;
 }
+
+#controls {
+	width: 30%;
+}
