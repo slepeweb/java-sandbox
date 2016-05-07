@@ -27,11 +27,11 @@ def camera(req, ctrl, value):
         
 def delete(req, files=""):
     req.content_type="Content-Type: text/plain"
-    return send_message("delete", {"files": files})
+    return send_message("delete", {"files": files.split(",")}, True)
     
 def backup(req, plik=""):
     req.content_type="Content-Type: text/plain"
-    return send_message("backup", {"plik": plik})
+    return send_message("backup", {"plik": plik}, True)
     
 def table(req):
     h1 = """<h1>Video index</h1>"""
@@ -127,7 +127,9 @@ def tail(req):
         <div id="bop"></div>
   </body> 
 </html>
-    """ % (int_options_stepped(10, 100, 10), int_options_stepped(-80, 100, 20), str_options_arr(["auto", "night"]), int_options_arr([0, 100, 200, 400, 800]))
+    """ % (int_options_stepped(10, 100, 5), int_options_stepped(-80, 100, 5), 
+           str_options_arr(["auto", "night", "nightpreview", "backlight", "spotlight"]), 
+           int_options_arr([0, 100, 200, 400, 800]))
     return s
 
 def int_options_stepped(start, end, step):

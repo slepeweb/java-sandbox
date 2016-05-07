@@ -309,34 +309,53 @@ class SecamController:
                 dataStr = conn.recv(2048).strip(" \t\n\r")
                 obj = json.loads(dataStr)
                 action = obj["action"]
+                args = obj["args"]
                 
                 # Do actions that require an immediate response here
                 if action == self.const.stat:
                     conn.sendall(json.dumps(self.camera.get_status()))
+                    
                 elif action == "get_file_register":
                     response = self._get_videos()
                     conn.sendall(json.dumps(response))
+                    
                 elif action == "camera":
-                    camera_ctrl = obj["args"]["ctrl"]
-                    value = obj["args"]["value"]
+                    camera_ctrl = args["ctrl"]
+                    value = args["value"]
                     self.camera.set_setting(camera_ctrl, value)
                     conn.sendall(json.dumps(self.camera.get_status()))
+                    
                 elif action == self.const.stop:
                     if self.camera.status != self.const.stop:
                         self.camera.status = self.const.stop
                         conn.sendall(json.dumps(self.camera.get_status()))
                     else:
                         logging.info("Camera already stopped")
+                        
                 elif action == self.const.go:
                     if self.camera.status != self.const.go:
                         self.camera.status = self.const.go
                         conn.sendall(json.dumps(self.camera.get_status()))
                     else:
                         logging.info("Camera already started")
+                        
                 elif action == self.const.stop:
                     if self.camera.status != self.const.stop:
                         self.camera.status = self.const.stop
                         conn.sendall(json.dumps(self.camera.get_status()))
+                        
+                elif action == "delete":
+                    reply, ok = self._delete_files(args["files"])
+                    logging.info(reply)
+                    obj = {"status": ok, "msg": reply}
+                    conn.sendall(json.dumps(obj))
+                    
+                elif action == "backup":
+                    reply, ok = self._backup_file(args["plik"])
+                    logging.info(reply)
+                    obj = {"status": ok, "msg": reply}
+                    conn.sendall(json.dumps(obj))
+                    
                 else:
                     self.enqueue(obj)
                     self._process_tasks()
@@ -347,7 +366,15 @@ class SecamController:
             logging.info("Keyboard interrupt")
         finally:
             self.server.close()
-                 
+    
+    def _to_docs(self, get_video_results):
+        docs = []
+        for obj in get_video_results:
+            d = Document(obj['filename'], self.const)
+            d.backedup = obj['backedup']
+            docs.append(d)
+        return docs
+             
     def _process_tasks(self):
         if not self._get_thread_status():
             self._set_thread_status(True)
@@ -413,6 +440,9 @@ class SecamController:
             a.append(obj)
         
         return a
+    
+    def _get_videos_as_documents(self):
+        return self._to_docs(self._get_videos())
 
     def _get_backup_register(self):
         entries = {}
@@ -425,7 +455,7 @@ class SecamController:
     # Copy source_file to dropbox folder
     def _backup_file(self, source_file):
         file_exists = False
-        for d in self._get_videos():
+        for d in self._get_videos_as_documents():
             if d.filename == source_file:
                 file_exists = True
                 break
@@ -450,7 +480,7 @@ class SecamController:
     def _update_backup_register(self, backup_filename):
         # Identify videos stored locally on webserver; store in a dictionary
         videos_stored_locally = {}
-        for d in self._get_videos():
+        for d in self._get_videos_as_documents():
             videos_stored_locally[d.filename] = d
             
         # Identify files previously backed up that are still resident on the web server
@@ -471,10 +501,9 @@ class SecamController:
                 if d.backedup:
                     f.write(d.filename + "\n")
     
-    def _delete_files(self, file_list):
+    def _delete_files(self, files):
         count = 0
-        files = file_list.split(",")
-        for d in self._get_videos():
+        for d in self._get_videos_as_documents():
             for filename in files:
                 if d.filename == filename:
                     try:
@@ -482,7 +511,7 @@ class SecamController:
                         count += 1
                     except:
                         return "Failed to delete file [%s]" % filename, False
-                 
+        
         return "Deleted %d file(s)" % count, count == len(files)
     
     def _get_filename_prefix(self, event_id, time_mark):

@@ -39,7 +39,8 @@ function reloadTable() {
 				dataType : "text",
 				cache : false
 			}).done(function(resp) {
-				$(".flash").empty().append("File " + filename + " backed up");
+				var obj = $.parseJSON(resp)
+				$(".flash").empty().append(obj.msg);
 				reloadTable();
 			}).fail(function(jqXHR, status) {
 				console.log(status);
@@ -70,7 +71,8 @@ function reloadTable() {
 								dataType : "text",
 								cache : false
 							}).done(function(resp) {
-								$(".flash").empty().append(resp);
+								var obj = $.parseJSON(resp)
+								$(".flash").empty().append(obj.msg);
 								reloadTable();
 								$("#dialog-trash-confirm").dialog("close");
 							}).fail(function(jqXHR, status) {
