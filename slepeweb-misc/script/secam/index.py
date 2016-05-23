@@ -64,7 +64,7 @@ def table(req):
 
     for d in results:         
         row = """<tr><td>%s</td><td>%s</td><td>%s</td>""" % (d.event, d.get_date().strftime("%d/%m/%y"), d.get_date().strftime("%H:%M:%S"))
-        url = _const.app + _const.video_subfolder + d.filename
+        url = _const.video_folder_web + d.filename
         row += """<td><a href="%s">%s</a></td><td>%s</td>""" % (url, "View", d.size)
         row += """<td><input class="deleteable-video" type="checkbox" value="%s" /></td>""" % d.filename
         row += "<td>Done</td>" if d.backedup else """<td><button class="backup-button" value="%s">Backup</button></td>""" % d.filename 

@@ -6,114 +6,33 @@ import time, subprocess, smtplib
 #import RPi.GPIO as GPIO
 from email.mime.text import MIMEText
 import RPi.GPIO as GPIO
-    
-# def check_action_messages(camera, ctrl):
-#     msg = ctrl.get_message()
-#     not_recognized = "Message not recognized [%s]" % msg
-#     error = False
-#     
-#     if msg:
-#         if len(msg) > 1:
-#             parts = msg.split(",")
-#             if len(parts) < 2:
-#                 error = True
-#             else:
-#                 action = parts[1]
-#                 
-#                 if action == _const.photo:
-#                     # Photos can be taken whilst surveillance is paused
-#                     time_mark = datetime.now()
-#                     take_photo(camera, time_mark)
-#                 elif action == _const.stop:
-#                     if ctrl.get_status() == _const.go:
-#                         camera.set_status(action)
-#                         logging.info("STOP message received")
-#                     else:
-#                         logging.warn("Current status is already STOP")
-#                 elif action == _const.go:
-#                     if ctrl.get_status() == _const.stop:
-#                         camera.set_status(action)
-#                         logging.info("GO message received")
-#                     else:
-#                         logging.warn("Current status is already GO")
-#                 elif len(parts) == 3:
-#                     arg = parts[2]
-#                     if action == _const.brightness:
-#                         logging.info("Brightness was set to %s" % camera.get_brightness())
-#                         camera.set_brightness(int(arg))
-#                         logging.info("Brightness changed to %s" % arg)
-#                     elif action == _const.contrast:
-#                         logging.info("Contrast was set to %s" % camera.contrast)
-#                         camera.set_contrast(int(arg))
-#                         logging.info("Contrast changed to %s" % arg)
-#                     elif action == _const.exposure_mode:
-#                         logging.info("Exposure mode was set to %s" % camera.get_exposure_mode())
-#                         camera.set_exposure_mode(arg)
-#                         logging.info("Exposure mode changed to %s" % arg)
-#                     elif action == _const.iso:
-#                         logging.info("ISO sensitivity was set to %s" % camera.get_iso())
-#                         camera.set_iso(int(arg))
-#                         logging.info("ISO sensitivity changed to %s" % arg)
-#                         
-#                 else:
-#                     error = True
-#     
-#                 ctrl._dequeue(msg)
-#         else:
-#             error = True     
-#     
-#         if error:
-#             logging.info(not_recognized)     
-                
-    
-    
+       
 
 def spawn_messaging_service(ctrl):
     ctrl.start()        
 
-# def spawn_messaging_client(ctrl, camera):
-#     timer = 0
-#     small_sleep = 0.2
-#     big_sleep = 2
-#     
-#     while True:        
-#         if timer >= big_sleep:
-#             timer = 0
-#             check_action_messages(camera, ctrl)
-#             
-#         time.sleep(small_sleep)
-#         timer += small_sleep
-
     
 class Constants:
     def __init__(self):
-        self.user = "georgeb"
-        self.pwd = "giga8yte"
-        self.videotype = "h264"
+        self.videotype = "mp4"
         self.imagetype = "jpg"
-        self.ctx = "/secam/"
-        self.app = self.ctx + "app/"
-        self.index_page_path = self.app + "index.py"
+        
         self.webroot = "/var/www/html/"
-        self.video_subfolder = "video/"
-        self.video_folder = self.webroot + self.video_subfolder
+        self.video_folder = self.webroot + "video/"
+        self.video_folder_web = "/secam/app/video/"
         self.backup_register = "resource/backup-register"
+        
         self.go = "go"
         self.stop = "stop"
         self.photo = "photo"
+        
         self.settings = "settings"
         self.brightness = "brightness"
         self.contrast = "contrast"
         self.iso = "iso"
         self.exposure_mode = "mode"
-        self.ok = "ok"
-        self.q = "q"
-        self.dq = "dq"
-        self.nr = "-1"
-        self.next = "next"
-        self.getq = "getq"
-        self.clrq = "clrq"
-        self.close = "close"
+        
+        self.msg = "msg"
         self.stat = "status"
         self.host = ''   # Symbolic name, meaning all available interfaces
         self.port = 8888 # Arbitrary non-privileged port    
@@ -127,7 +46,7 @@ class Document:
         self.backedup = False
         self.timestamp = None
         self.size = None
-        m = re.search("(P|\d{1,})-(\d{14})\.[%s|%s]" % (const.videotype, const.imagetype), filename)
+        m = re.search("(P|\d{1,})-(\d{14})\.(%s|%s)" % (const.videotype, const.imagetype), filename)
 
         if m:
             self.timestamp = m.group(2)
@@ -163,8 +82,8 @@ class Camera:
     def __init__(self):
         self.const = Constants()
         self.status = self.const.stop
-        self.brightness = "50"
-        self.contrast = "0"
+        self.brightness = "70"
+        self.contrast = "70"
         self.exposure_mode = "auto"
         self.iso = "0"
         self.recording = False
@@ -215,19 +134,24 @@ class Camera:
         
     def get_status(self):
         response = {}
-        response["settings"] = self.get_settings()
+        response[self.const.settings] = self.get_settings()
+        response[self.const.msg] = "Surveillance is " + ("on" if self.status == self.const.go else "paused")
         response[self.const.stat] = self.status
         return response
     
     def set_setting(self, ctrl, value):
         if ctrl == self.const.brightness:
             self.brightness = value
+            return "Brightness set to '%s'" % value
         elif ctrl == self.const.contrast:
             self.contrast = value
+            return "Contrast set to '%s'" % value
         elif ctrl == self.const.exposure_mode:
             self.exposure_mode = value
+            return "Exposure mode set to '%s'" % value
         elif ctrl == self.const.iso:
             self.iso = value
+            return "ISO set to '%s'" % value
         
     
     def get_settings(self):
@@ -267,7 +191,7 @@ class SecamControllerClient:
             except:
                 logging.warn("Failed to close the socket")
             
-        return self.const.nr;
+        return -1;
 
 class SecamController:
             
@@ -322,27 +246,36 @@ class SecamController:
                 elif action == "camera":
                     camera_ctrl = args["ctrl"]
                     value = args["value"]
-                    self.camera.set_setting(camera_ctrl, value)
-                    conn.sendall(json.dumps(self.camera.get_status()))
+                    msg = self.camera.set_setting(camera_ctrl, value)
+                    response = self.camera.get_status()
+                    response["msg"] = msg
+                    conn.sendall(json.dumps(response))
                     
-                elif action == self.const.stop:
-                    if self.camera.status != self.const.stop:
-                        self.camera.status = self.const.stop
-                        conn.sendall(json.dumps(self.camera.get_status()))
-                    else:
-                        logging.info("Camera already stopped")
-                        
                 elif action == self.const.go:
                     if self.camera.status != self.const.go:
                         self.camera.status = self.const.go
-                        conn.sendall(json.dumps(self.camera.get_status()))
+                        response = self.camera.get_status()
+                        response["msg"] = "Surveillance is on"
+                        conn.sendall(json.dumps(response))
                     else:
-                        logging.info("Camera already started")
+                        msg = "Surveillance is already on"
+                        response = {}
+                        response["msg"] = msg
+                        logging.info(msg)
+                        conn.sendall(json.dumps(response))
                         
                 elif action == self.const.stop:
                     if self.camera.status != self.const.stop:
                         self.camera.status = self.const.stop
-                        conn.sendall(json.dumps(self.camera.get_status()))
+                        response = self.camera.get_status()
+                        response["msg"] = "Surveillance paused"
+                        conn.sendall(json.dumps(response))
+                    else:
+                        msg = "Surveillance is already paused"
+                        response = {}
+                        response["msg"] = msg
+                        logging.info(msg)
+                        conn.sendall(json.dumps(response))
                         
                 elif action == "delete":
                     reply, ok = self._delete_files(args["files"])
@@ -358,7 +291,6 @@ class SecamController:
                     
                 else:
                     self.enqueue(obj)
-                    self._process_tasks()
                 
                 conn.close()
                     
@@ -398,7 +330,8 @@ class SecamController:
         self.q_lock.acquire()
         try:
             self.queue.append(obj)
-            logging.info("En-queued message: %s" % obj)
+            logging.info("Queued message: %s" % obj)
+            self._process_tasks()
             return obj
         finally:
             self.q_lock.release()
@@ -518,7 +451,7 @@ class SecamController:
         return "%s-%s" % (event_id, time_mark.strftime("%Y%m%d%H%M%S"))
     
     def record_video(self, event_id, time_mark):
-        logging.info("%d) Motion detected! ..." % event_id)
+        logging.info("%d) Recording video ..." % event_id)
         h264_path = ''.join([self.const.video_folder, self._get_filename_prefix(event_id, time_mark), ".h264"])
         self._out(event_id, "recording to [%s]" % h264_path)
         # PIR stays high for 8 secs, then low for 8 secs; cycle is 16 secs
@@ -594,6 +527,8 @@ class Spibox:
     def __init__(self, ctrl):
         self.ctrl = ctrl
         self.const = Constants()
+        self.event_counter = 1
+        
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(PIR, GPIO.IN, GPIO.PUD_DOWN)
         start_time = time.time()
@@ -616,9 +551,9 @@ class Spibox:
                     time_mark = datetime.now()
                     time_str = time_mark.strftime("%Y/%m/%d %H:%M:%S")
                        
-                    if self.ctrl.get_status() == self.const.go:
-                        self.ctrl.enqueue({"action": "video", "args": {"event_id": EVENT_COUNTER, "time_mark": time_mark}})
-                        EVENT_COUNTER += 1
+                    if self.ctrl.camera.get_status()[self.const.stat] == self.const.go:
+                        self.ctrl.enqueue({"action": "video", "args": {"event_id": self.event_counter, "time_mark": time_mark}})
+                        self.event_counter += 1
                     else:
                         logging.info("Alarm raised at %s, but surveillance is currently OFF" % time_str)
                  
@@ -633,9 +568,7 @@ if __name__ == "__main__":
     logging.info("====================================================================")
     logging.info("Secam application started")
 
-    EVENT_COUNTER = 1
-    PIR = 4
-    
+    PIR = 4    
     CAMERA = Camera()
     CTRL = SecamController(CAMERA)
     

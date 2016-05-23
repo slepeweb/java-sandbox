@@ -40,7 +40,7 @@ function reloadTable() {
 				cache : false
 			}).done(function(resp) {
 				var obj = $.parseJSON(resp)
-				$(".flash").empty().append(obj.msg);
+				$(".flash").empty().append(obj["msg"]);
 				reloadTable();
 			}).fail(function(jqXHR, status) {
 				console.log(status);
@@ -72,7 +72,7 @@ function reloadTable() {
 								cache : false
 							}).done(function(resp) {
 								var obj = $.parseJSON(resp)
-								$(".flash").empty().append(obj.msg);
+								$(".flash").empty().append(obj["msg"]);
 								reloadTable();
 								$("#dialog-trash-confirm").dialog("close");
 							}).fail(function(jqXHR, status) {
@@ -97,7 +97,7 @@ function reloadTable() {
 				cache : false
 			}).done(function(resp) {
 				var obj = $.parseJSON(resp)
-				$(".flash").empty().append("Status: " + obj["status"]);
+				$(".flash").empty().append(obj["msg"]);
 				manageButtons(obj);
 			}).fail(function(jqXHR, status) {
 				console.log(status);
@@ -115,7 +115,7 @@ function reloadTable() {
 				cache : false
 			}).done(function(resp) {
 				var obj = $.parseJSON(resp)
-				$(".flash").empty().append("Status: " + obj["status"]);
+				$(".flash").empty().append(obj["msg"]);
 				manageButtons(obj);
 			}).fail(function(jqXHR, status) {
 				console.log(status);
@@ -137,7 +137,7 @@ $(function() {
 		cache : false
 	}).done(function(resp) {
 		var obj = $.parseJSON(resp)
-		$(".flash").empty().append("Status: " + obj["status"]);
+		$(".flash").empty().append(obj["msg"]);
 		reloadTable();
 		manageButtons(obj);
 	}).fail(function(jqXHR, status) {
