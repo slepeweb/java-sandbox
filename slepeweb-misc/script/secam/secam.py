@@ -288,6 +288,10 @@ class SecamController:
                     logging.info(reply)
                     obj = {"status": ok, "msg": reply}
                     conn.sendall(json.dumps(obj))
+                                        
+                elif action == "reboot":
+                    logging.info("Reboot requested")
+                    os.system("shutdown -r now")
                     
                 else:
                     self.enqueue(obj)

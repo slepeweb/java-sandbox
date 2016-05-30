@@ -1,5 +1,6 @@
-import logging, secam
+import logging, secam, os
 from operator import attrgetter
+from datetime import datetime
 
 logging.basicConfig(filename="/var/www/html/log/secam.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -13,6 +14,14 @@ _message_body = """
 
 _const = secam.Constants()
 
+def reboot(req, pwd=""):
+    cf = datetime.now().strftime("%H%d%m%Y")
+    if pwd == cf:            
+        send_message("reboot", {}, True)
+    else:
+        logging.error("*** Bad password provided for reboot [%s]" % pwd)
+            
+    
 def send_message(action, argsObject, return_json=False):
     ctrl = secam.SecamControllerClient()
     return ctrl.send_message({"action": action, "args": argsObject}, return_json)
