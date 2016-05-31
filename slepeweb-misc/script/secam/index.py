@@ -17,7 +17,9 @@ _const = secam.Constants()
 def reboot(req, pwd=""):
     cf = datetime.now().strftime("%H%d%m%Y")
     if pwd == cf:            
-        send_message("reboot", {}, True)
+        logging.info("Reboot requested")
+        os.system("sudo shutdown -r now")
+                    
     else:
         logging.error("*** Bad password provided for reboot [%s]" % pwd)
             

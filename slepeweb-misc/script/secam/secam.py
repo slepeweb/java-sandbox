@@ -289,10 +289,6 @@ class SecamController:
                     obj = {"status": ok, "msg": reply}
                     conn.sendall(json.dumps(obj))
                                         
-                elif action == "reboot":
-                    logging.info("Reboot requested")
-                    os.system("shutdown -r now")
-                    
                 else:
                     self.enqueue(obj)
                 
@@ -566,6 +562,20 @@ class Spibox:
             logging.info("Keyboard interrupt - Spibox thread terminating")
             GPIO.cleanup()
 
+
+# Development idea in progress ...
+class Task:
+    def __init__(self, ident, action, *args):
+        self.id = ident
+        self.action = action
+        self.args = args
+        self.start = datetime.now()
+        self.end = None
+        
+    def elapsed(self):
+        delta = datetime.now() - self.start
+        return "%.3f" % (delta.seconds + (delta.microseconds/1000000.0))
+        
 
 if __name__ == "__main__":
     logging.basicConfig(filename="/var/www/html/log/secam.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
