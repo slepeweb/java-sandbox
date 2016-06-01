@@ -25,7 +25,8 @@ class Constants:
         self.go = "go"
         self.stop = "stop"
         self.photo = "photo"
-        
+        self.video = "video"
+       
         self.settings = "settings"
         self.brightness = "brightness"
         self.contrast = "contrast"
@@ -98,7 +99,7 @@ class Camera:
                 camera.wait_recording(duration)
                 camera.stop_recording() 
                 self._complete(camera)
-                logging.info("Video recording completed")
+                #logging.info("Video recording completed")
                 
             self.recording = False
         else:
@@ -232,26 +233,25 @@ class SecamController:
                 
                 dataStr = conn.recv(2048).strip(" \t\n\r")
                 obj = json.loads(dataStr)
-                action = obj["action"]
-                args = obj["args"]
+                task = Task(obj["action"], obj["args"])
                 
                 # Do actions that require an immediate response here
-                if action == self.const.stat:
+                if task.action == self.const.stat:
                     conn.sendall(json.dumps(self.camera.get_status()))
                     
-                elif action == "get_file_register":
+                elif task.action == "get_file_register":
                     response = self._get_videos()
                     conn.sendall(json.dumps(response))
                     
-                elif action == "camera":
-                    camera_ctrl = args["ctrl"]
-                    value = args["value"]
+                elif task.action == "camera":
+                    camera_ctrl = task.args["ctrl"]
+                    value = task.args["value"]
                     msg = self.camera.set_setting(camera_ctrl, value)
                     response = self.camera.get_status()
                     response["msg"] = msg
                     conn.sendall(json.dumps(response))
                     
-                elif action == self.const.go:
+                elif task.action == self.const.go:
                     if self.camera.status != self.const.go:
                         self.camera.status = self.const.go
                         response = self.camera.get_status()
@@ -264,7 +264,7 @@ class SecamController:
                         logging.info(msg)
                         conn.sendall(json.dumps(response))
                         
-                elif action == self.const.stop:
+                elif task.action == self.const.stop:
                     if self.camera.status != self.const.stop:
                         self.camera.status = self.const.stop
                         response = self.camera.get_status()
@@ -277,20 +277,20 @@ class SecamController:
                         logging.info(msg)
                         conn.sendall(json.dumps(response))
                         
-                elif action == "delete":
-                    reply, ok = self._delete_files(args["files"])
+                elif task.action == "delete":
+                    reply, ok = self._delete_files(task.args["files"])
                     logging.info(reply)
                     obj = {"status": ok, "msg": reply}
                     conn.sendall(json.dumps(obj))
                     
-                elif action == "backup":
-                    reply, ok = self._backup_file(args["plik"])
+                elif task.action == "backup":
+                    reply, ok = self._backup_file(task.args["plik"])
                     logging.info(reply)
                     obj = {"status": ok, "msg": reply}
                     conn.sendall(json.dumps(obj))
                                         
                 else:
-                    self.enqueue(obj)
+                    self.enqueue(task)
                 
                 conn.close()
                     
@@ -314,25 +314,26 @@ class SecamController:
     
     def _service(self):
         while len(self.queue) > 0:
-            obj = self._dequeue()
-            action = obj["action"]
-            args = obj["args"]
+            task = self._dequeue()
             
-            if action == self.const.photo:
-                self._take_photo(datetime.now())
-            elif action == "video":
-                h264_path = self.record_video(args["event_id"], args["time_mark"])
-                start_new_thread(self._send_mail_and_backup_video, (args["event_id"], args["time_mark"], h264_path))
+            if task.action == self.const.photo:
+                task.id = "P"
+                self._take_photo(task)
+                task.log_history()
+            elif task.action == self.const.video:
+                h264_path = self._record_video(task)
+                start_new_thread(self._send_mail_and_backup_video, (task, h264_path))
+                # leave this new thread to log the history
             
         self._set_thread_status(False);
 
-    def enqueue(self, obj):
+    def enqueue(self, task):
         self.q_lock.acquire()
         try:
-            self.queue.append(obj)
-            logging.info("Queued message: %s" % obj)
+            self.queue.append(task)
+            logging.info("Queued task: %s" % task.action)
             self._process_tasks()
-            return obj
+            return task
         finally:
             self.q_lock.release()
                     
@@ -340,10 +341,10 @@ class SecamController:
         self.q_lock.acquire()
         try:
             if len(self.queue) > 0:
-                obj = self.queue[0]
-                self.queue.remove(obj)
-                logging.info("De-queued message: %s" % obj)
-                return obj
+                task = self.queue[0]
+                self.queue.remove(task)
+                logging.info("De-queued task: %s" % task.action)
+                return task
         finally:
             self.q_lock.release()
             
@@ -450,28 +451,27 @@ class SecamController:
     def _get_filename_prefix(self, event_id, time_mark):
         return "%s-%s" % (event_id, time_mark.strftime("%Y%m%d%H%M%S"))
     
-    def record_video(self, event_id, time_mark):
-        logging.info("%d) Recording video ..." % event_id)
-        h264_path = ''.join([self.const.video_folder, self._get_filename_prefix(event_id, time_mark), ".h264"])
-        self._out(event_id, "recording to [%s]" % h264_path)
+    def _record_video(self, task):
+        h264_path = ''.join([self.const.video_folder, self._get_filename_prefix(task.id, task.get_start()), ".h264"])
         # PIR stays high for 8 secs, then low for 8 secs; cycle is 16 secs
         self.camera.record_video(h264_path, 16)
+        task.add_event("video recorded [%s]" % h264_path)
         return h264_path
     
-    def _convert2mp4(self, event_id, h264_path):
+    def _convert2mp4(self, task, h264_path):
         mp4_path = h264_path.replace("h264", "mp4")
-        self._out(event_id, "converting to [%s]" % mp4_path)
+
         try:
             subprocess.check_call(["/usr/bin/MP4Box", "-add", h264_path, mp4_path], stdout=self.null_device, stderr=self.null_device)
-            self._out(event_id, "video conversion complete")
+            task.add_event("video conversion complete")
             os.remove(h264_path)
-            self._out(event_id, "deleted h264 file")
+            task.add_event("deleted h264 file")
         except subprocess.CalledProcessError as e:
-            self._out(event_id, "*** error converting record_video file [%s]" % e)
+            task.add_event("*** error converting record_video file [%s]" % e)
         
         return mp4_path
     
-    def _send_mail(self, event_id, time_mark):
+    def _send_mail(self, task):
         mail_from = "george@slepeweb.com"
         mail_to = "george@buttigieg.org.uk"
         web_page = "http://www.slepeweb.com/secam/app/py/index.py"
@@ -481,47 +481,42 @@ class SecamController:
         Please investigate further @ %s
         """
     
-        event_time = time_mark.strftime("%Y/%m/%d %H:%M:%S")
-        msg = MIMEText(mail_body % (event_id, event_time, web_page))
+        event_time = task.get_start().strftime("%Y/%m/%d %H:%M:%S")
+        msg = MIMEText(mail_body % (task.id, event_time, web_page))
         msg['Subject'] = "Security Alarm"
         msg['From'] = mail_from
         msg['To'] = mail_to
         server = None
         
         try:
-            self._out(event_id, "sending mail")
+            task.add_event("sending mail")
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
             server.login("george.buttigieg@gmail.com", "br1cktop1")
             server.sendmail(mail_from, [mail_to], msg.as_string())
-            self._out(event_id, "mail sent ok")
+            task.add_event("mail sent ok")
         except:
-            self._out(event_id, "*** problem sending mail")
+            task.add_event("*** problem sending mail")
             
         finally:
             if server != None:
                 server.quit() 
     
-    def _take_photo(self, time_mark):
-        file_path = ''.join([self.const.video_folder, self._get_filename_prefix("P", time_mark), ".jpg"])
+    def _take_photo(self, task):
+        file_path = ''.join([self.const.video_folder, self._get_filename_prefix("P", task.get_start()), ".jpg"])
         self.camera.capture_photo(file_path) 
+        task.add_event("photo captured")
         
     def _file_part(self, file_path):
         return file_path.split("/")[-1]
     
-    def _send_mail_and_backup_video(self, event_id, time_mark, h264_path):
-        self._send_mail(event_id, time_mark)    
-        mp4_path = self._convert2mp4(event_id, h264_path)    
+    def _send_mail_and_backup_video(self, task, h264_path):
+        self._send_mail(task)    
+        mp4_path = self._convert2mp4(task, h264_path)    
         msg, ok = self._backup_file(self._file_part(mp4_path))
-        self._out(event_id, msg)
-    
-    def _spawn_remaining_tasks(self, event_id, time_mark, h264_path):
-        task = threading.Thread(target=self._send_mail_and_backup_video, args=[event_id, time_mark, h264_path])
-        task.start()        
-
-    def _out(self, event_id, s):
-        logging.info("%d) ... %s" % (event_id, s))
-    
+        task.add_event(msg)
+        task.log_history()
+        
         
 class Spibox:
     def __init__(self, ctrl):
@@ -547,15 +542,14 @@ class Spibox:
         
         try:    
             while True:
-                if GPIO.wait_for_edge(PIR, GPIO.RISING): 
-                    time_mark = datetime.now()
-                    time_str = time_mark.strftime("%Y/%m/%d %H:%M:%S")
-                       
+                if GPIO.wait_for_edge(PIR, GPIO.RISING):
                     if self.ctrl.camera.get_status()[self.const.stat] == self.const.go:
-                        self.ctrl.enqueue({"action": "video", "args": {"event_id": self.event_counter, "time_mark": time_mark}})
+                        task = Task(self.const.video, {})
+                        task.id = self.event_counter
+                        self.ctrl.enqueue(task)
                         self.event_counter += 1
                     else:
-                        logging.info("Alarm raised at %s, but surveillance is currently OFF" % time_str)
+                        logging.info("Alarm raised at %s, but surveillance is currently OFF" % datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
                  
                  
         except KeyboardInterrupt:
@@ -563,18 +557,38 @@ class Spibox:
             GPIO.cleanup()
 
 
-# Development idea in progress ...
+class Event:
+    def __init__(self, date, msg):
+        self.date = date
+        self.msg = msg
+        
+    
 class Task:
-    def __init__(self, ident, action, *args):
-        self.id = ident
+    def __init__(self, action, args):
+        self.id = "-"
         self.action = action
         self.args = args
-        self.start = datetime.now()
-        self.end = None
+        self.events = []
+        self.events.append(Event(datetime.now(), "Start: %s" % action))
         
-    def elapsed(self):
-        delta = datetime.now() - self.start
+    def get_start(self):
+        return self.events[0].date
+        
+    def elapsed(self, to):
+        delta = to - self.get_start()
         return "%.3f" % (delta.seconds + (delta.microseconds/1000000.0))
+    
+    def add_event(self, msg):
+        self.events.append(Event(datetime.now(), msg))
+        
+    def log_history(self):
+        logging.info("==============================")
+        logging.info("Task history [%s]" % self.id)
+        
+        for e in self.events:
+            logging.info("%s secs: %s", self.elapsed(e.date), e.msg)
+
+        logging.info("------------------------------")
         
 
 if __name__ == "__main__":
