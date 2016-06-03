@@ -2,26 +2,19 @@ import logging, secam, os
 from operator import attrgetter
 from datetime import datetime
 
-logging.basicConfig(filename="/var/www/html/log/secam.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.INFO)
+LOG = logging.getLogger("secam")
 logging.getLogger("requests").setLevel(logging.WARNING)
-logging.info("Index page loaded")
-
-_message_body = """
-<h1>Messaging</h1>
-<p>Message received: '%s'</p>
-<a href="%s">Return to index</a>
-"""
-
+LOG.info("Index page loaded")
 _const = secam.Constants()
 
 def reboot(req, pwd=""):
     cf = datetime.now().strftime("%H%d%m%Y")
     if pwd == cf:            
-        logging.info("Reboot requested")
+        LOG.info("Reboot requested")
         os.system("sudo shutdown -r now")
                     
     else:
-        logging.error("*** Bad password provided for reboot [%s]" % pwd)
+        LOG.error("*** Bad password provided for reboot [%s]" % pwd)
             
     
 def send_message(action, argsObject, return_json=False):
@@ -76,7 +69,7 @@ def table(req):
     for d in results:         
         row = """<tr><td>%s</td><td>%s</td><td>%s</td>""" % (d.event, d.get_date().strftime("%d/%m/%y"), d.get_date().strftime("%H:%M:%S"))
         url = _const.video_folder_web + d.filename
-        row += """<td><a href="%s">%s</a></td><td>%s</td>""" % (url, "View", d.size)
+        row += """<td><a href="%s" class="iframe group2">%s</a></td><td>%s</td>""" % (url, "View", d.size)
         row += """<td><input class="deleteable-video" type="checkbox" value="%s" /></td>""" % d.filename
         row += "<td>Done</td>" if d.backedup else """<td><button class="backup-button" value="%s">Backup</button></td>""" % d.filename 
         row += "</tr>"
@@ -101,8 +94,10 @@ def head(req):
     <title>Security camera application</title>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
     <link rel="stylesheet" href="/secam/app/resource/style.css" />
+    <link rel="stylesheet" href="/secam/app/resource/colorbox.css" />
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+    <script src="/secam/app/resource/jquery.colorbox-min.js"></script>
     <script src="/secam/app/resource/secam.js"></script>
   </head> 
   <body>
@@ -115,6 +110,7 @@ def tail(req):
     s = """
         </div>
         <table><tr>
+            <td><a href="/secam/app/log/secam.log">Show log</a></td>
             <td><button id="button-photo" value="photo">Take photo</button></td>
             <td><button id="button-stopgo" value="stop">Pause surveillance</button></td></td>
             <td><button id="button-refresh">Refresh</button></td>

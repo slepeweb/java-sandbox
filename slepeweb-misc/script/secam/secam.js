@@ -19,7 +19,7 @@ function manageButtons(map) {
 	$(sel).attr("selected", "selected");
 	
 	sel = "#iso option[value=" + map.settings.iso + "]";
-	$(sel).attr("selected", "selected");
+	$(sel).attr("selected", "selected");	
 }
 
 function reloadTable() {
@@ -27,10 +27,12 @@ function reloadTable() {
 		url : indexPath + "/table",
 		cache : false
 	}).done(function(resp) {
-		$("#main").empty().append(resp);
-		
+		var table = $(resp);
+		table.find(".iframe").colorbox({iframe:true, opacity:0.5, closeButton:true, width:"90%", height:"80%", top:"15%"});
+		table.find(".group2").colorbox({rel:'group2', transition:"none", current:'Media item {current} of {total}'});
+		$("#main").empty().append(table);
+				
 		// Parse page to add behaviour
-		
 		// Backup files to dropbox
 		$(".backup-button").click(function() {
 			var filename = $(this).attr("value");
@@ -125,6 +127,7 @@ function reloadTable() {
 		$("#button-refresh").click(function(e) {	
 			location.reload(true);
 		});
+
 	}).fail(function(jqXHR, status) {
 		console.log(status);
 	});		

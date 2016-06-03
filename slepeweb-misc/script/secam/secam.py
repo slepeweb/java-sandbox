@@ -1,6 +1,6 @@
 import socket, sys, json, threading
 from thread import *
-import re, os, dropbox, logging, picamera
+import re, os, dropbox, logging, logging.handlers, picamera
 from datetime import datetime
 import time, subprocess, smtplib
 #import RPi.GPIO as GPIO
@@ -99,11 +99,11 @@ class Camera:
                 camera.wait_recording(duration)
                 camera.stop_recording() 
                 self._complete(camera)
-                #logging.info("Video recording completed")
+                #LOG.info("Video recording completed")
                 
             self.recording = False
         else:
-            logging.warn("Camera is already recording")
+            LOG.warn("Camera is already recording")
                
         return file_path
 
@@ -112,7 +112,7 @@ class Camera:
             self._prepare(camera)
             camera.capture(file_path)
             self._complete(camera)
-            logging.info("Photo taken")
+            LOG.info("Photo taken")
                
         return file_path
 
@@ -164,7 +164,7 @@ class Camera:
                 
 
 
-class SecamControllerClient:
+class SecamControllerClient:    
     def __init__(self):
         self.const = Constants()
         
@@ -177,25 +177,24 @@ class SecamControllerClient:
             
             # Marshall the supplied object into a string, and send to the server
             s = json.dumps(obj)
-            logging.debug("Sending message [%s] ..." % s)
+            LOG.debug("Sending message [%s] ..." % s)
             sock.sendall(s)
             
             # Wait for a response
             s = sock.recv(2048)
             
             # Unmarshall the returned json string into an object, and return same to caller
-            logging.debug("... received response [%s]" % s)
+            LOG.debug("... received response [%s]" % s)
             return s if return_json else json.loads(s)
         finally:
             try:
                 sock.close()
             except:
-                logging.warn("Failed to close the socket")
+                LOG.warn("Failed to close the socket")
             
         return -1;
 
 class SecamController:
-            
     def __init__(self, camera):
         self.const = Constants()
         self.camera = camera
@@ -210,20 +209,20 @@ class SecamController:
      
     def start(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        logging.debug('Socket created')
+        LOG.debug('Socket created')
         
         # Bind socket to local host and port
         try:
             self.server.bind((self.const.host, self.const.port))
         except socket.error as msg:
-            logging.error('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+            LOG.error('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
             sys.exit()
              
-        logging.debug('Socket bind complete')
+        LOG.debug('Socket bind complete')
          
         # Start listening on socket
         self.server.listen(5)
-        logging.debug('Socket now listening')
+        LOG.debug('Socket now listening')
          
         # now keep talking with the client
         try:
@@ -246,6 +245,8 @@ class SecamController:
                 elif task.action == "camera":
                     camera_ctrl = task.args["ctrl"]
                     value = task.args["value"]
+                    LOG.info("Setting camera %s to %s" % (camera_ctrl, value))
+                    
                     msg = self.camera.set_setting(camera_ctrl, value)
                     response = self.camera.get_status()
                     response["msg"] = msg
@@ -256,12 +257,13 @@ class SecamController:
                         self.camera.status = self.const.go
                         response = self.camera.get_status()
                         response["msg"] = "Surveillance is on"
+                        LOG.info("Surveillance switched on")
                         conn.sendall(json.dumps(response))
                     else:
                         msg = "Surveillance is already on"
                         response = {}
                         response["msg"] = msg
-                        logging.info(msg)
+                        LOG.info(msg)
                         conn.sendall(json.dumps(response))
                         
                 elif task.action == self.const.stop:
@@ -269,23 +271,24 @@ class SecamController:
                         self.camera.status = self.const.stop
                         response = self.camera.get_status()
                         response["msg"] = "Surveillance paused"
+                        LOG.info(response["msg"])
                         conn.sendall(json.dumps(response))
                     else:
                         msg = "Surveillance is already paused"
                         response = {}
                         response["msg"] = msg
-                        logging.info(msg)
+                        LOG.info(msg)
                         conn.sendall(json.dumps(response))
                         
                 elif task.action == "delete":
                     reply, ok = self._delete_files(task.args["files"])
-                    logging.info(reply)
+                    LOG.info(reply)
                     obj = {"status": ok, "msg": reply}
                     conn.sendall(json.dumps(obj))
                     
                 elif task.action == "backup":
                     reply, ok = self._backup_file(task.args["plik"])
-                    logging.info(reply)
+                    LOG.info(reply)
                     obj = {"status": ok, "msg": reply}
                     conn.sendall(json.dumps(obj))
                                         
@@ -295,7 +298,7 @@ class SecamController:
                 conn.close()
                     
         except KeyboardInterrupt:
-            logging.info("Keyboard interrupt")
+            LOG.info("Keyboard interrupt")
         finally:
             self.server.close()
     
@@ -331,7 +334,7 @@ class SecamController:
         self.q_lock.acquire()
         try:
             self.queue.append(task)
-            logging.info("Queued task: %s" % task.action)
+            LOG.info("Queued task: %s" % task.action)
             self._process_tasks()
             return task
         finally:
@@ -343,7 +346,7 @@ class SecamController:
             if len(self.queue) > 0:
                 task = self.queue[0]
                 self.queue.remove(task)
-                logging.info("De-queued task: %s" % task.action)
+                LOG.info("De-queued task: %s" % task.action)
                 return task
         finally:
             self.q_lock.release()
@@ -532,7 +535,7 @@ class Spibox:
             time.sleep(0.1)
         
         stop_time = time.time()
-        logging.info("Sensor reset took: %0.1f secs" % (stop_time - start_time))
+        LOG.info("Sensor reset took: %0.1f secs" % (stop_time - start_time))
 
         
     def _service(self):
@@ -549,11 +552,11 @@ class Spibox:
                         self.ctrl.enqueue(task)
                         self.event_counter += 1
                     else:
-                        logging.info("Alarm raised at %s, but surveillance is currently OFF" % datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
+                        LOG.info("Alarm raised at %s, but surveillance is currently OFF" % datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
                  
                  
         except KeyboardInterrupt:
-            logging.info("Keyboard interrupt - Spibox thread terminating")
+            LOG.info("Keyboard interrupt - Spibox thread terminating")
             GPIO.cleanup()
 
 
@@ -582,23 +585,26 @@ class Task:
         self.events.append(Event(datetime.now(), msg))
         
     def log_history(self):
-        logging.info("==============================")
-        logging.info("Task history [%s]" % self.id)
+        LOG.info("==============================")
+        LOG.info("Task history [%s]" % self.id)
         
         for e in self.events:
-            logging.info("%s secs: %s", self.elapsed(e.date), e.msg)
+            LOG.info("%s secs: %s", self.elapsed(e.date), e.msg)
 
-        logging.info("------------------------------")
+        LOG.info("------------------------------")
         
+LOG = logging.getLogger("secam")
 
 if __name__ == "__main__":
-    logging.basicConfig(filename="/var/www/html/log/secam.log", format="%(asctime)s (%(filename)s) [%(levelname)s] %(message)s", level=logging.DEBUG)
-    logging.info("====================================================================")
-    logging.info("Secam application started")
+    LOG.setLevel(logging.INFO)
+    fh = logging.handlers.RotatingFileHandler("/var/www/html/log/secam.log", maxBytes=512000, backupCount=5)
+    fh.setFormatter(logging.Formatter("%(asctime)s (%(filename)s) [%(levelname)s] %(message)s"))
+    LOG.addHandler(fh)
+    
+    LOG.info("====================================================================")
+    LOG.info("Secam application started")
 
     PIR = 4    
-    CAMERA = Camera()
-    CTRL = SecamController(CAMERA)
-    
+    CTRL = SecamController(Camera())    
     start_new_thread(spawn_messaging_service, (CTRL,))     
     Spibox(CTRL)._service()
