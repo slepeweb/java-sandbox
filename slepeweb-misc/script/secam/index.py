@@ -1,21 +1,11 @@
-import logging, secam, os
+import secam
 from operator import attrgetter
-from datetime import datetime
 
-LOG = logging.getLogger("secam")
-logging.getLogger("requests").setLevel(logging.WARNING)
-LOG.info("Index page loaded")
 _const = secam.Constants()
 
 def reboot(req, pwd=""):
-    cf = datetime.now().strftime("%H%d%m%Y")
-    if pwd == cf:            
-        LOG.info("Reboot requested")
-        os.system("sudo shutdown -r now")
-                    
-    else:
-        LOG.error("*** Bad password provided for reboot [%s]" % pwd)
-            
+    req.content_type="Content-Type: text/plain"
+    return send_message("reboot", {"pwd": pwd}, True)            
     
 def send_message(action, argsObject, return_json=False):
     ctrl = secam.SecamControllerClient()
@@ -38,7 +28,7 @@ def backup(req, plik=""):
     return send_message("backup", {"plik": plik}, True)
     
 def table(req):
-    h1 = """<h1>Video index</h1>"""
+    h1 = """<h1><a href="%spy/index.py">Video index</a></h1>""" % _const.app_folder_web
     
     # results is an array of objects. Each object has keys 'filename' and 'backedup'
     results = send_message("get_file_register", {})

@@ -19,7 +19,8 @@ class Constants:
         
         self.webroot = "/var/www/html/"
         self.video_folder = self.webroot + "video/"
-        self.video_folder_web = "/secam/app/video/"
+        self.app_folder_web = "/secam/app/"
+        self.video_folder_web = self.app_folder_web + "video/"
         self.backup_register = "resource/backup-register"
         
         self.go = "go"
@@ -257,7 +258,7 @@ class SecamController:
                         self.camera.status = self.const.go
                         response = self.camera.get_status()
                         response["msg"] = "Surveillance is on"
-                        LOG.info("Surveillance switched on")
+                        LOG.info(response["msg"])
                         conn.sendall(json.dumps(response))
                     else:
                         msg = "Surveillance is already on"
@@ -292,6 +293,14 @@ class SecamController:
                     obj = {"status": ok, "msg": reply}
                     conn.sendall(json.dumps(obj))
                                         
+                elif task.action == "reboot":
+                    cf = datetime.now().strftime("%H%d%m%Y")
+                    if task.args["pwd"] == cf:            
+                        LOG.info("Reboot requested")
+                        os.system("sudo shutdown -r now")                    
+                    else:
+                        LOG.error("*** Bad password provided for reboot [%s]" % task.args["pwd"])
+                    
                 else:
                     self.enqueue(task)
                 
@@ -495,7 +504,7 @@ class SecamController:
             task.add_event("sending mail")
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
-            server.login("george.buttigieg@gmail.com", "br1cktop1")
+            server.login("george.buttigieg@gmail.com", "g1ga5Eftg00g6E")
             server.sendmail(mail_from, [mail_to], msg.as_string())
             task.add_event("mail sent ok")
         except:
@@ -597,7 +606,7 @@ LOG = logging.getLogger("secam")
 
 if __name__ == "__main__":
     LOG.setLevel(logging.INFO)
-    fh = logging.handlers.RotatingFileHandler("/var/www/html/log/secam.log", maxBytes=512000, backupCount=5)
+    fh = logging.handlers.RotatingFileHandler("/var/www/html/log/secam.log", maxBytes=128000, backupCount=5)
     fh.setFormatter(logging.Formatter("%(asctime)s (%(filename)s) [%(levelname)s] %(message)s"))
     LOG.addHandler(fh)
     
