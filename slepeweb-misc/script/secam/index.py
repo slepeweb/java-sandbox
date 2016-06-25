@@ -1,4 +1,4 @@
-import secam
+import secam, controls
 from operator import attrgetter
 
 _const = secam.Constants()
@@ -14,6 +14,10 @@ def send_message(action, argsObject, return_json=False):
 def putm(req, msg, json=False):
     req.content_type="Content-Type: text/plain"
     return send_message(msg, {}, json)
+
+def status(req):
+    req.content_type="Content-Type: text/plain"
+    return send_message("status", {}, True)
         
 def camera(req, ctrl, value):
     req.content_type="Content-Type: text/plain"
@@ -28,12 +32,10 @@ def backup(req, plik=""):
     return send_message("backup", {"plik": plik}, True)
     
 def table(req):
-    h1 = """<h1><a href="%spy/index.py">Video index</a></h1>""" % _const.app_folder_web
-    
     # results is an array of objects. Each object has keys 'filename' and 'backedup'
     results = send_message("get_file_register", {})
     if len(results) == 0:
-        return " ".join([h1, "<h2>No media items found</h2>"])
+        return "<h2>No media items found</h2>"
     
     b_start = """<table id="video-index-table"><tr>
             <th>Event id</th>
@@ -65,15 +67,12 @@ def table(req):
         row += "</tr>"
         rows.append(row)
 
-    b_end = "</table>"
-    return " ".join([h1, b_start, ' '.join(rows), b_end])
+    b_end = "</table>"    
+    return " ".join([b_start, ' '.join(rows), b_end])
 
 
 def index(req):
-    h = head(req) 
-    t = tail(req)
-    b = table(req)
-    return " ".join([h, b, t])
+    return " ".join([head(req), controls.controls(req), tail(req)])
 
 
 def head(req): 
@@ -92,6 +91,8 @@ def head(req):
   </head> 
   <body>
       <div id="main">
+        <h1><a href="index.py">Video index</a></h1>    
+        <div id="video-table"><p>(Video table is loading ...)</p></div>
     """
     return s
 
@@ -99,50 +100,8 @@ def head(req):
 def tail(req):    
     s = """
         </div>
-        <table><tr>
-            <td><a href="/secam/app/log/secam.log">Show log</a></td>
-            <td><button id="button-photo" value="photo">Take photo</button></td>
-            <td><button id="button-stopgo" value="stop">Pause surveillance</button></td></td>
-            <td><button id="button-refresh">Refresh</button></td>
-            <td class="flash"></td>
-        </tr></table>
-        
-        <table id="controls">
-            <tr><td>Brightness</td><td><select class="ctrl" id="brightness">%s</select></td></tr>
-            <tr><td>Contrast</td><td><select class="ctrl" id="contrast">%s</select></td></tr>
-            <tr><td>Mode</td><td><select class="ctrl" id="mode">%s</select></td></tr>
-            <tr><td>ISO</td><td><select class="ctrl" id="iso">%s</select></td></tr>
-        </table>
-        
-        <p></p>
-        <div id="dialog-trash-confirm" class="hide" title="Delete file?">
-            <p>
-                <span class="ui-icon ui-icon-alert"></span>
-                Are you sure you want to delete <span id="num-files-target"></span> file(s)?
-            </p>
-        </div>
-        <div id="bop"></div>
+    </div>
   </body> 
 </html>
-    """ % (int_options_stepped(10, 100, 5), int_options_stepped(-80, 100, 5), 
-           str_options_arr(["auto", "night", "nightpreview", "backlight", "spotlight"]), 
-           int_options_arr([0, 100, 200, 400, 800]))
-    return s
-
-def int_options_stepped(start, end, step):
-    s = ""
-    for i in range(start, end, step):
-        s += """<option value="%d">%d</option>""" % (i, i)
-    return s
-
-def str_options_arr(lis):
-    s = ""
-    for ss in lis:
-        s += """<option value="%s">%s</option>""" % (ss, ss)
-    return s
-
-def int_options_arr(lis):
-    s = ""
-    for i in lis:
-        s += """<option value="%d">%d</option>""" % (i, i)
+    """
     return s

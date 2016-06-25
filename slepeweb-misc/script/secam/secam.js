@@ -1,5 +1,7 @@
 var status = null;
-var indexPath = "/secam/app/py/index.py";
+var rootPath = "/secam/app/";
+var indexPath = rootPath + "py/index.py";
+var securePath = rootPath + "secure/index.py";
 
 function manageButtons(map) {
 	if (map.status == "stop") {
@@ -30,7 +32,7 @@ function reloadTable() {
 		var table = $(resp);
 		table.find(".iframe").colorbox({iframe:true, opacity:0.5, closeButton:true, width:"90%", height:"80%", top:"15%"});
 		table.find(".group2").colorbox({rel:'group2', transition:"none", current:'Media item {current} of {total}'});
-		$("#main").empty().append(table);
+		$("#video-table").empty().append(table);
 				
 		// Parse page to add behaviour
 		// Backup files to dropbox
@@ -133,19 +135,26 @@ function reloadTable() {
 	});		
 }
 
-$(function() {	
+function getStatus() {
 	$.ajax({
-		url : indexPath + "/putm?msg=status&json=1",
+		url : indexPath + "/status",
 		dataType : "text",
 		cache : false
 	}).done(function(resp) {
-		var obj = $.parseJSON(resp)
-		$(".flash").empty().append(obj["msg"]);
+		var status = $.parseJSON(resp)
+		$(".flash").empty().append(status["msg"]);
 		reloadTable();
-		manageButtons(obj);
+		manageButtons(status);
 	}).fail(function(jqXHR, status) {
 		console.log(status);
 	});		
-		
-	//$("html", "body").scrollTo("#bop");
+}
+
+// After page is fully loaded ...
+$(function() {
+	getStatus();
+	
+	$(".controls-toggle").click(function() {
+		window.location = securePath;		
+	});
 });

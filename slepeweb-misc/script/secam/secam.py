@@ -237,7 +237,9 @@ class SecamController:
                 
                 # Do actions that require an immediate response here
                 if task.action == self.const.stat:
-                    conn.sendall(json.dumps(self.camera.get_status()))
+                    response = self.camera.get_status()
+                    # Return response as a json string
+                    conn.sendall(json.dumps(response))
                     
                 elif task.action == "get_file_register":
                     response = self._get_videos()
