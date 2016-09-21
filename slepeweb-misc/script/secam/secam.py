@@ -46,7 +46,7 @@ class Document:
         self.filename = filename
         self.path = const.video_folder + filename
         self.backedup = False
-        self.timestamp = None
+        self.timestamp = "20000101235959" # a default/arbitrary date
         self.size = None
         m = re.search("(P|\d{1,})-(\d{14})\.(%s|%s)" % (const.videotype, const.imagetype), filename)
 
@@ -68,7 +68,7 @@ class Document:
             return "%d Mb" % (l/million)
     
     def get_date(self):
-        return datetime.strptime(self.timestamp, '%Y%m%d%H%M%S')
+        return datetime.strptime(self.timestamp, '%Y%m%d%H%M%S') 
     
     def to_obj(self):
         obj = {}
@@ -382,10 +382,11 @@ class SecamController:
         a = []  
         register = self._get_backup_register()
         for f in os.listdir(self.const.video_folder):
-            obj = {}
-            obj['filename'] = f
-            obj['backedup'] = register.has_key(f)
-            a.append(obj)
+            if re.match(".*?(mp4|jpg)$", f): # In case any failed conversions are still lying around
+                obj = {}
+                obj['filename'] = f
+                obj['backedup'] = register.has_key(f)
+                a.append(obj)
         
         return a
     
