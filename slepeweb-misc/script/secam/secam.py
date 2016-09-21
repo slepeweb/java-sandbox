@@ -322,9 +322,14 @@ class SecamController:
         return docs
              
     def _process_tasks(self):
+        # Start a new thread to process the task queue, but only if one is not already running.
         if not self._get_thread_status():
             self._set_thread_status(True)
+            LOG.info("Starting new queue-processing thread")
             start_new_thread(self._service, ())
+        else:
+            LOG.info("The message queue is being processed by an existing thread")            
+            
     
     def _service(self):
         while len(self.queue) > 0:
@@ -345,7 +350,7 @@ class SecamController:
         self.q_lock.acquire()
         try:
             self.queue.append(task)
-            LOG.info("Queued task: %s" % task.action)
+            task.add_event("Task queued")
             self._process_tasks()
             return task
         finally:
@@ -357,7 +362,8 @@ class SecamController:
             if len(self.queue) > 0:
                 task = self.queue[0]
                 self.queue.remove(task)
-                LOG.info("De-queued task: %s" % task.action)
+                task.add_event("Task de-queued")
+                #LOG.info("De-queued task: %s" % task.action)
                 return task
         finally:
             self.q_lock.release()
@@ -496,7 +502,7 @@ class SecamController:
         Please investigate further @ %s
         """
     
-        event_time = task.get_start().strftime("%Y/%m/%d %H:%M:%S")
+        event_time = task.get_start_as_string()
         msg = MIMEText(mail_body % (task.id, event_time, web_page))
         msg['Subject'] = "Security Alarm"
         msg['From'] = mail_from
@@ -584,10 +590,14 @@ class Task:
         self.action = action
         self.args = args
         self.events = []
-        self.events.append(Event(datetime.now(), "Start: %s" % action))
+        self.start = datetime.now()
+        #self.events.append(Event(datetime.now(), "Start: %s" % action))
         
     def get_start(self):
-        return self.events[0].date
+        return self.start
+        
+    def get_start_as_string(self):
+        return self.get_start().strftime("%Y/%m/%d %H:%M:%S")
         
     def elapsed(self, to):
         delta = to - self.get_start()
@@ -598,7 +608,7 @@ class Task:
         
     def log_history(self):
         LOG.info("==============================")
-        LOG.info("Task history [%s]" % self.id)
+        LOG.info("Task history [%s] started at %s" % (self.id, self.get_start_as_string()))
         
         for e in self.events:
             LOG.info("%s secs: %s", self.elapsed(e.date), e.msg)
