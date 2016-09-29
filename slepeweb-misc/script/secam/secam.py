@@ -170,19 +170,19 @@ class SecamControllerClient:
         self.const = Constants()
         
     def send_message(self, obj, return_json=False):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
         try:
-            # Connect to the server
+            # Create new socket, and connect to the server
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self.const.host, self.const.port))
+            util = SocketUtil(sock)
             
             # Marshall the supplied object into a string, and send to the server
             s = json.dumps(obj)
             LOG.debug("Sending message [%s] ..." % s)
-            sock.sendall(s)
+            util.send(s)
             
             # Wait for a response
-            s = sock.recv(2048)
+            s = util.recv()
             
             # Unmarshall the returned json string into an object, and return same to caller
             LOG.debug("... received response [%s]" % s)
@@ -206,7 +206,6 @@ class SecamController:
         self.null_device = open(os.devnull, 'w')
         self.q_lock = threading.Lock()
         self.service_lock = threading.Lock()
-
      
     def start(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -230,8 +229,9 @@ class SecamController:
             while True:
                 # wait to accept a connection - blocking call
                 conn, addr = self.server.accept()
+                util = SocketUtil(conn)
                 
-                dataStr = conn.recv(2048).strip(" \t\n\r")
+                dataStr = util.recv().strip(" \t\n\r")
                 obj = json.loads(dataStr)
                 task = Task(obj["action"], obj["args"])
                 
@@ -239,11 +239,11 @@ class SecamController:
                 if task.action == self.const.stat:
                     response = self.camera.get_status()
                     # Return response as a json string
-                    conn.sendall(json.dumps(response))
+                    util.send(json.dumps(response))
                     
                 elif task.action == "get_file_register":
                     response = self._get_videos()
-                    conn.sendall(json.dumps(response))
+                    util.send(json.dumps(response))
                     
                 elif task.action == "camera":
                     camera_ctrl = task.args["ctrl"]
@@ -253,7 +253,7 @@ class SecamController:
                     msg = self.camera.set_setting(camera_ctrl, value)
                     response = self.camera.get_status()
                     response["msg"] = msg
-                    conn.sendall(json.dumps(response))
+                    util.send(json.dumps(response))
                     
                 elif task.action == self.const.go:
                     if self.camera.status != self.const.go:
@@ -261,13 +261,13 @@ class SecamController:
                         response = self.camera.get_status()
                         response["msg"] = "Surveillance is on"
                         LOG.info(response["msg"])
-                        conn.sendall(json.dumps(response))
+                        util.send(json.dumps(response))
                     else:
                         msg = "Surveillance is already on"
                         response = {}
                         response["msg"] = msg
                         LOG.info(msg)
-                        conn.sendall(json.dumps(response))
+                        util.send(json.dumps(response))
                         
                 elif task.action == self.const.stop:
                     if self.camera.status != self.const.stop:
@@ -275,25 +275,25 @@ class SecamController:
                         response = self.camera.get_status()
                         response["msg"] = "Surveillance paused"
                         LOG.info(response["msg"])
-                        conn.sendall(json.dumps(response))
+                        util.send(json.dumps(response))
                     else:
                         msg = "Surveillance is already paused"
                         response = {}
                         response["msg"] = msg
                         LOG.info(msg)
-                        conn.sendall(json.dumps(response))
+                        util.send(json.dumps(response))
                         
                 elif task.action == "delete":
                     reply, ok = self._delete_files(task.args["files"])
                     LOG.info(reply)
                     obj = {"status": ok, "msg": reply}
-                    conn.sendall(json.dumps(obj))
+                    util.send(json.dumps(obj))
                     
                 elif task.action == "backup":
                     reply, ok = self._backup_file(task.args["plik"])
                     LOG.info(reply)
                     obj = {"status": ok, "msg": reply}
-                    conn.sendall(json.dumps(obj))
+                    util.send(json.dumps(obj))
                                         
                 elif task.action == "reboot":
                     cf = datetime.now().strftime("%H%d%m%Y")
@@ -614,6 +614,46 @@ class Task:
             LOG.info("%s secs: %s", self.elapsed(e.date), e.msg)
 
         LOG.info("------------------------------")
+        
+
+class SocketUtil:
+    def __init__(self, sock=None):
+        self.terminator = "$$$"
+        self.bufflen = 2048
+        
+        if sock is None:
+            self.sock = socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM)
+        else:
+            self.sock = sock    
+            
+    def send(self, msg):
+        # append $$$ delimiter to the messag
+        totalsent = 0
+        terminated_msg = msg + self.terminator
+        total_chars_in_msg = len(terminated_msg)
+        while totalsent < total_chars_in_msg:
+            sent = self.sock.send(terminated_msg[totalsent:])
+            if sent == 0:
+                raise RuntimeError("socket connection broken")
+            totalsent = totalsent + sent
+            
+    def recv(self):
+        chunks = []
+        bytes_recd = 0
+        terminated = False
+        
+        while not terminated:
+            chunk = self.sock.recv(self.bufflen)
+            if chunk == '':
+                raise RuntimeError("socket connection broken")
+            chunks.append(chunk)
+            bytes_recd = bytes_recd + len(chunk)
+            terminated = chunk.endswith(self.terminator)
+            
+        return ''.join(chunks)[0:bytes_recd - len(self.terminator)]
+
+    
         
 LOG = logging.getLogger("secam")
 
