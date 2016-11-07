@@ -8,7 +8,7 @@
   		- The name attribute value comes from the wsdl: 
   				<portType name="PasswordService">
   		- The url-pattern attribute value is also in the wsdl: 
-  				<soap:address location="http://localhost:8081/wspub/password"/>
+  				<soap:address location="http://localhost:8080/wspub/password"/>
   				(note that /wspub is the context for this webapp)
   	-->
 	  <endpoint
