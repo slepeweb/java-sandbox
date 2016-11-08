@@ -50,23 +50,24 @@ public class BaseController {
 	
 	@ModelAttribute(value=ITEM)
 	public Item getRequestItem(HttpServletRequest req) {
-		Item i = (Item) req.getAttribute("_item");
-		LOG.trace(String.format("Model attribute (_item): [%s]", i));
+		Item i = (Item) req.getAttribute(ITEM);
+		LOG.trace(String.format("Model attribute (%s): [%s]", ITEM, i));
 		return i;
 	}
 	
 	@ModelAttribute(value=SITE)
 	public Site getRequestSite(HttpServletRequest req) {
-		Site s = (Site) req.getAttribute("_site");
-		LOG.trace(String.format("Model attribute (_site): [%s]", s));
+		Site s = (Site) req.getAttribute(SITE);
+		LOG.trace(String.format("Model attribute (%s): [%s]", SITE, s));
 		return s;
 	}
 	
 	@ModelAttribute(value="_shortSitename")
-	protected String getShortSitename(@ModelAttribute("_site") Site s) {
-		String site = s != null ? s.getShortname() : "";
-		LOG.trace(String.format("Model attribute (_shortSitename): [%s]", site));
-		return site;
+	protected String getShortSitename(HttpServletRequest req) {
+		Site s = (Site) req.getAttribute(SITE);
+		String shortName = s != null ? s.getShortname() : "";
+		LOG.trace(String.format("Model attribute (_shortSitename): [%s]", shortName));
+		return shortName;
 	}
 	
 	@ModelAttribute(value=USER)
