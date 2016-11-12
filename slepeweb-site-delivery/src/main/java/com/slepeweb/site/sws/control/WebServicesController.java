@@ -1,5 +1,6 @@
 package com.slepeweb.site.sws.control;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
@@ -35,8 +36,9 @@ public class WebServicesController {
 	
 	@RequestMapping(value="/password", method=RequestMethod.GET, produces={"application/json", "text/xml"})	
 	@ResponseBody
-	public PasswordBean doPassword(@RequestParam String org) {
-		return this.passwordJaxwsClient.getPassword(org);
+	public PasswordBean doPassword(@RequestParam String org, @RequestParam String key) {
+		String arg = StringUtils.isNotBlank(key) ? org + "___" + key : org;
+		return this.passwordJaxwsClient.getPassword(arg);
 	}
 		
 	@RequestMapping(value="/lotterynumbers/{howmany}", method=RequestMethod.GET, produces={"application/json", "text/xml"})	

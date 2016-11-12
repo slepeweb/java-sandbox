@@ -87,6 +87,11 @@ public class BaseController {
 		return hasAuthority(u, "SWS_ADMIN");
 	}
 	
+	@ModelAttribute(value="_isPasswordClient")
+	protected boolean isPasswordClient(@AuthenticationPrincipal User u) {
+		return hasAuthority(u, "SWS_PWD");
+	}
+	
 	private boolean hasAuthority(User u, String name) {
 		if (u != null) {
 			for (GrantedAuthority auth : u.getAuthorities()) {

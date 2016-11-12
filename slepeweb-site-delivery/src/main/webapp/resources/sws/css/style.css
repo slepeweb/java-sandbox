@@ -1109,3 +1109,11 @@ img.markup.right {
   background: -moz-linear-gradient(right, rgba(204, 204, 204, 0), #ccc);
   background: linear-gradient(to right, rgba(204, 204, 204, 0), #ccc);
 }
+
+.hide {
+  display: none;
+}
+
+#password-update, #password-reset {
+  margin-bottom: 1em;
+}

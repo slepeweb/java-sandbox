@@ -124,8 +124,10 @@ public class PageController extends BaseController {
 		@ModelAttribute("_shortSitename") String shortSitename, 
 		ModelMap model) {
  
-		Page page = getStandardPage(i, shortSitename, "article-leftnav", model);
+		// Specific page required for ws demo, so as to forward to a view that loads extra js
+		Page page = getStandardPage(i, shortSitename, "wsdemo", model);
 		page.addJavascript("/resources/sws/js/sandbox.js");
+		
 		return page.getView();
  
 	}

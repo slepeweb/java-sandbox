@@ -1189,3 +1189,12 @@ img.markup {
 		background: linear-gradient(to right,$right2left-gradient);
 	}
 }
+
+.hide {
+	display: none;
+}	
+
+#password-update, #password-reset {
+	margin-bottom: 1em;
+}
+
