@@ -11,5 +11,5 @@ import com.slepeweb.ws.bean.PasswordBean;
 @WebService
 @SOAPBinding(style=Style.DOCUMENT, use=Use.LITERAL)
 public interface PasswordService {
-	@WebMethod PasswordBean getPassword(String org);
+	@WebMethod PasswordBean getPassword(String source, String key);
 }

@@ -13,11 +13,11 @@ public class PasswordJaxwsClientImpl implements PasswordJaxwsClient {
 		
 	@Autowired private PasswordService passwordJaxwsProxy;	
 
-	public PasswordBean getPassword(String seed) {
+	public PasswordBean getPassword(String source, String key) {
 		LOG.info(String.format("Getting password at %1$tH:%1$tM:%1$tS", System.currentTimeMillis()));
 		
 		try {
-			PasswordBean bean = this.passwordJaxwsProxy.getPassword(seed);
+			PasswordBean bean = this.passwordJaxwsProxy.getPassword(source, key);
 			return bean;
 		}
 		catch (Exception e) {

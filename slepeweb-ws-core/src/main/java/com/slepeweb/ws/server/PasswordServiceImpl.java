@@ -8,11 +8,11 @@ import com.slepeweb.ws.bean.PasswordBean;
 @WebService(endpointInterface = "com.slepeweb.ws.server.PasswordService")
 public class PasswordServiceImpl implements PasswordService {
 	
-	public PasswordBean getPassword(String input) {
+	public PasswordBean getPassword(String source, String key) {
 		PasswordBean pwd = new PasswordBean();
 		PasswordGenerator generator = new PasswordGenerator();
-		pwd.setSeed(input);		
-		pwd.setPassword(generator.encode(input));
+		pwd.setSeed(source);		
+		pwd.setPassword(generator.encode(source, key));
 		return pwd;
 	}
 }
