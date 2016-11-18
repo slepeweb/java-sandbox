@@ -15,6 +15,7 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.constant.ItemTypeName;
+import com.slepeweb.site.model.CustomComponent;
 import com.slepeweb.site.model.ImageComponent;
 import com.slepeweb.site.model.LogozerComponent;
 import com.slepeweb.site.model.RssComponent;
@@ -74,6 +75,10 @@ public class ComponentServiceImpl implements ComponentService {
 
 	public StandardComponent standard(Link l) {
 		return new StandardComponent().setup(l);				
+	}
+	
+	public CustomComponent custom(Link l) {
+		return new CustomComponent().setup(l);				
 	}
 	
 	public RssComponent rss_feed(Link l) {
