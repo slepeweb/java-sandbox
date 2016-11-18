@@ -6,7 +6,7 @@
 <c:set var="_extraJs" scope="request">/resources/sws/js/wsdemo.js</c:set>
 
 <sw:standardLayout>
-	<gen:debug><!-- jsp/sws/wsdemo.jsp --></gen:debug>
+	<gen:debug><!-- jsp/sws/template/wsdemo.jsp --></gen:debug>
 	
 		<!-- Left Sidebar -->
 		<div class="3u 12u(3) grey-gradient left2right">
