@@ -1,14 +1,17 @@
 $(function() {
 
-	if (_isPasswordClient) {
-		$("tr.hide").removeClass("hide");
-	}
-
 	$("#password-update").click(
 			function(e) {
 				$("#password-pwd").val("");
 				var org = $("#password-org").val();
-				var key = $("#password-key").val();
+				
+				// If this input field is missing from the page, then provide a suitable default
+				var ele = $("#password-key");
+				var key = "";
+				if (ele) {
+					key = ele.val();
+				}
+
 				if (org) {
 					$.ajax({
 						url : "/ws/password?org=" + org + "&key=" + key,

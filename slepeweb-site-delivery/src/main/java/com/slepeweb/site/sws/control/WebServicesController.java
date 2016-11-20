@@ -1,6 +1,7 @@
 package com.slepeweb.site.sws.control;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -35,7 +36,14 @@ public class WebServicesController {
 	
 	@RequestMapping(value="/password", method=RequestMethod.GET, produces={"application/json", "text/xml"})	
 	@ResponseBody
-	public PasswordBean doPassword(@RequestParam String org, @RequestParam String key) {
+	public PasswordBean doPassword(@RequestParam String org, 
+			@RequestParam(value="key", required=false) String key,
+			@AuthenticationPrincipal User u) {
+		
+		if (! hasAuthority(u, "SWS_PWD")) {
+			key = "";
+		}
+		
 		return this.passwordJaxwsClient.getPassword(org, key);
 	}
 		
@@ -79,4 +87,16 @@ public class WebServicesController {
 		c = this.twitterService.getSyndicatedTweets(c);		
 		return c;
 	}
+	
+	private boolean hasAuthority(User u, String name) {
+		if (u != null) {
+			for (GrantedAuthority auth : u.getAuthorities()) {
+				if (auth.getAuthority().equals(name)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 }
