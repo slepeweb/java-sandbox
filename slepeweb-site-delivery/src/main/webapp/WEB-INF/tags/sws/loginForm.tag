@@ -28,6 +28,7 @@
 				</tr>
 			</table>
 			<input class="button special small" type="submit" value="Login" />
+<%-- 			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> --%>
 		</form>	
 	</c:if>
 	

@@ -28,10 +28,10 @@ $(function() {
 	}).done(function(resp) {
 		if (resp && resp.username) {
 			$("a.topnav").each(function(){
-				var ele = $(this);
-				if (ele.text() == "Login") {
-					ele.attr("href", "/j_spring_security_logout");
-					ele.text("Logout");
+				var link = $(this);
+				if (link.text() == "Login") {
+					link.attr("href", "/j_spring_security_logout");
+					link.text("Logout");					
 				}
 			});
 		}

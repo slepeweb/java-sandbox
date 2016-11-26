@@ -13,6 +13,7 @@
 		<intercept-url pattern="/spring/user/add" access="hasRole('SWS_GUEST')" />
 		<intercept-url pattern="/spring/user/upd" access="hasRole('SWS_GUEST')" />
 		<intercept-url pattern="/spring/user/del/*" access="hasRole('SWS_ADMIN')" />
+		<intercept-url pattern="/**" access="permitAll" />
 		
 		<form-login 
 		  login-page="/login" 
@@ -21,7 +22,10 @@
 			username-parameter="alias"
 			password-parameter="password" />
 			
-		<logout logout-success-url="/login?logout" />	
+		<logout 
+			logout-success-url="/login?logout"
+			logout-url="/j_spring_security_logout" />	
+			<!-- 		<csrf /> -->
 		
 	</http>
  
