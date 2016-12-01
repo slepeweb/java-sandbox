@@ -81,6 +81,7 @@ public class CmsDeliveryServlet {
 				Item item = site.getItem(path);
 				
 				if (item != null) {
+					LOG.info(LogUtil.compose("Requesting", item));
 					logRequestHeaders(req, path);					
 					long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
 
