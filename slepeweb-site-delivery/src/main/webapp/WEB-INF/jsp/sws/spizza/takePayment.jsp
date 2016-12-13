@@ -53,10 +53,10 @@
 			</table> 
 	      
 	    <div class="row">
-	    	<div class="6u">
+	    	<div class="col-1-2">
 	        <input type="submit" class="button small special" name="_eventId_submitPayment" value="Take payment" />
         </div>
-	    	<div class="6u">
+	    	<div class="col-1-2">
 	        <input type="submit" class="button small special" name="_eventId_cancel" value="Cancel order" />
         </div>
 	    </div>

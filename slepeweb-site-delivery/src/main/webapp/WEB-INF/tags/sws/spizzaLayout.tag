@@ -24,16 +24,17 @@
 			<div class="container">
 				<div class="row">
 				
-					<!-- Left Sidebar -->
-					<div class="3u 6u(3)">
-						<sw:navigation-left />
-					</div>
-					
 					<!-- Main content -->	
-					<c:if test="${empty mainCols}"><c:set var="mainCols" value="6u 9u(2) 12u(3) important(3)" /></c:if>
+					<c:if test="${empty mainCols}"><c:set var="mainCols" value="col-1-2 primary-col" /></c:if>
 					<div class="${mainCols}">	
 						<jsp:doBody />
 					</div>
+					
+					<!-- Left Sidebar -->
+					<div class="col-1-4 primary-col pull-right-sm">
+						<sw:navigation-left />
+					</div>
+					
 				</div>
 			</div>
 		</div>

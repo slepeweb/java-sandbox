@@ -5,16 +5,17 @@
 <header id="header">
 	<div class="container">
 		<div class="row">
-			<div class="3u">
+			<div class="left">
 				<h1><a href="/about">slepe web solutions</a></h1>
 			</div>
-			<nav class="9u" id="nav">
-				<ul class="fr">
+			<div class="right nav anchor">
+				<ul id="primary-nav">
 					<c:forEach items="${_page.header.topNavigation}" var="link">
-						<li<c:if test="${link.selected}"> class="selected"</c:if>><a class="topnav" href="${link.href}">${link.title}</a></li>
+						<li<c:if test="${link.selected}"> class="selected"</c:if>><a href="${link.href}">${link.title}</a></li>
 					</c:forEach>
 				</ul>
-			</nav>
+				<div id="tiny-nav"><i class="fa fa-bars fa-2x"></i></div>
+			</div>
 		</div>
 	</div>
 </header>
@@ -39,6 +40,6 @@ $(function() {
 		//console.log(status);
 	});		
 	
-	$("#header").css("visibility", "visible");
+	//$("#header").css("visibility", "visible");
 });
 </script>

@@ -1,3 +1,27 @@
+@mixin extra-small-only {
+    @media only screen and (max-width : $transition-small-to-medium - 0.0625) {
+        @content;
+    }
+}
+
+@mixin small-and-above {
+    @media only screen and (min-width : $transition-small-to-medium) {
+        @content;
+    }
+}
+
+@mixin nav-transition {
+    @media only screen and (max-width : $transition-nav) {
+        @content;
+    }
+}
+
+@mixin std-container-padding {
+  padding-left: $std-container-padding;
+  padding-right: $std-container-padding;
+}
+
+
 @mixin vendor-property($property, $value) { 
     @each $vendor in ('-moz-', '-webkit-', '-o-', '-ms-', '') {
         #{$vendor}#{$property}: #{$value};

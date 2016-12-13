@@ -96,6 +96,6 @@ $(function(){
 					<img id="img_${_imgId}" src="${_comp.components[_imgId - 1].src}" />
 				</c:forEach>
 			</c:if>
-		
+		</div>
 	</c:forEach>
 </div>

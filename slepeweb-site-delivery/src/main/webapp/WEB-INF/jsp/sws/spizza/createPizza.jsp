@@ -2,7 +2,7 @@
 	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 	
-<sw:spizzaLayout mainCols="9u 12u(3) important(3)">
+<sw:spizzaLayout mainCols="col-3-4">
 	<gen:debug><!-- jsp/sws/spizza/createPizza.jsp --></gen:debug>
 
 	<article>
@@ -36,8 +36,8 @@
 			</table>
 
 			<div class="row">
-				<div class="6u"><input type="submit" class="button small special" name="_eventId_addPizza" value="Continue" /></div>
-				<div class="6u"><input type="submit" class="button small special" name="_eventId_cancel" value="Cancel order" /></div>
+				<div class="col-1-2"><input type="submit" class="button small special" name="_eventId_addPizza" value="Continue" /></div>
+				<div class="col-1-2"><input type="submit" class="button small special" name="_eventId_cancel" value="Cancel order" /></div>
 			</div>
 		</form:form>
 	</article>

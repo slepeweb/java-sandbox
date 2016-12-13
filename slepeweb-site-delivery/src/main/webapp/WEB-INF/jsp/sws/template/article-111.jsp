@@ -5,20 +5,24 @@
 <sw:standardLayout>
 	<gen:debug><!-- jsp/sws/article-111.jsp --></gen:debug>
 	
+	<div class="col-3-4 pull-right-sm">	
+		<div>
+			<!-- Main content -->	
+			<div class="col-2-3 primary-col">
+				<sw:standardBody />	
+				<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
+			</div>
+			
+			<!-- Right sidebar -->
+			<div class="col-1-3 primary-col">	
+					<site:insertComponents site="${_item.site.shortname}" list="${_page.rightSidebar.components}" /> 
+			</div>
+		</div>
+	</div>
+	
 	<!-- Left Sidebar -->
-	<div class="3u 12u(2)">
+	<div class="col-1-4 primary-col">
 		<site:insertComponents site="${_item.site.shortname}" list="${_page.leftSidebar.components}" /> 
 	</div>
 
-	<!-- Main content -->	
-	<div class="6u 12u(2) important(2)">	
-		<sw:standardBody />	
-		<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
-	</div>
-	
-	<!-- Right sidebar -->
-	<div class="3u 12u(2)">	
-			<site:insertComponents site="${_item.site.shortname}" list="${_page.rightSidebar.components}" /> 
-	</div>
-	
 </sw:standardLayout>

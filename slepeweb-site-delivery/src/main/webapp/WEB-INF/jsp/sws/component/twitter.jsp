@@ -7,7 +7,7 @@ $(function() {
 	var tweets = {
 			error: "... tweets not available right now.",
 			updateDiv: function(html) {
-				var div = $("#twitter-feed");
+				var div = $("#twitter-side");
 				div.empty();
 				div.append(html);	
 			}
@@ -28,11 +28,11 @@ $(function() {
 			}
 			
 			for (var i = 0; i < resp.tweets.length; i++) {
-				html += '<div class="row twitter-side"><div class="2u"><img src="';
+				html += '<div class="twitter-feed"><div class="left"><img src="';
 				html += resp.tweets[i].account.iconPath;
 				html += '" title="';
 				html += resp.tweets[i].account.name;
-				html += '" align="left" /></div><div class="9u"><span>';
+				html += '" align="left" /></div><div class="right"><span>';
 				html += resp.tweets[i].account.name;
 				html += ', ';
 				html += resp.tweets[i].timeAgo.quantity + resp.tweets[i].timeAgo.unit + " ago";
@@ -55,6 +55,6 @@ $(function() {
 });
 </script>  
 
-<div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
-	<div id="twitter-feed">Please wait for latest tweets ...</div>
+<div id="twitter-side">
+	Please wait for latest tweets ...
 </div>

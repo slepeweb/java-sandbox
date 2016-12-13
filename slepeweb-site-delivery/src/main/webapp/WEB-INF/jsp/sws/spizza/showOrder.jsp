@@ -35,9 +35,9 @@
 			</table> 
 			
 			<div class="row">
-				<div class="4u"><input type="submit" class="button small special" name="_eventId_createPizza" value="More pizza" /></div>
-				<div class="4u"><input type="submit" class="button small special" name="_eventId_checkout" value="Checkout" /></div>
-				<div class="4u"><input type="submit" class="button small special" name="_eventId_cancel" value="Cancel order" /></div>
+				<div class="col-1-3"><input type="submit" class="button small special" name="_eventId_createPizza" value="More pizza" /></div>
+				<div class="col-1-3"><input type="submit" class="button small special" name="_eventId_checkout" value="Checkout" /></div>
+				<div class="col-1-3"><input type="submit" class="button small special" name="_eventId_cancel" value="Cancel order" /></div>
 			</div>
 		</form:form>
 	</article>

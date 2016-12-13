@@ -50,8 +50,8 @@
 				</table> 
 				
 		    <div class="row">
-					<div class="6u"><input class="button small special" type="submit" name="_eventId_register" value="Register" /></div>
-		      <div class="6u"><input class="button small special" type="submit" name="_eventId_cancel" value="Cancel" /></div>
+					<div class="col-1-2"><input class="button small special" type="submit" name="_eventId_register" value="Register" /></div>
+		      <div class="col-1-2"><input class="button small special" type="submit" name="_eventId_cancel" value="Cancel" /></div>
 		    </div>
 		</form:form>
 	</article>
