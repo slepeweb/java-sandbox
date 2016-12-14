@@ -633,66 +633,15 @@ input[type="button"]:disabled,
 
 /* Footer */
 #footer-wrapper {
-  padding: 2em 0;
+  padding: 1em 0;
   box-shadow: inset 0px 10px 60px 0px rgba(0, 0, 0, 0.15);
 }
 
-	/*
-	#footer {
-		background: #f2f2f2;
-		padding: 4em 0;
-
-		.copyright {
-			color: $color-fg-light;
-			font-size: 0.9em;
-			margin: 2em 0 0 0;
-			padding: 0;
-			text-align: center;
-
-			li {
-				border-left: solid $size-border-width $color-border;
-				display: inline-block;
-				list-style: none;
-				margin-left: 1.5em;
-				padding-left: 1.5em;
-
-				&:first-child {
-					border-left: 0;
-					margin-left: 0;
-					padding-left: 0;
-				}
-			}
-		}
-	}
-	*/
 #copyright {
   text-align: center;
   font-size: 0.9em;
-}
-
-/* Grid Demo */
-.grid-demo {
-  display: block;
-  margin: 0 0 2em 0;
-}
-.grid-demo span {
-  background: #6ec9ad;
-  border-radius: 4px;
-  color: rgba(0, 0, 0, 0.25);
-  display: block;
-  font-weight: bold;
-  height: 2em;
-  line-height: 2em;
-  text-align: center;
-}
-.grid-demo .row.flush > div span {
-  border-radius: 0;
-}
-.grid-demo .row.flush > div:first-child span {
-  border-radius: 4px 0 0 4px;
-}
-.grid-demo .row.flush > div:last-child span {
-  border-radius: 0 4px 4px 0;
+  background: #000;
+  color: #bbb;
 }
 
 /***************************
@@ -961,6 +910,11 @@ html {
   }
 }
 #primary-nav.data-toggle-on {
+  -moz-box-shadow: 5px 5px 2px grey;
+  -webkit-box-shadow: 5px 5px 2px grey;
+  -o-box-shadow: 5px 5px 2px grey;
+  -ms-box-shadow: 5px 5px 2px grey;
+  box-shadow: 5px 5px 2px grey;
   border: 1px;
   background: #ccc;
   position: absolute;
@@ -969,6 +923,8 @@ html {
   width: 130px;
   display: block;
   float: none;
+  padding-top: 5px;
+  line-height: 2em;
   z-index: 1;
 }
 
@@ -1256,18 +1212,18 @@ section.special, article.special {
   margin-bottom: 1em;
 }
 .twitter-feed > .left {
-  width: 16.66667%;
+  width: 42px;
 }
 .twitter-feed > .right {
   width: 75%;
+  margin-left: 5px;
 }
 .twitter-feed > div {
   float: left;
   margin-bottom: 1em;
 }
 .twitter-feed img {
-  width: 180%;
-  max-width: 40px;
+  width: 40px;
 }
 .twitter-feed span {
   font-weight: bold;

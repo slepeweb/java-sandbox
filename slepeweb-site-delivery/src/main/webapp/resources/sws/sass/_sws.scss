@@ -169,11 +169,12 @@ section, article {
 	margin-bottom: 1em;
 	
 	> .left {
-		width: (100%/6);
+		width: 42px;
 	}
 	
 	> .right {
 		width: (300%/4);
+		margin-left: 5px;
 	}
 	
 	> div {
@@ -182,8 +183,7 @@ section, article {
 	}
 	
 	img {
-		width: 180%;
-		max-width: 40px;
+		width: 40px;
 	}
 	
 	span {
