@@ -1,37 +1,44 @@
-	.align-left {
-		text-align: left;
-	}
+/* For IE10 snap mode ??? */
+@media screen and (max-width:400px) {
+  @-ms-viewport{
+    width: device-width;
+  }
+}
 
-	.align-center {
-		text-align: center;
-	}
+.align-left {
+	text-align: left;
+}
 
-	.align-right {
-		text-align: right;
-	}
-	
-	.fr {
-		float: right;
-	}
-	
-	.smaller {
-		font-size: 0.9em;
-	}
-	
-	.caption {
-		font-size: 0.9em;
-		line-height: 1.2em;
-		font-style: italic;
-		margin-left: 0.2em;
-	}
+.align-center {
+	text-align: center;
+}
+
+.align-right {
+	text-align: right;
+}
+
+.fr {
+	float: right;
+}
+
+.smaller {
+	font-size: 0.9em;
+}
+
+.caption {
+	font-size: 0.9em;
+	line-height: 1.2em;
+	font-style: italic;
+	margin-left: 0.2em;
+}
 
 /* Section/Article */
 
-	section, article {
-		&.special {
-			text-align: center;
-		}
+section, article {
+	&.special {
+		text-align: center;
 	}
+}
 
 #weather-report {
 	font-size: 0.8em;

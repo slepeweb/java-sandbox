@@ -6,7 +6,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="left">
-				<h1><a href="/about">slepe web solutions</a></h1>
+				<h1><a href="/about">slepe web </a></h1>
 			</div>
 			<div class="right nav anchor">
 				<ul id="primary-nav">

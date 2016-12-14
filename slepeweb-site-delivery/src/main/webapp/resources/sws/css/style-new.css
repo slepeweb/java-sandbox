@@ -5,7 +5,7 @@
 body {
   background: #f0f0f0 url("images/bg1.png");
 }
-@media only screen and (max-width: 47.9375em) {
+@media only screen and (max-width: 25.9375em) {
   body {
     min-width: 320px;
   }
@@ -18,7 +18,7 @@ body, input, select, textarea {
   font-weight: normal;
   line-height: 1.65em;
 }
-@media only screen and (max-width: 47.9375em) {
+@media only screen and (max-width: 25.9375em) {
   body, input, select, textarea {
     font-size: 12pt;
   }
@@ -579,7 +579,7 @@ input[type="button"].alt.icon:before,
 .button.alt.icon:before {
   color: #bbb;
 }
-@media only screen and (max-width: 47.9375em) {
+@media only screen and (max-width: 25.9375em) {
   input[type="submit"].alt,
   input[type="reset"].alt,
   input[type="button"].alt,
@@ -739,7 +739,7 @@ html {
   padding-left: 15px;
   padding-right: 15px;
 }
-@media only screen and (max-width: 47.9375em) {
+@media only screen and (max-width: 25.9375em) {
   .primary-col {
     margin-bottom: 4em;
   }
@@ -815,6 +815,8 @@ html {
   line-height: 3.25em;
   width: 100%;
   z-index: 10000;
+  /* Left side of header, containing company logo */
+  /* Right side of header, containing primary nav */
   /* This governs the primary nav in desktop mode */
 }
 @media only screen and (max-width: 52em) {
@@ -823,8 +825,13 @@ html {
   }
 }
 #header div.left {
-  width: 360px;
+  width: 350px;
   float: left;
+}
+@media only screen and (max-width: 25.9375em) {
+  #header div.left {
+    width: 250px;
+  }
 }
 #header div.right {
   width: auto;
@@ -917,12 +924,18 @@ html {
   font-size: 1.5em;
   margin-bottom: 1.75em;
 }
-@media only screen and (max-width: 47.9375em) {
+@media only screen and (max-width: 25.9375em) {
   #banner {
     padding: 5em 2em 4em 2em;
   }
 }
 
+/* To avoid changing the size of the company logo, shorten it for small devices */
+@media only screen and (min-width: 26em) {
+  h1 > a:after {
+    content: "solutions";
+  }
+}
 #tiny-nav {
   display: none;
 }
@@ -1057,7 +1070,7 @@ ul.actions.fit.small {
 ul.actions.fit.small li {
   padding: 0 0 0 0.5em;
 }
-@media only screen and (max-width: 47.9375em) {
+@media only screen and (max-width: 25.9375em) {
   ul.actions {
     margin: 0 0 2em 0;
   }
@@ -1089,6 +1102,12 @@ dl {
   margin: 0 0 2em 0;
 }
 
+/* For IE10 snap mode ??? */
+@media screen and (max-width: 400px) {
+  @-ms-viewport {
+    width: device-width;
+  }
+}
 .align-left {
   text-align: left;
 }
@@ -1289,7 +1308,7 @@ img.markup.right {
   float: right;
   padding: 0.25em 0em 1em 1em;
 }
-@media only screen and (max-width: 47.9375em) {
+@media only screen and (max-width: 25.9375em) {
   img.markup {
     max-width: 100%;
     display: block;
