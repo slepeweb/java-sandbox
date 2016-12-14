@@ -41,7 +41,7 @@ html {
 .primary-col {
   @include std-container-padding{}
   
- 	@include extra-small-only {
+ 	@include small-only {
   	margin-bottom: 4em; 
  	}
 }

@@ -4,12 +4,17 @@
     }
 }
 
-@mixin above-extra-small {
+@mixin extra-small-and-above {
     @media only screen and (min-width : $transition-xsmall-to-small) {
         @content;
     }
 }
 
+@mixin small-only {
+    @media only screen and (max-width : $transition-small-to-medium - 0.0625) {
+        @content;
+    }
+}
 @mixin small-and-above {
     @media only screen and (min-width : $transition-small-to-medium) {
         @content;

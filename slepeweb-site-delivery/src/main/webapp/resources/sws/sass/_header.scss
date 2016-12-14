@@ -138,7 +138,7 @@
 }
 	
 /* To avoid changing the size of the company logo, shorten it for small devices */
-@include above-extra-small {
+@include extra-small-and-above {
 	h1 > a {		
 		&:after {
 				content: "solutions";
