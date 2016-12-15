@@ -9,7 +9,7 @@
 	<gen:debug><!-- jsp/sws/template/wsdemo.jsp --></gen:debug>
 	
 		<!-- Main content -->	
-		<div class="col-3-4 primary-col">	
+		<div class="col-3-4 primary-col pull-right-sm">	
 			<sw:standardBody />	
 			
 			<!-- This jsp is identical to article-leftnav.jsp, except for the
@@ -25,7 +25,7 @@
 		</div>					
 	
 		<!-- Left Sidebar -->
-		<div class="col-1-4 primary-col grey-gradient left2right pull-right-sm">
+		<div class="col-1-4 primary-col grey-gradient left2right">
 			<sw:navigation-left />
 		</div>
 		

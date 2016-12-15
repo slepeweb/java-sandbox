@@ -20,18 +20,22 @@
 			<sw:navigation-top />
 		</div>
 	
-		<div id="main-wrapper" class="subpage">
-			<div class="container">
+		<div id="main-wrapper">
+			<div id="main" class="container">
 				<div class="row">
 				
 					<!-- Main content -->	
-					<c:if test="${empty mainCols}"><c:set var="mainCols" value="col-1-2 primary-col" /></c:if>
-					<div class="${mainCols}">	
-						<jsp:doBody />
+					<c:if test="${empty mainCols}"><c:set var="mainCols" value="col-3-4" /></c:if>
+					<div class="${mainCols} pull-right-sm">	
+						<div>
+							<div class="col-1-1 primary-col">
+								<jsp:doBody />
+							</div>							
+						</div>
 					</div>
 					
 					<!-- Left Sidebar -->
-					<div class="col-1-4 primary-col pull-right-sm">
+					<div class="col-1-4 primary-col grey-gradient left2right">
 						<sw:navigation-left />
 					</div>
 					

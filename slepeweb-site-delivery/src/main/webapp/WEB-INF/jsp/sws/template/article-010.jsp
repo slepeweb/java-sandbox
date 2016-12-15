@@ -6,7 +6,7 @@
 	<gen:debug><!-- jsp/sws/article-010.jsp --></gen:debug>
 
 	<!-- Main content -->	
-	<div class="12u skel-cell-mainContent">	
+	<div class="col-1-1">	
 		<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
 	</div>					
 

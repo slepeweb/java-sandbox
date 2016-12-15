@@ -17,13 +17,20 @@
 <sw:standardLayout>
 	<gen:debug><!-- jsp/sws/template/user/form.jsp --></gen:debug>
 			
-	<!-- Main content -->	
-	<div class="col-1-2 primary-col">	
-		<sw:userForm />	
-	</div>	
+	<div class="col-3-4 pull-right-sm">	
+		<div>
+			<!-- Main content -->	
+			<div class="col-2-3 primary-col">
+				<sw:userForm />	
+			</div>
+			
+			<!-- *Empty* Right sidebar -->
+			<div class="col-1-3"></div>
+		</div>
+	</div>
 	
 	<!-- Left Sidebar -->
-	<div class="col-1-4 primary-col grey-gradient left2right pull-right-sm">
+	<div class="col-1-4 primary-col grey-gradient left2right">
 		<sw:navigation-left />
 	</div>
 	
