@@ -1,7 +1,0 @@
-To generate the artifacts in the jaxws folder:
-
-In a bash shell: 
-- cd to classes folder (below 'target'), in the local git repository 
-- then run wsgen on the service implementation class, eg: 
-- -- wsgen -keep -cp . com.slepeweb.sandbox.ws.soap.PasswordManagerImpl -s ../../src/main/java 
-- -- this creates a 'jaxws' folder below com.slepeweb.sandbox.ws.soap, and creates the artifacts below that
