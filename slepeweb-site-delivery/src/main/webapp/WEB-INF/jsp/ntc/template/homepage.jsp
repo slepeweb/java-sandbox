@@ -11,7 +11,7 @@
 		
 		<div class="8u$ 12u$(3)">
 			<div id="welcome" class="two-column">
-				<site:p>${_item.fields.bodytext}</site:p>
+				${_item.fields.bodytext}
 			</div>	
 		</div>	
 	</div>

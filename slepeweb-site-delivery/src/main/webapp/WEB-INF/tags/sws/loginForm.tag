@@ -4,16 +4,12 @@
 
 <article class="first">
 
-	<h2>${_item.fields.title}</h2>
-	
 	<c:if test="${not empty error}">
 		<div class="underline red"><p>${error}</p></div>
 	</c:if>
 	<c:if test="${not empty msg}">
 		<div class="underline green"><p>${msg}</p></div>
 	</c:if>	
-	
-	<p>${_item.fields.bodytext}</p>
 	
 	<c:if test="${not _isGuest and not _isAdmin}">	
 		<form method="post" action="<c:url value="/j_spring_security_check" />">

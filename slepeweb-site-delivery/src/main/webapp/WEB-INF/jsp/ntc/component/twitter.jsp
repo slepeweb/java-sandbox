@@ -8,7 +8,7 @@
 <div class="raised-box ${_xclass}">
 	<div class="twitter scroll">
 		<h2>${_comp.heading}</h2>
-		<c:if test="${not empty _comp.blurb}"><site:div>${_comp.blurb}</site:div></c:if>
+		<c:if test="${not empty _comp.blurb}">${_comp.blurb}</c:if>
 		
 		<c:forEach items="${_comp.tweets}" var="_tweet">
 			<div class="row tweet">

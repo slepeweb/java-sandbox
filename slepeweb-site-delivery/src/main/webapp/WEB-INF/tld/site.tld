@@ -10,17 +10,6 @@
 	<uri>siteTags</uri>
 
 	<tag>
-		<name>div</name>
-		<tag-class>com.slepeweb.site.tags.WrapDivTag</tag-class>
-		<body-content>JSP</body-content>
-		<attribute>
-			<name>class</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-	</tag>
-	
-	<tag>
 		<name>insertComponent</name>
 		<tag-class>com.slepeweb.site.tags.InsertSingleComponentTag</tag-class>
 		<body-content>empty</body-content>
@@ -63,17 +52,6 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 			<type>java.lang.String</type>
-		</attribute>
-	</tag>
-	
-	<tag>
-		<name>p</name>
-		<tag-class>com.slepeweb.site.tags.WrapParaTag</tag-class>
-		<body-content>JSP</body-content>
-		<attribute>
-			<name>class</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
 	

@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.utils.StringUtil;
 
 public class FieldValue extends CmsBean {
 	private static final long serialVersionUID = 1L;
@@ -134,10 +135,14 @@ public class FieldValue extends CmsBean {
 	public String getStringValueResolved() {
 		if (this.stringValueResolved == null) {
 			if (this.field.getType() == FieldType.markup) {
-				this.stringValueResolved = resolveLinks(this.stringValue);
+				// Take this opportunity to wrap text nodes with para tags
+				this.stringValueResolved = StringUtil.wrapWithMarkup(this.stringValue, "p", null);
+				
+				// Now do what this method was originally intended for
+				this.stringValueResolved = resolveLinks(this.stringValueResolved);
 			}
 			else {
-				this.stringValueResolved = "";
+				this.stringValueResolved = this.stringValue;
 			}
 		}
 		return this.stringValueResolved;

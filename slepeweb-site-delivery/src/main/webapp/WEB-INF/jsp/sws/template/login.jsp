@@ -9,6 +9,7 @@
 		<div>
 			<!-- Main content -->	
 			<div class="col-2-3 primary-col">
+				<sw:standardBody />
 				<sw:loginForm />	
 			</div>
 			

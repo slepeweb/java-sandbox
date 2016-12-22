@@ -3,4 +3,4 @@
 <gen:debug><!-- tags/sws/standardBody.tag --></gen:debug>
 
 <h2>${_page.title}</h2>
-${_page.body}		
+${_page.body}
