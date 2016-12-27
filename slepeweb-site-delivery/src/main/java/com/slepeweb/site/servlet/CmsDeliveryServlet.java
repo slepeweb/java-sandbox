@@ -30,6 +30,7 @@ import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.site.constant.FieldName;
+import com.slepeweb.site.util.HttpUtil;
 
 @Component
 public class CmsDeliveryServlet {
@@ -126,7 +127,7 @@ public class CmsDeliveryServlet {
 			 * servlet has been 'broken' by Spring's use of the 'default' servlet.
 			 */
 			LOG.debug(LogUtil.compose("Forwarding bypassed request to default servlet", path));
-			setCacheHeaders(requestTime, -1L, this.defaultPrivateCacheTime, this.defaultPublicCacheTime, res);
+			HttpUtil.setCacheHeaders(requestTime, -1L, this.defaultPrivateCacheTime, this.defaultPublicCacheTime, res);
 			req.getServletContext().getNamedDispatcher("default").forward(req, res);
 		}
 		
@@ -352,31 +353,7 @@ public class CmsDeliveryServlet {
 			publicCacheTime = item.getType().getPublicCache() * 1000;
 		}
 
-		setCacheHeaders(requestTime, lastModified, privateCacheTime, publicCacheTime, res);
-	}
-	
-	private void setCacheHeaders(long requestTime, long lastModified, 
-			long privateCacheTime, long publicCacheTime, HttpServletResponse res) {
-
-		long expireTime;
-		StringBuffer cacheControl = new StringBuffer();
-		
-		if (0L == privateCacheTime && 0L == publicCacheTime) {
-			expireTime = requestTime;
-			cacheControl.append("no-cache, s-maxage=0, max-age=0");
-		} 
-		else {			
-			cacheControl.
-				append("s-maxage=").append(publicCacheTime / 1000L).
-				append(", max-age=").append(privateCacheTime / 1000L);
-			expireTime = requestTime + publicCacheTime;
-		}
-
-		res.setHeader("Cache-Control", cacheControl.toString());
-		res.setDateHeader("Expires", expireTime);
-		if (lastModified > -1L) {
-			res.setDateHeader("Last-Modified", lastModified);
-		}
+		HttpUtil.setCacheHeaders(requestTime, lastModified, privateCacheTime, publicCacheTime, res);
 	}
 	
 	/**

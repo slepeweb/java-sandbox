@@ -1,10 +1,13 @@
 package com.slepeweb.site.sws.control;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +21,7 @@ import com.slepeweb.site.model.TwitterComponent;
 import com.slepeweb.site.ntc.service.NtcHtmlScraperService;
 import com.slepeweb.site.service.TwitterService;
 import com.slepeweb.site.sws.bean.LotteryNumbersBean;
+import com.slepeweb.site.util.HttpUtil;
 import com.slepeweb.ws.bean.PasswordBean;
 import com.slepeweb.ws.bean.WeatherBean;
 import com.slepeweb.ws.bean.WeatherBeanWrapper;
@@ -34,6 +38,14 @@ public class WebServicesController {
 	@Autowired private TwitterService twitterService;
 	@Autowired private ItemService itemService;
 	
+	// All requests in this package should by default not be cached. This method
+	// will get executed before any of the request mappings below.
+	@ModelAttribute(value="_void")
+	public String nocache(HttpServletResponse res) {
+		HttpUtil.setCacheHeaders(System.currentTimeMillis(), -1L, 0L, 0L, res);
+		return "nocache";
+	}
+
 	@RequestMapping(value="/password", method=RequestMethod.GET, produces={"application/json", "text/xml"})	
 	@ResponseBody
 	public PasswordBean doPassword(@RequestParam String org, 

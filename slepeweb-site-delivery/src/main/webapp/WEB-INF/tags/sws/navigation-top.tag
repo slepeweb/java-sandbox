@@ -28,7 +28,7 @@ $(function() {
 		cache : false
 	}).done(function(resp) {
 		if (resp && resp.username) {
-			$("a.topnav").each(function(){
+			$("#primary-nav a").each(function(){
 				var link = $(this);
 				if (link.text() == "Login") {
 					link.attr("href", "/j_spring_security_logout");
