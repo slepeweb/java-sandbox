@@ -16,11 +16,11 @@
 			<table>
 				<tr>
 					<td class="heading"><label for="alias">User name</label></td>
-					<td><input name="alias" size="32" /></td>
+					<td><input type="text" name="alias" /></td>
 				</tr>
 				<tr>
 					<td class="heading"><label for="password">Password</label></td>
-					<td><input type="password" name="password" size="32" /></td>
+					<td><input type="password" name="password" /></td>
 				</tr>
 			</table>
 			<input class="button special small" type="submit" value="Login" />
