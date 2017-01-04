@@ -130,11 +130,6 @@ form div {
 	margin-left: 50px;
 }
 
-#trash-button {
-	background-color: red;
-	float: right;
-}
-
 /* Link tab: to identify link targets  */
 
 #linknav {
@@ -280,3 +275,18 @@ p.main-heading {
 	bottom: -20px;
 	top: auto;
 }
+
+#item-editor button {
+	background: #6eac2c;
+	border: 1px solid #acdd4a;
+	border-radius: 6px;
+	color: #fff;
+	padding: 6px;
+	margin-top: 1.5em;
+}
+
+#item-editor #trash-button {
+	background: red;
+	float: right;
+}
+

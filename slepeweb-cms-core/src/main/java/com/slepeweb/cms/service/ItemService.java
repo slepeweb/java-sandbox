@@ -22,4 +22,5 @@ public interface ItemService {
 	Item trashItem(Long id);
 	Item restoreItem(Long id);
 	int getBinCount();
+	Item copy(Item source, String name, String simplename);
 }

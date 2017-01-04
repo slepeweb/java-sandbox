@@ -114,7 +114,23 @@ var renderItemForms = function(nodeKey, activeTab) {
 			if (tabsdiv.hasClass("ui-tabs")) {
 				$("#item-editor").tabs("destroy");
 			}
-			$("#item-editor").tabs({active: activeTab});
+			
+			// Focus on same tab as previous render
+			var tabName;
+			var tabNum = 0;
+			var activeTabId = 0;
+			
+			if (activeTab) {
+				$("#editor-tabs a").each(function() {
+					tabName = $(this).attr("href").substring(1);
+					if (activeTab == tabName) {
+						activeTabId = tabNum;
+					}
+					tabNum++;
+				});
+			}
+
+			$("#item-editor").tabs({active: activeTabId});
 			
 			// Identify tooltips
 			$("input,select,textarea").tooltip({
@@ -195,6 +211,25 @@ var renderItemForms = function(nodeKey, activeTab) {
 						itemtype: $("#add-tab select[name='itemtype']").val(),
 						name: $("#add-tab input[name='name']").val(),
 						simplename: $("#add-tab input[name='simplename']").val()
+					}, 
+					dataType: "json",
+					success: function(json, status, z) {
+						gotoPage(json, 3, 1);
+					},
+					error: function(json, status, z) {
+						gotoPage(json, 4, 0);
+					},
+				});
+			});
+			
+			// Add behaviour to copy an item 
+			$("#copy-button").click(function () {
+				$.ajax(_ctx + "/rest/item/" + nodeKey + "/copy", {
+					type: "POST",
+					cache: false,
+					data: {
+						name: $("#copy-tab input[name='name']").val(),
+						simplename: $("#copy-tab input[name='simplename']").val()
 					}, 
 					dataType: "json",
 					success: function(json, status, z) {
@@ -503,11 +538,7 @@ $(function() {
 			if (! data.node.data.shortcut) {
 				// Update the item forms
 				var tabName = $("li.ui-tabs-active").attr("aria-controls");
-				var tabNum = 0;
-				if (tabName == 'field-tab') {tabNum = 1;}
-				else if (tabName == 'links-tab') {tabNum = 2;}
-				else if (tabName == 'add-tab') {tabNum = 3;}
-				renderItemForms(data.node.key, tabNum);
+				renderItemForms(data.node.key, tabName);
 			}
 			else {
 				// Do not allow the user to work with the shortcut item - automatically

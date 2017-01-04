@@ -7,7 +7,6 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
-<link rel="stylesheet" href="${applicationContextPath}/resources/css/main.css" type="text/css">
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/start/jquery-ui.css">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
@@ -38,6 +37,8 @@
 	<c:if test="${not empty param.msg}">_flashMessageCode = ${param.msg};</c:if>
 	<c:if test="${not empty param.err}">_flashErrorCode = ${param.err};</c:if>
 </script>
+
+<link rel="stylesheet" href="${applicationContextPath}/resources/css/main.css" type="text/css">
 <script src="${applicationContextPath}/resources/js/editor.js" type="text/javascript"></script>
 
 <cms:extraCSS />

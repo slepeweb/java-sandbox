@@ -223,6 +223,19 @@ public class RestController extends BaseController {
 		return i.getId();
 	}
 	
+	@RequestMapping(value="/item/{itemId}/copy", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public long copyItem(
+			@PathVariable long itemId, 
+			@RequestParam(value="name", required=true) String name, 
+			@RequestParam(value="simplename", required=true) String simplename, 
+			ModelMap model) {	
+		
+		Item i = this.itemService.getItem(itemId);
+		Item c = this.itemService.copy(i, name, simplename);			
+		return c.getId();
+	}
+	
 	@RequestMapping(value="/item/{itemId}/trash", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public long trashItem(@PathVariable long itemId, ModelMap model) {	

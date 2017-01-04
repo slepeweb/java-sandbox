@@ -114,8 +114,10 @@ public class FieldValue extends CmsBean {
 	}
 
 	public FieldValue setDateValue(Timestamp dateValue) {		
-		this.dateValue = dateValue;
-		this.dateValue.setNanos(0);
+		if (dateValue != null) {
+			this.dateValue = dateValue;
+			this.dateValue.setNanos(0);
+		}
 		return this;
 	}
 

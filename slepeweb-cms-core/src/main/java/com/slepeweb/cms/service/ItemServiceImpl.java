@@ -1,5 +1,7 @@
 package com.slepeweb.cms.service;
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -59,7 +62,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			if (extendedSave) {
 				saveFieldValues(i.getFieldValues());
 				saveLinks(i, dbRecord);
-//				saveMedia(i);
 			}
 			
 			if (updated) {
@@ -146,12 +148,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			}
 		}
 	}
-	
-//	private void saveMedia(Item i) {
-//		if (i.getMediaUploadFilePath() != null && i.getType().isMedia()) {
-//			this.mediaService.save(i);
-//		}
-//	}
 	
 	private void saveDefaultFieldValues(Item i) {
 		// If item has no field values, create them, with default values
@@ -365,6 +361,74 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		newParent.setLinks(null);
 		
 		return true;
+	}
+	
+	public Item copy(Item source, String name, String simplename) {
+		Item parent = source.getParent();
+		
+		if (parent == null) {
+			// TODO: Cannot copy the root item ... yet !?
+			return null;
+		}
+		
+		// Core data
+		Item ni = CmsBeanFactory.makeItem();
+		ni.assimilate(source);
+		ni.
+			setParent(parent).
+			setName(name).
+			setSimpleName(simplename).
+			setDateCreated(new Timestamp(System.currentTimeMillis())).
+			setPublished(false);
+		
+		ni.setDateUpdated(ni.getDateCreated());
+		
+		// The copy is assigned a new unique id after it is saved
+		ni = ni.save();
+		
+		// Field data
+		List <FieldValue> nfvl = new ArrayList<FieldValue>(source.getFieldValues().size());
+		FieldValue nfv;
+		for (FieldValue fv : source.getFieldValues()) {
+			nfv = CmsBeanFactory.makeFieldValue();
+			nfv.assimilate(fv);
+			nfv.setItemId(ni.getId());
+			nfvl.add(nfv);
+		}
+		ni.setFieldValues(nfvl);
+		
+		// Links
+		List<Link> nll = new ArrayList<Link>(source.getLinks().size());
+		Link nl;
+		for (Link l : source.getLinks()) {
+			nl = CmsBeanFactory.makeLink();
+			nl.assimilate(l);
+			nl.
+				setParentId(ni.getId()).
+				setChild(l.getChild());
+			nll.add(nl);
+		}
+		ni.setLinks(nll);
+		
+		ni.save(true);
+		
+		// Does this item have media?
+		Media m = this.mediaService.getMedia(source.getId());
+		Media nm;
+		if (m != null) {
+			nm = CmsBeanFactory.makeMedia();
+			nm.assimilate(m);
+			nm.setItemId(ni.getId());
+			try {
+				nm.setInputStream(m.getBlob().getBinaryStream());
+			}
+			catch (SQLException e) {
+				LOG.error("Failed to copy media", e);
+			}
+			this.mediaService.save(nm);
+		}
+		
+		return ni;
 	}
 	
 	private Item getItem(String sql, Object[] params) {

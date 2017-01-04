@@ -28,7 +28,7 @@ public class BaseServiceImpl {
 	}
 	
 	protected <T> Object getFirstInList(List<T> list) {
-		if (list.size() > 0) {
+		if (list != null && list.size() > 0) {
 			return list.get(0);
 		}
 		return null;

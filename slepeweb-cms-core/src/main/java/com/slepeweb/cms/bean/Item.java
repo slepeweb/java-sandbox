@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -15,6 +17,13 @@ import com.slepeweb.cms.bean.Field.FieldType;
 public class Item extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private static Logger LOG = Logger.getLogger(Item.class);
+	public static String NAME_COPY_EXT = " COPY ";
+	public static Pattern NAME_COPY_PATTERN = 
+			Pattern.compile("(^.*?" + NAME_COPY_EXT + ")(\\d{1,})$");
+	public static String SIMPLENAME_COPY_EXT = "-copy-";
+	public static Pattern SIMPLENAME_COPY_PATTERN = 
+			Pattern.compile("(^.*?" + SIMPLENAME_COPY_EXT + ")(\\d{1,})$");
+	
 	private Site site;
 	private ItemType type;
 	private Template template;
@@ -25,6 +34,7 @@ public class Item extends CmsBean {
 	private Long id = -1L;
 	private List<Link> links;
 	private List<String> tags;
+	private Item parent;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Item) {
@@ -89,12 +99,14 @@ public class Item extends CmsBean {
 	}
 	
 	public Item getParent() {
-		Link l = this.cmsService.getLinkService().getParent(getId());
-		if (l != null) {
-			// In this case, the 'child' IS the 'parent'
-			return l.getChild();
+		if (this.parent == null) {
+			Link l = this.cmsService.getLinkService().getParent(getId());
+			if (l != null) {
+				// In this case, the 'child' IS the 'parent'
+				return l.getChild();
+			}
 		}
-		return null;
+		return this.parent;
 	}
 	
 	@Override
@@ -212,14 +224,59 @@ public class Item extends CmsBean {
 		return getCmsService().getItemService().move(this, currentParent, target, shortcut, mode);
 	}
 	
-	// TODO: Review this code, in the context of shortcuts
+	public Object[] getCopyDetails() {
+		Object[] result = new Object[3];
+		String baseName, baseSimplename;
+		String test = null;
+		Matcher nameMatcher = NAME_COPY_PATTERN.matcher(getName());
+		Matcher simplenameMatcher = SIMPLENAME_COPY_PATTERN.matcher(getSimpleName());
+		Integer n = -1;
+		
+		if (simplenameMatcher.matches()) {
+			baseSimplename = simplenameMatcher.group(1);
+			n = Integer.parseInt(simplenameMatcher.group(2)) + 1;
+		}
+		else {
+			baseSimplename = getSimpleName() + SIMPLENAME_COPY_EXT;
+			n = 1;
+		}
+		
+		if (nameMatcher.matches()) {
+			baseName = nameMatcher.group(1);
+		}
+		else {
+			baseName = getName() + NAME_COPY_EXT;
+		}
+		
+		String parentPath = getParentPath();
+		if (parentPath.equals("/")) {
+			parentPath = "";
+		}
+		
+		while (n < 10) {
+			test = baseSimplename + n;			
+			
+			// Does this item already exist?
+			if (getSite().getItem(parentPath + "/" + test) == null) {
+				result[0] = n;
+				result[1] = test;
+				result[2] = baseName + n;
+				return result;
+			}
+			n++;
+		}
+		
+		// Failed to find suitable names
+		n = 99;
+		result[0] = n;
+		result[1] = baseSimplename + n;
+		result[2] = baseName + n;
+		return result;
+	}
+	
 	public String getParentPath() {
 		if (! isRoot()) {
-			int c = getPath().lastIndexOf("/");
-			if (c > 0) {
-				return getPath().substring(0, c);
-			}
-			return "/";
+			return getParent().getPath();
 		}
 		
 		// A null parent means that this item is a root item
@@ -391,8 +448,11 @@ public class Item extends CmsBean {
 				setPath("/" + this.simpleName);
 			}
 			else {
+				// When creating new items, the parent item might not have been identified at this point
 				String parentPath = getParentPath();
-				setPath(parentPath.equals("/") ? "/" + this.simpleName : parentPath + "/" + simpleName);
+				if (parentPath != null) {
+					setPath(parentPath.equals("/") ? "/" + this.simpleName : parentPath + "/" + this.simpleName);
+				}
 			}
 		}
 		return this.path;
@@ -660,5 +720,10 @@ public class Item extends CmsBean {
 
 	public String getTagsAsString() {
 		return StringUtils.join(getTags(), ",").replaceAll(",", ", ");
+	}
+
+	public Item setParent(Item parent) {
+		this.parent = parent;
+		return this;
 	}
 }

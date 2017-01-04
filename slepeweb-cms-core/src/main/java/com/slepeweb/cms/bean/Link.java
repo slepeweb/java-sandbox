@@ -21,7 +21,8 @@ public class Link extends CmsBean {
 	public boolean isDefined4Insert() {
 		return
 			getParentId() != null &&
-			getChild() != null & getChild().getId() != null &&
+			getChild() != null && 
+			getChild().getId() != null &&
 			getType() != null;
 	}
 	
