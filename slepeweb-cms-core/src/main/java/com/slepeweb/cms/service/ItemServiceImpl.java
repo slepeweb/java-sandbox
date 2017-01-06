@@ -14,9 +14,11 @@ import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
+import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -78,17 +80,18 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private void insertItem(Item i) {
 		// Item table
 		this.jdbcTemplate.update(
-				"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, published) " +
-				"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, editable, published, version) " +
+				"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 				i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
-				i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false, false);				
+				i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false, true, false, i.getVersion());				
 		
 		Long lastId = getLastInsertId();
 		i.setId(lastId);
+		
 		saveDefaultFieldValues(i);
 		LOG.info(compose("Added new item", i));
 		
-		// Insert binding link to parent item
+		// Insert binding link to parent item UNLESS we are creating/versioning the root item
 		if (! i.isRoot()) {
 			Item parentItem = getItem(i.getSite().getId(), i.getParentPath());				
 			Item childItem = getItem(lastId);
@@ -108,13 +111,23 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			}
 			else {
 				LOG.warn(compose("Parent item not found", i.getParentPath()));
-			}
+			}			
+		}
+		
+		if (i.getVersion() > 1) {
+			retireOlderEditableVersions(i);
+		}
+
+		int maxVersions = 4;
+		if (i.getVersion() > maxVersions) {
+			deleteOlderVersions(i, maxVersions);
 		}
 	}
 
 	private void updateItem(Item dbRecord, Item i) {
 		if (! dbRecord.equals(i)) {
 			boolean simplenameHasChanged = ! dbRecord.getSimpleName().equals(i.getSimpleName());
+			boolean isPublishedNow = i.isPublished() && ! dbRecord.isPublished();
 			String oldPath = dbRecord.getPath();
 			String newPath = i.getPath();
 			
@@ -122,10 +135,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			dbRecord.assimilate(i);
 			
 			this.jdbcTemplate.update(
-					"update item set name = ?, simplename = ?, path = ?, templateid = ?, dateupdated = ?, deleted = ?, published = ? where id = ?",
+					"update item set name = ?, simplename = ?, path = ?, templateid = ?, dateupdated = ?, deleted = ?, editable = ?, published = ?, version = ? where id = ?",
 					dbRecord.getName(), dbRecord.getSimpleName(), dbRecord.getPath(), 
 					dbRecord.getTemplate() == null ? 0 : dbRecord.getTemplate().getId(), 
-					dbRecord.getDateUpdated(), dbRecord.isDeleted(), dbRecord.isPublished(), i.getId());
+					dbRecord.getDateUpdated(), dbRecord.isDeleted(), dbRecord.isEditable(), dbRecord.isPublished(), i.getVersion(), i.getId());
 			
 			LOG.info(compose("Updated item", i));
 			
@@ -133,12 +146,40 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				// All child (binding) descendants will need their path properties updated
 				updateDescendantPaths(oldPath, newPath);
 			}
+			
+			if (isPublishedNow) {
+				unpublishOlderVersions(dbRecord);
+			}
 		}
 		else {
 			i.setId(dbRecord.getId());
 			LOG.info(compose("Item not modified", i));
 		}
 		
+	}
+	
+	private void unpublishOlderVersions(Item i) {
+		this.jdbcTemplate.update(
+				"update item set published = 0 where siteid = ? and path = ? and version < ?",
+				i.getSite().getId(), i.getPath(), i.getVersion());
+		
+		LOG.info(compose("Older versions now unpublished", i));
+	}
+	
+	private void retireOlderEditableVersions(Item i) {
+		this.jdbcTemplate.update(
+				"update item set editable = 0 where siteid = ? and path = ? and version < ?",
+				i.getSite().getId(), i.getPath(), i.getVersion());
+		
+		LOG.info(compose("Older versions now uneditable", i));
+	}
+	
+	private void deleteOlderVersions(Item i, int max) {
+		this.jdbcTemplate.update(
+				"delete from item where siteid = ? and path = ? and version <= ?",
+				i.getSite().getId(), i.getPath(), i.getVersion() - max);
+		
+		LOG.info(compose("Older versions deleted", i));
 	}
 	
 	public void saveFieldValues(List<FieldValue> fieldValues) {
@@ -238,19 +279,19 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 
 	public Item getItem(Long siteId, String path) {
 		return getItem(
-			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=? and i.deleted=0" + getPublishedClause()),
+			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=? and i.deleted=0" + getVersionClause()),
 			new Object[]{siteId, path});
 	}
 
 	public Item getItem(Long id) {
 		return getItem(
-			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=0" + getPublishedClause()), 
+			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=0"), 
 			new Object[]{id});
 	}
 	
 	public Item getItemFromBin(Long id) {
 		return getItem(
-			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=1" + getPublishedClause()), 
+			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=1"), 
 			new Object[]{id});
 	}
 	
@@ -364,22 +405,32 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	public Item copy(Item source, String name, String simplename) {
+		return copy(false, source, name, simplename);
+	}
+	
+	private Item copy(boolean isNewVersion, Item source, String name, String simplename) {
 		Item parent = source.getParent();
-		
-		if (parent == null) {
-			// TODO: Cannot copy the root item ... yet !?
-			return null;
-		}
 		
 		// Core data
 		Item ni = CmsBeanFactory.makeItem();
 		ni.assimilate(source);
 		ni.
 			setParent(parent).
-			setName(name).
-			setSimpleName(simplename).
-			setDateCreated(new Timestamp(System.currentTimeMillis())).
-			setPublished(false);
+			setDateCreated(new Timestamp(System.currentTimeMillis()));
+		
+		if (isNewVersion) {
+			ni.
+				setDeleted(false).
+				setEditable(true).
+				setPublished(false).
+				setVersion(source.getVersion() + 1);
+		}
+		else {
+			ni.
+				setName(name).
+				setSimpleName(simplename).
+				setVersion(1);
+		}
 		
 		ni.setDateUpdated(ni.getDateCreated());
 		
@@ -431,8 +482,15 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return ni;
 	}
 	
+	public Item version(Item source) throws NotVersionableException {
+		if (source.getType().getName().equals(ItemType.CONTENT_FOLDER_TYPE_NAME)) {
+			throw new NotVersionableException(String.format("%s [%s]", "Cannot version item type", ItemType.CONTENT_FOLDER_TYPE_NAME));
+		}
+		return copy(true, source, null, null);
+	}
+	
 	private Item getItem(String sql, Object[] params) {
-		return (Item) getFirstInList(this.jdbcTemplate.query(
+		return (Item) getLastInList(this.jdbcTemplate.query(
 			sql, params, new RowMapperUtil.ItemMapper()));
 	}
 

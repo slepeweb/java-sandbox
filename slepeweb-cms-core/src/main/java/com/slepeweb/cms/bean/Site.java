@@ -42,6 +42,10 @@ public class Site extends CmsBean {
 		return getItemService().getItem(getId(), path);
 	}
 	
+	public Item getItem(Long id) {
+		return getItemService().getItem(id);
+	}
+	
 	public Item getTaggedItem(String tagname) {
 		return getTagService().getTaggedItem(getId(), tagname);
 	}

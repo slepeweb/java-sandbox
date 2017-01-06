@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
@@ -234,6 +235,23 @@ public class RestController extends BaseController {
 		Item i = this.itemService.getItem(itemId);
 		Item c = this.itemService.copy(i, name, simplename);			
 		return c.getId();
+	}
+	
+	@RequestMapping(value="/item/{itemId}/version", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public long versionItem(
+			@PathVariable long itemId, 
+			ModelMap model) {	
+		
+		Item i = this.itemService.getItem(itemId);
+		
+		try {
+			Item c = this.itemService.version(i);			
+			return c.getId();
+		}
+		catch (NotVersionableException e) {
+			return i.getId();
+		}
 	}
 	
 	@RequestMapping(value="/item/{itemId}/trash", method=RequestMethod.POST, produces="application/json")

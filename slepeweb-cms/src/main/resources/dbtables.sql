@@ -64,9 +64,14 @@ create table item
 	datecreated timestamp,
 	dateupdated timestamp,
 	deleted boolean,
+	editable boolean,
 	published boolean,
+	version int,
 	primary key (id),
-	unique key idx_item_site_path (siteid, path),
+	unique key idx_item_site_path (siteid, path, version),
+	index idx_deleted (deleted),
+	index idx_editable (editable),
+	index idx_published (published),
 	constraint foreign key (siteid) references site(id) on delete cascade,
 	constraint foreign key (typeid) references itemtype(id) on delete cascade
 ) ENGINE=InnoDB;

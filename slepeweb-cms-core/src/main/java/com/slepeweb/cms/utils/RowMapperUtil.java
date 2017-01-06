@@ -60,7 +60,9 @@ public class RowMapperUtil {
 				setDateCreated(rs.getTimestamp("datecreated")).
 				setDateUpdated(rs.getTimestamp("dateupdated")).
 				setDeleted(rs.getBoolean("deleted")).
-				setPublished(rs.getBoolean("published"));
+				setEditable(rs.getBoolean("editable")).
+				setPublished(rs.getBoolean("published")).
+				setVersion(rs.getInt("version"));
 		
 		ItemType type = CmsBeanFactory.makeItemType().
 				setId(rs.getLong("typeid")).

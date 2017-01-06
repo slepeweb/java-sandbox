@@ -14,6 +14,9 @@
 	<c:if test="${editingItem.path ne '/'}">
 		<li><a href="#copy-tab">Copy</a></li>
 	</c:if>
+	<c:if test="${editingItem.type.name ne 'ContentFolder'}">
+		<li><a href="#version-tab">Version</a></li>
+	</c:if>
 </ul>
 
 <div id="core-tab">
@@ -29,6 +32,9 @@
 		</div>
 		<div>
 			<label for="dateupdated">Date last updated: </label><input disabled="disabled" value="${editingItem.dateUpdated}" />
+		</div>
+		<div>
+			<label for="version">Version: </label><input disabled="disabled" value="${editingItem.version}" />
 		</div>
 		<div>
 			<label for="type">Template: </label>
@@ -198,6 +204,16 @@
 			</div>
 			<div>
 				<label>&nbsp;</label><button id="copy-button" type="button">Copy</button>
+			</div>
+		</form>
+	</div>
+</c:if>
+
+<c:if test="${editingItem.type.name ne 'ContentFolder'}">
+	<div id="version-tab">
+		<form>
+			<div>
+				<label>Click button to create a new version: </label><button id="version-button" type="button">Version</button>
 			</div>
 		</form>
 	</div>

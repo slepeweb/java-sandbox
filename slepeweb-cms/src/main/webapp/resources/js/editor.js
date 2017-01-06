@@ -1,5 +1,5 @@
 var messages = [
-  "Failed to update item",
+  "Failed to update item", // 1
   "Field data successfully updated",
   "Item successfully updated",
   "New item successfully created",
@@ -10,7 +10,9 @@ var messages = [
   "Failed to move the item",
   "Links successfully updated",
   "Failed to update links",
-  "Failed to retrieve breadcrumb trail"
+  "Failed to retrieve breadcrumb trail",
+  "Failed to version item", // 12
+  "Successfully created new version"
 ];
 
 var flashError = function(id) {
@@ -237,6 +239,21 @@ var renderItemForms = function(nodeKey, activeTab) {
 					},
 					error: function(json, status, z) {
 						gotoPage(json, 4, 0);
+					},
+				});
+			});
+			
+			// Add behaviour to create a new version 
+			$("#version-button").click(function () {
+				$.ajax(_ctx + "/rest/item/" + nodeKey + "/version", {
+					type: "POST",
+					cache: false,
+					dataType: "json",
+					success: function(json, status, z) {
+						gotoPage(json, 13, 1);
+					},
+					error: function(json, status, z) {
+						gotoPage(json, 12, 0);
 					},
 				});
 			});

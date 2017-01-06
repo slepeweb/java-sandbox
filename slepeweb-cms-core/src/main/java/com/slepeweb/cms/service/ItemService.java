@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.except.NotVersionableException;
 
 
 public interface ItemService {
@@ -23,4 +24,5 @@ public interface ItemService {
 	Item restoreItem(Long id);
 	int getBinCount();
 	Item copy(Item source, String name, String simplename);
+	Item version(Item source) throws NotVersionableException;
 }

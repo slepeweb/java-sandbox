@@ -18,8 +18,8 @@ public class BaseServiceImpl {
 	@Autowired protected CacheEvictor cacheEvictor;
 	
 	
-	protected String getPublishedClause() {
-		return this.config.isLiveDelivery() ? " and i.published = 1" : "";
+	protected String getVersionClause() {
+		return this.config.isLiveDelivery() ? " and i.published = 1" : " and i.editable = 1";
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -32,7 +32,13 @@ public class BaseServiceImpl {
 			return list.get(0);
 		}
 		return null;
+	}
 
+	protected <T> Object getLastInList(List<T> list) {
+		if (list != null && list.size() > 0) {
+			return list.get(list.size() - 1);
+		}
+		return null;
 	}
 
 	protected String compose(String template, Object ... params) {

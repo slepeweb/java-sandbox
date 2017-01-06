@@ -1,0 +1,7 @@
+alter table item add editable boolean before published
+alter table item add version int after published
+update item set version=1, editable=1
+alter table item drop index idx_item_site_path, add unique key idx_item_site_path_version (siteid,path,version)
+alter table item add index idx_deleted (deleted)
+alter table item add index idx_editable (editable)
+alter table item add index idx_published (published)

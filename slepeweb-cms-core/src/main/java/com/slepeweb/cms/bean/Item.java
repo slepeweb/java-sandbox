@@ -30,11 +30,13 @@ public class Item extends CmsBean {
 	private List<FieldValue> fieldValues;
 	private String name, simpleName, path;
 	private Timestamp dateCreated, dateUpdated;
-	private boolean deleted, published;
+	private boolean deleted, editable = true, published;
 	private Long id = -1L;
 	private List<Link> links;
 	private List<String> tags;
 	private Item parent;
+	private int version = 1;
+
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Item) {
@@ -48,7 +50,9 @@ public class Item extends CmsBean {
 			setSite(i.getSite());
 			setType(i.getType());
 			setTemplate(i.getTemplate());
+			setEditable(i.isEditable());
 			setPublished(i.isPublished());
+			setVersion(i.getVersion());
 			
 			// Must assimilate fields and links too? 
 			// NO - fields and links are loaded when needed.
@@ -176,6 +180,7 @@ public class Item extends CmsBean {
 	}
 	
 	public Item addChild(Item child) {
+		child.setParent(this);
 		return getItemService().save(child);
 	}
 	
@@ -724,6 +729,24 @@ public class Item extends CmsBean {
 
 	public Item setParent(Item parent) {
 		this.parent = parent;
+		return this;
+	}
+
+	public int getVersion() {
+		return version;
+	}
+
+	public Item setVersion(int version) {
+		this.version = version;
+		return this;
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public Item setEditable(boolean editable) {
+		this.editable = editable;
 		return this;
 	}
 }
