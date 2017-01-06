@@ -26,6 +26,15 @@ create table site
 	unique key idx_site_hostname (hostname)
 ) ENGINE=InnoDB;
 
+create table host
+(
+	id int not null auto_increment,
+	siteid int,
+	name varchar(255),
+	primary key (id),
+	unique key idx_host_name (name),
+) ENGINE=InnoDB;
+
 create table itemtype
 (
 	id int not null auto_increment,
