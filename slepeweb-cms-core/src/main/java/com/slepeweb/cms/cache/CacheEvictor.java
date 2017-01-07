@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.slepeweb.cms.bean.CmsBean;
 import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.FieldForType;
+import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
@@ -97,6 +98,11 @@ public class CacheEvictor {
 		broadcast(sc);
 	}
 
+	public void evict(Host h) {
+		evict(compose("getHost", h.getName()));		
+		broadcast(h);
+	}
+	
 	public void evict(Site s) {
 		evict(
 				compose("getSite", s.getName()),

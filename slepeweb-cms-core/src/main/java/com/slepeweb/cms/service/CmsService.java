@@ -3,6 +3,7 @@ package com.slepeweb.cms.service;
 
 public interface CmsService {
 	boolean isLiveServer();
+	HostService getHostService();
 	SiteService getSiteService();
 	ItemTypeService getItemTypeService();
 	FieldService getFieldService();

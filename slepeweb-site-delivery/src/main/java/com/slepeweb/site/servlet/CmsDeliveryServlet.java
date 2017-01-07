@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 
+import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
@@ -240,8 +241,12 @@ public class CmsDeliveryServlet {
     }
 	
 	private Site getSite(HttpServletRequest req) {
-		String host = req.getServerName();
-		return this.cmsService.getSiteService().getSiteByHostname(host);
+		String hostname = req.getServerName();
+		Host h = this.cmsService.getHostService().getHost(hostname);
+		if (h != null) {
+			return this.cmsService.getSiteService().getSite(h.getSiteId());
+		}
+		return null;
 	}
 
 	private String getItemPath(HttpServletRequest req) {

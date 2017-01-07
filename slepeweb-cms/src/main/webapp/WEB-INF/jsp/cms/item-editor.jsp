@@ -14,7 +14,7 @@
 	<c:if test="${editingItem.path ne '/'}">
 		<li><a href="#copy-tab">Copy</a></li>
 	</c:if>
-	<c:if test="${editingItem.type.name ne 'ContentFolder'}">
+	<c:if test="${editingItem.published and editingItem.type.name ne 'ContentFolder'}">
 		<li><a href="#version-tab">Version</a></li>
 	</c:if>
 </ul>

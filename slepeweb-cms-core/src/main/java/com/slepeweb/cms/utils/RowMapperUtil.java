@@ -10,6 +10,7 @@ import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
+import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
@@ -24,6 +25,15 @@ import com.slepeweb.cms.bean.Template;
 
 public class RowMapperUtil {
 
+	public static final class HostMapper implements RowMapper<Host> {
+		public Host mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeHost().
+					setId(rs.getLong("id")).
+					setSiteId(rs.getLong("siteid")).
+					setName(rs.getString("name"));
+		}
+	}
+	
 	public static final class SiteMapper implements RowMapper<Site> {
 		public Site mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return CmsBeanFactory.makeSite().

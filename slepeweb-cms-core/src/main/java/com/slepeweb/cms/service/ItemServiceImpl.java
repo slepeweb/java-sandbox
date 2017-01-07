@@ -267,12 +267,18 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return trashAction(id, "Restore", 0);
 	}
 
+	// The 'delete' methods permanently delete items from the db that have their 'deleted' flag set.
+	// HOWEVER, these methods are not being called.
+	// The 'trash' methods perform soft-deletes, by setting/un-setting the 'deleted' flag.
+	
+	// TODO: Referenced by Item, but never called?
 	public void deleteItem(Long id) {
 		if (this.jdbcTemplate.update("delete from item where id = ? and deleted = 1", id) > 0) {
 			LOG.warn(compose("Deleted item", String.valueOf(id)));
 		}
 	}
 
+	// TODO: Not used
 	public void deleteItem(Item i) {
 		deleteItem(i.getId());
 	}
@@ -485,6 +491,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	public Item version(Item source) throws NotVersionableException {
 		if (source.getType().getName().equals(ItemType.CONTENT_FOLDER_TYPE_NAME)) {
 			throw new NotVersionableException(String.format("%s [%s]", "Cannot version item type", ItemType.CONTENT_FOLDER_TYPE_NAME));
+		}
+		else if (! source.isPublished()) {
+			throw new NotVersionableException("Cannot version un-published item");
 		}
 		return copy(true, source, null, null);
 	}

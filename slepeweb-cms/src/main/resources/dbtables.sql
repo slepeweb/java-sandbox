@@ -32,7 +32,7 @@ create table host
 	siteid int,
 	name varchar(255),
 	primary key (id),
-	unique key idx_host_name (name),
+	unique key idx_host_name (name)
 ) ENGINE=InnoDB;
 
 create table itemtype
