@@ -27,10 +27,17 @@ public class RowMapperUtil {
 
 	public static final class HostMapper implements RowMapper<Host> {
 		public Host mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return CmsBeanFactory.makeHost().
+			Host h = CmsBeanFactory.makeHost().
 					setId(rs.getLong("id")).
-					setSiteId(rs.getLong("siteid")).
 					setName(rs.getString("name"));
+			
+			Site s = CmsBeanFactory.makeSite().
+					setId(rs.getLong("siteid")).
+					setHostname(rs.getString("name")).
+					setName(rs.getString("sitename")).
+					setShortname(rs.getString("shortname"));
+			
+			return h.setSite(s);			
 		}
 	}
 	

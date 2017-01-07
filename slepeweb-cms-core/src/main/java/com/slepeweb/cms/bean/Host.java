@@ -5,19 +5,22 @@ import org.apache.commons.lang3.StringUtils;
 public class Host extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private String name;
-	private Long id, siteId;
+	private Long id;
+	private Site site;
 		
 	public void assimilate(Object obj) {
 		if (obj instanceof Host) {
 			Host h = (Host) obj;
 			setName(h.getName());
+			setSite(h.getSite());
 		}
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
 			StringUtils.isNotBlank(getName()) &&
-			getSiteId() > 0;
+			getSite() != null && 
+			getSite().getId() > 0;
 	}
 	
 	@Override
@@ -51,15 +54,15 @@ public class Host extends CmsBean {
 		return this;
 	}
 	
-	public Long getSiteId() {
-		return siteId;
+	public Site getSite() {
+		return site;
 	}
 
-	public Host setSiteId(Long siteId) {
-		this.siteId = siteId;
+	public Host setSite(Site site) {
+		this.site = site;
 		return this;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -244,7 +244,7 @@ public class CmsDeliveryServlet {
 		String hostname = req.getServerName();
 		Host h = this.cmsService.getHostService().getHost(hostname);
 		if (h != null) {
-			return this.cmsService.getSiteService().getSite(h.getSiteId());
+			return h.getSite();
 		}
 		return null;
 	}

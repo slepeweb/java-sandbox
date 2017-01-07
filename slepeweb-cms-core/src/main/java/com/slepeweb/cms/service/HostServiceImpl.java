@@ -14,6 +14,12 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	
 	private static Logger LOG = Logger.getLogger(HostServiceImpl.class);
 	
+	private final static String SELECT_TEMPLATE = 
+			"select h.id, h.name, s.id as siteid, s.name as sitename, s.hostname, s.shortname " +
+			"from host h " +
+			"join site s on h.siteid = s.id " +
+			"where %s";
+	
 	public Host save(Host h) {
 		if (h.isDefined4Insert()) {
 			Host dbRecord = getHost(h.getName());		
@@ -64,14 +70,14 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 		}
 	}
 
-	//@Cacheable(value="serviceCache")
+	//TODO: @Cacheable(value="serviceCache")
 	public Host getHost(String name) {
-		return getHost("select * from host where name = ?", new Object[]{name});
+		return getHost(String.format(SELECT_TEMPLATE, " h.name = ?"), new Object[]{name});
 	}
 
 	@Cacheable(value="serviceCache")
 	public Host getHost(Long id) {
-		return getHost("select * from host where id = ?", new Object[]{id});
+		return getHost(String.format(SELECT_TEMPLATE, " h.id = ?"), new Object[]{id});
 	}
 	
 	private Host getHost(String sql, Object[] params) {
@@ -81,7 +87,7 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 
 	public List<Host> getAllHosts(Long siteId) {
 		return this.jdbcTemplate.query(
-			"select * from host where siteid = ?", new RowMapperUtil.HostMapper());
+				String.format(SELECT_TEMPLATE, " h.siteid = ?"), new RowMapperUtil.HostMapper());
 	}
 
 }
