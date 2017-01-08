@@ -40,8 +40,8 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	private Site insertSite(Site s) {
 		
 		this.jdbcTemplate.update(
-				"insert into site (name, hostname, shortname) values (?, ?, ?)", 
-				s.getName(), s.getHostname(), s.getShortname());
+				"insert into site (name, shortname) values (?, ?)", 
+				s.getName(), s.getShortname());
 		
 		s.setId(getLastInsertId());	
 		
@@ -66,8 +66,8 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 			dbRecord.assimilate(site);
 			
 			this.jdbcTemplate.update(
-					"update site set name = ?, hostname = ?, shortname = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getHostname(), dbRecord.getShortname(), dbRecord.getId());
+					"update site set name = ?, shortname = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getShortname(), dbRecord.getId());
 			
 			LOG.info(compose("Updated site", site));
 		}
@@ -93,11 +93,6 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	@Cacheable(value="serviceCache")
 	public Site getSite(String name) {
 		return getSite("select * from site where name = ?", new Object[]{name});
-	}
-
-	@Cacheable(value="serviceCache")
-	public Site getSiteByHostname(String hostname) {
-		return getSite("select * from site where hostname = ?", new Object[]{hostname});
 	}
 
 	@Cacheable(value="serviceCache")

@@ -106,7 +106,6 @@ public class CacheEvictor {
 	public void evict(Site s) {
 		evict(
 				compose("getSite", s.getName()),
-				compose("getSiteByHostname", s.getHostname()),
 				compose("getSite", s.getId()));
 		
 		broadcast(s);

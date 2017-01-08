@@ -33,7 +33,6 @@ public class RowMapperUtil {
 			
 			Site s = CmsBeanFactory.makeSite().
 					setId(rs.getLong("siteid")).
-					setHostname(rs.getString("name")).
 					setName(rs.getString("sitename")).
 					setShortname(rs.getString("shortname"));
 			
@@ -46,7 +45,6 @@ public class RowMapperUtil {
 			return CmsBeanFactory.makeSite().
 					setId(rs.getLong("id")).
 					setName(rs.getString("name")).
-					setHostname(rs.getString("hostname")).
 					setShortname(rs.getString("shortname"));
 		}
 	}
@@ -93,7 +91,6 @@ public class RowMapperUtil {
 		Site site = CmsBeanFactory.makeSite().
 				setId(rs.getLong("siteid")).
 				setName(rs.getString("sitename")).
-				setHostname(rs.getString("hostname")).
 				setShortname(rs.getString("site_shortname"));
 		
 		item.setSite(site);

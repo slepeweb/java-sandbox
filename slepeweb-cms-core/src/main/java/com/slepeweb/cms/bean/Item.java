@@ -471,10 +471,6 @@ public class Item extends CmsBean {
 		this.cmsService.getItemService().restoreItem(getId());
 	}
 	
-	public String getUrl() {
-		return new StringBuilder("//").append(getSite().getHostname()).append(getPath()).toString();
-	}
-	
 	public boolean isDeleted() {
 		return deleted;
 	}
