@@ -1,15 +1,22 @@
 package com.slepeweb.cms.test;
 
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.service.ItemService;
 
 @Service
 public class VersionTest extends BaseTest {
+	
+	private static Logger LOG = Logger.getLogger(VersionTest.class);
+	private static String NEWS_SECTION_PATH = "/news";
 
 	@Autowired
 	private ItemService itemService;
@@ -18,92 +25,165 @@ public class VersionTest extends BaseTest {
 
 		TestResult r;
 		TestResultSet trs = new TestResultSet("Versioning testbed").
-				register(7010, "Create a new version of the news section", 
-						"The News section should have a greater id").
-				register(7020, "Check the version number of the new item", "It should have incremented by 1").
-				register(7030, "Check the publishing status of the new item", "It should not be published").
-				register(7035, "Check the editable status of the new item", "It should be editable").
-				register(7040, "Check the publishing status of the original item", "It should NOT have changed").
-				register(7045, "Check the editable status of the original item", "It should NOT be editable").
+				register(7005, "Should not be able to version an un-published item").
+				register(7010, "Create a new version of the news section", "The News section should have a greater id").
+				register(7020, "", "The new version should have incremented by 1").
+				register(7030, "", "The new version should not be published").
+				register(7035, "", "The new version should be editable").
+				register(7040, "Check the original item", "Its should still be published").
+				register(7045, "", "It should NOT be editable").
 				register(7050, "Check the parent of the new item", "It should be the same as before").
-				register(7060, "Check the children of the new item", "They should be the same as before");
-
-		Site site = getTestSite();
-
-		if (site == null) {
-			return trs;
-		}
+				register(7060, "Check the children of the new item", "They should be the same as before (UNLESS this is a repeat-run)").
+				register(7070, "Trash the new item", "There should be 4 more entries in the bin").
+				register(7080, "Restore the new item", "There should be 4 less entries in the bin").
+				register(7090, "Revert the new item", "It's version no. should be 1 less").
+				register(7100, "", "It should be editable").
+				register(7110, "", "Its published status should be the same as before it was versioned").
+				register(7120, "", "The new version should no longer be in the db");
 		
-		String newsSectionPath = "/news";
-		Item newsSectionItem = site.getItem(newsSectionPath);
 
-		r = trs.execute(7010);
-		if (newsSectionItem == null) {
-			r.setNotes("No item found at " + newsSectionPath).fail();
-			return trs;
-		}
+		try {
+			Site site = getTestSite();
+	
+			if (site == null) {
+				return trs;
+			}
+			
+			Item newsSectionItem = site.getItem(NEWS_SECTION_PATH);
+	
+			if (newsSectionItem == null) {
+				LOG.warn("No item found at " + NEWS_SECTION_PATH);
+				return trs;
+			}
+			
+			// Try versioning an un-published item
+			newsSectionItem.setPublished(false).save();
+			r = trs.execute(7005);
+			Item newVersionOfNewsSection = versionItem(r, newsSectionItem);
+			r.test(newVersionOfNewsSection == null);
+			
+			if (! trs.isSuccess(7005)) {
+				return trs;
+			}
+			
+			// No publish the item and try again
+			newsSectionItem.setPublished(true).save();		
+			
+			// We now have an instance of the newsSectionItem BEFORE it is versioned
+			r = trs.execute(7010);
+			newVersionOfNewsSection = versionItem(r, newsSectionItem);
+			r.test(newVersionOfNewsSection.getId() > newsSectionItem.getId());
+			
+			if (trs.isSuccess(7010)) {			
+				r = trs.execute(7020);
+				r.setNotes(String.format("Item version is: %d", newVersionOfNewsSection.getVersion()));
+				r.test(newVersionOfNewsSection.getVersion() > newsSectionItem.getVersion());
+				
+				r = trs.execute(7030);
+				r.setNotes(String.format("Version %d is %s", newVersionOfNewsSection.getVersion(), newVersionOfNewsSection.isPublished() ? "published" : "NOT published"));
+				r.failIf(newVersionOfNewsSection.isPublished());
 		
+				r = trs.execute(7035);
+				r.setNotes(String.format("Version %d is %s", newVersionOfNewsSection.getVersion(), newVersionOfNewsSection.isEditable() ? "editable" : "NOT editable"));
+				r.test(newVersionOfNewsSection.isEditable());
+		
+				// We now need an instance of the newsSectionItem AFTER it was versioned
+				newsSectionItem = this.itemService.getItem(newsSectionItem.getOrigId(), newsSectionItem.getVersion());
+				r = trs.execute(7040);
+				r.setNotes(String.format("Version %d is %s", newsSectionItem.getVersion(), newsSectionItem.isPublished() ? "published" : "NOT published"));
+				r.test(newsSectionItem.isPublished());
+				
+				r = trs.execute(7045);
+				r.setNotes(String.format("Version %d is %s", newsSectionItem.getVersion(), newsSectionItem.isEditable() ? "editable" : "NOT editable"));
+				r.failIf(newsSectionItem.isEditable());
+	
+				Item neuParent = newVersionOfNewsSection.getParent();
+				Item parent = newsSectionItem.getParent();
+				
+				r = trs.execute(7050);
+				r.setNotes(String.format("The parent id of the new version of the news section is %d", neuParent.getId()));
+				r.test(neuParent.getId().equals(parent.getId()));
+				
+				r = trs.execute(7060);
+				List<Link> origChildren = newsSectionItem.getBindings();
+				List<Link> neuChildren = newVersionOfNewsSection.getBindings();
+				boolean ok = (origChildren.size() == neuChildren.size());
+				if (ok) {
+					for (int i = 0; i < origChildren.size(); i++) {
+						if (neuChildren.get(i).getChild().getId().longValue() != origChildren.get(i).getChild().getId().longValue()) {
+							ok = false;
+							break;
+						}
+					}
+					
+					if (! ok) {
+						r.setNotes("Children are different");
+					}
+				}
+				else {
+					r.setNotes(String.format("Child numbers differ [%d -> %d]", origChildren.size(), neuChildren.size()));
+				}
+				
+				r.test(ok);
+				
+				int binCount = this.cmsService.getItemService().getBinCount();
+				newVersionOfNewsSection.trash();
+				
+				// 7070: Assert bin has grown in size
+				int binCount2 = this.cmsService.getItemService().getBinCount();
+				r = trs.execute(7070);
+				r.setNotes(String.format("Bin has %d entries", binCount2));
+				r.test((binCount2 - binCount) == 4);
+						
+				// Restore the trashed section
+				newVersionOfNewsSection.restore();
+				
+				// 7080: Assert bin size back to original
+				int finalBinCount = this.cmsService.getItemService().getBinCount();
+				r = trs.execute(7080);
+				r.setNotes(String.format("Bin has %d remaining entries", finalBinCount));
+				r.test(finalBinCount == binCount);
+				
+				// 7090: Revert the new item
+				r = trs.execute(7090);
+				Item revertedItem = this.itemService.revert(newVersionOfNewsSection);
+				r.setNotes(String.format("Reverted version is %d", revertedItem.getVersion()));
+				r.test(revertedItem.getVersion() == newsSectionItem.getVersion());
+				
+				// 7100: It should be editable
+				r = trs.execute(7100);
+				r.setNotes(String.format("Status is %s", revertedItem.isEditable() ? "editable" : "NOT editable"));
+				r.test(revertedItem.isEditable());
+				
+				// 7110: Its published status should be the same as before it was versioned
+				r = trs.execute(7110);
+				r.setNotes(String.format("Status is %s", revertedItem.isPublished() ? "published" : "NOT published"));
+				r.failIf(revertedItem.isPublished() ^ newsSectionItem.isPublished());
+				
+				// 7120: The new version should no longer be in the db
+				r = trs.execute(7120);
+				r.test(this.itemService.getItem(revertedItem.getOrigId(), revertedItem.getVersion() + 1) == null);
+				r.setNotes(String.format("(Tried to get version %d)", revertedItem.getVersion() + 1));
+			}
+		}
+		catch (Exception e) {
+			LOG.warn("Unexpected exception", e);
+		}
+		return trs;
+	}
+	
+	private Item versionItem(TestResult r, Item item) {
 		Item neu = null;
 		try {
-			neu = this.itemService.version(newsSectionItem);
-			if (neu.getId() <= newsSectionItem.getId()) {
-				r.setNotes(String.format("Item id anomoly: %d v. %d", newsSectionItem.getId(), neu.getId())).fail();
-			}
-			else {
-				r.setNotes(String.format("Valid increment: %d -> %d", newsSectionItem.getId(), neu.getId()));
-			}
+			neu = this.itemService.version(item);
+			r.setNotes(String.format("New version is: %d", neu.getVersion()));
+			r.failIf(neu.getId() <= item.getId());
 		}
 		catch (NotVersionableException e) {
 			r.setNotes("Item is not versionable").fail();
-			return trs;
-		}
-			
-		r = trs.execute(7020);
-		if (neu.getVersion() <= newsSectionItem.getVersion()) {
-			r.setNotes(String.format("Item version anomoly: %d v. %d", newsSectionItem.getVersion(), neu.getVersion())).fail();
-		}
-		else {
-			r.setNotes(String.format("Valid increment: %d -> %d", newsSectionItem.getVersion(), neu.getVersion()));
+			return null;
 		}
 		
-		r = trs.execute(7030);
-		if (neu.isPublished()) {
-			r.setNotes(String.format("Version %d is published!", neu.getVersion())).fail();
-		}
-
-		Item parent = newsSectionItem.getParent();
-		Item newsSectionItem_2 = site.getItem(newsSectionItem.getId());
-		
-		if (parent == null || newsSectionItem_2 == null) {
-			return trs;
-		}
-		
-		r = trs.execute(7035);
-		if (! neu.isEditable()) {
-			r.setNotes(String.format("Version %d is not editable!", neu.getVersion())).fail();
-		}
-
-		r = trs.execute(7040);
-		if (newsSectionItem.isPublished() ^ newsSectionItem_2.isPublished()) {
-			r.setNotes(String.format("The published status of the old version has changed [%s]!", 
-					newsSectionItem_2.isPublished() ? "Published" : "Unpublished")).fail();
-		}
-		
-		r = trs.execute(7045);
-		if (newsSectionItem_2.isEditable()) {
-			r.setNotes(String.format("Old version %d is still editable!", newsSectionItem_2.getVersion())).fail();
-		}
-
-		Item neuParent = neu.getParent();
-		if (neuParent == null) {
-			return trs;
-		}
-		
-		r = trs.execute(7050);
-		if (! neuParent.getId().equals(parent.getId())) {
-			r.setNotes(String.format("The parent item has changed [%d -> %d]", parent.getId(), neuParent.getId())).fail();
-		}
-		
-		return trs;
-	}
+		return neu;
+	}	
 }

@@ -74,7 +74,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			LOG.error(compose("Item not saved - insufficient data", i));
 		}
 		
-		return i;
+		/* 
+		 * Return the item instance with nullified field values and links,
+		 * forcing these data to be re-calculated on demand.
+		 */
+		return i.setLinks(null).setFieldValues(null);
 	}
 	
 	private void insertItem(Item i) {
@@ -87,6 +91,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		
 		Long lastId = getLastInsertId();
 		i.setId(lastId);
+		
+		// For a brand new item, the 'origid' is the same as 'id'.
+		// But for a new version of , the versioning code will have to overwrite this next setting:
+		this.jdbcTemplate.update("update item set origid = ? where id = ?", i.getId(), i.getId());
+		i.setOrigId(i.getId());
 		
 		saveDefaultFieldValues(i);
 		LOG.info(compose("Added new item", i));
@@ -158,6 +167,14 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		
 	}
 	
+	private void updateOrigId(Item i) {
+		this.jdbcTemplate.update(
+				"update item set origid = ? where id = ?",
+				i.getOrigId(), i.getId());
+		
+		LOG.info(compose("Updated original id", i));			
+	}
+	
 	private void unpublishOlderVersions(Item i) {
 		this.jdbcTemplate.update(
 				"update item set published = 0 where siteid = ? and path = ? and version < ?",
@@ -167,11 +184,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	private void retireOlderEditableVersions(Item i) {
-		this.jdbcTemplate.update(
+		int num = this.jdbcTemplate.update(
 				"update item set editable = 0 where siteid = ? and path = ? and version < ?",
 				i.getSite().getId(), i.getPath(), i.getVersion());
 		
-		LOG.info(compose("Older versions now uneditable", i));
+		LOG.info(String.format("%d older versions now uneditable", num));
 	}
 	
 	private void deleteOlderVersions(Item i, int max) {
@@ -242,35 +259,53 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where deleted = 1");
 	}
 
-	private Item trashAction(Long id, String actionHeading, int actionCode) {
-		Item i = actionCode == 1 ? getItem(id) : getItemFromBin(id);
-		
-		// Action the given item
-		if (this.jdbcTemplate.update("update item set deleted = ? where id = ?", actionCode, id) > 0) {
-			LOG.warn(compose(String.format("%sed item", actionHeading), String.valueOf(id)));
-			
-			// Now action any descendant items
-			int count = this.jdbcTemplate.update("update item set deleted = ? where siteid = ? and path like ?", 
-					actionCode, i.getSite().getId(), i.getPath() + "/%");
-			
-			LOG.warn(compose(String.format("%sed %d descendant items", actionHeading, count), String.valueOf(i.getPath())));
-		}
-		
-		return i.setDeleted(actionCode == 1);
-	}
-
-	public Item trashItem(Long id) {
-		return trashAction(id, "Trash", 1);
-	}
-	
-	public Item restoreItem(Long id) {
-		return trashAction(id, "Restore", 0);
-	}
-
 	// The 'delete' methods permanently delete items from the db that have their 'deleted' flag set.
 	// HOWEVER, these methods are not being called.
 	// The 'trash' methods perform soft-deletes, by setting/un-setting the 'deleted' flag.
 	
+	public Item trashItem(Long id) {
+		return trashOrRestore(id, "Trash", 1);
+	}
+	
+	public Item restoreItem(Long id) {
+		return trashOrRestore(id, "Restor", 0);
+	}
+
+	private Item trashOrRestore(Long id, String actionHeading, int trashAction) {
+		Item i = trashAction == 1 ? getItem(id) : getItemFromBin(id);
+		trashOrRestoreDescendants(i, actionHeading, trashAction);		
+		return i.setDeleted(trashAction == 1).setLinks(null).setFieldValues(null);
+	}
+
+	private void trashOrRestoreDescendants(Item item, String actionHeading, int trashAction) {
+		// Action the given item
+		if (this.jdbcTemplate.update("update item set deleted = ? where origid = ?", trashAction, item.getOrigId()) > 0) {
+			LOG.info(compose(String.format("%sed item", actionHeading), String.valueOf(item)));
+			
+			// Now action any child items
+			List<Link> list = trashAction == 1 ?
+					this.linkService.getBindings(item.getId()) :
+						this.linkService.getBindings2TrashedItems(item.getId());
+				
+			for (Link l : list) {
+				trashOrRestoreDescendants(l.getChild(), actionHeading, trashAction);
+			}
+		}
+	}
+	
+	public Item revert(Item i) {
+		if (i.getVersion() > 1) {
+			deleteItem(i.getOrigId(), i.getVersion());
+			Item r = getItem(i.getOrigId(), i.getVersion() - 1);
+			if (r != null) {
+				r.setEditable(true);
+				return r;
+			}
+		}
+		
+		return i;
+	}
+
 	// TODO: Referenced by Item, but never called?
 	public void deleteItem(Long id) {
 		if (this.jdbcTemplate.update("delete from item where id = ? and deleted = 1", id) > 0) {
@@ -278,10 +313,17 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 
+	public void deleteItem(Long origId, int version) {
+		if (this.jdbcTemplate.update("delete from item where origid = ? and version = ?", origId, version) > 0) {
+			LOG.warn(compose("Deleted item version", String.valueOf(origId), String.valueOf(version)));
+		}
+	}
+	/*
 	// TODO: Not used
 	public void deleteItem(Item i) {
 		deleteItem(i.getId());
 	}
+	*/
 
 	public Item getItem(Long siteId, String path) {
 		return getItem(
@@ -295,6 +337,19 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			new Object[]{id});
 	}
 	
+	public Item getItem(Long origId, int version) {
+		return getItem(
+			String.format(SELECT_TEMPLATE, "i.origid=? and version=? and i.deleted=0"), 
+			new Object[]{origId, version});
+	}
+	
+	@SuppressWarnings("unused")
+	private List<Item> getAllVersions(Long origId) {
+		return this.jdbcTemplate.query(
+			String.format(SELECT_TEMPLATE, "i.origid=? and i.deleted=0 order by i.version"),
+			new Object[]{origId}, new RowMapperUtil.ItemMapper());		
+	}
+
 	public Item getItemFromBin(Long id) {
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=1"), 
@@ -415,7 +470,18 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	private Item copy(boolean isNewVersion, Item source, String name, String simplename) {
+
+		/*
+		 *  The source instance will change subtly after new version is created (eg editable property),
+		 *  so keep record of required data before the new version is created.
+		 */
+		int origVersion = source.getVersion();
 		Item parent = source.getParent();
+		int origOrdering = this.linkService.getLink(parent.getId(), source.getId()).getOrdering();
+		long sourceId = source.getId();
+		long sourceOrigId = source.getOrigId();
+		List <FieldValue> origFieldValues = source.getFieldValues();
+		List<Link> origLinks = source.getLinks();
 		
 		// Core data
 		Item ni = CmsBeanFactory.makeItem();
@@ -429,7 +495,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				setDeleted(false).
 				setEditable(true).
 				setPublished(false).
-				setVersion(source.getVersion() + 1);
+				setVersion(origVersion + 1);
 		}
 		else {
 			ni.
@@ -439,14 +505,31 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 		
 		ni.setDateUpdated(ni.getDateCreated());
+		ni = save(ni);
 		
-		// The copy is assigned a new unique id after it is saved
-		ni = ni.save();
+		/*
+		 * The copy is assigned a new unique id after it is saved, and the same
+		 * value is reflected in the origid field. 
+		 * 
+		 * The copy is also bound to the same
+		 * parent item, but at the end of its list. We need to override that at 
+		 * this point, so that it appears in the same position as the original was.
+		 */		
+		if (isNewVersion) {
+			// Overwrite the 'origid' field, to be the same as the source
+			ni.setOrigId(sourceOrigId);
+			updateOrigId(ni);
+		}
+		
+		// Overwrite the ordering of the parent link
+		Link parentLink2NewVersion = this.linkService.getLink(parent.getId(), ni.getId());
+		parentLink2NewVersion.setOrdering(origOrdering);
+		parentLink2NewVersion.save();
 		
 		// Field data
-		List <FieldValue> nfvl = new ArrayList<FieldValue>(source.getFieldValues().size());
+		List <FieldValue> nfvl = new ArrayList<FieldValue>(origFieldValues.size());
 		FieldValue nfv;
-		for (FieldValue fv : source.getFieldValues()) {
+		for (FieldValue fv : origFieldValues) {
 			nfv = CmsBeanFactory.makeFieldValue();
 			nfv.assimilate(fv);
 			nfv.setItemId(ni.getId());
@@ -455,9 +538,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		ni.setFieldValues(nfvl);
 		
 		// Links
-		List<Link> nll = new ArrayList<Link>(source.getLinks().size());
+		List<Link> nll = new ArrayList<Link>(origLinks.size());
 		Link nl;
-		for (Link l : source.getLinks()) {
+		for (Link l : origLinks) {
 			nl = CmsBeanFactory.makeLink();
 			nl.assimilate(l);
 			nl.
@@ -467,10 +550,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 		ni.setLinks(nll);
 		
-		ni.save(true);
+		ni = save(ni, true);
 		
 		// Does this item have media?
-		Media m = this.mediaService.getMedia(source.getId());
+		Media m = this.mediaService.getMedia(sourceId);
 		Media nm;
 		if (m != null) {
 			nm = CmsBeanFactory.makeMedia();
@@ -485,7 +568,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			this.mediaService.save(nm);
 		}
 		
-		return ni;
+		/* 
+		 * Return the item instance with nullified field values and links,
+		 * forcing these data to be re-calculated on demand.
+		 */
+		return ni.setLinks(null).setFieldValues(null);
 	}
 	
 	public Item version(Item source) throws NotVersionableException {

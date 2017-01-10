@@ -12,7 +12,9 @@ var messages = [
   "Failed to update links",
   "Failed to retrieve breadcrumb trail",
   "Failed to version item", // 12
-  "Successfully created new version"
+  "Successfully created new version", 
+  "Failed to revert item", // 14
+  "Successfully reverted to previous version"
 ];
 
 var flashError = function(id) {
@@ -254,6 +256,21 @@ var renderItemForms = function(nodeKey, activeTab) {
 					},
 					error: function(json, status, z) {
 						gotoPage(json, 12, 0);
+					},
+				});
+			});
+			
+			// Add behaviour to revert to a previous version 
+			$("#revert-button").click(function () {
+				$.ajax(_ctx + "/rest/item/" + nodeKey + "/revert", {
+					type: "POST",
+					cache: false,
+					dataType: "json",
+					success: function(json, status, z) {
+						gotoPage(json, 15, 1);
+					},
+					error: function(json, status, z) {
+						gotoPage(json, 14, 0);
 					},
 				});
 			});

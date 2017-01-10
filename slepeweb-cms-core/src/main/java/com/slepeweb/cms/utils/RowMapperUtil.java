@@ -69,6 +69,7 @@ public class RowMapperUtil {
 	private static Item mapItem(ResultSet rs) throws SQLException {
 		Item item = CmsBeanFactory.makeItem().
 				setId(rs.getLong("id")).
+				setOrigId(rs.getLong("origid")).
 				setName(rs.getString("name")).
 				setSimpleName(rs.getString("simplename")).
 				setPath(rs.getString("path")).

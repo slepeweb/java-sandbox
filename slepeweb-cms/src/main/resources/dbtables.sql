@@ -63,6 +63,7 @@ create table template
 create table item
 (
 	id int not null auto_increment,
+	origid int,
 	name varchar(255),
 	simplename varchar(255),
 	path varchar(255),
@@ -77,6 +78,7 @@ create table item
 	version int,
 	primary key (id),
 	unique key idx_item_site_path (siteid, path, version),
+	index idx_origid (origid),
 	index idx_deleted (deleted),
 	index idx_editable (editable),
 	index idx_published (published),

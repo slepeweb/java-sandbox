@@ -51,6 +51,11 @@ public class TestResultSet {
 		return tr;
 	}
 	
+	public boolean isSuccess(int id) {
+		TestResult tr =  this.map.get(id);
+		return tr != null && tr.isExecuted() && tr.isSuccess();
+	}
+	
 	public List<TestResult> getResults() {
 		return results;
 	}

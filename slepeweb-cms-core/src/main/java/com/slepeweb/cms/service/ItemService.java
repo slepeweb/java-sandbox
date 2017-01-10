@@ -11,6 +11,7 @@ public interface ItemService {
 	void deleteItem(Long id);
 	Item getItem(Long siteId, String path);
 	Item getItem(Long id);
+	Item getItem(Long id, int version);
 	Item save(Item i);
 	Item save(Item i, boolean extended);
 	void saveFieldValues(List<FieldValue> fvs);
@@ -25,4 +26,5 @@ public interface ItemService {
 	int getBinCount();
 	Item copy(Item source, String name, String simplename);
 	Item version(Item source) throws NotVersionableException;
+	Item revert(Item source);
 }

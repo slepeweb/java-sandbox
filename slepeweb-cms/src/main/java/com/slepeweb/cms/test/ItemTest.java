@@ -3,6 +3,7 @@ package com.slepeweb.cms.test;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,47 +15,55 @@ import com.slepeweb.cms.utils.LogUtil;
 @Service
 public class ItemTest extends BaseTest {
 	
-	@Autowired TagService tagService;
+	private static Logger LOG = Logger.getLogger(ItemTest.class);
 	
+	@Autowired TagService tagService;
+		
 	public TestResultSet execute() {
 		
 		TestResult r;
 		TestResultSet trs = new TestResultSet("Item testbed").
-			register(4010, "Move the About section to below the News section", 
-					"The News section should have 3 children").
-			register(4020, "Check path of About article after the move", "Should be /news/about/about-us").
-			register(4030, "Reverse previous move", "The News section should have 2 children").
-			register(4040, "Re-check path of About article", "Should be /about/about-us").
-			register(4050, "Add an inline to the About article", "Article should have 1 inline").
-			register(4060, "Remove the inline from the About article", "Article should have 0 inlines").
-			register(4070, "Check simplename change propagates to descendants", "First news item should be at /newz/101").
-			register(4080, "Revert simplename change", "First news item should be at /news/101").
-			register(4090, "Trash a branch and its descendants", "3 new items should appear in the bin").
-			register(4100, "Trashed branch should not appear as child of homepage", "Homepage should now have one less child").
-			register(4110, "Restore trashed branch", "the bin size should return to original").
-			register(4120, "Get parent of news item", "should be /news").
-			register(4130, "Get parent of news section", "should be /").
-			register(4140, "Tag item", "tags should be 'football' and 'cricket'").
-			register(4150, "Update tags", "tag should be 'tennis' only").
-			register(4160, "Get item by tag value", "item path should be /news/101");
+				register(4010, "Move the About section to below the News section", "The News section should have 3 children").
+				register(4020, "Check path of About article after the move", "Should be /news/about/about-us").
+				register(4030, "Reverse previous move", "The News section should have 2 children").
+				register(4040, "Re-check path of About article", "Should be /about/about-us").
+				register(4050, "Add an inline to the About article", "Article should have 1 inline").
+				register(4060, "Remove the inline from the About article", "Article should have 0 inlines").
+				register(4070, "Check simplename change propagates to descendants", "First news item should be at /newz/101").
+				register(4080, "Revert simplename change", "First news item should be at /news/101").
+				register(4090, "Trash a branch and its descendants", "3 new items should appear in the bin").
+				register(4100, "Trashed branch should not appear as child of homepage", "Homepage should now have one less child").
+				register(4110, "Restore trashed branch", "the bin size should return to original").
+				register(4120, "Get parent of news item", "should be /news").
+				register(4130, "Get parent of news section", "should be /").
+				register(4140, "Tag item", "tags should be 'football' and 'cricket'").
+				register(4150, "Update tags", "tag should be 'tennis' only").
+				register(4160, "Get item by tag value", "item path should be /news/101");
 		
-		Site site = getTestSite();
 		
-		if (site != null) {
+		try {
+			Site site = getTestSite();
+			
+			if (site == null) {
+				LOG.warn("Failed to retrieve test site");
+				return trs;
+			}
+			
 			Item aboutSectionItem = site.getItem("/about");
 			Item newsSectionItem = site.getItem("/news");
 			Item rootItem = site.getItem("/");
 			
-			if (aboutSectionItem != null && newsSectionItem != null) {
-				
+			if (aboutSectionItem == null || newsSectionItem == null) {
+				LOG.warn("Failed to retrieve either 'about' section or 'news' section");
+			}
+			else {	
 				// Move the 'about' article item to the 'news' section
 				if (aboutSectionItem.move(rootItem, newsSectionItem, false)) {				
 					// 4010: Assert news section now has 3 children
 					int count = newsSectionItem.getBoundItems().size();
 					r = trs.execute(4010);
-					if (count != 3) {
-						r.setNotes("News section has " + count + " children").fail();
-					}
+					r.setNotes("News section has " + count + " children");
+					r.test(count == 3);
 					
 					// 4020: Check path of article item has been updated
 					String articlePath = "/news/about/about-us";
@@ -70,7 +79,11 @@ public class ItemTest extends BaseTest {
 						}
 						
 						r = trs.execute(4020);
-						if (article == null) {
+						if (article != null) {
+							r.setNotes(LogUtil.compose("Path is", articlePath));
+							r.test(articlePath.equals("/news/about/about-us"));
+						}
+						else {
 							r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
 						}
 					}
@@ -84,9 +97,8 @@ public class ItemTest extends BaseTest {
 							newsSectionItem = site.getItem("/news");
 							count = newsSectionItem.getBoundItems().size();
 							r = trs.execute(4030);
-							if (count != 2) {
-								r.setNotes("News section has " + count + " children").fail();
-							}
+							r.setNotes("News section has " + count + " children");
+							r.test(count == 2);
 							
 							// 4040: Re-check path of article item
 							aboutSectionItem = site.getItem("/about");
@@ -100,7 +112,11 @@ public class ItemTest extends BaseTest {
 							}
 							
 							r = trs.execute(4040);
-							if (article == null) {
+							if (article != null) {
+								r.setNotes(LogUtil.compose("Path is", articlePath));
+								r.test(articlePath.equals("/about/about-us"));
+							}
+							else {
 								r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
 							}
 						}
@@ -110,6 +126,7 @@ public class ItemTest extends BaseTest {
 				// Add an inline item to the article
 				Item articleItem = site.getItem("/about/about-us");
 				Item imageItem = site.getItem("/content/media/ex1");
+				
 				if (articleItem != null && imageItem != null) {
 					articleItem.addInline(imageItem);
 					articleItem.saveLinks();
@@ -118,6 +135,7 @@ public class ItemTest extends BaseTest {
 					articleItem = site.getItem("/about/about-us");
 					List<Item> inlines = articleItem.getInlineItems();
 					r = trs.execute(4050);
+					r.setNotes(String.format("Article has %d inlines", inlines.size()));
 					if (! inlines.contains(imageItem)) {
 						r.setNotes("Image item inline not added").fail();
 					}
@@ -151,7 +169,10 @@ public class ItemTest extends BaseTest {
 				Item newsItem = site.getItem(newPath);
 				
 				r = trs.execute(4070);
-				if (newsItem != null) {
+				if (newsItem == null) {
+						r.setNotes("No item found at " + newPath).fail();
+				}
+				else {
 					if (! newPath.equals(newsItem.getPath())) {
 						r.setNotes("Path is: " + newsItem.getPath()).fail();
 					}
@@ -176,9 +197,6 @@ public class ItemTest extends BaseTest {
 						}
 					}
 				}
-				else {
-					r.setNotes("No item found at " + newPath).fail();
-				}
 				
 				// Trash the news branch an its descendants
 				rootItem = site.getItem("/");
@@ -192,17 +210,15 @@ public class ItemTest extends BaseTest {
 					// 4090: Assert bin has grown in size
 					int diff = this.cmsService.getItemService().getBinCount() - binCount;
 					r = trs.execute(4090);
-					if (diff != 3) {
-						r.setNotes(String.format("Bin has %d new entries", diff)).fail();
-					}
+					r.setNotes(String.format("Bin has %d entries", binCount));
+					r.test(diff == 3);
 					
 					// 4100: Homepage should have 1 less children
 					rootItem = site.getItem("/");
 					diff = bindingCount - rootItem.getBoundItems().size();
 					r = trs.execute(4100);
-					if (diff != 1) {
-						r.setNotes(String.format("Homepage has %d less children", diff)).fail();
-					}
+					r.setNotes(String.format("Homepage has %d less children", diff)).fail();
+					r.test(diff == 1);
 					
 					// Restore the trashed section
 					newsSectionItem.restore();
@@ -210,9 +226,8 @@ public class ItemTest extends BaseTest {
 					// 4110: Assert bin size back to original
 					int finalBinCount = this.cmsService.getItemService().getBinCount();
 					r = trs.execute(4110);
-					if (finalBinCount != binCount) {
-						r.setNotes(String.format("Bin has %d remaining entries", finalBinCount)).fail();
-					}					
+					r.setNotes(String.format("Bin has %d remaining entries", finalBinCount));
+					r.test(finalBinCount == binCount);
 				}
 			}
 			
@@ -223,17 +238,17 @@ public class ItemTest extends BaseTest {
 				Item newsSection = newsItem.getParent();
 				
 				if (newsSection != null) {
+					r.setNotes(String.format("Parent path is [%s]", newsSection.getPath()));
 					if (! newsSection.getPath().equals("/news")) {
-						r.fail().setNotes(String.format("Parent path is [%s]", newsSection.getPath()));
+						r.fail();
 					}
 					else {
 						// 4130
 						r = trs.execute(4130);
 						Item root = newsSection.getParent();
 						if (root != null) {
-							if (! root.getPath().equals("/")) {
-								r.fail().setNotes(String.format("Parent path is [%s]", root.getPath()));
-							}
+							r.fail().setNotes(String.format("Parent path is [%s]", root.getPath()));
+							r.failIf(! root.getPath().equals("/"));
 						}
 						else {
 							r.fail().setNotes(String.format("Failed to identify parent of [%s]", newsSection));
@@ -288,8 +303,10 @@ public class ItemTest extends BaseTest {
 				else if (! taggedItem.getPath().equals("/news/101")) {
 					r.fail().setNotes(String.format("Item found has different path [%s]", taggedItem.getPath()));
 				}
-			}
-
+			}	
+		}
+		catch (Exception e) {
+			LOG.error("Unexpected exception", e);
 		}
 				
 		return trs;

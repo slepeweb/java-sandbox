@@ -254,6 +254,16 @@ public class RestController extends BaseController {
 		}
 	}
 	
+	@RequestMapping(value="/item/{itemId}/revert", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public long revertItem(
+			@PathVariable long itemId, 
+			ModelMap model) {	
+		
+		Item i = this.itemService.getItem(itemId);
+		return this.itemService.revert(i).getId();
+	}
+	
 	@RequestMapping(value="/item/{itemId}/trash", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public long trashItem(@PathVariable long itemId, ModelMap model) {	

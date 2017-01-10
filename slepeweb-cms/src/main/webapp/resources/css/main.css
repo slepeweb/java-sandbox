@@ -285,8 +285,15 @@ p.main-heading {
 	margin-top: 1.5em;
 }
 
+#item-editor button.disabled {
+	background: #ccc;
+}
+
 #item-editor #trash-button {
 	background: red;
 	float: right;
 }
 
+#version-tab button {
+	margin-bottom: 1.5em;
+}

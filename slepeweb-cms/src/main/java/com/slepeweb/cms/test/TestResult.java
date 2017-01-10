@@ -51,6 +51,16 @@ public class TestResult {
 		return this;
 	}
 
+	public TestResult failIf(boolean condition) {
+		this.success = ! condition;
+		return this;
+	}
+
+	public TestResult test(boolean condition) {
+		this.success = condition;
+		return this;
+	}
+	
 	public boolean isExecuted() {
 		return executed;
 	}

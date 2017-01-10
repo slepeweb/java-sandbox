@@ -5,3 +5,10 @@ alter table item drop index idx_item_site_path, add unique key idx_item_site_pat
 alter table item add index idx_deleted (deleted);
 alter table item add index idx_editable (editable);
 alter table item add index idx_published (published);
+
+alter table site drop column hostname;
+alter table item add origid int after id;
+alter table item add index idx_origid (origid);
+
+update item set origid = id;
+select id, origid, path, version from item where siteid=16 and path in (select path from item where siteid=16 and version >1) order by path, version
