@@ -175,6 +175,14 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		LOG.info(compose("Updated original id", i));			
 	}
 	
+	private void updateEditable(Item i) {
+		this.jdbcTemplate.update(
+				"update item set editable = ? where id = ?",
+				i.isEditable(), i.getId());
+		
+		LOG.info(compose("Updated original id", i));			
+	}
+	
 	private void unpublishOlderVersions(Item i) {
 		this.jdbcTemplate.update(
 				"update item set published = 0 where siteid = ? and path = ? and version < ?",
@@ -259,6 +267,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where deleted = 1");
 	}
 
+	@SuppressWarnings("deprecation")
+	public int getVersionCount(long origid) {
+		return this.jdbcTemplate.queryForInt("select count(*) from item where origid=?", origid);
+	}
+
 	// The 'delete' methods permanently delete items from the db that have their 'deleted' flag set.
 	// HOWEVER, these methods are not being called.
 	// The 'trash' methods perform soft-deletes, by setting/un-setting the 'deleted' flag.
@@ -299,6 +312,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			Item r = getItem(i.getOrigId(), i.getVersion() - 1);
 			if (r != null) {
 				r.setEditable(true);
+				updateEditable(r);
 				return r;
 			}
 		}

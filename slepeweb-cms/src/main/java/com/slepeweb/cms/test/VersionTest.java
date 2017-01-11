@@ -33,13 +33,14 @@ public class VersionTest extends BaseTest {
 				register(7040, "Check the original item", "Its should still be published").
 				register(7045, "", "It should NOT be editable").
 				register(7050, "Check the parent of the new item", "It should be the same as before").
-				register(7060, "Check the children of the new item", "They should be the same as before (UNLESS this is a repeat-run)").
-				register(7070, "Trash the new item", "There should be 4 more entries in the bin").
-				register(7080, "Restore the new item", "There should be 4 less entries in the bin").
+				register(7060, "Check the children of the new item", "They should be the same as before").
+				register(7070, "Trash the new item", "There should be N more entries in the bin").
+				register(7080, "Restore the new item", "The bin size should revert back to before").
 				register(7090, "Revert the new item", "It's version no. should be 1 less").
 				register(7100, "", "It should be editable").
 				register(7110, "", "Its published status should be the same as before it was versioned").
-				register(7120, "", "The new version should no longer be in the db");
+				register(7120, "", "The new version should no longer be in the db").
+				register(7130, "", "The original version should be editable and accessible");
 		
 
 		try {
@@ -132,8 +133,8 @@ public class VersionTest extends BaseTest {
 				// 7070: Assert bin has grown in size
 				int binCount2 = this.cmsService.getItemService().getBinCount();
 				r = trs.execute(7070);
-				r.setNotes(String.format("Bin has %d entries", binCount2));
-				r.test((binCount2 - binCount) == 4);
+				r.setNotes(String.format("Bin has grown from %d to %d entries", binCount, binCount2));
+				r.test((binCount2 - binCount) > 0);
 						
 				// Restore the trashed section
 				newVersionOfNewsSection.restore();
@@ -141,7 +142,7 @@ public class VersionTest extends BaseTest {
 				// 7080: Assert bin size back to original
 				int finalBinCount = this.cmsService.getItemService().getBinCount();
 				r = trs.execute(7080);
-				r.setNotes(String.format("Bin has %d remaining entries", finalBinCount));
+				r.setNotes(String.format("Bin has reduced from %d to %d entries", binCount2, finalBinCount));
 				r.test(finalBinCount == binCount);
 				
 				// 7090: Revert the new item
@@ -164,6 +165,11 @@ public class VersionTest extends BaseTest {
 				r = trs.execute(7120);
 				r.test(this.itemService.getItem(revertedItem.getOrigId(), revertedItem.getVersion() + 1) == null);
 				r.setNotes(String.format("(Tried to get version %d)", revertedItem.getVersion() + 1));
+				
+				// 7130: The original version should be editable and accessible
+				r = trs.execute(7130);
+				newsSectionItem = site.getItem(NEWS_SECTION_PATH);
+				r.test(newsSectionItem != null);
 			}
 		}
 		catch (Exception e) {

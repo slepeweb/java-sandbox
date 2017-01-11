@@ -31,7 +31,7 @@ public class ItemTest extends BaseTest {
 				register(4060, "Remove the inline from the About article", "Article should have 0 inlines").
 				register(4070, "Check simplename change propagates to descendants", "First news item should be at /newz/101").
 				register(4080, "Revert simplename change", "First news item should be at /news/101").
-				register(4090, "Trash a branch and its descendants", "3 new items should appear in the bin").
+				register(4090, "Trash a branch and its descendants", "N more items should appear in the bin").
 				register(4100, "Trashed branch should not appear as child of homepage", "Homepage should now have one less child").
 				register(4110, "Restore trashed branch", "the bin size should return to original").
 				register(4120, "Get parent of news item", "should be /news").
@@ -209,9 +209,10 @@ public class ItemTest extends BaseTest {
 					
 					// 4090: Assert bin has grown in size
 					int diff = this.cmsService.getItemService().getBinCount() - binCount;
+					int binCount2 = this.cmsService.getItemService().getBinCount();
 					r = trs.execute(4090);
-					r.setNotes(String.format("Bin has %d entries", binCount));
-					r.test(diff == 3);
+					r.setNotes(String.format("Bin has grown from %d to %d entries", binCount, binCount2));
+					r.test(diff > 0);
 					
 					// 4100: Homepage should have 1 less children
 					rootItem = site.getItem("/");
@@ -226,7 +227,7 @@ public class ItemTest extends BaseTest {
 					// 4110: Assert bin size back to original
 					int finalBinCount = this.cmsService.getItemService().getBinCount();
 					r = trs.execute(4110);
-					r.setNotes(String.format("Bin has %d remaining entries", finalBinCount));
+					r.setNotes(String.format("Bin has reduced from %d to %d entries", binCount2, finalBinCount));
 					r.test(finalBinCount == binCount);
 				}
 			}

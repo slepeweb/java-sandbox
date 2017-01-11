@@ -19,6 +19,7 @@ public interface ItemService {
 	int getCount();
 	int getCount(String path);
 	int getCountByType(Long itemTypeId);
+	int getVersionCount(long origid);
 	boolean move(Item child, Item currentParent, Item newParent, boolean shortcut);
 	boolean move(Item child, Item currentParent, Item target, boolean shortcut, String mode);
 	Item trashItem(Long id);
