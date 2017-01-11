@@ -10,6 +10,7 @@ import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
+import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
@@ -24,12 +25,26 @@ import com.slepeweb.cms.bean.Template;
 
 public class RowMapperUtil {
 
+	public static final class HostMapper implements RowMapper<Host> {
+		public Host mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Host h = CmsBeanFactory.makeHost().
+					setId(rs.getLong("id")).
+					setName(rs.getString("name"));
+			
+			Site s = CmsBeanFactory.makeSite().
+					setId(rs.getLong("siteid")).
+					setName(rs.getString("sitename")).
+					setShortname(rs.getString("shortname"));
+			
+			return h.setSite(s);			
+		}
+	}
+	
 	public static final class SiteMapper implements RowMapper<Site> {
 		public Site mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return CmsBeanFactory.makeSite().
 					setId(rs.getLong("id")).
 					setName(rs.getString("name")).
-					setHostname(rs.getString("hostname")).
 					setShortname(rs.getString("shortname"));
 		}
 	}
@@ -54,6 +69,7 @@ public class RowMapperUtil {
 	private static Item mapItem(ResultSet rs) throws SQLException {
 		Item item = CmsBeanFactory.makeItem().
 				setId(rs.getLong("id")).
+				setOrigId(rs.getLong("origid")).
 				setName(rs.getString("name")).
 				setSimpleName(rs.getString("simplename")).
 				setPath(rs.getString("path")).
@@ -76,7 +92,6 @@ public class RowMapperUtil {
 		Site site = CmsBeanFactory.makeSite().
 				setId(rs.getLong("siteid")).
 				setName(rs.getString("sitename")).
-				setHostname(rs.getString("hostname")).
 				setShortname(rs.getString("site_shortname"));
 		
 		item.setSite(site);

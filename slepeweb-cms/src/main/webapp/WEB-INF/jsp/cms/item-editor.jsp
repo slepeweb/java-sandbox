@@ -3,6 +3,8 @@
     taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%><%@ 
     taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%>
 
+<c:set var="_showVersionTab" value="${editingItem.type.name ne 'ContentFolder' and (editingItem.published or editingItem.version > 1)}" />
+
 <ul id="editor-tabs">
 	<li><a href="#core-tab">Core</a></li>
 	<li><a href="#field-tab">Fields</a></li>
@@ -14,7 +16,7 @@
 	<c:if test="${editingItem.path ne '/'}">
 		<li><a href="#copy-tab">Copy</a></li>
 	</c:if>
-	<c:if test="${editingItem.type.name ne 'ContentFolder'}">
+	<c:if test="${_showVersionTab}">
 		<li><a href="#version-tab">Version</a></li>
 	</c:if>
 </ul>
@@ -209,12 +211,27 @@
 	</div>
 </c:if>
 
-<c:if test="${editingItem.type.name ne 'ContentFolder'}">
+<c:if test="${_showVersionTab}">
 	<div id="version-tab">
 		<form>
-			<div>
-				<label>Click button to create a new version: </label><button id="version-button" type="button">Version</button>
-			</div>
+			<table width="100%">
+				<tr>
+					<c:choose><c:when test="${editingItem.published}">
+						<td><label>Click button to create a new version: </label></td>
+						<td><button id="version-button" type="button">Version</button></td>
+					</c:when><c:otherwise>
+						<td><label>Cannot version an un-published item: </label></td>
+						<td><button id="version-button-disabled" class="disabled" type="button">Version</button></td>
+					</c:otherwise></c:choose>
+				</tr>
+				
+				<c:if test="${editingItem.version > 1}">
+					<tr>
+							<td><label>Click button to revert to previous version: </label></td>
+							<td><button id="revert-button" type="button">Revert</button></td>
+					</tr>
+				</c:if>
+			</table>
 		</form>
 	</div>
 </c:if>

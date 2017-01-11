@@ -11,6 +11,7 @@ public interface ItemService {
 	void deleteItem(Long id);
 	Item getItem(Long siteId, String path);
 	Item getItem(Long id);
+	Item getItem(Long id, int version);
 	Item save(Item i);
 	Item save(Item i, boolean extended);
 	void saveFieldValues(List<FieldValue> fvs);
@@ -18,6 +19,7 @@ public interface ItemService {
 	int getCount();
 	int getCount(String path);
 	int getCountByType(Long itemTypeId);
+	int getVersionCount(long origid);
 	boolean move(Item child, Item currentParent, Item newParent, boolean shortcut);
 	boolean move(Item child, Item currentParent, Item target, boolean shortcut, String mode);
 	Item trashItem(Long id);
@@ -25,4 +27,5 @@ public interface ItemService {
 	int getBinCount();
 	Item copy(Item source, String name, String simplename);
 	Item version(Item source) throws NotVersionableException;
+	Item revert(Item source);
 }

@@ -10,6 +10,7 @@ import com.slepeweb.cms.bean.CmsBeanFactory;
 @Service
 public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	
+	@Autowired protected HostService hostService;	
 	@Autowired protected SiteService siteService;	
 	@Autowired protected ItemTypeService itemTypeService;
 	@Autowired protected FieldService fieldService;
@@ -32,6 +33,10 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	
 	public boolean isLiveServer() {
 		return this.config.isLiveDelivery();
+	}
+	
+	public HostService getHostService() {
+		return hostService;
 	}
 	
 	public SiteService getSiteService() {

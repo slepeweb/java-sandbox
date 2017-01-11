@@ -38,7 +38,7 @@
 						</tr>
 					</table>
 					<br />
-					<input class="button" type="submit" name="Submit" />
+					<input class="button" type="submit" name="Submit" value="Login" />
 				</form>	
 			</c:if>		
 		</div>

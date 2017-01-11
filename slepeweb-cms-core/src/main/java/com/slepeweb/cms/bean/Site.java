@@ -6,14 +6,13 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Site extends CmsBean {
 	private static final long serialVersionUID = 1L;
-	private String name, hostname, shortname;
+	private String name, shortname;
 	private Long id;
 		
 	public void assimilate(Object obj) {
 		if (obj instanceof Site) {
 			Site s = (Site) obj;
 			setName(s.getName());
-			setHostname(s.getHostname());
 			setShortname(s.getShortname());
 		}
 	}
@@ -21,13 +20,12 @@ public class Site extends CmsBean {
 	public boolean isDefined4Insert() {
 		return 
 			StringUtils.isNotBlank(getName()) &&
-			StringUtils.isNotBlank(getHostname()) &&
 			StringUtils.isNotBlank(getShortname());
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("%s: %s (%s)", getName(), getHostname(), getShortname());
+		return String.format("%s (%s)", getName(), getShortname());
 	}
 	
 	public Site save() {
@@ -80,20 +78,10 @@ public class Site extends CmsBean {
 		return this;
 	}
 	
-	public String getHostname() {
-		return hostname;
-	}
-
-	public Site setHostname(String hostname) {
-		this.hostname = hostname;
-		return this;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((hostname == null) ? 0 : hostname.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((shortname == null) ? 0 : shortname.hashCode());
 		return result;
@@ -108,11 +96,6 @@ public class Site extends CmsBean {
 		if (getClass() != obj.getClass())
 			return false;
 		Site other = (Site) obj;
-		if (hostname == null) {
-			if (other.hostname != null)
-				return false;
-		} else if (!hostname.equals(other.hostname))
-			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;

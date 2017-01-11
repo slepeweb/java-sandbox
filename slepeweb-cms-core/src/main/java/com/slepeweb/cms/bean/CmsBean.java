@@ -6,6 +6,7 @@ import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.FieldForTypeService;
 import com.slepeweb.cms.service.FieldService;
 import com.slepeweb.cms.service.FieldValueService;
+import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemTypeService;
 import com.slepeweb.cms.service.LinkNameService;
@@ -51,6 +52,10 @@ public abstract class CmsBean implements Serializable {
 	
 	public void setCmsService(CmsService cmsService) {
 		this.cmsService = cmsService;
+	}
+	
+	public HostService getHostService() {
+		return this.cmsService.getHostService();
 	}
 	
 	public SiteService getSiteService() {

@@ -11,6 +11,7 @@ drop table if exists linkname;
 drop table if exists item;
 drop table if exists template;
 drop table if exists itemtype;
+drop table if exists host;
 drop table if exists site;
 
 
@@ -18,12 +19,10 @@ create table site
 (
 	id int not null auto_increment,
 	name varchar(255),
-	hostname varchar(255),
 	shortname varchar(8),
 	primary key (id),
 	unique key idx_site_name (name),
 	unique key idx_site_shortname (shortname),
-	unique key idx_site_hostname (hostname)
 ) ENGINE=InnoDB;
 
 create table host
@@ -32,7 +31,7 @@ create table host
 	siteid int,
 	name varchar(255),
 	primary key (id),
-	unique key idx_host_name (name),
+	unique key idx_host_name (name)
 ) ENGINE=InnoDB;
 
 create table itemtype
@@ -64,6 +63,7 @@ create table template
 create table item
 (
 	id int not null auto_increment,
+	origid int,
 	name varchar(255),
 	simplename varchar(255),
 	path varchar(255),
@@ -78,6 +78,7 @@ create table item
 	version int,
 	primary key (id),
 	unique key idx_item_site_path (siteid, path, version),
+	index idx_origid (origid),
 	index idx_deleted (deleted),
 	index idx_editable (editable),
 	index idx_published (published),

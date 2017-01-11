@@ -140,7 +140,6 @@ public class SiteSetup {
 					s.
 						setName(name).
 						setShortname(SiteSetupUtils.getString(row.getCell(2))).
-						setHostname(SiteSetupUtils.getString(row.getCell(3))).
 						save();
 					
 					if (s.getId() != null) {

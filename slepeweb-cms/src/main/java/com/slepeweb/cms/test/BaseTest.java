@@ -41,7 +41,6 @@ public abstract class BaseTest {
 	protected Site addSite(String name, String hostname, String homepageTypeName, String shortname) {
 		return CmsBeanFactory.makeSite().
 				setName(name).
-				setHostname(hostname).
 				setShortname(shortname).
 				save();	
 	}

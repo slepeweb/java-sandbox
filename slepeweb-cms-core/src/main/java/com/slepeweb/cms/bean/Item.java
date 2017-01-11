@@ -31,7 +31,7 @@ public class Item extends CmsBean {
 	private String name, simpleName, path;
 	private Timestamp dateCreated, dateUpdated;
 	private boolean deleted, editable = true, published;
-	private Long id = -1L;
+	private Long id = -1L, origId;
 	private List<Link> links;
 	private List<String> tags;
 	private Item parent;
@@ -471,10 +471,6 @@ public class Item extends CmsBean {
 		this.cmsService.getItemService().restoreItem(getId());
 	}
 	
-	public String getUrl() {
-		return new StringBuilder("//").append(getSite().getHostname()).append(getPath()).toString();
-	}
-	
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -567,8 +563,9 @@ public class Item extends CmsBean {
 				LinkType.shortcut});
 	}
 
-	public void setLinks(List<Link> links) {
+	public Item setLinks(List<Link> links) {
 		this.links = links;
+		return this;
 	}
 	
 	public final List<Item> getBoundItems() {
@@ -747,6 +744,15 @@ public class Item extends CmsBean {
 
 	public Item setEditable(boolean editable) {
 		this.editable = editable;
+		return this;
+	}
+
+	public Long getOrigId() {
+		return origId;
+	}
+
+	public Item setOrigId(Long origId) {
+		this.origId = origId;
 		return this;
 	}
 }

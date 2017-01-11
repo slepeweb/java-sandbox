@@ -15,6 +15,12 @@ public class CmsBeanFactory {
 		CMS = s;
 	}
 	
+	public static Host makeHost() {
+		Host h = new Host();
+		h.setCmsService(CMS);
+		return h;
+	}
+	
 	public static Site makeSite() {
 		Site s = new Site();
 		s.setCmsService(CMS);
