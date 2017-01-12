@@ -1,3 +1,5 @@
+Start of versioning work
+------------------------
 alter table item add editable boolean after deleted;
 alter table item add version int after published;
 update item set version=1, editable=1;
@@ -5,6 +7,14 @@ alter table item drop index idx_item_site_path, add unique key idx_item_site_pat
 alter table item add index idx_deleted (deleted);
 alter table item add index idx_editable (editable);
 alter table item add index idx_published (published);
+
+Hostname alias introduction and
+further work on versioning
+-------------------------------
+
+(See dbtables.sql for creation of host table)
+insert into host values (1, 16, 'sws.slepeweb.com');
+insert into host values (2, 16, 'sws-staging.slepeweb.com');
 
 alter table site drop column hostname;
 alter table item add origid int after id;

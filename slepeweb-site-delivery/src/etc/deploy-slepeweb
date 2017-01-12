@@ -21,6 +21,20 @@ sudo unzip $war_folder/slepeweb-site-delivery.war -d $webapps_folder/webapps/sit
 sudo unzip $war_folder/slepeweb-cms.war -d $webapps_folder/webapps/cms
 sudo unzip $war_folder/slepeweb-ws.war -d $webapps_folder/webapps/ws
 
+# Identify 'site-staging' as a staging server
+ed $webapps_folder/webapps/site-staging/WEB-INF/slepeweb-site-servlet.xml << EOF
+,s/property name="liveDelivery" value="true"/property name="liveDelivery" value="false"/
+w
+q
+EOF
+
+# Assign a different log file to 'site-staging'
+ed $webapps_folder/webapps/site-staging/WEB-INF/classes/log4j.properties << EOF
+,s|File=/var/log/slepeweb/site.log|File=/var/log/slepeweb/site-staging.log|
+w
+q
+EOF
+
 sudo service apache2 stop
 sudo rm -r /var/cache/apache2/mod_cache_disk/*
 sudo service apache2 start
