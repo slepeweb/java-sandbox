@@ -170,7 +170,7 @@ public class FieldValue extends CmsBean {
 
 		while (m.find()) {
 			id = m.group(2);
-			i = getCmsService().getItemService().getItem(Long.parseLong(id));
+			i = getCmsService().getItemService().getItemByOriginalId(Long.parseLong(id));
 
 			if (m.pattern().equals(ANCHOR_PATTERN)) {
 				if (i != null) {

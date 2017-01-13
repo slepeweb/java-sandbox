@@ -11,6 +11,7 @@ public interface ItemService {
 	void deleteItem(Long id);
 	Item getItem(Long siteId, String path);
 	Item getItem(Long id);
+	Item getItemByOriginalId(Long id);
 	Item getItem(Long id, int version);
 	Item save(Item i);
 	Item save(Item i, boolean extended);

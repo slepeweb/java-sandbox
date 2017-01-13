@@ -351,6 +351,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			new Object[]{id});
 	}
 	
+	public Item getItemByOriginalId(Long id) {
+		return getItem(
+			String.format(SELECT_TEMPLATE, "i.origid=? and i.deleted=0" + getVersionClause()), 
+			new Object[]{id});
+	}
+	
 	public Item getItem(Long origId, int version) {
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.origid=? and version=? and i.deleted=0"), 
