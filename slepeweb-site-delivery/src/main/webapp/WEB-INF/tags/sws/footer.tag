@@ -1,7 +1,11 @@
-<%@ tag %><%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ tag %><%@ 
+	taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %><%@ 
+	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <div id="copyright">
-	&copy; Slepe Web Solutions Ltd. All rights reserved.
+	<span>&copy; Slepe Web Solutions Ltd. All rights reserved.</span><br />
+	<span class="smaller">Rendered @ <c:set var="_now" value="<%= new java.util.Date() %>" /><fmt:formatDate 
+		value="${_now}" type="both" pattern="MMM dd, YYYY, HH:mm:ss z" /></span>
 </div>
 
 <c:if test="${_serverConfig.liveDelivery}">
