@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.NotRevertableException;
 import com.slepeweb.cms.except.NotVersionableException;
@@ -16,8 +17,8 @@ public interface ItemService {
 	Item getItem(Long id);
 	Item getItemByOriginalId(Long id);
 	Item getItem(Long id, int version);
-	Item save(Item i) throws MissingDataException;
-	Item save(Item i, boolean extended) throws MissingDataException;
+	Item save(Item i) throws MissingDataException, DuplicateItemException;
+	Item save(Item i, boolean extended) throws MissingDataException, DuplicateItemException;
 	void saveFieldValues(List<FieldValue> fvs) throws MissingDataException;
 	void saveLinks(Item i) throws MissingDataException;
 	int getCount();
@@ -31,7 +32,7 @@ public interface ItemService {
 	Item trashItem(Long id);
 	Item restoreItem(Long id);
 	int getBinCount();
-	Item copy(Item source, String name, String simplename) throws MissingDataException;
-	Item version(Item source) throws NotVersionableException, MissingDataException;
+	Item copy(Item source, String name, String simplename) throws MissingDataException, DuplicateItemException;
+	Item version(Item source) throws NotVersionableException, MissingDataException, DuplicateItemException;
 	Item revert(Item source) throws NotRevertableException;
 }

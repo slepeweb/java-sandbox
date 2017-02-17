@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
@@ -20,7 +21,7 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	@Autowired protected ItemTypeService itemTypeService;	
 	@Autowired protected ItemService itemService;	
 	
-	public Site save(Site s) throws MissingDataException {
+	public Site save(Site s) throws MissingDataException, DuplicateItemException {
 		if (s.isDefined4Insert()) {
 			Site dbRecord = getSite(s.getName());		
 			if (dbRecord != null) {
@@ -40,7 +41,7 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		return s;
 	}
 	
-	private Site insertSite(Site s) throws MissingDataException {
+	private Site insertSite(Site s) throws MissingDataException, DuplicateItemException {
 		
 		this.jdbcTemplate.update(
 				"insert into site (name, shortname) values (?, ?)", 

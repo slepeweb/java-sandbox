@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
@@ -39,7 +40,9 @@ public abstract class BaseTest {
 		return this.cmsService.getSiteService().getSite(TEST_SITE_NAME);
 	}
 
-	protected Site addSite(String name, String hostname, String homepageTypeName, String shortname) throws MissingDataException {
+	protected Site addSite(String name, String hostname, String homepageTypeName, String shortname) 
+			throws MissingDataException, DuplicateItemException {
+		
 		return CmsBeanFactory.makeSite().
 				setName(name).
 				setShortname(shortname).
@@ -82,7 +85,7 @@ public abstract class BaseTest {
 		try {
 			return parent != null ? parent.addChild(i) : null;
 		}
-		catch (MissingDataException e) {
+		catch (Exception e) {
 			return null;
 		}
 	}

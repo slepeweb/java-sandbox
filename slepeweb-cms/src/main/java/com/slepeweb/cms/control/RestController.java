@@ -36,9 +36,9 @@ import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.NotRevertableException;
-import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.ItemService;
@@ -99,7 +99,7 @@ public class RestController extends BaseController {
 				i.save();
 				resp.addMessage("Core item data successfully updated");
 			}
-			catch (MissingDataException e) {
+			catch (Exception e) {
 				return resp.setError(true).addMessage(e.getMessage());		
 			}
 			
@@ -154,6 +154,9 @@ public class RestController extends BaseController {
 					String s = "Missing item data ??? - not saved";
 					LOG.error(s, e);
 					return resp.setError(true).addMessage(s);		
+				}
+				catch (DuplicateItemException e) {
+					// Shouldn't ever happen for this update
 				}
 				
 				return resp.setError(false).addMessage("Media successfully uploaded");
@@ -238,7 +241,9 @@ public class RestController extends BaseController {
 		catch (MissingDataException e) {
 			return resp.setError(true).addMessage("Item could not be saved: missing data");					
 		}
-		
+		catch (DuplicateItemException e) {
+			return resp.setError(true).addMessage(e.getMessage());					
+		}
 	}	
 	
 	@RequestMapping(value="/item/{itemId}/add", method=RequestMethod.POST, produces="application/json")
@@ -278,8 +283,8 @@ public class RestController extends BaseController {
 		try {
 			i.save();
 		}
-		catch (MissingDataException e) {
-			return resp.setError(true).addMessage("Item data missing - not saved").setData(itemId);
+		catch (Exception e) {
+			return resp.setError(true).addMessage(e.getMessage()).setData(itemId);
 		}
 		
 		return resp.setError(false).addMessage("Item added").setData(i.getId());
@@ -300,8 +305,8 @@ public class RestController extends BaseController {
 			Item c = this.itemService.copy(i, name, simplename);	
 			return resp.setError(c == null).addMessage("Item copied").setData(c.getId());
 		}
-		catch (MissingDataException e) {
-			return resp.setError(true).addMessage("Item copy failed - missing data").setData(itemId);
+		catch (Exception e) {
+			return resp.setError(true).addMessage(e.getMessage()).setData(itemId);
 		}		
 	}
 	
@@ -318,11 +323,8 @@ public class RestController extends BaseController {
 			Item c = this.itemService.version(i);			
 			return resp.setError(false).setData(c.getId()).addMessage("New version created");
 		}
-		catch (NotVersionableException e) {
-			return resp.setError(true).setData(i.getId()).addMessage("Item not versionable");
-		}
-		catch (MissingDataException e) {
-			return resp.setError(true).setData(i.getId()).addMessage("Item data missing - copy not possible");
+		catch (Exception e) {
+			return resp.setError(true).setData(i.getId()).addMessage(e.getMessage());
 		}
 	}
 	

@@ -3,6 +3,7 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 
 
@@ -11,5 +12,5 @@ public interface SiteService {
 	Site getSite(String name);
 	Site getSite(Long id);
 	List<Site> getAllSites();
-	Site save(Site s) throws MissingDataException;
+	Site save(Site s) throws MissingDataException, DuplicateItemException;
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
@@ -18,6 +19,7 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
+import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.NotRevertableException;
 import com.slepeweb.cms.except.NotVersionableException;
@@ -25,9 +27,6 @@ import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 /*
- * TODO: Need to catch 'duplicate path' exception, for items in the bin.
- * Catch: org.springframework.dao.DuplicateKeyException
- * 
  * TODO: almost every cms operation (ie. ajax call) ends up with the entire 
  * page being rendered, so do we need to fetch the new page in javascript?
  * 
@@ -58,11 +57,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected MediaService mediaService;
 
-	public Item save(Item i) throws MissingDataException {
+	public Item save(Item i) throws MissingDataException, DuplicateItemException {
 		return save(i, false);
 	}
 	
-	public Item save(Item i, boolean extendedSave) throws MissingDataException {
+	public Item save(Item i, boolean extendedSave) throws MissingDataException, DuplicateItemException {
 		boolean updated = false;
 		
 		if (! i.isDefined4Insert()) {
@@ -94,13 +93,18 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return i.setLinks(null).setFieldValues(null);
 	}
 	
-	private void insertItem(Item i) throws MissingDataException {
+	private void insertItem(Item i) throws MissingDataException, DuplicateItemException {
 		// Item table
-		this.jdbcTemplate.update(
-				"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, editable, published, version) " +
-				"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-				i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
-				i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false, true, false, i.getVersion());				
+		try {
+			this.jdbcTemplate.update(
+					"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, editable, published, version) " +
+					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+					i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
+					i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false, true, false, i.getVersion());				
+		}
+		catch (DuplicateKeyException e) {
+			throw new DuplicateItemException("Item already exists - check the bin");
+		}
 		
 		Long lastId = getLastInsertId();
 		i.setId(lastId);
@@ -509,12 +513,14 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return true;
 	}
 	
-	public Item copy(Item source, String name, String simplename) throws MissingDataException {
+	public Item copy(Item source, String name, String simplename) 
+			throws MissingDataException, DuplicateItemException {
+		
 		return copy(false, source, name, simplename);
 	}
 	
 	private Item copy(boolean isNewVersion, Item source, String name, String simplename)
-			 throws MissingDataException {
+			 throws MissingDataException, DuplicateItemException {
 
 		/*
 		 *  The source instance will change subtly after new version is created (eg editable property),
@@ -620,7 +626,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return ni.setLinks(null).setFieldValues(null);
 	}
 	
-	public Item version(Item source) throws NotVersionableException, MissingDataException {
+	public Item version(Item source) throws NotVersionableException, MissingDataException, DuplicateItemException {
 		if (source.getType().getName().equals(ItemType.CONTENT_FOLDER_TYPE_NAME)) {
 			throw new NotVersionableException(String.format("%s [%s]", "Cannot version item type", ItemType.CONTENT_FOLDER_TYPE_NAME));
 		}

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 
@@ -148,11 +149,11 @@ public class Item extends CmsBean {
 		}
 	}
 	
-	public Item save() throws MissingDataException {
+	public Item save() throws MissingDataException, DuplicateItemException {
 		return getItemService().save(this);
 	}
 	
-	public Item save(boolean extended) throws MissingDataException {
+	public Item save(boolean extended) throws MissingDataException, DuplicateItemException {
 		return getItemService().save(this, extended);
 	}
 	
@@ -181,7 +182,7 @@ public class Item extends CmsBean {
 		return this;
 	}
 	
-	public Item addChild(Item child) throws MissingDataException {
+	public Item addChild(Item child) throws MissingDataException, DuplicateItemException {
 		child.setParent(this);
 		return getItemService().save(child);
 	}

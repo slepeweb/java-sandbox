@@ -2,6 +2,7 @@ package com.slepeweb.cms.bean;
 
 import java.io.Serializable;
 
+import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.FieldForTypeService;
@@ -24,7 +25,7 @@ public abstract class CmsBean implements Serializable {
 	protected static final Long NO_ID = -1L;
 	protected transient CmsService cmsService;
 	
-	protected abstract CmsBean save() throws MissingDataException;	
+	protected abstract CmsBean save() throws MissingDataException, DuplicateItemException;	
 	protected abstract void delete();
 	public abstract Long getId();
 	protected abstract boolean isDefined4Insert() throws MissingDataException;	

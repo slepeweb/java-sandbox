@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.setup.SiteSetup;
 
@@ -29,6 +30,9 @@ public class SetupController extends BaseController {
 			}
 			catch (MissingDataException e) {
 				LOG.warn("Missing data - site initialisation incomplete");				
+			}
+			catch (DuplicateItemException e) {
+				LOG.warn("Item(s) already exist - site initialisation incomplete");				
 			}
 			
 			return "finished";
