@@ -1,5 +1,6 @@
 package com.slepeweb.cms.bean;
 
+import com.slepeweb.cms.except.MissingDataException;
 
 public class Link extends CmsBean {
 	private static final long serialVersionUID = 1L;
@@ -35,7 +36,7 @@ public class Link extends CmsBean {
 		return String.format("%s (%s): %d -> %s", getType(), getName(), getParentId(), getChild().getName());
 	}
 	
-	public Link save() {
+	public Link save() throws MissingDataException {
 		return getLinkService().save(this);
 	}
 

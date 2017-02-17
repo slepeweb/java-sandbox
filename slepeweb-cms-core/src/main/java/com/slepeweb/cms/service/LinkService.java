@@ -3,6 +3,7 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.except.MissingDataException;
 
 
 public interface LinkService {
@@ -15,7 +16,7 @@ public interface LinkService {
 	List<Link> getRelations(Long parentId);
 	List<Link> getComponents(Long parentId);
 	Link getLink(Long parentId, Long childId);
-	Link save(Link l);
+	Link save(Link l) throws MissingDataException;
 	int getCount();
 	int getCount(Long parentId);
 	Link getParent(Long childId);

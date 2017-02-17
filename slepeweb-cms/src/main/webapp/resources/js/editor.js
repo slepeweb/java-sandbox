@@ -1,33 +1,38 @@
-var messages = [
-  "Failed to update item", // 1
-  "Field data successfully updated",
-  "Item successfully updated",
-  "New item successfully created",
-  "Failed to create new item",
-  "Item(s) successfully trashed",
-  "Failed to trash the item(s)",
-  "Item successfully moved",
-  "Failed to move the item",
-  "Links successfully updated",
-  "Failed to update links",
-  "Failed to retrieve breadcrumb trail",
-  "Failed to version item", // 12
-  "Successfully created new version", 
-  "Failed to revert item", // 14
-  "Successfully reverted to previous version"
-];
-
-var flashError = function(id) {
-	flashMessage(messages[id], "red");
+var toStatus = function(err, msg) {
+	var obj = {};
+	obj.error = err;
+	obj.message = msg;
+	return obj;
 };
 
-var flashSuccess = function(id) {
-	flashMessage(messages[id], "green");
+/*
+ * Standard error message.
+ */
+var serverError = function() {
+	flashMessage(toStatus(true, "Server error"));
 };
 
-var flashMessage = function(msg, clazz) {
-	$("#status-block").addClass(clazz).append(msg);
-	$("#bell").get(0).play();
+/*
+ * Displays a flash message, in red for errors, and green for info messages.
+ */
+var flashMessage = function(status) {
+	if (status) {
+		var clazz = status.error ? "red" : "green";
+		$("#status-block").removeClass("red").removeClass("green").addClass(clazz).append(status.message);
+		$("#bell").get(0).play();
+	}
+};
+
+var pageEditorUrlPrefix = _ctx + "/page/editor/";
+
+/*
+ * Tells the browser to get the item editor page for a given item.
+ */
+var fetchItemEditor = function(nodeKey, status) {
+	var url = pageEditorUrlPrefix + nodeKey;
+	var param = status.error ? "error" : "success";
+	url += ("?status=" + param + "&msg=" + status.messageEncoded);	
+	window.location = url; 
 };
 	
 // Get form field names and values for forms on item-editor 
@@ -63,6 +68,9 @@ var getFieldsFormInputData = function() {
 	return result;
 };
 
+/*
+ * Shows a modal giving the user a chance to confirm his selection.
+ */
 var showDialog = function(id, relocate) {
 	$("#" + id).dialog({
 		modal: true,
@@ -75,18 +83,6 @@ var showDialog = function(id, relocate) {
 			}
 		}
 	});
-};
-
-var pageEditorUrlPrefix = _ctx + "/page/editor/";
-
-var gotoPage = function(suffix, code, status) {
-	var url = pageEditorUrlPrefix + suffix;
-	if (code > -1) {
-		var param = status == 1 ? "msg" : "err";
-		url += ("?" + param + "=" + code);
-	}
-	
-	window.location = url; 
 };
 
 /* Nodes representing shortcuts in the FancyTree have '.s' appended to their standard key value,
@@ -165,11 +161,11 @@ var renderItemForms = function(nodeKey, activeTab) {
 						tags: $("#core-tab input[name='tags']").val()
 					}, 
 					dataType: "json",
-					success: function(json, status, z) {
-						gotoPage(nodeKey, 2, 1);
+					success: function(obj, status, z) {
+						fetchItemEditor(nodeKey, obj);
 					},
 					error: function(json, status, z) {
-						flashError(0);
+						serverError();
 					},
 				});
 			});
@@ -188,13 +184,13 @@ var renderItemForms = function(nodeKey, activeTab) {
 								cache: false,
 								data: getFieldsFormInputData(), 
 								dataType: "json",
-								success: function(json, status, z) {
+								success: function(obj, status, z) {
 									theDialog.dialog("close");
-									flashSuccess(1);
+									flashMessage(obj);
 								},
-								error: function(json, status, z) {
+								error: function(obj, status, z) {
 									theDialog.dialog("close");
-									flashError(0);
+									serverError();
 								},
 							});
 						},
@@ -217,11 +213,11 @@ var renderItemForms = function(nodeKey, activeTab) {
 						simplename: $("#add-tab input[name='simplename']").val()
 					}, 
 					dataType: "json",
-					success: function(json, status, z) {
-						gotoPage(json, 3, 1);
+					success: function(obj, status, z) {
+						fetchItemEditor(obj.data, obj);
 					},
 					error: function(json, status, z) {
-						gotoPage(json, 4, 0);
+						serverError();
 					},
 				});
 			});
@@ -236,11 +232,11 @@ var renderItemForms = function(nodeKey, activeTab) {
 						simplename: $("#copy-tab input[name='simplename']").val()
 					}, 
 					dataType: "json",
-					success: function(json, status, z) {
-						gotoPage(json, 3, 1);
+					success: function(obj, status, z) {
+						fetchItemEditor(obj.data, obj);
 					},
 					error: function(json, status, z) {
-						gotoPage(json, 4, 0);
+						serverError();
 					},
 				});
 			});
@@ -251,11 +247,11 @@ var renderItemForms = function(nodeKey, activeTab) {
 					type: "POST",
 					cache: false,
 					dataType: "json",
-					success: function(json, status, z) {
-						gotoPage(json, 13, 1);
+					success: function(obj, status, z) {
+						fetchItemEditor(obj.data, obj);
 					},
 					error: function(json, status, z) {
-						gotoPage(json, 12, 0);
+						serverError();
 					},
 				});
 			});
@@ -266,11 +262,11 @@ var renderItemForms = function(nodeKey, activeTab) {
 					type: "POST",
 					cache: false,
 					dataType: "json",
-					success: function(json, status, z) {
-						gotoPage(json, 15, 1);
+					success: function(obj, status, z) {
+						fetchItemEditor(obj.data, obj);
 					},
 					error: function(json, status, z) {
-						gotoPage(json, 14, 0);
+						serverError();
 					},
 				});
 			});
@@ -289,13 +285,13 @@ var renderItemForms = function(nodeKey, activeTab) {
 								cache: false,
 								data: {key: nodeKey}, 
 								dataType: "json",
-								success: function(json, status, z) {
+								success: function(obj, status, z) {
 									theDialog.dialog("close");
-									gotoPage(json, 5, 1);
+									fetchItemEditor(obj.data, obj);
 								},
 								error: function(json, status, z) {
 									theDialog.dialog("close");
-									gotoPage(json, 6, 0);
+									serverError();
 								}
 							});
 						},
@@ -412,10 +408,10 @@ var renderItemForms = function(nodeKey, activeTab) {
 					success: function(obj, status, z) {
 						// Need to refresh the page, to update the FancyTree,
 						// in case a shortcut link was added/removed
-						gotoPage(nodeKey, 9, 1);
+						fetchItemEditor(nodeKey, obj);
 					},
 					error: function(obj, status, z) {
-						gotoPage(nodeKey, 10, 0);
+						serverError();
 					},
 				});
 			});
@@ -445,41 +441,24 @@ var renderItemForms = function(nodeKey, activeTab) {
 			            return myXhr;
 			        },
 			        success: function() {
-						flashSuccess(2);
+						flashMessage(toStatus(false, "Media successfully uploaded"));
 			        },
 			        error: function() {
-						flashError(0);
+						serverError();
 			        },
 			        data: formData,
 			        cache: false,
 			        contentType: false,
 			        processData: false
 			    });
+			});
 				
-//				$.ajax(_ctx + "/rest/item/" + nodeKey + "/update/media", {
-//					type: "POST",
-//					cache: false,
-//					contentType: "multipart/form-data",
-//					data: {
-//						media: $("#media-tab input[name='choose-media']").val(),
-//					}, 
-//					dataType: "json",
-//					success: function(json, status, z) {
-//						showDialog("dialog-update-success");
-//					},
-//					error: function(json, status, z) {
-//						showDialog("dialog-update-error");
-//					},
-//				});
-			});				
-			
 			// Initialise sortable links 
 			$( "#sortable-links" ).sortable();
 			$( "#sortable-links" ).disableSelection();
 			
 		}
 	});
-	
 };
 
 // Left navigation
@@ -551,13 +530,13 @@ $(function() {
 									mode: data.hitMode
 								}, 
 								dataType: "json",
-								success: function(json, status, z) {
+								success: function(obj, status, z) {
 									theDialog.dialog("close");
-									gotoPage(json, 7, 1);
+									fetchItemEditor(obj.data, obj);
 								},
 								error: function(json, status, z) {
 									theDialog.dialog("close");
-									gotoPage(json, 8, 0);
+									serverError();
 								}
 							});
 						},
@@ -597,7 +576,7 @@ $(function() {
 							});
 						},
 						error: function(json, status, z) {
-							flashError(11);
+							flashMessage(toStatus(false, "Failed to retrieve breadcrumb trail"));
 						}
 					});
 				}
@@ -615,10 +594,5 @@ $(function() {
 	}
 	
 	// Render flash message when page is first loaded
-	if (_flashMessageCode) {
-		flashSuccess(_flashMessageCode);
-	}
-	else if (_flashErrorCode) {
-		flashError(_flashErrorCode);
-	}
+	flashMessage(_flashMessage);
 });

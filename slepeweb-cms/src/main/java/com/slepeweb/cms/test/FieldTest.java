@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.except.MissingDataException;
 
 @Service
 public class FieldTest extends BaseTest {
@@ -33,7 +34,12 @@ public class FieldTest extends BaseTest {
 				cal.add(Calendar.DAY_OF_MONTH, 14);
 				Timestamp ts = new Timestamp(cal.getTime().getTime());
 				aboutItem.setFieldValue(EMBARGO_FIELD_NAME, ts);
-				aboutItem.saveFieldValues();
+				
+				try {
+					aboutItem.saveFieldValues();
+				}
+				catch (MissingDataException e) {
+				}
 				
 				// 3010: Assert title field value update
 				Item checkItem = this.cmsService.getItemService().getItem(aboutItem.getId());

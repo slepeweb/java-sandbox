@@ -18,8 +18,22 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
+import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.NotRevertableException;
 import com.slepeweb.cms.except.NotVersionableException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
+
+/*
+ * TODO: Need to catch 'duplicate path' exception, for items in the bin.
+ * Catch: org.springframework.dao.DuplicateKeyException
+ * 
+ * TODO: almost every cms operation (ie. ajax call) ends up with the entire 
+ * page being rendered, so do we need to fetch the new page in javascript?
+ * 
+ * TODO: Where ops execute on an entire tree, count the number of items affected,
+ * and report back to user in flash message.
+ */
 
 @Repository
 public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
@@ -44,34 +58,33 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected MediaService mediaService;
 
-	public Item save(Item i) {
+	public Item save(Item i) throws MissingDataException {
 		return save(i, false);
 	}
 	
-	public Item save(Item i, boolean extendedSave) {
+	public Item save(Item i, boolean extendedSave) throws MissingDataException {
 		boolean updated = false;
 		
-		if (i.isDefined4Insert()) {
-			Item dbRecord = getItem(i.getId());		
-			if (dbRecord != null) {
-				updateItem(dbRecord, i);
-				updated = true;
-			}
-			else {
-				insertItem(i);
-			}
-			
-			if (extendedSave) {
-				saveFieldValues(i.getFieldValues());
-				saveLinks(i, dbRecord);
-			}
-			
-			if (updated) {
-				return dbRecord;
-			}
+		if (! i.isDefined4Insert()) {
+			throw new MissingDataException("Item data not sufficient for db insert");
+		}
+		
+		Item dbRecord = getItem(i.getId());		
+		if (dbRecord != null) {
+			updateItem(dbRecord, i);
+			updated = true;
 		}
 		else {
-			LOG.error(compose("Item not saved - insufficient data", i));
+			insertItem(i);
+		}
+		
+		if (extendedSave) {
+			saveFieldValues(i.getFieldValues());
+			saveLinks(i, dbRecord);
+		}
+		
+		if (updated) {
+			return dbRecord.setLinks(null).setFieldValues(null);
 		}
 		
 		/* 
@@ -81,7 +94,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return i.setLinks(null).setFieldValues(null);
 	}
 	
-	private void insertItem(Item i) {
+	private void insertItem(Item i) throws MissingDataException {
 		// Item table
 		this.jdbcTemplate.update(
 				"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, editable, published, version) " +
@@ -207,7 +220,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		LOG.info(compose("Older versions deleted", i));
 	}
 	
-	public void saveFieldValues(List<FieldValue> fieldValues) {
+	public void saveFieldValues(List<FieldValue> fieldValues) throws MissingDataException {
 		if (fieldValues != null) {
 			for (FieldValue fv : fieldValues) {
 				fv.save();
@@ -215,7 +228,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
-	private void saveDefaultFieldValues(Item i) {
+	private void saveDefaultFieldValues(Item i) throws MissingDataException {
 		// If item has no field values, create them, with default values
 		if (i.getFieldValues() == null || i.getFieldValues().size() == 0) {
 			i.setFieldValues(new ArrayList<FieldValue>());
@@ -233,11 +246,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 
-	public void saveLinks(Item i) {
+	public void saveLinks(Item i) throws MissingDataException {
 		saveLinks(i, null);
 	}
 	
-	private void saveLinks(Item i, Item dbRecord) {
+	private void saveLinks(Item i, Item dbRecord) throws MissingDataException {
 		if (i.getLinks() != null) {
 			if (dbRecord == null) {
 				dbRecord = getItem(i.getId());
@@ -281,7 +294,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	public Item restoreItem(Long id) {
-		return trashOrRestore(id, "Restor", 0);
+		return trashOrRestore(id, "Restore", 0);
 	}
 
 	private Item trashOrRestore(Long id, String actionHeading, int trashAction) {
@@ -306,7 +319,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
-	public Item revert(Item i) {
+	public Item revert(Item i) throws NotRevertableException {
 		if (i.getVersion() > 1) {
 			deleteItem(i.getOrigId(), i.getVersion());
 			Item r = getItem(i.getOrigId(), i.getVersion() - 1);
@@ -315,9 +328,13 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				updateEditable(r);
 				return r;
 			}
+			else {
+				throw new NotRevertableException(String.format("Item not found with original id %d", i.getOrigId()));				
+			}
 		}
-		
-		return i;
+		else {		
+			throw new NotRevertableException("Cannot revert from existing version 1");
+		}
 	}
 
 	// TODO: Referenced by Item, but never called?
@@ -395,7 +412,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
 	}
 	
-	public boolean move(Item mover, Item currentParent, Item newParent, boolean shortcut) {
+	public boolean move(Item mover, Item currentParent, Item newParent, boolean shortcut) 
+			throws MissingDataException, ResourceException {
+		
 		return move(mover, currentParent, newParent, shortcut, "over");
 	}
 	
@@ -403,7 +422,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 * This provides a relative move, ie before/after target.
 	 * If mode == "over", then target is effectively a new parent.
 	 */
-	public boolean move(Item mover, Item currentParent, Item target, boolean isShortcut, String mode) {
+	public boolean move(Item mover, Item currentParent, Item target, boolean isShortcut, String mode) 
+			throws MissingDataException, ResourceException {
+		
+		if (mover == null || target == null || currentParent == null || mode == null) {
+			throw new ResourceException("Missing item data for move");
+		}
 		
 		LOG.debug(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mode.toUpperCase(), target));			
 		LOG.debug(compose("  Old parent", currentParent));		
@@ -485,11 +509,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return true;
 	}
 	
-	public Item copy(Item source, String name, String simplename) {
+	public Item copy(Item source, String name, String simplename) throws MissingDataException {
 		return copy(false, source, name, simplename);
 	}
 	
-	private Item copy(boolean isNewVersion, Item source, String name, String simplename) {
+	private Item copy(boolean isNewVersion, Item source, String name, String simplename)
+			 throws MissingDataException {
 
 		/*
 		 *  The source instance will change subtly after new version is created (eg editable property),
@@ -595,7 +620,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return ni.setLinks(null).setFieldValues(null);
 	}
 	
-	public Item version(Item source) throws NotVersionableException {
+	public Item version(Item source) throws NotVersionableException, MissingDataException {
 		if (source.getType().getName().equals(ItemType.CONTENT_FOLDER_TYPE_NAME)) {
 			throw new NotVersionableException(String.format("%s [%s]", "Cannot version item type", ItemType.CONTENT_FOLDER_TYPE_NAME));
 		}

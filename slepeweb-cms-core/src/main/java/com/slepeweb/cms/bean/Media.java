@@ -3,6 +3,8 @@ package com.slepeweb.cms.bean;
 import java.io.InputStream;
 import java.sql.Blob;
 
+import com.slepeweb.cms.except.MissingDataException;
+
 
 public class Media extends CmsBean {
 	private static final long serialVersionUID = 1L;
@@ -37,7 +39,7 @@ public class Media extends CmsBean {
 	}
 
 	@Override
-	protected CmsBean save() {
+	protected CmsBean save() throws MissingDataException {
 		return getMediaService().save(this);
 	}
 

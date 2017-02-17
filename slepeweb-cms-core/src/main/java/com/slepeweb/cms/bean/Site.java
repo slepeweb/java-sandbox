@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.slepeweb.cms.except.MissingDataException;
+
 public class Site extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private String name, shortname;
@@ -28,7 +30,7 @@ public class Site extends CmsBean {
 		return String.format("%s (%s)", getName(), getShortname());
 	}
 	
-	public Site save() {
+	public Site save() throws MissingDataException {
 		return getSiteService().save(this);
 	}
 	

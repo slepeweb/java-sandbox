@@ -2,6 +2,9 @@ package com.slepeweb.cms.control;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteService;
@@ -28,13 +32,22 @@ public class PageController extends BaseController {
 	}
 	
 	@RequestMapping(value="/editor/{itemId}")	
-	public String doWithItem(@PathVariable long itemId, ModelMap model) {	
+	public String doWithItem(@PathVariable long itemId, ModelMap model, HttpServletRequest req) {	
 		Item i = this.itemService.getItem(itemId);
 		if (i != null) {
 			model.addAttribute("editingItem", i);
 			model.addAttribute("site", i.getSite());
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
 		}
+		
+		String flash = req.getParameter("status");
+		if (StringUtils.isNotBlank(flash)) {
+			RestResponse status = new RestResponse();
+			String msg = req.getParameter("msg");
+			status.setError(flash.equals("error")).parseMessages(msg);
+			model.addAttribute("_flashMessage", status);
+		}
+		
 		return "cms.editor";
 	}
 	

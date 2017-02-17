@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.setup.SiteSetup;
 
 @Controller
@@ -23,7 +24,13 @@ public class SetupController extends BaseController {
 		String resource = "/xls/" + fileName;
 		URL url = getClass().getClassLoader().getResource(resource);
 		if (url != null) {
-			this.siteSetup.load(url.getPath());
+			try {
+				this.siteSetup.load(url.getPath());
+			}
+			catch (MissingDataException e) {
+				LOG.warn("Missing data - site initialisation incomplete");				
+			}
+			
 			return "finished";
 		}
 		else {

@@ -12,6 +12,7 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.utils.LogUtil;
 
 @Service
@@ -123,7 +124,10 @@ public class BuildTest extends BaseTest {
 		}		
 				
 		// Create test site
-		site = addSite(TEST_SITE_NAME, "test.slepeweb.com", HOMEPAGE_TYPE_NAME, "z");
+		try {
+			site = addSite(TEST_SITE_NAME, "test.slepeweb.com", HOMEPAGE_TYPE_NAME, "z");
+		}
+		catch (MissingDataException e) {}
 		
 		// 2040: Assert site has been created
 		r = trs.execute(2040);

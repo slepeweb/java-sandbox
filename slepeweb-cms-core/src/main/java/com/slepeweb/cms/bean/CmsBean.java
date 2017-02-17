@@ -2,6 +2,7 @@ package com.slepeweb.cms.bean;
 
 import java.io.Serializable;
 
+import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.FieldForTypeService;
 import com.slepeweb.cms.service.FieldService;
@@ -23,10 +24,10 @@ public abstract class CmsBean implements Serializable {
 	protected static final Long NO_ID = -1L;
 	protected transient CmsService cmsService;
 	
-	protected abstract CmsBean save();	
+	protected abstract CmsBean save() throws MissingDataException;	
 	protected abstract void delete();
 	public abstract Long getId();
-	protected abstract boolean isDefined4Insert();	
+	protected abstract boolean isDefined4Insert() throws MissingDataException;	
 	
 	// The properties that should be assimilated are those which are specified in the update sql
 	protected abstract void assimilate(Object obj);	

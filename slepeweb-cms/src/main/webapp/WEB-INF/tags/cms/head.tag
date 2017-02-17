@@ -16,9 +16,6 @@
 <link href="${applicationContextPath}/resources/fancytree/skin-win8/ui.fancytree.min.css" rel="stylesheet" type="text/css">
 <script src="${applicationContextPath}/resources/fancytree/jquery.fancytree.min.js" type="text/javascript"></script>
 <script src="${applicationContextPath}/resources/fancytree/jquery.fancytree.dnd.js" type="text/javascript"></script>
-<%-- <script src="${applicationContextPath}/resources/fileupload/vendor/jquery.ui.widget.js"></script> --%>
-<%-- <script src="${applicationContextPath}/resources/fileupload/jquery.iframe-transport.js"></script> --%>
-<%-- <script src="${applicationContextPath}/resources/fileupload/jquery.fileupload.js"></script> --%>
 
 <!-- Initialize the tree when page is loaded -->
 <script type="text/javascript">
@@ -32,10 +29,12 @@
 	</c:if>
 	
 	// Flash messages passed through when window.location is set 
-	var _flashMessageCode = null;
-	var _flashErrorCode = null;	
-	<c:if test="${not empty param.msg}">_flashMessageCode = ${param.msg};</c:if>
-	<c:if test="${not empty param.err}">_flashErrorCode = ${param.err};</c:if>
+	var _flashMessage = null;
+	<c:if test="${not empty _flashMessage}">
+		_flashMessage = {};
+		_flashMessage.error = ${_flashMessage.error};
+		_flashMessage.message = "${_flashMessage.message}";
+	</c:if>
 </script>
 
 <link rel="stylesheet" href="${applicationContextPath}/resources/css/main.css" type="text/css">

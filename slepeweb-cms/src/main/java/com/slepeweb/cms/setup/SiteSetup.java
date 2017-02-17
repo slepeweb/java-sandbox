@@ -23,6 +23,7 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.setup.SiteSetupStatistics.ResultType;
 import com.slepeweb.cms.utils.LogUtil;
@@ -34,7 +35,7 @@ public class SiteSetup {
 	@Autowired private CmsService cmsService;
 	private Map<String, Site> siteCache = new HashMap<String, Site>();
 
-	public void load(String filePath) {
+	public void load(String filePath) throws MissingDataException {
 		LOG.info(LogUtil.compose("Setting up site", filePath));
 		SiteSetupStatistics result = new SiteSetupStatistics();
 
@@ -97,7 +98,7 @@ public class SiteSetup {
 		}		
 	}
 
-	private void processCsv(HSSFWorkbook wb, SiteSetupStatistics stats) {
+	private void processCsv(HSSFWorkbook wb, SiteSetupStatistics stats) throws MissingDataException {
 		if (wb != null) {
 			createSites(wb.getSheetAt(0).rowIterator(), stats);
 			createFields(wb.getSheetAt(1).rowIterator(), stats);
@@ -110,7 +111,7 @@ public class SiteSetup {
 		}
 	}
 
-	private void createSites(Iterator<Row> rowIter, SiteSetupStatistics stats) {
+	private void createSites(Iterator<Row> rowIter, SiteSetupStatistics stats) throws MissingDataException {
 		Row row;
 		Site s = null;
 		String firstCell, name;

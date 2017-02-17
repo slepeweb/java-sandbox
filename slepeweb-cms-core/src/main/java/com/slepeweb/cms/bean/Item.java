@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 
 public class Item extends CmsBean {
 	private static final long serialVersionUID = 1L;
@@ -146,19 +148,19 @@ public class Item extends CmsBean {
 		}
 	}
 	
-	public Item save() {
+	public Item save() throws MissingDataException {
 		return getItemService().save(this);
 	}
 	
-	public Item save(boolean extended) {
+	public Item save(boolean extended) throws MissingDataException {
 		return getItemService().save(this, extended);
 	}
 	
-	public void saveFieldValues() {
+	public void saveFieldValues() throws MissingDataException {
 		getItemService().saveFieldValues(getFieldValues());
 	}
 	
-	public void saveLinks() {
+	public void saveLinks() throws MissingDataException {
 		 getItemService().saveLinks(this);
 	}
 	
@@ -179,7 +181,7 @@ public class Item extends CmsBean {
 		return this;
 	}
 	
-	public Item addChild(Item child) {
+	public Item addChild(Item child) throws MissingDataException {
 		child.setParent(this);
 		return getItemService().save(child);
 	}
@@ -221,11 +223,13 @@ public class Item extends CmsBean {
 	 * Shortcut items must be treated differently when subject to move. In 
 	 * particular, need to know which of possibly many parents is affected.
 	 */
-	public boolean move(Item currentParent, Item target, boolean shortcut) {
+	public boolean move(Item currentParent, Item target, boolean shortcut) 
+			throws MissingDataException, ResourceException {
 		return move(currentParent, target, shortcut, "over");
 	}
 	
-	public boolean move(Item currentParent, Item target, boolean shortcut, String mode) {
+	public boolean move(Item currentParent, Item target, boolean shortcut, String mode) 
+			throws MissingDataException, ResourceException {
 		return getCmsService().getItemService().move(this, currentParent, target, shortcut, mode);
 	}
 	

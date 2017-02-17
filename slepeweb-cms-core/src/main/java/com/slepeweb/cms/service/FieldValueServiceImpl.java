@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FieldValue;
+import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -15,7 +16,7 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 	private static final String SELECTOR_TEMPLATE = "select f.*, fv.* from field f, fieldvalue fv where " +
 			"fv.fieldid = f.id and %s";
 	
-	public FieldValue save(FieldValue fv) {
+	public FieldValue save(FieldValue fv) throws MissingDataException {
 		if (fv.isDefined4Insert()) {
 			FieldValue dbRecord = getFieldValue(fv.getField().getId(), fv.getItemId());		
 			if (dbRecord != null) {
@@ -27,7 +28,9 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 			}
 		}
 		else {
-			LOG.error(compose("FieldValue not saved - insufficient data", fv));
+			String s = "FieldValue not saved - insufficient data";
+			LOG.error(compose(s, fv));
+			throw new MissingDataException(s);
 		}
 		
 		return fv;

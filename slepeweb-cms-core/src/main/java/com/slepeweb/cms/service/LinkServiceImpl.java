@@ -13,6 +13,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -49,7 +50,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	@Autowired private LinkTypeService linkTypeService;
 	@Autowired private LinkNameService linkNameService;
 
-	public Link save(Link l) {
+	public Link save(Link l) throws MissingDataException {
 		if (l.isDefined4Insert()) {
 			Link dbRecord = getLink(l.getParentId(), l.getChild().getId());		
 			if (dbRecord != null) {
@@ -61,7 +62,9 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 			}
 		}
 		else {
-			LOG.error(compose("Link not saved - insufficient data", l));
+			String s = "Link not saved - insufficient data";
+			LOG.error(compose(s, l));
+			throw new MissingDataException(s);
 		}
 		
 		return l;
