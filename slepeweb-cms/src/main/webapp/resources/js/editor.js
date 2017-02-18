@@ -16,11 +16,18 @@ var serverError = function() {
  * Displays a flash message, in red for errors, and green for info messages.
  */
 var flashMessage = function(status) {
+	var clazz, msg;
 	if (status) {
-		var clazz = status.error ? "red" : "green";
-		$("#status-block").removeClass("red").removeClass("green").addClass(clazz).append(status.message);
-		$("#bell").get(0).play();
+		clazz = status.error ? "red" : "green";
+		msg = status.message;
 	}
+	else {
+		clazz = "red";
+		msg = "System error - no RestStatus object"
+	}
+	
+	$("#status-block").removeClass("red").removeClass("green").addClass(clazz).append(msg);
+	$("#bell").get(0).play();
 };
 
 var pageEditorUrlPrefix = _ctx + "/page/editor/";
@@ -162,7 +169,7 @@ var renderItemForms = function(nodeKey, activeTab) {
 					}, 
 					dataType: "json",
 					success: function(obj, status, z) {
-						fetchItemEditor(nodeKey, obj);
+						flashMessage(obj);
 					},
 					error: function(json, status, z) {
 						serverError();
@@ -479,6 +486,7 @@ $(function() {
 		$("#status-block").empty();
 	});
 
+	// Manage the left-hand navigation
 	$("#leftnav").fancytree({
 		extensions: ["dnd"],
 		source: {

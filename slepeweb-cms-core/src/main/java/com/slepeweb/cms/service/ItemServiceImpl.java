@@ -27,11 +27,12 @@ import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 /*
- * TODO: almost every cms operation (ie. ajax call) ends up with the entire 
- * page being rendered, so do we need to fetch the new page in javascript?
- * 
  * TODO: Where ops execute on an entire tree, count the number of items affected,
  * and report back to user in flash message.
+ * 
+ * TODO: Need tools to manage the bin.
+ * 
+ * TODO: Provide seperate tab for main navigation?
  */
 
 @Repository
