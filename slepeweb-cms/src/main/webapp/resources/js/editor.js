@@ -23,7 +23,7 @@ var flashMessage = function(status) {
 	}
 	else {
 		clazz = "red";
-		msg = "System error - no RestStatus object"
+		msg = "";
 	}
 	
 	$("#status-block").removeClass("red").removeClass("green").addClass(clazz).append(msg);
@@ -321,48 +321,6 @@ var renderItemForms = function(nodeKey, activeTab) {
 				}
 			});
 	  		
-			// Add a fancytree to identify child links 
-			$("#linknav").fancytree({
-				source: {
-					url: _ctx + "/rest/leftnav/lazy/thread",
-					data: queryParams, /* TODO: Not sure this is right */
-					cache: false,
-					checkbox: true
-				},
-				lazyLoad: function(event, data) {
-					var node = data.node;
-					data.result = {
-						url: _ctx + "/rest/leftnav/lazy/one",
-						data: {key: node.key}
-					};
-				},
-				activate: function(event, data) {
-					var linkType = $("#addlinkdiv select[name='linktype']").val();
-					var linkName = $("#addlinkdiv select[name='linkname']").val();
-					var parentId = nodeKey;
-					var childId = data.node.key;
- 	   			
-					if (linkType != 'unknown' && linkName != 'unknown') {
-						var selector = $("#sortable-links");
-						var copy = $("#link-template li").clone(true);
-	 	 	   	  	
-						$.ajax(_ctx + "/rest/item/" + childId + "/name", {
-							type: "POST",
-							cache: false,
-							dataType: "text",
-							success: function(itemName, status, z) {
-								copy.find("a").attr("href", pageEditorUrlPrefix + childId).html(linkType + " (" + linkName + "): " + itemName);
-								copy.find("span.hide").html(parentId + "," + childId + "," + linkType + "," + linkName);
-								copy.appendTo(selector);
-							}
-						});
-					}
-					else {
-						showDialog("dialog-choose-linktype");
-					}
-				}
-			});
- 	    
 			// Re-populate linkname options when link type is selected
 			$("#addlinkdiv select[name='linktype']").change(function(e) {
 				var selector = $("#addlinkdiv select[name='linkname']");

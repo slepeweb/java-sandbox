@@ -31,8 +31,6 @@ import com.slepeweb.cms.utils.RowMapperUtil;
  * and report back to user in flash message.
  * 
  * TODO: Need tools to manage the bin.
- * 
- * TODO: Provide seperate tab for main navigation?
  */
 
 @Repository
