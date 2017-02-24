@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -360,6 +361,88 @@ public class RestController extends BaseController {
 		i.trash();
 			
 		return resp.setError(false).addMessage("Item trashed").setData(parent.getId());
+	}
+	
+	@RequestMapping(value="/trash/get")
+	public String getTrashedItems(ModelMap model) {			
+		model.put("_trashContents", this.itemService.getTrashedItems());			
+		return "cms.trash.contents";
+	}
+	
+	@RequestMapping(value="/trash/empty/all", produces="application/json")
+	@ResponseBody
+	public RestResponse deleteAllTrashedItems(ModelMap model) {	
+		
+		RestResponse resp = new RestResponse();
+		int num = this.itemService.deleteTrashedItems(null);			
+		return resp.setError(false).addMessage(String.format("Emptied %d items from the trash", num));
+	}
+	
+	@RequestMapping(value="/trash/restore/selected", produces="application/json")
+	@ResponseBody
+	public RestResponse restoreSelectedTrashedItems(
+			@RequestParam(value="id", required=true) String idList,
+			ModelMap model) {	
+		
+		RestResponse resp = new RestResponse();
+
+		if (idList.endsWith(",")) {
+			idList = idList.substring(0, idList.length() - 1);
+		}
+		
+		if (StringUtils.isNotBlank(idList)) {
+			String[] idStr = idList.split(",");
+			int len = idStr.length;
+		
+			long[] ids = new long[len];
+			for (int i = 0; i < len; i++) {
+				ids[i] = Integer.parseInt(idStr[i]);
+			}
+			
+			return resp.setError(false).addMessage(
+					String.format("Restored %d items from the trash", this.itemService.restoreSelectedItems(ids)));
+		}
+		else {
+			return resp.setError(true).addMessage("No items selected by user");
+		}
+	}
+	
+	@RequestMapping(value="/trash/restore/all", produces="application/json")
+	@ResponseBody
+	public RestResponse restoreAllTrashedItems(ModelMap model) {	
+		
+		RestResponse resp = new RestResponse();
+		int num = this.itemService.restoreSelectedItems(null);		
+		return resp.setError(false).addMessage(String.format("Restored %d items from the trash", num));
+	}
+	
+	@RequestMapping(value="/trash/empty/selected", produces="application/json")
+	@ResponseBody
+	public RestResponse deleteSelectedTrashedItems(
+			@RequestParam(value="id", required=true) String idList,
+			ModelMap model) {	
+		
+		RestResponse resp = new RestResponse();
+
+		if (idList.endsWith(",")) {
+			idList = idList.substring(0, idList.length() - 1);
+		}
+		
+		if (StringUtils.isNotBlank(idList)) {
+			String[] idStr = idList.split(",");
+			int len = idStr.length;
+		
+			long[] ids = new long[len];
+			for (int i = 0; i < len; i++) {
+				ids[i] = Integer.parseInt(idStr[i]);
+			}
+			
+			return resp.setError(false).addMessage(
+					String.format("Emptied %d items from the trash bin", this.itemService.deleteTrashedItems(ids)));
+		}
+		else {
+			return resp.setError(true).addMessage("No items selected by user");
+		}
 	}
 	
 	@RequestMapping(value="/item/{itemId}/move", method=RequestMethod.POST, produces="application/json")

@@ -190,6 +190,11 @@ form div {
 #item-editor {
 	float:left;
 	margin-left: 10px;
+	min-width: 640px;
+}
+
+#item-editor button {
+	cursor: pointer;
 }
 
 #leftnav {
@@ -296,4 +301,43 @@ p.main-heading {
 
 #version-tab button {
 	margin-bottom: 1.5em;
+}
+
+#trash-table {
+	margin-top: 1em;
+	width: 100%;
+}
+
+#trash-table input[type=radio] {
+	float: left;
+	margin-left: 2em;
+}
+
+#trash-action {
+	margin-top: 1em;
+}
+
+#trash-action .radio-set {
+	margin-top: 2em;
+	margin-left: 2em;
+	float: left;
+}
+
+#trash-action input {
+	float: left;
+}
+
+#trash-empty-button {
+	width: 20%;
+	float: left;
+}
+
+#trash-restore-button {
+	width: 20%;
+	float: right;
+}
+
+#trash-action .radio-set-container {
+	width: 40%;
+	margin: auto;
 }

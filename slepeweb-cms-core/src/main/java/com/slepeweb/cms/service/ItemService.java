@@ -31,6 +31,9 @@ public interface ItemService {
 			throws MissingDataException, ResourceException;
 	Item trashItem(Long id);
 	Item restoreItem(Long id);
+	List<Item> getTrashedItems();
+	int deleteTrashedItems(long[] idArr);
+	int restoreSelectedItems(long[] idArr);
 	int getBinCount();
 	Item copy(Item source, String name, String simplename) throws MissingDataException, DuplicateItemException;
 	Item version(Item source) throws NotVersionableException, MissingDataException, DuplicateItemException;

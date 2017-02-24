@@ -288,8 +288,47 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where origid=?", origid);
 	}
 
+	public List<Item> getTrashedItems() {
+		return this.jdbcTemplate.query(
+				String.format(SELECT_TEMPLATE, "i.deleted=1 order by i.path, i.version"),
+				new Object[]{}, new RowMapperUtil.ItemMapper());
+	}
+	
+	public int deleteTrashedItems(long[] idArr) {
+		int num = 0;
+		if (idArr == null) {
+			if ((num = this.jdbcTemplate.update("delete from item where deleted = 1")) > 0) {
+				LOG.warn("The trash has been emptied");
+			}
+		}
+		else {
+			for (Long id : idArr) {
+				deleteItem(id);
+			}
+			num = idArr.length;
+			LOG.warn(String.format("Deleted %d items from the bin", num));
+		}
+		return num;
+	}
+	
+	public int restoreSelectedItems(long[] idArr) {
+		int num = 0;
+		if (idArr == null) {
+			if ((num = this.jdbcTemplate.update("update item set deleted = 0 where deleted = 1")) > 0) {
+				LOG.warn("The entire trash bin has been restored");
+			}
+		}
+		else {
+			for (Long id : idArr) {
+				restoreItem(id);
+			}
+			num = idArr.length;
+			LOG.warn(String.format("Restored %d items from the bin", num));
+		}
+		return num;
+	}
+	
 	// The 'delete' methods permanently delete items from the db that have their 'deleted' flag set.
-	// HOWEVER, these methods are not being called.
 	// The 'trash' methods perform soft-deletes, by setting/un-setting the 'deleted' flag.
 	
 	public Item trashItem(Long id) {
@@ -340,7 +379,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 
-	// TODO: Referenced by Item, but never called?
 	public void deleteItem(Long id) {
 		if (this.jdbcTemplate.update("delete from item where id = ? and deleted = 1", id) > 0) {
 			LOG.warn(compose("Deleted item", String.valueOf(id)));

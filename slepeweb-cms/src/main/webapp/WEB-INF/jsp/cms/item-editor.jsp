@@ -19,6 +19,7 @@
 	<c:if test="${_showVersionTab}">
 		<li><a href="#version-tab">Version</a></li>
 	</c:if>
+		<li><a href="#misc-tab">Misc</a></li>
 </ul>
 
 <div id="core-tab">
@@ -235,3 +236,8 @@
 		</form>
 	</div>
 </c:if>
+
+<div id="misc-tab">
+	<button id="trash-show-button" type="button">Show bin</button>
+	<div id="trash-container"></div>
+</div>

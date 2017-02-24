@@ -24,5 +24,6 @@
 
 	<definition name="cms.login" template="/WEB-INF/jsp/cms/login.jsp" />
 	<definition name="cms.item.editor" template="/WEB-INF/jsp/cms/item-editor.jsp" />
+	<definition name="cms.trash.contents" template="/WEB-INF/jsp/cms/trash-contents.jsp" />
 
 </tiles-definitions>

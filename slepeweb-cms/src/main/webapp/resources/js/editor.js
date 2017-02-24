@@ -278,6 +278,90 @@ var renderItemForms = function(nodeKey, activeTab) {
 				});
 			});
 			
+			// Add behaviour to show trash contents 
+			$("#trash-show-button").click(function () {
+				$.ajax(_ctx + "/rest/trash/get", {
+					cache: false,
+					dataType: "html",
+					mimeType: "text/html",
+					
+					success: function(html, status, z) {
+						var mydiv = $("#trash-container");
+						mydiv.empty().append(html);
+
+						// Add behaviour to empty the trash 
+						$("#trash-empty-button").click(function () {
+							var selection = null;
+							$("#trash-action input:checked").each(function() {
+							    selection = $(this).attr("value");
+							});
+
+							var url = "/rest/trash/empty/" + selection;
+							var params = null;
+							
+							if (selection == "selected") {
+								var idList = "";
+								$("#trash-table input:checked").each(function() {
+								    idList += ($(this).attr("value") + ",");
+								});
+								params = {id: idList};
+							}
+							
+							$.ajax(_ctx + url, {
+								cache: false,
+								dataType: "json",
+								data: params,
+								
+								success: function(obj, status, z) {
+									var mydiv = $("#trash-container");
+									mydiv.empty();
+									flashMessage(obj);
+								},
+								error: function(json, status, z) {
+									serverError();
+								},
+							});
+						});
+						
+						// Add behaviour to restore the trash 
+						$("#trash-restore-button").click(function () {
+							var selection = null;
+							$("#trash-action input:checked").each(function() {
+							    selection = $(this).attr("value");
+							});
+
+							var url = "/rest/trash/restore/" + selection;
+							var params = null;
+							
+							if (selection == "selected") {
+								var idList = "";
+								$("#trash-table input:checked").each(function() {
+								    idList += ($(this).attr("value") + ",");
+								});
+								params = {id: idList};
+							}
+							
+							$.ajax(_ctx + url, {
+								cache: false,
+								dataType: "json",
+								data: params,
+								
+								success: function(obj, status, z) {
+									var mydiv = $("#trash-container");
+									fetchItemEditor(nodeKey, obj);
+								},
+								error: function(json, status, z) {
+									serverError();
+								},
+							});
+						});
+					},
+					error: function(json, status, z) {
+						serverError();
+					},
+				});
+			});	
+			
 			// Add behaviour to trash an item 
 			$("#trash-button").click(function () {
 				var theDialog = $("#dialog-trash-confirm");
