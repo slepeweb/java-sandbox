@@ -1,3 +1,3 @@
 #!/bin/bash
 #
-scp -i ~/.ssh/id_rsa slepeweb-cms.war slepeweb-site-delivery.war slepeweb-ws.war ubuntu@rpi-ubuntu:~
+scp -P 222 -i ~/.ssh/id_rsa slepeweb-cms.war slepeweb-site-delivery.war slepeweb-ws.war ubuntu@rpi-ubuntu:~

@@ -33,7 +33,7 @@ public class ItemTest extends BaseTest {
 				register(4080, "Revert simplename change", "First news item should be at /news/101").
 				register(4090, "Trash a branch and its descendants", "N more items should appear in the bin").
 				register(4100, "Trashed branch should not appear as child of homepage", "Homepage should now have one less child").
-				register(4110, "Restore trashed branch", "the bin size should return to original").
+				register(4110, "Restore top-level branch only", "the bin size should reduce by 1").
 				register(4120, "Get parent of news item", "should be /news").
 				register(4130, "Get parent of news section", "should be /").
 				register(4140, "Tag item", "tags should be 'football' and 'cricket'").
@@ -52,6 +52,8 @@ public class ItemTest extends BaseTest {
 			Item aboutSectionItem = site.getItem("/about");
 			Item newsSectionItem = site.getItem("/news");
 			Item rootItem = site.getItem("/");
+			Long newsItemId_101 = site.getItem("/news/101").getId();
+			Long newsItemId_102 = site.getItem("/news/102").getId();
 			
 			if (aboutSectionItem == null || newsSectionItem == null) {
 				LOG.warn("Failed to retrieve either 'about' section or 'news' section");
@@ -228,12 +230,15 @@ public class ItemTest extends BaseTest {
 					int finalBinCount = this.cmsService.getItemService().getBinCount();
 					r = trs.execute(4110);
 					r.setNotes(String.format("Bin has reduced from %d to %d entries", binCount2, finalBinCount));
-					r.test(finalBinCount == binCount);
+					r.test(finalBinCount == binCount2 - 1);
 				}
 			}
 			
 			// 4120
-			Item newsItem = site.getItem("/news/101");
+			// Restore 2 news items trashed earlier when parent folder was trashed
+			Item newsItem = this.cmsService.getItemService().restoreItem(newsItemId_101);
+			this.cmsService.getItemService().restoreItem(newsItemId_102);
+			
 			if (newsItem != null) {
 				r = trs.execute(4120);
 				Item newsSection = newsItem.getParent();

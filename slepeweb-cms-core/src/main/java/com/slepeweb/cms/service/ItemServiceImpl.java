@@ -313,17 +313,24 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	public int restoreSelectedItems(long[] idArr) {
 		int num = 0;
+		String allItemsSql = "update item set deleted = 0, published = 0 where deleted = 1";
+		String  singleItemSql = "update item set deleted = 0, published = 0 where origid = ?";
+		
 		if (idArr == null) {
-			if ((num = this.jdbcTemplate.update("update item set deleted = 0 where deleted = 1")) > 0) {
-				LOG.warn("The entire trash bin has been restored");
+			if ((num = this.jdbcTemplate.update(allItemsSql)) > 0) {
+				LOG.info("The entire trash bin has been restored");
 			}
 		}
 		else {
+			int c;
+			Item i;
 			for (Long id : idArr) {
-				restoreItem(id);
+				i = getItemFromBin(id);
+				if (i != null && ((c = this.jdbcTemplate.update(singleItemSql, i.getOrigId()))) > 0) {
+					num += c;
+				}
 			}
-			num = idArr.length;
-			LOG.warn(String.format("Restored %d items from the bin", num));
+			LOG.info(String.format("Restored %d items from the bin", num));
 		}
 		return num;
 	}
@@ -332,35 +339,28 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	// The 'trash' methods perform soft-deletes, by setting/un-setting the 'deleted' flag.
 	
 	public Item trashItem(Long id) {
-		return trashOrRestore(id, "Trash", 1);
+		Item i = getItem(id);
+
+		// Delete all versions of this item
+		if (this.jdbcTemplate.update("update item set deleted = 1 where origid = ?", i.getOrigId()) > 0) {
+			LOG.info(compose("Trashed item", String.valueOf(i)));
+			
+			// Now attend to any child items
+			List<Link> list = this.linkService.getBindings(i.getId());
+				
+			for (Link l : list) {
+				trashItem(l.getChild().getId());
+			}
+		}
+		
+		return getItem(id);
 	}
 	
 	public Item restoreItem(Long id) {
-		return trashOrRestore(id, "Restore", 0);
+		restoreSelectedItems(new long[] {id});
+		return getItem(id);
 	}
 
-	private Item trashOrRestore(Long id, String actionHeading, int trashAction) {
-		Item i = trashAction == 1 ? getItem(id) : getItemFromBin(id);
-		trashOrRestoreDescendants(i, actionHeading, trashAction);		
-		return i.setDeleted(trashAction == 1).setLinks(null).setFieldValues(null);
-	}
-
-	private void trashOrRestoreDescendants(Item item, String actionHeading, int trashAction) {
-		// Action the given item
-		if (this.jdbcTemplate.update("update item set deleted = ? where origid = ?", trashAction, item.getOrigId()) > 0) {
-			LOG.info(compose(String.format("%sed item", actionHeading), String.valueOf(item)));
-			
-			// Now action any child items
-			List<Link> list = trashAction == 1 ?
-					this.linkService.getBindings(item.getId()) :
-						this.linkService.getBindings2TrashedItems(item.getId());
-				
-			for (Link l : list) {
-				trashOrRestoreDescendants(l.getChild(), actionHeading, trashAction);
-			}
-		}
-	}
-	
 	public Item revert(Item i) throws NotRevertableException {
 		if (i.getVersion() > 1) {
 			deleteItem(i.getOrigId(), i.getVersion());

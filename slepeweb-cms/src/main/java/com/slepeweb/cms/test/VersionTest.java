@@ -37,10 +37,10 @@ public class VersionTest extends BaseTest {
 				register(7050, "Check the parent of the new item", "It should be the same as before").
 				register(7060, "Check the children of the new item", "They should be the same as before").
 				register(7070, "Trash the new item", "There should be N more entries in the bin").
-				register(7080, "Restore the new item", "The bin size should revert back to before").
+				register(7080, "Restore the new item", "The bin size should be reduced by 2").
 				register(7090, "Revert the new item", "It's version no. should be 1 less").
 				register(7100, "", "It should be editable").
-				register(7110, "", "Its published status should be the same as before it was versioned").
+				register(7110, "", "Its status should NOT be published").
 				register(7120, "", "The new version should no longer be in the db").
 				register(7130, "", "The original version should be editable and accessible");
 		
@@ -145,7 +145,7 @@ public class VersionTest extends BaseTest {
 				int finalBinCount = this.cmsService.getItemService().getBinCount();
 				r = trs.execute(7080);
 				r.setNotes(String.format("Bin has reduced from %d to %d entries", binCount2, finalBinCount));
-				r.test(finalBinCount == binCount);
+				r.test(finalBinCount == binCount2 - 2);
 				
 				// 7090: Revert the new item
 				r = trs.execute(7090);
@@ -158,10 +158,10 @@ public class VersionTest extends BaseTest {
 				r.setNotes(String.format("Status is %s", revertedItem.isEditable() ? "editable" : "NOT editable"));
 				r.test(revertedItem.isEditable());
 				
-				// 7110: Its published status should be the same as before it was versioned
+				// 7110: Its status should NOT be published
 				r = trs.execute(7110);
 				r.setNotes(String.format("Status is %s", revertedItem.isPublished() ? "published" : "NOT published"));
-				r.failIf(revertedItem.isPublished() ^ newsSectionItem.isPublished());
+				r.failIf(revertedItem.isPublished());
 				
 				// 7120: The new version should no longer be in the db
 				r = trs.execute(7120);
