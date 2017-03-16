@@ -1,0 +1,20 @@
+
+        var options = {
+        	chart: {
+          	title: 'Unit prices (p)',
+          	subtitle: 'total value (approx.) ' + _totalValue
+          },
+          width: 900,
+          height: 500
+        };
+
+        var chart = new google.charts.Line(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="curve_chart" style="width: 900px; height: 500px"></div>
+  </body>
+</html>
