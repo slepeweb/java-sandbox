@@ -1,4 +1,4 @@
-package com.slepeweb.funds;
+package com.slepeweb.funds.service;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
@@ -12,16 +12,16 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.slepeweb.funds.bean.Fund;
 import com.slepeweb.funds.bean.FundPrice;
-import com.slepeweb.funds.service.FundPriceService;
-import com.slepeweb.funds.service.FundService;
 
-public class FundReporter {
+@Service("fundReporterService")
+public class FundReporterServiceImpl implements FundReporterService {
 
-	private static Logger LOG = Logger.getLogger(FundReporter.class);
-	private String template;
+	private static Logger LOG = Logger.getLogger(FundReporterServiceImpl.class);
+	private String template = "template";
 	
 	@Autowired FundService fundService;
 	@Autowired FundPriceService fundPriceService;
@@ -184,9 +184,4 @@ public class FundReporter {
 			}
 		}
 	}
-
-	public void setTemplate(String template) {
-		this.template = template;
-	}
-
 }

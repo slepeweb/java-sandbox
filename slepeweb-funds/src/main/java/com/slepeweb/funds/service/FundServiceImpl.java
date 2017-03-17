@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import com.slepeweb.funds.bean.Fund;
 import com.slepeweb.funds.except.DuplicateItemException;
 import com.slepeweb.funds.except.MissingDataException;
 
-@Repository
+@Service("fundService")
 public class FundServiceImpl extends BaseServiceImpl implements FundService {
 	
 	private static Logger LOG = Logger.getLogger(FundServiceImpl.class);

@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.slepeweb.funds.bean.FundPrice;
+import com.slepeweb.funds.service.FundReporterService;
 import com.slepeweb.funds.service.FundScraperService;
 
 public class FundManager {
@@ -29,7 +30,7 @@ public class FundManager {
 			}
 		}
 		
-		FundReporter fr = (FundReporter) context.getBean("fundReporter");
+		FundReporterService fr = (FundReporterService) context.getBean("fundReporterService");
 		fr.graphReport();	
 		
 		LOG.info("... FundManager has finished");
