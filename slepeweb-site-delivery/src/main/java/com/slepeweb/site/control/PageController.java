@@ -22,6 +22,7 @@ import com.slepeweb.site.ntc.service.CompetitionService;
 import com.slepeweb.site.ntc.service.EventsService;
 import com.slepeweb.site.ntc.service.NtcNewsService;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
+import com.slepeweb.site.sws.service.FundsService;
 
 @Controller
 public class PageController extends BaseController {
@@ -30,6 +31,7 @@ public class PageController extends BaseController {
 	@Autowired private CompetitionService competitionService;
 	@Autowired private EventsService eventsService;
 	@Autowired private NtcNewsService newsService;
+	@Autowired private FundsService fundsService;
 	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
@@ -103,6 +105,17 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "article-leftnav", model);
+		return page.getView();
+	}
+		
+	@RequestMapping(value="/spring/article/funds")	
+	public String funds(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "article-funds", model);
+		model.addAttribute("_graphData", this.fundsService.scrapeJs("/tmp/funds.html"));
 		return page.getView();
 	}
 		
