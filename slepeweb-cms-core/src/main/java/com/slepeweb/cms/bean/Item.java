@@ -286,7 +286,11 @@ public class Item extends CmsBean {
 	
 	public String getParentPath() {
 		if (! isRoot()) {
-			return getParent().getPath();
+			int c = getPath().lastIndexOf("/");
+			if (c > 0) {
+				return getPath().substring(0, c);
+			}
+			return "/";
 		}
 		
 		// A null parent means that this item is a root item
