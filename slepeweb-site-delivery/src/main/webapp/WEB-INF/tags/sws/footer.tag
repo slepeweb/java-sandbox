@@ -1,11 +1,10 @@
 <%@ tag %><%@ 
-	taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %><%@ 
-	taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 
 <div id="copyright">
 	<span>&copy; Slepe Web Solutions Ltd. All rights reserved.</span><br />
-	<span class="smaller"><c:set var="_now" value="<%= new java.util.Date() %>" /><fmt:formatDate 
-		value="${_now}" type="both" pattern="MMMM d, HH:mm" /></span>
+	<c:set var="_now" value="<%= new java.util.Date() %>" />
+	<span class="smaller">${site:formatUKDate(_now, 'MMMM d, HH:mm z')}</span>
 </div>
 
 <c:if test="${_serverConfig.liveDelivery}">
