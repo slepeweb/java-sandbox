@@ -69,6 +69,16 @@
 	</form>
 </div>
 
+<script>
+	$(function() {
+		$(".datepicker").datepicker({
+			dateFormat: "yy-mm-dd",
+			changeMonth: true,
+			changeYear: true
+		});
+	});
+</script>
+
 <div id="field-tab">
 	<form id="field-form">
 	<c:set var="fvm" value="${editingItem.fieldValuesMap}" />

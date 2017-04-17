@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +50,6 @@ import com.slepeweb.cms.service.LinkTypeService;
 import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.service.TemplateService;
-import com.slepeweb.cms.utils.LogUtil;
 
 @Controller
 @RequestMapping("/rest")
@@ -178,20 +178,57 @@ public class RestController extends BaseController {
 		
 		RestResponse resp = new RestResponse();
 		Item i = this.itemService.getItem(itemId);
-		String param, stringValue;
+		String param, stringValue, dateValueStr = null, timeValueStr = null;
 		FieldType ft;
 		FieldValue fv;
-		Map<String, FieldValue> fieldValuesMap = i.getFieldValuesMap();
 		SimpleDateFormat sdf;
 		Timestamp stamp;
+		Calendar cal;
 		int c = 0;
-		boolean fieldErrors = false;
 		
+		// Identify FieldValue objects for this item
+		Map<String, FieldValue> fieldValuesMap = i.getFieldValuesMap();
+		
+		// Build a list of FieldValue objects that need to be saved
+		List<FieldValue> fvList2Save = new ArrayList<FieldValue>();
+		
+		// Store error messages
+		List<String> errors = new ArrayList<String>();
+		boolean isErrors = false;
+		
+		// Loop through fields for this item type
 		for (FieldForType fft : i.getType().getFieldsForType()) {
+			// For this field, see if there is a matching query parameter
 			param = fft.getField().getVariable();
 			ft = fft.getField().getType();
-			stringValue = request.getParameter(param);
 			fv = fieldValuesMap.get(param);
+			stringValue = request.getParameter(param);
+			
+			if (ft == FieldType.date || ft == FieldType.datetime) {
+				/* 
+				 * For a datetime field, there will be 2 query parameters, eg. for a field 
+				 * named 'datepublished', param 'datepublished_d' will hold the date value,
+				 * and param 'datepublished_t' will hold the time.
+				 */
+				dateValueStr = request.getParameter(String.format("%s_d", param));
+				timeValueStr = null;
+				
+				if (ft == FieldType.datetime) {
+					timeValueStr = request.getParameter(String.format("%s_t", param));
+					if (timeValueStr != null) {
+						// Validate time
+						int hours = Integer.parseInt(timeValueStr.substring(0, 2));
+						int minutes = Integer.parseInt(timeValueStr.substring(3));
+						
+						if (hours > 23 || minutes > 59) {
+							errors.add(String.format("Invalid time value [%s]", timeValueStr));
+							continue;
+						}
+					}
+				}
+				
+				stringValue = dateValueStr + (timeValueStr == null ? "" : " " + timeValueStr);
+			}
 			
 			if (stringValue != null) {			
 				if (fv == null) {
@@ -204,17 +241,31 @@ public class RestController extends BaseController {
 				if (ft == FieldType.integer) {
 					fv.setValue(Integer.parseInt(stringValue));
 				}
-				else if (ft == FieldType.date) {
-					sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+				else if (ft == FieldType.date || ft == FieldType.datetime) {
+					if (ft == FieldType.date) {
+						sdf = new SimpleDateFormat("yyyy-MM-dd");
+					}
+					else {
+						sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+					}
+					
 					try {
-						stamp = new Timestamp(sdf.parse(stringValue).getTime());
-						stamp.setNanos(0);
+						cal = Calendar.getInstance();
+						cal.setTime(sdf.parse(stringValue));
+						cal.set(Calendar.MILLISECOND, 0);
+						cal.set(Calendar.SECOND, 1);
+						
+						if (ft == FieldType.date) {
+							cal.set(Calendar.MINUTE, 0);
+							cal.set(Calendar.HOUR, 0);
+						}
+						
+						stamp = new Timestamp(cal.getTimeInMillis());
 						fv.setDateValue(stamp);
-						fv.setStringValue(stringValue.replace("T", " "));
+						fv.setStringValue(stringValue);
 					}
 					catch (ParseException e) {
-						LOG.warn(LogUtil.compose("Date not parseable", stringValue));
-						fieldErrors = true;
+						errors.add(String.format("Date not parseable [%s]", stringValue));
 						continue;
 					}
 				}
@@ -222,29 +273,53 @@ public class RestController extends BaseController {
 					fv.setValue(stringValue);
 				}
 				
+				/* 
+				 * Save this FieldValue for saving later, as long as there are no subsequent 
+				 * errors relating to other fields on this item.
+				 */
+				fvList2Save.add(fv);
+			}
+		}
+		
+		
+		isErrors = errors.size() > 0;
+		if (! isErrors) {			
+			for (FieldValue fvx : fvList2Save) {
 				try {
-					fv.save();
+					fvx.save();
 					c++;
 				}
 				catch (MissingDataException e) {
-					fieldErrors = true;
+					LOG.error(e.getMessage());
+					isErrors = true;
 				}
 			}
 		}
 		
+		resp.setError(isErrors);
+		
 		// Update dateUpdated for the item
 		i.resetDateUpdated();
 		
-		try {
-			i.save();
-			return resp.setError(fieldErrors).addMessage(String.format("%d fields updated", c));		
+		if (isErrors) {
+			for (String s : errors) {
+				resp.addMessage(s);		
+			}
 		}
-		catch (MissingDataException e) {
-			return resp.setError(true).addMessage("Item could not be saved: missing data");					
+		else {
+			try {
+				i.save();
+				resp.addMessage(String.format("%d fields updated", c));
+			}
+			catch (MissingDataException e) {
+				resp.setError(true).addMessage("Item could not be saved: missing data");					
+			}
+			catch (DuplicateItemException e) {
+				resp.setError(true).addMessage(e.getMessage());					
+			}
 		}
-		catch (DuplicateItemException e) {
-			return resp.setError(true).addMessage(e.getMessage());					
-		}
+		
+		return resp;
 	}	
 	
 	@RequestMapping(value="/item/{itemId}/add", method=RequestMethod.POST, produces="application/json")

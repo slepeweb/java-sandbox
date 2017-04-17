@@ -22,3 +22,6 @@ alter table item add index idx_origid (origid);
 
 update item set origid = id;
 select id, origid, path, version from item where siteid=16 and path in (select path from item where siteid=16 and version >1) order by path, version
+
+
+alter table field modify column fieldtype enum ('text', 'markup', 'integer', 'date', 'url', 'radio', 'checkbox', 'select', 'datetime');

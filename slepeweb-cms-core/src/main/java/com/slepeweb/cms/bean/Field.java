@@ -20,7 +20,6 @@ public class Field extends CmsBean {
 	private static final String RADIO = "radio";
 	private static final String CHECKBOX = "checkbox";
 	private static final String TEXT = "text";
-	private static final String DATE = "datetime-local";
 	
 	private Long id;
 	private String name, variable, help;
@@ -30,7 +29,7 @@ public class Field extends CmsBean {
 	private String validValues; 
 	
 	public enum FieldType {
-		text, markup, integer, date, url, radio, checkbox, select;
+		text, markup, integer, date, datetime, url, radio, checkbox, select;
 	}
 
 	public void assimilate(Object obj) {
@@ -75,11 +74,12 @@ public class Field extends CmsBean {
 		String tag = null, inputType = "";
 		String rows = null, cols = null;
 		
-		if (getType() == FieldType.integer || getType() == FieldType.date || getType() == FieldType.url) {
+		if (getType() == FieldType.integer || getType() == FieldType.url || 
+				getType() == FieldType.date|| getType() == FieldType.datetime) {
 			tag = INPUT_TAG;
 			rows = cols = null;
-			if (getType() == FieldType.date) {
-				inputType = DATE;
+			if (getType() == FieldType.date || getType() == FieldType.datetime) {
+				inputType = getType().name();
 			}
 		}
 		else if (getType() == FieldType.text || getType() == FieldType.markup) {
@@ -105,6 +105,7 @@ public class Field extends CmsBean {
 		String notNullValue = value != null ? value : "";
 		
 		if (tag.equals(INPUT_TAG)) {
+			// We need to produce an <input> element
 			if (inputType.equals(RADIO) || inputType.equals(CHECKBOX)) {
 				for (String vv : vvl.getValues()) {
 					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s ", 
@@ -125,12 +126,40 @@ public class Field extends CmsBean {
 				}
 			}
 			else {
-				if (inputType.equals(DATE)) {
-					// Convert value from Timestamp string to T format
-					notNullValue = notNullValue.replace(" ", "T");
+				if (inputType.equals(FieldType.date.name()) || inputType.equals(FieldType.datetime.name())) {
+					// This is a date/datetime input field
+					String dateValueStr = null, timeValueStr = null;
+
+					int c = notNullValue.indexOf(" ");
+					if (c > -1) {
+						// The supplied value comprises both date and time components
+						dateValueStr = notNullValue.substring(0, c);
+						timeValueStr = notNullValue.substring(c + 1);
+						int maxTimeStrLen = 5;
+						if (timeValueStr.length() > maxTimeStrLen) {
+							timeValueStr = timeValueStr.substring(0, maxTimeStrLen);
+						}
+					}
+					else {
+						// The supplied value has no time component
+						dateValueStr = notNullValue;
+					}
+					
+					// Input field for the datepicker
+					sb.append("<").append(tag).append(String.format(" type=\"text\" name=\"%s_d\" class=\"datepicker\" value=\"%s\"%s />", 
+							getVariable(), dateValueStr, getTooltip()));
+				
+					if (inputType.equals(FieldType.datetime.name())) {
+						// Input field for time
+						sb.append("<").append(tag).append(String.format(" type=\"text\" name=\"%s_t\" class=\"timepicker\" value=\"%s\"%s />", 
+								getVariable(), timeValueStr, getTooltip()));
+					}
 				}
-				sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s />", 
-						inputType, getVariable(), notNullValue, getTooltip()));
+				else {
+					// This is a plain text input field, and NOT a date/datetime one
+					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s />", 
+							inputType, getVariable(), notNullValue, getTooltip()));
+				}
 			}
 		}
 		else if (tag.equals(SELECT_TAG)) {
