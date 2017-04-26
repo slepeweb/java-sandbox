@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.service.LoglevelUpdateService;
@@ -117,9 +118,9 @@ public class BaseController {
 				setItem(i).
 				setView(getFullyQualifiedViewName(shortSitename, viewNameSuffix));
 		
-		p.setComponents(this.componentService.getComponents(i.getComponents(), "main"));
-		p.getLeftSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "leftside"));
-		p.getRightSidebar().setComponents(this.componentService.getComponents(i.getComponents(), "rightside"));
+		p.setComponents(this.componentService.getComponents(i.getComponents(), LinkName.MAIN));
+		p.getLeftSidebar().setComponents(this.componentService.getComponents(i.getComponents(), LinkName.LEFT_SIDE));
+		p.getRightSidebar().setComponents(this.componentService.getComponents(i.getComponents(), LinkName.RIGHT_SIDE));
 		
 		model.addAttribute("_page", p);
 		return p;

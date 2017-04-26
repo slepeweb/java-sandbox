@@ -9,8 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.slepeweb.cms.bean.Host;
+import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.service.HostService;
+import com.slepeweb.cms.service.SolrService;
 import com.slepeweb.cms.setup.SiteSetup;
 
 @Controller
@@ -18,6 +24,8 @@ public class SetupController extends BaseController {
 	private static Logger LOG = Logger.getLogger(SetupController.class);
 	
 	@Autowired private SiteSetup siteSetup;
+	@Autowired private HostService hostService;
+	@Autowired private SolrService solrService;
 	
 	@RequestMapping(value="/setup", produces="text/text")	
 	@ResponseBody
@@ -40,6 +48,40 @@ public class SetupController extends BaseController {
 		else {
 			LOG.warn(String.format("Spreadsheet not found [%s]", resource));
 			return String.format("Resource not found [%s]", resource);
+		}
+	}
+	
+	@RequestMapping(value="/solr/index", produces="text/text")	
+	@ResponseBody
+	public String solrIndex(@RequestParam(value="host", required=true) String hostName,
+			@RequestParam(value="path", required=true) String startPath) {
+		
+		String msg;
+		Host h = this.hostService.getHost(hostName);
+		if (h == null) {
+			LOG.warn(msg = String.format("Host not found [%s]", hostName));	
+			return msg;
+		}
+		
+		Item i = h.getSite().getItem(startPath);
+		if (i == null) {
+			LOG.warn(msg = String.format("Item not found [%s%s]", hostName, startPath));	
+			return msg;
+		}
+		
+		// Crawl down the site, indexing the content on each item found
+		diveSite(i);
+		return "Indexing complete";
+	}	
+	
+	private void diveSite(Item parentItem) {
+		// The solrService composites content from this item and its main components
+		this.solrService.save(parentItem);
+		
+		for (Link l : parentItem.getBindings()) {
+			if (! l.getType().equals(LinkType.shortcut)) {
+				diveSite(l.getChild());
+			}
 		}
 	}	
 }

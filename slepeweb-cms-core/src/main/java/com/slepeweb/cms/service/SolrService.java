@@ -1,0 +1,11 @@
+package com.slepeweb.cms.service;
+
+import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.solr.SolrParams;
+import com.slepeweb.cms.bean.solr.SolrResponse;
+
+public interface SolrService {
+	
+	boolean save(Item i);
+	SolrResponse query(SolrParams p);
+}

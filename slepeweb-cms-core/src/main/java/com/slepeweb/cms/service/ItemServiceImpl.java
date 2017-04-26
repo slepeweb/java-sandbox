@@ -26,13 +26,6 @@ import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
-/*
- * TODO: Where ops execute on an entire tree, count the number of items affected,
- * and report back to user in flash message.
- * 
- * TODO: Need tools to manage the bin.
- */
-
 @Repository
 public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
@@ -55,6 +48,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected FieldValueService fieldValueService;
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected MediaService mediaService;
+	@Autowired protected SolrService solrService;
 
 	public Item save(Item i) throws MissingDataException, DuplicateItemException {
 		return save(i, false);
@@ -79,6 +73,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		if (extendedSave) {
 			saveFieldValues(i.getFieldValues());
 			saveLinks(i, dbRecord);
+		}
+		
+		// Update the Solr index if item is a page (ie has a template assigned to it)
+		if (i.getTemplate() != null) {
+			this.solrService.save(i);
 		}
 		
 		if (updated) {

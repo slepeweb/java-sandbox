@@ -28,9 +28,9 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.utils.LogUtil;
-import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.util.HttpUtil;
 
 @Component

@@ -87,4 +87,14 @@
 	<import resource="hibernate-beans.xml" />
 	<import resource="webflow-beans.xml" />
 	<import resource="ws-beans.xml" />
+	
+	<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="locations">
+			<list>
+				<value>classpath:/cms.properties</value>
+			</list>
+		</property>
+	</bean>
+	
 </beans>

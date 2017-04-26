@@ -93,4 +93,13 @@
 		<!-- one of the properties available; the maximum file size in bytes -->
 		<property name="maxUploadSize" value="2000000"/>
 	</bean>
+	
+	<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="locations">
+			<list>
+				<value>classpath:/cms.properties</value>
+			</list>
+		</property>
+	</bean>
 </beans>

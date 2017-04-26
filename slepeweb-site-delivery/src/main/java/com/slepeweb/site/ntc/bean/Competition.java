@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.site.constant.FieldName;
+import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.site.util.StringUtil;
 
 public class Competition {

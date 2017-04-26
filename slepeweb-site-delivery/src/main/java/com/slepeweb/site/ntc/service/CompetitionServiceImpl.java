@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.site.constant.ItemTypeName;
-import com.slepeweb.site.constant.TagName;
+import com.slepeweb.cms.constant.ItemTypeName;
+import com.slepeweb.cms.constant.TagName;
 import com.slepeweb.site.ntc.bean.Competition;
 import com.slepeweb.site.ntc.bean.CompetitionIndex;
 

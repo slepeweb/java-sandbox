@@ -820,7 +820,12 @@ html {
   margin-left: 1em;
   padding-left: 0;
 }
-#header .nav > ul > li a {
+@media only screen and (max-width: 52em) {
+  #header .nav > ul > li {
+    display: block;
+  }
+}
+#header .nav > ul > li a, #header .nav > ul > li i {
   -moz-transition: color 0.2s ease-in-out;
   -webkit-transition: color 0.2s ease-in-out;
   -o-transition: color 0.2s ease-in-out;
@@ -830,21 +835,26 @@ html {
   display: inline-block;
   text-decoration: none;
 }
-#header .nav > ul > li a:hover {
+#header .nav > ul > li a:hover, #header .nav > ul > li i:hover {
   color: #fff;
 }
 #header .nav > ul > li.selected {
   background: url("images/nav-arrow-down-small.png") center top no-repeat;
 }
-#header .nav > ul > li.selected a {
+@media only screen and (max-width: 52em) {
+  #header .nav > ul > li.selected {
+    background: url("images/nav-arrow-down-small.png") left top no-repeat;
+  }
+}
+#header .nav > ul > li.selected a, #header .nav > ul > li.selected i {
   font-weight: bold;
   color: #fff;
 }
 @media only screen and (max-width: 52em) {
-  #header .nav > ul > li a {
+  #header .nav > ul > li a, #header .nav > ul > li i {
     color: #333;
   }
-  #header .nav > ul > li a:hover {
+  #header .nav > ul > li a:hover, #header .nav > ul > li i:hover {
     color: #666;
   }
 }
@@ -856,6 +866,26 @@ html {
   position: relative;
   top: -0.075em;
   vertical-align: middle;
+}
+
+#search-bar {
+  visibility: hidden;
+  position: absolute;
+  right: 0px;
+  top: 67px;
+  width: 258px;
+}
+#search-bar input[type='text'] {
+  color: #000;
+  background: #fff;
+  float: right;
+  width: 80%;
+}
+#search-bar input[type='submit'] {
+  color: #000 !important;
+  background: #9bd7de;
+  float: right;
+  padding: 0 10px;
 }
 
 /* Banner */
@@ -922,7 +952,7 @@ html {
   border: 1px;
   background: #ccc;
   position: absolute;
-  top: 45px;
+  top: 170px;
   right: 20px;
   width: 130px;
   display: block;
@@ -1303,4 +1333,28 @@ img.markup.right {
 
 #password-update, #password-reset {
   margin-bottom: 1em;
+}
+
+.search-results-div h3, .search-results-div p {
+  line-height: 1.2em;
+}
+.search-results-div h3 {
+  margin-top: -20px;
+}
+.search-results-div p {
+  margin-top: -10px;
+  margin-bottom: -10px;
+  margin-left: 2.5em;
+}
+
+.solr-page {
+  display: inline;
+  margin-right: 1em;
+}
+.solr-page.selected {
+  opacity: 0.5;
+  text-decoration: underline;
+}
+.solr-page.heading {
+  font-weight: bold;
 }

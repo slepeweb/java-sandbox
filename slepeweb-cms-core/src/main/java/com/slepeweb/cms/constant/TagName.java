@@ -1,4 +1,4 @@
-package com.slepeweb.site.constant;
+package com.slepeweb.cms.constant;
 
 public class TagName {
 

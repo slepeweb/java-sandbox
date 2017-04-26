@@ -20,8 +20,8 @@ import org.springframework.webflow.execution.RequestContext;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
-import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.NavigationService;
 import com.slepeweb.site.sws.spizza.bean.Customer;

@@ -2,6 +2,7 @@ package com.slepeweb.cms.service;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
@@ -84,4 +85,32 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 		return this.jdbcTemplate.queryForInt("select count(*) from config");
 	}
 
+	@Cacheable(value="serviceCache")
+	public String getProperty(Long siteId, String name, String dflt) {
+		SiteConfig config = getSiteConfig(siteId, name);
+		if (config != null) {
+			return config.getValue();
+		}
+		return dflt;
+	}
+
+	public String getProperty(Long siteId, String name) {
+		return getProperty(siteId, name, null);
+	}
+	
+	public Integer getIntegerProperty(Long siteId, String name, Integer dflt) {
+		String value = getProperty(siteId, name, String.valueOf(dflt));
+		if (value == null) {
+			return dflt;
+		}
+		
+		if (StringUtils.isNumeric(value)) {
+			return Integer.valueOf(value);
+		}
+		return null;
+	}
+
+	public Integer getIntegerProperty(Long siteId, String name) {
+		return getIntegerProperty(siteId, name, null);
+	}
 }

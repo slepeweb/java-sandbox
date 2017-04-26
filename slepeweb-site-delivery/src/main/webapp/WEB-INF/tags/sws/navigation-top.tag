@@ -13,8 +13,17 @@
 					<c:forEach items="${_page.header.topNavigation}" var="link">
 						<li<c:if test="${link.selected}"> class="selected"</c:if>><a href="${link.href}">${link.title}</a></li>
 					</c:forEach>
+					<li><i class="fa fa-search" aria-hidden="true"></i></li>
 				</ul>
 				<div id="tiny-nav"><i class="fa fa-bars fa-2x"></i></div>
+				<div id="search-bar">
+					<form method="post" action="/search-results">
+						<input type="submit" value="Go" />
+						<input type="text" name="searchText" 
+							placeholder="Enter search terms here" 
+							value="${_searchResults.params.searchText}" />
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -40,6 +49,10 @@ $(function() {
 		//console.log(status);
 	});		
 	
-	//$("#header").css("visibility", "visible");
+	$(".fa-search").click(function() {
+		var visibility = $("#search-bar").css("visibility");
+		visibility == 'visible' ? visibility = 'hidden' : visibility = 'visible';
+		$("#search-bar").css("visibility", visibility);
+	});
 });
 </script>

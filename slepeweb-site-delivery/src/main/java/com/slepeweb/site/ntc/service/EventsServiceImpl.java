@@ -11,10 +11,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.site.bean.DatedLinkTarget;
-import com.slepeweb.site.constant.FieldName;
 import com.slepeweb.site.ntc.bean.CompetitionIndex;
-import com.slepeweb.site.ntc.service.CompetitionService;
 
 @Service("eventsService")
 public class EventsServiceImpl implements EventsService {

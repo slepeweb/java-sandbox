@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.solr.SolrConfig;
+import com.slepeweb.cms.bean.solr.SolrParams;
+import com.slepeweb.cms.service.SiteConfigService;
+import com.slepeweb.cms.service.SolrService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.model.SiblingItemPager;
 import com.slepeweb.site.ntc.bean.CompetitionIndex;
@@ -32,6 +36,8 @@ public class PageController extends BaseController {
 	@Autowired private EventsService eventsService;
 	@Autowired private NtcNewsService newsService;
 	@Autowired private FundsService fundsService;
+	@Autowired private SiteConfigService siteConfigService;
+	@Autowired private SolrService solrService;
 	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
@@ -108,6 +114,28 @@ public class PageController extends BaseController {
 		return page.getView();
 	}
 		
+	@RequestMapping(value="/spring/search-results")	
+	public String searchResults(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			HttpServletRequest req,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "search-results", model);
+		
+		Long siteId = i.getSite().getId();
+		SolrConfig config = new SolrConfig().
+				setPageSize(this.siteConfigService.getIntegerProperty(siteId, SolrConfig.PAGE_SIZE_KEY, 5)).
+				setMaxPages(this.siteConfigService.getIntegerProperty(siteId, SolrConfig.MAX_PAGES_KEY, 5));
+		
+		SolrParams params = new SolrParams(i, config).
+				setSearchText(req.getParameter("searchText")).
+				setPageNum(req.getParameter("page"));
+		
+		model.addAttribute("_searchResults", this.solrService.query(params));		
+		return page.getView();
+	}
+	
 	@RequestMapping(value="/spring/article/funds")	
 	public String funds(
 			@ModelAttribute("_item") Item i, 
