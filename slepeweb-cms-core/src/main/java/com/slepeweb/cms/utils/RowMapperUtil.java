@@ -78,6 +78,7 @@ public class RowMapperUtil {
 				setDeleted(rs.getBoolean("deleted")).
 				setEditable(rs.getBoolean("editable")).
 				setPublished(rs.getBoolean("published")).
+				setSearchable(rs.getBoolean("searchable")).
 				setVersion(rs.getInt("version"));
 		
 		ItemType type = CmsBeanFactory.makeItemType().

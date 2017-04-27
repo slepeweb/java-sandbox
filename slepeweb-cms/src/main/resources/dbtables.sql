@@ -75,6 +75,7 @@ create table item
 	deleted boolean,
 	editable boolean,
 	published boolean,
+	searchable boolean,
 	version int,
 	primary key (id),
 	unique key idx_item_site_path (siteid, path, version),

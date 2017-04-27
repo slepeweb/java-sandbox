@@ -80,6 +80,7 @@ public class RestController extends BaseController {
 			@PathVariable long itemId, 
 			@RequestParam("name") String name, 
 			@RequestParam("simplename") String simplename, 
+			@RequestParam("searchable") boolean searchable, 
 			@RequestParam("published") boolean published, 
 			@RequestParam("template") Long templateId, 
 			@RequestParam("tags") String tagStr, 
@@ -93,6 +94,7 @@ public class RestController extends BaseController {
 			i = i.setName(name).
 				setSimpleName(simplename).
 				setDateUpdated(new Timestamp(System.currentTimeMillis())).
+				setSearchable(searchable).
 				setPublished(published).
 				setTemplate(t);
 			

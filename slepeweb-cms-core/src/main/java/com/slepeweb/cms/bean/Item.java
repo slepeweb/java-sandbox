@@ -33,7 +33,7 @@ public class Item extends CmsBean {
 	private List<FieldValue> fieldValues;
 	private String name, simpleName, path;
 	private Timestamp dateCreated, dateUpdated;
-	private boolean deleted, editable = true, published;
+	private boolean deleted, editable = true, published, searchable;
 	private Long id = -1L, origId;
 	private List<Link> links;
 	private List<String> tags;
@@ -55,6 +55,7 @@ public class Item extends CmsBean {
 			setTemplate(i.getTemplate());
 			setEditable(i.isEditable());
 			setPublished(i.isPublished());
+			setSearchable(i.isSearchable());
 			setVersion(i.getVersion());
 			
 			// Must assimilate fields and links too? 
@@ -653,6 +654,7 @@ public class Item extends CmsBean {
 		result = prime * result + ((type == null) ? 0 : type.getId().hashCode());
 		result = prime * result + ((dateUpdated == null) ? 0 : dateUpdated.hashCode());
 		result = prime * result + (published ? 1231 : 1237);
+		result = prime * result + (searchable ? 1231 : 1237);
 		return result;
 	}
 
@@ -668,6 +670,8 @@ public class Item extends CmsBean {
 		if (deleted != other.deleted)
 			return false;
 		if (published != other.published)
+			return false;
+		if (searchable != other.searchable)
 			return false;
 		if (name == null) {
 			if (other.name != null)
@@ -762,6 +766,19 @@ public class Item extends CmsBean {
 
 	public Item setOrigId(Long origId) {
 		this.origId = origId;
+		return this;
+	}
+	
+	public boolean isPage() {
+		return getTemplate() != null;
+	}
+
+	public boolean isSearchable() {
+		return this.searchable;
+	}
+
+	public Item setSearchable(boolean searchable) {
+		this.searchable = searchable;
 		return this;
 	}
 }

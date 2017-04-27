@@ -49,6 +49,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected MediaService mediaService;
 	@Autowired protected SolrService solrService;
+	@Autowired protected CmsService cmsService;
 
 	public Item save(Item i) throws MissingDataException, DuplicateItemException {
 		return save(i, false);
@@ -75,9 +76,15 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			saveLinks(i, dbRecord);
 		}
 		
-		// Update the Solr index if item is a page (ie has a template assigned to it)
-		if (i.getTemplate() != null) {
+		// Update the Solr index if item is searchable, otherwise, remove it from the index
+		boolean isIndexable = i.isSearchable() && i.isPage() && 
+				(this.cmsService.isLiveServer() ? i.isPublished() : i.isEditable());
+		
+		if (isIndexable) {
 			this.solrService.save(i);
+		}
+		else {
+			this.solrService.remove(i);
 		}
 		
 		if (updated) {
@@ -95,10 +102,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		// Item table
 		try {
 			this.jdbcTemplate.update(
-					"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, editable, published, version) " +
+					"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, editable, published, searchable, version) " +
 					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 					i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
-					i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false, true, false, i.getVersion());				
+					i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false, true, false, false, i.getVersion());				
 		}
 		catch (DuplicateKeyException e) {
 			throw new DuplicateItemException("Item already exists - check the bin");
@@ -159,10 +166,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			dbRecord.assimilate(i);
 			
 			this.jdbcTemplate.update(
-					"update item set name = ?, simplename = ?, path = ?, templateid = ?, dateupdated = ?, deleted = ?, editable = ?, published = ?, version = ? where id = ?",
+					"update item set name = ?, simplename = ?, path = ?, templateid = ?, dateupdated = ?, deleted = ?, editable = ?, published = ?, searchable = ?, version = ? where id = ?",
 					dbRecord.getName(), dbRecord.getSimpleName(), dbRecord.getPath(), 
 					dbRecord.getTemplate() == null ? 0 : dbRecord.getTemplate().getId(), 
-					dbRecord.getDateUpdated(), dbRecord.isDeleted(), dbRecord.isEditable(), dbRecord.isPublished(), i.getVersion(), i.getId());
+					dbRecord.getDateUpdated(), dbRecord.isDeleted(), dbRecord.isEditable(), dbRecord.isPublished(), dbRecord.isSearchable(), dbRecord.getVersion(), i.getId());
 			
 			LOG.info(compose("Updated item", i));
 			
@@ -310,6 +317,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return num;
 	}
 	
+	/*
+	 * Restored items are set to 'not-published', and so shouldn't be re-indexed
+	 * by Solr, but they will be once they are published manually by the user.
+	 */
 	public int restoreSelectedItems(long[] idArr) {
 		int num = 0;
 		String allItemsSql = "update item set deleted = 0, published = 0 where deleted = 1";
@@ -344,6 +355,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		if (this.jdbcTemplate.update("update item set deleted = 1 where origid = ?", i.getOrigId()) > 0) {
 			LOG.info(compose("Trashed item", String.valueOf(i)));
 			
+			// Remove item from Solr index
+			this.solrService.remove(i);
+			
 			// Now attend to any child items
 			List<Link> list = this.linkService.getBindings(i.getId());
 				
@@ -367,6 +381,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			if (r != null) {
 				r.setEditable(true);
 				updateEditable(r);
+				this.solrService.save(r);
 				return r;
 			}
 			else {

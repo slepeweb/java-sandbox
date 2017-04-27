@@ -25,3 +25,6 @@ select id, origid, path, version from item where siteid=16 and path in (select p
 
 
 alter table field modify column fieldtype enum ('text', 'markup', 'integer', 'date', 'url', 'radio', 'checkbox', 'select', 'datetime');
+
+alter table item add searchable boolean after published;
+update item set searchable=1;

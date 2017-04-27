@@ -66,6 +66,24 @@ public class SolrServiceImpl implements SolrService {
 		return true;
 	}
 	
+	public boolean remove(Item i) {
+		if (isServerEnabled(i.getSite().getId())) {
+			try {
+				/*UpdateResponse resp = */ getClient().deleteById(String.valueOf(i.getOrigId()));
+				this.client.commit();
+				LOG.debug("Item successfully removed from Solr index");
+				return true;
+			}
+			catch (Exception e) {
+				LOG.error("Solr failed to remove item from Solr index", e);
+				return false;
+			}
+		}
+		
+		// Don't report failure if solr functionality is disabled in this deployment.
+		return true;
+	}
+	
 	public SolrResponse query(SolrParams params) {
 		Long siteId = params.getSearchResultsItem().getSite().getId();
 		SolrResponse response = new SolrResponse(params);

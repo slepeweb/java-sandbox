@@ -164,6 +164,7 @@ var renderItemForms = function(nodeKey, activeTab) {
 						name: $("#core-tab input[name='name']").val(),
 						simplename: $("#core-tab input[name='simplename']").val(),
 						template: $("#core-tab select[name='template']").val(),
+						searchable: $("#core-tab input[name='searchable']").is(':checked'),
 						published: $("#core-tab input[name='published']").is(':checked'),
 						tags: $("#core-tab input[name='tags']").val()
 					}, 
