@@ -15,6 +15,11 @@ public class SolrDocument {
 	
 	public SolrDocument() {}
 	
+	@Override
+	public String toString() {
+		return String.format("(%s) [%s]", getTitle(), getPath());
+	}
+	
 	public String getId() {
 		return id;
 	}

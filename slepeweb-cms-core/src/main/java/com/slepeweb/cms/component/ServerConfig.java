@@ -1,8 +1,5 @@
 package com.slepeweb.cms.component;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class ServerConfig {
 	private boolean liveDelivery = true;
 

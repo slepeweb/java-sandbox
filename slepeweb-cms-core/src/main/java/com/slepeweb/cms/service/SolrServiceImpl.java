@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,20 @@ public class SolrServiceImpl implements SolrService {
 			LOG.info(String.format("Initialised solr server [%s]", this.serverUrl));
 		}
 		return this.client;
+	}
+	
+	public SolrDocument getDocument(Item i) {
+		if (isServerEnabled(i.getSite().getId())) {
+			try {
+				org.apache.solr.common.SolrDocument doc = getClient().getById(String.valueOf(i.getOrigId()));
+				DocumentObjectBinder binder = new DocumentObjectBinder();
+				return binder.getBean(SolrDocument.class, doc);
+			}
+			catch (Exception e) {
+				LOG.error("Failed to retrieve Solr document", e);
+			}
+		}
+		return null;
 	}
 	
 	public boolean save(Item i) {
@@ -134,6 +149,11 @@ public class SolrServiceImpl implements SolrService {
 			setTitle(i.getFieldValue(FieldName.TITLE)).
 			setTeaser(i.getFieldValue(FieldName.TEASER)).
 			setPath(i.getPath());
+		
+		// A really annoying hack for the purpose of regression testing
+		if (StringUtils.isNotBlank(i.getFieldValue("ztitle"))) {
+			doc.setTitle(i.getFieldValue("ztitle"));
+		}
 		
 		// ... and from its main components plus their children ...
 		StringBuilder sbBody = new StringBuilder(i.getFieldValue(FieldName.BODYTEXT));

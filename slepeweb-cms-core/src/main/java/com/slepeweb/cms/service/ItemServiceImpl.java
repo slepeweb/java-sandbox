@@ -77,13 +77,17 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 		
 		// Update the Solr index if item is searchable, otherwise, remove it from the index
-		boolean isIndexable = i.isSearchable() && i.isPage() && 
-				(this.cmsService.isLiveServer() ? i.isPublished() : i.isEditable());
+		boolean isIndexable = i.isSearchable() && i.isPage() && i.isPublished();
 		
 		if (isIndexable) {
 			this.solrService.save(i);
 		}
-		else {
+		/* 
+		 * We might have created a new item as a result of versioning,
+		 * in which case we wouldn't want to remove any Solr documents for previous
+		 * published versions.
+		 */
+		else if (i.getVersion() == 1){
 			this.solrService.remove(i);
 		}
 		
@@ -103,7 +107,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		try {
 			this.jdbcTemplate.update(
 					"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, editable, published, searchable, version) " +
-					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 					i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
 					i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false, true, false, false, i.getVersion());				
 		}

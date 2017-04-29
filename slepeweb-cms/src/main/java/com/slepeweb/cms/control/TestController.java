@@ -11,6 +11,7 @@ import com.slepeweb.cms.test.FieldTest;
 import com.slepeweb.cms.test.ItemTest;
 import com.slepeweb.cms.test.MediaTest;
 import com.slepeweb.cms.test.PurgeTest;
+import com.slepeweb.cms.test.SolrTest;
 import com.slepeweb.cms.test.VersionTest;
 
 @Controller
@@ -26,6 +27,7 @@ public class TestController extends BaseController {
 	@Autowired private PurgeTest purgeTest;
 	@Autowired private CacheTest cacheTest;
 	@Autowired private VersionTest versionTest;
+	@Autowired private SolrTest solrTest;
 	
 	@RequestMapping("/build")
 	public String doBuild(ModelMap model) {
@@ -66,6 +68,12 @@ public class TestController extends BaseController {
 	@RequestMapping("/version")
 	public String doVersion(ModelMap model) {
 		model.addAttribute("testResults", this.versionTest.execute());
+		return TEST_VIEW;
+	}
+	
+	@RequestMapping("/solr")
+	public String doSolr(ModelMap model) {
+		model.addAttribute("testResults", this.solrTest.execute());
 		return TEST_VIEW;
 	}
 	
