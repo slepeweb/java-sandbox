@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.bean.solr.SolrDocument;
 import com.slepeweb.cms.bean.solr.SolrPager;
@@ -99,6 +101,24 @@ public class SolrServiceImpl implements SolrService {
 		return true;
 	}
 	
+	public boolean remove(Site s) {
+		if (isServerEnabled(s.getId())) {
+			try {
+				/*UpdateResponse resp = */ getClient().deleteByQuery(String.format("siteid:%d", s.getId()));
+				this.client.commit();
+				LOG.debug("Items successfully removed from Solr index");
+				return true;
+			}
+			catch (Exception e) {
+				LOG.error("Solr failed to remove items from Solr index", e);
+				return false;
+			}
+		}
+		
+		// Don't report failure if solr functionality is disabled in this deployment.
+		return true;
+	}
+	
 	public SolrResponse query(SolrParams params) {
 		Long siteId = params.getSearchResultsItem().getSite().getId();
 		SolrResponse response = new SolrResponse(params);
@@ -138,6 +158,17 @@ public class SolrServiceImpl implements SolrService {
 		response.setResults(new ArrayList<SolrDocument>(0));
 		return response;
 	}
+	
+	public void indexSection(Item parentItem) {
+		// The solrService composites content from this item and its main components
+		save(parentItem);
+		
+		for (Link l : parentItem.getBindings()) {
+			if (! l.getType().equals(LinkType.shortcut)) {
+				indexSection(l.getChild());
+			}
+		}
+	}	
 	
 	private SolrDocument makeDoc(Item i) {
 		SolrDocument doc = new SolrDocument();

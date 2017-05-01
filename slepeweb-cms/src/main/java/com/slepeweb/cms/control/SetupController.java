@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.service.HostService;
@@ -69,19 +67,12 @@ public class SetupController extends BaseController {
 			return msg;
 		}
 		
-		// Crawl down the site, indexing the content on each item found
-		diveSite(i);
+		// Empty the index for this site
+		this.solrService.remove(h.getSite());
+		
+		// Index the site
+		this.solrService.indexSection(i);
 		return "Indexing complete";
 	}	
 	
-	private void diveSite(Item parentItem) {
-		// The solrService composites content from this item and its main components
-		this.solrService.save(parentItem);
-		
-		for (Link l : parentItem.getBindings()) {
-			if (! l.getType().equals(LinkType.shortcut)) {
-				diveSite(l.getChild());
-			}
-		}
-	}	
 }

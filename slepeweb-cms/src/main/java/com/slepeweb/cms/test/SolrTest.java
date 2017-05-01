@@ -50,6 +50,9 @@ public class SolrTest extends BaseTest {
 				return trs;
 			}		
 			
+			// Clean out all documents for this site
+			this.solrService.remove(site);
+			
 			// Check item not already indexed
 			r = trs.execute(8010);
 			SolrDocument doc = getDocument(testItem);
@@ -65,9 +68,6 @@ public class SolrTest extends BaseTest {
 				testItem = testItem.setPublished(false).setSearchable(true).save();
 			}
 			
-			// Clean ou the solr index for this test item
-			this.solrService.remove(testItem);
-	
 			// No publish the item and try again
 			r = trs.execute(8020);
 			testItem = testItem.setPublished(true).save();
