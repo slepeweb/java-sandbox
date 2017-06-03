@@ -1,3 +1,8 @@
+drop table if exists axisvalue;
+drop table if exists axis;
+drop table if exists variant;
+drop table if exists product;
+
 drop table if exists tag;
 drop table if exists loglevel;
 drop table if exists config;
@@ -197,3 +202,47 @@ create table tag
 	 constraint foreign key (itemid) references item(id) on delete cascade
 ) ENGINE=InnoDB;
 
+create table product
+(
+   origitemid int,
+   partnum varchar(256) not null,
+   stock int,
+   price int,
+   alphaaxisid int,
+   betaaxisid int,
+   primary key (origitemid),
+   index idx_product_partnum (partnum)
+) ENGINE=InnoDB;
+
+create table variant
+(
+   origitemid int,
+   sku varchar(32),
+   stock int,
+   price int,
+   alphavalueid int,
+   betavalueid int,
+   primary key (origitemid, alphavalueid, betavalueid),
+	 constraint foreign key (origitemid) references product(origitemid) on delete cascade
+) ENGINE=InnoDB;
+
+create table axis
+(
+   id int not null auto_increment,
+   ref varchar(16) not null,
+   label varchar(32) not null,
+   units varchar(16),
+   description varchar(256),
+   primary key (id),
+   unique key idx_axis_ref (ref)
+) ENGINE=InnoDB;
+
+create table axisvalue
+(
+   id int not null auto_increment,
+   axisid int,
+   value varchar(64) not null,
+   ordering int not null,
+   primary key (id),
+	 constraint foreign key (axisid) references axis(id) on delete cascade
+) ENGINE=InnoDB;
