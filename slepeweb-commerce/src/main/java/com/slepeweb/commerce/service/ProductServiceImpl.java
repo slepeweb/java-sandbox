@@ -20,18 +20,18 @@ public class ProductServiceImpl extends BaseServiceImpl implements ProductServic
 			throw new MissingDataException("Product data not sufficient for db insert");
 		}
 		
-		Product dbRecord = getProduct(p.getOrigItemId());		
+		Product dbRecord = get(p.getOrigItemId());		
 		if (dbRecord != null) {
-			updateProduct(dbRecord, p);
+			update(dbRecord, p);
 		}
 		else {
-			insertProduct(p);
+			insert(p);
 		}
 		
 		return p;
 	}
 	
-	private void insertProduct(Product p) throws MissingDataException, DuplicateItemException {
+	private void insert(Product p) throws MissingDataException, DuplicateItemException {
 		try {
 			this.jdbcTemplate.update(
 					"insert into product (origitemid, partnum, stock, price, alphaid, betaid) " +
@@ -45,7 +45,7 @@ public class ProductServiceImpl extends BaseServiceImpl implements ProductServic
 		LOG.info(compose("Added new product", p));		
 	}
 
-	private void updateProduct(Product dbRecord, Product p) {
+	private void update(Product dbRecord, Product p) {
 		if (! dbRecord.equals(p)) {
 			dbRecord.assimilate(p);
 			
@@ -63,14 +63,14 @@ public class ProductServiceImpl extends BaseServiceImpl implements ProductServic
 		
 	}
 	
-	public Product getProduct(Long origItemId) {
+	public Product get(Long origItemId) {
 		return (Product) getLastInList(this.jdbcTemplate.query(
 			"select * from product where origitemid = ?", 
 			new Object[] {origItemId}, 
 			new CommerceRowMapper.ProductMapper()));
 	}
 	
-	public void deleteProduct(Long origItemId) {
+	public void delete(Long origItemId) {
 		if (this.jdbcTemplate.update("delete from product where origitemid = ?", origItemId) > 0) {
 			LOG.warn(compose("Deleted product", String.valueOf(origItemId)));
 		}

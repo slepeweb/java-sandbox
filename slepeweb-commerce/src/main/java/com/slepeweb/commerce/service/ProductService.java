@@ -5,7 +5,7 @@ import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.commerce.bean.Product;
 
 public interface ProductService {
-	void deleteProduct(Long origItemId);
-	Product getProduct(Long origItemId);
+	void delete(Long origItemId);
+	Product get(Long origItemId);
 	Product save(Product p) throws MissingDataException, DuplicateItemException;
 }

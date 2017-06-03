@@ -45,7 +45,7 @@ public class Variant extends CmsBean {
 
 	@Override
 	public void delete() {
-		getVariantService().deleteVariant(this);
+		getVariantService().delete(this);
 	}
 
 	@Override
