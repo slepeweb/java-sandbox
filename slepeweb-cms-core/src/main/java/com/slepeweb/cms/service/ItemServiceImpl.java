@@ -19,12 +19,14 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
+import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.NotRevertableException;
 import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
+import com.slepeweb.commerce.service.ProductService;
 
 @Repository
 public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
@@ -50,12 +52,15 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected MediaService mediaService;
 	@Autowired protected SolrService solrService;
 	@Autowired protected CmsService cmsService;
-
+	@Autowired protected ServerConfig config;
+	@Autowired protected ProductService productService;
+	
 	public Item save(Item i) throws MissingDataException, DuplicateItemException {
 		return save(i, false);
 	}
 	
 	public Item save(Item i, boolean extendedSave) throws MissingDataException, DuplicateItemException {
+		
 		boolean updated = false;
 		
 		if (! i.isDefined4Insert()) {
@@ -64,11 +69,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		
 		Item dbRecord = getItem(i.getId());		
 		if (dbRecord != null) {
-			updateItem(dbRecord, i);
+			update(dbRecord, i);
 			updated = true;
 		}
 		else {
-			insertItem(i);
+			insert(i);
 		}
 		
 		if (extendedSave) {
@@ -102,7 +107,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return i.setLinks(null).setFieldValues(null);
 	}
 	
-	private void insertItem(Item i) throws MissingDataException, DuplicateItemException {
+	private void insert(Item i) throws MissingDataException, DuplicateItemException {
 		// Item table
 		try {
 			this.jdbcTemplate.update(
@@ -159,7 +164,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 
-	private void updateItem(Item dbRecord, Item i) {
+	private void update(Item dbRecord, Item i) {
 		if (! dbRecord.equals(i)) {
 			boolean simplenameHasChanged = ! dbRecord.getSimpleName().equals(i.getSimpleName());
 			boolean isPublishedNow = i.isPublished() && ! dbRecord.isPublished();
@@ -398,8 +403,16 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 
 	public void deleteItem(Long id) {
+		Item i = getItem(id);
+		
 		if (this.jdbcTemplate.update("delete from item where id = ? and deleted = 1", id) > 0) {
 			LOG.warn(compose("Deleted item", String.valueOf(id)));
+			
+			// Now delete associated Product and Variants, if applicable
+			if (this.config.isCommerceEnabled() && i != null && i.getType().getName().equals("Product")) {
+				this.productService.delete(i.getOrigId());
+				LOG.warn(compose("Deleted products and variants too", String.valueOf(id)));
+			}
 		}
 	}
 

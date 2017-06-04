@@ -35,8 +35,8 @@ public class AxisServiceImpl extends BaseServiceImpl implements AxisService {
 	private void insert(Axis a) throws MissingDataException, DuplicateItemException {
 		try {
 			this.jdbcTemplate.update(
-					"insert into axis (id, label, units, description) " +
-					"values (?, ?, ?, ?)",
+					"insert into axis (label, units, description) " +
+					"values (?, ?, ?)",
 					a.getId(), a.getLabel(), a.getUnits(), a.getDescription());				
 		}
 		catch (DuplicateKeyException e) {
@@ -77,7 +77,6 @@ public class AxisServiceImpl extends BaseServiceImpl implements AxisService {
 		}
 	}
 
-	@Override
 	public void delete(Axis a) {
 		delete(a.getId());
 	}

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.slepeweb.commerce.bean.Axis;
+import com.slepeweb.commerce.bean.AxisValue;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.commerce.bean.Variant;
 
@@ -45,4 +46,13 @@ public class CommerceRowMapper {
 		}
 	}	
 
+	public static final class AxisValueMapper implements RowMapper<AxisValue> {
+		public AxisValue mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new AxisValue().
+				setId(rs.getLong("id")).
+				setAxisId(rs.getLong("axisid")).
+				setValue(rs.getString("value")).
+				setOrdering(rs.getInt("ordering"));
+		}
+	}	
 }

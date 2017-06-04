@@ -113,4 +113,22 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 	public Integer getIntegerProperty(Long siteId, String name) {
 		return getIntegerProperty(siteId, name, null);
 	}
+	
+	public Boolean getBooleanProperty(Long siteId, String name, Boolean dflt) {
+		String value = getProperty(siteId, name, String.valueOf(dflt));
+		if (value == null) {
+			return dflt;
+		}
+		
+		value = value.toLowerCase();
+		return StringUtils.isNotBlank(value) && (
+				value.equals("yes") ||
+				value.equals("y") ||
+				value.equals("true") ||
+				value.equals("1"));
+	}
+
+	public Boolean getBooleanProperty(Long siteId, String name) {
+		return getBooleanProperty(siteId, name, null);
+	}
 }

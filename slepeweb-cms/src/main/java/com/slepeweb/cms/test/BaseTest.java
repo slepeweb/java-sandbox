@@ -25,6 +25,7 @@ public abstract class BaseTest {
 	protected static final String EVENT_TYPE_NAME = "ZEvent";
 	protected static final String ARTICLE_TYPE_NAME = "ZArticle";
 	protected static final String IMAGE_TYPE_NAME = "ZImage";
+	protected static final String PRODUCT_TYPE_NAME = "Product";
 	protected static final String TITLE_FIELD_NAME = "ztitle";
 	protected static final String TEASER_FIELD_NAME = "zteaser";
 	protected static final String BODY_FIELD_NAME = "zbodytext";

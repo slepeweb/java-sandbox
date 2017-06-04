@@ -10,6 +10,7 @@ import com.slepeweb.cms.test.CacheTest;
 import com.slepeweb.cms.test.FieldTest;
 import com.slepeweb.cms.test.ItemTest;
 import com.slepeweb.cms.test.MediaTest;
+import com.slepeweb.cms.test.ProductTest;
 import com.slepeweb.cms.test.PurgeTest;
 import com.slepeweb.cms.test.SolrTest;
 import com.slepeweb.cms.test.VersionTest;
@@ -28,6 +29,7 @@ public class TestController extends BaseController {
 	@Autowired private CacheTest cacheTest;
 	@Autowired private VersionTest versionTest;
 	@Autowired private SolrTest solrTest;
+	@Autowired private ProductTest productTest;
 	
 	@RequestMapping("/build")
 	public String doBuild(ModelMap model) {
@@ -74,6 +76,12 @@ public class TestController extends BaseController {
 	@RequestMapping("/solr")
 	public String doSolr(ModelMap model) {
 		model.addAttribute("testResults", this.solrTest.execute());
+		return TEST_VIEW;
+	}
+	
+	@RequestMapping("/product")
+	public String doProduct(ModelMap model) {
+		model.addAttribute("testResults", this.productTest.execute());
 		return TEST_VIEW;
 	}
 	

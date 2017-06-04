@@ -12,6 +12,8 @@ public interface SiteConfigService {
 	String getProperty(Long siteId, String key, String dflt);
 	Integer getIntegerProperty(Long siteId, String key);
 	Integer getIntegerProperty(Long siteId, String key, Integer dflt);
+	Boolean getBooleanProperty(Long siteId, String key);
+	Boolean getBooleanProperty(Long siteId, String key, Boolean dflt);
 	List<SiteConfig> getSiteConfigs(Long siteId);
 	SiteConfig save(SiteConfig sc);
 	int getCount();

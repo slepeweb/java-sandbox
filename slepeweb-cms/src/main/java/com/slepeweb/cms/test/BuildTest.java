@@ -53,7 +53,7 @@ public class BuildTest extends BaseTest {
 		// Purge item types (BUT NOT content folder)
 		for (String name : new String[] {
 				HOMEPAGE_TYPE_NAME, SECTION_TYPE_NAME, NEWS_TYPE_NAME, EVENT_TYPE_NAME, ARTICLE_TYPE_NAME, 
-				IMAGE_TYPE_NAME}) {			
+				IMAGE_TYPE_NAME, PRODUCT_TYPE_NAME}) {			
 			ItemType it = this.cmsService.getItemTypeService().getItemType(name);
 			if (it != null) {
 				it.delete();
@@ -74,11 +74,12 @@ public class BuildTest extends BaseTest {
 		ItemType eventType = addType(EVENT_TYPE_NAME);
 		ItemType articleType = addType(ARTICLE_TYPE_NAME);
 		ItemType imageType = addType(IMAGE_TYPE_NAME, "image/jpeg");
+		ItemType productType = addType(PRODUCT_TYPE_NAME);
 		
 		// 2010: Assert N types have been created
 		int numItemTypes = this.cmsService.getItemTypeService().getCount() - count;
 		r = trs.execute(2010).setNotes(numItemTypes + " items types have been created");
-		if (numItemTypes != 5) {
+		if (numItemTypes != 6) {
 			r.fail();
 		}
 		
@@ -99,7 +100,7 @@ public class BuildTest extends BaseTest {
 		
 		// Define fields for all types
 		count = this.cmsService.getFieldForTypeService().getCount();
-		for (ItemType it : new ItemType[] {sectionType, newsType, eventType, articleType} ) {
+		for (ItemType it : new ItemType[] {sectionType, newsType, eventType, articleType, productType} ) {
 			it.addFieldForType(titleField, 1L, true);
 			it.addFieldForType(teaserField, 2L, false);
 			it.addFieldForType(bodyField, 3L, false);
@@ -118,7 +119,7 @@ public class BuildTest extends BaseTest {
 		// 2030: Assert number of fieldfortype rows
 		int numFieldForTypes = this.cmsService.getFieldForTypeService().getCount() - count;
 		r = trs.execute(2030).setNotes(numFieldForTypes + " fieldfortype rows have been created");
-		if (numFieldForTypes != 15) {
+		if (numFieldForTypes != 16) {
 			r.fail();
 		}		
 				
@@ -166,11 +167,12 @@ public class BuildTest extends BaseTest {
 				Item aboutSection = addItem(rootItem, "About section", "about", now, now, site, sectionType, null);
 				Item contentFolder = site.getItem("/content");
 				Item mediaFolder = addItem(contentFolder, "Media section", "media", now, now, site, cfolderType, null);
+				addItem(rootItem, "Storefront", "storefront", now, now, site, sectionType, null);
 				
 				// 2060: Assert N section items have been created
 				int sectionCount = this.cmsService.getItemService().getCountByType(sectionType.getId());
 				r = trs.execute(2060).setNotes(sectionCount + " sections have been created");
-				if (sectionCount != 3) {
+				if (sectionCount != 4) {
 					r.fail();
 				}
 				
