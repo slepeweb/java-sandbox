@@ -7,15 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.except.DuplicateItemException;
+import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.commerce.bean.Product;
 
 public abstract class BaseTest {
 	protected static final String TEST_SITE_NAME = "Integration Testing";
@@ -75,20 +76,45 @@ public abstract class BaseTest {
 	protected Item addItem(Item parent, String name, String simplename, 
 			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type, Template t) {
 		
-		String path = 
-			parent != null ? 
-				parent.isSiteRoot() ? parent.getPath() + simplename : parent.getPath() + "/" + simplename : 
-					"/" + simplename;
-		
-		Item i = CmsBeanFactory.makeItem().setName(name).setSimpleName(simplename).setPath(path).
-			setDateCreated(dateCreated).setDateUpdated(dateUpdated).setSite(site).setType(type).setTemplate(t);
-		
+		Item i = CmsBeanFactory.makeItem();
+		i.setName(name).setSimpleName(simplename).setPath(getPath(parent, simplename)).
+		setDateCreated(dateCreated).setDateUpdated(dateUpdated).
+		setSite(site).setType(type).setTemplate(t);
+	
 		try {
 			return parent != null ? parent.addChild(i) : null;
 		}
 		catch (Exception e) {
 			return null;
 		}
+	}
+	
+	protected Product addProduct(Item parent, String name, String simplename, 
+			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type, Template t,
+			String partNum, Long stock, Long price, Long alphaAxisId, Long betaAxisId) {
+		
+		Product p = CmsBeanFactory.makeProduct();
+		p.setPartNum(partNum).setStock(stock).setPrice(price).setAlphaAxisId(alphaAxisId).setBetaAxisId(betaAxisId);
+		p.setName(name).setSimpleName(simplename).setPath(getPath(parent, simplename)).
+		setDateCreated(dateCreated).setDateUpdated(dateUpdated).
+		setSite(site).setType(type).setTemplate(t);
+		p.setParent(parent);
+		
+		try {
+			p = p.save();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return p;		
+	}
+	
+	private String getPath(Item parent, String simplename) {
+		return 
+				parent != null ? 
+					parent.isSiteRoot() ? parent.getPath() + simplename : parent.getPath() + "/" + simplename : 
+						"/" + simplename;
 	}
 	
 	protected Template addTemplate(String name, String forward, Long siteId, Long typeId) {

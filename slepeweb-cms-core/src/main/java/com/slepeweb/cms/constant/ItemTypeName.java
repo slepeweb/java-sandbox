@@ -10,4 +10,5 @@ public class ItemTypeName {
 	public static final String IMAGE_PNG = "Image PNG";
 	public static final String NEWS = "News";
 	public static final String PDF = "PDF";
+	public static final String PRODUCT = "Product";
 }

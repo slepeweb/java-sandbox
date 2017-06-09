@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
+import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.commerce.bean.Axis;
 import com.slepeweb.commerce.bean.AxisValue;
 import com.slepeweb.commerce.bean.Product;
@@ -14,13 +15,13 @@ public class CommerceRowMapper {
 
 	public static final class ProductMapper implements RowMapper<Product> {
 		public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new Product().
-				setOrigItemId(rs.getLong("origitemid")).
-				setStock(rs.getInt("stock")).
-				setPrice(rs.getInt("price")).
+			return CmsBeanFactory.makeProduct().
+				setOrigId(rs.getLong("origitemid")).
+				setStock(rs.getLong("stock")).
+				setPrice(rs.getLong("price")).
 				setPartNum(rs.getString("partnum")).
-				setAlphaAxisId(rs.getLong("alphaid")).
-				setBetaAxisId(rs.getLong("betaid"));
+				setAlphaAxisId(rs.getLong("alphaaxisid")).
+				setBetaAxisId(rs.getLong("betaaxisid"));
 		}
 	}	
 

@@ -2,28 +2,30 @@ package com.slepeweb.commerce.bean;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.cms.bean.CmsBean;
+import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
-import com.slepeweb.cms.utils.SpringContext;
-import com.slepeweb.commerce.service.ProductService;
 
-public class Product extends CmsBean {
+public class Product extends Item {
 	private static final long serialVersionUID = 1L;
 	//private static Logger LOG = Logger.getLogger(Product.class);
 	
 	private String partNum;
-	private Integer stock, price;
-	private Long origItemId, alphaAxisId, betaAxisId;
-	private transient ProductService productService;
+	private Long stock, price;
+	private Long alphaAxisId, betaAxisId;
 	
-	private ProductService getProductService() {
-		if (this.productService == null) {
-			this.productService = (ProductService) SpringContext.getApplicationContext().getBean("productService");
-		}
-		return this.productService;
+	@Override
+	public boolean isProduct() {
+		return true;
 	}
 	
+	@Override
+	public Product setOrigId(Long origId) {
+		super.setOrigId(origId);
+		return this;
+	}
+	
+	@Override
 	public void assimilate(Object obj) {
 		if (obj instanceof Product) {
 			Product p = (Product) obj;
@@ -34,37 +36,32 @@ public class Product extends CmsBean {
 		}
 	}
 	
+	public void assimilateItem(Object obj) {
+		if (obj instanceof Item) {
+			Item i = (Item) obj;
+			super.assimilate(i);
+			setId(i.getId());
+		}
+	}
+	
+	@Override
 	public boolean isDefined4Insert() {
 		return StringUtils.isNotBlank(getPartNum());
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("Product '%s' (%d @ %f.2)", getPartNum(), getStock(), getPrice());
+		return String.format("Product '%s' (%d @ %f.2)", getPartNum(), getStock(), getPriceInPounds());
 	}
 	
-	@Override
-	protected void delete() {
-		// TODO: not implemented
-	}
-
-	@Override
-	public Long getId() {
-		// Not required for Product table
-		return null;
-	}
-
 	public Product save() throws MissingDataException, DuplicateItemException {
 		return getProductService().save(this);
 	}
 	
-	public Long getOrigItemId() {
-		return origItemId;
-	}
-
-	public Product setOrigItemId(Long itemId) {
-		this.origItemId = itemId;
-		return this;
+	// This deletes a specific version of an item, and NOT all versions
+	@Override
+	public void delete() {
+		getProductService().delete(getOrigId());
 	}
 	
 	public String getPartNum() {
@@ -76,16 +73,16 @@ public class Product extends CmsBean {
 		return this;
 	}
 
-	public Integer getStock() {
+	public Long getStock() {
 		return stock;
 	}
 
-	public Product setStock(Integer stock) {
+	public Product setStock(Long stock) {
 		this.stock = stock;
 		return this;
 	}
 
-	public Integer getPrice() {
+	public Long getPrice() {
 		return price;
 	}
 
@@ -93,7 +90,7 @@ public class Product extends CmsBean {
 		return this.price != null ? this.price / 100F : -1.0F;
 	}
 
-	public Product setPrice(Integer price) {
+	public Product setPrice(Long price) {
 		this.price = price;
 		return this;
 	}

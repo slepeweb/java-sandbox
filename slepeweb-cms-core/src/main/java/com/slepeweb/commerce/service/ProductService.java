@@ -8,4 +8,5 @@ public interface ProductService {
 	void delete(Long origItemId);
 	Product get(Long origItemId);
 	Product save(Product p) throws MissingDataException, DuplicateItemException;
+	long count();
 }

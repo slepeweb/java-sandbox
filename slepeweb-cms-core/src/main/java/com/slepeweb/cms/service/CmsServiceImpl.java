@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.commerce.service.ProductService;
 
 @Service
 public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
@@ -25,6 +26,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected SiteConfigService siteConfigService;
 	@Autowired protected LoglevelService loglevelService;
 	@Autowired protected TagService tagService;
+	@Autowired protected ProductService productService;
 	
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {
@@ -105,5 +107,9 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public TagService getTagService() {
 		return tagService;
+	}
+
+	public ProductService getProductService() {
+		return productService;
 	}
 }

@@ -27,7 +27,7 @@
 	    </mvc:argument-resolvers>
 	</mvc:annotation-driven>
 
-	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.site, com.slepeweb.ws" />
+	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.commerce, com.slepeweb.site, com.slepeweb.ws" />
 		
 	<bean id="config" class="com.slepeweb.cms.component.ServerConfig">
 		<property name="liveDelivery" value="true" />
@@ -76,7 +76,9 @@
 	
 	<aop:config>
 		<aop:pointcut id="cmsServiceMethods" expression="execution(* com.slepeweb.cms.service.*.*(..))"/>
+		<aop:pointcut id="commerceServiceMethods" expression="execution(* com.slepeweb.commerce.service.*.*(..))"/>
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="cmsServiceMethods"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="commerceServiceMethods"/>
 	</aop:config>
 
 	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

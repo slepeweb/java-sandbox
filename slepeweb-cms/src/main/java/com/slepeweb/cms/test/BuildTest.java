@@ -25,7 +25,7 @@ public class BuildTest extends BaseTest {
 		TestResultSet trs = new TestResultSet("Test site build").
 			register(2010, "Check 6 item types have been created").
 			register(2020, "Check 5 fields have been created").
-			register(2030, "Check 15 fieldfortype rows have been created").
+			register(2030, "Check 18 fieldfortype rows have been created").
 			register(2040, "Check test site has been created").
 			register(2045, "Check news template has been created").
 			register(2050, "Check root item has been created").
@@ -119,7 +119,7 @@ public class BuildTest extends BaseTest {
 		// 2030: Assert number of fieldfortype rows
 		int numFieldForTypes = this.cmsService.getFieldForTypeService().getCount() - count;
 		r = trs.execute(2030).setNotes(numFieldForTypes + " fieldfortype rows have been created");
-		if (numFieldForTypes != 16) {
+		if (numFieldForTypes != 18) {
 			r.fail();
 		}		
 				

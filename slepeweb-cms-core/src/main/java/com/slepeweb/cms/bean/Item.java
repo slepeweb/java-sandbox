@@ -40,6 +40,9 @@ public class Item extends CmsBean {
 	private Item parent;
 	private int version = 1;
 
+	public boolean isProduct() {
+		return false;
+	}
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Item) {
@@ -166,6 +169,7 @@ public class Item extends CmsBean {
 		 getItemService().saveLinks(this);
 	}
 	
+	// This deletes a specific version of an item, and NOT all versions
 	public void delete() {
 		getItemService().deleteItem(getId());
 	}

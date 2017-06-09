@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.commerce.bean.Product;
 
 @Component
 public class CmsBeanFactory {
@@ -45,6 +46,12 @@ public class CmsBeanFactory {
 		Item i = new Item();
 		i.setCmsService(CMS);
 		return i;
+	}
+	
+	public static Product makeProduct() {
+		Product p = new Product();
+		p.setCmsService(CMS);
+		return p;
 	}
 	
 	public static Template makeTemplate() {

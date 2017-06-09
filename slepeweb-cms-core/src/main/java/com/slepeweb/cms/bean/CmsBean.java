@@ -19,6 +19,7 @@ import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.cms.utils.SpringContext;
+import com.slepeweb.commerce.service.ProductService;
 
 public abstract class CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -102,5 +103,9 @@ public abstract class CmsBean implements Serializable {
 	
 	public TagService getTagService() {
 		return this.cmsService.getTagService();
+	}
+	
+	public ProductService getProductService() {
+		return this.cmsService.getProductService();
 	}
 }

@@ -1,5 +1,6 @@
 package com.slepeweb.cms.service;
 
+import com.slepeweb.commerce.service.ProductService;
 
 public interface CmsService {
 	boolean isLiveServer();
@@ -18,4 +19,5 @@ public interface CmsService {
 	SiteConfigService getSiteConfigService();
 	LoglevelService getLoglevelService();
 	TagService getTagService();
+	ProductService getProductService();
 }

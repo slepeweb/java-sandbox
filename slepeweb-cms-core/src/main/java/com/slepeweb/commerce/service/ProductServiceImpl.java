@@ -1,26 +1,36 @@
 package com.slepeweb.commerce.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
+import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
-import com.slepeweb.cms.service.BaseServiceImpl;
+import com.slepeweb.cms.service.ItemService;
+import com.slepeweb.cms.service.ItemServiceImpl;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.commerce.util.CommerceRowMapper;
 
-@Repository
-public class ProductServiceImpl extends BaseServiceImpl implements ProductService {
+@Repository(value="productService")
+public class ProductServiceImpl extends ItemServiceImpl implements ProductService {
 	
 	private static Logger LOG = Logger.getLogger(ProductServiceImpl.class);
 	
+	@Autowired ItemService itemService;
+	
 	public Product save(Product p) throws MissingDataException, DuplicateItemException {
+		
+		// First save the item data, ie insert/update row in Item
+		Item i = super.save(p);
+		
 		if (! p.isDefined4Insert()) {
 			throw new MissingDataException("Product data not sufficient for db insert");
 		}
 		
-		Product dbRecord = get(p.getOrigItemId());		
+		// Now save the insert/update row in Product
+		Product dbRecord = get(p.getOrigId());		
 		if (dbRecord != null) {
 			update(dbRecord, p);
 		}
@@ -28,15 +38,18 @@ public class ProductServiceImpl extends BaseServiceImpl implements ProductServic
 			insert(p);
 		}
 		
-		return p;
+		return get(i.getOrigId());
 	}
 	
+	/*
+	 * This method inserts one row in Product - doesn't need to touch the Item table
+	 */
 	private void insert(Product p) throws MissingDataException, DuplicateItemException {
 		try {
 			this.jdbcTemplate.update(
-					"insert into product (origitemid, partnum, stock, price, alphaid, betaid) " +
+					"insert into product (origitemid, partnum, stock, price, alphaaxisid, betaaxisid) " +
 					"values (?, ?, ?, ?, ?, ?)",
-					p.getOrigItemId(), p.getPartNum(), p.getStock(), p.getPrice(), p.getAlphaAxisId(), p.getBetaAxisId());				
+					p.getOrigId(), p.getPartNum(), p.getStock(), p.getPrice(), p.getAlphaAxisId(), p.getBetaAxisId());				
 		}
 		catch (DuplicateKeyException e) {
 			throw new DuplicateItemException("Product already exists");
@@ -45,14 +58,17 @@ public class ProductServiceImpl extends BaseServiceImpl implements ProductServic
 		LOG.info(compose("Added new product", p));		
 	}
 
+	/*
+	 * This method updates one row in Product - doesn't need to touch the Item table
+	 */
 	private void update(Product dbRecord, Product p) {
 		if (! dbRecord.equals(p)) {
 			dbRecord.assimilate(p);
 			
 			this.jdbcTemplate.update(
-					"update product set partnum = ?, stock = ?, price = ?, alphaid = ?, betaid = ? where origitemid = ?",
+					"update product set partnum = ?, stock = ?, price = ?, alphaaxisid = ?, betaaxisid = ? where origitemid = ?",
 					dbRecord.getPartNum(), dbRecord.getStock(), dbRecord.getPrice(), 
-					dbRecord.getAlphaAxisId(), dbRecord.getBetaAxisId(), p.getOrigItemId());
+					dbRecord.getAlphaAxisId(), dbRecord.getBetaAxisId(), p.getOrigId());
 			
 			LOG.info(compose("Updated product", p));
 			
@@ -63,16 +79,31 @@ public class ProductServiceImpl extends BaseServiceImpl implements ProductServic
 		
 	}
 	
+	/*
+	 * Gets row from Product, and DOES NOT mashes in row from Item
+	 */
 	public Product get(Long origItemId) {
 		return (Product) getLastInList(this.jdbcTemplate.query(
 			"select * from product where origitemid = ?", 
 			new Object[] {origItemId}, 
-			new CommerceRowMapper.ProductMapper()));
+			new CommerceRowMapper.ProductMapper()));		
 	}
 	
+	/*
+	 * This method deletes one or more rows in Item table, and one row in Product table.
+	 */
 	public void delete(Long origItemId) {
+		// First delete row(s) in Item
+		super.deleteAllVersions(origItemId);
+		
+		// Now delete row in Product
 		if (this.jdbcTemplate.update("delete from product where origitemid = ?", origItemId) > 0) {
 			LOG.warn(compose("Deleted product", String.valueOf(origItemId)));
 		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	public long count() {
+		return this.jdbcTemplate.queryForInt("select count(*) from product");
 	}
 }

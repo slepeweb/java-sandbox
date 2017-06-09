@@ -20,15 +20,18 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.component.ServerConfig;
+import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.NotRevertableException;
 import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
-import com.slepeweb.commerce.service.ProductService;
+import com.slepeweb.commerce.bean.Product;
 
-@Repository
+// TODO: Can getItem() return a Product (if item type is Product)?
+
+@Repository(value="itemService")
 public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	private static Logger LOG = Logger.getLogger(ItemServiceImpl.class);
@@ -53,7 +56,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected SolrService solrService;
 	@Autowired protected CmsService cmsService;
 	@Autowired protected ServerConfig config;
-	@Autowired protected ProductService productService;
 	
 	public Item save(Item i) throws MissingDataException, DuplicateItemException {
 		return save(i, false);
@@ -67,7 +69,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			throw new MissingDataException("Item data not sufficient for db insert");
 		}
 		
-		Item dbRecord = getItem(i.getId());		
+		Item dbRecord = i.isProduct() ? getItem(i.getId()) : getItemByOriginalId(i.getOrigId());
+		
 		if (dbRecord != null) {
 			update(dbRecord, i);
 			updated = true;
@@ -124,7 +127,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		i.setId(lastId);
 		
 		// For a brand new item, the 'origid' is the same as 'id'.
-		// But for a new version of , the versioning code will have to overwrite this next setting:
+		// But for a new version, the versioning code will have to overwrite this next setting:
 		this.jdbcTemplate.update("update item set origid = ? where id = ?", i.getId(), i.getId());
 		i.setOrigId(i.getId());
 		
@@ -403,16 +406,14 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 
 	public void deleteItem(Long id) {
-		Item i = getItem(id);
-		
 		if (this.jdbcTemplate.update("delete from item where id = ? and deleted = 1", id) > 0) {
 			LOG.warn(compose("Deleted item", String.valueOf(id)));
-			
-			// Now delete associated Product and Variants, if applicable
-			if (this.config.isCommerceEnabled() && i != null && i.getType().getName().equals("Product")) {
-				this.productService.delete(i.getOrigId());
-				LOG.warn(compose("Deleted products and variants too", String.valueOf(id)));
-			}
+		}
+	}
+
+	public void deleteAllVersions(Long origId) {
+		if (this.jdbcTemplate.update("delete from item where origid = ?", origId) > 0) {
+			LOG.warn(compose("Deleted item and all its versions", String.valueOf(origId)));
 		}
 	}
 
@@ -705,10 +706,26 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	private Item getItem(String sql, Object[] params) {
-		return (Item) getLastInList(this.jdbcTemplate.query(
+		Item i = (Item) getLastInList(this.jdbcTemplate.query(
 			sql, params, new RowMapperUtil.ItemMapper()));
+		
+		return adaptIfProduct(i);
 	}
 
+	private Item adaptIfProduct(Item i) {
+		if (i != null && i.getType().getName().equals(ItemTypeName.PRODUCT)) {
+			Product p = this.cmsService.getProductService().get(i.getOrigId());
+			if (p == null) {
+				p = CmsBeanFactory.makeProduct();
+				p.setOrigId(i.getOrigId());
+			}
+			
+			p.assimilateItem(i);
+			return p;
+		}
+		return i;
+	}
+	
 	/*
 	 * Ensure that both string args have trailing slash
 	 */
