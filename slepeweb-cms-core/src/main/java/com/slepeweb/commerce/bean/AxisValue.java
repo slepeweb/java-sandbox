@@ -5,8 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.slepeweb.cms.bean.CmsBean;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
-import com.slepeweb.cms.utils.SpringContext;
-import com.slepeweb.commerce.service.AxisValueService;
 
 public class AxisValue extends CmsBean {
 	
@@ -15,17 +13,14 @@ public class AxisValue extends CmsBean {
 	private Long id, axisId;
 	private int ordering;
 	private String value;
-	private AxisValueService axisValueService;
 	
-	private AxisValueService getAxisValueService() {
-		if (this.axisValueService == null) {
-			this.axisValueService = (AxisValueService) SpringContext.getApplicationContext().getBean("axisValueService");
-		}
-		return this.axisValueService;
+	@Override
+	public String toString() {
+		return String.format("AxisValue [%s]", getValue());
 	}
 	
 	@Override
-	public CmsBean save() throws MissingDataException, DuplicateItemException {
+	public AxisValue save() throws MissingDataException, DuplicateItemException {
 		return getAxisValueService().save(this);
 	}
 
@@ -36,7 +31,7 @@ public class AxisValue extends CmsBean {
 
 	@Override
 	public boolean isDefined4Insert() throws MissingDataException {
-		return getId() != null && getAxisId() != null && StringUtils.isNotBlank(getValue());
+		return getAxisId() != null && StringUtils.isNotBlank(getValue());
 	}
 
 	@Override

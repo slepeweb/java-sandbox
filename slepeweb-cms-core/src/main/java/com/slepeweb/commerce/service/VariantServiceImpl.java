@@ -23,9 +23,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 			throw new MissingDataException("Variant data not sufficient for db insert");
 		}
 		
-		Variant dbRecord = get(v.getOrigItemId(), 
-				v.getAlphaAxisValueId(), 
-				v.getBetaAxisValueId());	
+		Variant dbRecord = get(v.getSku());	
 				
 		if (dbRecord != null) {
 			update(dbRecord, v);
@@ -71,13 +69,13 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 	}
 	
 	public Variant get(Variant v) {
-		return get(v.getOrigItemId(), v.getAlphaAxisValueId(), v.getBetaAxisValueId());
+		return get(v.getSku());
 	}
 	
-	public Variant get(Long origItemId, Long alphaAxisValueId, Long betaAxisValueId) {
+	public Variant get(String sku) {
 		return (Variant) getLastInList(this.jdbcTemplate.query(
-				"select * from variant where origitemid = ? and alphavalueid = ? and betavalueid = ?", 
-				new Object[] {origItemId, alphaAxisValueId, betaAxisValueId}, 
+				"select * from variant where sku = ?", 
+				new Object[] {sku}, 
 				new CommerceRowMapper.VariantMapper()));
 	}
 	
@@ -119,7 +117,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 			sb.append(" and alphavalueid = ?");
 			list.add(alphaAxisValueId);
 			
-			if (betaAxisValueId != null) {
+			if (betaAxisValueId != null && betaAxisValueId > 0) {
 				sb.append(" and betavalueid = ?");
 				list.add(betaAxisValueId);
 			}
@@ -128,5 +126,10 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 
 	public void deleteMany(Long origItemId) {
 		deleteMany(origItemId, null, null);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public long count() {
+		return this.jdbcTemplate.queryForInt("select count(*) from variant");
 	}
 }

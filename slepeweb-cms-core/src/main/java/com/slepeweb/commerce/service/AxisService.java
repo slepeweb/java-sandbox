@@ -8,5 +8,6 @@ public interface AxisService {
 	void delete(Axis a);
 	void delete(Long id);
 	Axis get(Long id);
+	Axis get(String shortname);
 	Axis save(Axis a) throws MissingDataException, DuplicateItemException;
 }

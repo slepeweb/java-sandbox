@@ -42,7 +42,11 @@ public class VersionTest extends BaseTest {
 				register(7100, "", "It should be editable").
 				register(7110, "", "Its status should NOT be published").
 				register(7120, "", "The new version should no longer be in the db").
-				register(7130, "", "The original version should be editable and accessible");
+				register(7130, "", "The original version should be editable and accessible").
+				register(7140, "Repeat creation of new version of the news section after emptying the bin", "There should"
+						+ " be one new row in the item table").
+				register(7150, "Remove this specific item from the bin", "The number of records in the item table "
+						+ "should be 2 fewer");
 		
 
 		try {

@@ -20,24 +20,26 @@ public class AxisServiceImpl extends BaseServiceImpl implements AxisService {
 			throw new MissingDataException("Axis data not sufficient for db insert");
 		}
 		
-		Axis dbRecord = get(a.getId());	
+		Axis dbRecord = get(a.getShortname());	
 				
 		if (dbRecord != null) {
 			update(dbRecord, a);
+			return dbRecord;
 		}
 		else {
 			insert(a);
-		}
-		
-		return a;
+			return a;
+		}			
 	}
 	
 	private void insert(Axis a) throws MissingDataException, DuplicateItemException {
 		try {
 			this.jdbcTemplate.update(
-					"insert into axis (label, units, description) " +
-					"values (?, ?, ?)",
-					a.getId(), a.getLabel(), a.getUnits(), a.getDescription());				
+					"insert into axis (shortname, label, units, description) " +
+					"values (?, ?, ?, ?)",
+					a.getShortname(), a.getLabel(), a.getUnits(), a.getDescription());	
+			
+			a.setId(getLastInsertId());
 		}
 		catch (DuplicateKeyException e) {
 			throw new DuplicateItemException("Axis already exists");
@@ -51,8 +53,8 @@ public class AxisServiceImpl extends BaseServiceImpl implements AxisService {
 			dbRecord.assimilate(a);
 			
 			this.jdbcTemplate.update(
-					"update axis set label = ?, units = ?, description = ? where id = ?",
-					dbRecord.getLabel(), dbRecord.getUnits(), dbRecord.getDescription(), 
+					"update axis set shortname = ?, label = ?, units = ?, description = ? where id = ?",
+					dbRecord.getShortname(), dbRecord.getLabel(), dbRecord.getUnits(), dbRecord.getDescription(), 
 					a.getId());
 			
 			LOG.info(compose("Updated Axis", a));
@@ -62,6 +64,13 @@ public class AxisServiceImpl extends BaseServiceImpl implements AxisService {
 			LOG.info(compose("Axis not modified", a));
 		}
 		
+	}
+	
+	public Axis get(String shortname) {
+		return (Axis) getLastInList(this.jdbcTemplate.query(
+				"select * from axis where shortname = ?", 
+				new Object[] {shortname}, 
+				new CommerceRowMapper.AxisMapper()));
 	}
 	
 	public Axis get(Long id) {

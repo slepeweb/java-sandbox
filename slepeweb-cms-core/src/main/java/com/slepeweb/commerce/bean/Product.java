@@ -1,5 +1,7 @@
 package com.slepeweb.commerce.bean;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
@@ -13,6 +15,7 @@ public class Product extends Item {
 	private String partNum;
 	private Long stock, price;
 	private Long alphaAxisId, betaAxisId;
+	private List<Variant> variants;
 	
 	@Override
 	public boolean isProduct() {
@@ -54,6 +57,7 @@ public class Product extends Item {
 		return String.format("Product '%s' (%d @ %f.2)", getPartNum(), getStock(), getPriceInPounds());
 	}
 	
+	@Override
 	public Product save() throws MissingDataException, DuplicateItemException {
 		return getProductService().save(this);
 	}
@@ -61,7 +65,23 @@ public class Product extends Item {
 	// This deletes a specific version of an item, and NOT all versions
 	@Override
 	public void delete() {
-		getProductService().delete(getOrigId());
+		getProductService().deleteAllVersions(getOrigId());
+	}
+	
+	public Product copy() {
+		Object[] copyDetails = getCopyDetails();
+		String name = (String) copyDetails[2];
+		String simplename = (String) copyDetails[1];
+		String partNum = getPartNum() + (String) copyDetails[3] + String.valueOf(copyDetails[0]);
+		
+		try {
+			return getProductService().copy(this, name, simplename, partNum, (Integer) copyDetails[0]);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		return null;
 	}
 	
 	public String getPartNum() {
@@ -111,6 +131,18 @@ public class Product extends Item {
 	public Product setBetaAxisId(Long betaAxis) {
 		this.betaAxisId = betaAxis;
 		return this;
+	}
+
+	public Product setVariants(List<Variant> variants) {
+		this.variants = variants;
+		return this;
+	}
+
+	public List<Variant> getVariants() {
+		if (this.variants == null) {
+			this.variants = getVariantService().getMany(getOrigId(), null, null);
+		}
+		return this.variants;
 	}
 
 	@Override

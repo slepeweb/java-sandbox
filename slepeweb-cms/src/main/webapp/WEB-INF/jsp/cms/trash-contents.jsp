@@ -8,7 +8,7 @@
 		<tr><th id="select-all-trash">Select</th><th>Path</th><th>Version</th></tr>
 		<c:forEach items="${_trashContents}" var="_item">
 			<tr>
-				<td><input type="checkbox" value="${_item.id}" /></td>
+				<td><input type="checkbox" value="${_item.origId}" /></td>
 				<td>${_item.path}</td>
 				<td>${_item.version}</td>
 			</tr>

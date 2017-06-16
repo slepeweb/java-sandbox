@@ -307,25 +307,40 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 
 	public List<Item> getTrashedItems() {
-		return this.jdbcTemplate.query(
+		List<Item> items = this.jdbcTemplate.query(
 				String.format(SELECT_TEMPLATE, "i.deleted=1 order by i.path, i.version"),
 				new Object[]{}, new RowMapperUtil.ItemMapper());
+		
+		for (int i = 0; i < items.size(); i++) {
+			items.set(i, adaptIfProduct(items.get(i)));
+		}
+		
+		return items;
 	}
 	
-	public int deleteTrashedItems(long[] idArr) {
+	public int deleteTrashedItems(long[] origIds) {
 		int num = 0;
-		if (idArr == null) {
-			if ((num = this.jdbcTemplate.update("delete from item where deleted = 1")) > 0) {
-				LOG.warn("The trash has been emptied");
+		if (origIds == null) {
+			for (Item i : getTrashedItems()) {
+				/* 
+				 * Call the delete() method of Item, instead of the deleteItem() method of this service.
+				 * This ensures that if the Item is in fact a Product, then the overriden delete()
+				 * method in Product gets executed.
+				 */
+				i.delete();
+				num++;
 			}
 		}
 		else {
-			for (Long id : idArr) {
-				deleteItem(id);
+			for (Long id : origIds) {
+				// Above comment applies here too.
+				Item i = getItemByOriginalId(id);
+				i.delete();
 			}
-			num = idArr.length;
-			LOG.warn(String.format("Deleted %d items from the bin", num));
+			num = origIds.length;
 		}
+		
+		LOG.warn(String.format("Deleted %d items from the bin", num));
 		return num;
 	}
 	
@@ -405,29 +420,18 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 
-	public void deleteItem(Long id) {
-		if (this.jdbcTemplate.update("delete from item where id = ? and deleted = 1", id) > 0) {
-			LOG.warn(compose("Deleted item", String.valueOf(id)));
-		}
-	}
-
 	public void deleteAllVersions(Long origId) {
 		if (this.jdbcTemplate.update("delete from item where origid = ?", origId) > 0) {
 			LOG.warn(compose("Deleted item and all its versions", String.valueOf(origId)));
 		}
 	}
 
+	// This deletes a specific version of an item - required for 'revert' functionality.
 	public void deleteItem(Long origId, int version) {
 		if (this.jdbcTemplate.update("delete from item where origid = ? and version = ?", origId, version) > 0) {
 			LOG.warn(compose("Deleted item version", String.valueOf(origId), String.valueOf(version)));
 		}
 	}
-	/*
-	// TODO: Not used
-	public void deleteItem(Item i) {
-		deleteItem(i.getId());
-	}
-	*/
 
 	public Item getItem(Long siteId, String path) {
 		return getItem(

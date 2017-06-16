@@ -1,6 +1,9 @@
 package com.slepeweb.cms.service;
 
+import com.slepeweb.commerce.service.AxisService;
+import com.slepeweb.commerce.service.AxisValueService;
 import com.slepeweb.commerce.service.ProductService;
+import com.slepeweb.commerce.service.VariantService;
 
 public interface CmsService {
 	boolean isLiveServer();
@@ -20,4 +23,7 @@ public interface CmsService {
 	LoglevelService getLoglevelService();
 	TagService getTagService();
 	ProductService getProductService();
+	AxisService getAxisService();
+	AxisValueService getAxisValueService();
+	VariantService getVariantService();
 }

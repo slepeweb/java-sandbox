@@ -169,9 +169,8 @@ public class Item extends CmsBean {
 		 getItemService().saveLinks(this);
 	}
 	
-	// This deletes a specific version of an item, and NOT all versions
 	public void delete() {
-		getItemService().deleteItem(getId());
+		getItemService().deleteAllVersions(getOrigId());
 	}
 	
 	public Item setFieldValue(String variable, Object value) {
@@ -240,7 +239,7 @@ public class Item extends CmsBean {
 	}
 	
 	public Object[] getCopyDetails() {
-		Object[] result = new Object[3];
+		Object[] result = new Object[4];
 		String baseName, baseSimplename;
 		String test = null;
 		Matcher nameMatcher = NAME_COPY_PATTERN.matcher(getName());
@@ -276,6 +275,7 @@ public class Item extends CmsBean {
 				result[0] = n;
 				result[1] = test;
 				result[2] = baseName + n;
+				result[3] = SIMPLENAME_COPY_EXT;
 				return result;
 			}
 			n++;
@@ -286,6 +286,7 @@ public class Item extends CmsBean {
 		result[0] = n;
 		result[1] = baseSimplename + n;
 		result[2] = baseName + n;
+		result[3] = SIMPLENAME_COPY_EXT;
 		return result;
 	}
 	

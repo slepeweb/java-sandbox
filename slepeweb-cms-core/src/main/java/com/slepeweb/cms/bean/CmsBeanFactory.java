@@ -7,7 +7,10 @@ import org.springframework.stereotype.Component;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.commerce.bean.Axis;
+import com.slepeweb.commerce.bean.AxisValue;
 import com.slepeweb.commerce.bean.Product;
+import com.slepeweb.commerce.bean.Variant;
 
 @Component
 public class CmsBeanFactory {
@@ -46,12 +49,6 @@ public class CmsBeanFactory {
 		Item i = new Item();
 		i.setCmsService(CMS);
 		return i;
-	}
-	
-	public static Product makeProduct() {
-		Product p = new Product();
-		p.setCmsService(CMS);
-		return p;
 	}
 	
 	public static Template makeTemplate() {
@@ -140,4 +137,29 @@ public class CmsBeanFactory {
 			setDateUpdated(i.getDateCreated()).
 			setDeleted(false);
 	}
+	
+	public static Product makeProduct() {
+		Product p = new Product();
+		p.setCmsService(CMS);
+		return p;
+	}
+	
+	public static Axis makeAxis() {
+		Axis a = new Axis();
+		a.setCmsService(CMS);
+		return a;
+	}
+	
+	public static AxisValue makeAxisValue() {
+		AxisValue av = new AxisValue();
+		av.setCmsService(CMS);
+		return av;
+	}
+	
+	public static Variant makeVariant() {
+		Variant v = new Variant();
+		v.setCmsService(CMS);
+		return v;
+	}
+	
 }

@@ -1,16 +1,20 @@
 package com.slepeweb.commerce.service;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
+import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemServiceImpl;
 import com.slepeweb.commerce.bean.Product;
+import com.slepeweb.commerce.bean.Variant;
 import com.slepeweb.commerce.util.CommerceRowMapper;
 
 @Repository(value="productService")
@@ -92,7 +96,8 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	/*
 	 * This method deletes one or more rows in Item table, and one row in Product table.
 	 */
-	public void delete(Long origItemId) {
+	@Override
+	public void deleteAllVersions(Long origItemId) {
 		// First delete row(s) in Item
 		super.deleteAllVersions(origItemId);
 		
@@ -101,9 +106,32 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 			LOG.warn(compose("Deleted product", String.valueOf(origItemId)));
 		}
 	}
-	
+		
 	@SuppressWarnings("deprecation")
 	public long count() {
 		return this.jdbcTemplate.queryForInt("select count(*) from product");
+	}
+	
+	public Product copy(Product source, String name, String simplename, String partNum, Integer copyId) 
+			throws MissingDataException, DuplicateItemException {
+		
+		List<Variant>  sourceVariants = source.getVariants();
+		
+		// Manipulate source, and use it to save a new copy
+		Item i = source;
+		i.setName(name).setSimpleName(simplename).setId(-1L);
+		source.setPartNum(partNum);
+		
+		Product p = save(source);
+		Variant nv;
+		
+		// Now copy the original (source) product's variants
+		for (Variant v : sourceVariants) {
+			nv = CmsBeanFactory.makeVariant();
+			nv.assimilate(v);
+			nv.setOrigItemId(p.getOrigId()).setSku(String.format("%s%s%d", v.getSku(), Item.SIMPLENAME_COPY_EXT, copyId)).save();
+		}
+		
+		return p.setVariants(null);
 	}
 }

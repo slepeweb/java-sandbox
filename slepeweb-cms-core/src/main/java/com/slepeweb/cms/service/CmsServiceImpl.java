@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.commerce.service.AxisService;
+import com.slepeweb.commerce.service.AxisValueService;
 import com.slepeweb.commerce.service.ProductService;
+import com.slepeweb.commerce.service.VariantService;
 
 @Service
 public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
@@ -27,6 +30,9 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected LoglevelService loglevelService;
 	@Autowired protected TagService tagService;
 	@Autowired protected ProductService productService;
+	@Autowired protected AxisService axisService;
+	@Autowired protected AxisValueService axisValueService;
+	@Autowired protected VariantService variantService;
 	
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {
@@ -111,5 +117,17 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public ProductService getProductService() {
 		return productService;
+	}
+
+	public AxisService getAxisService() {
+		return axisService;
+	}
+
+	public AxisValueService getAxisValueService() {
+		return axisValueService;
+	}
+
+	public VariantService getVariantService() {
+		return variantService;
 	}
 }

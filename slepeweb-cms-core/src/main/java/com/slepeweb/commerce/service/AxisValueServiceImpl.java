@@ -1,5 +1,7 @@
 package com.slepeweb.commerce.service;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -20,7 +22,7 @@ public class AxisValueServiceImpl extends BaseServiceImpl implements AxisValueSe
 			throw new MissingDataException("AxisValue data not sufficient for db insert");
 		}
 		
-		AxisValue dbRecord = get(av.getId());	
+		AxisValue dbRecord = get(av.getAxisId(), av.getValue());	
 				
 		if (dbRecord != null) {
 			update(dbRecord, av);
@@ -37,7 +39,9 @@ public class AxisValueServiceImpl extends BaseServiceImpl implements AxisValueSe
 			this.jdbcTemplate.update(
 					"insert into axisvalue (axisid, value, ordering) " +
 					"values (?, ?, ?)",
-					av.getAxisId(), av.getValue(), av.getOrdering());				
+					av.getAxisId(), av.getValue(), av.getOrdering());	
+			
+			av.setId(getLastInsertId());
 		}
 		catch (DuplicateKeyException e) {
 			throw new DuplicateItemException("AxisValue already exists");
@@ -69,6 +73,20 @@ public class AxisValueServiceImpl extends BaseServiceImpl implements AxisValueSe
 				"select * from axisvalue where id = ?", 
 				new Object[] {id}, 
 				new CommerceRowMapper.AxisValueMapper()));
+	}
+	
+	public AxisValue get(Long axisId, String value) {
+		return (AxisValue) getLastInList(this.jdbcTemplate.query(
+				"select * from axisvalue where axisid = ? and value = ?", 
+				new Object[] {axisId, value}, 
+				new CommerceRowMapper.AxisValueMapper()));
+	}
+	
+	public List<AxisValue> getAll(Long axisId) {
+		return this.jdbcTemplate.query(
+				"select * from axisvalue where axisid = ? order by ordering", 
+				new Object[] {axisId}, 
+				new CommerceRowMapper.AxisValueMapper());
 	}
 	
 	public void delete(Long id) {

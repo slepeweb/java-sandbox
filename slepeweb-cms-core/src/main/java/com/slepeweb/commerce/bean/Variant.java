@@ -1,10 +1,10 @@
 package com.slepeweb.commerce.bean;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.cms.bean.CmsBean;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
-import com.slepeweb.cms.utils.SpringContext;
-import com.slepeweb.commerce.service.VariantService;
 
 public class Variant extends CmsBean {
 
@@ -13,14 +13,6 @@ public class Variant extends CmsBean {
 	private Long origItemId, alphaAxisValueId, betaAxisValueId;
 	private String sku;
 	private Integer stock, price;
-	private VariantService variantService;
-	
-	private VariantService getVariantService() {
-		if (this.variantService == null) {
-			this.variantService = (VariantService) SpringContext.getApplicationContext().getBean("variantService");
-		}
-		return this.variantService;
-	}
 	
 	@Override
 	public void assimilate(Object obj) {
@@ -35,11 +27,11 @@ public class Variant extends CmsBean {
 	
 	@Override
 	public String toString() {
-		return String.format("Variant '%s' (%d @ %f.2)", getSku(), getStock(), getPrice());
+		return String.format("Variant '%s' (%d @ %f.2)", getSku(), getStock(), getPriceInPounds());
 	}
 	
 	@Override
-	public CmsBean save() throws MissingDataException, DuplicateItemException {
+	public Variant save() throws MissingDataException, DuplicateItemException {
 		return getVariantService().save(this);
 	}
 
@@ -55,7 +47,7 @@ public class Variant extends CmsBean {
 
 	@Override
 	public boolean isDefined4Insert() throws MissingDataException {
-		return this.origItemId != null;
+		return getOrigItemId() != null && StringUtils.isNotBlank(getSku());
 	}
 
 	@Override
@@ -127,6 +119,10 @@ public class Variant extends CmsBean {
 		return price;
 	}
 	
+	public float getPriceInPounds() {
+		return this.price != null ? this.price / 100F : -1.0F;
+	}
+
 	public Variant setPrice(Integer price) {
 		this.price = price;
 		return this;
@@ -142,7 +138,7 @@ public class Variant extends CmsBean {
 	}
 	
 	public Long getBetaAxisValueId() {
-		return betaAxisValueId;
+		return this.betaAxisValueId == null ? -1L : this.betaAxisValueId;
 	}
 	
 	public Variant setBetaAxisValueId(Long betaValue) {

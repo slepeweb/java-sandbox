@@ -41,6 +41,7 @@ public class CommerceRowMapper {
 		public Axis mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new Axis().
 				setId(rs.getLong("id")).
+				setShortname(rs.getString("shortname")).
 				setLabel(rs.getString("label")).
 				setUnits(rs.getString("units")).
 				setDescription(rs.getString("description"));
