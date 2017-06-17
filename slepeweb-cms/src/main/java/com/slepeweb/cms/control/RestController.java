@@ -346,7 +346,7 @@ public class RestController extends BaseController {
 		ItemType it = this.itemTypeService.getItemType(itemTypeId);
 		Item parent = this.itemService.getItem(itemId);
 		 
-		Item i = CmsBeanFactory.makeItem().
+		Item i = CmsBeanFactory.makeItem(it.getName()).
 				setSite(parent.getSite()).
 				setPath(String.format("%s/%s", parent.getPath(), simplename)).
 				setTemplate(t).
@@ -566,7 +566,7 @@ public class RestController extends BaseController {
 					setOrdering(lp.getOrdering()).
 					setType(lp.getType());
 			
-			i = CmsBeanFactory.makeItem().
+			i = CmsBeanFactory.makeItem(null).
 					setId(lp.getChildId());
 			
 			l.setChild(i);			

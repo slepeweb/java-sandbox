@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 import org.springframework.stereotype.Component;
 
+import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.service.CmsService;
@@ -45,7 +46,11 @@ public class CmsBeanFactory {
 		return f;
 	}
 	
-	public static Item makeItem() {
+	public static Item makeItem(String itemTypeName) {
+		if (itemTypeName != null && itemTypeName.equals(ItemTypeName.PRODUCT)) {
+			return makeProduct();
+		}
+		
 		Item i = new Item();
 		i.setCmsService(CMS);
 		return i;
@@ -125,7 +130,7 @@ public class CmsBeanFactory {
 	}
 	
 	private static Item proveItem(Site s, ItemType type, String name, String simpleName, String path) {
-		Item i = makeItem().
+		Item i = makeItem(type.getName()).
 			setName(name).
 			setSimpleName(simpleName).
 			setPath(path).

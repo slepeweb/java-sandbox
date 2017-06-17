@@ -20,7 +20,6 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.component.ServerConfig;
-import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.NotRevertableException;
@@ -69,7 +68,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			throw new MissingDataException("Item data not sufficient for db insert");
 		}
 		
-		Item dbRecord = i.isProduct() ? getItem(i.getId()) : getItemByOriginalId(i.getOrigId());
+		Item dbRecord = getItem(i.getId());
 		
 		if (dbRecord != null) {
 			update(dbRecord, i);
@@ -311,8 +310,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				String.format(SELECT_TEMPLATE, "i.deleted=1 order by i.path, i.version"),
 				new Object[]{}, new RowMapperUtil.ItemMapper());
 		
+		// Just in case any one of the trashed items is a Product ...
 		for (int i = 0; i < items.size(); i++) {
-			items.set(i, adaptIfProduct(items.get(i)));
+			items.set(i, extendIfProduct(items.get(i)));
 		}
 		
 		return items;
@@ -608,7 +608,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		List<Link> origLinks = source.getLinks();
 		
 		// Core data
-		Item ni = CmsBeanFactory.makeItem();
+		Item ni = CmsBeanFactory.makeItem(source.getType().getName());
 		ni.assimilate(source);
 		ni.
 			setParent(parent).
@@ -713,19 +713,17 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		Item i = (Item) getLastInList(this.jdbcTemplate.query(
 			sql, params, new RowMapperUtil.ItemMapper()));
 		
-		return adaptIfProduct(i);
+		return extendIfProduct(i);
 	}
 
-	private Item adaptIfProduct(Item i) {
-		if (i != null && i.getType().getName().equals(ItemTypeName.PRODUCT)) {
-			Product p = this.cmsService.getProductService().get(i.getOrigId());
-			if (p == null) {
-				p = CmsBeanFactory.makeProduct();
-				p.setOrigId(i.getOrigId());
+	private Item extendIfProduct(Item i) {
+		if (i != null && i.isProduct() && i.getOrigId() != null) {
+			Product p = (Product) i;
+			Product dbRecord = this.cmsService.getProductService().get(i.getOrigId());
+			if (dbRecord != null) {
+				p.assimilate(dbRecord);
+				return p;
 			}
-			
-			p.assimilateItem(i);
-			return p;
 		}
 		return i;
 	}

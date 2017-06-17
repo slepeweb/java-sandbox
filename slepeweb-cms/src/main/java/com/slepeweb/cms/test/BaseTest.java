@@ -76,7 +76,7 @@ public abstract class BaseTest {
 	protected Item addItem(Item parent, String name, String simplename, 
 			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type, Template t) {
 		
-		Item i = CmsBeanFactory.makeItem();
+		Item i = CmsBeanFactory.makeItem(type.getName());
 		i.setName(name).setSimpleName(simplename).setPath(getPath(parent, simplename)).
 		setDateCreated(dateCreated).setDateUpdated(dateUpdated).
 		setSite(site).setType(type).setTemplate(t);

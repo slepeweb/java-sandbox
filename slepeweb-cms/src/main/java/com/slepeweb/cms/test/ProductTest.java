@@ -92,7 +92,7 @@ public class ProductTest extends BaseTest {
 			
 			r = trs.execute(9020);
 			count = this.cmsService.getProductService().count();
-			addProduct(storefrontItem, "Product A", "product-a", now, now, site, productType, null, "part-no-123", 50L, 121L, null, null);
+			addProduct(storefrontItem, "Product A", "product-a", now, now, site, productType, null, "part-no-123", 50L, 121L, a.getId(), null);
 			productItem = site.getItem(path);
 			if (productItem == null) {
 				r.fail().setNotes(String.format("Product item couldn't be found", path));

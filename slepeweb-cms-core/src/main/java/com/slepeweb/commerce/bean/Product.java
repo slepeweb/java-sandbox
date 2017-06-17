@@ -32,6 +32,7 @@ public class Product extends Item {
 	public void assimilate(Object obj) {
 		if (obj instanceof Product) {
 			Product p = (Product) obj;
+			setPartNum(p.getPartNum());
 			setStock(p.getStock());
 			setPrice(p.getPrice());
 			setAlphaAxisId(p.getAlphaAxisId());
@@ -116,7 +117,7 @@ public class Product extends Item {
 	}
 
 	public Long getAlphaAxisId() {
-		return alphaAxisId;
+		return this.alphaAxisId == null ? -1L : this.alphaAxisId;
 	}
 
 	public Product setAlphaAxisId(Long alphaAxis) {
@@ -125,7 +126,7 @@ public class Product extends Item {
 	}
 
 	public Long getBetaAxisId() {
-		return betaAxisId;
+		return this.betaAxisId == null ? -1L : this.betaAxisId;
 	}
 
 	public Product setBetaAxisId(Long betaAxis) {

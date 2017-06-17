@@ -123,14 +123,16 @@ public class BuildTest extends BaseTest {
 			r.fail();
 		}		
 				
-		// Create test site
+		// 2040: Assert site has been created
+		r = trs.execute(2040);
 		try {
 			site = addSite(TEST_SITE_NAME, "test.slepeweb.com", HOMEPAGE_TYPE_NAME, "z");
 		}
-		catch (Exception e) {}
+		catch (Exception e) {
+			r.fail().setNotes("Failed to create the site");
+			return trs;
+		}
 		
-		// 2040: Assert site has been created
-		r = trs.execute(2040);
 		if (site != null) {
 			r.setNotes(LogUtil.compose("Test site has been created", site.getName()));
 			

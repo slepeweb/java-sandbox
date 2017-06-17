@@ -67,7 +67,8 @@ public class RowMapperUtil {
 	}
 	
 	private static Item mapItem(ResultSet rs) throws SQLException {
-		Item item = CmsBeanFactory.makeItem().
+		String itemTypeName = rs.getString("typename");
+		Item item = CmsBeanFactory.makeItem(itemTypeName).
 				setId(rs.getLong("id")).
 				setOrigId(rs.getLong("origid")).
 				setName(rs.getString("name")).
@@ -83,7 +84,7 @@ public class RowMapperUtil {
 		
 		ItemType type = CmsBeanFactory.makeItemType().
 				setId(rs.getLong("typeid")).
-				setName(rs.getString("typename")).
+				setName(itemTypeName).
 				setMimeType(rs.getString("mimetype")).
 				setPrivateCache(rs.getLong("privatecache")).
 				setPublicCache(rs.getLong("publiccache"));

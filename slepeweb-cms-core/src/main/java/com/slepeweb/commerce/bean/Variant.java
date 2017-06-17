@@ -116,7 +116,7 @@ public class Variant extends CmsBean {
 	}
 	
 	public Integer getPrice() {
-		return price;
+		return this.price == null ? 0 : this.price;
 	}
 	
 	public float getPriceInPounds() {
@@ -129,7 +129,7 @@ public class Variant extends CmsBean {
 	}
 	
 	public Long getAlphaAxisValueId() {
-		return alphaAxisValueId;
+		return this.alphaAxisValueId == null ? -1L : this.alphaAxisValueId;
 	}
 	
 	public Variant setAlphaAxisValueId(Long alphaValue) {
