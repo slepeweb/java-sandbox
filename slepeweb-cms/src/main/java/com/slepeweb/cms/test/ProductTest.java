@@ -34,8 +34,12 @@ public class ProductTest extends BaseTest {
 				register(9040, "", "Item should be an instance of Product").
 				register(9050, "Create some variants, on colour", "4 variants should be created").
 				register(9060, "Copy a product", "Should be 1 new row in product table").
-				register(9070, "", "Should be 4 new rows in variant table");
-		
+				register(9070, "", "Should be 4 new rows in variant table").
+				register(9080, "Trash the copy", "Should be no change in rows in item table").
+				register(9090, "", "... and no change in rows in product table").
+				register(9100, "Deleted the trashed item", "Should be one less row in item table").
+				register(9110, "", "Should be one less row in product table").
+				register(9120, "", "Should be 4 less rows in variant table");		
 		
 		try {
 			Site site = getTestSite();
@@ -138,6 +142,31 @@ public class ProductTest extends BaseTest {
 				
 				r = trs.execute(9070);
 				r.failIf(this.cmsService.getVariantService().count() - varCount != avs.size());
+				
+				long itemCount = this.cmsService.getItemService().getCount();
+				prodCount = this.cmsService.getProductService().count();
+				varCount = this.cmsService.getVariantService().count();
+				productItem = site.getItem(path + "-copy-1");
+				if (productItem != null && productItem.isProduct()) {
+					r = trs.execute(9080);
+					p = (Product) productItem;
+					p.trash();
+					r.failIf(this.cmsService.getItemService().getCount() != itemCount);
+					
+					r = trs.execute(9090);
+					r.failIf(this.cmsService.getProductService().count() != prodCount);
+					
+					r = trs.execute(9100);
+					p.delete();
+					r.failIf(this.cmsService.getItemService().getCount() - itemCount != -1);
+					
+					r = trs.execute(9110);
+					r.failIf(this.cmsService.getProductService().count() - prodCount != -1);
+					
+					r = trs.execute(9120);
+					r.failIf(this.cmsService.getVariantService().count() - varCount != -avs.size());
+				}
+				
 			}
 			else {
 				r.setNotes("Item is NOT a Product");

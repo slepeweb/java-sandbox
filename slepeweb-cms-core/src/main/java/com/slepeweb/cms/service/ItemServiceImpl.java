@@ -334,10 +334,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		else {
 			for (Long id : origIds) {
 				// Above comment applies here too.
-				Item i = getItemByOriginalId(id);
-				i.delete();
+				Item i = getItemFromBin(id);
+				if (i != null) {
+					i.delete();
+					num++;
+				}
 			}
-			num = origIds.length;
 		}
 		
 		LOG.warn(String.format("Deleted %d items from the bin", num));
@@ -464,10 +466,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			new Object[]{origId}, new RowMapperUtil.ItemMapper());		
 	}
 
-	public Item getItemFromBin(Long id) {
+	public Item getItemFromBin(Long origId) {
 		return getItem(
-			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=1"), 
-			new Object[]{id});
+			String.format(SELECT_TEMPLATE, "i.origid=? and i.editable=1 and i.deleted=1"), 
+			new Object[]{origId});
 	}
 	
 	public int getCount() {
