@@ -178,7 +178,12 @@ var renderItemForms = function(nodeKey, activeTab) {
 						template: $("#core-tab select[name='template']").val(),
 						searchable: $("#core-tab input[name='searchable']").is(':checked'),
 						published: $("#core-tab input[name='published']").is(':checked'),
-						tags: $("#core-tab input[name='tags']").val()
+						tags: $("#core-tab input[name='tags']").val(),
+						partNum: $("#core-tab input[name='partNum']").val(),
+						price: $("#core-tab input[name='price']").val(),
+						stock: $("#core-tab input[name='stock']").val(),
+						alphaaxis: $("#core-tab input[name='alphaaxis']").val(),
+						betaaxis: $("#core-tab input[name='betaaxis']").val()
 					}, 
 					dataType: "json",
 					success: function(obj, status, z) {
@@ -230,7 +235,12 @@ var renderItemForms = function(nodeKey, activeTab) {
 						template: $("#add-tab select[name='template']").val(),
 						itemtype: $("#add-tab select[name='itemtype']").val(),
 						name: $("#add-tab input[name='name']").val(),
-						simplename: $("#add-tab input[name='simplename']").val()
+						simplename: $("#add-tab input[name='simplename']").val(),
+						partNum: $("#add-tab input[name='partNum']").val(),
+						price: $("#add-tab input[name='price']").val(),
+						stock: $("#add-tab input[name='stock']").val(),
+						alphaaxis: $("#add-tab input[name='alphaaxis']").val(),
+						betaaxis: $("#add-tab input[name='betaaxis']").val()
 					}, 
 					dataType: "json",
 					success: function(obj, status, z) {

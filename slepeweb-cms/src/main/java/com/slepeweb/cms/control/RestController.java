@@ -50,6 +50,7 @@ import com.slepeweb.cms.service.LinkTypeService;
 import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.service.TemplateService;
+import com.slepeweb.commerce.bean.Product;
 
 @Controller
 @RequestMapping("/rest")
@@ -84,6 +85,11 @@ public class RestController extends BaseController {
 			@RequestParam("published") boolean published, 
 			@RequestParam("template") Long templateId, 
 			@RequestParam("tags") String tagStr, 
+			@RequestParam(value="partNum", required=false) String partNum, 
+			@RequestParam(value="price", required=false) Long price, 
+			@RequestParam(value="stock", required=false) Long stock, 
+			@RequestParam(value="alphaaxis", required=false) Long alphaAxisId, 
+			@RequestParam(value="betaaxis", required=false) Long betaAxisId, 
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
@@ -98,9 +104,29 @@ public class RestController extends BaseController {
 				setPublished(published).
 				setTemplate(t);
 			
+			Product p = null;
+			
+			if (i.isProduct()) {
+				p = (Product) i;
+				p.
+					setPartNum(partNum).
+					setStock(stock).
+					setPrice(price).
+					
+					// TODO: if axes change, then associated variants must be deleted
+					setAlphaAxisId(alphaAxisId).
+					setBetaAxisId(betaAxisId);
+			}
+			
 			try {
-				i.save();
-				resp.addMessage("Core item data successfully updated");
+				if (i.isProduct()) {
+					p.save();
+					resp.addMessage("Core product data successfully updated");
+				}
+				else {
+					i.save();
+					resp.addMessage("Core item data successfully updated");
+				}
 			}
 			catch (Exception e) {
 				return resp.setError(true).addMessage(e.getMessage());		
@@ -332,6 +358,11 @@ public class RestController extends BaseController {
 			@RequestParam("itemtype") long itemTypeId, 
 			@RequestParam("name") String name, 
 			@RequestParam("simplename") String simplename, 
+			@RequestParam(value="partNum", required=false) String partNum, 
+			@RequestParam(value="price", required=false) Long price, 
+			@RequestParam(value="stock", required=false) Long stock, 
+			@RequestParam(value="alphaaxis", required=false) Long alphaAxisId, 
+			@RequestParam(value="betaaxis", required=false) Long betaAxisId, 
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
@@ -358,8 +389,25 @@ public class RestController extends BaseController {
 		
 		i.setDateUpdated(i.getDateCreated());
 		
+		Product p = null;
+		
+		if (i.isProduct()) {
+			p = (Product) i;
+			p.
+				setPartNum(partNum).
+				setStock(stock).
+				setPrice(price).
+				setAlphaAxisId(alphaAxisId).
+				setBetaAxisId(betaAxisId);
+		}
+		
 		try {
-			i.save();
+			if (i.isProduct()) {
+				p.save();
+			}
+			else {
+				i.save();
+			}
 		}
 		catch (Exception e) {
 			return resp.setError(true).addMessage(e.getMessage()).setData(itemId);

@@ -50,7 +50,7 @@ public class Product extends Item {
 	
 	@Override
 	public boolean isDefined4Insert() {
-		return StringUtils.isNotBlank(getPartNum());
+		return super.isDefined4Insert() && StringUtils.isNotBlank(getPartNum());
 	}
 	
 	@Override

@@ -29,10 +29,6 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 		// First save the item data, ie insert/update row in Item
 		Item i = super.save(p);
 		
-		if (! p.isDefined4Insert()) {
-			throw new MissingDataException("Product data not sufficient for db insert");
-		}
-		
 		// Now save the insert/update row in Product
 		Product dbRecord = get(p.getOrigId());		
 		if (dbRecord != null) {

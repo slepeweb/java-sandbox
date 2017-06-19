@@ -60,7 +60,7 @@
 		<%-- This div will only be visible if the selected item type is Product --%>
 		<c:if test="${editingItem.product}">
 			<div>
-				<label for="partnum">Part number: </label><input type="text" name="partnum" value="${editingItem.partNum}" />
+				<label for="partNum">Part number: </label><input type="text" name="partNum" value="${editingItem.partNum}" />
 			</div>
 			<div>
 				<label for="price">Price: </label><input type="text" name="price" value="${editingItem.price}" />
@@ -240,7 +240,7 @@
 		<%-- This div will only be visible if the selected item type is Product --%>
 		<div id="core-commerce">
 			<div>
-				<label for="partnum">Part number: </label><input type="text" name="partnum" value="" />
+				<label for="partNum">Part number: </label><input type="text" name="partNum" value="" />
 			</div>
 			<div>
 				<label for="price">Price: </label><input type="text" name="price" value="0" />
