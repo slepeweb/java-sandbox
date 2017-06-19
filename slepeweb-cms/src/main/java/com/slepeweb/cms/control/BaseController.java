@@ -10,7 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.component.ServerConfig;
+import com.slepeweb.cms.constant.ItemTypeName;
+import com.slepeweb.cms.service.ItemTypeService;
 import com.slepeweb.cms.service.LoglevelUpdateService;
 
 @Controller
@@ -18,6 +21,8 @@ public class BaseController {
 	
 	@Autowired protected ServerConfig config;
 	@Autowired private LoglevelUpdateService loglevelUpdateService;
+	@Autowired private ItemTypeService itemTypeService;
+	
 	private String contextPath;
 
 	@ModelAttribute(value="applicationContextPath")
@@ -51,6 +56,15 @@ public class BaseController {
 		}
 		
 		return false;
+	}
+	
+	@ModelAttribute(value="_productTypeId")
+	protected String getProductTypeId() {
+		ItemType productType = this.itemTypeService.getItemType(ItemTypeName.PRODUCT);
+		if (productType != null) {
+			return String.valueOf(productType.getId());
+		}
+		return "0";
 	}
 	
 	private boolean hasAuthority(User u, String name) {

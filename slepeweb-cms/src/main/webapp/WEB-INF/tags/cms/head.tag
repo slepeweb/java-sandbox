@@ -35,6 +35,8 @@
 		_flashMessage.error = ${_flashMessage.error};
 		_flashMessage.message = "${_flashMessage.message}";
 	</c:if>
+	
+	var _productTypeId = "${_productTypeId}";
 </script>
 
 <link rel="stylesheet" href="${applicationContextPath}/resources/css/main.css" type="text/css">

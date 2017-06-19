@@ -56,6 +56,40 @@
 		<div>
 			<label for="simplename">Simple name: </label><input type="text" name="simplename" value="${editingItem.simpleName}" />
 		</div>
+		
+		<%-- This div will only be visible if the selected item type is Product --%>
+		<c:if test="${editingItem.product}">
+			<div>
+				<label for="partnum">Part number: </label><input type="text" name="partnum" value="${editingItem.partNum}" />
+			</div>
+			<div>
+				<label for="price">Price: </label><input type="text" name="price" value="${editingItem.price}" />
+			</div>
+			<div>
+				<label for="stock">Stock: </label><input type="text" name="stock" value="${editingItem.stock}" />
+			</div>
+			<div>
+				<label for="alphaaxis">Axis A: </label>
+				<select name="alphaaxis">
+					<option value="-1">Choose ...</option>
+					<c:forEach items="${availableAxes}" var="axis">
+						<option value="${axis.id}"<c:if 
+							test="${axis.id eq editingItem.alphaAxisId}"> selected</c:if>>${axis.shortname}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div>
+				<label for="betaaxis">Axis B: </label>
+				<select name="betaaxis">
+					<option value="-1">Choose ...</option>
+					<c:forEach items="${availableAxes}" var="axis">
+						<option value="${axis.id}"<c:if 
+							test="${axis.id eq editingItem.betaAxisId}"> selected</c:if>>${axis.shortname}</option>
+					</c:forEach>
+				</select>
+			</div>
+		</c:if>
+		
 		<div>
 			<label for="tags">Tags: </label><input type="text" name="tags" value="${editingItem.tagsAsString}" />
 		</div>
@@ -181,7 +215,8 @@
 			<select name="template">
 				<option value="0">Choose ...</option>
 				<c:forEach items="${editingItem.site.availableTemplates}" var="template">
-					<option value="${template.id}">${template.name}</option>
+					<option value="${template.id}" 
+						data-isproduct="${template.itemTypeId == _productTypeId ? 1 : 0}">${template.name}</option>
 				</c:forEach>
 			</select>
 		</div>
@@ -190,7 +225,8 @@
 			<select name="itemtype">
 				<option value="0">Choose ...</option>
 				<c:forEach items="${editingItem.site.availableItemTypes}" var="it">
-					<option value="${it.id}">${it.name}</option>
+					<option value="${it.id}"
+						data-isproduct="${it.id == _productTypeId ? 1 : 0}">${it.name}</option>
 				</c:forEach>
 			</select>			
 		</div>
@@ -200,6 +236,40 @@
 		<div>
 			<label for="simplename">Simple name: </label><input name="simplename" value="" />
 		</div>
+		
+		<%-- This div will only be visible if the selected item type is Product --%>
+		<div id="core-commerce">
+			<div>
+				<label for="partnum">Part number: </label><input type="text" name="partnum" value="" />
+			</div>
+			<div>
+				<label for="price">Price: </label><input type="text" name="price" value="0" />
+			</div>
+			<div>
+				<label for="stock">Stock: </label><input type="text" name="stock" value="0" />
+			</div>
+			<div>
+				<label for="alphaaxis">Axis A: </label>
+				<select id="alphaaxis" name="alphaaxis">
+					<option value="-1">Choose ...</option>
+					<c:forEach items="${availableAxes}" var="axis">
+						<option value="${axis.id}"<c:if 
+							test="${axis.id eq editingItem.alphaAxisId}"> selected</c:if>>${axis.shortname}</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div>
+				<label for="betaaxis">Axis B: </label>
+				<select id="betaaxis" name="betaaxis">
+					<option value="-1">Choose ...</option>
+					<c:forEach items="${availableAxes}" var="axis">
+						<option value="${axis.id}"<c:if 
+							test="${axis.id eq editingItem.betaAxisId}"> selected</c:if>>${axis.shortname}</option>
+					</c:forEach>
+				</select>
+			</div>
+		</div>
+
 		<div>
 			<label>&nbsp;</label><button id="add-button" type="button">Add</button>
 		</div>

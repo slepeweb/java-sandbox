@@ -32,6 +32,18 @@ var flashMessage = function(status) {
 
 var pageEditorUrlPrefix = _ctx + "/page/editor/";
 
+var displayCommerceElements = function(target) {
+	var ele = target.find("option:selected");
+	var flag = ele.attr("data-isproduct");
+
+	if (flag == 1) {
+		$("#core-commerce").css("display", "block");
+	}
+	else {
+		$("#core-commerce").css("display", "none");
+	}
+};
+
 /*
  * Tells the browser to get the item editor page for a given item.
  */
@@ -228,6 +240,16 @@ var renderItemForms = function(nodeKey, activeTab) {
 						serverError();
 					},
 				});
+			});
+			
+			// Add commerce form controls when user selects template corresponding to Product item type 
+			$("#add-tab select[name='itemtype']").change(function (e) {
+				displayCommerceElements($(e.target));
+			});
+			
+			// Add commerce form controls when user selects Product for item type 
+			$("#add-tab select[name='template']").change(function (e) {
+				displayCommerceElements($(e.target));
 			});
 			
 			// Add behaviour to copy an item 
