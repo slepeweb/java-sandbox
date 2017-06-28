@@ -56,11 +56,14 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected CmsService cmsService;
 	@Autowired protected ServerConfig config;
 	
-	public Item save(Item i) throws MissingDataException, DuplicateItemException {
+	public Item save(Item i) 
+			throws MissingDataException, DuplicateItemException, ResourceException {
+		
 		return save(i, false);
 	}
 	
-	public Item save(Item i, boolean extendedSave) throws MissingDataException, DuplicateItemException {
+	public Item save(Item i, boolean extendedSave) 
+			throws MissingDataException, DuplicateItemException, ResourceException {
 		
 		boolean updated = false;
 		
@@ -109,7 +112,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return i.setLinks(null).setFieldValues(null);
 	}
 	
-	private void insert(Item i) throws MissingDataException, DuplicateItemException {
+	private void insert(Item i) throws MissingDataException, DuplicateItemException, ResourceException {
+		// Set timestamps
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		i.setDateCreated(now);
+		i.setDateUpdated(now);
+		
 		// Item table
 		try {
 			this.jdbcTemplate.update(
@@ -152,7 +160,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				this.linkService.save(l);	
 			}
 			else {
-				LOG.warn(compose("Parent item not found", i.getParentPath()));
+				String s = compose("Parent item not found", i.getParentPath());
+				LOG.warn(s);
+				throw new ResourceException(s);
 			}			
 		}
 		
@@ -175,6 +185,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			
 			// -Now- merge the changed properties from i into dbRecord
 			dbRecord.assimilate(i);
+			
+			// Update timestamp
+			dbRecord.setDateUpdated(new Timestamp(System.currentTimeMillis()));
 			
 			this.jdbcTemplate.update(
 					"update item set name = ?, simplename = ?, path = ?, templateid = ?, dateupdated = ?, deleted = ?, editable = ?, published = ?, searchable = ?, version = ? where id = ?",
@@ -589,13 +602,13 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	public Item copy(Item source, String name, String simplename) 
-			throws MissingDataException, DuplicateItemException {
+			throws MissingDataException, DuplicateItemException, ResourceException {
 		
 		return copy(false, source, name, simplename);
 	}
 	
 	private Item copy(boolean isNewVersion, Item source, String name, String simplename)
-			 throws MissingDataException, DuplicateItemException {
+			 throws MissingDataException, DuplicateItemException, ResourceException {
 
 		/*
 		 *  The source instance will change subtly after new version is created (eg editable property),
@@ -701,7 +714,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return ni.setLinks(null).setFieldValues(null);
 	}
 	
-	public Item version(Item source) throws NotVersionableException, MissingDataException, DuplicateItemException {
+	public Item version(Item source) 
+			throws NotVersionableException, MissingDataException, DuplicateItemException, ResourceException {
+		
 		if (source.getType().getName().equals(ItemType.CONTENT_FOLDER_TYPE_NAME)) {
 			throw new NotVersionableException(String.format("%s [%s]", "Cannot version item type", ItemType.CONTENT_FOLDER_TYPE_NAME));
 		}

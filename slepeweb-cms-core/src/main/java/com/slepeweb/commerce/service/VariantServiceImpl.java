@@ -132,4 +132,11 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 	public long count() {
 		return this.jdbcTemplate.queryForInt("select count(*) from variant");
 	}
+	
+	public Long count(Long origId) {
+		return this.jdbcTemplate.queryForObject(
+				"select count(*) from variant where origitemid = ?", 
+				Long.class,
+				new Object[] {origId});
+	}
 }

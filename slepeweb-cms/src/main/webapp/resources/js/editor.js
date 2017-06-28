@@ -182,8 +182,8 @@ var renderItemForms = function(nodeKey, activeTab) {
 						partNum: $("#core-tab input[name='partNum']").val(),
 						price: $("#core-tab input[name='price']").val(),
 						stock: $("#core-tab input[name='stock']").val(),
-						alphaaxis: $("#core-tab input[name='alphaaxis']").val(),
-						betaaxis: $("#core-tab input[name='betaaxis']").val()
+						alphaaxis: $("#core-tab select[name='alphaaxis']").val(),
+						betaaxis: $("#core-tab select[name='betaaxis']").val()
 					}, 
 					dataType: "json",
 					success: function(obj, status, z) {
@@ -239,8 +239,8 @@ var renderItemForms = function(nodeKey, activeTab) {
 						partNum: $("#add-tab input[name='partNum']").val(),
 						price: $("#add-tab input[name='price']").val(),
 						stock: $("#add-tab input[name='stock']").val(),
-						alphaaxis: $("#add-tab input[name='alphaaxis']").val(),
-						betaaxis: $("#add-tab input[name='betaaxis']").val()
+						alphaaxis: $("#add-tab select[name='alphaaxis']").val(),
+						betaaxis: $("#add-tab select[name='betaaxis']").val()
 					}, 
 					dataType: "json",
 					success: function(obj, status, z) {

@@ -12,6 +12,7 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -21,7 +22,9 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	@Autowired protected ItemTypeService itemTypeService;	
 	@Autowired protected ItemService itemService;	
 	
-	public Site save(Site s) throws MissingDataException, DuplicateItemException {
+	public Site save(Site s) 
+			throws MissingDataException, DuplicateItemException, ResourceException {
+		
 		if (s.isDefined4Insert()) {
 			Site dbRecord = getSite(s.getName());		
 			if (dbRecord != null) {
@@ -41,7 +44,8 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		return s;
 	}
 	
-	private Site insertSite(Site s) throws MissingDataException, DuplicateItemException {
+	private Site insertSite(Site s) 
+			throws MissingDataException, DuplicateItemException, ResourceException {
 		
 		this.jdbcTemplate.update(
 				"insert into site (name, shortname) values (?, ?)", 

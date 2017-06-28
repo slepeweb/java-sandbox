@@ -12,6 +12,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.NotVersionableException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.ItemService;
 
 @Service
@@ -201,6 +202,10 @@ public class VersionTest extends BaseTest {
 		}
 		catch (DuplicateItemException e) {
 			r.setNotes("Item already exists at new version").fail();
+			return null;
+		}
+		catch (ResourceException e) {
+			r.setNotes("Resource exception").fail();
 			return null;
 		}
 		

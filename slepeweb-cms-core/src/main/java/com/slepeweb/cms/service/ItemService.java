@@ -17,8 +17,10 @@ public interface ItemService {
 	Item getItem(Long id);
 	Item getItemByOriginalId(Long id);
 	Item getItem(Long id, int version);
-	Item save(Item i) throws MissingDataException, DuplicateItemException;
-	Item save(Item i, boolean extended) throws MissingDataException, DuplicateItemException;
+	Item save(Item i) 
+			throws MissingDataException, DuplicateItemException, ResourceException;
+	Item save(Item i, boolean extended) 
+			throws MissingDataException, DuplicateItemException, ResourceException;
 	void saveFieldValues(List<FieldValue> fvs) throws MissingDataException;
 	void saveLinks(Item i) throws MissingDataException;
 	int getCount();
@@ -35,7 +37,9 @@ public interface ItemService {
 	int deleteTrashedItems(long[] idArr);
 	int restoreSelectedItems(long[] idArr);
 	int getBinCount();
-	Item copy(Item source, String name, String simplename) throws MissingDataException, DuplicateItemException;
-	Item version(Item source) throws NotVersionableException, MissingDataException, DuplicateItemException;
+	Item copy(Item source, String name, String simplename) 
+			throws MissingDataException, DuplicateItemException, ResourceException;
+	Item version(Item source) 
+			throws NotVersionableException, MissingDataException, DuplicateItemException, ResourceException;
 	Item revert(Item source) throws NotRevertableException;
 }

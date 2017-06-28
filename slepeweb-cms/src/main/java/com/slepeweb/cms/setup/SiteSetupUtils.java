@@ -271,10 +271,11 @@ public class SiteSetupUtils {
 	public static InputStream unzipMedia(File inputFile) {
 		BufferedOutputStream dest = null;
 		BufferedInputStream is = null;
+		ZipFile zipfile = null;
 
 		try {
 			ZipEntry entry;
-			ZipFile zipfile = new ZipFile(inputFile);
+			zipfile = new ZipFile(inputFile);
 			Enumeration e = zipfile.entries();
 
 			if (e.hasMoreElements()) {
@@ -292,6 +293,10 @@ public class SiteSetupUtils {
 
 				if (is != null) {
 					is.close();
+				}
+
+				if (zipfile != null) {
+					zipfile.close();
 				}
 			} catch (IOException e) {
 				LOG.error("Failed to close IO resources", e);

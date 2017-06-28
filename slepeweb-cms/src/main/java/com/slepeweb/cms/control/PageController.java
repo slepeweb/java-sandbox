@@ -18,6 +18,7 @@ import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteService;
+import com.slepeweb.commerce.service.AxisService;
 
 @Controller
 @RequestMapping("/page")
@@ -25,6 +26,7 @@ public class PageController extends BaseController {
 	
 	@Autowired private SiteService siteService;
 	@Autowired private ItemService itemService;
+	@Autowired private AxisService axisService;
 	
 	@RequestMapping(value="/editor")	
 	public String doMain(ModelMap model) {		
@@ -38,6 +40,10 @@ public class PageController extends BaseController {
 			model.addAttribute("editingItem", i);
 			model.addAttribute("site", i.getSite());
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
+			
+			if (i.isProduct()) {
+				model.addAttribute("availableAxes", this.axisService.get());
+			}
 		}
 		
 		String flash = req.getParameter("status");

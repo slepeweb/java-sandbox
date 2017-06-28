@@ -68,26 +68,38 @@
 			<div>
 				<label for="stock">Stock: </label><input type="text" name="stock" value="${editingItem.stock}" />
 			</div>
-			<div>
-				<label for="alphaaxis">Axis A: </label>
-				<select name="alphaaxis">
-					<option value="-1">Choose ...</option>
-					<c:forEach items="${availableAxes}" var="axis">
-						<option value="${axis.id}"<c:if 
-							test="${axis.id eq editingItem.alphaAxisId}"> selected</c:if>>${axis.shortname}</option>
-					</c:forEach>
-				</select>
-			</div>
-			<div>
-				<label for="betaaxis">Axis B: </label>
-				<select name="betaaxis">
-					<option value="-1">Choose ...</option>
-					<c:forEach items="${availableAxes}" var="axis">
-						<option value="${axis.id}"<c:if 
-							test="${axis.id eq editingItem.betaAxisId}"> selected</c:if>>${axis.shortname}</option>
-					</c:forEach>
-				</select>
-			</div>
+			
+			<c:choose><c:when test="${not editingItem.hasVariants}">
+				<div>
+					<label for="alphaaxis">Axis A: </label>
+					<select name="alphaaxis">
+						<option value="-1">Choose ...</option>
+						<c:forEach items="${availableAxes}" var="axis">
+							<option value="${axis.id}"<c:if 
+								test="${axis.id eq editingItem.alphaAxisId}"> selected</c:if>>${axis.shortname}</option>
+						</c:forEach>
+					</select>
+				</div>
+				<div>
+					<label for="betaaxis">Axis B: </label>
+					<select name="betaaxis">
+						<option value="-1">Choose ...</option>
+						<c:forEach items="${availableAxes}" var="axis">
+							<option value="${axis.id}"<c:if 
+								test="${axis.id eq editingItem.betaAxisId}"> selected</c:if>>${axis.shortname}</option>
+						</c:forEach>
+					</select>
+				</div>
+			</c:when><c:otherwise>
+				<div>
+					<label for="alphaaxis">Axis A: </label>
+					<input disabled="disabled" value="${editingItem.alphaAxis.shortname}" />
+				</div>
+				<div>
+					<label for="betaaxis">Axis B: </label>
+					<input disabled="disabled" value="${editingItem.betaAxis.shortname}" />
+				</div>
+			</c:otherwise></c:choose>
 		</c:if>
 		
 		<div>

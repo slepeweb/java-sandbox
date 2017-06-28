@@ -71,8 +71,6 @@ public class Item extends CmsBean {
 			StringUtils.isNotBlank(getName()) &&
 			StringUtils.isNotBlank(getPath()) &&
 			(StringUtils.isNotBlank(getSimpleName()) || isRoot()) &&
-			getDateCreated() != null &&
-			getDateUpdated() != null &&
 			getSite() != null &&
 			getSite().getId() != null &&
 			getType() != null &&
@@ -153,11 +151,15 @@ public class Item extends CmsBean {
 		}
 	}
 	
-	public Item save() throws MissingDataException, DuplicateItemException {
+	public Item save() 
+			throws MissingDataException, DuplicateItemException, ResourceException {
+		
 		return getItemService().save(this);
 	}
 	
-	public Item save(boolean extended) throws MissingDataException, DuplicateItemException {
+	public Item save(boolean extended) 
+			throws MissingDataException, DuplicateItemException, ResourceException {
+		
 		return getItemService().save(this, extended);
 	}
 	
@@ -186,7 +188,9 @@ public class Item extends CmsBean {
 		return this;
 	}
 	
-	public Item addChild(Item child) throws MissingDataException, DuplicateItemException {
+	public Item addChild(Item child) 
+			throws MissingDataException, DuplicateItemException, ResourceException {
+		
 		child.setParent(this);
 		return getItemService().save(child);
 	}

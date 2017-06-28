@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 
 public class Product extends Item {
 	private static final long serialVersionUID = 1L;
@@ -59,7 +60,9 @@ public class Product extends Item {
 	}
 	
 	@Override
-	public Product save() throws MissingDataException, DuplicateItemException {
+	public Product save() 
+			throws MissingDataException, DuplicateItemException, ResourceException {
+		
 		return getProductService().save(this);
 	}
 	
@@ -120,6 +123,13 @@ public class Product extends Item {
 		return this.alphaAxisId == null ? -1L : this.alphaAxisId;
 	}
 
+	public Axis getBetaAxis() {
+		if (this.betaAxisId != null) {
+			return getAxisService().get(this.betaAxisId);
+		}
+		return null;
+	}
+
 	public Product setAlphaAxisId(Long alphaAxis) {
 		this.alphaAxisId = alphaAxis;
 		return this;
@@ -127,6 +137,13 @@ public class Product extends Item {
 
 	public Long getBetaAxisId() {
 		return this.betaAxisId == null ? -1L : this.betaAxisId;
+	}
+
+	public Axis getAlphaAxis() {
+		if (this.alphaAxisId != null) {
+			return getAxisService().get(this.alphaAxisId);
+		}
+		return null;
 	}
 
 	public Product setBetaAxisId(Long betaAxis) {
@@ -137,6 +154,10 @@ public class Product extends Item {
 	public Product setVariants(List<Variant> variants) {
 		this.variants = variants;
 		return this;
+	}
+	
+	public boolean isHasVariants() {
+		return getVariantService().count(getOrigId()).longValue() > 0;
 	}
 
 	public List<Variant> getVariants() {

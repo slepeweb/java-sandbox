@@ -25,6 +25,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.setup.SiteSetupStatistics.ResultType;
 import com.slepeweb.cms.utils.LogUtil;
@@ -36,7 +37,9 @@ public class SiteSetup {
 	@Autowired private CmsService cmsService;
 	private Map<String, Site> siteCache = new HashMap<String, Site>();
 
-	public void load(String filePath) throws MissingDataException, DuplicateItemException {
+	public void load(String filePath) 
+			throws MissingDataException, DuplicateItemException, ResourceException {
+		
 		LOG.info(LogUtil.compose("Setting up site", filePath));
 		SiteSetupStatistics result = new SiteSetupStatistics();
 
@@ -100,7 +103,7 @@ public class SiteSetup {
 	}
 
 	private void processCsv(HSSFWorkbook wb, SiteSetupStatistics stats) 
-			throws MissingDataException, DuplicateItemException {
+			throws MissingDataException, DuplicateItemException, ResourceException, ResourceException {
 		
 		if (wb != null) {
 			createSites(wb.getSheetAt(0).rowIterator(), stats);
@@ -115,7 +118,7 @@ public class SiteSetup {
 	}
 
 	private void createSites(Iterator<Row> rowIter, SiteSetupStatistics stats) 
-			throws MissingDataException, DuplicateItemException {
+			throws MissingDataException, DuplicateItemException, ResourceException {
 		
 		Row row;
 		Site s = null;

@@ -51,6 +51,7 @@ import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.service.TemplateService;
 import com.slepeweb.commerce.bean.Product;
+import com.slepeweb.commerce.service.AxisService;
 
 @Controller
 @RequestMapping("/rest")
@@ -64,6 +65,7 @@ public class RestController extends BaseController {
 	@Autowired private LinkTypeService linkTypeService;
 	@Autowired private LinkNameService linkNameService;
 	@Autowired private TagService tagService;
+	@Autowired private AxisService axisService;
 	
 	@RequestMapping("/item/editor")
 	public String doItemEditor(ModelMap model, @RequestParam(value="key", required=true) Long id) {	
@@ -71,6 +73,10 @@ public class RestController extends BaseController {
 		if (i != null) {
 			model.put("editingItem", i);
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
+			
+			if (i.isProduct()) {
+				model.addAttribute("availableAxes", this.axisService.get());
+			}
 		}
 		return "cms.item.editor";		
 	}
@@ -111,11 +117,13 @@ public class RestController extends BaseController {
 				p.
 					setPartNum(partNum).
 					setStock(stock).
-					setPrice(price).
+					setPrice(price);
 					
-					// TODO: if axes change, then associated variants must be deleted
-					setAlphaAxisId(alphaAxisId).
-					setBetaAxisId(betaAxisId);
+				if (! p.isHasVariants()) {
+					p.
+						setAlphaAxisId(alphaAxisId).
+						setBetaAxisId(betaAxisId);
+				}
 			}
 			
 			try {
@@ -186,6 +194,8 @@ public class RestController extends BaseController {
 				}
 				catch (DuplicateItemException e) {
 					// Shouldn't ever happen for this update
+				}
+				catch (ResourceException e) {
 				}
 				
 				return resp.setError(false).addMessage("Media successfully uploaded");
@@ -343,6 +353,9 @@ public class RestController extends BaseController {
 				resp.setError(true).addMessage("Item could not be saved: missing data");					
 			}
 			catch (DuplicateItemException e) {
+				resp.setError(true).addMessage(e.getMessage());					
+			}
+			catch (ResourceException e) {
 				resp.setError(true).addMessage(e.getMessage());					
 			}
 		}

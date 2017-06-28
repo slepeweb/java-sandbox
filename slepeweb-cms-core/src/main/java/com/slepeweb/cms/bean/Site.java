@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 
 public class Site extends CmsBean {
 	private static final long serialVersionUID = 1L;
@@ -31,7 +32,9 @@ public class Site extends CmsBean {
 		return String.format("%s (%s)", getName(), getShortname());
 	}
 	
-	public Site save() throws MissingDataException, DuplicateItemException {
+	public Site save() 
+			throws MissingDataException, DuplicateItemException, ResourceException {
+		
 		return getSiteService().save(this);
 	}
 	

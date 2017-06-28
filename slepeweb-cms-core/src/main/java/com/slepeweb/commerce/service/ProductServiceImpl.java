@@ -11,6 +11,7 @@ import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemServiceImpl;
 import com.slepeweb.commerce.bean.Product;
@@ -24,7 +25,7 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	
 	@Autowired ItemService itemService;
 	
-	public Product save(Product p) throws MissingDataException, DuplicateItemException {
+	public Product save(Product p) throws MissingDataException, DuplicateItemException, ResourceException {
 		
 		// First save the item data, ie insert/update row in Item
 		Item i = super.save(p);
@@ -89,6 +90,13 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 			new CommerceRowMapper.ProductMapper()));		
 	}
 	
+	public Product get(String partNum) {
+		return (Product) getLastInList(this.jdbcTemplate.query(
+			"select * from product where partnum = ?", 
+			new Object[] {partNum}, 
+			new CommerceRowMapper.ProductMapper()));		
+	}
+	
 	/*
 	 * This method deletes one or more rows in Item table, and one row in Product table.
 	 */
@@ -109,7 +117,7 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	}
 	
 	public Product copy(Product source, String name, String simplename, String partNum, Integer copyId) 
-			throws MissingDataException, DuplicateItemException {
+			throws MissingDataException, DuplicateItemException, ResourceException {
 		
 		List<Variant>  sourceVariants = source.getVariants();
 		

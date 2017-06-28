@@ -1,5 +1,7 @@
 package com.slepeweb.commerce.service;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -71,6 +73,13 @@ public class AxisServiceImpl extends BaseServiceImpl implements AxisService {
 				"select * from axis where shortname = ?", 
 				new Object[] {shortname}, 
 				new CommerceRowMapper.AxisMapper()));
+	}
+	
+	public List<Axis> get() {
+		return this.jdbcTemplate.query(
+				"select * from axis order by shortname", 
+				new Object[] {}, 
+				new CommerceRowMapper.AxisMapper());
 	}
 	
 	public Axis get(Long id) {

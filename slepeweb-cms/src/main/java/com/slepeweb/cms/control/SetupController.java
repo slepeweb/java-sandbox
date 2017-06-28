@@ -13,8 +13,10 @@ import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.SolrService;
+import com.slepeweb.cms.setup.CommerceSetup;
 import com.slepeweb.cms.setup.SiteSetup;
 
 @Controller
@@ -22,6 +24,7 @@ public class SetupController extends BaseController {
 	private static Logger LOG = Logger.getLogger(SetupController.class);
 	
 	@Autowired private SiteSetup siteSetup;
+	@Autowired private CommerceSetup commerceSetup;
 	@Autowired private HostService hostService;
 	@Autowired private SolrService solrService;
 	
@@ -39,6 +42,40 @@ public class SetupController extends BaseController {
 			}
 			catch (DuplicateItemException e) {
 				LOG.warn("Item(s) already exist - site initialisation incomplete");				
+			}
+			catch (ResourceException e) {
+				LOG.warn("Resource exception", e);				
+			}
+			
+			return "finished";
+		}
+		else {
+			LOG.warn(String.format("Spreadsheet not found [%s]", resource));
+			return String.format("Resource not found [%s]", resource);
+		}
+	}
+	
+	@RequestMapping(value="/setup/commerce", produces="text/text")	
+	@ResponseBody
+	public String initCommerce(
+			@RequestParam(value="site", required=true) String siteName,
+			@RequestParam(value="file", required=true) String fileName) {	
+		
+		String resource = "/xls/" + fileName;
+		URL url = getClass().getClassLoader().getResource(resource);
+		
+		if (url != null) {
+			try {
+				this.commerceSetup.load(siteName, url.getPath());
+			}
+			catch (MissingDataException e) {
+				LOG.warn("Missing data - site initialisation incomplete");				
+			}
+			catch (DuplicateItemException e) {
+				LOG.warn("Item(s) already exist - site initialisation incomplete");				
+			}
+			catch (ResourceException e) {
+				LOG.warn("Resource exception");				
 			}
 			
 			return "finished";

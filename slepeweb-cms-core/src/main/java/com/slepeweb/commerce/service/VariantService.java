@@ -14,4 +14,5 @@ public interface VariantService {
 	List<Variant> getMany(Long origItemId, Long alphaValueId, Long betaValueId);
 	Variant save(Variant v) throws MissingDataException, DuplicateItemException;
 	long count();
+	Long count(Long origId);
 }
