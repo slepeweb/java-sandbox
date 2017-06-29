@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -18,7 +19,7 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	
 	private static Logger LOG = Logger.getLogger(MediaServiceImpl.class);
 	
-	public Media save(Media m) throws MissingDataException {
+	public Media save(Media m) throws ResourceException {
 		if (m.isDefined4Insert()) {
 			Media dbRecord = getMedia(m.getItemId());
 			if (dbRecord != null) {

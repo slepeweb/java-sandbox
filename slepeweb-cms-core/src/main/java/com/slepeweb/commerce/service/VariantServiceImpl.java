@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.BaseServiceImpl;
 import com.slepeweb.commerce.bean.Variant;
 import com.slepeweb.commerce.util.CommerceRowMapper;
@@ -18,7 +19,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 	
 	private static Logger LOG = Logger.getLogger(VariantServiceImpl.class);
 	
-	public Variant save(Variant v) throws MissingDataException, DuplicateItemException {
+	public Variant save(Variant v) throws ResourceException {
 		if (! v.isDefined4Insert()) {
 			throw new MissingDataException("Variant data not sufficient for db insert");
 		}
@@ -35,7 +36,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 		return v;
 	}
 	
-	private void insert(Variant v) throws MissingDataException, DuplicateItemException {
+	private void insert(Variant v) throws ResourceException {
 		try {
 			this.jdbcTemplate.update(
 					"insert into variant (origitemid, sku, stock, price, alphavalueid, betavalueid) " +

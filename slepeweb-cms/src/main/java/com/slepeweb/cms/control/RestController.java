@@ -38,9 +38,7 @@ import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Template;
-import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
-import com.slepeweb.cms.except.NotRevertableException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.ItemService;
@@ -176,7 +174,7 @@ public class RestController extends BaseController {
 				try {
 					this.mediaService.save(m);
 				}
-				catch (MissingDataException e) {
+				catch (ResourceException e) {
 					String s = "Missing media data - not saved";
 					LOG.error(s, e);
 					return resp.setError(true).addMessage(s);		
@@ -187,15 +185,10 @@ public class RestController extends BaseController {
 					i.setDateUpdated(new Timestamp(System.currentTimeMillis()));
 					i.save();
 				}
-				catch (MissingDataException e) {
+				catch (ResourceException e) {
 					String s = "Missing item data ??? - not saved";
 					LOG.error(s, e);
 					return resp.setError(true).addMessage(s);		
-				}
-				catch (DuplicateItemException e) {
-					// Shouldn't ever happen for this update
-				}
-				catch (ResourceException e) {
 				}
 				
 				return resp.setError(false).addMessage("Media successfully uploaded");
@@ -327,7 +320,7 @@ public class RestController extends BaseController {
 					fvx.save();
 					c++;
 				}
-				catch (MissingDataException e) {
+				catch (ResourceException e) {
 					LOG.error(e.getMessage());
 					isErrors = true;
 				}
@@ -349,14 +342,8 @@ public class RestController extends BaseController {
 				i.save();
 				resp.addMessage(String.format("%d fields updated", c));
 			}
-			catch (MissingDataException e) {
-				resp.setError(true).addMessage("Item could not be saved: missing data");					
-			}
-			catch (DuplicateItemException e) {
-				resp.setError(true).addMessage(e.getMessage());					
-			}
 			catch (ResourceException e) {
-				resp.setError(true).addMessage(e.getMessage());					
+				resp.setError(true).addMessage("Item could not be saved: missing data");					
 			}
 		}
 		
@@ -481,7 +468,7 @@ public class RestController extends BaseController {
 				Item r = this.itemService.revert(i);
 				return resp.setError(false).addMessage("Item reverted to previous version").setData(r.getId());
 			}
-			catch (NotRevertableException e) {
+			catch (ResourceException e) {
 				return resp.setError(true).addMessage(String.format("No item with this id", itemId));
 			}
 		}
@@ -640,7 +627,7 @@ public class RestController extends BaseController {
 			parent.saveLinks();		
 			return resp.setError(false).addMessage(String.format("%d links saved", links.size()));
 		}
-		catch (MissingDataException e) {
+		catch (ResourceException e) {
 			return resp.setError(true).addMessage(e.getMessage());
 		}
 	}

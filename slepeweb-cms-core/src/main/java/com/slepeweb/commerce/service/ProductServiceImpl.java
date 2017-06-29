@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemServiceImpl;
@@ -25,8 +24,7 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	
 	@Autowired ItemService itemService;
 	
-	public Product save(Product p) throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Product save(Product p) throws ResourceException {
 		// First save the item data, ie insert/update row in Item
 		Item i = super.save(p);
 		
@@ -45,7 +43,7 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	/*
 	 * This method inserts one row in Product - doesn't need to touch the Item table
 	 */
-	private void insert(Product p) throws MissingDataException, DuplicateItemException {
+	private void insert(Product p) throws ResourceException {
 		try {
 			this.jdbcTemplate.update(
 					"insert into product (origitemid, partnum, stock, price, alphaaxisid, betaaxisid) " +
@@ -117,7 +115,7 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	}
 	
 	public Product copy(Product source, String name, String simplename, String partNum, Integer copyId) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
+			throws ResourceException {
 		
 		List<Variant>  sourceVariants = source.getVariants();
 		

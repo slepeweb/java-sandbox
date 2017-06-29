@@ -19,8 +19,7 @@ import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.setup.SiteSetupStatistics.ResultType;
@@ -36,8 +35,7 @@ public class CommerceSetup {
 
 	@Autowired private CmsService cmsService;
 
-	public void load(String siteName, String filePath) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
+	public void load(String siteName, String filePath) throws ResourceException {
 		
 		LOG.info(LogUtil.compose("Setting up storefront", filePath));
 		SiteSetupStatistics result = new SiteSetupStatistics();
@@ -98,17 +96,13 @@ public class CommerceSetup {
 		}		
 	}
 
-	private void processCsv(HSSFWorkbook wb, Site site, SiteSetupStatistics stats) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	private void processCsv(HSSFWorkbook wb, Site site, SiteSetupStatistics stats) throws ResourceException {
 		if (wb != null) {
 			createProducts(wb.getSheetAt(0).rowIterator(), site, stats);
 		}
 	}
 
-	private void createProducts(Iterator<Row> rowIter, Site site, SiteSetupStatistics stats) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	private void createProducts(Iterator<Row> rowIter, Site site, SiteSetupStatistics stats) throws ResourceException {		
 		Row row;
 		Item i;
 		Product p;
@@ -150,6 +144,7 @@ public class CommerceSetup {
 					i.setName(StringUtils.isBlank(currentRow.getName()) ? 
 							currentRow.getPartNum() : currentRow.getName());
 					i.setSimpleName(currentRow.getPartNum());
+					i.setFieldValue(FieldName.TITLE, currentRow.getPartNum());
 					LOG.info(String.format("Creating new product [%s]", currentRow.getPartNum()));
 				}
 				else {

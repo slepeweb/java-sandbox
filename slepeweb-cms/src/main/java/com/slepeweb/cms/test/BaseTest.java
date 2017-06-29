@@ -13,8 +13,6 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.commerce.bean.Product;
@@ -44,7 +42,7 @@ public abstract class BaseTest {
 	}
 
 	protected Site addSite(String name, String hostname, String homepageTypeName, String shortname) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
+			throws ResourceException {
 		
 		return CmsBeanFactory.makeSite().
 				setName(name).

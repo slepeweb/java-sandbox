@@ -3,7 +3,7 @@ package com.slepeweb.cms.bean;
 import java.io.InputStream;
 import java.sql.Blob;
 
-import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 
 
 public class Media extends CmsBean {
@@ -39,7 +39,7 @@ public class Media extends CmsBean {
 	}
 
 	@Override
-	protected CmsBean save() throws MissingDataException {
+	protected CmsBean save() throws ResourceException {
 		return getMediaService().save(this);
 	}
 

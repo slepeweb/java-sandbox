@@ -7,4 +7,9 @@ public class ResourceException extends Exception {
 	public ResourceException(String message) {
 		super(message);
 	}
+	
+	@Override
+	public String getMessage() {
+		return String.format("%s: %s", getClass().getSimpleName(), super.getMessage());
+	}
 }

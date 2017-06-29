@@ -13,8 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.bean.Field.FieldType;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 
 public class Item extends CmsBean {
@@ -151,23 +149,19 @@ public class Item extends CmsBean {
 		}
 	}
 	
-	public Item save() 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Item save() throws ResourceException {
 		return getItemService().save(this);
 	}
 	
-	public Item save(boolean extended) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Item save(boolean extended) throws ResourceException {
 		return getItemService().save(this, extended);
 	}
 	
-	public void saveFieldValues() throws MissingDataException {
+	public void saveFieldValues() throws ResourceException {
 		getItemService().saveFieldValues(getFieldValues());
 	}
 	
-	public void saveLinks() throws MissingDataException {
+	public void saveLinks() throws ResourceException {
 		 getItemService().saveLinks(this);
 	}
 	
@@ -188,9 +182,7 @@ public class Item extends CmsBean {
 		return this;
 	}
 	
-	public Item addChild(Item child) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Item addChild(Item child) throws ResourceException {
 		child.setParent(this);
 		return getItemService().save(child);
 	}
@@ -232,13 +224,12 @@ public class Item extends CmsBean {
 	 * Shortcut items must be treated differently when subject to move. In 
 	 * particular, need to know which of possibly many parents is affected.
 	 */
-	public boolean move(Item currentParent, Item target, boolean shortcut) 
-			throws MissingDataException, ResourceException {
+	public boolean move(Item currentParent, Item target, boolean shortcut) throws ResourceException {
 		return move(currentParent, target, shortcut, "over");
 	}
 	
 	public boolean move(Item currentParent, Item target, boolean shortcut, String mode) 
-			throws MissingDataException, ResourceException {
+			throws ResourceException {
 		return getCmsService().getItemService().move(this, currentParent, target, shortcut, mode);
 	}
 	

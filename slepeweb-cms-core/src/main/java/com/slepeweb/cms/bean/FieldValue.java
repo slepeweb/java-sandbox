@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Field.FieldType;
-import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.StringUtil;
 
 public class FieldValue extends CmsBean {
@@ -52,7 +52,7 @@ public class FieldValue extends CmsBean {
 		return String.format("itemId=%d: %s {%s}", getItemId(), getField(), StringUtils.abbreviate(getStringValue(), 64));
 	}
 	
-	public FieldValue save() throws MissingDataException {
+	public FieldValue save() throws ResourceException {
 		return getFieldValueService().save(this);
 	}
 	

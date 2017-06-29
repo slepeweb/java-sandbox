@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.BaseServiceImpl;
 import com.slepeweb.commerce.bean.AxisValue;
 import com.slepeweb.commerce.util.CommerceRowMapper;
@@ -17,7 +18,7 @@ public class AxisValueServiceImpl extends BaseServiceImpl implements AxisValueSe
 	
 	private static Logger LOG = Logger.getLogger(AxisValueServiceImpl.class);
 	
-	public AxisValue save(AxisValue av) throws MissingDataException, DuplicateItemException {
+	public AxisValue save(AxisValue av) throws ResourceException {
 		if (! av.isDefined4Insert()) {
 			throw new MissingDataException("AxisValue data not sufficient for db insert");
 		}
@@ -34,7 +35,7 @@ public class AxisValueServiceImpl extends BaseServiceImpl implements AxisValueSe
 		return av;
 	}
 	
-	private void insert(AxisValue av) throws MissingDataException, DuplicateItemException {
+	private void insert(AxisValue av) throws ResourceException {
 		try {
 			this.jdbcTemplate.update(
 					"insert into axisvalue (axisid, value, ordering) " +

@@ -1,6 +1,6 @@
 package com.slepeweb.cms.except;
 
-public class NotRevertableException extends Exception {
+public class NotRevertableException extends ResourceException {
 
 	private static final long serialVersionUID = 1L;
 

@@ -9,9 +9,6 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
-import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.ItemService;
 
@@ -192,20 +189,8 @@ public class VersionTest extends BaseTest {
 			r.setNotes(String.format("New version is: %d", neu.getVersion()));
 			r.failIf(neu.getId() <= item.getId());
 		}
-		catch (NotVersionableException e) {
-			r.setNotes("Item is not versionable").fail();
-			return null;
-		}
-		catch (MissingDataException e) {
-			r.setNotes("Item data missing - could not create new version").fail();
-			return null;
-		}
-		catch (DuplicateItemException e) {
-			r.setNotes("Item already exists at new version").fail();
-			return null;
-		}
 		catch (ResourceException e) {
-			r.setNotes("Resource exception").fail();
+			r.setNotes(e.getMessage()).fail();
 			return null;
 		}
 		

@@ -5,8 +5,6 @@ import java.sql.Timestamp;
 import org.springframework.stereotype.Component;
 
 import com.slepeweb.cms.constant.ItemTypeName;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.commerce.bean.Axis;
@@ -111,16 +109,12 @@ public class CmsBeanFactory {
 		return tag;
 	}
 	
-	public static Item makeHomepageItem(Site s) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public static Item makeHomepageItem(Site s) throws ResourceException {
 		ItemType homepageType = makeHomepageType(s.getName());
 		return proveItem(s, homepageType, "Homepage", "", "/").save();
 	}
 	
-	public static Item makeContentFolderRootItem(Site s, ItemType it) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public static Item makeContentFolderRootItem(Site s, ItemType it) throws ResourceException {
 		return proveItem(s, it, "Content", "content", "/content").save();
 	}
 	

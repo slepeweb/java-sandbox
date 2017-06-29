@@ -56,15 +56,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected CmsService cmsService;
 	@Autowired protected ServerConfig config;
 	
-	public Item save(Item i) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Item save(Item i) throws ResourceException {
 		return save(i, false);
 	}
 	
-	public Item save(Item i, boolean extendedSave) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Item save(Item i, boolean extendedSave) throws ResourceException {
 		boolean updated = false;
 		
 		if (! i.isDefined4Insert()) {
@@ -112,7 +108,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return i.setLinks(null).setFieldValues(null);
 	}
 	
-	private void insert(Item i) throws MissingDataException, DuplicateItemException, ResourceException {
+	private void insert(Item i) throws ResourceException {
 		// Set timestamps
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		i.setDateCreated(now);
@@ -253,7 +249,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		LOG.info(compose("Older versions deleted", i));
 	}
 	
-	public void saveFieldValues(List<FieldValue> fieldValues) throws MissingDataException {
+	public void saveFieldValues(List<FieldValue> fieldValues) throws ResourceException {
 		if (fieldValues != null) {
 			for (FieldValue fv : fieldValues) {
 				fv.save();
@@ -261,7 +257,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
-	private void saveDefaultFieldValues(Item i) throws MissingDataException {
+	private void saveDefaultFieldValues(Item i) throws ResourceException {
 		// If item has no field values, create them, with default values
 		if (i.getFieldValues() == null || i.getFieldValues().size() == 0) {
 			i.setFieldValues(new ArrayList<FieldValue>());
@@ -279,11 +275,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 
-	public void saveLinks(Item i) throws MissingDataException {
+	public void saveLinks(Item i) throws ResourceException {
 		saveLinks(i, null);
 	}
 	
-	private void saveLinks(Item i, Item dbRecord) throws MissingDataException {
+	private void saveLinks(Item i, Item dbRecord) throws ResourceException {
 		if (i.getLinks() != null) {
 			if (dbRecord == null) {
 				dbRecord = getItem(i.getId());
@@ -416,7 +412,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return getItem(id);
 	}
 
-	public Item revert(Item i) throws NotRevertableException {
+	public Item revert(Item i) throws ResourceException {
 		if (i.getVersion() > 1) {
 			deleteItem(i.getOrigId(), i.getVersion());
 			Item r = getItem(i.getOrigId(), i.getVersion() - 1);
@@ -505,7 +501,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	public boolean move(Item mover, Item currentParent, Item newParent, boolean shortcut) 
-			throws MissingDataException, ResourceException {
+			throws ResourceException {
 		
 		return move(mover, currentParent, newParent, shortcut, "over");
 	}
@@ -515,7 +511,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 * If mode == "over", then target is effectively a new parent.
 	 */
 	public boolean move(Item mover, Item currentParent, Item target, boolean isShortcut, String mode) 
-			throws MissingDataException, ResourceException {
+			throws ResourceException {
 		
 		if (mover == null || target == null || currentParent == null || mode == null) {
 			throw new ResourceException("Missing item data for move");
@@ -601,14 +597,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return true;
 	}
 	
-	public Item copy(Item source, String name, String simplename) 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Item copy(Item source, String name, String simplename) throws ResourceException {
 		return copy(false, source, name, simplename);
 	}
 	
 	private Item copy(boolean isNewVersion, Item source, String name, String simplename)
-			 throws MissingDataException, DuplicateItemException, ResourceException {
+			 throws ResourceException {
 
 		/*
 		 *  The source instance will change subtly after new version is created (eg editable property),
@@ -714,9 +708,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return ni.setLinks(null).setFieldValues(null);
 	}
 	
-	public Item version(Item source) 
-			throws NotVersionableException, MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Item version(Item source) throws ResourceException {
 		if (source.getType().getName().equals(ItemType.CONTENT_FOLDER_TYPE_NAME)) {
 			throw new NotVersionableException(String.format("%s [%s]", "Cannot version item type", ItemType.CONTENT_FOLDER_TYPE_NAME));
 		}

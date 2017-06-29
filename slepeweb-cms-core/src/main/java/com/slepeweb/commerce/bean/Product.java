@@ -5,8 +5,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 
 public class Product extends Item {
@@ -60,9 +58,7 @@ public class Product extends Item {
 	}
 	
 	@Override
-	public Product save() 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Product save() throws ResourceException {
 		return getProductService().save(this);
 	}
 	

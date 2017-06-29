@@ -1,6 +1,6 @@
 package com.slepeweb.cms.except;
 
-public class DuplicateItemException extends Exception {
+public class DuplicateItemException extends ResourceException {
 
 	private static final long serialVersionUID = 1L;
 

@@ -2,8 +2,7 @@ package com.slepeweb.commerce.service;
 
 import java.util.List;
 
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.commerce.bean.Variant;
 
 public interface VariantService {
@@ -12,7 +11,7 @@ public interface VariantService {
 	void deleteMany(Long origItemId);
 	Variant get(String sku);
 	List<Variant> getMany(Long origItemId, Long alphaValueId, Long betaValueId);
-	Variant save(Variant v) throws MissingDataException, DuplicateItemException;
+	Variant save(Variant v) throws ResourceException;
 	long count();
 	Long count(Long origId);
 }

@@ -3,8 +3,7 @@ package com.slepeweb.commerce.bean;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.CmsBean;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 
 public class AxisValue extends CmsBean {
 	
@@ -20,7 +19,7 @@ public class AxisValue extends CmsBean {
 	}
 	
 	@Override
-	public AxisValue save() throws MissingDataException, DuplicateItemException {
+	public AxisValue save() throws ResourceException {
 		return getAxisValueService().save(this);
 	}
 
@@ -30,7 +29,7 @@ public class AxisValue extends CmsBean {
 	}
 
 	@Override
-	public boolean isDefined4Insert() throws MissingDataException {
+	public boolean isDefined4Insert() throws ResourceException {
 		return getAxisId() != null && StringUtils.isNotBlank(getValue());
 	}
 

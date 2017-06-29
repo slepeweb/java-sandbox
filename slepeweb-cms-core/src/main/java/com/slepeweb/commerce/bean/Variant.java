@@ -3,8 +3,7 @@ package com.slepeweb.commerce.bean;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.CmsBean;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 
 public class Variant extends CmsBean {
 
@@ -31,7 +30,7 @@ public class Variant extends CmsBean {
 	}
 	
 	@Override
-	public Variant save() throws MissingDataException, DuplicateItemException {
+	public Variant save() throws ResourceException {
 		return getVariantService().save(this);
 	}
 
@@ -46,7 +45,7 @@ public class Variant extends CmsBean {
 	}
 
 	@Override
-	public boolean isDefined4Insert() throws MissingDataException {
+	public boolean isDefined4Insert() throws ResourceException {
 		return getOrigItemId() != null && StringUtils.isNotBlank(getSku());
 	}
 

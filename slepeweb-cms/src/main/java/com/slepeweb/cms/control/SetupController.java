@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.SolrService;
@@ -37,14 +35,8 @@ public class SetupController extends BaseController {
 			try {
 				this.siteSetup.load(url.getPath());
 			}
-			catch (MissingDataException e) {
-				LOG.warn("Missing data - site initialisation incomplete");				
-			}
-			catch (DuplicateItemException e) {
-				LOG.warn("Item(s) already exist - site initialisation incomplete");				
-			}
 			catch (ResourceException e) {
-				LOG.warn("Resource exception", e);				
+				LOG.warn(String.format("Site initialisation incomplete : %s", e.getMessage()));				
 			}
 			
 			return "finished";
@@ -68,14 +60,8 @@ public class SetupController extends BaseController {
 			try {
 				this.commerceSetup.load(siteName, url.getPath());
 			}
-			catch (MissingDataException e) {
-				LOG.warn("Missing data - site initialisation incomplete");				
-			}
-			catch (DuplicateItemException e) {
-				LOG.warn("Item(s) already exist - site initialisation incomplete");				
-			}
 			catch (ResourceException e) {
-				LOG.warn("Resource exception");				
+				LOG.warn(String.format("Commerce initialisation incomplete : %s", e.getMessage()));				
 			}
 			
 			return "finished";

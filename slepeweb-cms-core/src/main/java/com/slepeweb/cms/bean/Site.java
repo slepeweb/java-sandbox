@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 
 public class Site extends CmsBean {
@@ -32,9 +30,7 @@ public class Site extends CmsBean {
 		return String.format("%s (%s)", getName(), getShortname());
 	}
 	
-	public Site save() 
-			throws MissingDataException, DuplicateItemException, ResourceException {
-		
+	public Site save() throws ResourceException {
 		return getSiteService().save(this);
 	}
 	

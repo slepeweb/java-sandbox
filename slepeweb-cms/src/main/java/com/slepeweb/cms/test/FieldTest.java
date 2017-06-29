@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.except.MissingDataException;
+import com.slepeweb.cms.except.ResourceException;
 
 @Service
 public class FieldTest extends BaseTest {
@@ -38,7 +38,7 @@ public class FieldTest extends BaseTest {
 				try {
 					aboutItem.saveFieldValues();
 				}
-				catch (MissingDataException e) {
+				catch (ResourceException e) {
 				}
 				
 				// 3010: Assert title field value update

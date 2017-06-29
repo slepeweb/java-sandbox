@@ -4,10 +4,6 @@ import java.util.List;
 
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.except.DuplicateItemException;
-import com.slepeweb.cms.except.MissingDataException;
-import com.slepeweb.cms.except.NotRevertableException;
-import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.except.ResourceException;
 
 
@@ -17,29 +13,25 @@ public interface ItemService {
 	Item getItem(Long id);
 	Item getItemByOriginalId(Long id);
 	Item getItem(Long id, int version);
-	Item save(Item i) 
-			throws MissingDataException, DuplicateItemException, ResourceException;
-	Item save(Item i, boolean extended) 
-			throws MissingDataException, DuplicateItemException, ResourceException;
-	void saveFieldValues(List<FieldValue> fvs) throws MissingDataException;
-	void saveLinks(Item i) throws MissingDataException;
+	Item save(Item i) throws ResourceException;
+	Item save(Item i, boolean extended) throws ResourceException;
+	void saveFieldValues(List<FieldValue> fvs) throws ResourceException;
+	void saveLinks(Item i) throws ResourceException;
 	int getCount();
 	int getCount(String path);
 	int getCountByType(Long itemTypeId);
 	int getVersionCount(long origid);
 	boolean move(Item child, Item currentParent, Item newParent, boolean shortcut) 
-			throws MissingDataException, ResourceException;
+			throws ResourceException;
 	boolean move(Item child, Item currentParent, Item target, boolean shortcut, String mode) 
-			throws MissingDataException, ResourceException;
+			throws ResourceException;
 	Item trashItem(Long id);
 	Item restoreItem(Long id);
 	List<Item> getTrashedItems();
 	int deleteTrashedItems(long[] idArr);
 	int restoreSelectedItems(long[] idArr);
 	int getBinCount();
-	Item copy(Item source, String name, String simplename) 
-			throws MissingDataException, DuplicateItemException, ResourceException;
-	Item version(Item source) 
-			throws NotVersionableException, MissingDataException, DuplicateItemException, ResourceException;
-	Item revert(Item source) throws NotRevertableException;
+	Item copy(Item source, String name, String simplename) throws ResourceException;
+	Item version(Item source) throws ResourceException;
+	Item revert(Item source) throws ResourceException;
 }
