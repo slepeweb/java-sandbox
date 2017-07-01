@@ -10,8 +10,9 @@ public class Variant extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	
 	private Long origItemId, alphaAxisValueId, betaAxisValueId;
-	private String sku;
-	private Integer stock, price;
+	private String qualifier;
+	private Long stock, price;
+	private Product product;
 	
 	@Override
 	public void assimilate(Object obj) {
@@ -26,7 +27,7 @@ public class Variant extends CmsBean {
 	
 	@Override
 	public String toString() {
-		return String.format("Variant '%s' (%d @ %f.2)", getSku(), getStock(), getPriceInPounds());
+		return String.format("Variant '%s' (%d @ %f.2)", getQualifier(), getStock(), getPriceInPounds());
 	}
 	
 	@Override
@@ -46,7 +47,7 @@ public class Variant extends CmsBean {
 
 	@Override
 	public boolean isDefined4Insert() throws ResourceException {
-		return getOrigItemId() != null && StringUtils.isNotBlank(getSku());
+		return getOrigItemId() != null && StringUtils.isNotBlank(getQualifier());
 	}
 
 	@Override
@@ -96,25 +97,32 @@ public class Variant extends CmsBean {
 		return this;
 	}
 	
-	public String getSku() {
-		return sku;
+	public String getQualifier() {
+		return qualifier;
 	}
 	
-	public Variant setSku(String sku) {
-		this.sku = sku;
+	public Variant setQualifier(String q) {
+		this.qualifier = q;
 		return this;
 	}
 	
-	public Integer getStock() {
+	public Long getStock() {
 		return stock;
 	}
 	
-	public Variant setStock(Integer stock) {
+	public Product getProduct() {
+		if (this.product == null) {
+			this.product = getCmsService().getProductService().get(getOrigItemId());
+		}
+		return this.product;
+	}
+
+	public Variant setStock(Long stock) {
 		this.stock = stock;
 		return this;
 	}
 	
-	public Integer getPrice() {
+	public Long getPrice() {
 		return this.price == null ? 0 : this.price;
 	}
 	
@@ -122,7 +130,7 @@ public class Variant extends CmsBean {
 		return this.price != null ? this.price / 100F : -1.0F;
 	}
 
-	public Variant setPrice(Integer price) {
+	public Variant setPrice(Long price) {
 		this.price = price;
 		return this;
 	}

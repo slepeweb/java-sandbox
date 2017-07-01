@@ -125,8 +125,8 @@ public class ProductTest extends BaseTest {
 					v = CmsBeanFactory.makeVariant().
 							setAlphaAxisValueId(avx.getId()).
 							setOrigItemId(p.getOrigId()).
-							setStock(33).
-							setSku(p.getPartNum() + "-" + avx.getValue().toLowerCase());
+							setStock(33L).
+							setQualifier(p.getPartNum() + "-" + avx.getValue().toLowerCase());
 					v.save();
 				}
 				

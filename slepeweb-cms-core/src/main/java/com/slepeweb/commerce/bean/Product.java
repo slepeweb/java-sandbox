@@ -1,5 +1,6 @@
 package com.slepeweb.commerce.bean;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -9,6 +10,7 @@ import com.slepeweb.cms.except.ResourceException;
 
 public class Product extends Item {
 	private static final long serialVersionUID = 1L;
+	private static NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance();
 	//private static Logger LOG = Logger.getLogger(Product.class);
 	
 	private String partNum;
@@ -29,6 +31,11 @@ public class Product extends Item {
 	
 	@Override
 	public void assimilate(Object obj) {
+		super.assimilate(obj);
+		assimilateProduct(obj);
+	}
+	
+	public void assimilateProduct(Object obj) {
 		if (obj instanceof Product) {
 			Product p = (Product) obj;
 			setPartNum(p.getPartNum());
@@ -36,14 +43,6 @@ public class Product extends Item {
 			setPrice(p.getPrice());
 			setAlphaAxisId(p.getAlphaAxisId());
 			setBetaAxisId(p.getBetaAxisId());
-		}
-	}
-	
-	public void assimilateItem(Object obj) {
-		if (obj instanceof Item) {
-			Item i = (Item) obj;
-			super.assimilate(i);
-			setId(i.getId());
 		}
 	}
 	
@@ -110,6 +109,10 @@ public class Product extends Item {
 		return this.price != null ? this.price / 100F : -1.0F;
 	}
 
+	public String getPriceInPoundsAsString() {
+		return CURRENCY_FORMAT.format(getPriceInPounds()).substring(1);
+	}
+
 	public Product setPrice(Long price) {
 		this.price = price;
 		return this;
@@ -167,7 +170,11 @@ public class Product extends Item {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
+		result = prime * result + ((alphaAxisId == null) ? 0 : alphaAxisId.hashCode());
+		result = prime * result + ((betaAxisId == null) ? 0 : betaAxisId.hashCode());
 		result = prime * result + ((partNum == null) ? 0 : partNum.hashCode());
+		result = prime * result + ((price == null) ? 0 : price.hashCode());
+		result = prime * result + ((stock == null) ? 0 : stock.hashCode());
 		return result;
 	}
 
@@ -175,17 +182,47 @@ public class Product extends Item {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
+		
 		if (!super.equals(obj))
 			return false;
+		
+		if (! equalsProduct(obj))
+			return false;
+
+		return true;
+	}
+	
+	public boolean equalsProduct(Object obj) {
+		if (this == obj)
+			return true;
 		if (getClass() != obj.getClass())
 			return false;
 		Product other = (Product) obj;
+		if (alphaAxisId == null) {
+			if (other.alphaAxisId != null)
+				return false;
+		} else if (!alphaAxisId.equals(other.alphaAxisId))
+			return false;
+		if (betaAxisId == null) {
+			if (other.betaAxisId != null)
+				return false;
+		} else if (!betaAxisId.equals(other.betaAxisId))
+			return false;
 		if (partNum == null) {
 			if (other.partNum != null)
 				return false;
 		} else if (!partNum.equals(other.partNum))
 			return false;
+		if (price == null) {
+			if (other.price != null)
+				return false;
+		} else if (!price.equals(other.price))
+			return false;
+		if (stock == null) {
+			if (other.stock != null)
+				return false;
+		} else if (!stock.equals(other.stock))
+			return false;
 		return true;
 	}
-
 }

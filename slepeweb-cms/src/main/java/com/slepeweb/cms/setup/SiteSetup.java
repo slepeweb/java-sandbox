@@ -119,7 +119,7 @@ public class SiteSetup {
 		
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
-			firstCell = SiteSetupUtils.getString(row.getCell(0));
+			firstCell = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0));
 
 			if (firstCell.startsWith("###")) {
 				break;
@@ -128,7 +128,7 @@ public class SiteSetup {
 			} else {
 				stats.inc(ResultType.ROWS_PROCESSED);
 				updateable = firstCell.equals("1");
-				name = SiteSetupUtils.getString(row.getCell(1));
+				name = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1));
 				s = this.cmsService.getSiteService().getSite(name);
 				exists = s != null;
 				
@@ -140,7 +140,7 @@ public class SiteSetup {
 				if (! exists || updateable) {
 					s.
 						setName(name).
-						setShortname(SiteSetupUtils.getString(row.getCell(2))).
+						setShortname(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))).
 						save();
 					
 					if (s.getId() != null) {
@@ -164,7 +164,7 @@ public class SiteSetup {
 
 		while (rowIter.hasNext()) {
 			row = (Row) rowIter.next();
-			String firstCell = SiteSetupUtils.getString(row.getCell(0));
+			String firstCell = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0));
 
 			if (firstCell.startsWith("###")) {
 				break;
@@ -173,7 +173,7 @@ public class SiteSetup {
 			} else {
 				stats.inc(ResultType.ROWS_PROCESSED);
 				updateable = firstCell.equals("1");
-				variable = SiteSetupUtils.getString(row.getCell(2));
+				variable = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2));
 				f = this.cmsService.getFieldService().getField(variable);
 				exists = f != null;
 				
@@ -184,13 +184,13 @@ public class SiteSetup {
 				
 				if (! exists || updateable) {
 					f.
-						setName(SiteSetupUtils.getString(row.getCell(1))).
-						setVariable(SiteSetupUtils.getString(row.getCell(2))).
-						setType(FieldType.valueOf(SiteSetupUtils.getString(row.getCell(3)))).
+						setName(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))).
+						setVariable(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))).
+						setType(FieldType.valueOf(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3)))).
 						setSize(SiteSetupUtils.getInteger(row.getCell(4))).
-						setHelp(SiteSetupUtils.getString(row.getCell(5))).
-						setValidValues(SiteSetupUtils.getString(row.getCell(6))).
-						setDefaultValue(SiteSetupUtils.getString(row.getCell(7))).
+						setHelp(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(5))).
+						setValidValues(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(6))).
+						setDefaultValue(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(7))).
 						save();
 					
 					LOG.info(String.format("Field saved [%s]", variable));
@@ -213,7 +213,7 @@ public class SiteSetup {
 
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
-			String firstCell = SiteSetupUtils.getString(row.getCell(0));
+			String firstCell = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0));
 
 			if (firstCell.startsWith("###")) {
 				break;
@@ -222,7 +222,7 @@ public class SiteSetup {
 			} else {
 				stats.inc(ResultType.ROWS_PROCESSED);
 				updateable = firstCell.equals("1");
-				name = SiteSetupUtils.getString(row.getCell(1));
+				name = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1));
 				it = this.cmsService.getItemTypeService().getItemType(name);
 				exists = it != null;
 				
@@ -234,7 +234,7 @@ public class SiteSetup {
 				if (! exists || updateable) {
 					it.
 						setName(name).
-						setMimeType(SiteSetupUtils.getString(row.getCell(2))).
+						setMimeType(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))).
 						setPrivateCache(SiteSetupUtils.getLong(row.getCell(4))).
 						setPublicCache(SiteSetupUtils.getLong(row.getCell(5))).
 						save();
@@ -249,7 +249,7 @@ public class SiteSetup {
 					
 					// NOTE: This method does not remove fields from an item type - do this manually.
 					long count = 0;
-					for (String variable : SiteSetupUtils.getString(row.getCell(3)).split(", ")) {
+					for (String variable : SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3)).split(", ")) {
 						variable = variable.trim();
 						f = fieldCache.get(variable);
 						if (f == null) {
@@ -290,7 +290,7 @@ public class SiteSetup {
 		
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
-			firstCell = SiteSetupUtils.getString(row.getCell(0));
+			firstCell = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0));
 
 			if (firstCell.startsWith("###")) {
 				break;
@@ -299,10 +299,10 @@ public class SiteSetup {
 			} else {
 				stats.inc(ResultType.ROWS_PROCESSED);
 				updateable = firstCell.equals("1");
-				linkType = SiteSetupUtils.getString(row.getCell(1));
-				linkNameStr = SiteSetupUtils.getString(row.getCell(2));				
+				linkType = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1));
+				linkNameStr = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2));				
 				lt = this.cmsService.getLinkTypeService().getLinkType(linkType);
-				s = this.siteCache.get(SiteSetupUtils.getString(row.getCell(3)));
+				s = this.siteCache.get(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3)));
 				
 				if (s != null && lt != null) {
 					for (String linkName : linkNameStr.split(", ")) {
@@ -346,7 +346,7 @@ public class SiteSetup {
 
 		while (rowIter.hasNext()) {
 			row = rowIter.next();
-			String firstCell = SiteSetupUtils.getString(row.getCell(0));
+			String firstCell = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0));
 
 			if (firstCell.startsWith("###")) {
 				break;
@@ -355,11 +355,11 @@ public class SiteSetup {
 			} else {
 				stats.inc(ResultType.ROWS_PROCESSED);
 				updateable = firstCell.equals("1");				
-				it = this.cmsService.getItemTypeService().getItemType(SiteSetupUtils.getString(row.getCell(1)));
+				it = this.cmsService.getItemTypeService().getItemType(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1)));
 				
 				if (it != null) {
-					templateName = SiteSetupUtils.getString(row.getCell(2));
-					sitename = SiteSetupUtils.getString(row.getCell(4));
+					templateName = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2));
+					sitename = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(4));
 					s = this.siteCache.get(sitename);
 					
 					if (s != null) {
@@ -376,7 +376,7 @@ public class SiteSetup {
 								setSiteId(s.getId()).
 								setItemTypeId(it.getId()).
 								setName(templateName).
-								setForward(SiteSetupUtils.getString(row.getCell(3))).
+								setForward(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))).
 								save();
 							
 							LOG.info(String.format("Updated template [%s]", templateName));

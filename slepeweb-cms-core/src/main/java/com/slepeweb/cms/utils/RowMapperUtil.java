@@ -68,6 +68,11 @@ public class RowMapperUtil {
 	
 	private static Item mapItem(ResultSet rs) throws SQLException {
 		String itemTypeName = rs.getString("typename");
+		
+		/*
+		 *  CmsBeanFactory.makeItem() will make either an Item or a Product,
+		 *  depending on the item type name.
+		 */
 		Item item = CmsBeanFactory.makeItem(itemTypeName).
 				setId(rs.getLong("id")).
 				setOrigId(rs.getLong("origid")).

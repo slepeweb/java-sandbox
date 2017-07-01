@@ -2,7 +2,9 @@ package com.slepeweb.cms.setup;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,17 +27,22 @@ import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.setup.SiteSetupStatistics.ResultType;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.commerce.bean.Axis;
+import com.slepeweb.commerce.bean.AxisValue;
 import com.slepeweb.commerce.bean.Product;
-import com.slepeweb.commerce.service.ProductXlsRow;
+import com.slepeweb.commerce.bean.Variant;
+import com.slepeweb.commerce.xls.AxisValueXlsRow;
+import com.slepeweb.commerce.xls.AxisXlsRow;
+import com.slepeweb.commerce.xls.ProductXlsRow;
+import com.slepeweb.commerce.xls.VariantXlsRow;
 
 @Component
 public class CommerceSetup {
 	private static Logger LOG = Logger.getLogger(CommerceSetup.class);
-	private static Pattern CURRENCY_PATTERN = Pattern.compile("(\\d+)\\.(\\d{2})");
+	private static Pattern CURRENCY_PATTERN = Pattern.compile("(\\d+)(\\.(\\d*))?");
 
 	@Autowired private CmsService cmsService;
 
-	public void load(String siteName, String filePath) throws ResourceException {
+	public void load(String siteName, String filePath) {
 		
 		LOG.info(LogUtil.compose("Setting up storefront", filePath));
 		SiteSetupStatistics result = new SiteSetupStatistics();
@@ -56,10 +63,10 @@ public class CommerceSetup {
 		stopwatch.stop();
 		long sec = stopwatch.getTime() / 1000;
 
-		LOG.info("Rows processed    :" + result.getNumRowsProcessed());
-		LOG.info("XLS errors        :" + result.getNumXlsErrors());
-		LOG.info("XLS warnings      :" + result.getNumXlsWarnings());
-		LOG.info("Product updates  :" + result.getNumProductUpdates());
+		LOG.info("Rows processed     :" + result.getNumRowsProcessed());
+		LOG.info("XLS errors         :" + result.getNumXlsErrors());
+		LOG.info("XLS warnings       :" + result.getNumXlsWarnings());
+		LOG.info("Products processed :" + result.getNumProductUpdates());
 		LOG.info("Took " + sec + " secs");
 		LOG.info("Finished");
 	}
@@ -96,18 +103,134 @@ public class CommerceSetup {
 		}		
 	}
 
-	private void processCsv(HSSFWorkbook wb, Site site, SiteSetupStatistics stats) throws ResourceException {
+	private void processCsv(HSSFWorkbook wb, Site site, SiteSetupStatistics stats) {
 		if (wb != null) {
-			createProducts(wb.getSheetAt(0).rowIterator(), site, stats);
+			createAxes(wb.getSheetAt(0).rowIterator(), stats);
+			createAxisValues(wb.getSheetAt(1).rowIterator(), stats);
+			createProducts(wb.getSheetAt(2).rowIterator(), site, stats);
+			createVariants(wb.getSheetAt(3).rowIterator(), site, stats);
 		}
 	}
 
-	private void createProducts(Iterator<Row> rowIter, Site site, SiteSetupStatistics stats) throws ResourceException {		
+	private void createAxes(Iterator<Row> rowIter, SiteSetupStatistics stats) {		
+		Row row;
+		Axis a;
+		AxisXlsRow currentRow = new AxisXlsRow();
+		
+		while (rowIter.hasNext()) {
+			row = (Row) rowIter.next();
+			update(currentRow, row);
+
+			if (currentRow.getUpdate().startsWith("###")) {
+				break;
+			} else if (currentRow.getUpdate().startsWith("#") || StringUtils.isBlank(currentRow.getUpdate())) {
+				continue;
+			} else {
+				stats.inc(ResultType.ROWS_PROCESSED);
+				
+				if (! currentRow.getUpdate().equals("1")) {
+					LOG.debug(LogUtil.compose("Axis is not updateable", currentRow.getShortname()));
+					continue;
+				}
+				
+				if (StringUtils.isBlank(currentRow.getShortname())) {
+					LOG.error(LogUtil.compose("Missing shortname in XLS"));
+					stats.inc(ResultType.XLS_ERROR);
+					continue;
+				}
+				
+				a = this.cmsService.getAxisService().get(currentRow.getShortname());
+				if (a == null) {
+					a = CmsBeanFactory.makeAxis().
+							setShortname(currentRow.getShortname());
+				}
+								
+				a.
+					setLabel(currentRow.getLabel()).
+					setUnits(currentRow.getUnits()).
+					setDescription(currentRow.getDescription());
+				
+					
+				// Save variant
+				try {
+					a.save();
+					stats.inc(ResultType.AXIS_UPDATED);
+				}
+				catch (ResourceException e) {
+					LOG.error(LogUtil.compose("Failed to save axis", a.getShortname()));
+				}
+			}
+		}
+	}
+	
+	private void createAxisValues(Iterator<Row> rowIter, SiteSetupStatistics stats) {		
+		Row row;
+		Axis a;
+		AxisValue av;
+		AxisValueXlsRow currentRow = new AxisValueXlsRow();
+		String lastAxisShortname = null;
+		int ordering = 10;
+		
+		while (rowIter.hasNext()) {
+			row = (Row) rowIter.next();
+			update(currentRow, row);
+			if (lastAxisShortname == null || ! lastAxisShortname.equals(currentRow.getAxis())) {
+				lastAxisShortname = currentRow.getAxis();
+				ordering = 10;
+			}
+
+			if (currentRow.getUpdate().startsWith("###")) {
+				break;
+			} else if (currentRow.getUpdate().startsWith("#") || StringUtils.isBlank(currentRow.getUpdate())) {
+				continue;
+			} else {
+				stats.inc(ResultType.ROWS_PROCESSED);
+				
+				if (! currentRow.getUpdate().equals("1")) {
+					LOG.debug(LogUtil.compose("AxisValue is not updateable", currentRow.getAxis(), currentRow.getAxis()));
+					continue;
+				}
+				
+				if (StringUtils.isBlank(currentRow.getValue())) {
+					LOG.error(LogUtil.compose("Missing value in XLS"));
+					stats.inc(ResultType.XLS_ERROR);
+					continue;
+				}
+				
+				a = this.cmsService.getAxisService().get(currentRow.getAxis());
+				if (a == null) {
+					LOG.error(LogUtil.compose("No such axis in DB", currentRow.getAxis()));
+					stats.inc(ResultType.XLS_ERROR);
+					continue;
+				}
+				
+				av = this.cmsService.getAxisValueService().get(a.getId(), currentRow.getValue());
+				if (av == null) {
+					av = CmsBeanFactory.makeAxisValue().
+							setAxisId(a.getId()).
+							setValue(currentRow.getValue());
+				}
+								
+				av.setOrdering(ordering);				
+				ordering += 10;
+									
+				// Save axis value
+				try {
+					av.save();
+					stats.inc(ResultType.AXISVALUE_UPDATED);
+				}
+				catch (ResourceException e) {
+					LOG.error(LogUtil.compose("Failed to save axis value", a.getShortname(), av.getValue()));
+				}
+			}
+		}
+	}
+	
+	private void createProducts(Iterator<Row> rowIter, Site site, SiteSetupStatistics stats) {		
 		Row row;
 		Item i;
 		Product p;
 		String path;
-		boolean updateable = false, exists;
 		Long oldAlphaAxisId, oldBetaAxisId;
 		ProductXlsRow currentRow = new ProductXlsRow();
 		ItemType productType = this.cmsService.getItemTypeService().getItemType("Product");
@@ -130,21 +253,20 @@ public class CommerceSetup {
 			} else {
 				stats.inc(ResultType.ROWS_PROCESSED);
 				
-				updateable = currentRow.getUpdate().equals("1");
+				if (! currentRow.getUpdate().equals("1")) {
+					LOG.debug(LogUtil.compose("Product is not updateable", currentRow.getPartNum()));
+					continue;
+				}
+				
 				path = String.format("%s/%s", currentRow.getSection(), currentRow.getPartNum());
 				i = this.cmsService.getItemService().getItem(site.getId(), path);
-				exists = i != null;
 				oldAlphaAxisId = oldBetaAxisId = null;
 				
-				if (! exists) {
+				if (i == null) {
 					i = CmsBeanFactory.makeProduct();
 					i.setSite(site);
 					i.setType(productType);
 					i.setPath(path);
-					i.setName(StringUtils.isBlank(currentRow.getName()) ? 
-							currentRow.getPartNum() : currentRow.getName());
-					i.setSimpleName(currentRow.getPartNum());
-					i.setFieldValue(FieldName.TITLE, currentRow.getPartNum());
 					LOG.info(String.format("Creating new product [%s]", currentRow.getPartNum()));
 				}
 				else {
@@ -156,65 +278,193 @@ public class CommerceSetup {
 					}
 				}
 				
-				if (! exists || updateable) {
-					if (i.isProduct()) {
-						p = (Product) i;
-						p.setPartNum(currentRow.getPartNum()).
+				i.
+					setName(StringUtils.isBlank(currentRow.getName()) ? currentRow.getPartNum() : currentRow.getName()).
+					setSimpleName(currentRow.getPartNum()).
+					setFieldValue(FieldName.TITLE, currentRow.getPartNum());
+				
+				if (i.isProduct()) {
+					p = (Product) i;
+					p.
+						setPartNum(currentRow.getPartNum()).
 						setStock(Long.valueOf(currentRow.getStock())).
 						setPrice(pounds2pence(currentRow.getPrice()));
+					
+					// Identify axes
+					alpha = this.cmsService.getAxisService().get(currentRow.getAlpha());
+					if (alpha == null && StringUtils.isNotBlank(currentRow.getAlpha())) {
+						LOG.warn(String.format("Un-recognized alpha axis [%s]", currentRow.getAlpha()));
+					}
+					p.setAlphaAxisId(alpha == null ? -1L : alpha.getId());
+					
+					beta = this.cmsService.getAxisService().get(currentRow.getBeta());
+					if (beta == null && StringUtils.isNotBlank(currentRow.getBeta())) {
+						LOG.warn(String.format("Un-recognized beta axis [%s]", currentRow.getBeta()));
+					}
+					p.setBetaAxisId(beta == null ? -1L : beta.getId());
+					
+					// Delete all variants of this product IFF axes have changed
+					if (
+							(oldAlphaAxisId != null && ! oldAlphaAxisId.equals(p.getAlphaAxisId())) || 
+							(oldBetaAxisId != null  && ! oldBetaAxisId.equals(p.getBetaAxisId()))) {
 						
-						// Identify axes
-						alpha = this.cmsService.getAxisService().get(currentRow.getAlpha());
-						if (alpha == null && StringUtils.isNotBlank(currentRow.getAlpha())) {
-							LOG.warn(String.format("Un-recognized alpha axis [%s]", currentRow.getAlpha()));
-						}
-						p.setAlphaAxisId(alpha == null ? -1L : alpha.getId());
-						
-						beta = this.cmsService.getAxisService().get(currentRow.getBeta());
-						if (beta == null && StringUtils.isNotBlank(currentRow.getBeta())) {
-							LOG.warn(String.format("Un-recognized beta axis [%s]", currentRow.getBeta()));
-						}
-						p.setBetaAxisId(beta == null ? -1L : beta.getId());
-						
-						// Delete all variants of this product IFF axes have changed
-						if (
-								(oldAlphaAxisId != null && ! oldAlphaAxisId.equals(p.getAlphaAxisId())) || 
-								(oldBetaAxisId != null  && ! oldBetaAxisId.equals(p.getBetaAxisId()))) {
-							
-							this.cmsService.getVariantService().deleteMany(p.getOrigId());
-							LOG.warn(String.format("Deleted all product variants [%s]", currentRow.getPartNum()));
-						}
-						
-						// Save product
+						this.cmsService.getVariantService().deleteMany(p.getOrigId());
+						LOG.warn(String.format("Deleted all product variants [%s]", currentRow.getPartNum()));
+					}
+					
+					// Save product
+					try {
 						p.save();
-						LOG.info(String.format("Product saved [%s]", currentRow.getPartNum()));
 						stats.inc(ResultType.PRODUCT_UPDATED);
 					}
-				}
-				else {
-					LOG.debug(LogUtil.compose("Product is not updateable", i));
+					catch (ResourceException e) {
+						LOG.error(LogUtil.compose("Failed to save product", p.getPartNum()));
+					}
 				}
 			}
 		}
 	}
 	
+	private void createVariants(Iterator<Row> rowIter, Site site, SiteSetupStatistics stats) {		
+		Row row;
+		Product p;
+		Variant v;
+		VariantXlsRow currentRow = new VariantXlsRow();
+		AxisValue alpha, beta;
+		Map<String, Product> productCache = new HashMap<String, Product>();
+		Map<String, AxisValue> axisValueCache = new HashMap<String, AxisValue>();
+		
+		while (rowIter.hasNext()) {
+			row = (Row) rowIter.next();
+			update(currentRow, row);
+
+			if (currentRow.getUpdate().startsWith("###")) {
+				break;
+			} else if (currentRow.getUpdate().startsWith("#") || StringUtils.isBlank(currentRow.getUpdate())) {
+				continue;
+			} else {
+				stats.inc(ResultType.ROWS_PROCESSED);
+				
+				if (! currentRow.getUpdate().equals("1")) {
+					LOG.debug(LogUtil.compose("Variant is not updateable", currentRow.getPartNum()));
+					continue;
+				}
+				
+				if (StringUtils.isBlank(currentRow.getPartNum())) {
+					LOG.error(LogUtil.compose("Missing part number in XLS", currentRow.getPartNum()));
+					stats.inc(ResultType.XLS_ERROR);
+					continue;
+				}
+				
+				p = productCache.get(currentRow.getPartNum());
+				if (p == null) {
+					p = this.cmsService.getProductService().get(currentRow.getPartNum());
+					if (p != null) {
+						productCache.put(currentRow.getPartNum(), p);
+					}
+				}
+				
+				if (p == null) {
+					LOG.error(LogUtil.compose("Product not in DB", currentRow.getPartNum()));
+					stats.inc(ResultType.XLS_ERROR);
+					continue;
+				}
+				
+				// The alpha axis must have a value
+				alpha = getAxisValue(axisValueCache, p.getAlphaAxisId(), currentRow.getAlpha());
+				if (alpha == null) {
+					LOG.error(LogUtil.compose("Alpha axis value not in DB", currentRow.getAlpha()));
+					stats.inc(ResultType.XLS_ERROR);
+					continue;
+				}
+				
+				// The beta axis is not mandatory
+				beta = getAxisValue(axisValueCache, p.getAlphaAxisId(), currentRow.getAlpha());
+				
+				v = this.cmsService.getVariantService().get(p.getOrigId(), alpha.getId(), beta.getId());
+				if (v == null) {
+					v = CmsBeanFactory.makeVariant();
+					v.setOrigItemId(p.getOrigId()).
+					setAlphaAxisValueId(alpha.getAxisId()).
+					setBetaAxisValueId(beta.getAxisId());
+				}
+				
+				v.
+					setQualifier(currentRow.getQualifier()).
+					setStock(Long.valueOf(currentRow.getStock())).
+					setPrice(pounds2pence(currentRow.getPrice()));
+				
+					
+				// Save variant
+				try {
+					v.save();
+					stats.inc(ResultType.VARIANT_UPDATED);
+				}
+				catch (ResourceException e) {
+					LOG.error(LogUtil.compose("Failed to save variant", p.getPartNum(), v.getQualifier()));
+				}
+			}
+		}
+	}
+	
+	private void update(AxisXlsRow currentRow, Row row) {
+		currentRow.setUpdate(stringValueParser(currentRow.getUpdate(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0))));
+		currentRow.setShortname(stringValueParser(currentRow.getShortname(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))));
+		currentRow.setLabel(stringValueParser(currentRow.getLabel(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))));
+		currentRow.setUnits(stringValueParser(currentRow.getUnits(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))));
+		currentRow.setDescription(stringValueParser(currentRow.getDescription(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(4))));
+	}
+	
+	
+	private void update(AxisValueXlsRow currentRow, Row row) {
+		currentRow.setUpdate(stringValueParser(currentRow.getUpdate(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0))));
+		currentRow.setAxis(stringValueParser(currentRow.getAxis(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))));
+		currentRow.setValue(stringValueParser(currentRow.getValue(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))));
+	}
+	
+	
 	private void update(ProductXlsRow currentRow, Row row) {
 		currentRow.setUpdate(stringValueParser(currentRow.getUpdate(), 
-				SiteSetupUtils.getString(row.getCell(0))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0))));
 		currentRow.setName(stringValueParser(currentRow.getName(), 
-				SiteSetupUtils.getString(row.getCell(1))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))));
 		currentRow.setSection(stringValueParser(currentRow.getSection(), 
-				SiteSetupUtils.getString(row.getCell(2))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))));
 		currentRow.setPartNum(stringValueParser(currentRow.getPartNum(), 
-				SiteSetupUtils.getString(row.getCell(3))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))));
 		currentRow.setStock(stringValueParser(currentRow.getStock(), 
-				SiteSetupUtils.getString(row.getCell(4))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(4))));
 		currentRow.setPrice(stringValueParser(currentRow.getPrice(), 
 				SiteSetupUtils.getString(row.getCell(5))));
 		currentRow.setAlpha(stringValueParser(currentRow.getAlpha(), 
-				SiteSetupUtils.getString(row.getCell(6))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(6))));
 		currentRow.setBeta(stringValueParser(currentRow.getBeta(), 
-				SiteSetupUtils.getString(row.getCell(7))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(7))));
+	}
+	
+	private void update(VariantXlsRow currentRow, Row row) {
+		currentRow.setUpdate(stringValueParser(currentRow.getUpdate(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0))));
+		currentRow.setPartNum(stringValueParser(currentRow.getPartNum(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))));
+		currentRow.setQualifier(stringValueParser(currentRow.getQualifier(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))));
+		currentRow.setStock(stringValueParser(currentRow.getStock(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))));
+		currentRow.setPrice(stringValueParser(currentRow.getPrice(), 
+				SiteSetupUtils.getString(row.getCell(4))));
+		currentRow.setAlpha(stringValueParser(currentRow.getAlpha(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(5))));
+		currentRow.setBeta(stringValueParser(currentRow.getBeta(), 
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(6))));
 	}
 	
 	private String stringValueParser(String orig, String replacement) {
@@ -227,11 +477,39 @@ public class CommerceSetup {
 		return replacement;
 	}
 	
+	private AxisValue getAxisValue(Map<String, AxisValue> cache, Long axisId, String value) {
+		String axisValueKey = String.format("%s-%s", axisId, value);
+		AxisValue av = cache.get(axisValueKey);
+		if (av == null) {
+			av = this.cmsService.getAxisValueService().get(axisId, value);
+			if (av != null) {
+				cache.put(axisValueKey, av);
+			}
+		}
+		
+		return av;
+	}
+	
 	private Long pounds2pence(String poundsStr) {
 		Matcher m = CURRENCY_PATTERN.matcher(poundsStr);
 		if (m.matches()) {
-			return Long.valueOf(m.group(1) + m.group(2));
+			Float f = Float.valueOf(poundsStr) * 100.0F;
+			return f.longValue();
 		}
 		return -1L;
+	}
+	
+	private void tout(String t) {
+		System.out.println(String.format("%s => %d", t, pounds2pence(t)));
+	}
+	
+	public static void main(String[] args) {
+		CommerceSetup c = new CommerceSetup();
+		c.tout("25");
+		c.tout("25.");
+		c.tout("25.1");
+		c.tout("25.12");
+		c.tout("25.123");
+		c.tout("25.126");
 	}
 }

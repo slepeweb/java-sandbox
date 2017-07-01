@@ -63,7 +63,7 @@
 				<label for="partNum">Part number: </label><input type="text" name="partNum" value="${editingItem.partNum}" />
 			</div>
 			<div>
-				<label for="price">Price: </label><input type="text" name="price" value="${editingItem.price}" />
+				<label for="price">Price: </label><input type="text" name="price" value="${editingItem.priceInPoundsAsString}" />
 			</div>
 			<div>
 				<label for="stock">Stock: </label><input type="text" name="stock" value="${editingItem.stock}" />

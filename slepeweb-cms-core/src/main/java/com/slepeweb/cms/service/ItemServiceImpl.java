@@ -28,8 +28,6 @@ import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 import com.slepeweb.commerce.bean.Product;
 
-// TODO: Can getItem() return a Product (if item type is Product)?
-
 @Repository(value="itemService")
 public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
@@ -730,7 +728,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			Product p = (Product) i;
 			Product dbRecord = this.cmsService.getProductService().get(i.getOrigId());
 			if (dbRecord != null) {
-				p.assimilate(dbRecord);
+				p.assimilateProduct(dbRecord);
 				return p;
 			}
 		}

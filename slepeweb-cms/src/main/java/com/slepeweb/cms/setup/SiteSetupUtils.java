@@ -195,7 +195,7 @@ public class SiteSetupUtils {
 	 * @param cell
 	 * @return
 	 */
-	public static String getString(Cell cell, String dflt) {
+	public static String getStringIgnoreDecimal(Cell cell, String dflt) {
 		if (cell != null) {
 			int type = cell.getCellType();
 			if (type != Cell.CELL_TYPE_ERROR) {
@@ -224,6 +224,29 @@ public class SiteSetupUtils {
 
 	public static String getString(Cell cell) {
 		return getString(cell, null);
+	}
+	
+	public static String getString(Cell cell, String dflt) {
+		if (cell != null) {
+			int type = cell.getCellType();
+			if (type != Cell.CELL_TYPE_ERROR) {
+				if (type == Cell.CELL_TYPE_STRING || type == Cell.CELL_TYPE_FORMULA) {
+					return cell.getStringCellValue().trim();
+				} else if (type == Cell.CELL_TYPE_NUMERIC) {
+					return String.valueOf(cell.getNumericCellValue());
+				}
+			}
+		}
+
+		if (dflt != null) {
+			return dflt;
+		}
+
+		return "";
+	}
+
+	public static String getStringIgnoreDecimal(Cell cell) {
+		return getStringIgnoreDecimal(cell, null);
 	}
 
 	public static String diffStr(String subject, Object destination, Object source) {

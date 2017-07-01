@@ -24,7 +24,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 			throw new MissingDataException("Variant data not sufficient for db insert");
 		}
 		
-		Variant dbRecord = get(v.getSku());	
+		Variant dbRecord = get(v);	
 				
 		if (dbRecord != null) {
 			update(dbRecord, v);
@@ -41,7 +41,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 			this.jdbcTemplate.update(
 					"insert into variant (origitemid, sku, stock, price, alphavalueid, betavalueid) " +
 					"values (?, ?, ?, ?, ?, ?)",
-					v.getOrigItemId(), v.getSku(), v.getStock(), v.getPrice(), 
+					v.getOrigItemId(), v.getQualifier(), v.getStock(), v.getPrice(), 
 					v.getAlphaAxisValueId(), v.getBetaAxisValueId());				
 		}
 		catch (DuplicateKeyException e) {
@@ -57,7 +57,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 			
 			this.jdbcTemplate.update(
 					"update product set sku = ?, stock = ?, price = ?, alphavalueid = ?, betavalueid = ? where origitemid = ?",
-					dbRecord.getSku(), dbRecord.getStock(), dbRecord.getPrice(), 
+					dbRecord.getQualifier(), dbRecord.getStock(), dbRecord.getPrice(), 
 					v.getAlphaAxisValueId(), v.getBetaAxisValueId(), v.getOrigItemId());
 			
 			LOG.info(compose("Updated variant", v));
@@ -70,13 +70,23 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 	}
 	
 	public Variant get(Variant v) {
-		return get(v.getSku());
+		return get(v.getOrigItemId(), v.getQualifier());
 	}
 	
-	public Variant get(String sku) {
+	public Variant get(Long origItemId, String qualifier) {
 		return (Variant) getLastInList(this.jdbcTemplate.query(
-				"select * from variant where sku = ?", 
-				new Object[] {sku}, 
+				"select * from variant where origitemid = ? and qualifier = ?", 
+				new Object[] {origItemId, qualifier}, 
+				new CommerceRowMapper.VariantMapper()));
+	}
+	
+	public Variant get(Long origItemId, Long alphaAxisValueId, Long betaAxisValueId) {
+		String sql = new String("select * from variant where origitemid = ? and "
+				+ "alphavalueid = ? and betavalueid = ?");
+		
+		return (Variant) getLastInList(this.jdbcTemplate.query(
+				sql, 
+				new Object[] {origItemId, alphaAxisValueId, betaAxisValueId}, 
 				new CommerceRowMapper.VariantMapper()));
 	}
 	

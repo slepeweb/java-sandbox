@@ -29,9 +29,9 @@ public class CommerceRowMapper {
 		public Variant mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new Variant().
 				setOrigItemId(rs.getLong("origitemid")).
-				setSku(rs.getString("sku")).
-				setStock(rs.getInt("stock")).
-				setPrice(rs.getInt("price")).
+				setQualifier(rs.getString("sku")).
+				setStock(rs.getLong("stock")).
+				setPrice(rs.getLong("price")).
 				setAlphaAxisValueId(rs.getLong("alphavalueid")).
 				setBetaAxisValueId(rs.getLong("betavalueid"));
 		}

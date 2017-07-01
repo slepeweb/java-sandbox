@@ -25,8 +25,12 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	@Autowired ItemService itemService;
 	
 	public Product save(Product p) throws ResourceException {
+		return save(p, false);
+	}
+	
+	public Product save(Product p, boolean extendedSave) throws ResourceException {
 		// First save the item data, ie insert/update row in Item
-		Item i = super.save(p);
+		Item i = super.save(p, extendedSave);
 		
 		// Now save the insert/update row in Product
 		Product dbRecord = get(p.getOrigId());		
@@ -61,7 +65,7 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	 * This method updates one row in Product - doesn't need to touch the Item table
 	 */
 	private void update(Product dbRecord, Product p) {
-		if (! dbRecord.equals(p)) {
+		if (! dbRecord.equalsProduct(p)) {
 			dbRecord.assimilate(p);
 			
 			this.jdbcTemplate.update(
@@ -131,7 +135,7 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 		for (Variant v : sourceVariants) {
 			nv = CmsBeanFactory.makeVariant();
 			nv.assimilate(v);
-			nv.setOrigItemId(p.getOrigId()).setSku(String.format("%s%s%d", v.getSku(), Item.SIMPLENAME_COPY_EXT, copyId)).save();
+			nv.setOrigItemId(p.getOrigId()).setQualifier(String.format("%s%s%d", v.getQualifier(), Item.SIMPLENAME_COPY_EXT, copyId)).save();
 		}
 		
 		return p.setVariants(null);

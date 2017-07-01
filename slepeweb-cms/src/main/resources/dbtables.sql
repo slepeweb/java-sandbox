@@ -217,12 +217,12 @@ create table product
 create table variant
 (
    origitemid int,
-   sku varchar(32) not null,
+   qualifier varchar(32) not null,
    stock int,
    price int,
    alphavalueid int,
    betavalueid int default -1,
-   primary key (sku),
+   primary key (origitemid, qualifier),
    unique key idx_variant_unique (origitemid, alphavalueid, betavalueid),
 	 constraint foreign key (origitemid) references product(origitemid) on delete cascade
 ) ENGINE=InnoDB;

@@ -3,12 +3,13 @@ package com.slepeweb.cms.setup;
 public class SiteSetupStatistics {
 	private int numRowsProcessed, numXlsErrors, numXlsWarnings;
 	private int numSiteUpdates, numItemTypeUpdates, numFieldUpdates, numTemplateUpdates;
-	private int numLinkNameUpdates, numProductUpdates;
+	private int numLinkNameUpdates;
+	private int numAxisUpdates, numAxisValueUpdates, numVariantUpdates, numProductUpdates;
 
 	public enum ResultType {
 		ROWS_PROCESSED, XLS_ERROR, XLS_WARNING, 
 		SITE_UPDATED, FIELD_UPDATED, ITEMTYPE_UPDATED, TEMPLATE_UPDATED,
-		LINKNAME_UPDATED, PRODUCT_UPDATED
+		LINKNAME_UPDATED, PRODUCT_UPDATED, VARIANT_UPDATED, AXIS_UPDATED, AXISVALUE_UPDATED
 	}
 
 	public void inc(ResultType type) {
@@ -28,7 +29,17 @@ public class SiteSetupStatistics {
 			this.numTemplateUpdates++;
 		} else if (type == ResultType.LINKNAME_UPDATED) {
 			this.numLinkNameUpdates++;
-		} else if (type == ResultType.PRODUCT_UPDATED) {
+		} 
+		else if (type == ResultType.AXIS_UPDATED) {
+			this.numProductUpdates++;
+		}
+		else if (type == ResultType.PRODUCT_UPDATED) {
+			this.numProductUpdates++;
+		}
+		else if (type == ResultType.PRODUCT_UPDATED) {
+			this.numProductUpdates++;
+		}
+		else if (type == ResultType.PRODUCT_UPDATED) {
 			this.numProductUpdates++;
 		}
 	}
@@ -63,6 +74,18 @@ public class SiteSetupStatistics {
 
 	public int getNumLinkNameUpdates() {
 		return numLinkNameUpdates;
+	}
+
+	public int getNumAxisUpdates() {
+		return numAxisUpdates;
+	}
+
+	public int getNumAxisValueUpdates() {
+		return numAxisValueUpdates;
+	}
+
+	public int getNumVariantUpdates() {
+		return numVariantUpdates;
 	}
 
 	public int getNumProductUpdates() {

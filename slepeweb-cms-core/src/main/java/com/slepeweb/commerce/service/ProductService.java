@@ -10,5 +10,6 @@ public interface ProductService extends ItemService {
 	Product get(Long origItemId);
 	Product get(String partNum);
 	Product save(Product p) throws ResourceException;
+	Product save(Product p, boolean extendedSave) throws ResourceException;
 	long count();
 }

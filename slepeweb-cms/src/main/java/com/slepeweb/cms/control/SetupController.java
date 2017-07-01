@@ -57,13 +57,7 @@ public class SetupController extends BaseController {
 		URL url = getClass().getClassLoader().getResource(resource);
 		
 		if (url != null) {
-			try {
-				this.commerceSetup.load(siteName, url.getPath());
-			}
-			catch (ResourceException e) {
-				LOG.warn(String.format("Commerce initialisation incomplete : %s", e.getMessage()));				
-			}
-			
+			this.commerceSetup.load(siteName, url.getPath());
 			return "finished";
 		}
 		else {

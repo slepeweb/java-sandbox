@@ -9,7 +9,8 @@ public interface VariantService {
 	void delete(Variant v);
 	void deleteMany(Long origItemId, Long alphaValueId, Long betaValueId);
 	void deleteMany(Long origItemId);
-	Variant get(String sku);
+	Variant get(Long origItemId, String sku);
+	Variant get(Long origItemId, Long alphaValueId, Long betaValueId);
 	List<Variant> getMany(Long origItemId, Long alphaValueId, Long betaValueId);
 	Variant save(Variant v) throws ResourceException;
 	long count();

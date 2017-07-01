@@ -1,4 +1,4 @@
-package com.slepeweb.commerce.service;
+package com.slepeweb.commerce.xls;
 
 public class ProductXlsRow {
 	private String update, name, section, partNum, stock, price, alpha, beta;
