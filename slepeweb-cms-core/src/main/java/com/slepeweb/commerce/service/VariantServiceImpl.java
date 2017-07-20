@@ -39,7 +39,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 	private void insert(Variant v) throws ResourceException {
 		try {
 			this.jdbcTemplate.update(
-					"insert into variant (origitemid, sku, stock, price, alphavalueid, betavalueid) " +
+					"insert into variant (origitemid, qualifier, stock, price, alphavalueid, betavalueid) " +
 					"values (?, ?, ?, ?, ?, ?)",
 					v.getOrigItemId(), v.getQualifier(), v.getStock(), v.getPrice(), 
 					v.getAlphaAxisValueId(), v.getBetaAxisValueId());				
@@ -56,9 +56,9 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 			dbRecord.assimilate(v);
 			
 			this.jdbcTemplate.update(
-					"update product set sku = ?, stock = ?, price = ?, alphavalueid = ?, betavalueid = ? where origitemid = ?",
+					"update variant set qualifier = ?, stock = ?, price = ? where origitemid = ? and alphavalueid = ? and betavalueid = ?",
 					dbRecord.getQualifier(), dbRecord.getStock(), dbRecord.getPrice(), 
-					v.getAlphaAxisValueId(), v.getBetaAxisValueId(), v.getOrigItemId());
+					v.getOrigItemId(), v.getAlphaAxisValueId(), v.getBetaAxisValueId());
 			
 			LOG.info(compose("Updated variant", v));
 			

@@ -50,9 +50,10 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	private void insert(Product p) throws ResourceException {
 		try {
 			this.jdbcTemplate.update(
-					"insert into product (origitemid, partnum, stock, price, alphaaxisid, betaaxisid) " +
-					"values (?, ?, ?, ?, ?, ?)",
-					p.getOrigId(), p.getPartNum(), p.getStock(), p.getPrice(), p.getAlphaAxisId(), p.getBetaAxisId());				
+					"insert into product (origitemid, siteid, partnum, stock, price, alphaaxisid, betaaxisid) " +
+					"values (?, ?, ?, ?, ?, ?, ?)",
+					p.getOrigId(), p.getSite().getId(), p.getPartNum(), p.getStock(), p.getPrice(), 
+					p.getAlphaAxisId(), p.getBetaAxisId());				
 		}
 		catch (DuplicateKeyException e) {
 			throw new DuplicateItemException("Product already exists");
@@ -82,9 +83,6 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 		
 	}
 	
-	/*
-	 * Gets row from Product, and DOES NOT mashes in row from Item
-	 */
 	public Product get(Long origItemId) {
 		return (Product) getLastInList(this.jdbcTemplate.query(
 			"select * from product where origitemid = ?", 
@@ -92,10 +90,10 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 			new CommerceRowMapper.ProductMapper()));		
 	}
 	
-	public Product get(String partNum) {
+	public Product get(Long siteId, String partNum) {
 		return (Product) getLastInList(this.jdbcTemplate.query(
-			"select * from product where partnum = ?", 
-			new Object[] {partNum}, 
+			"select * from product where siteid = ? and partnum = ?", 
+			new Object[] {siteId, partNum}, 
 			new CommerceRowMapper.ProductMapper()));		
 	}
 	

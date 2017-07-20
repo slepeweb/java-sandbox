@@ -21,6 +21,7 @@ import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.CmsService;
@@ -41,19 +42,32 @@ public class CommerceSetup {
 	private static Pattern CURRENCY_PATTERN = Pattern.compile("(\\d+)(\\.(\\d*))?");
 
 	@Autowired private CmsService cmsService;
+	private Template productTemplate, categoryTemplate;
 
-	public void load(String siteName, String filePath) {
+	public void load(String siteName, String filePath, String productTemplateName, String categoryTemplateName) {
 		
-		LOG.info(LogUtil.compose("Setting up storefront", filePath));
+		LOG.info(LogUtil.compose("Setting up storefront", filePath, productTemplateName, categoryTemplateName));
 		SiteSetupStatistics result = new SiteSetupStatistics();
 		Site site = this.cmsService.getSiteService().getSite(siteName);
 
 		StopWatch stopwatch = new StopWatch();
 		stopwatch.start();
 
-		if (site != null && filePath != null) {
-			LOG.info("Reading/validating spreadsheet");
-			processCsv(readCsv(filePath, result), site, result);
+		if (site != null && 
+				StringUtils.isNotBlank(filePath) && 
+				StringUtils.isNotBlank(productTemplateName) && 
+				StringUtils.isNotBlank(categoryTemplateName)) {
+			
+			this.productTemplate = this.cmsService.getTemplateService().getTemplate(site.getId(), productTemplateName);
+			this.categoryTemplate = this.cmsService.getTemplateService().getTemplate(site.getId(), categoryTemplateName);
+			
+			if (this.productTemplate != null && this.categoryTemplate != null) {
+				LOG.info("Reading/validating spreadsheet");
+				processCsv(readCsv(filePath, result), site, result);
+			}
+			else {
+				LOG.error("Check templates exist");
+			}
 		}
 
 		finish(result, stopwatch);
@@ -63,10 +77,13 @@ public class CommerceSetup {
 		stopwatch.stop();
 		long sec = stopwatch.getTime() / 1000;
 
-		LOG.info("Rows processed     :" + result.getNumRowsProcessed());
-		LOG.info("XLS errors         :" + result.getNumXlsErrors());
-		LOG.info("XLS warnings       :" + result.getNumXlsWarnings());
-		LOG.info("Products processed :" + result.getNumProductUpdates());
+		LOG.info("Rows processed       :" + result.getNumRowsProcessed());
+		LOG.info("XLS errors           :" + result.getNumXlsErrors());
+		LOG.info("XLS warnings         :" + result.getNumXlsWarnings());
+		LOG.info("Axes processed       :" + result.getNumAxisUpdates());
+		LOG.info("AxisValues processed :" + result.getNumAxisValueUpdates());
+		LOG.info("Products processed   :" + result.getNumProductUpdates());
+		LOG.info("Variants processed   :" + result.getNumVariantUpdates());
 		LOG.info("Took " + sec + " secs");
 		LOG.info("Finished");
 	}
@@ -105,17 +122,21 @@ public class CommerceSetup {
 
 	private void processCsv(HSSFWorkbook wb, Site site, SiteSetupStatistics stats) {
 		if (wb != null) {
-			createAxes(wb.getSheetAt(0).rowIterator(), stats);
-			createAxisValues(wb.getSheetAt(1).rowIterator(), stats);
-			createProducts(wb.getSheetAt(2).rowIterator(), site, stats);
-			createVariants(wb.getSheetAt(3).rowIterator(), site, stats);
+			if (createAxes(wb.getSheetAt(0).rowIterator(), stats)) {
+				if (createAxisValues(wb.getSheetAt(1).rowIterator(), stats)) {
+					if (createProducts(wb.getSheetAt(2).rowIterator(), site, stats)) {
+						createVariants(wb.getSheetAt(3).rowIterator(), site, stats);
+					}
+				}
+			}
 		}
 	}
 
-	private void createAxes(Iterator<Row> rowIter, SiteSetupStatistics stats) {		
+	private boolean createAxes(Iterator<Row> rowIter, SiteSetupStatistics stats) {		
 		Row row;
 		Axis a;
 		AxisXlsRow currentRow = new AxisXlsRow();
+		boolean ok = true;
 		
 		while (rowIter.hasNext()) {
 			row = (Row) rowIter.next();
@@ -136,6 +157,7 @@ public class CommerceSetup {
 				if (StringUtils.isBlank(currentRow.getShortname())) {
 					LOG.error(LogUtil.compose("Missing shortname in XLS"));
 					stats.inc(ResultType.XLS_ERROR);
+					ok = false;
 					continue;
 				}
 				
@@ -158,18 +180,22 @@ public class CommerceSetup {
 				}
 				catch (ResourceException e) {
 					LOG.error(LogUtil.compose("Failed to save axis", a.getShortname()));
+					ok = false;
 				}
 			}
 		}
+		
+		return ok;
 	}
 	
-	private void createAxisValues(Iterator<Row> rowIter, SiteSetupStatistics stats) {		
+	private boolean createAxisValues(Iterator<Row> rowIter, SiteSetupStatistics stats) {		
 		Row row;
 		Axis a;
 		AxisValue av;
 		AxisValueXlsRow currentRow = new AxisValueXlsRow();
 		String lastAxisShortname = null;
 		int ordering = 10;
+		boolean ok = true;
 		
 		while (rowIter.hasNext()) {
 			row = (Row) rowIter.next();
@@ -194,6 +220,7 @@ public class CommerceSetup {
 				if (StringUtils.isBlank(currentRow.getValue())) {
 					LOG.error(LogUtil.compose("Missing value in XLS"));
 					stats.inc(ResultType.XLS_ERROR);
+					ok = false;
 					continue;
 				}
 				
@@ -201,6 +228,7 @@ public class CommerceSetup {
 				if (a == null) {
 					LOG.error(LogUtil.compose("No such axis in DB", currentRow.getAxis()));
 					stats.inc(ResultType.XLS_ERROR);
+					ok = false;
 					continue;
 				}
 				
@@ -221,27 +249,26 @@ public class CommerceSetup {
 				}
 				catch (ResourceException e) {
 					LOG.error(LogUtil.compose("Failed to save axis value", a.getShortname(), av.getValue()));
+					ok = false;
 				}
 			}
 		}
+		
+		return ok;
 	}
 	
-	private void createProducts(Iterator<Row> rowIter, Site site, SiteSetupStatistics stats) {		
+	private boolean createProducts(Iterator<Row> rowIter, Site site, SiteSetupStatistics stats) {		
 		Row row;
-		Item i;
+		Item i, categoryItem;
 		Product p;
-		String path;
+		String productPath, categoryPath;
 		Long oldAlphaAxisId, oldBetaAxisId;
 		ProductXlsRow currentRow = new ProductXlsRow();
-		ItemType productType = this.cmsService.getItemTypeService().getItemType("Product");
+		ItemType productType = this.productTemplate.getItemType();
+		ItemType categoryType = this.categoryTemplate.getItemType();
 		Axis alpha, beta;
+		boolean ok = true;
 		
-		if (productType == null) {
-			stats.inc(ResultType.XLS_ERROR);
-			LOG.error("Failed to find item type Product in the database");
-			return;
-		}
-
 		while (rowIter.hasNext()) {
 			row = (Row) rowIter.next();
 			update(currentRow, row);
@@ -258,15 +285,22 @@ public class CommerceSetup {
 					continue;
 				}
 				
-				path = String.format("%s/%s", currentRow.getSection(), currentRow.getPartNum());
-				i = this.cmsService.getItemService().getItem(site.getId(), path);
+				categoryPath = currentRow.getSection();
+				categoryItem = this.cmsService.getItemService().getItem(site.getId(), categoryPath);
+				if (categoryItem == null) {
+					createCategory(site, categoryType, categoryPath);
+				}
+				
+				productPath = String.format("%s/%s", categoryPath, currentRow.getPartNum());
+				i = this.cmsService.getItemService().getItem(site.getId(), productPath);
 				oldAlphaAxisId = oldBetaAxisId = null;
 				
 				if (i == null) {
 					i = CmsBeanFactory.makeProduct();
 					i.setSite(site);
 					i.setType(productType);
-					i.setPath(path);
+					i.setPath(productPath);
+					i.setTemplate(productTemplate);
 					LOG.info(String.format("Creating new product [%s]", currentRow.getPartNum()));
 				}
 				else {
@@ -318,11 +352,33 @@ public class CommerceSetup {
 						stats.inc(ResultType.PRODUCT_UPDATED);
 					}
 					catch (ResourceException e) {
-						LOG.error(LogUtil.compose("Failed to save product", p.getPartNum()));
+						LOG.error(LogUtil.compose("Failed to save product", p.getPartNum(), e.getMessage()));
+						ok = false;
 					}
 				}
 			}
 		}
+		
+		return ok;
+	}
+	
+	private Item createCategory(Site site, ItemType category, String path) {		
+		Item i = CmsBeanFactory.makeItem(category.getName()).
+				setSite(site).
+				setType(category).
+				setPath(path).
+				setTemplate(this.categoryTemplate).
+				setName("New category");
+		
+		try {
+			LOG.info(String.format("Creating new category [%s]", category.getName()));
+			return i.save();
+		}
+		catch (ResourceException e) {
+			LOG.error(String.format("Failed to create category item: %s", e.getMessage()));
+		}
+		
+		return null;
 	}
 	
 	private void createVariants(Iterator<Row> rowIter, Site site, SiteSetupStatistics stats) {		
@@ -330,7 +386,7 @@ public class CommerceSetup {
 		Product p;
 		Variant v;
 		VariantXlsRow currentRow = new VariantXlsRow();
-		AxisValue alpha, beta;
+		AxisValue alphaValue, betaValue;
 		Map<String, Product> productCache = new HashMap<String, Product>();
 		Map<String, AxisValue> axisValueCache = new HashMap<String, AxisValue>();
 		
@@ -358,7 +414,7 @@ public class CommerceSetup {
 				
 				p = productCache.get(currentRow.getPartNum());
 				if (p == null) {
-					p = this.cmsService.getProductService().get(currentRow.getPartNum());
+					p = this.cmsService.getProductService().get(site.getId(), currentRow.getPartNum());
 					if (p != null) {
 						productCache.put(currentRow.getPartNum(), p);
 					}
@@ -371,22 +427,26 @@ public class CommerceSetup {
 				}
 				
 				// The alpha axis must have a value
-				alpha = getAxisValue(axisValueCache, p.getAlphaAxisId(), currentRow.getAlpha());
-				if (alpha == null) {
+				alphaValue = getAxisValue(axisValueCache, p.getAlphaAxisId(), currentRow.getAlpha());
+				if (alphaValue == null) {
 					LOG.error(LogUtil.compose("Alpha axis value not in DB", currentRow.getAlpha()));
 					stats.inc(ResultType.XLS_ERROR);
 					continue;
 				}
 				
 				// The beta axis is not mandatory
-				beta = getAxisValue(axisValueCache, p.getAlphaAxisId(), currentRow.getAlpha());
+				betaValue = p.getBetaAxisId() > 0L ?
+						getAxisValue(axisValueCache, p.getBetaAxisId(), currentRow.getBeta()) :
+						null;				
 				
-				v = this.cmsService.getVariantService().get(p.getOrigId(), alpha.getId(), beta.getId());
+				v = this.cmsService.getVariantService().get(p.getOrigId(), alphaValue.getId(), 
+						betaValue != null ? betaValue.getId() : -1L);
+				
 				if (v == null) {
 					v = CmsBeanFactory.makeVariant();
 					v.setOrigItemId(p.getOrigId()).
-					setAlphaAxisValueId(alpha.getAxisId()).
-					setBetaAxisValueId(beta.getAxisId());
+					setAlphaAxisValueId(alphaValue.getId()).
+					setBetaAxisValueId(betaValue != null ? betaValue.getId() : -1L);
 				}
 				
 				v.
@@ -401,7 +461,7 @@ public class CommerceSetup {
 					stats.inc(ResultType.VARIANT_UPDATED);
 				}
 				catch (ResourceException e) {
-					LOG.error(LogUtil.compose("Failed to save variant", p.getPartNum(), v.getQualifier()));
+					LOG.error(LogUtil.compose("Failed to save variant", e.getMessage(), p.getPartNum(), v.getQualifier()));
 				}
 			}
 		}
@@ -427,7 +487,7 @@ public class CommerceSetup {
 		currentRow.setAxis(stringValueParser(currentRow.getAxis(), 
 				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))));
 		currentRow.setValue(stringValueParser(currentRow.getValue(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))));
+				SiteSetupUtils.getString(row.getCell(2))));
 	}
 	
 	
@@ -491,10 +551,12 @@ public class CommerceSetup {
 	}
 	
 	private Long pounds2pence(String poundsStr) {
-		Matcher m = CURRENCY_PATTERN.matcher(poundsStr);
-		if (m.matches()) {
-			Float f = Float.valueOf(poundsStr) * 100.0F;
-			return f.longValue();
+		if (StringUtils.isNotBlank(poundsStr)) {
+			Matcher m = CURRENCY_PATTERN.matcher(poundsStr);
+			if (m.matches()) {
+				Float f = Float.valueOf(poundsStr) * 100.0F;
+				return f.longValue();
+			}
 		}
 		return -1L;
 	}

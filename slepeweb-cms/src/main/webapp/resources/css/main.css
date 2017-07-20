@@ -137,12 +137,18 @@ form div {
 /* Link tab: to identify link targets  */
 
 #linknav {
-		margin-left: 100px;
+		margin-left: 4em;
+		width: 55%;
+}
+
+ul.fancytree-container {
+	background-color: #ccc;
 }
 
 #addlinkdiv {
 	float: left;
 	visibility: hidden;
+	width: 100%;
 }
 
 #addlinkdiv input {
@@ -180,13 +186,20 @@ form div {
 	margin: 0 3px 3px 3px; 
 	padding: 0.4em; 
 	padding-left: 1.5em; 
-/* 	font-size: 1.4em;  */
 	height: 16px; 
+	position: relative;
+	width: 80%;
 }
 
 #sortable-links li span { 
 	position: absolute; 
 	margin-left: -1.3em; 
+}
+
+#sortable-links button {
+	position: absolute;
+	right: -80px;
+	bottom: -2px;
 }
 
 /* Main page elements  */

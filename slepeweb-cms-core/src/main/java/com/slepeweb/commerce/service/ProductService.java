@@ -8,7 +8,7 @@ public interface ProductService extends ItemService {
 	Product copy(Product source, String name, String simplename, String partNum, Integer copyId) 
 			throws ResourceException;
 	Product get(Long origItemId);
-	Product get(String partNum);
+	Product get(Long siteId, String partNum);
 	Product save(Product p) throws ResourceException;
 	Product save(Product p, boolean extendedSave) throws ResourceException;
 	long count();

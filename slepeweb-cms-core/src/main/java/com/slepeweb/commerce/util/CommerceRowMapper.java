@@ -27,9 +27,9 @@ public class CommerceRowMapper {
 
 	public static final class VariantMapper implements RowMapper<Variant> {
 		public Variant mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new Variant().
+			return CmsBeanFactory.makeVariant().
 				setOrigItemId(rs.getLong("origitemid")).
-				setQualifier(rs.getString("sku")).
+				setQualifier(rs.getString("qualifier")).
 				setStock(rs.getLong("stock")).
 				setPrice(rs.getLong("price")).
 				setAlphaAxisValueId(rs.getLong("alphavalueid")).
@@ -39,7 +39,7 @@ public class CommerceRowMapper {
 
 	public static final class AxisMapper implements RowMapper<Axis> {
 		public Axis mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new Axis().
+			return CmsBeanFactory.makeAxis().
 				setId(rs.getLong("id")).
 				setShortname(rs.getString("shortname")).
 				setLabel(rs.getString("label")).
@@ -50,7 +50,7 @@ public class CommerceRowMapper {
 
 	public static final class AxisValueMapper implements RowMapper<AxisValue> {
 		public AxisValue mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new AxisValue().
+			return CmsBeanFactory.makeAxisValue().
 				setId(rs.getLong("id")).
 				setAxisId(rs.getLong("axisid")).
 				setValue(rs.getString("value")).

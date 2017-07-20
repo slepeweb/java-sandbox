@@ -286,6 +286,16 @@ public class PageController extends BaseController {
 		return page.getView();
 	}
 
+	@RequestMapping(value="/spring/product")	
+	public String standardProduct(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "commerce/product-111", model);
+		return page.getView();
+	}
+	
 	private SiblingItemPager getSiblings(Item i, String[] typesOfInterest, int max) {
 		ItemFilter f = new ItemFilter().setTypes(typesOfInterest);
 		List<Item> children = i.getParent().getBoundItems(f);		

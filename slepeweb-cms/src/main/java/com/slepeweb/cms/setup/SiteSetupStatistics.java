@@ -31,16 +31,16 @@ public class SiteSetupStatistics {
 			this.numLinkNameUpdates++;
 		} 
 		else if (type == ResultType.AXIS_UPDATED) {
-			this.numProductUpdates++;
+			this.numAxisUpdates++;
+		}
+		else if (type == ResultType.AXISVALUE_UPDATED) {
+			this.numAxisValueUpdates++;
 		}
 		else if (type == ResultType.PRODUCT_UPDATED) {
 			this.numProductUpdates++;
 		}
-		else if (type == ResultType.PRODUCT_UPDATED) {
-			this.numProductUpdates++;
-		}
-		else if (type == ResultType.PRODUCT_UPDATED) {
-			this.numProductUpdates++;
+		else if (type == ResultType.VARIANT_UPDATED) {
+			this.numVariantUpdates++;
 		}
 	}
 

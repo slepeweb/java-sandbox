@@ -24,6 +24,9 @@
 
 <div id="core-tab">
 	<form>
+		<%-- Javascript looks for this input element --%>
+		<input id="itemIsProductFlag" type="hidden" value="${editingItem.product}" />
+		
 		<div>
 			<label for="id">Id: </label><input disabled="disabled" value="${editingItem.id}" />
 		</div>
@@ -161,7 +164,7 @@
 	<div>
 		<ul id="sortable-links">
 			<c:forEach items="${editingItem.allLinksBarBindings}" var="link">
-				<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
+				<li class="sortable-link ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
 					href="${applicationContextPath}/page/editor/${link.child.id}">${link}</a>
 						<button class="remove-link float-right">Remove</button><span 
 							class="hide">${link.parentId},${link.child.id},${link.type},${link.name}</span></li>

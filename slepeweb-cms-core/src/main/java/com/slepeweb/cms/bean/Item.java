@@ -442,7 +442,7 @@ public class Item extends CmsBean {
 	}
 	
 	public String getSimpleName() {
-		return simpleName;
+		return this.simpleName;
 	}
 	
 	public Item setSimpleName(String simpleName) {
@@ -705,6 +705,12 @@ public class Item extends CmsBean {
 
 	public Item setPath(String path) {
 		this.path = path;
+		if (StringUtils.isNotBlank(path)) {
+			int cursor = path.lastIndexOf("/");
+			if (cursor > -1) {
+				this.simpleName = path.substring(cursor + 1);
+			}
+		}
 		return this;
 	}
 

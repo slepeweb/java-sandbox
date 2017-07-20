@@ -205,13 +205,14 @@ create table tag
 create table product
 (
    origitemid int,
+   siteid int,
    partnum varchar(256) not null,
    stock int,
    price int,
    alphaaxisid int,
    betaaxisid int,
    primary key (origitemid),
-   unique key idx_product_partnum (partnum)
+   unique key idx_product_partnum (siteid, partnum)
 ) ENGINE=InnoDB;
 
 create table variant
@@ -222,8 +223,8 @@ create table variant
    price int,
    alphavalueid int,
    betavalueid int default -1,
-   primary key (origitemid, qualifier),
-   unique key idx_variant_unique (origitemid, alphavalueid, betavalueid),
+   primary key (origitemid, alphavalueid, betavalueid),
+   unique key idx_variant_unique (origitemid, qualifier),
 	 constraint foreign key (origitemid) references product(origitemid) on delete cascade
 ) ENGINE=InnoDB;
 

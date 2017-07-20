@@ -51,13 +51,15 @@ public class SetupController extends BaseController {
 	@ResponseBody
 	public String initCommerce(
 			@RequestParam(value="site", required=true) String siteName,
-			@RequestParam(value="file", required=true) String fileName) {	
+			@RequestParam(value="file", required=true) String fileName,
+			@RequestParam(value="ptemp", required=true) String productTemplate,
+			@RequestParam(value="ctemp", required=true) String categoryTemplate) {	
 		
 		String resource = "/xls/" + fileName;
 		URL url = getClass().getClassLoader().getResource(resource);
 		
 		if (url != null) {
-			this.commerceSetup.load(siteName, url.getPath());
+			this.commerceSetup.load(siteName, url.getPath(), productTemplate, categoryTemplate);
 			return "finished";
 		}
 		else {

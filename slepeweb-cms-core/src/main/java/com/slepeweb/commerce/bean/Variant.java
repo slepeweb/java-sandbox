@@ -107,7 +107,7 @@ public class Variant extends CmsBean {
 	}
 	
 	public Long getStock() {
-		return stock;
+		return this.stock == null ? 0L : this.stock;
 	}
 	
 	public Product getProduct() {
@@ -139,6 +139,10 @@ public class Variant extends CmsBean {
 		return this.alphaAxisValueId == null ? -1L : this.alphaAxisValueId;
 	}
 	
+	public AxisValue getAlphaAxisValue() {
+		return getAxisValueService().get(getAlphaAxisValueId());
+	}
+	
 	public Variant setAlphaAxisValueId(Long alphaValue) {
 		this.alphaAxisValueId = alphaValue;
 		return this;
@@ -146,6 +150,10 @@ public class Variant extends CmsBean {
 	
 	public Long getBetaAxisValueId() {
 		return this.betaAxisValueId == null ? -1L : this.betaAxisValueId;
+	}
+	
+	public AxisValue getBetaAxisValue() {
+		return getAxisValueService().get(getBetaAxisValueId());
 	}
 	
 	public Variant setBetaAxisValueId(Long betaValue) {

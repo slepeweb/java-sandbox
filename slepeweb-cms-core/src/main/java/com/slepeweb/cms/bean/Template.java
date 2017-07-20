@@ -6,6 +6,7 @@ public class Template extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private String name, forward;
 	private Long id, siteId, itemTypeId;
+	private ItemType itemType;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Template) {
@@ -77,6 +78,13 @@ public class Template extends CmsBean {
 	public Template setItemTypeId(Long itemTypeId) {
 		this.itemTypeId = itemTypeId;
 		return this;
+	}
+	
+	public ItemType getItemType() {
+		if (this.itemType == null) {
+			this.itemType = getItemTypeService().getItemType(getItemTypeId());
+		}
+		return this.itemType;
 	}
 
 	@Override

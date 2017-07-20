@@ -1,7 +1,8 @@
 <%@ tag %><%@ 
 	taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %><%@ 
 	taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %><%@ 
-	taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%>
+	taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%><%@ 
+	taglib prefix="cmsjs" tagdir="/WEB-INF/tags/cms/js"%>
 
 <title>slepe web solutions | </title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -40,7 +41,7 @@
 </script>
 
 <link rel="stylesheet" href="${applicationContextPath}/resources/css/main.css" type="text/css">
-<script src="${applicationContextPath}/resources/js/editor.js" type="text/javascript"></script>
+<cmsjs:main />
 
 <cms:extraCSS />
 <cms:extraJS />
