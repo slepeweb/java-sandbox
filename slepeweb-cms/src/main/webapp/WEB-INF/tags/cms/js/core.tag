@@ -19,10 +19,8 @@ $("#core-button").click(function () {
 	
 	if (isProduct) {
 			args.partNum = $("#core-tab input[name='partNum']").val();
-			args.price = $("#core-tab input[name='price']").val() * 100;
+			args.price = Math.floor($("#core-tab input[name='price']").val() * 100);
 			args.stock = $("#core-tab input[name='stock']").val();
-			args.alphaaxis = $("#core-tab select[name='alphaaxis']").val();
-			args.betaaxis = $("#core-tab select[name='betaaxis']").val();
 	}
 	
 	$.ajax(_ctx + "/rest/item/" + nodeKey + "/update/core", {

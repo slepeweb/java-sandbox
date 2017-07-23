@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.commerce.bean.Axis;
 import com.slepeweb.commerce.bean.AxisValue;
+import com.slepeweb.commerce.bean.AxisValueSelector;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.commerce.bean.Variant;
 
@@ -34,6 +35,35 @@ public class CommerceRowMapper {
 				setPrice(rs.getLong("price")).
 				setAlphaAxisValueId(rs.getLong("alphavalueid")).
 				setBetaAxisValueId(rs.getLong("betavalueid"));
+		}
+	}	
+
+	public static final class VariantAndBetaAxisValueMapper implements RowMapper<Variant> {
+		public Variant mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Variant v = CmsBeanFactory.makeVariant().
+				setOrigItemId(rs.getLong("origitemid")).
+				setQualifier(rs.getString("qualifier")).
+				setStock(rs.getLong("stock")).
+				setPrice(rs.getLong("price")).
+				setAlphaAxisValueId(rs.getLong("alphavalueid")).
+				setBetaAxisValueId(rs.getLong("betavalueid"));
+			
+			AxisValue beta = CmsBeanFactory.makeAxisValue().
+					setId(rs.getLong("betavalueid")).
+					setAxisId(rs.getLong("axisid")).
+					setOrdering(rs.getInt("ordering")).
+					setValue(rs.getString("value"));
+			
+			v.setBetaAxisValue(beta);
+			return v;
+		}
+	}	
+
+	public static final class AxisValueSelectorMapper implements RowMapper<AxisValueSelector.Option> {
+		public AxisValueSelector.Option mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new AxisValueSelector.Option().
+					setBody(rs.getString("value")).
+					setValue(rs.getLong("id"));
 		}
 	}	
 

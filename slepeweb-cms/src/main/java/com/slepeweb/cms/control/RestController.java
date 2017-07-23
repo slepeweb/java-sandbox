@@ -79,33 +79,26 @@ public class RestController extends BaseController {
 		return "cms.item.editor";		
 	}
 	
+	/*
+	 * NOTE: that I was getting 'Bad Request' returned by Spring when I had a long list of @RequestParam's,
+	 * so instead used HttpServletRequest in the method signature, and that seemed to cure the problem.
+	 * (But it could have been something else!)
+	 */
 	@RequestMapping(value="/item/{itemId}/update/core", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse updateItemCore(
-			@PathVariable long itemId, 
-			@RequestParam("name") String name, 
-			@RequestParam("simplename") String simplename, 
-			@RequestParam("searchable") boolean searchable, 
-			@RequestParam("published") boolean published, 
-			@RequestParam("template") Long templateId, 
-			@RequestParam("tags") String tagStr, 
-			@RequestParam(value="partNum", required=false) String partNum, 
-			@RequestParam(value="price", required=false) Long price, 
-			@RequestParam(value="stock", required=false) Long stock, 
-			@RequestParam(value="alphaaxis", required=false) Long alphaAxisId, 
-			@RequestParam(value="betaaxis", required=false) Long betaAxisId, 
-			ModelMap model) {	
+			@PathVariable long itemId, HttpServletRequest req, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
 		Item i = this.itemService.getItem(itemId);
-		Template t = this.templateService.getTemplate(templateId);
+		Template t = this.templateService.getTemplate(getLongParam(req, "template"));
 		
 		if (i != null) {
-			i = i.setName(name).
-				setSimpleName(simplename).
+			i = i.setName(getParam(req, "name")).
+				setSimpleName(getParam(req, "simplename")).
 				setDateUpdated(new Timestamp(System.currentTimeMillis())).
-				setSearchable(searchable).
-				setPublished(published).
+				setSearchable(getBooleanParam(req, "searchable")).
+				setPublished(getBooleanParam(req, "published")).
 				setTemplate(t);
 			
 			Product p = null;
@@ -113,15 +106,9 @@ public class RestController extends BaseController {
 			if (i.isProduct()) {
 				p = (Product) i;
 				p.
-					setPartNum(partNum).
-					setStock(stock).
-					setPrice(price);
-					
-				if (! p.isHasVariants()) {
-					p.
-						setAlphaAxisId(alphaAxisId).
-						setBetaAxisId(betaAxisId);
-				}
+					setPartNum(getParam(req, "partNum")).
+					setStock(getLongParam(req, "stock")).
+					setPrice(getLongParam(req, "price"));					
 			}
 			
 			try {
@@ -139,6 +126,7 @@ public class RestController extends BaseController {
 			}
 			
 			List<String> existingTags = i.getTags();
+			String tagStr = getParam(req, "tags");
 			List<String> latestTags = Arrays.asList(tagStr.split("[ ,]+"));
 			if (existingTags.size() != latestTags.size() || ! existingTags.containsAll(latestTags)) {
 				this.tagService.save(i, tagStr);
@@ -149,6 +137,18 @@ public class RestController extends BaseController {
 		}
 				
 		return resp.setError(true).addMessage(String.format("No item found with id %d", itemId));		
+	}
+	
+	private String getParam(HttpServletRequest req, String name) {
+		return req.getParameter(name);
+	}
+	
+	private Long getLongParam(HttpServletRequest req, String name) {
+		return Long.valueOf(getParam(req, name));
+	}
+	
+	private boolean getBooleanParam(HttpServletRequest req, String name) {
+		return getParam(req, name).equals("true");
 	}
 	
 	@RequestMapping(value="/item/{itemId}/update/media", method=RequestMethod.POST, produces="application/json")
@@ -663,4 +663,5 @@ public class RestController extends BaseController {
 		}
 		return "n/a";
 	}
+	
 }

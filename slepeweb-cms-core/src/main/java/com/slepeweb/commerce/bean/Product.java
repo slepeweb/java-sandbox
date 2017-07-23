@@ -1,7 +1,6 @@
 package com.slepeweb.commerce.bean;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -178,32 +177,8 @@ public class Product extends Item {
 		return this.variants;
 	}
 	
-	public List<AxisValue> getAlphaAxisValues() {
-		return getAxisValueService().getAll(getAlphaAxisId());
-	}
-
-	public List<AxisValue> getAlphaAxisValuesWithStock() {
-		List<AxisValue> list = new ArrayList<AxisValue>();
-		for (Variant v : getVariants()) {
-			if (v.getAlphaAxisValue().getAxisId().equals(getAlphaAxisId()) && v.getStock() > 0L) {
-				list.add(v.getAlphaAxisValue());
-			}
-		}
-		return list;
-	}
-
-	public List<AxisValue> getBetaAxisValues() {
-		return getAxisValueService().getAll(getBetaAxisId());
-	}
-
-	public List<AxisValue> getBetaAxisValuesWithStock() {
-		List<AxisValue> list = new ArrayList<AxisValue>();
-		for (Variant v : getVariants()) {
-			if (v.getBetaAxisValue().getAxisId().equals(getBetaAxisId()) && v.getStock() > 0L) {
-				list.add(v.getBetaAxisValue());
-			}
-		}
-		return list;
+	public AxisValueSelector getAlphaAxisValues() {
+		return getVariantService().getAlphaAxisSelector(getOrigId(), getAlphaAxisId());
 	}
 
 	@Override

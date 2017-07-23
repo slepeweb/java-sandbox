@@ -10,6 +10,15 @@ public class Variant extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	
 	private Long origItemId, alphaAxisValueId, betaAxisValueId;
+	private AxisValue alphaAxisValue, betaAxisValue;
+	public void setAlphaAxisValue(AxisValue alphaAxisValue) {
+		this.alphaAxisValue = alphaAxisValue;
+	}
+
+	public void setBetaAxisValue(AxisValue betaAxisValue) {
+		this.betaAxisValue = betaAxisValue;
+	}
+
 	private String qualifier;
 	private Long stock, price;
 	private Product product;
@@ -140,7 +149,10 @@ public class Variant extends CmsBean {
 	}
 	
 	public AxisValue getAlphaAxisValue() {
-		return getAxisValueService().get(getAlphaAxisValueId());
+		if (this.alphaAxisValue == null) {
+			this.alphaAxisValue = getAxisValueService().get(getAlphaAxisValueId());
+		}
+		return this.alphaAxisValue;
 	}
 	
 	public Variant setAlphaAxisValueId(Long alphaValue) {
@@ -153,7 +165,10 @@ public class Variant extends CmsBean {
 	}
 	
 	public AxisValue getBetaAxisValue() {
-		return getAxisValueService().get(getBetaAxisValueId());
+		if (this.betaAxisValue == null) {
+			this.betaAxisValue = getAxisValueService().get(getBetaAxisValueId());
+		}
+		return this.betaAxisValue;
 	}
 	
 	public Variant setBetaAxisValueId(Long betaValue) {

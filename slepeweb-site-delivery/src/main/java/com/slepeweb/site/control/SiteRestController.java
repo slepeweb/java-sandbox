@@ -2,10 +2,13 @@ package com.slepeweb.site.control;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,6 +17,10 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.service.TagService;
+import com.slepeweb.commerce.bean.AxisValue;
+import com.slepeweb.commerce.bean.AxisValueSelector;
+import com.slepeweb.commerce.bean.Variant;
+import com.slepeweb.commerce.service.VariantService;
 import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.service.NavigationService;
 
@@ -27,6 +34,7 @@ public class SiteRestController extends BaseController {
 	@Autowired private SiteService siteService;
 	@Autowired private NavigationService navigationService;
 	@Autowired private TagService tagService;
+	@Autowired private VariantService variantService;
 	
 	@RequestMapping(value="/sitemap/sws.txt", method=RequestMethod.GET, produces="text/plain")
 	@ResponseBody
@@ -91,5 +99,27 @@ public class SiteRestController extends BaseController {
 		for (LinkTarget lt : node.getChildren()) {
 			drillDown(lt, set);
 		}
+	}
+	
+	@RequestMapping(value="/product/{itemId}/variants/{alphaValueId}", 
+			method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public AxisValueSelector getManyWithStock(@PathVariable long itemId, @PathVariable long alphaValueId, ModelMap model) {	
+		List<Variant> variants = this.variantService.getVariantsWithBetaAxis(itemId, alphaValueId);
+		AxisValueSelector selector = new AxisValueSelector();
+		AxisValueSelector.Option option;
+		AxisValue av;
+		
+		for (Variant v : variants) {
+			av = v.getBetaAxisValue();
+			option = new AxisValueSelector.Option().
+					setBody(av.getValue()).
+					setValue(av.getId()).
+					setStock(v.getStock());
+			
+			selector.getOptions().add(option);
+		}
+		
+		return selector;
 	}
 }

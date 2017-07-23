@@ -2,6 +2,11 @@
 	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 	
+<c:set var="_extraJs" scope="request" value="/resources/sws/js/commerce.js" />
+<script type="text/javascript">
+	var _itemKey = "${_item.id}";
+</script>
+
 <sw:standardLayout>
 	<gen:debug><!-- jsp/sws/commerce/product-111.jsp --></gen:debug>
 	
@@ -18,18 +23,17 @@
 			<div class="col-1-3 primary-col">	
 				<c:if test="${_item.alphaAxisId > -1}">
 					<label>${_item.alphaAxis.label}</label>
-					<select>
-						<c:forEach items="${_item.alphaAxisValuesWithStock}" var="_av">
-							<option value="${_av.id}">${_av.value}</option>
+					<select id="alphaaxis-options">
+						<option value="-1">Choose ...</option>
+						<c:forEach items="${_item.alphaAxisValues.options}" var="_av">
+							<option value="${_av.value}">${_av.body}</option>
 						</c:forEach>
 					</select>
 					
 					<c:if test="${_item.betaAxisId > -1}">
 						<label>${_item.betaAxis.label}</label>
-						<select>
-							<c:forEach items="${_item.betaAxisValuesWithStock}" var="_av">
-								<option value="${_av.id}">${_av.value}</option>
-							</c:forEach>
+						<select id="betaaxis-options">
+							<option value="-1">Choose ...</option>
 						</select>
 					</c:if>
 				</c:if>				

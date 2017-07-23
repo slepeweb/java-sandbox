@@ -70,9 +70,9 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 			dbRecord.assimilate(p);
 			
 			this.jdbcTemplate.update(
-					"update product set partnum = ?, stock = ?, price = ?, alphaaxisid = ?, betaaxisid = ? where origitemid = ?",
+					"update product set partnum = ?, stock = ?, price = ? where origitemid = ?",
 					dbRecord.getPartNum(), dbRecord.getStock(), dbRecord.getPrice(), 
-					dbRecord.getAlphaAxisId(), dbRecord.getBetaAxisId(), p.getOrigId());
+					p.getOrigId());
 			
 			LOG.info(compose("Updated product", p));
 			

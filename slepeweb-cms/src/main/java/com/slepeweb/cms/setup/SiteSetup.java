@@ -341,7 +341,7 @@ public class SiteSetup {
 		Template t = null;
 		Site s;
 		boolean updateable = false, exists;
-		String sitename, templateName;
+		String sitename, templateName, itemTypeName;
 		ItemType it;
 
 		while (rowIter.hasNext()) {
@@ -354,8 +354,9 @@ public class SiteSetup {
 				continue;
 			} else {
 				stats.inc(ResultType.ROWS_PROCESSED);
-				updateable = firstCell.equals("1");				
-				it = this.cmsService.getItemTypeService().getItemType(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1)));
+				updateable = firstCell.equals("1");
+				itemTypeName = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1));
+				it = this.cmsService.getItemTypeService().getItemType(itemTypeName);
 				
 				if (it != null) {
 					templateName = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2));
@@ -389,6 +390,9 @@ public class SiteSetup {
 					else {
 						LOG.debug(LogUtil.compose("Site shortname is not valid", sitename));
 					}
+				}
+				else {
+					LOG.warn(LogUtil.compose("No such item type", itemTypeName));
 				}
 			}
 		}

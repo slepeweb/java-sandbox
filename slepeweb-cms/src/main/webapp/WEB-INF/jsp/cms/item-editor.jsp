@@ -32,6 +32,7 @@
 		</div>
 		<div>
 			<label for="path">Path: </label><input disabled="disabled" value="${editingItem.path}" />
+			<a href="${editingItem.path}" target="_blank">View</a>
 		</div>
 		<div>
 			<label for="type">Type: </label><input disabled="disabled" value="${editingItem.type.name}" />
@@ -95,11 +96,11 @@
 				</div>
 			</c:when><c:otherwise>
 				<div>
-					<label for="alphaaxis">Axis A: </label>
+					<label>Axis A: </label>
 					<input disabled="disabled" value="${editingItem.alphaAxis.shortname}" />
 				</div>
 				<div>
-					<label for="betaaxis">Axis B: </label>
+					<label>Axis B: </label>
 					<input disabled="disabled" value="${editingItem.betaAxis.shortname}" />
 				</div>
 			</c:otherwise></c:choose>
