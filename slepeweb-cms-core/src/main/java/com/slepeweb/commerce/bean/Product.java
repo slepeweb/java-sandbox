@@ -83,6 +83,14 @@ public class Product extends Item {
 		return null;
 	}
 	
+	public List<Item> getImages() {
+		Item mainImage = getImage();
+		if (mainImage != null) {
+			return getItemService().getItemsByPathLike(getSite().getId(), mainImage.getPath());
+		}
+		return null;
+	}
+	
 	public String getPartNum() {
 		return partNum;
 	}

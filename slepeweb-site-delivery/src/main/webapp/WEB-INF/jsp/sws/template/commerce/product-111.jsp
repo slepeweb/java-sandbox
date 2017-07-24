@@ -16,6 +16,14 @@
 			<div class="col-2-3 primary-col">
 				<sw:standardBody />	
 				<div><img src="${_item.image.path}" /></div>
+				
+				<c:if test="${not empty _item.images}">
+					<div>
+						<c:forEach items="${_item.images}" var="_image">
+							<img src="${_image.path}?height=100" />
+						</c:forEach>
+					</div>
+				</c:if>
 				<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
 			</div>
 			

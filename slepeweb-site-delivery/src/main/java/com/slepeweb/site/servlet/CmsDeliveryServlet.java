@@ -1,7 +1,12 @@
 package com.slepeweb.site.servlet;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -12,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -300,28 +306,21 @@ public class CmsDeliveryServlet {
 			return;
 		}
 		
-		res.setHeader("Content-Length", String.valueOf(media.getSize()));
 		res.setContentType(item.getType().getMimeType());
 		
 		if (media.getBlob() != null) {
-			final ServletOutputStream out = res.getOutputStream();
 			InputStream in = null;
 			
 			try {
 				in = media.getBlob().getBinaryStream();
-		
-				// We assume the JVM's memory management is efficient!
-				byte[] buff = getBuff();
-				try {
-					for (;;) {
-						int len = in.read(buff);
-						if (len == -1) {
-							break;
-						}
-						out.write(buff, 0, len);
-					}
-				} finally {
-					putBuff(buff);
+				int width = getImageSizeParam(req.getParameter("width"));
+				int height = getImageSizeParam(req.getParameter("height"));
+				if (width == -1 && height == -1) {
+					res.setHeader("Content-Length", String.valueOf(media.getSize()));
+					streamOldSchool(in, res.getOutputStream());
+				}
+				else {
+					streamScaled(in, res, width, height, item.getType().getMimeType());
 				}
 			}
 			catch (SQLException e) {
@@ -333,6 +332,59 @@ public class CmsDeliveryServlet {
 				}
 			}
 		}
+	}
+	
+	private int getImageSizeParam(String value) {
+		if (value == null) {
+			return -1;
+		}
+		return Integer.parseInt(value); 
+	}
+	
+	private void streamOldSchool(InputStream in, ServletOutputStream out) throws ServletException, IOException {
+		// Get a pooled buffer
+		byte[] buff = getBuff();
+		try {
+			for (;;) {
+				int len = in.read(buff);
+				if (len == -1) {
+					break;
+				}
+				out.write(buff, 0, len);
+			}
+		} finally {
+			// Return buffer to the pool
+			putBuff(buff);
+		}
+	}
+	
+	private void streamScaled(InputStream in, HttpServletResponse res, int width, int height, String mediaType) 
+			throws ServletException, IOException {
+		
+		// Create the tumbnail
+		BufferedImage src = ImageIO.read(in);
+		Image img = src.getScaledInstance(width, height, Image.SCALE_SMOOTH);		
+		BufferedImage thumb = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = thumb.createGraphics();
+		g.drawImage(img, 0, 0, null);
+		g.dispose();
+		
+		int c = mediaType.lastIndexOf("/");
+		String thumbType = mediaType.toLowerCase().substring(c + 1);
+		if (thumbType.equals("jpeg")) {
+			thumbType = "jpg";
+		}
+		
+		// Write it to a temporary in-memory stream, so that you can work out the content length
+	    ByteArrayOutputStream tmpStream = new ByteArrayOutputStream();
+	    ImageIO.write(thumb, thumbType, tmpStream);
+	    tmpStream.close();
+
+	    // Write the temporary stream to the servlet output
+	    res.setHeader("Content-Length", String.valueOf(tmpStream.size()));
+	    OutputStream out = res.getOutputStream();
+	    out.write(tmpStream.toByteArray());
+	    out.close();
 	}
 	
 	private boolean isCacheable(Item i) {

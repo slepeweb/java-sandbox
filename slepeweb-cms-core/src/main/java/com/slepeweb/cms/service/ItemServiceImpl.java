@@ -453,16 +453,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 * using the Link table.
 	 * TODO: Review whether this is going to be useful.
 	 */
-	public Item getItemByPathLike(Long siteId, String path) {
-		return getItem(
-			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path like ? and i.deleted=0" + getVersionClause()),
-			new Object[]{siteId, path + "%"});
-	}
-
-	/*
-	 * Similar to above method.
-	 * TODO: Review whether this is going to be useful.
-	 */
 	public List<Item> getItemsByPathLike(Long siteId, String path) {
 		String sql = String.format(SELECT_TEMPLATE, "i.siteid=? and i.path like ? and i.deleted=0" + getVersionClause());
 		List<Item> list = this.jdbcTemplate.query(
