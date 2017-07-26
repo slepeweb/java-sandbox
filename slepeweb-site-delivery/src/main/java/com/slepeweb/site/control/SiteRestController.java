@@ -11,14 +11,17 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.commerce.bean.AxisValue;
 import com.slepeweb.commerce.bean.AxisValueSelector;
+import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.commerce.bean.Variant;
 import com.slepeweb.commerce.service.VariantService;
 import com.slepeweb.site.model.LinkTarget;
@@ -34,6 +37,7 @@ public class SiteRestController extends BaseController {
 	@Autowired private SiteService siteService;
 	@Autowired private NavigationService navigationService;
 	@Autowired private TagService tagService;
+	@Autowired private ItemService itemService;
 	@Autowired private VariantService variantService;
 	
 	@RequestMapping(value="/sitemap/sws.txt", method=RequestMethod.GET, produces="text/plain")
@@ -121,5 +125,18 @@ public class SiteRestController extends BaseController {
 		}
 		
 		return selector;
+	}
+
+	@RequestMapping(value="/product/{itemId}/has-hifi", method=RequestMethod.POST, produces="text/plain")
+	@ResponseBody
+	public String getHifiImagePath(@PathVariable long itemId, @RequestParam String baseImagePath, ModelMap model) {	
+		Item product = this.itemService.getItem(itemId);
+		if (product != null) {
+			Item hifiImage = this.itemService.getItem(product.getSite().getId(), Product.getHifiImagePath(baseImagePath));
+			if (hifiImage != null) {
+				return hifiImage.getPath();
+			}
+		}
+		return null;
 	}
 }

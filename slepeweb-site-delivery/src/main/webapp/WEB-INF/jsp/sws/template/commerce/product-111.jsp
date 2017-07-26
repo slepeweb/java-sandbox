@@ -2,9 +2,12 @@
 	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 	
-<c:set var="_extraJs" scope="request" value="/resources/sws/js/commerce.js" />
+<c:set var="_extraJs" scope="request" value="/resources/sws/js/commerce.js,/resources/js/jquery.magnify.js" />
+<c:set var="_extraCss" scope="request" value="/resources/css/magnify.css" />
+
 <script type="text/javascript">
 	var _itemKey = "${_item.id}";
+	var _zoomer;
 </script>
 
 <sw:standardLayout>
@@ -15,15 +18,25 @@
 			<!-- Main content -->	
 			<div class="col-2-3 primary-col">
 				<sw:standardBody />	
-				<div><img src="${_item.image.path}" /></div>
-				
-				<c:if test="${not empty _item.images}">
+				<c:if test="${not empty _item.image}">
+					<c:set var="_hifiImage" value="${site:getMatchingHifiImage(_item, _item.image)}" />
 					<div>
-						<c:forEach items="${_item.images}" var="_image">
-							<img src="${_image.path}?height=100" />
-						</c:forEach>
+						<c:choose><c:when test="${empty _hifiImage}">
+							<img class="main-image" src="${_item.image.path}" /> 
+						</c:when><c:otherwise> 
+							<img class="main-image zoom" src="${_item.image.path}" data-magnify-src="${_hifiImage.path}" />
+						</c:otherwise></c:choose>
 					</div>
+					
+					<c:if test="${not empty _item.imageCarousel and fn:length(_item.imageCarousel) gt 1}">
+						<div>
+							<c:forEach items="${_item.imageCarousel}" var="_image" varStatus="_stat">
+								<img class="thumbnail<c:if test="${_stat.first}"> border</c:if>" src="${_image.path}?height=100" />
+							</c:forEach>
+						</div>
+					</c:if>
 				</c:if>
+				
 				<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" /> 
 			</div>
 			

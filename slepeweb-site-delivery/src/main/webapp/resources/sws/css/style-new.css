@@ -1358,3 +1358,9 @@ img.markup.right {
 .solr-page.heading {
   font-weight: bold;
 }
+
+.thumbnail.border {
+  border-style: solid;
+  border-width: 1px;
+  border-color: lightblue;
+}

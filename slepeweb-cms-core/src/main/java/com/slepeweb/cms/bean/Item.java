@@ -602,45 +602,18 @@ public class Item extends CmsBean {
 		return toItems(getInlines(), filter);
 	}
 	
-	// TODO: Method has not been tested fully.
 	private final List<Item> toItems(List<Link> links, ItemFilter filter) {
+		if (filter != null) {
+			return filter.filterLinks(links);
+		}
+		
 		List<Item> list = new ArrayList<Item>();
-		boolean linkNameMatch, itemTypeMatch;
 
 		for (Link l : links) {
-			if (filter != null) {
-				linkNameMatch = itemTypeMatch = true;
-
-				if (filter.getLinkNames() != null) {
-					linkNameMatch = matches(filter.getLinkNames(), l.getName());
-				}
-
-				if (filter.getTypes() != null) {
-					itemTypeMatch = matches(filter.getTypes(), l.getChild().getType().getName());
-				}
-
-				if (linkNameMatch && itemTypeMatch) {
-					list.add(l.getChild());
-				}
-			} 
-			else {
-				list.add(l.getChild());
-			}
+			list.add(l.getChild());
 		}
 
 		return list;
-	}
-	
-	private <T> boolean matches(T[] arr, T target) {
-		// Must match ANY element in the array
-		for (T ele : arr) {
-			if (ele.equals(target)) {
-				return true;
-			}
-		}
-		
-		// There were NO matching elements in the array
-		return false;
 	}
 	
 	@Override

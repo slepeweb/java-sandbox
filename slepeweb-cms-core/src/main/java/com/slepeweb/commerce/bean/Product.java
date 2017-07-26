@@ -1,15 +1,18 @@
 package com.slepeweb.commerce.bean;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.except.ResourceException;
 
 public class Product extends Item {
 	private static final long serialVersionUID = 1L;
+	public static final String HIFI_EXT = "-hifi";
 	private static NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance();
 	//private static Logger LOG = Logger.getLogger(Product.class);
 	
@@ -17,6 +20,11 @@ public class Product extends Item {
 	private Long stock, price;
 	private Long alphaAxisId, betaAxisId;
 	private List<Variant> variants;
+	private List<Item> allImages, hifiImages;
+	
+	public static String getHifiImagePath(String basePath) {
+		return basePath + HIFI_EXT;
+	}
 	
 	@Override
 	public boolean isProduct() {
@@ -83,10 +91,47 @@ public class Product extends Item {
 		return null;
 	}
 	
-	public List<Item> getImages() {
-		Item mainImage = getImage();
-		if (mainImage != null) {
-			return getItemService().getItemsByPathLike(getSite().getId(), mainImage.getPath());
+	private List<Item> getAllImages() {
+		if (this.allImages == null) {
+			Item mainImage = getImage();
+			if (mainImage != null) {
+				this.allImages = getItemService().getItemsByPathLike(getSite().getId(), mainImage.getPath());
+			}
+			else {
+				this.allImages = new ArrayList<Item>();
+			}
+		}
+		return this.allImages;
+	}
+	
+
+	public List<Item> getHifiImages() {
+		if (this.hifiImages == null) {
+			ItemFilter filter = new ItemFilter().setSimpleNamePatterns(new String[] {"^.*?-hifi$"});
+			this.hifiImages = filter.filterItems(getAllImages());
+		}
+		return this.hifiImages;
+	}
+
+	public List<Item> getImageCarousel() {
+		List<Item> result = new ArrayList<Item>();
+		for (Item i : getAllImages()) {
+			if (! getHifiImages().contains(i)) {
+				result.add(i);
+			}
+		}
+		return result;
+	}
+	
+	public void setAllImages(List<Item> images) {
+		this.allImages = images;
+	}
+	
+	public Item getMatchingHifiImage(Item testImg) {
+		for (Item i : getHifiImages()) {
+			if (i.getPath().equals(getHifiImagePath(testImg.getPath()))) {
+				return i;
+			}
 		}
 		return null;
 	}

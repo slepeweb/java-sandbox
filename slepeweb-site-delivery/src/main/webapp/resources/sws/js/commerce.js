@@ -23,4 +23,38 @@ $(function() {
 		});
 	});
 
+	$(".thumbnail").click(function(e) {
+		$(".thumbnail").removeClass("border");
+		var thumbSrc = $(this).addClass("border").attr("src");
+		var c = thumbSrc.indexOf("?");
+		if (c > -1) {
+			thumbSrc = thumbSrc.substring(0, c);
+		}
+		
+		$(".main-image").attr("src", thumbSrc);
+		
+		$.ajax("/rest/product/" + _itemKey + "/has-hifi", {
+			type: "POST",
+			data: {
+				baseImagePath: thumbSrc
+			},
+			cache: false,
+			dataType: "text",
+			success: function(response, status, z) {	
+				if (response) {
+					$(".main-image").attr("data-magnify-src", response).addClass("zoom");
+					_zoomer = $(".zoom").magnify();
+				}
+				else {
+					_zoomer.destroy();					
+					$(".main-image").removeAttr("data-magnify-src").removeClass("zoom");
+				}
+			},
+			error: function(json, status, z) {
+				console.log(z);
+			},
+		});
+	});
+	
+	_zoomer = $('.zoom').magnify();
 });	

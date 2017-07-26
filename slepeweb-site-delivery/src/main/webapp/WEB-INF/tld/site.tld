@@ -61,4 +61,10 @@
 		<function-signature>java.lang.String formatUKDate(java.util.Date, java.lang.String)</function-signature>
 	</function>
 	
+	<function>
+		<name>getMatchingHifiImage</name>
+		<function-class>com.slepeweb.site.util.TldFunction</function-class>
+		<function-signature>com.slepeweb.cms.bean.Item getMatchingHifiImage(com.slepeweb.commerce.bean.Product, com.slepeweb.cms.bean.Item)</function-signature>
+	</function>
+	
 </taglib>
