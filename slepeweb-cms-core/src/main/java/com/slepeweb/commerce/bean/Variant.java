@@ -11,6 +11,10 @@ public class Variant extends CmsBean {
 	
 	private Long origItemId, alphaAxisValueId, betaAxisValueId;
 	private AxisValue alphaAxisValue, betaAxisValue;
+	private String qualifier;
+	private Long stock, price;
+	private Product product;	
+	
 	public void setAlphaAxisValue(AxisValue alphaAxisValue) {
 		this.alphaAxisValue = alphaAxisValue;
 	}
@@ -19,10 +23,6 @@ public class Variant extends CmsBean {
 		this.betaAxisValue = betaAxisValue;
 	}
 
-	private String qualifier;
-	private Long stock, price;
-	private Product product;
-	
 	@Override
 	public void assimilate(Object obj) {
 		if (obj instanceof Variant) {

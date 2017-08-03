@@ -18,6 +18,10 @@ public class TldFunction {
 		return product.getMatchingHifiImage(testImg);
 	}
 	
+	public static String resolveMarkupFieldValue(Item i, String variable, String dflt) {
+		return i.getFieldValueResolved(variable, dflt);
+	}
+	
 	public static void main(String[] args) {
 		System.out.println(formatUKDate(new Date(), "MMMM d, HH:mm z"));
 	}

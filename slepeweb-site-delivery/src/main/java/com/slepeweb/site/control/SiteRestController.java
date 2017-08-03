@@ -5,6 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -21,8 +26,11 @@ import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.commerce.bean.AxisValue;
 import com.slepeweb.commerce.bean.AxisValueSelector;
+import com.slepeweb.commerce.bean.Basket;
+import com.slepeweb.commerce.bean.OrderItem;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.commerce.bean.Variant;
+import com.slepeweb.commerce.service.ProductService;
 import com.slepeweb.commerce.service.VariantService;
 import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.service.NavigationService;
@@ -33,11 +41,13 @@ public class SiteRestController extends BaseController {
 	//private static Logger LOG = Logger.getLogger(SiteRestController.class);
 	public static final String SLEPEWEB_SITENAME = "Slepeweb";
 	public static final String NOCRAWL = "nocrawl";
+	private static final String BASKET_COOKIE = "_basket";
 	
 	@Autowired private SiteService siteService;
 	@Autowired private NavigationService navigationService;
 	@Autowired private TagService tagService;
 	@Autowired private ItemService itemService;
+	@Autowired private ProductService productService;
 	@Autowired private VariantService variantService;
 	
 	@RequestMapping(value="/sitemap/sws.txt", method=RequestMethod.GET, produces="text/plain")
@@ -135,6 +145,62 @@ public class SiteRestController extends BaseController {
 			Item hifiImage = this.itemService.getItem(product.getSite().getId(), Product.getHifiImagePath(baseImagePath));
 			if (hifiImage != null) {
 				return hifiImage.getPath();
+			}
+		}
+		return null;
+	}
+	
+	@RequestMapping(value="/product/basket/add/{origItemId}", method=RequestMethod.POST, produces="text/plain")
+	@ResponseBody
+	public String add2basket(@PathVariable long origItemId, HttpServletRequest req, HttpServletResponse res) {
+		String alphaAxisIdStr = req.getParameter("alphavalueid");
+		String betaAxisIdStr = req.getParameter("betavalueid");
+		
+		Cookie c = getBasketCookie(req.getCookies(), BASKET_COOKIE);
+		if (c == null) {
+			c = new Cookie(BASKET_COOKIE, "");
+		}
+		
+		Basket b = Basket.parseCookieStringValue(c.getValue());
+		OrderItem oi = new OrderItem(1, origItemId, null);
+		
+		if (alphaAxisIdStr == null && betaAxisIdStr == null) {
+			// Adding a product
+			Product p = this.productService.get(origItemId);
+			if (p != null) {
+				b.add(oi);
+			}
+			else {
+				return "Product not identified";
+			}
+		}
+		else {
+			// Adding a variant
+			Long alphaAxisId = StringUtils.isNumeric(alphaAxisIdStr) ? Long.valueOf(alphaAxisIdStr) : -1;
+			Long betaAxisId = StringUtils.isNumeric(betaAxisIdStr) ? Long.valueOf(betaAxisIdStr) : -1;
+			Variant v = this.variantService.get(origItemId, alphaAxisId, betaAxisId);
+			
+			if (v != null) {
+				oi.setQualifier(v.getQualifier());
+				b.add(oi);
+			}
+			else {
+				return "Product variant not identified";
+			}
+		}
+		
+		c.setValue(b.formatCookieStringValue());
+		c.setMaxAge(3 * 24 * 3600); // 3 days
+		c.setPath("/rest/product/");
+		res.addCookie(c);
+		
+		return String.format("Basket contains %d item(s)", b.getSize());
+	}
+	
+	private Cookie getBasketCookie(Cookie[] arr, String name) {
+		for (Cookie c : arr) {
+			if (c.getName().equals(name)) {
+				return c;
 			}
 		}
 		return null;

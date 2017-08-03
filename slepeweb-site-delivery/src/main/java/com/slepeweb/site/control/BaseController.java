@@ -125,5 +125,4 @@ public class BaseController {
 		model.addAttribute("_page", p);
 		return p;
 	}
-
 }

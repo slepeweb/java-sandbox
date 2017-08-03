@@ -753,7 +753,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	/*
-	 * Ensure that both string args have trailing slash
+	 * Ensure that both string args have trailing slash.
+	 * TODO: This approach fails if (for some reason like coding error) an descendant item's path
+	 *       has become corrupted - it will get ignored.
 	 */
 	private void updateDescendantPaths(String oldPath, String newPath) {
 		if (! oldPath.endsWith("/")) oldPath += "/";

@@ -209,6 +209,8 @@ create table product
    partnum varchar(256) not null,
    stock int,
    price int,
+   rrp int,
+   shippingweight int,
    alphaaxisid int,
    betaaxisid int,
    primary key (origitemid),

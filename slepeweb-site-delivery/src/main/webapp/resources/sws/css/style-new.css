@@ -1364,3 +1364,11 @@ img.markup.right {
   border-width: 1px;
   border-color: lightblue;
 }
+
+#add2basket {
+  margin-top: 1em;
+}
+#add2basket span {
+  display: block;
+  color: green;
+}

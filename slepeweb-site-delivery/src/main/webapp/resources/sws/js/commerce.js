@@ -57,4 +57,52 @@ $(function() {
 	});
 	
 	_zoomer = $('.zoom').magnify();
+	
+	$("#accordion").accordion({
+		active: false,
+		collapsible: true
+	});
+	
+	$("#add2basket > button").click(function(e) {
+		/*
+		 * TODO: Must check axes have been selected
+		 */
+		var _alphaSelector = $("#alphaaxis-options");
+		var _betaSelector = $("#betaaxis-options");
+		var _data = {};
+		
+		if (_alphaSelector) {
+			if (_alphaSelector.val() == "-1") {
+				window.alert("Please select an alpha value");
+				return;
+			}
+			else {
+				_data.alphavalueid = _alphaSelector.val();
+			}
+		}
+		
+		if (_betaSelector) {
+			if (_betaSelector.val() == "-1") {
+				window.alert("Please select an beta value");
+				return;
+			}
+			else {
+				_data.betavalueid = _betaSelector.val();
+			}
+		}
+		
+		$.ajax("/rest/product/basket/add/" + _itemKey, {
+			type: "POST",
+			cache: false,
+			data: _data,
+			dataType: "text",
+			success: function(response, status, z) {	
+				$("#add2basket > span").html(response);
+			},
+			error: function(json, status, z) {
+				console.log(z);
+			},
+		});
+	});
+	
 });	

@@ -91,11 +91,11 @@ public class Product extends Item {
 		return null;
 	}
 	
-	private List<Item> getAllImages() {
+	private List<Item> getSiblingImages() {
 		if (this.allImages == null) {
 			Item mainImage = getImage();
 			if (mainImage != null) {
-				this.allImages = getItemService().getItemsByPathLike(getSite().getId(), mainImage.getPath());
+				this.allImages = getItemService().getItemsByPathLike(getSite().getId(), mainImage.getParentPath());
 			}
 			else {
 				this.allImages = new ArrayList<Item>();
@@ -108,14 +108,14 @@ public class Product extends Item {
 	public List<Item> getHifiImages() {
 		if (this.hifiImages == null) {
 			ItemFilter filter = new ItemFilter().setSimpleNamePatterns(new String[] {"^.*?-hifi$"});
-			this.hifiImages = filter.filterItems(getAllImages());
+			this.hifiImages = filter.filterItems(getSiblingImages());
 		}
 		return this.hifiImages;
 	}
 
 	public List<Item> getImageCarousel() {
 		List<Item> result = new ArrayList<Item>();
-		for (Item i : getAllImages()) {
+		for (Item i : getSiblingImages()) {
 			if (! getHifiImages().contains(i)) {
 				result.add(i);
 			}
@@ -129,7 +129,7 @@ public class Product extends Item {
 	
 	public Item getMatchingHifiImage(Item testImg) {
 		for (Item i : getHifiImages()) {
-			if (i.getPath().equals(getHifiImagePath(testImg.getPath()))) {
+			if (i.getSimpleName().equals(getHifiImagePath(testImg.getSimpleName()))) {
 				return i;
 			}
 		}

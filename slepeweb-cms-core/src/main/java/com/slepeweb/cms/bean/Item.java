@@ -68,7 +68,7 @@ public class Item extends CmsBean {
 		boolean b =  
 			StringUtils.isNotBlank(getName()) &&
 			StringUtils.isNotBlank(getPath()) &&
-			(StringUtils.isNotBlank(getSimpleName()) || isRoot()) &&
+			//(StringUtils.isNotBlank(getSimpleName()) || isRoot()) &&
 			getSite() != null &&
 			getSite().getId() != null &&
 			getType() != null &&
@@ -107,10 +107,12 @@ public class Item extends CmsBean {
 	
 	public Item getParent() {
 		if (this.parent == null) {
-			Link l = this.cmsService.getLinkService().getParent(getId());
-			if (l != null) {
-				// In this case, the 'child' IS the 'parent'
-				return l.getChild();
+			if (getId() != null) {
+				Link l = this.cmsService.getLinkService().getParent(getId());
+				if (l != null) {
+					// In this case, the 'child' IS the 'parent'
+					this.parent = l.getChild();
+				}
 			}
 		}
 		return this.parent;
@@ -463,8 +465,19 @@ public class Item extends CmsBean {
 				setPath("/" + this.simpleName);
 			}
 			else {
-				// When creating new items, the parent item might not have been identified at this point
-				String parentPath = getParentPath();
+				/*
+				 *  When creating new items, the parent item might not have been identified at this point.
+				 *  Follow the link preferably, otherwise work with the specified path of the new item.
+				 */
+				String parentPath = null;
+				
+				if (getParent() != null) {
+					parentPath = getParent().getPath();
+				}
+				else {
+					parentPath = getParentPath();
+				}
+				
 				if (parentPath != null) {
 					setPath(parentPath.equals("/") ? "/" + this.simpleName : parentPath + "/" + this.simpleName);
 				}
@@ -678,12 +691,6 @@ public class Item extends CmsBean {
 
 	public Item setPath(String path) {
 		this.path = path;
-		if (StringUtils.isNotBlank(path)) {
-			int cursor = path.lastIndexOf("/");
-			if (cursor > -1) {
-				this.simpleName = path.substring(cursor + 1);
-			}
-		}
 		return this;
 	}
 

@@ -412,56 +412,60 @@ public class CommerceSetup {
 					continue;
 				}
 				
-				p = productCache.get(currentRow.getPartNum());
-				if (p == null) {
-					p = this.cmsService.getProductService().get(site.getId(), currentRow.getPartNum());
-					if (p != null) {
-						productCache.put(currentRow.getPartNum(), p);
+				String[] partNumberArr = currentRow.getPartNum().split(",");
+				
+				for (String partNumber : partNumberArr) {				
+					p = productCache.get(partNumber);
+					if (p == null) {
+						p = this.cmsService.getProductService().get(site.getId(), partNumber);
+						if (p != null) {
+							productCache.put(partNumber, p);
+						}
 					}
-				}
-				
-				if (p == null) {
-					LOG.error(LogUtil.compose("Product not in DB", currentRow.getPartNum()));
-					stats.inc(ResultType.XLS_ERROR);
-					continue;
-				}
-				
-				// The alpha axis must have a value
-				alphaValue = getAxisValue(axisValueCache, p.getAlphaAxisId(), currentRow.getAlpha());
-				if (alphaValue == null) {
-					LOG.error(LogUtil.compose("Alpha axis value not in DB", currentRow.getAlpha()));
-					stats.inc(ResultType.XLS_ERROR);
-					continue;
-				}
-				
-				// The beta axis is not mandatory
-				betaValue = p.getBetaAxisId() > 0L ?
-						getAxisValue(axisValueCache, p.getBetaAxisId(), currentRow.getBeta()) :
-						null;				
-				
-				v = this.cmsService.getVariantService().get(p.getOrigId(), alphaValue.getId(), 
-						betaValue != null ? betaValue.getId() : -1L);
-				
-				if (v == null) {
-					v = CmsBeanFactory.makeVariant();
-					v.setOrigItemId(p.getOrigId()).
-					setAlphaAxisValueId(alphaValue.getId()).
-					setBetaAxisValueId(betaValue != null ? betaValue.getId() : -1L);
-				}
-				
-				v.
-					setQualifier(currentRow.getQualifier()).
-					setStock(Long.valueOf(currentRow.getStock())).
-					setPrice(pounds2pence(currentRow.getPrice()));
-				
 					
-				// Save variant
-				try {
-					v.save();
-					stats.inc(ResultType.VARIANT_UPDATED);
-				}
-				catch (ResourceException e) {
-					LOG.error(LogUtil.compose("Failed to save variant", e.getMessage(), p.getPartNum(), v.getQualifier()));
+					if (p == null) {
+						LOG.error(LogUtil.compose("Product not in DB", partNumber));
+						stats.inc(ResultType.XLS_ERROR);
+						continue;
+					}
+					
+					// The alpha axis must have a value
+					alphaValue = getAxisValue(axisValueCache, p.getAlphaAxisId(), currentRow.getAlpha());
+					if (alphaValue == null) {
+						LOG.error(LogUtil.compose("Alpha axis value not in DB", currentRow.getAlpha()));
+						stats.inc(ResultType.XLS_ERROR);
+						continue;
+					}
+					
+					// The beta axis is not mandatory
+					betaValue = p.getBetaAxisId() > 0L ?
+							getAxisValue(axisValueCache, p.getBetaAxisId(), currentRow.getBeta()) :
+							null;				
+					
+					v = this.cmsService.getVariantService().get(p.getOrigId(), alphaValue.getId(), 
+							betaValue != null ? betaValue.getId() : -1L);
+					
+					if (v == null) {
+						v = CmsBeanFactory.makeVariant();
+						v.setOrigItemId(p.getOrigId()).
+						setAlphaAxisValueId(alphaValue.getId()).
+						setBetaAxisValueId(betaValue != null ? betaValue.getId() : -1L);
+					}
+					
+					v.
+						setQualifier(currentRow.getQualifier()).
+						setStock(Long.valueOf(currentRow.getStock())).
+						setPrice(pounds2pence(currentRow.getPrice()));
+					
+						
+					// Save variant
+					try {
+						v.save();
+						stats.inc(ResultType.VARIANT_UPDATED);
+					}
+					catch (ResourceException e) {
+						LOG.error(LogUtil.compose("Failed to save variant", e.getMessage(), p.getPartNum(), v.getQualifier()));
+					}
 				}
 			}
 		}
