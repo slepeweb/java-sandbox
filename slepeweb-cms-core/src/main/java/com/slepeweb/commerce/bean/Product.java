@@ -103,6 +103,28 @@ public class Product extends Item {
 		return null;
 	}
 	
+	/*
+	 * Images are expected to conform to the following structure in the content store:
+	 * 
+	 * <root container> (Content Folder)
+	 * 		|- image1
+	 * 		|- image1-hifi
+	 * 		|- image2
+	 * 		|- image2-hifi
+	 * 		|- (etc)
+	 * 		|- v (Content Folder)
+	 * 			|- image1-axisA[-axisB]
+	 * 			|- image2-axisA[-axisB]
+	 * 			|- (etc)
+	 * 
+	 * NOTES:
+	 * 1) images in v folder can be shortcut to one level below the root container
+	 * 2) hifi images matching variants must be one level below the container, and must
+	 *    have '-hifi' appended to their simplenames
+	 * 3) hifi images are optional
+	 * 4) If product does not have variants, as defined by Product item, then the v
+	 *    folder is ignored when this method executes.
+	 */
 	private void resolveImages() {
 		if (this.carouselImages == null && this.hifiImages == null && this.variantImages == null) {
 			
