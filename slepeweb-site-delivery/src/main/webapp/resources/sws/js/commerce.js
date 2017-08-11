@@ -33,7 +33,7 @@ $(function() {
 		
 		$(".main-image").attr("src", thumbSrc);
 		
-		$.ajax("/rest/product/" + _itemKey + "/has-hifi", {
+		$.ajax("/rest/product/" + _itemKey + "/hifi-path", {
 			type: "POST",
 			data: {
 				baseImagePath: thumbSrc

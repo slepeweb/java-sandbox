@@ -4,6 +4,7 @@ public class ItemTypeName {
 
 	public static final String COMPETITION = "Competition";
 	public static final String COMPONENT = "Component";
+	public static final String CONTENT_FOLDER = "Content Folder";
 	public static final String EVENT = "Event";
 	public static final String IMAGE_GIF = "Image GIF";
 	public static final String IMAGE_JPG = "Image JPG";

@@ -8,11 +8,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
+import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.except.ResourceException;
+import com.slepeweb.cms.utils.CmsUtil;
 
 public class Product extends Item {
 	private static final long serialVersionUID = 1L;
 	public static final String HIFI_EXT = "-hifi";
+	public static final String VARIANTS_FOLDER_SIMPLENAME = "v";
 	private static NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance();
 	//private static Logger LOG = Logger.getLogger(Product.class);
 	
@@ -20,10 +23,19 @@ public class Product extends Item {
 	private Long stock, price;
 	private Long alphaAxisId, betaAxisId;
 	private List<Variant> variants;
-	private List<Item> allImages, hifiImages;
-	
-	public static String getHifiImagePath(String basePath) {
-		return basePath + HIFI_EXT;
+	private List<Item> hifiImages, variantImages, carouselImages;
+	private Item variantImageFolder;
+		
+	public String getHifiImagePath(String basePath) {
+		resolveImages();
+		String baseSimpleName = CmsUtil.getSimplename(basePath);
+		for (Item img : getHifiImages()) {
+			if (img.getSimpleName().equals(baseSimpleName + HIFI_EXT)) {
+				return img.getPath();
+			}
+		}
+
+		return null;
 	}
 	
 	@Override
@@ -91,46 +103,90 @@ public class Product extends Item {
 		return null;
 	}
 	
-	private List<Item> getSiblingImages() {
-		if (this.allImages == null) {
+	private void resolveImages() {
+		if (this.carouselImages == null && this.hifiImages == null && this.variantImages == null) {
+			
+			this.carouselImages = new ArrayList<Item>();
+			this.hifiImages = new ArrayList<Item>();
+			this.variantImages = new ArrayList<Item>();
+			
 			Item mainImage = getImage();
 			if (mainImage != null) {
-				this.allImages = getItemService().getItemsByPathLike(getSite().getId(), mainImage.getParentPath());
-			}
-			else {
-				this.allImages = new ArrayList<Item>();
+				Item container = mainImage.getParent();
+				
+				// This image might be in a variants folder.
+				if (container != null && container.getSimpleName().equals(VARIANTS_FOLDER_SIMPLENAME)) {
+					this.variantImageFolder = container;
+					// Climb one level higher
+					container = container.getParent();
+				}
+				
+				if (container != null) {
+					
+					// Carousel & Hifi images
+					ItemFilter imageFilter = new ItemFilter().setTypes(new String[] {
+							ItemTypeName.IMAGE_JPG,
+							ItemTypeName.IMAGE_PNG,
+							ItemTypeName.IMAGE_GIF
+					});
+					
+					for (Item img : imageFilter.filterItems(container.getBoundItems())) {
+						if (img.getSimpleName().endsWith(HIFI_EXT)) {
+							this.hifiImages.add(img);
+						}
+						else {
+							this.carouselImages.add(img);
+						}
+					}
+					
+					// Variant images
+					if (getAlphaAxisId() > 0L || getBetaAxisId() > 0L) {
+						ItemFilter folderFilter = new ItemFilter().
+								setType(ItemTypeName.CONTENT_FOLDER).
+								setSimpleNamePattern(VARIANTS_FOLDER_SIMPLENAME);
+						
+						if (this.variantImageFolder == null) {
+							this.variantImageFolder = folderFilter.filterFirst(container.getBoundItems());
+						}
+						
+						if (this.variantImageFolder != null) {
+							this.variantImages = imageFilter.filterItems(this.variantImageFolder.getBoundItems());
+						}
+					}
+				}
 			}
 		}
-		return this.allImages;
 	}
 	
 
 	public List<Item> getHifiImages() {
 		if (this.hifiImages == null) {
-			ItemFilter filter = new ItemFilter().setSimpleNamePatterns(new String[] {"^.*?-hifi$"});
-			this.hifiImages = filter.filterItems(getSiblingImages());
+			resolveImages();
 		}
 		return this.hifiImages;
 	}
 
-	public List<Item> getImageCarousel() {
-		List<Item> result = new ArrayList<Item>();
-		for (Item i : getSiblingImages()) {
-			if (! getHifiImages().contains(i)) {
-				result.add(i);
-			}
+
+	public List<Item> getVariantImages() {
+		if (this.variantImages == null) {
+			resolveImages();
 		}
-		return result;
+		return this.variantImages;
 	}
-	
-	public void setAllImages(List<Item> images) {
-		this.allImages = images;
+
+	public List<Item> getCarouselImages() {
+		if (this.carouselImages == null) {
+			resolveImages();
+		}
+		return this.carouselImages;
 	}
 	
 	public Item getMatchingHifiImage(Item testImg) {
-		for (Item i : getHifiImages()) {
-			if (i.getSimpleName().equals(getHifiImagePath(testImg.getSimpleName()))) {
-				return i;
+		if (getHifiImages() != null) {
+			for (Item i : getHifiImages()) {
+				if (i.getSimpleName().equals(testImg.getSimpleName() + HIFI_EXT)) {
+					return i;
+				}
 			}
 		}
 		return null;
@@ -230,8 +286,16 @@ public class Product extends Item {
 		return this.variants;
 	}
 	
+	public Variant getVariant(String qualifier) {
+		return getVariantService().get(getOrigId(), qualifier);
+	}
+	
 	public AxisValueSelector getAlphaAxisValues() {
 		return getVariantService().getAlphaAxisSelector(getOrigId(), getAlphaAxisId());
+	}
+
+	public Item getVariantImageFolder() {
+		return variantImageFolder;
 	}
 
 	@Override

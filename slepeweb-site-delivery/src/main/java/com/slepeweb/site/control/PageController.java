@@ -2,6 +2,7 @@ package com.slepeweb.site.control;
 
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,23 +20,18 @@ import com.slepeweb.cms.bean.solr.SolrConfig;
 import com.slepeweb.cms.bean.solr.SolrParams;
 import com.slepeweb.cms.service.SiteConfigService;
 import com.slepeweb.cms.service.SolrService;
+import com.slepeweb.commerce.bean.Basket;
+import com.slepeweb.commerce.service.ProductService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.model.SiblingItemPager;
-import com.slepeweb.site.ntc.bean.CompetitionIndex;
-import com.slepeweb.site.ntc.service.CompetitionService;
-import com.slepeweb.site.ntc.service.EventsService;
-import com.slepeweb.site.ntc.service.NtcNewsService;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
-import com.slepeweb.site.sws.service.FundsService;
+import com.slepeweb.site.util.SiteUtil;
 
 @Controller
 public class PageController extends BaseController {
 	
 	@Autowired private CmsDeliveryServlet cmsDeliveryServlet;
-	@Autowired private CompetitionService competitionService;
-	@Autowired private EventsService eventsService;
-	@Autowired private NtcNewsService newsService;
-	@Autowired private FundsService fundsService;
+	@Autowired private ProductService productService;
 	@Autowired private SiteConfigService siteConfigService;
 	@Autowired private SolrService solrService;
 	
@@ -55,32 +51,6 @@ public class PageController extends BaseController {
 		// Doing the forward in the JSP, which is site dependant, whereas this controller
 		// might be used in multiple sites.
 		Page page = getStandardPage(i, shortSitename, "homepage", model);
-		return page.getView();
-	}
-
-	@RequestMapping(value="/spring/homepage/ntc")	
-	public String ntcHomepage(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			@ModelAttribute("_site") Site site, 
-			ModelMap model) {	
-		
-		Page page = getStandardPage(i, shortSitename, "homepage", model);		
-		CompetitionIndex index = this.competitionService.getCompetitionIndex(site);
-
-		Item item = i.getItemService().getItem(site.getId(), "/events");			
-		if (item != null) {
-			model.addAttribute("_eventsIndexItem", item);
-			model.addAttribute("_eventsIndex", this.eventsService.getCombinedEvents(item));
-		}
-		
-		item = i.getItemService().getItem(site.getId(), "/news");			
-		if (item != null) {
-			model.addAttribute("_newsIndexItem", item);
-			model.addAttribute("_newsIndex", this.newsService.getCombinedNews(item));
-		}
-		
-		model.addAttribute("_competitionIndex", index);		
 		return page.getView();
 	}
 
@@ -136,17 +106,6 @@ public class PageController extends BaseController {
 		return page.getView();
 	}
 	
-	@RequestMapping(value="/spring/article/funds")	
-	public String funds(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			ModelMap model) {	
-		
-		Page page = getStandardPage(i, shortSitename, "article-funds", model);
-		model.addAttribute("_graphData", this.fundsService.scrapeJs("/tmp/funds.html"));
-		return page.getView();
-	}
-		
 	@RequestMapping(value="/spring/projects")
 	public String projects(
 		@ModelAttribute("_item") Item i, 
@@ -293,6 +252,22 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "commerce/product-111", model);
+		return page.getView();
+	}
+	
+	@RequestMapping(value="/spring/basket")	
+	public String standardBasket(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			HttpServletRequest req,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "commerce/basket-111", model);
+		Cookie basketCookie = SiteUtil.getCookie(req.getCookies(), SiteRestController.BASKET_COOKIE);
+		Basket basket = Basket.parseCookieStringValue(basketCookie.getValue());
+		basket.extendOrderItems(this.productService);
+		model.addAttribute(SiteRestController.BASKET_COOKIE, basket);
+
 		return page.getView();
 	}
 	

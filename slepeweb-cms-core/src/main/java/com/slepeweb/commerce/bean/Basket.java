@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.slepeweb.commerce.service.ProductService;
+
 public class Basket {
 	private List<OrderItem> items = new ArrayList<OrderItem>();
 	private static final String DELIM = "|";
@@ -65,5 +67,16 @@ public class Basket {
 
 	public void setItems(List<OrderItem> items) {
 		this.items = items;
+	}
+	
+	public boolean isNotEmpty() {
+		return getItems().size() > 0;
+	}
+	
+	public Basket extendOrderItems(ProductService productService) {
+		for (OrderItem oi : getItems()) {
+			oi.setProduct(productService.get(oi.getOrigItemId()));
+		}
+		return this;
 	}
 }

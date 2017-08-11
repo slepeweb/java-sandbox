@@ -42,6 +42,15 @@ public class ItemFilter {
 		return result;
 	}
 
+	public Item filterFirst(List<Item> list) {
+		for (Item i : list) {
+			if (test(i)) {
+				return i;
+			}
+		}
+		return null;
+	}
+
 	public List<Item> filterLinks(List<Link> list) {
 		List<Item> result = new ArrayList<Item>(list.size());
 		for (Link l : list) {
@@ -80,6 +89,11 @@ public class ItemFilter {
 		return types;
 	}
 
+	public ItemFilter setType(String typeName) {
+		this.types = new String[] {typeName};
+		return this;
+	}
+
 	public ItemFilter setTypes(String[] types) {
 		this.types = types;
 		return this;
@@ -89,6 +103,11 @@ public class ItemFilter {
 		return linkNames;
 	}
 
+	public ItemFilter setLinkName(String linkName) {
+		this.linkNames = new String[] {linkName};
+		return this;
+	}
+
 	public ItemFilter setLinkNames(String[] linkNames) {
 		this.linkNames = linkNames;
 		return this;
@@ -96,6 +115,11 @@ public class ItemFilter {
 
 	public String[] getSimpleNamePatterns() {
 		return simpleNamePatterns;
+	}
+
+	public ItemFilter setSimpleNamePattern(String simpleName) {
+		this.simpleNamePatterns = new String[] {simpleName};
+		return this;
 	}
 
 	public ItemFilter setSimpleNamePatterns(String[] simpleNames) {

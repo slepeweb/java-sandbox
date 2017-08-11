@@ -34,6 +34,7 @@ import com.slepeweb.commerce.service.ProductService;
 import com.slepeweb.commerce.service.VariantService;
 import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.service.NavigationService;
+import com.slepeweb.site.util.SiteUtil;
 
 @Controller
 @RequestMapping("/rest")
@@ -41,7 +42,7 @@ public class SiteRestController extends BaseController {
 	//private static Logger LOG = Logger.getLogger(SiteRestController.class);
 	public static final String SLEPEWEB_SITENAME = "Slepeweb";
 	public static final String NOCRAWL = "nocrawl";
-	private static final String BASKET_COOKIE = "_basket";
+	public static final String BASKET_COOKIE = "_basket";
 	
 	@Autowired private SiteService siteService;
 	@Autowired private NavigationService navigationService;
@@ -137,14 +138,21 @@ public class SiteRestController extends BaseController {
 		return selector;
 	}
 
-	@RequestMapping(value="/product/{itemId}/has-hifi", method=RequestMethod.POST, produces="text/plain")
+	@RequestMapping(value="/product/{itemId}/hifi-path", method=RequestMethod.POST, produces="text/plain")
 	@ResponseBody
 	public String getHifiImagePath(@PathVariable long itemId, @RequestParam String baseImagePath, ModelMap model) {	
-		Item product = this.itemService.getItem(itemId);
-		if (product != null) {
-			Item hifiImage = this.itemService.getItem(product.getSite().getId(), Product.getHifiImagePath(baseImagePath));
-			if (hifiImage != null) {
-				return hifiImage.getPath();
+		Item i = this.itemService.getItem(itemId);		
+		if (i != null && i.isProduct()) {
+			Product p = (Product) i;
+			
+			if (p != null) {
+				String hifiImagePath = p.getHifiImagePath(baseImagePath);
+				if (StringUtils.isNotBlank(hifiImagePath)) {
+					Item hifiImage = this.itemService.getItem(p.getSite().getId(), hifiImagePath);
+					if (hifiImage != null) {
+						return hifiImage.getPath();
+					}
+				}
 			}
 		}
 		return null;
@@ -156,7 +164,7 @@ public class SiteRestController extends BaseController {
 		String alphaAxisIdStr = req.getParameter("alphavalueid");
 		String betaAxisIdStr = req.getParameter("betavalueid");
 		
-		Cookie c = getBasketCookie(req.getCookies(), BASKET_COOKIE);
+		Cookie c = SiteUtil.getCookie(req.getCookies(), BASKET_COOKIE);
 		if (c == null) {
 			c = new Cookie(BASKET_COOKIE, "");
 		}
@@ -195,14 +203,5 @@ public class SiteRestController extends BaseController {
 		res.addCookie(c);
 		
 		return String.format("Basket contains %d item(s)", b.getSize());
-	}
-	
-	private Cookie getBasketCookie(Cookie[] arr, String name) {
-		for (Cookie c : arr) {
-			if (c.getName().equals(name)) {
-				return c;
-			}
-		}
-		return null;
-	}
+	}	
 }

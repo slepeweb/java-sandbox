@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.except.ResourceException;
+import com.slepeweb.cms.utils.CmsUtil;
 
 public class Item extends CmsBean {
 	private static final long serialVersionUID = 1L;
@@ -134,7 +135,7 @@ public class Item extends CmsBean {
 	}
 		
 	private Item getImage(String classification) {
-		ItemFilter f = new ItemFilter().setLinkNames(new String[] {classification});
+		ItemFilter f = new ItemFilter().setLinkName(classification);
 		List<Item> images = getInlineItems(f);
 		if (images.size() > 0) {
 			return images.get(0);
@@ -288,16 +289,7 @@ public class Item extends CmsBean {
 	}
 	
 	public String getParentPath() {
-		if (! isRoot()) {
-			int c = getPath().lastIndexOf("/");
-			if (c > 0) {
-				return getPath().substring(0, c);
-			}
-			return "/";
-		}
-		
-		// A null parent means that this item is a root item
-		return null;
+		return CmsUtil.getParentPath(this);
 	}
 
 	public boolean hasMedia() {

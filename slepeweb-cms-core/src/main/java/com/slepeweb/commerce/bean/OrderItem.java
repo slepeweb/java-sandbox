@@ -4,6 +4,7 @@ public class OrderItem {
 	private long origItemId;
 	private String qualifier;
 	private int quantity;
+	private Product product;
 	
 	public OrderItem(int n, long o, String q) {
 		this.origItemId = o;
@@ -61,5 +62,13 @@ public class OrderItem {
 		} else if (!qualifier.equals(other.qualifier))
 			return false;
 		return true;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product p) {
+		this.product = p;
 	}
 }

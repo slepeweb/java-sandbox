@@ -414,7 +414,13 @@ public class CommerceSetup {
 				
 				String[] partNumberArr = currentRow.getPartNum().split(",");
 				
-				for (String partNumber : partNumberArr) {				
+				for (String partNumber : partNumberArr) {
+					partNumber = partNumber.trim();
+					
+					if (StringUtils.isBlank(partNumber)) {
+						continue;
+					}
+					
 					p = productCache.get(partNumber);
 					if (p == null) {
 						p = this.cmsService.getProductService().get(site.getId(), partNumber);
