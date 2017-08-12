@@ -7,8 +7,13 @@ body {
 span.fancytree-node.shortcut > span.fancytree-icon {
 	background-position: -64px -160px;
 }
+
 span.fancytree-node.shortcut > span.fancytree-expander {
 	display: none;
+}
+
+span.fancytree-node.shortcut > span.fancytree-icon {
+	margin-left: 19px;
 }
 
 /* Form elements */

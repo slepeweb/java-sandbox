@@ -515,18 +515,18 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
 	}
 	
-	public boolean move(Item mover, Item currentParent, Item newParent, boolean shortcut) 
-			throws ResourceException {
+	public boolean move(Item mover, Item currentParent, Item targetParent, Item target, 
+			boolean moverIsShortcut) throws ResourceException {
 		
-		return move(mover, currentParent, newParent, shortcut, "over");
+		return move(mover, currentParent, targetParent, target, moverIsShortcut, "over");
 	}
 	
 	/*
 	 * This provides a relative move, ie before/after target.
 	 * If mode == "over", then target is effectively a new parent.
 	 */
-	public boolean move(Item mover, Item currentParent, Item target, boolean isShortcut, String mode) 
-			throws ResourceException {
+	public boolean move(Item mover, Item currentParent, Item targetParent, Item target, 
+			boolean moverIsShortcut, String mode) throws ResourceException {
 		
 		if (mover == null || target == null || currentParent == null || mode == null) {
 			throw new ResourceException("Missing item data for move");
@@ -534,7 +534,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		
 		LOG.debug(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mode.toUpperCase(), target));			
 		LOG.debug(compose("  Old parent", currentParent));		
-		Item newParent = mode.equals(MOVE_OVER) ? target : target.getParent();
+		Item newParent = mode.equals(MOVE_OVER) ? target : targetParent;
 		LOG.debug(compose("  New parent", newParent));		
 		
 		// Break the parent link for the mover, EVEN IF old-parent = new-parent
@@ -545,11 +545,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		Link moverLink = CmsBeanFactory.makeLink().
 				setParentId(newParent.getId()).
 				setChild(mover).
-				setType(isShortcut ? LinkType.shortcut : LinkType.binding).
+				setType(moverIsShortcut ? LinkType.shortcut : LinkType.binding).
 				setName("std");
 		
 		// Add mover to new parent's bindings
-		List<Link> bindings = this.linkService.getBindings(newParent.getId());
+		List<Link> bindings = newParent.getBindings();
 		
 		if (mode.equals(MOVE_OVER)) {
 			bindings.add(moverLink);
@@ -559,7 +559,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			// If mode is 'before' or 'after', identify insertions point and re-order all siblings
 			int cursor = -1;
 			for (Link l : bindings) {
-				if (l.getChild().getId().longValue() == target.getId().longValue()) {
+				if (l.getChild().getId().equals(target.getId())) {
 					cursor = bindings.indexOf(l);
 					break;
 				}
@@ -597,7 +597,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 		
 		// Update paths of descendant items, but NOT for shortcuts
-		if (! isShortcut) {
+		if (! moverIsShortcut) {
 			String divider = newParent.isRoot() ? "" : "/";
 			String newChildPath = newParent.getPath() + divider + mover.getSimpleName();
 			updateDescendantPaths(mover.getPath(), newChildPath);

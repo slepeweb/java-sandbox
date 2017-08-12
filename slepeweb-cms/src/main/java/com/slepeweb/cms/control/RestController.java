@@ -570,23 +570,25 @@ public class RestController extends BaseController {
 		}
 	}
 	
-	@RequestMapping(value="/item/{itemId}/move", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{moverId}/move", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse moveItem(
-			@PathVariable long itemId,
+			@PathVariable long moverId,
 			@RequestParam(value="targetId", required=true) Long targetId,
-			@RequestParam(value="parentId", required=true) Long parentId,
-			@RequestParam(value="shortcut", required=true) boolean shortcut,
+			@RequestParam(value="targetParentId", required=true) Long targetParentId,
+			@RequestParam(value="moverParentId", required=true) Long moverParentId,
+			@RequestParam(value="moverIsShortcut", required=true) boolean moverIsShortcut,
 			@RequestParam(value="mode", required=true) String mode,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item mover = this.itemService.getItem(itemId);
+		Item mover = this.itemService.getItem(moverId);
 		Item target = this.itemService.getItem(targetId);
-		Item currentParent = this.itemService.getItem(parentId);
+		Item currentParent = this.itemService.getItem(moverParentId);
+		Item targetParent = this.itemService.getItem(targetParentId);
 		
 		try {
-			mover.move(currentParent, target, shortcut, mode);		
+			mover.move(currentParent, targetParent, target, moverIsShortcut, mode);		
 			return resp.setError(false).setData(mover.getId()).addMessage("Item moved");
 		}
 		catch (MissingDataException e) {

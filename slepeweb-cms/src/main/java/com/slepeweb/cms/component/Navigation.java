@@ -7,11 +7,9 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 public class Navigation {
 	
-//	String json = "[" +
-//			"{'title': 'Node 1', 'key': '1'}, " +
-//			"{'title': 'Folder 2', 'key': '2', 'folder': true, 'children': [ " +
-//				"{'title': 'Node 2.1', 'key': '3'}," +
-//				"{'title': 'Node 2.2', 'key': '4'}]}]";
+	/*
+	 * See example-leftnav.json for example output.
+	 */
 	
 	private List<Node> nodes = new ArrayList<Node>();
 	

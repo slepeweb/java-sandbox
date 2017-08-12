@@ -227,13 +227,17 @@ public class Item extends CmsBean {
 	 * Shortcut items must be treated differently when subject to move. In 
 	 * particular, need to know which of possibly many parents is affected.
 	 */
-	public boolean move(Item currentParent, Item target, boolean shortcut) throws ResourceException {
-		return move(currentParent, target, shortcut, "over");
+	public boolean move(Item currentParent, Item targetParent, Item target, 
+			boolean moverIsShortcut) throws ResourceException {
+		
+		return move(currentParent, targetParent, target, moverIsShortcut, "over");
 	}
 	
-	public boolean move(Item currentParent, Item target, boolean shortcut, String mode) 
-			throws ResourceException {
-		return getCmsService().getItemService().move(this, currentParent, target, shortcut, mode);
+	public boolean move(Item currentParent, Item targetParent, Item target, 
+			boolean moverIsShortcut, String mode) throws ResourceException {
+		
+		return getCmsService().getItemService().
+				move(this, currentParent, targetParent, target, moverIsShortcut, mode);
 	}
 	
 	public Object[] getCopyDetails() {

@@ -25,7 +25,7 @@ $("#leftnav").fancytree({
 		var node = data.node;
 		data.result = {
 			url: _ctx + "/rest/leftnav/lazy/one",
-			data: {key: node.key}
+			data: {key: removeShortcutMarker(node.key)}
 		};
 	},
 	dnd: {
@@ -40,6 +40,10 @@ $("#leftnav").fancytree({
 			return true;
 		},
 		dragDrop: function(node, data) {
+		/*
+			- data.otherNode is the item being dragged (mover)
+			- node is item which is the target of the drop (target)
+		*/
 			var theDialog = $("#dialog-move-confirm");
 			theDialog.dialog({
 				resizable: false,
@@ -51,9 +55,10 @@ $("#leftnav").fancytree({
 							type: "POST",
 							cache: false,
 							data: {
-								targetId: node.key,
-								parentId: data.otherNode.parent.key,
-								shortcut: data.otherNode.data.shortcut,
+								targetId: removeShortcutMarker(node.key),
+								targetParentId: removeShortcutMarker(node.parent.key),
+								moverParentId: removeShortcutMarker(data.otherNode.parent.key),
+								moverIsShortcut: data.otherNode.data.shortcut,
 								mode: data.hitMode
 							}, 
 							dataType: "json",
