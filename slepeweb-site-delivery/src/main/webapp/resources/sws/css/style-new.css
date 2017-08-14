@@ -1372,3 +1372,7 @@ img.markup.right {
   display: block;
   color: green;
 }
+
+td.horiz-rule {
+  border-top: 2px solid lightblue;
+}

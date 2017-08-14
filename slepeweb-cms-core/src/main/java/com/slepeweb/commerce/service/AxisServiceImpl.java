@@ -3,6 +3,7 @@ package com.slepeweb.commerce.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
@@ -69,6 +70,7 @@ public class AxisServiceImpl extends BaseServiceImpl implements AxisService {
 		
 	}
 	
+	@Cacheable(value="serviceCache")
 	public Axis get(String shortname) {
 		return (Axis) getLastInList(this.jdbcTemplate.query(
 				"select * from axis where shortname = ?", 
@@ -76,6 +78,7 @@ public class AxisServiceImpl extends BaseServiceImpl implements AxisService {
 				new CommerceRowMapper.AxisMapper()));
 	}
 	
+	@Cacheable(value="serviceCache")
 	public List<Axis> get() {
 		return this.jdbcTemplate.query(
 				"select * from axis order by shortname", 
@@ -83,6 +86,7 @@ public class AxisServiceImpl extends BaseServiceImpl implements AxisService {
 				new CommerceRowMapper.AxisMapper());
 	}
 	
+	@Cacheable(value="serviceCache")
 	public Axis get(Long id) {
 		return (Axis) getLastInList(this.jdbcTemplate.query(
 				"select * from axis where id = ?", 

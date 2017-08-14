@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.commerce.service.ProductService;
+import com.slepeweb.cms.bean.CmsBeanFactory;
 
 public class Basket {
 	private List<OrderItem> items = new ArrayList<OrderItem>();
@@ -36,7 +36,7 @@ public class Basket {
 			
 			for (int i = 0; i < numItems; i++) {
 				c = (3 * i) + 1;
-				oi = new OrderItem(
+				oi = CmsBeanFactory.makeOrderItem(
 						Integer.parseInt(parts[c]), 
 						Long.parseLong(parts[c + 1]), 
 						parts[c + 2].equals("null") ? null : parts[c + 2]);
@@ -73,10 +73,17 @@ public class Basket {
 		return getItems().size() > 0;
 	}
 	
-	public Basket extendOrderItems(ProductService productService) {
+	public float getTotalValue() {
+		float total = 0F;
+		
 		for (OrderItem oi : getItems()) {
-			oi.setProduct(productService.get(oi.getOrigItemId()));
+			total += oi.getTotalValue();
 		}
-		return this;
+		
+		return total;
+	}
+	
+	public String getTotalValueAsString() {
+		return Product.CURRENCY_FORMAT.format(getTotalValue());
 	}
 }

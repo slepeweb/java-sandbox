@@ -1,7 +1,11 @@
 package com.slepeweb.commerce.xls;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.slepeweb.cms.utils.StringUtil;
+
 public class VariantXlsRow {
-	private String update, partNum, qualifier, stock, price, alpha, beta;
+	private String update, partNum, stock, price, alpha, beta;
 
 	@Override
 	public String toString() {
@@ -25,11 +29,11 @@ public class VariantXlsRow {
 	}
 
 	public String getQualifier() {
-		return qualifier;
-	}
-
-	public void setQualifier(String q) {
-		this.qualifier = q;
+		StringBuilder sb = new StringBuilder(StringUtil.compress(getAlpha()));
+		if (StringUtils.isNotBlank(getBeta())) {
+			sb.append("-").append(StringUtil.compress(getBeta()));
+		}
+		return sb.toString();
 	}
 
 	public String getStock() {

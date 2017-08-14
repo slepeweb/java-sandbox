@@ -199,7 +199,7 @@ public class SiteRestController extends BaseController {
 		
 		c.setValue(b.formatCookieStringValue());
 		c.setMaxAge(3 * 24 * 3600); // 3 days
-		c.setPath("/rest/product/");
+		c.setPath("/");
 		res.addCookie(c);
 		
 		return String.format("Basket contains %d item(s)", b.getSize());

@@ -195,6 +195,7 @@ public class SiteSetupUtils {
 	 * @param cell
 	 * @return
 	 */
+	@Deprecated
 	public static String getStringIgnoreDecimal(Cell cell, String dflt) {
 		if (cell != null) {
 			int type = cell.getCellType();
@@ -231,7 +232,11 @@ public class SiteSetupUtils {
 			int type = cell.getCellType();
 			if (type != Cell.CELL_TYPE_ERROR) {
 				if (type == Cell.CELL_TYPE_STRING || type == Cell.CELL_TYPE_FORMULA) {
-					return cell.getStringCellValue().trim();
+					String r = cell.getStringCellValue().trim();
+					if (r.startsWith("#")) {
+						return r.substring(1);
+					}
+					return r;
 				} else if (type == Cell.CELL_TYPE_NUMERIC) {
 					return String.valueOf(cell.getNumericCellValue());
 				}
@@ -245,6 +250,7 @@ public class SiteSetupUtils {
 		return "";
 	}
 
+	@Deprecated
 	public static String getStringIgnoreDecimal(Cell cell) {
 		return getStringIgnoreDecimal(cell, null);
 	}

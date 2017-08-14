@@ -16,7 +16,7 @@ public class Product extends Item {
 	private static final long serialVersionUID = 1L;
 	public static final String HIFI_EXT = "-hifi";
 	public static final String VARIANTS_FOLDER_SIMPLENAME = "v";
-	private static NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance();
+	public static NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance();
 	//private static Logger LOG = Logger.getLogger(Product.class);
 	
 	private String partNum;
@@ -103,6 +103,36 @@ public class Product extends Item {
 		return null;
 	}
 	
+	public Item getOrderItemThumbnail(String qualifier) {
+		resolveImages();
+		Item bestMatch = null;
+		
+		if (getAlphaAxis() != null && getBetaAxis() != null) {
+			for (Item i : getVariantImages()) {
+				if (i.getSimpleName().equals(qualifier)) {					
+					return i;
+				}
+				else if (qualifier.contains(i.getSimpleName())) {					
+					bestMatch = i;
+				}					
+			}
+			
+			return bestMatch;
+		}
+		else if (getAlphaAxis() != null) {
+			for (Item i : getVariantImages()) {
+				if (i.getSimpleName().equals(qualifier)) {
+					return i;
+				}
+			}
+		}
+		else if (getCarouselImages().size() > 0) {
+			return getCarouselImages().get(0);
+		}
+		
+		return null;
+	}
+	
 	/*
 	 * Images are expected to conform to the following structure in the content store:
 	 * 
@@ -124,6 +154,8 @@ public class Product extends Item {
 	 * 3) hifi images are optional
 	 * 4) If product does not have variants, as defined by Product item, then the v
 	 *    folder is ignored when this method executes.
+	 * 5) Image names for variants should be comprised from one or more axis names,
+	 *    eg.'brown', or 'brown-wide', etc.
 	 */
 	private void resolveImages() {
 		if (this.carouselImages == null && this.hifiImages == null && this.variantImages == null) {
@@ -252,7 +284,7 @@ public class Product extends Item {
 	}
 
 	public String getPriceInPoundsAsString() {
-		return CURRENCY_FORMAT.format(getPriceInPounds()).substring(1);
+		return CURRENCY_FORMAT.format(getPriceInPounds());
 	}
 
 	public Product setPrice(Long price) {

@@ -73,4 +73,10 @@
 		<function-signature>java.lang.String resolveMarkupFieldValue(com.slepeweb.cms.bean.Item, java.lang.String, java.lang.String)</function-signature>
 	</function>
 	
+	<function>
+		<name>resolveOrderItemThumbnail</name>
+		<function-class>com.slepeweb.site.util.TldFunction</function-class>
+		<function-signature>com.slepeweb.cms.bean.Item resolveOrderItemThumbnail(com.slepeweb.commerce.bean.Product, java.lang.String)</function-signature>
+	</function>
+	
 </taglib>

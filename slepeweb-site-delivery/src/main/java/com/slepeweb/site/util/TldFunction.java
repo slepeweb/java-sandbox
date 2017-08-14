@@ -22,6 +22,10 @@ public class TldFunction {
 		return i.getFieldValueResolved(variable, dflt);
 	}
 	
+	public static Item resolveOrderItemThumbnail(Product p, String qualifier) {
+		return p.getOrderItemThumbnail(qualifier);
+	}
+	
 	public static void main(String[] args) {
 		System.out.println(formatUKDate(new Date(), "MMMM d, HH:mm z"));
 	}

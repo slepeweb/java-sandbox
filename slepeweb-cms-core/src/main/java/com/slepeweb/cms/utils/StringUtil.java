@@ -30,4 +30,11 @@ public class StringUtil {
 		
 		return sb.toString();
 	}
+	
+	public static String compress(String s) {
+		if (s != null) {
+			return s.toLowerCase().replaceAll("[\'\" ]", "");
+		}
+		return null;
+	}
 }

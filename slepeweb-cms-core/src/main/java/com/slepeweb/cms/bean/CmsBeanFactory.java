@@ -9,6 +9,7 @@ import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.commerce.bean.Axis;
 import com.slepeweb.commerce.bean.AxisValue;
+import com.slepeweb.commerce.bean.OrderItem;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.commerce.bean.Variant;
 
@@ -164,6 +165,12 @@ public class CmsBeanFactory {
 		Variant v = new Variant();
 		v.setCmsService(CMS);
 		return v;
+	}
+	
+	public static OrderItem makeOrderItem(int n, long o, String q) {
+		OrderItem oi = new OrderItem(n, o, q);
+		oi.setCmsService(CMS);
+		return oi;
 	}
 	
 }

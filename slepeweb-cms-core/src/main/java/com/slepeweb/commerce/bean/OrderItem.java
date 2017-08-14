@@ -1,10 +1,15 @@
 package com.slepeweb.commerce.bean;
 
+import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.service.CmsService;
+
 public class OrderItem {
 	private long origItemId;
 	private String qualifier;
 	private int quantity;
 	private Product product;
+	private Variant variant;
+	private transient CmsService cmsService;
 	
 	public OrderItem(int n, long o, String q) {
 		this.origItemId = o;
@@ -36,6 +41,43 @@ public class OrderItem {
 		this.qualifier = qualifier;
 	}
 
+	public Product getProduct() {
+		if (this.product == null) {
+			Item i = getCmsService().getItemService().getItemByOriginalId(getOrigItemId());
+			if (i.isProduct()) {
+				this.product = (Product) i;
+			}
+		}
+		return product;
+	}
+
+	public Variant getVariant() {
+		if (this.variant == null) {
+			this.variant = getCmsService().getVariantService().get(getOrigItemId(), getQualifier());
+		}
+		return variant;
+	}
+
+	public void setProduct(Product p) {
+		this.product = p;
+	}
+
+	public CmsService getCmsService() {
+		return cmsService;
+	}
+
+	public void setCmsService(CmsService cmsService) {
+		this.cmsService = cmsService;
+	}
+	
+	public float getTotalValue() {
+		return getProduct().getPriceInPounds() * getQuantity();
+	}
+	
+	public String getTotalValueAsString() {
+		return Product.CURRENCY_FORMAT.format(getTotalValue());
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -62,13 +104,5 @@ public class OrderItem {
 		} else if (!qualifier.equals(other.qualifier))
 			return false;
 		return true;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product p) {
-		this.product = p;
 	}
 }

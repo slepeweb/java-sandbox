@@ -477,64 +477,70 @@ public class CommerceSetup {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void update(AxisXlsRow currentRow, Row row) {
+		int cell = 0;
 		currentRow.setUpdate(stringValueParser(currentRow.getUpdate(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(cell++))));
 		currentRow.setShortname(stringValueParser(currentRow.getShortname(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setLabel(stringValueParser(currentRow.getLabel(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setUnits(stringValueParser(currentRow.getUnits(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setDescription(stringValueParser(currentRow.getDescription(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(4))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	private void update(AxisValueXlsRow currentRow, Row row) {
+		int cell = 0;
 		currentRow.setUpdate(stringValueParser(currentRow.getUpdate(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(cell++))));
 		currentRow.setAxis(stringValueParser(currentRow.getAxis(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setValue(stringValueParser(currentRow.getValue(), 
-				SiteSetupUtils.getString(row.getCell(2))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	private void update(ProductXlsRow currentRow, Row row) {
+		int cell = 0;
 		currentRow.setUpdate(stringValueParser(currentRow.getUpdate(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(cell++))));
 		currentRow.setName(stringValueParser(currentRow.getName(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setSection(stringValueParser(currentRow.getSection(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setPartNum(stringValueParser(currentRow.getPartNum(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setStock(stringValueParser(currentRow.getStock(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(4))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setPrice(stringValueParser(currentRow.getPrice(), 
-				SiteSetupUtils.getString(row.getCell(5))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setAlpha(stringValueParser(currentRow.getAlpha(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(6))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setBeta(stringValueParser(currentRow.getBeta(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(7))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void update(VariantXlsRow currentRow, Row row) {
+		int cell = 0;
 		currentRow.setUpdate(stringValueParser(currentRow.getUpdate(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0))));
+				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(cell++))));
 		currentRow.setPartNum(stringValueParser(currentRow.getPartNum(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))));
-		currentRow.setQualifier(stringValueParser(currentRow.getQualifier(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setStock(stringValueParser(currentRow.getStock(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setPrice(stringValueParser(currentRow.getPrice(), 
-				SiteSetupUtils.getString(row.getCell(4))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setAlpha(stringValueParser(currentRow.getAlpha(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(5))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 		currentRow.setBeta(stringValueParser(currentRow.getBeta(), 
-				SiteSetupUtils.getStringIgnoreDecimal(row.getCell(6))));
+				SiteSetupUtils.getString(row.getCell(cell++))));
 	}
 	
 	private String stringValueParser(String orig, String replacement) {

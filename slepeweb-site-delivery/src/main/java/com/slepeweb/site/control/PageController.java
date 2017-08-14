@@ -21,7 +21,6 @@ import com.slepeweb.cms.bean.solr.SolrParams;
 import com.slepeweb.cms.service.SiteConfigService;
 import com.slepeweb.cms.service.SolrService;
 import com.slepeweb.commerce.bean.Basket;
-import com.slepeweb.commerce.service.ProductService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.model.SiblingItemPager;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
@@ -31,7 +30,6 @@ import com.slepeweb.site.util.SiteUtil;
 public class PageController extends BaseController {
 	
 	@Autowired private CmsDeliveryServlet cmsDeliveryServlet;
-	@Autowired private ProductService productService;
 	@Autowired private SiteConfigService siteConfigService;
 	@Autowired private SolrService solrService;
 	
@@ -265,7 +263,6 @@ public class PageController extends BaseController {
 		Page page = getStandardPage(i, shortSitename, "commerce/basket-111", model);
 		Cookie basketCookie = SiteUtil.getCookie(req.getCookies(), SiteRestController.BASKET_COOKIE);
 		Basket basket = Basket.parseCookieStringValue(basketCookie.getValue());
-		basket.extendOrderItems(this.productService);
 		model.addAttribute(SiteRestController.BASKET_COOKIE, basket);
 
 		return page.getView();

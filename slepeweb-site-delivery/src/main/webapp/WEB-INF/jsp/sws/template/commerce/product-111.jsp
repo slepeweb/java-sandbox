@@ -57,6 +57,9 @@
 					<button type="button">Add to basket</button>	
 					<span></span>		
 				</div>
+				<div id="show-basket">
+					<a href="/storefront/basket">Show basket</a>	
+				</div>
 			</div>
 		</div>
 	</div>
