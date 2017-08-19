@@ -1,3 +1,58 @@
+var _updateBasket = function() {
+	$.ajax({
+		url: "/rest/product/basket/get",
+		cache: false,
+		dataType: "html",
+		success: function(response, status, z) {	
+			$("#basket").html(response);
+			_addBehaviour2Basket();
+		},
+		error: function(json, status, z) {
+			console.log(z);
+		},
+	});
+}
+
+var _addBehaviour2Basket = function() {
+	$(".basket-remove").click(function(e) {
+		var _origId = $(this).attr("data-id");
+		var _qualifier = $(this).attr("data-q");
+		
+		$.ajax("/rest/product/basket/remove/" + _origId + "/" + _qualifier, {
+			type: "POST",
+			cache: false,
+			dataType: "text",
+			success: function(response, status, z) {	
+				_updateBasket();
+			},
+			error: function(json, status, z) {
+				console.log(z);
+			}
+		});
+	});	
+	
+	$(".basket-change-quantity").change(function(e) {
+		var _origId = $(this).attr("data-id");
+		var _qualifier = $(this).attr("data-q");
+		var _quantity = $(this).val();
+		
+		$.ajax("/rest/product/basket/change/" + _origId + "/" + _qualifier, {
+			type: "POST",
+			cache: false,
+			data: {
+				n: _quantity
+			},
+			dataType: "text",
+			success: function(response, status, z) {	
+				_updateBasket();
+			},
+			error: function(json, status, z) {
+				console.log(z);
+			}
+		});
+	});	
+}
+
 $(function() {
 	
 	$("#alphaaxis-options").click(function(e) {	
@@ -105,4 +160,5 @@ $(function() {
 		});
 	});
 	
+	_updateBasket();
 });	

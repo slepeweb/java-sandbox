@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.service.TagService;
@@ -45,6 +47,7 @@ public class SiteRestController extends BaseController {
 	public static final String BASKET_COOKIE = "_basket";
 	
 	@Autowired private SiteService siteService;
+	@Autowired private HostService hostService;
 	@Autowired private NavigationService navigationService;
 	@Autowired private TagService tagService;
 	@Autowired private ItemService itemService;
@@ -164,11 +167,7 @@ public class SiteRestController extends BaseController {
 		String alphaAxisIdStr = req.getParameter("alphavalueid");
 		String betaAxisIdStr = req.getParameter("betavalueid");
 		
-		Cookie c = SiteUtil.getCookie(req.getCookies(), BASKET_COOKIE);
-		if (c == null) {
-			c = new Cookie(BASKET_COOKIE, "");
-		}
-		
+		Cookie c = getCookie(req);		
 		Basket b = Basket.parseCookieStringValue(c.getValue());
 		OrderItem oi = new OrderItem(1, origItemId, null);
 		
@@ -197,11 +196,80 @@ public class SiteRestController extends BaseController {
 			}
 		}
 		
+		saveBasket2Cookie(b, c, res);
+		return String.format("Basket contains %d item(s)", b.getSize());
+	}	
+	
+	@RequestMapping(value="/product/basket/change/{origItemId}/{qualifier}", 
+			method=RequestMethod.POST, produces="text/plain")
+	@ResponseBody
+	public String changeBasketQuantity(
+			@PathVariable long origItemId, 
+			@PathVariable String qualifier, 
+			HttpServletRequest req, 
+			HttpServletResponse res) {
+		
+		Cookie c = getCookie(req);
+		Basket b = Basket.parseCookieStringValue(c.getValue());
+		OrderItem template = new OrderItem(0, origItemId, qualifier);
+		OrderItem oi = b.get(template);
+		String quantityStr = req.getParameter("n");
+		
+		if (oi != null && StringUtils.isNumeric(quantityStr)) {
+			oi.setQuantity(Integer.parseInt(quantityStr)); 
+		}
+		
+		saveBasket2Cookie(b, c, res);
+		return "Order quantity updated";
+	}	
+	
+	@RequestMapping(value="/product/basket/remove/{origItemId}/{qualifier}", 
+			method=RequestMethod.POST, produces="text/plain")
+	@ResponseBody
+	public String removeFromBasket(
+			@PathVariable long origItemId, 
+			@PathVariable String qualifier, 
+			HttpServletRequest req, 
+			HttpServletResponse res) {
+		
+		Cookie c = getCookie(req);
+		Basket b = Basket.parseCookieStringValue(c.getValue());
+		OrderItem oi = new OrderItem(0, origItemId, qualifier);
+		b.remove(oi);
+		saveBasket2Cookie(b, c, res);		
+		return String.format("Basket contains %d item(s)", b.getSize());
+	}	
+	
+	@RequestMapping(value="/product/basket/get")
+	public String getbasket(
+			HttpServletRequest req, 
+			ModelMap model) {
+		
+		Cookie c = getCookie(req);
+		Basket b = Basket.parseCookieStringValue(c.getValue());
+		model.addAttribute(SiteRestController.BASKET_COOKIE, b);
+		
+		String shortSitename = "";
+		Host h = this.hostService.getHost(req.getServerName());
+		if (h != null) {
+			shortSitename = h.getSite().getShortname();
+		}
+
+		return getFullyQualifiedViewName(shortSitename, "commerce/basket");
+	}
+	
+	private void saveBasket2Cookie(Basket b, Cookie c, HttpServletResponse res) {
 		c.setValue(b.formatCookieStringValue());
 		c.setMaxAge(3 * 24 * 3600); // 3 days
 		c.setPath("/");
 		res.addCookie(c);
-		
-		return String.format("Basket contains %d item(s)", b.getSize());
-	}	
+	}
+	
+	private Cookie getCookie(HttpServletRequest req) {
+		Cookie c = SiteUtil.getCookie(req.getCookies(), BASKET_COOKIE);
+		if (c == null) {
+			c = new Cookie(BASKET_COOKIE, "");
+		}
+		return c;
+	}
 }

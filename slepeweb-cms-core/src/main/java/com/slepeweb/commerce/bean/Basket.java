@@ -22,6 +22,18 @@ public class Basket {
 		}
 	}
 	
+	public void remove(OrderItem oi) {
+		getItems().remove(oi);
+	}
+	
+	public OrderItem get(OrderItem template) {
+		int i = getItems().indexOf(template);
+		if (i > -1) {
+			return getItems().get(i);
+		}
+		return null;
+	}
+	
 	public int getSize() {
 		return getItems().size();
 	}
