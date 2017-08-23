@@ -47,7 +47,11 @@ public class CmsBeanFactory {
 	}
 	
 	public static Item makeItem(String itemTypeName) {
-		if (itemTypeName != null && itemTypeName.equals(ItemTypeName.PRODUCT)) {
+		if (
+				CMS.getServerConfig().isCommerceEnabled() && 
+				itemTypeName != null && 
+				itemTypeName.equals(ItemTypeName.PRODUCT)) {
+			
 			return makeProduct();
 		}
 		

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.commerce.service.AxisService;
 import com.slepeweb.commerce.service.AxisValueService;
 import com.slepeweb.commerce.service.ProductService;
@@ -33,6 +34,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected AxisService axisService;
 	@Autowired protected AxisValueService axisValueService;
 	@Autowired protected VariantService variantService;
+	@Autowired protected ServerConfig serverConfig;
 	
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {
@@ -129,5 +131,9 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public VariantService getVariantService() {
 		return variantService;
+	}
+
+	public ServerConfig getServerConfig() {
+		return serverConfig;
 	}
 }

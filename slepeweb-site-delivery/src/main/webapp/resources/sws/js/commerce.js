@@ -159,6 +159,4 @@ $(function() {
 			},
 		});
 	});
-	
-	_updateBasket();
 });	

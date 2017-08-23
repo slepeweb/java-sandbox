@@ -262,7 +262,15 @@ public class PageController extends BaseController {
 		
 		Page page = getStandardPage(i, shortSitename, "commerce/basket-111", model);
 		Cookie basketCookie = SiteUtil.getCookie(req.getCookies(), SiteRestController.BASKET_COOKIE);
-		Basket basket = Basket.parseCookieStringValue(basketCookie.getValue());
+		Basket basket = null;
+		
+		if (basketCookie != null) {
+			basket = Basket.parseCookieStringValue(basketCookie.getValue());
+		}
+		else {
+			basket = new Basket();
+		}
+		
 		model.addAttribute(SiteRestController.BASKET_COOKIE, basket);
 
 		return page.getView();

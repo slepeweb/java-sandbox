@@ -8,14 +8,20 @@
 <sw:standardLayout>
 	<gen:debug><!-- jsp/sws/commerce/basket-111.jsp --></gen:debug>
 	
-	<div class="col-1-1">	
-		<h2>${_page.title}</h2>
-		${_page.body}
+	<c:if test="${_serverConfig.commerceEnabled}">
+		<div class="col-1-1">	
+			<h2>${_page.title}</h2>
+			${_page.body}
+			
+			<%-- Basket is added by ajax call - see commerce.js --%>
+			<div id="basket">
+			</div>
+			
+		</div>		
 		
-		<%-- Basket is added by ajax call - see commerce.js --%>
-		<div id="basket">
-		</div>
-		
-	</div>			
+		<script type="text/javascript">
+		$(function() {_updateBasket();});
+		</script>
+	</c:if>
 	
 </sw:standardLayout>
