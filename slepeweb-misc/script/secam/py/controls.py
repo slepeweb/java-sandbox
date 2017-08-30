@@ -18,6 +18,11 @@ def controls(req):
                 <tr><td>ISO</td><td><select class="ctrl" id="iso">%s</select></td></tr>
             </table>
             
+            <div id="live-video">
+                <button value="start-live-video">Start live video</button>
+                <div></div>
+            </div>
+            
             <p></p>
             <div id="dialog-trash-confirm" class="hide" title="Delete file?">
                 <p>

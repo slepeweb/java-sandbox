@@ -1,14 +1,14 @@
-import secam, controls
+import messaging, constants, document, controls, socket
 from operator import attrgetter
 
-_const = secam.Constants()
+_const = constants.Constants()
 
 def reboot(req, pwd=""):
     req.content_type="Content-Type: text/plain"
     return send_message("reboot", {"pwd": pwd}, True)            
     
 def send_message(action, argsObject, return_json=False):
-    ctrl = secam.SecamControllerClient()
+    ctrl = messaging.SecamControllerClient()
     return ctrl.send_message({"action": action, "args": argsObject}, return_json)
     
 def putm(req, msg, json=False):
@@ -50,7 +50,7 @@ def table(req):
     # Convert list of objects into list of Document objects
     docs = []
     for obj in results:
-        d = secam.Document(obj['filename'], _const)
+        d = document.Document(obj['filename'], _const)
         d.backedup = obj['backedup']
         docs.append(d)
         
@@ -105,3 +105,30 @@ def tail(req):
 </html>
     """
     return s
+
+
+def live_video(req):
+    req.content_type='Content-Type: multipart/x-mixed-replace;boundary="--jpgboundary"'
+    #req.content_type="Content-Type: video/x-motion-jpeg"
+    
+    #req.headers_out["Connection"] = "keep-alive"
+    
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((_const.host, _const.live_video_port))
+        
+        while True:
+            chunk = sock.recv(2048)
+            if not chunk:
+                break
+            
+            req.write("--jpgboundary")
+            req.write("Content-Type: image/jpeg")
+            req.write("Content-Length: %d" % len(chunk))
+            req.write(chunk)
+        
+    finally:
+        try:
+            sock.close()
+        except:
+            ''

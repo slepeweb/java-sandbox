@@ -157,4 +157,26 @@ $(function() {
 	$(".controls-toggle").click(function() {
 		window.location = securePath;		
 	});
+	
+	$("#live-video button").click(function() {	
+		var msg = $(this).attr("value");
+		$.ajax({
+			url : indexPath + "/putm?msg=" + msg + "&json=1",
+			dataType : "text",
+			cache : false
+		}).done(function(resp) {
+			var obj = $.parseJSON(resp)
+			$(".flash").empty().append(obj["msg"]);
+			
+			if (msg.startsWith("start")) {
+				$("#live-video button").attr("value", "stop-live-video").html("Stop live video")
+			}
+			else {
+				$("#live-video button").attr("value", "start-live-video").html("Start live video")
+			}
+		}).fail(function(jqXHR, status) {
+			console.log(status);
+		});		
+	});
+
 });
