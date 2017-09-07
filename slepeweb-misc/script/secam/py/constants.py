@@ -14,8 +14,7 @@ class Constants:
         self.stop = "stop"
         self.photo = "photo"
         self.video = "video"
-        self.start_live_video = "start-live-video"
-        self.stop_live_video = "stop-live-video"
+        self.live_video = "livevideo"
        
         self.settings = "settings"
         self.brightness = "brightness"
@@ -27,4 +26,3 @@ class Constants:
         self.stat = "status"
         self.host = ''   # Symbolic name, meaning all available interfaces
         self.port = 8888 # Arbitrary non-privileged port    
-        self.live_video_port = 8889 # Arbitrary non-privileged port    

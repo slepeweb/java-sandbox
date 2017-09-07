@@ -1,4 +1,4 @@
-import constants, document, os, subprocess
+import constants, document, subprocess, os, time
 import re, dropbox, smtplib
 from email.mime.text import MIMEText
 
@@ -107,9 +107,12 @@ class Support:
     def record_video(self, task, camera):
         h264_path = ''.join([self.const.video_folder, self.get_filename_prefix(task.id, task.get_start()), ".h264"])
         # PIR stays high for 8 secs, then low for 8 secs; cycle is 16 secs
-        camera.record_video(h264_path, 16)
-        task.add_event("video recorded [%s]" % h264_path)
-        return h264_path
+        if camera.record_video(h264_path, 16):
+            task.add_event("video recorded [%s]" % h264_path)
+            return True
+        else:
+            task.add_event("video recording failed [%s]" % h264_path)
+            return False
     
     def convert2mp4(self, task, h264_path):
         mp4_path = h264_path.replace("h264", "mp4")
@@ -124,6 +127,23 @@ class Support:
         
         return mp4_path
     
+
+    def start_mjpeg_stream(self, task):
+        if os.system("/home/pi/mjpg-streamer.sh start > /dev/null 2>&1") == 0:
+            task.add_event("Started mjpeg-streamer")
+            time.sleep(1)
+        else:
+            task.add_event("*** error starting mjpg-streamer")
+        
+   
+    def stop_mjpeg_stream(self, task):
+        if os.system("/home/pi/mjpg-streamer.sh stop > /dev/null") == 0:
+            task.add_event("Stopped mjpeg-streamer")
+            time.sleep(1)
+        else:
+            task.add_event("*** error stopping mjpg-streamer")
+        
+   
     def send_mail(self, task):
         mail_from = "george@slepeweb.com"
         mail_to = "george@buttigieg.org.uk"
@@ -157,8 +177,13 @@ class Support:
     
     def take_photo(self, task, camera):
         file_path = ''.join([self.const.video_folder, self.get_filename_prefix("P", task.get_start()), ".jpg"])
-        camera.capture_photo(file_path) 
-        task.add_event("photo captured")
+        if camera.capture_photo(file_path): 
+            task.add_event("Photo captured")
+            return True
+        else:
+            task.add_event("*** Failed to capture photo")
+            return False
+            
         
     def file_part(self, file_path):
         return file_path.split("/")[-1]

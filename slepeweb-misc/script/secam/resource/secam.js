@@ -158,21 +158,23 @@ $(function() {
 		window.location = securePath;		
 	});
 	
-	$("#live-video button").click(function() {	
-		var msg = $(this).attr("value");
+	$("#live-video img").click(function() {	
+		var src = $("#live-video img").attr("src");
 		$.ajax({
-			url : indexPath + "/putm?msg=" + msg + "&json=1",
+			url : indexPath + "/putm?msg=livevideo&json=1",
 			dataType : "text",
 			cache : false
 		}).done(function(resp) {
 			var obj = $.parseJSON(resp)
 			$(".flash").empty().append(obj["msg"]);
 			
-			if (msg.startsWith("start")) {
-				$("#live-video button").attr("value", "stop-live-video").html("Stop live video")
+			if (! src.endsWith("stream")) {
+				$("#video-table-wrapper").css("visibility", "collapse")
+				$("#live-video img").attr("src", "http://rpi-raspbian:8083/?action=stream")
 			}
 			else {
-				$("#live-video button").attr("value", "start-live-video").html("Start live video")
+				$("#video-table-wrapper").css("visibility", "visible")
+				$("#live-video img").attr("src", "/secam/app/resource/images/video-play.png")
 			}
 		}).fail(function(jqXHR, status) {
 			console.log(status);

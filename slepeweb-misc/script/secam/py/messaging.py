@@ -137,14 +137,14 @@ class SecamController:
         elif task.action == "delete":
             reply, ok = self.support.delete_files(task.args["files"])
             self.logger.info(reply)
-            obj = {"status": ok, "msg": reply}
-            util.send(json.dumps(obj))
+            response = {"status": ok, "msg": reply}
+            util.send(json.dumps(response))
             
         elif task.action == "backup":
             reply, ok = self.support.backup_file(task.args["plik"])
             self.logger.info(reply)
-            obj = {"status": ok, "msg": reply}
-            util.send(json.dumps(obj))
+            response = {"status": ok, "msg": reply}
+            util.send(json.dumps(response))
                                 
         elif task.action == "reboot":
             cf = datetime.now().strftime("%H%d%m%Y")
@@ -156,6 +156,8 @@ class SecamController:
             
         else:
             self.enqueue(task)
+            response = {"msg": task.response}
+            util.send(json.dumps(response))
 
 
     def _process_tasks(self):
@@ -174,35 +176,49 @@ class SecamController:
             
             if task.action == self.const.photo:
                 task.id = "P"
+                self.stop_live_video(task)
                 self.support.take_photo(task, self.camera)
                 task.log_history()
             elif task.action == self.const.video:
+                self.stop_live_video(task)
                 h264_path = self.support.record_video(task, self.camera)
                 start_new_thread(self.support.send_mail_and_backup_video, (task, h264_path))
                 # leave this new thread to log the history
-            elif task.action == self.const.start_live_video:
-                self.logger.info("Starting live video")
-                while True:
-                    task.add_event("Live video in progress")
-                    self.camera.start_live_video(16)
-                    if len(self.queue) > 0:
-                        break
-                    
+            elif task.action == self.const.live_video:
+                task.id = "Live video"
+                if len(self.queue) > 0:
+                    task.add_event("Live video not available - other jobs waiting in queue")
+                else: 
+                    if not self.camera.is_busy():
+                        task.add_event("Starting live video")
+                        # start mjpg-streamer process; pause evry N secs to check queue,
+                        # and stop if queue not empty
+                        self.camera.playing_live_video = True
+                        self.support.start_mjpeg_stream(task)
+
+                        #self.support.start_mjpeg_stream(task)
+                    else:
+                        self.stop_live_video(task)
+                        
                 task.log_history()
-                    
-            elif task.action == self.const.stop_live_video:
-                self.logger.info("Stopped live video")
-                task.add_event("Live video stopped")
-                task.log_history()
-               
+                                       
             
         self._set_thread_status(False);
 
+
+    def stop_live_video(self, task):
+        if self.camera.playing_live_video:
+            self.support.stop_mjpeg_stream(task)
+            task.add_event("Stopped live video")
+            self.camera.playing_live_video = False
+        
+        
     def enqueue(self, task):
         self.q_lock.acquire()
         try:
             self.queue.append(task)
             task.add_event("Task queued")
+            task.response = "Queued task (%s)" % task.action
             self._process_tasks()
             return task
         finally:
@@ -283,6 +299,7 @@ class Task:
         self.events = []
         self.start = datetime.now()
         self.logger = logging.getLogger("secam")
+        self.response = ""
         #self.events.append(Event(datetime.now(), "Start: %s" % action))
         
     def get_start(self):
@@ -300,7 +317,7 @@ class Task:
         
     def log_history(self):
         self.logger.info("==============================")
-        self.logger.info("Task history [%s] started at %s" % (self.id, self.get_start_as_string()))
+        self.logger.info("Task history [%s]" % self.id)
         
         for e in self.events:
             self.logger.info("%s secs: %s", self.elapsed(e.date), e.msg)

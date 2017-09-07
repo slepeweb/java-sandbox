@@ -19,8 +19,8 @@ def controls(req):
             </table>
             
             <div id="live-video">
-                <button value="start-live-video">Start live video</button>
-                <div></div>
+                <h3>Play live video</h3>
+                <img src="/secam/app/resource/images/video-play.png" />                
             </div>
             
             <p></p>

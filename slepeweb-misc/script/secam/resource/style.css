@@ -217,4 +217,6 @@ td.flash {
 
 #controls {
 	width: 30%;
+	float: left;
+	margin-right: 2em;
 }

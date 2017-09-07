@@ -91,44 +91,20 @@ def head(req):
   </head> 
   <body>
       <div id="main">
-        <h1><a href="index.py">Video index</a></h1>    
-        <div id="video-table"><p>(Video table is loading ...)</p></div>
+        <div id="video-table-wrapper">
+          <h1><a href="index.py">Video index</a></h1>    
+          <div id="video-table"><p>(Video table is loading ...)</p></div>
+        </div>
     """
     return s
 
 
 def tail(req):    
     s = """
-        </div>
+      </div>
     </div>
   </body> 
 </html>
     """
     return s
-
-
-def live_video(req):
-    req.content_type='Content-Type: multipart/x-mixed-replace;boundary="--jpgboundary"'
-    #req.content_type="Content-Type: video/x-motion-jpeg"
-    
-    #req.headers_out["Connection"] = "keep-alive"
-    
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((_const.host, _const.live_video_port))
         
-        while True:
-            chunk = sock.recv(2048)
-            if not chunk:
-                break
-            
-            req.write("--jpgboundary")
-            req.write("Content-Type: image/jpeg")
-            req.write("Content-Length: %d" % len(chunk))
-            req.write(chunk)
-        
-    finally:
-        try:
-            sock.close()
-        except:
-            ''

@@ -1,5 +1,6 @@
+import picamera, time
+from datetime import datetime
 import constants, logging
-import picamera, io, socket, time
 
 class Camera:
     def __init__(self):
@@ -10,11 +11,14 @@ class Camera:
         self.exposure_mode = "auto"
         self.iso = "0"
         self.recording = False
-        self.live_viewing = False
+        self.playing_live_video = False
         self.logger = logging.getLogger("secam")
         
+    def is_busy(self):
+        return self.recording or self.playing_live_video
+    
     def record_video(self, file_path, duration):
-        if not self.recording:
+        if not self.is_busy():
             self.recording = True
             
             with picamera.PiCamera() as camera:
@@ -26,79 +30,23 @@ class Camera:
                 #LOG.info("Video recording completed")
                 
             self.recording = False
+            return True
         else:
-            self.logger.warning("Camera is already recording")
-               
-        return file_path
-
-    def start_live_video_0(self, duration):
-        if not self.live_viewing:
-            self.live_viewing = True
-            
-            try:
-                # Create new socket, and connect to the server
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect((self.const.host, self.const.live_video_port))
-                
-                # Make a file-like object out of the connection
-                connection = sock.makefile('wb')
-                
-                with picamera.PiCamera() as camera:
-                    self._prepare(camera)
-                    camera.start_recording(connection, format="mjpeg", quality=23)
-                    camera.wait_recording(duration)
-                    camera.stop_recording() 
-                    self._complete(camera)
-                
-            finally:
-                try:
-                    connection.close()
-                    sock.close()
-                except:
-                    self.logger.warning("Failed to close the connection or socket")
-                    
-            self.live_viewing = False
-        else:
-            self.logger.warning("Camera is already live_viewing")
-
-    def start_live_video(self, duration):
-        if not self.live_viewing:
-            self.live_viewing = True
-            
-            try:
-                # Create new socket, and connect to the server
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect((self.const.host, self.const.live_video_port))                
-                stream=io.BytesIO()
-                
-                with picamera.PiCamera() as camera:
-                    self._prepare(camera)
-                    for foo in camera.capture_continuous(stream, "jpeg"):
-                        sock.send(stream.getvalue())
-                        stream.seek(0)
-                        stream.truncate()
-                        time.sleep(0.2);
-                        
-                    self._complete(camera)
-                
-            finally:
-                try:
-                    sock.close()
-                except:
-                    self.logger.warning("Failed to close the connection or socket")
-                    
-            self.live_viewing = False
-        else:
-            self.logger.warning("Camera is already live_viewing")
+            return False
 
     def capture_photo(self, file_path):
-        with picamera.PiCamera() as camera:
-            self._prepare(camera)
-            camera.capture(file_path)
-            self._complete(camera)
-            self.logger.info("Photo taken")
+        if not self.is_busy():
+            self.recording = True
+            
+            with picamera.PiCamera() as camera:
+                self._prepare(camera)
+                camera.capture(file_path)
+                self._complete(camera)
                
-        return file_path
+            self.recording = False
+            return True;
+        else:
+            return False
 
     def _prepare(self, camera):
         camera.resolution = (1280, 720)
