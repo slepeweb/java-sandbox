@@ -190,15 +190,9 @@ class SecamController:
                     task.add_event("Live video not available - other jobs waiting in queue")
                 else: 
                     if not self.camera.is_busy():
-                        task.add_event("Starting live video")
-                        # start mjpg-streamer process; pause evry N secs to check queue,
-                        # and stop if queue not empty
-                        self.camera.playing_live_video = True
-                        self.support.start_mjpeg_stream(task)
-
-                        #self.support.start_mjpeg_stream(task)
+                        self.support.start_mjpeg_stream(task, self.camera)
                     else:
-                        self.stop_live_video(task)
+                        self.stop_live_video(task, self.camera)
                         
                 task.log_history()
                                        
@@ -206,11 +200,9 @@ class SecamController:
         self._set_thread_status(False);
 
 
-    def stop_live_video(self, task):
-        if self.camera.playing_live_video:
-            self.support.stop_mjpeg_stream(task)
-            task.add_event("Stopped live video")
-            self.camera.playing_live_video = False
+    def stop_live_video(self, task, camera):
+        if camera.playing_live_video:
+            self.support.stop_mjpeg_stream(task, camera)
         
         
     def enqueue(self, task):

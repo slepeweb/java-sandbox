@@ -70,6 +70,7 @@ class Camera:
         response[self.const.settings] = self.get_settings()
         response[self.const.msg] = "Surveillance is " + ("on" if self.status == self.const.go else "paused")
         response[self.const.stat] = self.status
+        response[self.const.live_video] = self.playing_live_video
         return response
     
     def set_setting(self, ctrl, value):

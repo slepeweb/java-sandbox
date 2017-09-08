@@ -128,20 +128,28 @@ class Support:
         return mp4_path
     
 
-    def start_mjpeg_stream(self, task):
-        if os.system("/home/pi/mjpg-streamer.sh start > /dev/null 2>&1") == 0:
-            task.add_event("Started mjpeg-streamer")
-            time.sleep(1)
+    def start_mjpeg_stream(self, task, camera):
+        if not camera.playing_live_video:
+            if os.system("/home/pi/mjpg-streamer.sh start > /dev/null 2>&1") == 0:
+                time.sleep(1)
+                task.add_event("Started mjpeg-streamer")
+                camera.playing_live_video = True
+            else:
+                task.add_event("*** error starting mjpg-streamer")
         else:
-            task.add_event("*** error starting mjpg-streamer")
+            task.add_event("*** mjpg-streamer already active")
         
    
-    def stop_mjpeg_stream(self, task):
-        if os.system("/home/pi/mjpg-streamer.sh stop > /dev/null") == 0:
-            task.add_event("Stopped mjpeg-streamer")
-            time.sleep(1)
+    def stop_mjpeg_stream(self, task, camera):
+        if camera.playing_live_video:        
+            if os.system("/home/pi/mjpg-streamer.sh stop > /dev/null") == 0:
+                time.sleep(1)
+                task.add_event("Stopped mjpeg-streamer")
+                camera.playing_live_video = False
+            else:
+                task.add_event("*** error stopping mjpg-streamer")
         else:
-            task.add_event("*** error stopping mjpg-streamer")
+            task.add_event("*** mjpg-streamer was not active")
         
    
     def send_mail(self, task):

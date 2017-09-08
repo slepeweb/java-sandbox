@@ -135,8 +135,21 @@ function reloadTable() {
 	});		
 }
 
-function getStatus() {
+function manageLiveVideoPlayer(playing_live_video) {	
+	if (playing_live_video) {
+		$("#video-table-wrapper").css("visibility", "collapse")
+		$("#live-video img").attr("src", "http://www.slepeweb.com:8083/?action=stream")
+	}
+	else {
+		$("#video-table-wrapper").css("visibility", "visible")
+		$("#live-video img").attr("src", "/secam/app/resource/images/video-play.png")
+	}	
+}
+
+
+function updatePage() {
 	$.ajax({
+		mimeType : "application/json",
 		url : indexPath + "/status",
 		dataType : "text",
 		cache : false
@@ -145,6 +158,7 @@ function getStatus() {
 		$(".flash").empty().append(status["msg"]);
 		reloadTable();
 		manageButtons(status);
+		manageLiveVideoPlayer(status["livevideo"])
 	}).fail(function(jqXHR, status) {
 		console.log(status);
 	});		
@@ -152,33 +166,28 @@ function getStatus() {
 
 // After page is fully loaded ...
 $(function() {
-	getStatus();
+	updatePage();
 	
 	$(".controls-toggle").click(function() {
 		window.location = securePath;		
 	});
 	
 	$("#live-video img").click(function() {	
-		var src = $("#live-video img").attr("src");
+		/* 
+		 * &json=1 means return a json text string, which will be parsed
+		 * later into a json object.
+		 */
 		$.ajax({
+			mimeType : "application/json",
 			url : indexPath + "/putm?msg=livevideo&json=1",
 			dataType : "text",
 			cache : false
 		}).done(function(resp) {
 			var obj = $.parseJSON(resp)
 			$(".flash").empty().append(obj["msg"]);
-			
-			if (! src.endsWith("stream")) {
-				$("#video-table-wrapper").css("visibility", "collapse")
-				$("#live-video img").attr("src", "http://rpi-raspbian:8083/?action=stream")
-			}
-			else {
-				$("#video-table-wrapper").css("visibility", "visible")
-				$("#live-video img").attr("src", "/secam/app/resource/images/video-play.png")
-			}
+			window.setTimeout(updatePage, 2000);
 		}).fail(function(jqXHR, status) {
 			console.log(status);
 		});		
 	});
-
 });
