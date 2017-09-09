@@ -220,3 +220,7 @@ td.flash {
 	float: left;
 	margin-right: 2em;
 }
+
+#live-video img {
+	cursor: pointer;
+}

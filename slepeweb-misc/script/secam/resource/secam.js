@@ -6,22 +6,21 @@ var securePath = rootPath + "secure/index.py";
 function manageButtons(map) {
 	if (map.status == "stop") {
 		$("#button-stopgo").val("go").empty().append("Continue surveillance");
-	}
-	else if (map.status == "go") {
+	} else if (map.status == "go") {
 		$("#button-stopgo").val("stop").empty().append("Pause surveillance");
 	}
-	
+
 	var sel = "#brightness option[value=" + map.settings.brightness + "]";
 	$(sel).attr("selected", "selected");
-	
+
 	sel = "#contrast option[value=" + map.settings.contrast + "]";
 	$(sel).attr("selected", "selected");
-	
+
 	sel = "#mode option[value=" + map.settings.mode + "]";
 	$(sel).attr("selected", "selected");
-	
+
 	sel = "#iso option[value=" + map.settings.iso + "]";
-	$(sel).attr("selected", "selected");	
+	$(sel).attr("selected", "selected");
 }
 
 function reloadTable() {
@@ -30,15 +29,27 @@ function reloadTable() {
 		cache : false
 	}).done(function(resp) {
 		var table = $(resp);
-		table.find(".iframe").colorbox({iframe:true, opacity:0.5, closeButton:true, width:"90%", height:"80%", top:"15%"});
-		table.find(".group2").colorbox({rel:'group2', transition:"none", current:'Media item {current} of {total}'});
+		table.find(".iframe").colorbox({
+			iframe : true,
+			opacity : 0.5,
+			closeButton : true,
+			width : "90%",
+			height : "80%",
+			top : "15%"
+		});
+		table.find(".group2").colorbox({
+			rel : 'group2',
+			transition : "none",
+			current : 'Media item {current} of {total}'
+		});
 		$("#video-table").empty().append(table);
-				
+
 		// Parse page to add behaviour
 		// Backup files to dropbox
 		$(".backup-button").click(function() {
 			var filename = $(this).attr("value");
 			$.ajax({
+				mimeType : "application/json",
 				url : indexPath + "/backup?plik=" + filename,
 				dataType : "text",
 				cache : false
@@ -48,29 +59,30 @@ function reloadTable() {
 				reloadTable();
 			}).fail(function(jqXHR, status) {
 				console.log(status);
-			});		
+			});
 		});
 
 		// Delete files
 		$(".del-check").click(function() {
 			var file_list = "";
-			$(".deleteable-video:checked").each(function(index, element){
+			$(".deleteable-video:checked").each(function(index, element) {
 				if (file_list.length > 0) {
 					file_list += ",";
 				}
 				file_list += $(this).attr("value");
 			});
-			
+
 			var list_length = file_list.split(",").length;
 			if (file_list.length > 0) {
 				$("#num-files-target").html(list_length);
 				$("#dialog-trash-confirm").dialog({
-					resizable: false,
-					height:225,
-					modal: true,
-					buttons: {
-						"Delete file(s)": function() {
+					resizable : false,
+					height : 225,
+					modal : true,
+					buttons : {
+						"Delete file(s)" : function() {
 							$.ajax({
+								mimeType : "application/json",
 								url : indexPath + "/delete?files=" + file_list,
 								dataType : "text",
 								cache : false
@@ -82,38 +94,40 @@ function reloadTable() {
 							}).fail(function(jqXHR, status) {
 								console.log(status);
 								$("#dialog-trash-confirm").dialog("close");
-							});		
+							});
 						},
-						Cancel: function() {
+						Cancel : function() {
 							$(this).dialog("close");
 						}
 					}
 				});
 			}
 		});
-		
+
 		// Send contro messages to camera (spibox.py)
-		$("#button-photo,#button-stopgo").click(function() {	
+		$("#button-photo,#button-stopgo").click(function() {
 			var msg = $(this).attr("value");
 			$.ajax({
+				mimeType : "application/json",
 				url : indexPath + "/putm?msg=" + msg + "&json=1",
 				dataType : "text",
 				cache : false
 			}).done(function(resp) {
 				var obj = $.parseJSON(resp)
 				$(".flash").empty().append(obj["msg"]);
-				manageButtons(obj);
+				window.setTimeout(updatePage, 2000);
 			}).fail(function(jqXHR, status) {
 				console.log(status);
-			});		
+			});
 		});
 
 		// Send more control messages to camera (spibox.py)
-		$(".ctrl").change(function() {	
+		$(".ctrl").change(function() {
 			var ctrl = $(this).attr("id");
 			var value = $(this).find(":selected").text();
 			var msg = ctrl + "," + value;
 			$.ajax({
+				mimeType : "application/json",
 				url : indexPath + "/camera?ctrl=" + ctrl + "&value=" + value,
 				dataType : "text",
 				cache : false
@@ -123,29 +137,27 @@ function reloadTable() {
 				manageButtons(obj);
 			}).fail(function(jqXHR, status) {
 				console.log(status);
-			});		
+			});
 		});
 
-		$("#button-refresh").click(function(e) {	
+		$("#button-refresh").click(function(e) {
 			location.reload(true);
 		});
 
 	}).fail(function(jqXHR, status) {
 		console.log(status);
-	});		
+	});
 }
 
-function manageLiveVideoPlayer(playing_live_video) {	
+function manageLiveVideoPlayer(playing_live_video) {
 	if (playing_live_video) {
-		$("#video-table-wrapper").css("visibility", "collapse")
+		$("#video-table-wrapper").css("display", "none")
 		$("#live-video img").attr("src", "http://www.slepeweb.com:8083/?action=stream")
-	}
-	else {
-		$("#video-table-wrapper").css("visibility", "visible")
+	} else {
+		$("#video-table-wrapper").css("display", "")
 		$("#live-video img").attr("src", "/secam/app/resource/images/video-play.png")
-	}	
+	}
 }
-
 
 function updatePage() {
 	$.ajax({
@@ -161,21 +173,21 @@ function updatePage() {
 		manageLiveVideoPlayer(status["livevideo"])
 	}).fail(function(jqXHR, status) {
 		console.log(status);
-	});		
+	});
 }
 
 // After page is fully loaded ...
 $(function() {
 	updatePage();
-	
+
 	$(".controls-toggle").click(function() {
-		window.location = securePath;		
+		window.location = securePath;
 	});
-	
-	$("#live-video img").click(function() {	
-		/* 
-		 * &json=1 means return a json text string, which will be parsed
-		 * later into a json object.
+
+	$("#live-video img").click(function() {
+		/*
+		 * &json=1 means return a json text string, which will be parsed later
+		 * into a json object.
 		 */
 		$.ajax({
 			mimeType : "application/json",
@@ -188,6 +200,6 @@ $(function() {
 			window.setTimeout(updatePage, 2000);
 		}).fail(function(jqXHR, status) {
 			console.log(status);
-		});		
+		});
 	});
 });

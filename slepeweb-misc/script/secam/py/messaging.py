@@ -176,11 +176,11 @@ class SecamController:
             
             if task.action == self.const.photo:
                 task.id = "P"
-                self.stop_live_video(task)
+                self.stop_live_video(task, self.camera)
                 self.support.take_photo(task, self.camera)
                 task.log_history()
             elif task.action == self.const.video:
-                self.stop_live_video(task)
+                self.stop_live_video(task, self.camera)
                 h264_path = self.support.record_video(task, self.camera)
                 start_new_thread(self.support.send_mail_and_backup_video, (task, h264_path))
                 # leave this new thread to log the history
