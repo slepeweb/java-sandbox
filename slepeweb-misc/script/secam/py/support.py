@@ -109,10 +109,11 @@ class Support:
         # PIR stays high for 8 secs, then low for 8 secs; cycle is 16 secs
         if camera.record_video(h264_path, 16):
             task.add_event("video recorded [%s]" % h264_path)
-            return True
+            return h264_path
         else:
             task.add_event("video recording failed [%s]" % h264_path)
-            return False
+            return None
+        
     
     def convert2mp4(self, task, h264_path):
         mp4_path = h264_path.replace("h264", "mp4")

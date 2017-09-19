@@ -182,8 +182,11 @@ class SecamController:
             elif task.action == self.const.video:
                 self.stop_live_video(task, self.camera)
                 h264_path = self.support.record_video(task, self.camera)
-                start_new_thread(self.support.send_mail_and_backup_video, (task, h264_path))
-                # leave this new thread to log the history
+                if h264_path:
+                    start_new_thread(self.support.send_mail_and_backup_video, (task, h264_path))
+                    # leave this new thread to log the history
+                else:
+                    task.log_history()
             elif task.action == self.const.live_video:
                 task.id = "Live video"
                 if len(self.queue) > 0:
