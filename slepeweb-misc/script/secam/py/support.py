@@ -1,6 +1,9 @@
 import constants, document, subprocess, os, time
-import re, dropbox, smtplib
+import re, smtplib
 from email.mime.text import MIMEText
+import dropbox
+from dropbox.files import WriteMode
+from dropbox.exceptions import ApiError, AuthError
 
 class Support:
     
@@ -42,19 +45,33 @@ class Support:
         if not file_exists:
             return "File not found [%s]" % source_file, False 
     
-        access_token = '4wPGw33d4lcAAAAAAAAAfVl873ag8OxmIoay_NNAGqol8rtv8QH3oPEADSSHiLhf'
-        dropbox_client = dropbox.client.DropboxClient(access_token)
+        access_token = '4wPGw33d4lcAAAAAAAAE2yEVxIuEqa8tJugyLWewvArmg79Hhd-9e9DUrDU4hKXj'
+        dbx = dropbox.Dropbox(access_token)
     
+        # Check that the access token is valid
+        try:
+            dbx.users_get_current_account()
+        except AuthError as err:
+            return "ERROR: Invalid access token", False
+            
         source_file_path = self.const.video_folder + source_file
         dest_file_path = '/' + source_file
         
-        try:
-            f = open(source_file_path, 'rb')
-            resp = dropbox_client.put_file(dest_file_path, f)
+        with open(source_file_path, 'rb') as f:
+            try:
+                dbx.files_upload(f.read(), dest_file_path, mode=WriteMode('overwrite'))
+            except ApiError as err:
+                tmplt = "Failed to upload %s [%s]"
+                if (err.error.is_path() and
+                        err.error.get_path().error.is_insufficient_space()):
+                    return tmplt % (source_file_path, "Insufficient space"), False
+                elif err.user_message_text:
+                    return err.user_message_text, False
+                else:
+                    return tmplt % (source_file_path, err), False
+                    
             self.update_backup_register(source_file)
-            return "Uploaded %s to dropbox path %s (%d bytes)" % (source_file_path, dest_file_path, resp['bytes']), True
-        except Exception as err:
-            return "Failed to upload %s [%s]" % (source_file_path, err), False
+            return "Uploaded %s to dropbox path %s" % (source_file_path, dest_file_path), True
     
     def update_backup_register(self, backup_filename):
         # Identify videos stored locally on webserver; store in a dictionary
@@ -154,7 +171,7 @@ class Support:
         
    
     def send_mail(self, task):
-        mail_from = "george@slepeweb.com"
+        mail_from = "donna@buttigieg.org.uk"
         mail_to = "george@buttigieg.org.uk"
         web_page = "http://www.slepeweb.com/secam/app/py/index.py"
         mail_body = """
@@ -174,11 +191,11 @@ class Support:
             task.add_event("sending mail")
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
-            server.login("george.buttigieg@gmail.com", "g1ga5Eftg00g6E")
+            server.login("george.buttigieg@gmail.com", "g!g@5Eftg00g6E")
             server.sendmail(mail_from, [mail_to], msg.as_string())
             task.add_event("mail sent ok")
-        except:
-            task.add_event("*** problem sending mail")
+        except Exception as err:
+            task.add_event("*** problem sending mail [%s]" % err, "ERROR")
             
         finally:
             if server != None:

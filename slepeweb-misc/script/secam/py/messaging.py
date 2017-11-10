@@ -307,21 +307,28 @@ class Task:
         delta = to - self.get_start()
         return "%.3f" % (delta.seconds + (delta.microseconds/1000000.0))
     
-    def add_event(self, msg):
-        self.events.append(Event(datetime.now(), msg))
+    def add_event(self, msg, severity="INFO"):
+        self.events.append(Event(datetime.now(), msg, severity))
         
     def log_history(self):
         self.logger.info("==============================")
         self.logger.info("Task history [%s]" % self.id)
         
         for e in self.events:
-            self.logger.info("%s secs: %s", self.elapsed(e.date), e.msg)
+            f = self.logger.info
+            if e.severity == "WARN":
+                f = self.logger.warn
+            elif e.severity == "ERROR":
+                f = self.logger.error
+                
+            f("%s secs: %s", self.elapsed(e.date), e.msg)
 
         self.logger.info("------------------------------")
 
         
 class Event:
-    def __init__(self, date, msg):
+    def __init__(self, date, msg, severity="INFO"):
         self.date = date
         self.msg = msg
+        self.severity = severity
         
