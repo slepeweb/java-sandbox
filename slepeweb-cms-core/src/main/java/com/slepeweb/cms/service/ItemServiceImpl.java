@@ -172,7 +172,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 
 	private void update(Item dbRecord, Item i) {
 		if (! dbRecord.equals(i)) {
-			boolean simplenameHasChanged = ! dbRecord.getSimpleName().equals(i.getSimpleName());
+			// Ignore simplename if item is site root - the root item cannot have a simplename.
+			if (i.isSiteRoot()) {
+				i.setSimpleName("");
+			}
+			
+			boolean simplenameHasChanged = ! i.isSiteRoot() && ! dbRecord.getSimpleName().equals(i.getSimpleName());
 			boolean isPublishedNow = i.isPublished() && ! dbRecord.isPublished();
 			String oldPath = dbRecord.getPath();
 			String newPath = i.getPath();
