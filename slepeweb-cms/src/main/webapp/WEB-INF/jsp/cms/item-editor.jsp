@@ -59,7 +59,7 @@
 		</div>
 		<div>
 			<label for="simplename">Simple name: </label><input type="text" name="simplename" value="${editingItem.simpleName}" <c:if 
-				test="${editingItem.path eq '/'}">disabled="disabled"</c:if> />
+				test="${editingItem.root}">disabled="disabled"</c:if> />
 		</div>
 		
 		<%-- This div will only be visible if the selected item type is Product --%>

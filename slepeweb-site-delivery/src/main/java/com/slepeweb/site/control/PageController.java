@@ -173,7 +173,7 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "section", model);
-		model.addAttribute("_defaultThumb", site.getItem("/content/images/default-thumb"));
+		model.addAttribute("_defaultThumb", site.getContentItem("/images/default-thumb"));
 		return page.getView();
 	}
 
@@ -185,7 +185,7 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "eventsIndex", model);
-		model.addAttribute("_defaultThumb", site.getItem("/content/images/default-thumb"));
+		model.addAttribute("_defaultThumb", site.getContentItem("/images/default-thumb"));
 		return page.getView();
 	}
 
@@ -197,7 +197,7 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "newsIndex", model);
-		model.addAttribute("_defaultThumb", site.getItem("/content/images/default-thumb"));
+		model.addAttribute("_defaultThumb", site.getContentItem("/images/default-thumb"));
 		return page.getView();
 	}
 
@@ -210,7 +210,7 @@ public class PageController extends BaseController {
 		
 		Page page = getStandardPage(i, shortSitename, "eventDetail", model);
 		if (i.getImage() == null) {
-			i.addInline(site.getItem("/content/images/logo"));
+			i.addInline(site.getContentItem("/images/logo"));
 		}
 		
 		model.addAttribute("_siblingPager", getSiblings(i, new String[] {"Event"}, 4));
@@ -226,7 +226,7 @@ public class PageController extends BaseController {
 		
 		Page page = getStandardPage(i, shortSitename, "newsDetail", model);
 		if (i.getImage() == null) {
-			i.addInline(site.getItem("/content/images/logo"));
+			i.addInline(site.getContentItem("/images/logo"));
 		}
 
 		model.addAttribute("_siblingPager", getSiblings(i, new String[] {"News"}, 4));

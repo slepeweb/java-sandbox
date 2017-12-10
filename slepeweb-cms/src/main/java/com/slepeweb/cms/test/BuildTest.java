@@ -167,7 +167,7 @@ public class BuildTest extends BaseTest {
 				Item newsSection = addItem(rootItem, "News section", "news", now, now, site, sectionType, null);
 				addItem(rootItem, "Events section", "events", now, now, site, sectionType, null);
 				Item aboutSection = addItem(rootItem, "About section", "about", now, now, site, sectionType, null);
-				Item contentFolder = site.getItem("/content");
+				Item contentFolder = site.getItem(Item.CONTENT_ROOT_PATH);
 				Item mediaFolder = addItem(contentFolder, "Media section", "media", now, now, site, cfolderType, null);
 				addItem(rootItem, "Storefront", "storefront", now, now, site, sectionType, null);
 				

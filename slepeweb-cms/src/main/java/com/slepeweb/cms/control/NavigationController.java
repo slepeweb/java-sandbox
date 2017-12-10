@@ -33,7 +33,7 @@ public class NavigationController extends BaseController {
 	public List<Navigation.Node> doFullNav() {	
 		Site site = this.siteService.getSite("Integration Testing"); // TODO: Only used for testing ???
 		Item homepage = site.getItem("/");
-		Item contentFolder = site.getItem("/content");		
+		Item contentFolder = site.getItem(Item.CONTENT_ROOT_PATH);		
 		Navigation nav = new Navigation();
 		
 		if (homepage != null) {
@@ -59,7 +59,7 @@ public class NavigationController extends BaseController {
 			Site site = this.siteService.getSite(siteId);
 			if (site != null) {				
 				level0.add(dive(site.getItem("/")));
-				level0.add(dive(site.getItem("/content")));
+				level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH)));
 				return level0;
 			}
 			else {
@@ -101,7 +101,7 @@ public class NavigationController extends BaseController {
 			pathComponents.remove(0);
 		}
 		
-		level0.add(dive(site.getItem("/content"), pathComponents));
+		level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH), pathComponents));
 		return level0;		
 	}
 	

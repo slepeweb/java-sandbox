@@ -20,7 +20,7 @@ public class MediaTest extends BaseTest {
 			register(4010, "Check media table has a new row").
 			register(4020, "Get media data from db");
 		
-		String imageItemPath = "/content/media/ex1";
+		String imageItemPath = Item.CONTENT_ROOT_PATH + "/media/ex1";
 		
 		// Set field values for first news item
 		Site site = this.cmsService.getSiteService().getSite(TEST_SITE_NAME);

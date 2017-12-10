@@ -25,6 +25,7 @@ public class Item extends CmsBean {
 	public static String SIMPLENAME_COPY_EXT = "-copy-";
 	public static Pattern SIMPLENAME_COPY_PATTERN = 
 			Pattern.compile("(^.*?" + SIMPLENAME_COPY_EXT + ")(\\d{1,})$");
+	public static final String CONTENT_ROOT_PATH = "/content";
 	
 	private Site site;
 	private ItemType type;
@@ -265,22 +266,26 @@ public class Item extends CmsBean {
 		}
 		
 		String parentPath = getParentPath();
-		if (parentPath.equals("/")) {
-			parentPath = "";
-		}
 		
-		while (n < 10) {
-			test = baseSimplename + n;			
-			
-			// Does this item already exist?
-			if (getSite().getItem(parentPath + "/" + test) == null) {
-				result[0] = n;
-				result[1] = test;
-				result[2] = baseName + n;
-				result[3] = SIMPLENAME_COPY_EXT;
-				return result;
+		// parentPath will be null for root items (ie. site & content)
+		if (parentPath != null) {
+			if (parentPath.equals("/")) {
+				parentPath = "";
 			}
-			n++;
+			
+			while (n < 10) {
+				test = baseSimplename + n;			
+				
+				// Does this item already exist?
+				if (getSite().getItem(parentPath + "/" + test) == null) {
+					result[0] = n;
+					result[1] = test;
+					result[2] = baseName + n;
+					result[3] = SIMPLENAME_COPY_EXT;
+					return result;
+				}
+				n++;
+			}
 		}
 		
 		// Failed to find suitable names
@@ -304,9 +309,12 @@ public class Item extends CmsBean {
 		return getPath().equals("/");
 	}
 	
+	public boolean isContentRoot() {
+		return getPath().equals(Item.CONTENT_ROOT_PATH);
+	}
+	
 	public boolean isRoot() {
-		return getPath().equals("/") ||
-				(getType().getName().equals(ItemType.CONTENT_FOLDER_TYPE_NAME) && getPath().lastIndexOf("/") == 0);
+		return isSiteRoot() || isContentRoot();
 	}
 	
 	public Item setType(ItemType type) {

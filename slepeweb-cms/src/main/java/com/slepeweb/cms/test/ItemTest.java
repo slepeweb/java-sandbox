@@ -127,7 +127,7 @@ public class ItemTest extends BaseTest {
 				
 				// Add an inline item to the article
 				Item articleItem = site.getItem("/about/about-us");
-				Item imageItem = site.getItem("/content/media/ex1");
+				Item imageItem = site.getContentItem("/media/ex1");
 				
 				if (articleItem != null && imageItem != null) {
 					articleItem.addInline(imageItem);

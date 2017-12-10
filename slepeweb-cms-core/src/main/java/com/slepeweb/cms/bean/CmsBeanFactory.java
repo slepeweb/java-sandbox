@@ -120,7 +120,7 @@ public class CmsBeanFactory {
 	}
 	
 	public static Item makeContentFolderRootItem(Site s, ItemType it) throws ResourceException {
-		return proveItem(s, it, "Content", "content", "/content").save();
+		return proveItem(s, it, "Content", "content", Item.CONTENT_ROOT_PATH).save();
 	}
 	
 	public static ItemType makeContentFolderType() {

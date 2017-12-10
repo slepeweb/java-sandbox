@@ -51,26 +51,32 @@ $("#leftnav").fancytree({
 				modal: true,
 				buttons: {
 					"Move item": function() {
-						$.ajax(_ctx + "/rest/item/" + removeShortcutMarker(data.otherNode.key) + "/move", {
-							type: "POST",
-							cache: false,
-							data: {
-								targetId: removeShortcutMarker(node.key),
-								targetParentId: removeShortcutMarker(node.parent.key),
-								moverParentId: removeShortcutMarker(data.otherNode.parent.key),
-								moverIsShortcut: data.otherNode.data.shortcut,
-								mode: data.hitMode
-							}, 
-							dataType: "json",
-							success: function(obj, status, z) {
-								theDialog.dialog("close");
-								fetchItemEditor(obj.data, obj);
-							},
-							error: function(json, status, z) {
-								theDialog.dialog("close");
-								serverError();
-							}
-						});
+						// Don't allow root items to be moved
+						if (! data.otherNode.parent.key.startsWith("root")) {
+							$.ajax(_ctx + "/rest/item/" + removeShortcutMarker(data.otherNode.key) + "/move", {
+								type: "POST",
+								cache: false,
+								data: {
+									targetId: removeShortcutMarker(node.key),
+									targetParentId: removeShortcutMarker(node.parent.key),
+									moverParentId: removeShortcutMarker(data.otherNode.parent.key),
+									moverIsShortcut: data.otherNode.data.shortcut,
+									mode: data.hitMode
+								}, 
+								dataType: "json",
+								success: function(obj, status, z) {
+									theDialog.dialog("close");
+									fetchItemEditor(obj.data, obj);
+								},
+								error: function(json, status, z) {
+									theDialog.dialog("close");
+									serverError();
+								}
+							});
+						}
+						else {
+							$(this).dialog("close");
+						}
 					},
 					Cancel: function() {
 						$(this).dialog("close");

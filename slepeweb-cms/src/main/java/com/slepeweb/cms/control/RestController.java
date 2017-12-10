@@ -583,6 +583,10 @@ public class RestController extends BaseController {
 		
 		RestResponse resp = new RestResponse();
 		Item mover = this.itemService.getItem(moverId);
+		if (mover.isRoot()) {
+			return resp.setError(true).setData(mover.getId()).addMessage("Cannot move the root item");
+		}
+		
 		Item target = this.itemService.getItem(targetId);
 		Item currentParent = this.itemService.getItem(moverParentId);
 		Item targetParent = this.itemService.getItem(targetParentId);
