@@ -22,10 +22,14 @@ import com.slepeweb.money.except.MissingDataException;
 public class MoneyImportServiceImpl implements MoneyImportService {
 	private static Logger LOG = Logger.getLogger(MoneyImportServiceImpl.class);
 	
-	@Autowired AccountService accountService;
-	@Autowired PayeeService payeeService;
-	@Autowired CategoryService categoryService;
-	@Autowired PaymentService paymentService;
+	@Autowired private AccountService accountService;
+	@Autowired private PayeeService payeeService;
+	@Autowired private CategoryService categoryService;
+	@Autowired private PaymentService paymentService;
+	@Autowired private PartPaymentService partPaymentService;
+	
+	private Payee NO_PAYEE = null;
+	private Category NO_CATEGORY = null;
 	
 	public Account identifyAccount(String accountName) {
 		Account a = this.accountService.get(accountName);
@@ -41,6 +45,43 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return a;
 	}
 	
+	public Payee identifyNoPayee() {
+		if (NO_PAYEE == null) {
+			Payee p = this.payeeService.get("");
+			if (p == null) {
+				p = new Payee().setName("");
+				try {
+					NO_PAYEE = this.payeeService.save(p);
+				}
+				catch (DuplicateItemException die) {
+				}
+				catch (MissingDataException mde) {
+				}
+			}
+		}
+		return NO_PAYEE;
+		
+	}
+	
+	public Category identifyNoCategory() {
+		if (NO_CATEGORY == null) {
+			Category c = this.categoryService.get("", "");
+			if (c == null) {
+				c = new Category().setMajor("").setMinor("");
+				try {
+					NO_CATEGORY = this.categoryService.save(c);
+				}
+				catch (DuplicateItemException die) {
+				}
+				catch (MissingDataException mde) {
+					
+				}
+			}
+		}
+		return NO_CATEGORY;
+		
+	}
+	
 	public Payment savePayment(Payment pt) {
 		try {
 			return this.paymentService.save(pt);
@@ -53,12 +94,21 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
+	public Payment savePartPayments(Payment pt) {
+		try {
+			return this.partPaymentService.save(pt);
+		}
+		catch (MissingDataException mde) {
+		}
+		catch (DuplicateItemException die) {
+		}
+		
+		return null;
+	}
+	
 	public Payment createPayment(Account account, BufferedReader inf) {
-		String line, code, value, major, minor;
-		String[] parts;
+		String line, code, value;
 		Payment pt = new Payment().setAccount(account);
-		Payee pe;
-		Category c;
 		
 		try {
 			while ((line = inf.readLine()) != null) {
@@ -86,43 +136,21 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 							pt.setMemo(value);
 						}
 						else if (code.equals("P")) {
-							pe = this.payeeService.get(value);
-							if (pe == null) {
-								pe = new Payee().setName(value);
-								try {
-									pe = this.payeeService.save(pe);
-								}
-								catch (Exception e) {
-									LOG.error("Failed to save payee", e);
-								}
-							}
-							pt.setPayee(pe);
+							pt.setPayee(getPayee(value));
 						}
 						else if (code.equals("L")) {
-							major = "";
-							minor = "";
 							pt.setTransfer(value.startsWith("["));
 							if (! pt.isTransfer()) {
-								parts = value.split(":");
-								if (parts.length > 0) {
-									major = parts[0];
-									if (parts.length > 1) {
-										minor = parts[1];
-									}
-								}
+								pt.setCategory(getCategory(value));
 							}
-	
-							c = this.categoryService.get(major, minor);
-							if (c == null) {
-								c = new Category().setMajor(major).setMinor(minor);
-								try {
-									c = this.categoryService.save(c);
-								}
-								catch (Exception e) {
-									LOG.error("Failed to save category", e);
-								}
-							}
-							pt.setCategory(c);
+						}
+						else if (code.equals("S")) {
+							pt.setSplit(true);
+							
+							// Get next line, optional E (memo) record, followd by $ (charge) record
+							// This MIGHT be followed by additional S/[E]/$ chunks. For each chunk, 
+							// add a part-payment to pt.
+							*** TODO
 						}
 					}
 				}
@@ -133,6 +161,45 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		}
 		
 		return null;
+	}
+	
+	private Payee getPayee(String name) {
+		Payee pe = this.payeeService.get(name);
+		if (pe == null) {
+			pe = new Payee().setName(name);
+			try {
+				pe = this.payeeService.save(pe);
+			}
+			catch (Exception e) {
+				LOG.error("Failed to save payee", e);
+			}
+		}
+		return pe;
+	}
+	
+	private Category getCategory(String value) {
+		String major = "";
+		String minor = "";
+		String[] parts = value.split(":");
+			if (parts.length > 0) {
+				major = parts[0];
+				if (parts.length > 1) {
+					minor = parts[1];
+				}
+			}
+
+		Category c = this.categoryService.get(major, minor);
+		if (c == null) {
+			c = new Category().setMajor(major).setMinor(minor);
+			try {
+				c = this.categoryService.save(c);
+			}
+			catch (Exception e) {
+				LOG.error("Failed to save category", e);
+			}
+		}
+		
+		return c;
 	}
 	
 	private Timestamp parseDate(String dateStr) {

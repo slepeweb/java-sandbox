@@ -33,6 +33,10 @@ public class MoneyImportManager {
 				return;
 			}
 			
+			// Create null entries for Payee and Category, if not already created
+			mis.identifyNoPayee();
+			mis.identifyNoCategory();
+			
 			// Open the input file
 			BufferedReader inf = null;
 			try {
@@ -46,6 +50,10 @@ public class MoneyImportManager {
 			Payment pt;
 			while ((pt = mis.createPayment(a, inf)) != null) {
 				mis.savePayment(pt);
+				
+				if (pt.isSplit()) {
+					mis.savePartPayments(pt);
+				}
 			}
 		}
 		

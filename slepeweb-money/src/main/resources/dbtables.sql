@@ -1,3 +1,4 @@
+drop table if exists partpayment;
 drop table if exists payment;
 drop table if exists account;
 drop table if exists payee;
@@ -47,5 +48,17 @@ create table payment
 	unique key idx_payment_unique (entered, accountid, payeeid, categoryid, reference),
 	constraint foreign key (accountid) references account(id) on delete cascade,
 	constraint foreign key (payeeid) references payee(id) on delete cascade,
+	constraint foreign key (categoryid) references category(id) on delete cascade
+) ENGINE=InnoDB;
+
+create table partpayment
+(
+	paymentid int,
+	categoryid int,
+	charge int,
+	memo varchar(255),
+	
+	primary key (paymentid, categoryid),
+	constraint foreign key (paymentid) references payment(id) on delete cascade,
 	constraint foreign key (categoryid) references category(id) on delete cascade
 ) ENGINE=InnoDB;
