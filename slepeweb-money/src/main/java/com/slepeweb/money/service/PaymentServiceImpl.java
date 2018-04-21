@@ -55,6 +55,7 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 					p.getAccount().getId(), p.getPayee().getId(), p.getCategory().getId(), p.getEntered(), p.getCharge(),
 					p.isReconciled(), p.isTransfer(), p.getReference(), p.getMemo());
 			
+			p.setId(getLastInsertId());	
 			LOG.info(compose("Added new payment", p));		
 			return p;
 		}

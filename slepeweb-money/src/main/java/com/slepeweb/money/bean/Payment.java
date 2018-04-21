@@ -154,6 +154,10 @@ public class Payment {
 		return partPayments;
 	}
 
+	public void setPartPayments(List<PartPayment> partPayments) {
+		this.partPayments = partPayments;
+	}
+
 	public long getId() {
 		return id;
 	}

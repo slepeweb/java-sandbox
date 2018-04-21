@@ -27,7 +27,7 @@ public class PartPayment {
 	
 	@Override
 	public String toString() {
-		return String.format("%s: %s (%3$td/%3$tm/%3$tY)", getCategory(), getValueInPounds());
+		return String.format("%s - %s", getCategory(), getValueInPounds());
 	}
 	
 	public String getValueInPounds() {
@@ -77,7 +77,7 @@ public class PartPayment {
 		result = prime * result + ((category == null) ? 0 : category.hashCode());
 		result = prime * result + ((charge == null) ? 0 : charge.hashCode());
 		result = prime * result + ((memo == null) ? 0 : memo.hashCode());
-		result = prime * result + ((paymentId == null) ? 0 : paymentId.hashCode());
+		result = prime * result + paymentId.hashCode();
 		return result;
 	}
 

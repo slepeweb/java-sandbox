@@ -16,6 +16,7 @@
 <script src="/resources/js/jquery.colorbox-min.js"></script>
 <script src="/resources/sws/js/colorbox-impl.js"></script>
 <script src="/resources/sws/js/site.js"></script>
+<!-- <script src="/resources/sws/js/jquery.paroller.min.js"></script> -->
 
 <gen:extraCSS />
 <gen:extraJS />

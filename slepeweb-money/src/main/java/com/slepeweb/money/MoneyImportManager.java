@@ -9,6 +9,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.PartPayment;
+import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.Payment;
 import com.slepeweb.money.service.MoneyImportService;
 
@@ -34,8 +37,8 @@ public class MoneyImportManager {
 			}
 			
 			// Create null entries for Payee and Category, if not already created
-			mis.identifyNoPayee();
-			mis.identifyNoCategory();
+			Payee noPayee = mis.identifyNoPayee();
+			Category noCategory = mis.identifyNoCategory();
 			
 			// Open the input file
 			BufferedReader inf = null;
@@ -48,10 +51,13 @@ public class MoneyImportManager {
 			
 			// Process each payment block, one at a time
 			Payment pt;
-			while ((pt = mis.createPayment(a, inf)) != null) {
-				mis.savePayment(pt);
+			while ((pt = mis.createPayment(a, noPayee, noCategory, inf)) != null) {
+				pt = mis.savePayment(pt);
 				
 				if (pt.isSplit()) {
+					for (PartPayment ppt : pt.getPartPayments()) {
+						ppt.setPaymentId(pt.getId());
+					}
 					mis.savePartPayments(pt);
 				}
 			}

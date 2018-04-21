@@ -11,7 +11,7 @@ public interface MoneyImportService {
 	Account identifyAccount(String account);
 	Payee identifyNoPayee();
 	Category identifyNoCategory();
-	Payment createPayment(Account a, BufferedReader inf);
+	Payment createPayment(Account a, Payee p, Category c, BufferedReader inf);
 	Payment savePayment(Payment pt);
 	Payment savePartPayments(Payment pt);
 }

@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.PartPayment;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.Payment;
 import com.slepeweb.money.except.DuplicateItemException;
@@ -58,6 +61,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 				catch (MissingDataException mde) {
 				}
 			}
+			else {
+				NO_PAYEE = p;
+			}
 		}
 		return NO_PAYEE;
 		
@@ -76,6 +82,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 				catch (MissingDataException mde) {
 					
 				}
+			}
+			else {
+				NO_CATEGORY = c;
 			}
 		}
 		return NO_CATEGORY;
@@ -106,9 +115,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	public Payment createPayment(Account account, BufferedReader inf) {
+	public Payment createPayment(Account account, Payee noPayee, Category noCategory, BufferedReader inf) {
 		String line, code, value;
-		Payment pt = new Payment().setAccount(account);
+		Payment pt = new Payment().setAccount(account).setPayee(noPayee).setCategory(noCategory);
 		
 		try {
 			while ((line = inf.readLine()) != null) {
@@ -150,14 +159,57 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 							// Get next line, optional E (memo) record, followd by $ (charge) record
 							// This MIGHT be followed by additional S/[E]/$ chunks. For each chunk, 
 							// add a part-payment to pt.
-							*** TODO
+							pt.setPartPayments(createPartPayments(value, noCategory, inf));
+							
+							// The ^ character in the input file delimits payments, and also marks the
+							// end of the part-payments list.
+							return pt;
 						}
 					}
 				}
 			}
 		}
 		catch (IOException e) {
-			LOG.error("Error reading inout file", e);
+			LOG.error("Error reading input file", e);
+		}
+		
+		return null;
+	}
+	
+	private List<PartPayment> createPartPayments(String firstCategoryStr, Category noCategory, BufferedReader inf) {
+		List<PartPayment> list = new ArrayList<PartPayment>();
+		String line, code, value;
+		PartPayment ppt = new PartPayment().setCategory(getCategory(firstCategoryStr));
+		
+		
+		try {
+			while ((line = inf.readLine()) != null) {
+				if (line.length() > 0) {
+					code = line.substring(0, 1);
+					value = line.substring(1);
+					
+					if (code.equals("^")) {
+						return list;
+					}
+					// There is always a Category record
+					else if (code.equals("S")) {
+						ppt.setCategory(getCategory(value));
+					}
+					// The memo record is optional
+					else if (code.equals("E")) {
+						ppt.setMemo(value);
+					}
+					// There is always a Charge record, marking the completion of the part-payment
+					else if (code.equals("$")) {
+						ppt.setCharge(parseCharge(value));
+						list.add(ppt);
+						ppt = new PartPayment().setCategory(noCategory);
+					}
+				}
+			}
+		}
+		catch (IOException e) {
+			LOG.error("Error reading input file", e);
 		}
 		
 		return null;

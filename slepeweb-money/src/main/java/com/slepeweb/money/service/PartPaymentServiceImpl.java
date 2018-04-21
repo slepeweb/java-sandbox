@@ -32,7 +32,7 @@ public class PartPaymentServiceImpl extends BaseServiceImpl implements PartPayme
 			// Insert latest part-payments
 			for (PartPayment ppt : revisedList) {
 				if (ppt.isDefined4Insert()) {
-					pt.getPartPayments().add(insert(ppt));
+					insert(ppt);
 				}
 				else {
 					String t = "Part-payments not saved - insufficient data";

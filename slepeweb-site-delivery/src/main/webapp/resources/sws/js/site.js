@@ -12,5 +12,12 @@ $(function() {
 			$('#primary-nav').removeClass("data-toggle-on");
 		}
 	});
-
+	
+	/*
+	$(".parallax").paroller({
+		factor: '0.5',
+		type: 'foreground',
+		direction: 'vertical'
+	});
+	*/
 });	

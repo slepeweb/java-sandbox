@@ -18,7 +18,7 @@ public class Category {
 	
 	@Override
 	public String toString() {
-		return getMajor();
+		return String.format("%s:%s", getMajor(), getMinor());
 	}
 	
 	public long getId() {
