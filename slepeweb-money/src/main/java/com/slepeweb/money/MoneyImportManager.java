@@ -51,8 +51,13 @@ public class MoneyImportManager {
 			
 			// Process each payment block, one at a time
 			Payment pt;
+			long count = 0L;
 			while ((pt = mis.createPayment(a, noPayee, noCategory, inf)) != null) {
 				pt = mis.savePayment(pt);
+				count++;
+				if (count % 100 == 0) {
+					System.out.print(String.format("%d ", count));
+				}
 				
 				if (pt.isSplit()) {
 					for (PartPayment ppt : pt.getPartPayments()) {

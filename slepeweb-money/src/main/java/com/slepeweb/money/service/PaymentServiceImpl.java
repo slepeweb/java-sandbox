@@ -28,14 +28,9 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 	
 	public Payment save(Payment pt) throws MissingDataException, DuplicateItemException {
 		if (pt.isDefined4Insert()) {
-			Payment dbRecord = get(pt);		
-			if (dbRecord != null) {
-				update(dbRecord, pt);
-				return dbRecord;
-			}
-			else {
-				insert(pt);
-			}
+			// Insert record, regardless of whether it has already been inserted.
+			// (Take care with batch updates - should clear table first!)
+			insert(pt);
 		}
 		else {
 			String t = "Payment not saved - insufficient data";
@@ -64,7 +59,7 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 		}
 	}
 
-	private void update(Payment dbRecord, Payment p) {
+	public void update(Payment dbRecord, Payment p) {
 		if (! dbRecord.equals(p)) {
 			dbRecord.assimilate(p);
 			
@@ -79,7 +74,7 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 			LOG.info(compose("Updated payment", p));
 			}
 			catch (DuplicateKeyException e) {
-				LOG.error("Set breakpoint here");
+				LOG.error(compose("Duplicate key", p));
 			}
 		}
 		else {
@@ -87,12 +82,10 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 		}
 	}
 
-	public Payment get(Payment bones) {
+	public Payment get(long id) {
 		return (Payment) getFirstInList(this.jdbcTemplate.query(
-				SELECT + "where pt.entered = ? and pt.accountid = ? and pt.payeeid = ? and pt.categoryid = ? and pt.reference = ?", 
-				new Object[]{
-						bones.getEntered(), bones.getAccount().getId(), bones.getPayee().getId(),
-						bones.getCategory().getId(), bones.getReference()}, 
+				SELECT + "where pt.id = ?", 
+				new Object[]{id}, 
 				new RowMapperUtil.PaymentMapper()));
 	}
 

@@ -45,7 +45,6 @@ create table payment
 	transfer boolean,
 	
 	primary key (id),
-	unique key idx_payment_unique (entered, accountid, payeeid, categoryid, reference),
 	constraint foreign key (accountid) references account(id) on delete cascade,
 	constraint foreign key (payeeid) references payee(id) on delete cascade,
 	constraint foreign key (categoryid) references category(id) on delete cascade

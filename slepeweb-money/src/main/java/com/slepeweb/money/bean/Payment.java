@@ -52,7 +52,8 @@ public class Payment {
 	
 	@Override
 	public String toString() {
-		return String.format("%s: %s (%3$td/%3$tm/%3$tY)", this.account.getName(), getValueInPounds(), getEntered().getTime());
+		return String.format("%s/%s: %s (%4$td/%4$tm/%4$tY)", this.account.getName(), getPayee(), 
+				getValueInPounds(), getEntered().getTime());
 	}
 	
 	public Account getAccount() {
