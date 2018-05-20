@@ -26,6 +26,7 @@ create table account
 (
 	id int not null auto_increment,
 	name varchar(255),
+	balance int,
 	primary key (id),
 	unique key idx_account_name (name)
 ) ENGINE=InnoDB;
@@ -42,7 +43,7 @@ create table payment
 	charge int,
 	memo varchar(255),
 	reconciled boolean,
-	transfer boolean,
+	transferid int,
 	
 	primary key (id),
 	constraint foreign key (accountid) references account(id) on delete cascade,

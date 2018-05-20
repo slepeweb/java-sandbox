@@ -147,9 +147,12 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 						else if (code.equals("P")) {
 							pt.setPayee(getPayee(value));
 						}
-						else if (code.equals("L")) {
-							pt.setTransfer(value.startsWith("["));
-							if (! pt.isTransfer()) {
+						else if (code.equals("L")) {							
+							if (value.startsWith("[")) {
+								// This payment is a transfer to another account
+								pt.setTransfer(getAccount(value));
+							}
+							else {
 								pt.setCategory(getCategory(value));
 							}
 						}
@@ -252,6 +255,33 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		}
 		
 		return c;
+	}
+	
+	private Account getAccount(String value) {
+		if (value.length() > 2 && value.startsWith("[")) {
+			String name = value.substring(1,  value.length() - 1);
+			Account a = this.accountService.get(name);
+			
+			if (a == null) {
+				a = new Account().setName(name);
+				try {
+					a = this.accountService.save(a);
+				}
+				catch (Exception e) {
+					LOG.error("Failed to save account", e);
+				}
+			}
+			
+			return a;
+		}
+		
+		return null;
+	}
+	
+	public Account resetAccountBalance(Account a) {
+		a = this.accountService.resetBalance(a);
+		LOG.info("Account balance updated");
+		return a;
 	}
 	
 	private Timestamp parseDate(String dateStr) {

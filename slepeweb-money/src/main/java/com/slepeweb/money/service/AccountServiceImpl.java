@@ -3,10 +3,12 @@ package com.slepeweb.money.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Payment;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
 
@@ -14,6 +16,7 @@ import com.slepeweb.money.except.MissingDataException;
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 	
 	private static Logger LOG = Logger.getLogger(AccountServiceImpl.class);
+	@Autowired private PaymentService paymentService;
 	
 	public Account save(Account a) throws MissingDataException, DuplicateItemException {
 		if (a.isDefined4Insert()) {
@@ -35,12 +38,31 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		return a;
 	}
 	
+	public void updateBalance(Account a) {
+		this.jdbcTemplate.update(
+				"update account set balance = ? where id = ?", 
+				a.getBalance(), a.getId());
+		
+		LOG.info(compose("Updated account balance", a));
+	}
+	
+	public Account resetBalance(Account a) {
+		long balance = 0L;
+		for (Payment pt : this.paymentService.getPaymentsForAccount(a.getId()) ) {
+			balance += pt.getCharge();
+		}
+		
+		a.setBalance(balance);
+		updateBalance(a);
+		return a;
+	}
+	
 	private Account insert(Account a) throws MissingDataException, DuplicateItemException {
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into account (name) values (?)", 
-					a.getName());
+					"insert into account (name, balance) values (?, ?)", 
+					a.getName(), a.getBalance());
 			
 			a.setId(getLastInsertId());	
 			
@@ -57,8 +79,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 			dbRecord.assimilate(a);
 			
 			this.jdbcTemplate.update(
-					"update account set name = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getId());
+					"update account set name = ?, balance = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getBalance(), dbRecord.getId());
 			
 			LOG.info(compose("Updated account", a));
 		}

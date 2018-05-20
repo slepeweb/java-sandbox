@@ -14,4 +14,5 @@ public interface MoneyImportService {
 	Payment createPayment(Account a, Payee p, Category c, BufferedReader inf);
 	Payment savePayment(Payment pt);
 	Payment savePartPayments(Payment pt);
+	Account resetAccountBalance(Account a);
 }

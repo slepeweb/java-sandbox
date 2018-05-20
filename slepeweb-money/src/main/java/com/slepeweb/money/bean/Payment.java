@@ -15,11 +15,11 @@ public class Payment {
 	public static DecimalFormat DF_TOTAL = new DecimalFormat("###,###");
 	
 	private long id;
-	private Account account;
+	private Account account, transfer;
 	private Payee payee;
 	private Category category;
 	private Timestamp entered;
-	private boolean transfer, reconciled, split;
+	private boolean reconciled, split;
 	private Long charge;
 	private String reference = "", memo = "";
 	private List<PartPayment> partPayments = new ArrayList<PartPayment>();
@@ -31,7 +31,7 @@ public class Payment {
 			setPayee(pt.getPayee());
 			setCategory(pt.getCategory());
 			setEntered(pt.getEntered());
-			setTransfer(pt.isTransfer());
+			setTransfer(pt.getTransfer());
 			setReconciled(pt.isReconciled());
 			setCharge(pt.getCharge());
 			setReference(pt.getReference());
@@ -97,10 +97,18 @@ public class Payment {
 	}
 
 	public boolean isTransfer() {
+		return transfer != null;
+	}
+
+	public Account getTransfer() {
 		return transfer;
 	}
 
-	public Payment setTransfer(boolean transfer) {
+	public long getTransferId() {
+		return getTransfer() == null ? -1 : getTransfer().getId();
+	}
+
+	public Payment setTransfer(Account transfer) {
 		this.transfer = transfer;
 		return this;
 	}
@@ -180,7 +188,7 @@ public class Payment {
 		result = prime * result + ((payee == null) ? 0 : payee.hashCode());
 		result = prime * result + (reconciled ? 1231 : 1237);
 		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
-		result = prime * result + (transfer ? 1231 : 1237);
+		result = prime * result + ((transfer == null) ? 0 : transfer.hashCode());
 		result = prime * result + (split ? 1231 : 1237);
 		return result;
 	}
@@ -231,7 +239,10 @@ public class Payment {
 				return false;
 		} else if (!reference.equals(other.reference))
 			return false;
-		if (transfer != other.transfer)
+		if (transfer == null) {
+			if (other.transfer != null)
+				return false;
+		} else if (!transfer.equals(other.transfer))
 			return false;
 		return true;
 	}

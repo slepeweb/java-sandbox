@@ -15,30 +15,30 @@ public class RowMapperUtil {
 
 	public static final class CategoryMapper implements RowMapper<Category> {
 		public Category mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return makeCategory(rs.getLong("id"), rs.getString("major"), rs.getString("minor"));
+			return makeCategory(rs);
 		}
 	}
 	
 	public static final class PayeeMapper implements RowMapper<Payee> {
 		public Payee mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return makePayee(rs.getLong("id"), rs.getString("name"));
+			return makePayee(rs);
 		}
 	}
 	
 	public static final class AccountMapper implements RowMapper<Account> {
 		public Account mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return makeAccount(rs.getLong("id"), rs.getString("name"));
+			return makeAccount(rs);
 		}
 	}
 	
 	public static final class PaymentMapper implements RowMapper<Payment> {
 		public Payment mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new Payment().
-					setAccount(makeAccount(rs.getLong("accountid"), rs.getString("accountname"))).
-					setPayee(makePayee(rs.getLong("payeeid"), rs.getString("payeename"))).
-					setCategory(makeCategory(rs.getLong("categoryid"), rs.getString("major"), rs.getString("minor"))).
+					setAccount(makeAccount(rs)).
+					setPayee(makePayee(rs)).
+					setCategory(makeCategory(rs)).
 					setEntered(rs.getTimestamp("entered")).
-					setTransfer(rs.getBoolean("transfer")).
+					setTransfer(makeAccount(rs)).
 					setReconciled(rs.getBoolean("reconciled")).
 					setCharge(rs.getLong("charge")).
 					setReference(rs.getString("reference")).
@@ -50,28 +50,32 @@ public class RowMapperUtil {
 		public PartPayment mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new PartPayment().
 					setPaymentId(rs.getLong("paymentid")).
-					setCategory(makeCategory(rs.getLong("categoryid"), rs.getString("major"), rs.getString("minor"))).
+					setCategory(makeCategory(rs)).
 					setCharge(rs.getLong("charge")).
 					setMemo(rs.getString("memo"));
 		}
 	}
 	
-	private static Payee makePayee(long id, String name) {
+	private static Payee makePayee(ResultSet rs) throws SQLException {
 		return new Payee().
-			setId(id).
-			setName(name);
+			setId(rs.getLong("payeeid")).
+			setName(rs.getString("payeename"));
 	}
 	
-	private static Account makeAccount(long id, String name) {
-		return new Account().
-			setId(id).
-			setName(name);
+	private static Account makeAccount(ResultSet rs) throws SQLException {
+		long id = rs.getLong("accountid");
+		if (id != -1) {
+			return new Account().
+				setId(id).
+				setName(rs.getString("accountname"));
+		}
+		return null;
 	}
 	
-	private static Category makeCategory(long id, String major, String minor) {
+	private static Category makeCategory(ResultSet rs) throws SQLException {
 		return new Category().
-			setId(id).
-			setMajor(major).
-			setMinor(minor);
+			setId(rs.getLong("categoryid")).
+			setMajor(rs.getString("major")).
+			setMinor(rs.getString("minor"));
 	}
 }

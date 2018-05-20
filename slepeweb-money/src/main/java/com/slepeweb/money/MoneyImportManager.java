@@ -65,7 +65,18 @@ public class MoneyImportManager {
 					}
 					mis.savePartPayments(pt);
 				}
+				
+				if (pt.isTransfer()) {
+					// Put the same payment details into the target account, as a credit
+					pt.setId(0L);
+					pt.setAccount(pt.getTransfer());
+					pt.setCharge(- pt.getCharge());
+					pt.setTransfer(null);
+					mis.savePayment(pt);
+				}
 			}
+			
+			mis.resetAccountBalance(a);
 		}
 		
 		LOG.info("... MoneyImportManager has finished");

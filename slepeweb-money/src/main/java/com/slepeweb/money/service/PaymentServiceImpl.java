@@ -20,9 +20,10 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 					"a.id as accountid, a.name as accountname, " + 
 					"pe.id as payeeid, pe.name as payeename, " + 
 					"c.id as categoryid, c.major, c.minor, " + 
-					"pt.entered, pt.memo, pt.reference, pt.charge, pt.reconciled, pt.transfer " +
+					"pt.entered, pt.memo, pt.reference, pt.charge, pt.reconciled, pt.transferid, at.name as transfername " +
 			"from payment pt " +
 					"join account a on a.id = pt.accountid " + 
+					"left join account at on at.id = pt.transferid " + 
 					"join payee pe on pe.id = pt.payeeid " +
 					"join category c on c.id = pt.categoryid ";
 	
@@ -41,18 +42,18 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 		return pt;
 	}
 	
-	private Payment insert(Payment p) throws MissingDataException, DuplicateItemException {
+	private Payment insert(Payment pt) throws MissingDataException, DuplicateItemException {
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into payment (accountid, payeeid, categoryid, entered, charge, reconciled, transfer, reference, memo) " +
+					"insert into payment (accountid, payeeid, categoryid, entered, charge, reconciled, transferid, reference, memo) " +
 					"values (?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-					p.getAccount().getId(), p.getPayee().getId(), p.getCategory().getId(), p.getEntered(), p.getCharge(),
-					p.isReconciled(), p.isTransfer(), p.getReference(), p.getMemo());
+					pt.getAccount().getId(), pt.getPayee().getId(), pt.getCategory().getId(), pt.getEntered(), pt.getCharge(),
+					pt.isReconciled(), pt.getTransferId(), pt.getReference(), pt.getMemo());
 			
-			p.setId(getLastInsertId());	
-			LOG.info(compose("Added new payment", p));		
-			return p;
+			pt.setId(getLastInsertId());	
+			LOG.info(compose("Added new payment", pt));		
+			return pt;
 		}
 		catch (DuplicateKeyException e) {
 			throw new DuplicateItemException("Payment already inserted");
@@ -65,9 +66,9 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 			
 			try {
 			this.jdbcTemplate.update(
-					"update payment set charge = ?, reconciled = ?, transfer = ?, memo = ? " +
+					"update payment set charge = ?, reconciled = ?, transferid = ?, memo = ? " +
 					"where entered = ? and accountid = ? and payeeid = ? and categoryid = ? and reference = ?", 
-					dbRecord.getCharge(), dbRecord.isReconciled(), dbRecord.isTransfer(), dbRecord.getMemo(),
+					dbRecord.getCharge(), dbRecord.isReconciled(), dbRecord.getTransferId(), dbRecord.getMemo(),
 					dbRecord.getEntered(), dbRecord.getAccount().getId(), dbRecord.getPayee().getId(),
 					dbRecord.getCategory().getId(), dbRecord.getReference());
 			
