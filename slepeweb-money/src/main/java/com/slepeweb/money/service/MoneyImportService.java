@@ -1,7 +1,5 @@
 package com.slepeweb.money.service;
 
-import java.io.BufferedReader;
-
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
@@ -11,8 +9,9 @@ public interface MoneyImportService {
 	Account identifyAccount(String account);
 	Payee identifyNoPayee();
 	Category identifyNoCategory();
-	Payment createPayment(Account a, Payee p, Category c, BufferedReader inf);
+	Payment createPayment(Payee p, Category c);
 	Payment savePayment(Payment pt);
 	Payment savePartPayments(Payment pt);
 	Account resetAccountBalance(Account a);
+	Payment getPaymentByOrigId(long id);
 }

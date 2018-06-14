@@ -14,7 +14,7 @@ public class Payment {
 	public static DecimalFormat DF = new DecimalFormat("#.00");
 	public static DecimalFormat DF_TOTAL = new DecimalFormat("###,###");
 	
-	private long id;
+	private long id, origId;
 	private Account account, transfer;
 	private Payee payee;
 	private Category category;
@@ -36,6 +36,7 @@ public class Payment {
 			setCharge(pt.getCharge());
 			setReference(pt.getReference());
 			setMemo(pt.getMemo());
+			setOrigId(pt.getOrigId());
 		}
 	}
 	
@@ -56,6 +57,15 @@ public class Payment {
 				getValueInPounds(), getEntered().getTime());
 	}
 	
+	public long getOrigId() {
+		return origId;
+	}
+
+	public Payment setOrigId(long origId) {
+		this.origId = origId;
+		return this;
+	}
+
 	public Account getAccount() {
 		return this.account;
 	}

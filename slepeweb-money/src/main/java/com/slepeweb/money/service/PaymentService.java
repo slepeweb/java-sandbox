@@ -10,6 +10,7 @@ import com.slepeweb.money.except.MissingDataException;
 
 public interface PaymentService {
 	Payment get(long id);
+	Payment getByOrigId(long id);
 	List<Payment> getPaymentsForAccount(long id);
 	List<Payment> getPaymentsForAccount(long id, Timestamp from, Timestamp to);
 	Payment save(Payment p) throws MissingDataException, DuplicateItemException;

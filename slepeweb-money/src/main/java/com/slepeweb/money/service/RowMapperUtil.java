@@ -34,15 +34,16 @@ public class RowMapperUtil {
 	public static final class PaymentMapper implements RowMapper<Payment> {
 		public Payment mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new Payment().
-					setAccount(makeAccount(rs)).
-					setPayee(makePayee(rs)).
-					setCategory(makeCategory(rs)).
+					setAccount(makeAccountX(rs)).
+					setPayee(makePayeeX(rs)).
+					setCategory(makeCategoryX(rs)).
 					setEntered(rs.getTimestamp("entered")).
 					setTransfer(makeAccount(rs)).
 					setReconciled(rs.getBoolean("reconciled")).
 					setCharge(rs.getLong("charge")).
 					setReference(rs.getString("reference")).
-					setMemo(rs.getString("memo"));
+					setMemo(rs.getString("memo")).
+					setOrigId(rs.getLong("origid"));
 		}
 	}
 	
@@ -58,11 +59,34 @@ public class RowMapperUtil {
 	
 	private static Payee makePayee(ResultSet rs) throws SQLException {
 		return new Payee().
+			setId(rs.getLong("id")).
+			setName(rs.getString("name"));
+	}
+	
+	private static Account makeAccount(ResultSet rs) throws SQLException {
+		long id = rs.getLong("id");
+		if (id != -1) {
+			return new Account().
+				setId(id).
+				setName(rs.getString("name"));
+		}
+		return null;
+	}
+	
+	private static Category makeCategory(ResultSet rs) throws SQLException {
+		return new Category().
+			setId(rs.getLong("id")).
+			setMajor(rs.getString("major")).
+			setMinor(rs.getString("minor"));
+	}
+	
+	private static Payee makePayeeX(ResultSet rs) throws SQLException {
+		return new Payee().
 			setId(rs.getLong("payeeid")).
 			setName(rs.getString("payeename"));
 	}
 	
-	private static Account makeAccount(ResultSet rs) throws SQLException {
+	private static Account makeAccountX(ResultSet rs) throws SQLException {
 		long id = rs.getLong("accountid");
 		if (id != -1) {
 			return new Account().
@@ -72,7 +96,7 @@ public class RowMapperUtil {
 		return null;
 	}
 	
-	private static Category makeCategory(ResultSet rs) throws SQLException {
+	private static Category makeCategoryX(ResultSet rs) throws SQLException {
 		return new Category().
 			setId(rs.getLong("categoryid")).
 			setMajor(rs.getString("major")).

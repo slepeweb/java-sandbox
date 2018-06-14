@@ -2,6 +2,7 @@ package com.slepeweb.money.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	@Autowired private CategoryService categoryService;
 	@Autowired private PaymentService paymentService;
 	@Autowired private PartPaymentService partPaymentService;
+	@Autowired private MSAccessService msAccessService;
 	
 	private Payee NO_PAYEE = null;
 	private Category NO_CATEGORY = null;
@@ -115,67 +117,31 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	public Payment createPayment(Account account, Payee noPayee, Category noCategory, BufferedReader inf) {
-		String line, code, value;
-		Payment pt = new Payment().setAccount(account).setPayee(noPayee).setCategory(noCategory);
-		
+	public Payment createPayment(Payee noPayee, Category noCategory) {
+
 		try {
-			while ((line = inf.readLine()) != null) {
-				if (line.length() > 0) {
-					code = line.substring(0, 1);
-					value = line.substring(1);
-					
-					if (! code.equals("!")) {
-						if (code.equals("^")) {
-							return pt;
-						}
-						else if (code.equals("D")) {
-							pt.setEntered(parseDate(value));
-						}
-						else if (code.equals("C")) {
-							pt.setReconciled(value.equals("X"));
-						}
-						else if (code.equals("T")) {
-							pt.setCharge(parseCharge(value));
-						}
-						else if (code.equals("N")) {
-							pt.setReference(value);
-						}
-						else if (code.equals("M")) {
-							pt.setMemo(value);
-						}
-						else if (code.equals("P")) {
-							pt.setPayee(getPayee(value));
-						}
-						else if (code.equals("L")) {							
-							if (value.startsWith("[")) {
-								// This payment is a transfer to another account
-								pt.setTransfer(getAccount(value));
-							}
-							else {
-								pt.setCategory(getCategory(value));
-							}
-						}
-						else if (code.equals("S")) {
-							pt.setSplit(true);
-							
-							// Get next line, optional E (memo) record, followd by $ (charge) record
-							// This MIGHT be followed by additional S/[E]/$ chunks. For each chunk, 
-							// add a part-payment to pt.
-							pt.setPartPayments(createPartPayments(value, noCategory, inf));
-							
-							// The ^ character in the input file delimits payments, and also marks the
-							// end of the part-payments list.
-							return pt;
-						}
-					}
-				}
+			if (this.msAccessService.getNextTransaction() != null) {
+
+				Payment pt = new Payment().
+						setAccount(identifyAccount(this.msAccessService.getAccount())).
+						setPayee(getPayee(this.msAccessService.getPayee())).
+						setCategory(getCategory("")).
+						//setCategory(getCategory(rs.getString("category"))).
+						setEntered(this.msAccessService.getDate()).
+						//setReconciled(value.equals("X")).
+						setCharge(this.msAccessService.getAmount()).
+						//pt.setCharge(parseCharge(value));
+						//pt.setReference(value);
+						setMemo(this.msAccessService.getMemo()).
+						setOrigId(this.msAccessService.getOrigId());
+
+				return pt;
 			}
+		} 
+		catch (SQLException e) {
+			LOG.error("Failed to read row of transaction data", e);
 		}
-		catch (IOException e) {
-			LOG.error("Error reading input file", e);
-		}
-		
+
 		return null;
 	}
 	
@@ -282,6 +248,10 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		a = this.accountService.resetBalance(a);
 		LOG.info("Account balance updated");
 		return a;
+	}
+	
+	public Payment getPaymentByOrigId(long id) {
+		return this.paymentService.getByOrigId(id);
 	}
 	
 	private Timestamp parseDate(String dateStr) {

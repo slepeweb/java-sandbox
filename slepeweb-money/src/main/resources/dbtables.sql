@@ -34,6 +34,7 @@ create table account
 create table payment
 (
 	id int not null auto_increment,
+	origid int,
 	entered timestamp,
 	accountid int,
 	payeeid int,
@@ -46,6 +47,7 @@ create table payment
 	transferid int,
 	
 	primary key (id),
+	index idx_origid (origid),
 	constraint foreign key (accountid) references account(id) on delete cascade,
 	constraint foreign key (payeeid) references payee(id) on delete cascade,
 	constraint foreign key (categoryid) references category(id) on delete cascade

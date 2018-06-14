@@ -20,7 +20,8 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 					"a.id as accountid, a.name as accountname, " + 
 					"pe.id as payeeid, pe.name as payeename, " + 
 					"c.id as categoryid, c.major, c.minor, " + 
-					"pt.entered, pt.memo, pt.reference, pt.charge, pt.reconciled, pt.transferid, at.name as transfername " +
+					"pt.origid, pt.entered, pt.memo, pt.reference, pt.charge, pt.reconciled, " +
+					"pt.transferid, at.name as transfername " +
 			"from payment pt " +
 					"join account a on a.id = pt.accountid " + 
 					"left join account at on at.id = pt.transferid " + 
@@ -30,7 +31,7 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 	public Payment save(Payment pt) throws MissingDataException, DuplicateItemException {
 		if (pt.isDefined4Insert()) {
 			// Insert record, regardless of whether it has already been inserted.
-			// (Take care with batch updates - should clear table first!)
+			// (Take care with imports - should check whether already imported first!)
 			insert(pt);
 		}
 		else {
@@ -46,9 +47,11 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into payment (accountid, payeeid, categoryid, entered, charge, reconciled, transferid, reference, memo) " +
-					"values (?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-					pt.getAccount().getId(), pt.getPayee().getId(), pt.getCategory().getId(), pt.getEntered(), pt.getCharge(),
+					"insert into payment (accountid, payeeid, categoryid, origid, entered, charge, " +
+					"reconciled, transferid, reference, memo) " +
+					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+					pt.getAccount().getId(), pt.getPayee().getId(), pt.getCategory().getId(), 
+					pt.getOrigId(), pt.getEntered(), pt.getCharge(),
 					pt.isReconciled(), pt.getTransferId(), pt.getReference(), pt.getMemo());
 			
 			pt.setId(getLastInsertId());	
@@ -86,6 +89,13 @@ public class PaymentServiceImpl extends BaseServiceImpl implements PaymentServic
 	public Payment get(long id) {
 		return (Payment) getFirstInList(this.jdbcTemplate.query(
 				SELECT + "where pt.id = ?", 
+				new Object[]{id}, 
+				new RowMapperUtil.PaymentMapper()));
+	}
+
+	public Payment getByOrigId(long id) {
+		return (Payment) getFirstInList(this.jdbcTemplate.query(
+				SELECT + "where pt.origid = ?", 
 				new Object[]{id}, 
 				new RowMapperUtil.PaymentMapper()));
 	}

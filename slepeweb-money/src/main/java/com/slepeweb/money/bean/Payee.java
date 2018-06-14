@@ -1,7 +1,5 @@
 package com.slepeweb.money.bean;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class Payee {
 	private String name;
 	private long id;
@@ -19,7 +17,7 @@ public class Payee {
 	
 	public boolean isDefined4Insert() {
 		return  
-			StringUtils.isNotBlank(getName());
+			getName() != null;
 	}
 	
 	@Override
