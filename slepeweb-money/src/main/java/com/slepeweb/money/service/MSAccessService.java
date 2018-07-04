@@ -1,15 +1,20 @@
 package com.slepeweb.money.service;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.io.IOException;
+
+import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.Transaction;
 
 public interface MSAccessService {
-	ResultSet getNextTransaction() throws SQLException;
-	String getAccount() throws SQLException;
-	String getPayee() throws SQLException;
-	Timestamp getDate() throws SQLException;
-	String getMemo() throws SQLException;
-	long getAmount() throws SQLException;
-	long getOrigId() throws SQLException;
+	void init(Payee p, Category c) throws IOException;
+	void cacheAccount(Long l, Account a);
+	void cachePayee(Long l, Payee a);
+	void cacheCategory(Long l, Category c);
+	Account getNextAccount() throws IOException;
+	Payee getNextPayee() throws IOException;
+	Category getNextCategory() throws IOException;
+	Transaction getNextTransaction() throws IOException;
+	Long[] getNextTransfer() throws IOException;
 }

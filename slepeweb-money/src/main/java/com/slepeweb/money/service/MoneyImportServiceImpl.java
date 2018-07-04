@@ -2,7 +2,6 @@ package com.slepeweb.money.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -16,9 +15,9 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
-import com.slepeweb.money.bean.PartPayment;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Payee;
-import com.slepeweb.money.bean.Payment;
+import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
 
@@ -29,14 +28,43 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
 	@Autowired private CategoryService categoryService;
-	@Autowired private PaymentService paymentService;
-	@Autowired private PartPaymentService partPaymentService;
+	@Autowired private TransactionService transactionService;
+	@Autowired private SplitTransactionService splitTransactionService;
 	@Autowired private MSAccessService msAccessService;
 	
-	private Payee NO_PAYEE = null;
-	private Category NO_CATEGORY = null;
+	public void init() throws IOException {
+		// Create null entries for Payee and Category, if not already created
+		this.msAccessService.init(getNoPayee(), getNoCategory());
+		
+		// Get all accounts from MSAccess, save them in mysql, and store them in a temporary cache
+		Account a, acct;
+		while((acct = this.msAccessService.getNextAccount()) != null) {
+			a = getAccount(acct.getName());
+			if (a != null) {
+				this.msAccessService.cacheAccount(acct.getId(), a);
+			}
+		}
+		
+		// Repeat for payments
+		Payee p, payee;
+		while((payee = this.msAccessService.getNextPayee()) != null) {
+			p = getPayee(payee.getName());
+			if (p != null) {
+				this.msAccessService.cachePayee(payee.getId(), p);
+			}
+		}
+		
+		// Repeat for categories
+		Category c, cat;
+		while((cat = this.msAccessService.getNextCategory()) != null) {
+			c = getCategory(cat.getMajor(), cat.getMinor());
+			if (c != null) {
+				this.msAccessService.cacheCategory(cat.getId(), c);
+			}
+		}
+	}
 	
-	public Account identifyAccount(String accountName) {
+	public Account getAccount(String accountName) {
 		Account a = this.accountService.get(accountName);
 		if (a == null) {
 			a = new Account().setName(accountName);
@@ -50,52 +78,48 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return a;
 	}
 	
-	public Payee identifyNoPayee() {
-		if (NO_PAYEE == null) {
-			Payee p = this.payeeService.get("");
-			if (p == null) {
-				p = new Payee().setName("");
-				try {
-					NO_PAYEE = this.payeeService.save(p);
-				}
-				catch (DuplicateItemException die) {
-				}
-				catch (MissingDataException mde) {
-				}
+	private Payee getNoPayee() {
+		Payee p = this.payeeService.get("");
+		if (p == null) {
+			p = new Payee().setName("");
+			try {
+				return this.payeeService.save(p);
 			}
-			else {
-				NO_PAYEE = p;
+			catch (DuplicateItemException die) {
+			}
+			catch (MissingDataException mde) {
 			}
 		}
-		return NO_PAYEE;
+		else {
+			return p;
+		}		
 		
+		return null;
 	}
 	
-	public Category identifyNoCategory() {
-		if (NO_CATEGORY == null) {
-			Category c = this.categoryService.get("", "");
-			if (c == null) {
-				c = new Category().setMajor("").setMinor("");
-				try {
-					NO_CATEGORY = this.categoryService.save(c);
-				}
-				catch (DuplicateItemException die) {
-				}
-				catch (MissingDataException mde) {
-					
-				}
+	private Category getNoCategory() {
+		Category c = this.categoryService.get("", "");
+		if (c == null) {
+			c = new Category().setMajor("").setMinor("");
+			try {
+				return this.categoryService.save(c);
 			}
-			else {
-				NO_CATEGORY = c;
+			catch (DuplicateItemException die) {
+			}
+			catch (MissingDataException mde) {
+				
 			}
 		}
-		return NO_CATEGORY;
+		else {
+			return c;
+		}
 		
+		return null;
 	}
 	
-	public Payment savePayment(Payment pt) {
+	public Transaction saveTransaction(Transaction pt) {
 		try {
-			return this.paymentService.save(pt);
+			return this.transactionService.save(pt);
 		}
 		catch (MissingDataException mde) {
 		}
@@ -105,9 +129,19 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	public Payment savePartPayments(Payment pt) {
+	public void updateTransfer(Long from, Long to) {
 		try {
-			return this.partPaymentService.save(pt);
+			this.transactionService.updateTransfer(from, to);
+		}
+		catch (MissingDataException mde) {
+		}
+		catch (DuplicateItemException die) {
+		}
+	}
+	
+	public Transaction saveSplitTransactions(Transaction pt) {
+		try {
+			return this.splitTransactionService.save(pt);
 		}
 		catch (MissingDataException mde) {
 		}
@@ -117,37 +151,75 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	public Payment createPayment(Payee noPayee, Category noCategory) {
-
+	public Transaction importTransaction() {
 		try {
-			if (this.msAccessService.getNextTransaction() != null) {
-
-				Payment pt = new Payment().
-						setAccount(identifyAccount(this.msAccessService.getAccount())).
-						setPayee(getPayee(this.msAccessService.getPayee())).
-						setCategory(getCategory("")).
-						//setCategory(getCategory(rs.getString("category"))).
-						setEntered(this.msAccessService.getDate()).
-						//setReconciled(value.equals("X")).
-						setCharge(this.msAccessService.getAmount()).
-						//pt.setCharge(parseCharge(value));
-						//pt.setReference(value);
-						setMemo(this.msAccessService.getMemo()).
-						setOrigId(this.msAccessService.getOrigId());
-
-				return pt;
-			}
+			return this.msAccessService.getNextTransaction();
 		} 
-		catch (SQLException e) {
+		catch (IOException e) {
 			LOG.error("Failed to read row of transaction data", e);
 		}
 
 		return null;
 	}
 	
-	private List<PartPayment> createPartPayments(String firstCategoryStr, Category noCategory, BufferedReader inf) {
-		List<PartPayment> list = new ArrayList<PartPayment>();
+	public boolean importTransfer() {
+		try {
+			Long[] ptArr = this.msAccessService.getNextTransfer();
+			if (ptArr != null) {
+				Transaction from = getTransactionByOrigId(ptArr[0]);
+				if (from == null) {
+					LOG.error(String.format("Failed to identify source transaction [%d]", ptArr[0]));
+				}
+				
+				Transaction to = getTransactionByOrigId(ptArr[1]);
+				if (to == null) {
+					LOG.error(String.format("Failed to identify target transaction [%d]", ptArr[1]));
+				}
+				
+				if (from != null && to != null) {
+					this.transactionService.updateTransfer(from.getId(), to.getId());
+				}
+			}
+			else {
+				// Return false only when there are no more transfer records to import
+				return false;
+			}
+		} 
+		catch (Exception e) {
+			LOG.error("Failed to import transaction transfer", e);
+		}
+		
+		// More transfer records to follow
+		return true;
+	}
+	
+	public boolean importSplit() {
+		/*
+		try {
+			Long[] ptArr = this.msAccessService.getNextTrnXfer();
+			if (ptArr != null) {
+				Transaction from = getPaymentByOrigId(ptArr[0]);
+				Transaction to = getPaymentByOrigId(ptArr[1]);
+				
+				if (from != null && to != null) {
+					this.paymentService.updateXferIds(from.getId(), to.getId());
+					return true;
+				}
+			}
+		} 
+		catch (Exception e) {
+			LOG.error("Failed to read row of transaction transfer data", e);
+		}
+		*/
+
+		return false;
+	}
+	
+	@SuppressWarnings("unused")
+	private List<SplitTransaction> createSplits(String firstCategoryStr, Category noCategory, BufferedReader inf) {
+		List<SplitTransaction> list = new ArrayList<SplitTransaction>();
 		String line, code, value;
+		/*
 		PartPayment ppt = new PartPayment().setCategory(getCategory(firstCategoryStr));
 		
 		
@@ -180,7 +252,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		catch (IOException e) {
 			LOG.error("Error reading input file", e);
 		}
-		
+		*/
 		return null;
 	}
 	
@@ -198,17 +270,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return pe;
 	}
 	
-	private Category getCategory(String value) {
-		String major = "";
-		String minor = "";
-		String[] parts = value.split(":");
-			if (parts.length > 0) {
-				major = parts[0];
-				if (parts.length > 1) {
-					minor = parts[1];
-				}
-			}
-
+	private Category getCategory(String major, String minor) {
 		Category c = this.categoryService.get(major, minor);
 		if (c == null) {
 			c = new Category().setMajor(major).setMinor(minor);
@@ -222,41 +284,21 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		
 		return c;
 	}
-	
-	private Account getAccount(String value) {
-		if (value.length() > 2 && value.startsWith("[")) {
-			String name = value.substring(1,  value.length() - 1);
-			Account a = this.accountService.get(name);
-			
-			if (a == null) {
-				a = new Account().setName(name);
-				try {
-					a = this.accountService.save(a);
-				}
-				catch (Exception e) {
-					LOG.error("Failed to save account", e);
-				}
-			}
-			
-			return a;
-		}
 		
-		return null;
-	}
-	
 	public Account resetAccountBalance(Account a) {
 		a = this.accountService.resetBalance(a);
 		LOG.info("Account balance updated");
 		return a;
 	}
 	
-	public Payment getPaymentByOrigId(long id) {
-		return this.paymentService.getByOrigId(id);
+	public Transaction getTransactionByOrigId(long id) {
+		return this.transactionService.getByOrigId(id);
 	}
 	
+	@SuppressWarnings("unused")
 	private Timestamp parseDate(String dateStr) {
 		try {
-	    	Date date = Payment.SDF.parse(dateStr);
+	    	Date date = Transaction.SDF.parse(dateStr);
 	    	Calendar cal = Calendar.getInstance();
 	    	cal.setTime(date);
 	    	cal.set(Calendar.HOUR, 0);
@@ -272,9 +314,10 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	private long parseCharge(String s) {
+	@SuppressWarnings("unused")
+	private long parseAmount(String s) {
 		try {
-			return Math.round(Payment.NF.parse(s).floatValue() * 100.0);
+			return Math.round(Transaction.NF.parse(s).floatValue() * 100.0);
 	    }
 	    catch (ParseException e) {
 	    	LOG.error("Price not parseable", e);

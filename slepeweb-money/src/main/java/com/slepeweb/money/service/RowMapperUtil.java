@@ -7,9 +7,9 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
-import com.slepeweb.money.bean.PartPayment;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Payee;
-import com.slepeweb.money.bean.Payment;
+import com.slepeweb.money.bean.Transaction;
 
 public class RowMapperUtil {
 
@@ -31,75 +31,77 @@ public class RowMapperUtil {
 		}
 	}
 	
-	public static final class PaymentMapper implements RowMapper<Payment> {
-		public Payment mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new Payment().
+	public static final class TransactionMapper implements RowMapper<Transaction> {
+		public Transaction mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new Transaction().
 					setAccount(makeAccountX(rs)).
 					setPayee(makePayeeX(rs)).
 					setCategory(makeCategoryX(rs)).
 					setEntered(rs.getTimestamp("entered")).
-					setTransfer(makeAccount(rs)).
+					setXferId(rs.getLong("transferid")).
 					setReconciled(rs.getBoolean("reconciled")).
-					setCharge(rs.getLong("charge")).
+					setAmount(rs.getLong("amount")).
 					setReference(rs.getString("reference")).
 					setMemo(rs.getString("memo")).
+					setId(rs.getLong("id")).
 					setOrigId(rs.getLong("origid"));
 		}
 	}
 	
-	public static final class PartPaymentMapper implements RowMapper<PartPayment> {
-		public PartPayment mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new PartPayment().
-					setPaymentId(rs.getLong("paymentid")).
+	public static final class SplitTransactionMapper implements RowMapper<SplitTransaction> {
+		public SplitTransaction mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new SplitTransaction().
+					setTransactionId(rs.getLong("transactionid")).
 					setCategory(makeCategory(rs)).
-					setCharge(rs.getLong("charge")).
+					setAmount(rs.getLong("amount")).
 					setMemo(rs.getString("memo"));
 		}
 	}
 	
 	private static Payee makePayee(ResultSet rs) throws SQLException {
+		return makePayee(rs, "id", "name");
+	}
+	
+	private static Payee makePayeeX(ResultSet rs) throws SQLException {
+		return makePayee(rs, "payeeid", "payeename");
+	}
+	
+	private static Payee makePayee(ResultSet rs, String idStr, String name) throws SQLException {
 		return new Payee().
-			setId(rs.getLong("id")).
-			setName(rs.getString("name"));
+			setId(rs.getLong(idStr)).
+			setName(rs.getString(name));
 	}
 	
 	private static Account makeAccount(ResultSet rs) throws SQLException {
-		long id = rs.getLong("id");
+		return makeAccount(rs, "id", "name");
+	}
+	
+	private static Account makeAccountX(ResultSet rs) throws SQLException {
+		return makeAccount(rs, "accountid", "accountname");
+	}
+	
+	private static Account makeAccount(ResultSet rs, String idStr, String name) throws SQLException {
+		long id = rs.getLong(idStr);
 		if (id != -1) {
 			return new Account().
 				setId(id).
-				setName(rs.getString("name"));
+				setName(rs.getString(name));
 		}
 		return null;
 	}
 	
 	private static Category makeCategory(ResultSet rs) throws SQLException {
-		return new Category().
-			setId(rs.getLong("id")).
-			setMajor(rs.getString("major")).
-			setMinor(rs.getString("minor"));
-	}
-	
-	private static Payee makePayeeX(ResultSet rs) throws SQLException {
-		return new Payee().
-			setId(rs.getLong("payeeid")).
-			setName(rs.getString("payeename"));
-	}
-	
-	private static Account makeAccountX(ResultSet rs) throws SQLException {
-		long id = rs.getLong("accountid");
-		if (id != -1) {
-			return new Account().
-				setId(id).
-				setName(rs.getString("accountname"));
-		}
-		return null;
+		return makeCategory(rs, "id", "major", "minor");
 	}
 	
 	private static Category makeCategoryX(ResultSet rs) throws SQLException {
+		return makeCategory(rs, "categoryid", "major", "minor");
+	}
+	
+	private static Category makeCategory(ResultSet rs, String id, String major, String minor) throws SQLException {
 		return new Category().
-			setId(rs.getLong("categoryid")).
-			setMajor(rs.getString("major")).
-			setMinor(rs.getString("minor"));
+			setId(rs.getLong(id)).
+			setMajor(rs.getString(major)).
+			setMinor(rs.getString(minor));
 	}
 }

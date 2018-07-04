@@ -1,14 +1,25 @@
 package com.slepeweb.money.service;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
+
+import com.healthmarketscience.jackcess.Cursor;
+import com.healthmarketscience.jackcess.CursorBuilder;
+import com.healthmarketscience.jackcess.Database;
+import com.healthmarketscience.jackcess.DatabaseBuilder;
+import com.healthmarketscience.jackcess.Row;
+import com.healthmarketscience.jackcess.Table;
+import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.Transaction;
 
 /*
  * TRANSACTION TRANSFERS
@@ -32,77 +43,182 @@ where tr1.htrn = trs.htrnParent and tr2.htrn = trs.htrn
 public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessService {
 	
 	private static Logger LOG = Logger.getLogger(MSAccessServiceImpl.class);
-	private static String ACCOUNT = "account";
-	private static String PAYEE = "payee";
-	private static String DATE_ENTERED = "dateentered";
-	private static String MEMO = "memo";
-	private static String AMOUNT = "amount";
-	private static String ORIG_ID = "origid";
+	public static final String FULL_NAME = "szFull";
 
-	private String accessFilePath = "jdbc:ucanaccess:///media/george/Windows/Users/gbutt/home.mdb";
+	private String accessFilePath = "/home/george/home.mdb";
+	
+	/*
 	private String trnQuery = String.format(
-			"select trn.htrn as %s, acct.szFull as %s, pay.szFull as %s, trn.dt as %s, trn.mMemo as %s, trn.amt as %s " +
-			"from trn " +
+			"select " + 
+					"trn.htrn as %s, acct.szFull as %s, pay.szFull as %s, trn.dt as %s, trn.mMemo as %s, trn.amt as %s, " +
+					"parent.szFull as %s, child.szFull as %s "	+		
+			"from trn, cat child " +
 			"join acct on trn.hacct = acct.hacct " +
 			"left join pay on trn.hpay = pay.hpay " +
+			"left join cat parent on child.hcatParent=parent.hcat " +
 			"left join trn_split trs on trn.htrn = trs.htrn " +
-			"where trs.htrnParent is null", ORIG_ID, ACCOUNT, PAYEE, DATE_ENTERED, MEMO, AMOUNT);
+			"where trs.htrnParent is null", 
+				ORIG_ID, ACCOUNT, PAYEE, DATE_ENTERED, MEMO, AMOUNT, PARENT_CATEGORY, CHILD_CATEGORY);
+				*/
 	
-	private Connection connection;
-	private ResultSet row;
+	private Map<Long, Account> accountMap = new HashMap<Long, Account>();
+	private Map<Long, Payee> payeeMap = new HashMap<Long, Payee>();
+	private Map<Long, Category> categoryMap = new HashMap<Long, Category>();
 	
-	private Connection getConnection() {
-		if (this.connection == null) {
-			try {
-				Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
-				this.connection = DriverManager.getConnection(this.accessFilePath);
-			} 
-			catch (Exception e) {
-				LOG.error("Failed to open database file", e);
-			}
-		}
+	private Payee noPayee;
+	private Category noCategory;
+	
+	private Table catTable;
+	private Cursor acctCursor, payCursor, catCursor, parentCatCursor;
+	private Cursor trnCursor, trnXferCursor, trnSplitCursor;
+	
+	public void init(Payee noPayee, Category noCategory) throws IOException {
+		this.noPayee = noPayee;
+		this.noCategory = noCategory;
 		
-		return this.connection;
+		Database db = DatabaseBuilder.open(new File(this.accessFilePath));		
+		this.acctCursor = CursorBuilder.createCursor(db.getTable("ACCT"));
+		this.payCursor = CursorBuilder.createCursor(db.getTable("PAY"));
+		this.catCursor = CursorBuilder.createCursor(this.catTable = db.getTable("CAT"));
+		this.parentCatCursor = CursorBuilder.createCursor(db.getTable("CAT"));
+		this.trnCursor = CursorBuilder.createCursor(db.getTable("TRN"));
+		this.trnXferCursor = CursorBuilder.createCursor(db.getTable("TRN_XFER"));
+		this.trnSplitCursor = CursorBuilder.createCursor(db.getTable("TRN_SPLIT"));
 	}
 	
-	public ResultSet getNextTransaction() throws SQLException {
-		if (this.row == null) {
-				Statement s = getConnection().createStatement();
-				this.row = s.executeQuery(this.trnQuery);
-		}
+	public Account getNextAccount() throws IOException {
+		// Create a new Account object (partial) with data from the ACCT table.
+		Row r = this.acctCursor.getNextRow();
 		
-		if (this.row.next()) {
-			return this.row;
+		if (r != null) {
+			return new Account().
+					setId(r.getInt("hacct")).
+					setName(r.getString("szFull"));
 		}
 		
 		return null;
 	}
-
-
-	public String getAccount() throws SQLException {
-		return this.row.getString(ACCOUNT);
+	
+	public Payee getNextPayee() throws IOException {
+		// Create a new Payee object (partial) with data from the PAY table.
+		Row r = this.payCursor.getNextRow();
+		
+		if (r != null) {
+			return new Payee().
+					setId(r.getInt("hpay")).
+					setName(r.getString("szFull"));
+		}
+		
+		return null;
 	}
 	
-
-	public String getPayee() throws SQLException {
-		return this.row.getString(PAYEE);
+	public Category getNextCategory() throws IOException {
+		// Create a new Category object (partial) with data from the CAT table.
+		Row childCategoryRow = this.catCursor.getNextRow();
+		
+		if (childCategoryRow != null) {
+			Category c = new Category().setId(childCategoryRow.getInt("hcat"));
+			
+			if (this.parentCatCursor.findFirstRow(Collections.singletonMap("hcat", childCategoryRow.getInt("hcatParent")))) {
+				String parentCategoryName = (String) this.parentCatCursor.getCurrentRowValue(this.catTable.getColumn(FULL_NAME));
+				
+				if (parentCategoryName.equals("INCOME") || parentCategoryName.equals("EXPENSE")) {
+					// This is a root category 
+					c.setMajor(childCategoryRow.getString(FULL_NAME));
+				}
+				else {
+					c.setMajor(parentCategoryName);
+					c.setMinor(childCategoryRow.getString(FULL_NAME));
+				}
+			}
+			else {
+				c.setMajor(childCategoryRow.getString(FULL_NAME));
+			}
+			
+			return c;
+		}
+		
+		return null;
 	}
 	
-
-	public Timestamp getDate() throws SQLException {
-		return new Timestamp(this.row.getDate(DATE_ENTERED).getTime());
+	public void cacheAccount(Long origId, Account a) {
+		this.accountMap.put(origId, a);
 	}
 	
-
-	public String getMemo() throws SQLException {
-		return this.row.getString(MEMO);
+	public void cachePayee(Long origId, Payee p) {
+		this.payeeMap.put(origId, p);
 	}
 	
-	public long getAmount() throws SQLException {
-		return new Float(this.row.getFloat(AMOUNT) * 100.0).longValue();
+	public void cacheCategory(Long origId, Category c) {
+		this.categoryMap.put(origId, c);
 	}
 	
-	public long getOrigId() throws SQLException {
-		return this.row.getLong(ORIG_ID) ;
+	public Transaction getNextTransaction() throws IOException {
+		// Create a new Payment object with data from the TRN table.
+		Row r = this.trnCursor.getNextRow();
+		
+		if (r != null) {
+			Integer htrn = r.getInt("htrn");
+			
+			// Do NOT process child transactions, ie those that are part of a split
+			if ( ! this.trnSplitCursor.findFirstRow(Collections.singletonMap("htrnParent", htrn))) {
+				
+				Transaction pt = new Transaction().
+						setAccount(this.accountMap.get(Long.valueOf(r.getInt("hacct")))).
+						setAmount(Float.valueOf(r.getBigDecimal("amt").floatValue() * 100).longValue()).
+						setEntered(new Timestamp(r.getDate("dt").getTime())).
+						setMemo(r.getString("mMemo")).
+						setOrigId(r.getInt("htrn"))/*.
+						setReconciled(false).
+						setReference("")*/;
+				
+				Integer h;
+	
+				// Payee might be null
+				h = r.getInt("hpay");
+				if (h != null) {
+					Payee p = this.payeeMap.get(Long.valueOf(h));
+					if (p == null) {
+						p = this.noPayee;
+					}
+					pt.setPayee(p);
+				}
+				else {
+					pt.setPayee(this.noPayee);
+				}
+		
+				// Category might be null ...
+				Integer hcat = r.getInt("hcat");
+				Category c = null;
+				
+				if (hcat != null) {
+					c = this.categoryMap.get(Long.valueOf(hcat));
+					if (c == null) {
+						c = this.noCategory;
+					}
+					pt.setCategory(c);
+				}
+				else {
+					pt.setCategory(this.noCategory);
+				}
+		
+				return pt;
+			}
+			else {
+				return getNextTransaction();
+			}
+		}
+		
+		return null;
+	}
+	
+	public Long[] getNextTransfer() throws IOException {
+		Row r = this.trnXferCursor.getNextRow();
+		
+		if (r != null) {
+			return new Long[]{new Long(r.getInt("htrnLink")), new Long(r.getInt("htrnFrom"))};
+		}
+		
+		return null;
 	}
 }

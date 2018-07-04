@@ -8,7 +8,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.Payment;
+import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
 
@@ -16,7 +16,7 @@ import com.slepeweb.money.except.MissingDataException;
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 	
 	private static Logger LOG = Logger.getLogger(AccountServiceImpl.class);
-	@Autowired private PaymentService paymentService;
+	@Autowired private TransactionService paymentService;
 	
 	public Account save(Account a) throws MissingDataException, DuplicateItemException {
 		if (a.isDefined4Insert()) {
@@ -48,8 +48,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	
 	public Account resetBalance(Account a) {
 		long balance = 0L;
-		for (Payment pt : this.paymentService.getPaymentsForAccount(a.getId()) ) {
-			balance += pt.getCharge();
+		for (Transaction t : this.paymentService.getTransactionsForAccount(a.getId()) ) {
+			balance += t.getAmount();
 		}
 		
 		a.setBalance(balance);

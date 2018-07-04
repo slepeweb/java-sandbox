@@ -1,17 +1,18 @@
 package com.slepeweb.money.service;
 
+import java.io.IOException;
+
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.Category;
-import com.slepeweb.money.bean.Payee;
-import com.slepeweb.money.bean.Payment;
+import com.slepeweb.money.bean.Transaction;
 
 public interface MoneyImportService {
-	Account identifyAccount(String account);
-	Payee identifyNoPayee();
-	Category identifyNoCategory();
-	Payment createPayment(Payee p, Category c);
-	Payment savePayment(Payment pt);
-	Payment savePartPayments(Payment pt);
+	void init() throws IOException;
+	Account getAccount(String account);
+	Transaction importTransaction();
+	boolean importTransfer();
+	boolean importSplit();
+	Transaction saveTransaction(Transaction pt);
+	Transaction saveSplitTransactions(Transaction pt);
 	Account resetAccountBalance(Account a);
-	Payment getPaymentByOrigId(long id);
+	Transaction getTransactionByOrigId(long id);
 }

@@ -1,10 +1,10 @@
 package com.slepeweb.money.bean;
 
-public class PartPayment {
+public class SplitTransaction {
 	
-	private Long paymentId;
+	private Long transactionId;
 	private Category category;
-	private Long charge;
+	private Long amount;
 	private String memo = "";
 	
 	/* NOT REQUIRED ?
@@ -20,26 +20,26 @@ public class PartPayment {
 	
 	public boolean isDefined4Insert() {
 		return  
-			getPaymentId() != null &&
+			getTransactionId() != null &&
 			getCategory() != null &&
 			getCategory().getId() > 0L;
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("%s - %s", getCategory(), getValueInPounds());
+		return String.format("%s - %s", getCategory(), getAmountInPounds());
 	}
 	
-	public String getValueInPounds() {
-		return Payment.DF.format(charge / 100.0);
+	public String getAmountInPounds() {
+		return Transaction.DF.format(amount / 100.0);
 	}
 	
-	public Long getCharge() {
-		return charge;
+	public Long getAmount() {
+		return amount;
 	}
 	
-	public PartPayment setCharge(Long value) {
-		this.charge = value;
+	public SplitTransaction setAmount(Long value) {
+		this.amount = value;
 		return this;
 	}
 
@@ -47,7 +47,7 @@ public class PartPayment {
 		return category;
 	}
 
-	public PartPayment setCategory(Category category) {
+	public SplitTransaction setCategory(Category category) {
 		this.category = category;
 		return this;
 	}
@@ -56,17 +56,17 @@ public class PartPayment {
 		return this.memo;
 	}
 
-	public PartPayment setMemo(String memo) {
+	public SplitTransaction setMemo(String memo) {
 		this.memo = memo;
 		return this;
 	}
 
-	public Long getPaymentId() {
-		return paymentId;
+	public Long getTransactionId() {
+		return transactionId;
 	}
 
-	public PartPayment setPaymentId(Long l) {
-		this.paymentId = l;
+	public SplitTransaction setTransactionId(Long l) {
+		this.transactionId = l;
 		return this;
 	}
 
@@ -75,9 +75,9 @@ public class PartPayment {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((category == null) ? 0 : category.hashCode());
-		result = prime * result + ((charge == null) ? 0 : charge.hashCode());
+		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
 		result = prime * result + ((memo == null) ? 0 : memo.hashCode());
-		result = prime * result + paymentId.hashCode();
+		result = prime * result + transactionId.hashCode();
 		return result;
 	}
 
@@ -89,26 +89,26 @@ public class PartPayment {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PartPayment other = (PartPayment) obj;
+		SplitTransaction other = (SplitTransaction) obj;
 		if (category == null) {
 			if (other.category != null)
 				return false;
 		} else if (!category.equals(other.category))
 			return false;
-		if (charge == null) {
-			if (other.charge != null)
+		if (amount == null) {
+			if (other.amount != null)
 				return false;
-		} else if (!charge.equals(other.charge))
+		} else if (!amount.equals(other.amount))
 			return false;
 		if (memo == null) {
 			if (other.memo != null)
 				return false;
 		} else if (!memo.equals(other.memo))
 			return false;
-		if (paymentId == null) {
-			if (other.paymentId != null)
+		if (transactionId == null) {
+			if (other.transactionId != null)
 				return false;
-		} else if (!paymentId.equals(other.paymentId))
+		} else if (!transactionId.equals(other.transactionId))
 			return false;
 		return true;
 	}

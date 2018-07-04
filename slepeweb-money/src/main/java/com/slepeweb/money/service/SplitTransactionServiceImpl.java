@@ -1,0 +1,78 @@
+package com.slepeweb.money.service;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.stereotype.Service;
+
+import com.slepeweb.money.bean.SplitTransaction;
+import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.except.DuplicateItemException;
+import com.slepeweb.money.except.MissingDataException;
+
+@Service("splitTransactionService")
+public class SplitTransactionServiceImpl extends BaseServiceImpl implements SplitTransactionService {
+	
+	private static Logger LOG = Logger.getLogger(SplitTransactionServiceImpl.class);
+	private static final String SELECT = 
+			"select " +
+					"st.transactionid, st.amount, st.memo" + 
+					"c.id as categoryid, c.major, c.minor, " + 
+			"from splittransaction st " +
+					"join category c on c.id = st.categoryid ";
+	
+	public Transaction save(Transaction t) throws MissingDataException, DuplicateItemException {
+		if (t.isSplit()) {
+			List<SplitTransaction> revisedList = t.getSplits();
+			
+			// Delete existing part payments
+			t = delete(t);
+			
+			// Insert latest part-payments
+			for (SplitTransaction st : revisedList) {
+				if (st.isDefined4Insert()) {
+					insert(st);
+				}
+				else {
+					String str = "Split transactions not saved - insufficient data";
+					LOG.error(compose(str, t));
+					throw new MissingDataException(str);
+				}
+			}
+		}
+		
+		return t;
+	}
+	
+	private SplitTransaction insert(SplitTransaction st) throws MissingDataException, DuplicateItemException {
+		
+		try {
+			this.jdbcTemplate.update(
+					"insert into splittransaction (transactionid, categoryid, amount, memo) " +
+					"values (?, ?, ?, ?)", 
+					st.getTransactionId(), st.getCategory().getId(), st.getAmount(), st.getMemo());
+			
+			LOG.info(compose("Added new split transaction", st));		
+			return st;
+		}
+		catch (DuplicateKeyException e) {
+			throw new DuplicateItemException("Split transaction already inserted");
+		}
+	}
+
+	public List<SplitTransaction> get(Transaction t) {
+		return this.jdbcTemplate.query(
+				SELECT + " where st.transactionid = ?", 
+				new Object[]{t.getId()}, 
+				new RowMapperUtil.SplitTransactionMapper());
+	}
+
+	public Transaction delete(Transaction t) {
+		if (this.jdbcTemplate.update("delete from splittransaction where transactionid = ?", t.getId()) > 0) {
+			LOG.warn(compose("Deleted split transactions", t.getId()));
+			t.getSplits().clear();
+		}
+		return t;
+	}	
+}
