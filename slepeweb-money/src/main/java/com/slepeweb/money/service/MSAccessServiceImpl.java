@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import com.healthmarketscience.jackcess.Table;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 
 /*
@@ -44,6 +47,8 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	
 	private static Logger LOG = Logger.getLogger(MSAccessServiceImpl.class);
 	public static final String FULL_NAME = "szFull";
+	public static final String TRANSACTION_ID = "htrn";
+	public static final String TRANSACTION_PARENT_ID = "htrnParent";
 
 	private String accessFilePath = "/home/george/home.mdb";
 	
@@ -64,31 +69,34 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	private Map<Long, Account> accountMap = new HashMap<Long, Account>();
 	private Map<Long, Payee> payeeMap = new HashMap<Long, Payee>();
 	private Map<Long, Category> categoryMap = new HashMap<Long, Category>();
+	private Set<Long> processedParentTransactions = new HashSet<Long>();
 	
 	private Payee noPayee;
 	private Category noCategory;
 	
 	private Table catTable;
-	private Cursor acctCursor, payCursor, catCursor, parentCatCursor;
-	private Cursor trnCursor, trnXferCursor, trnSplitCursor;
+	private Cursor acctCursorSeq, payCursorSeq, catCursorSeq, parentCatCursorFinder;
+	private Cursor trnCursorSeq, trnCursorFinder, trnXferCursorSeq, trnSplitCursorSeq, trnSplitCursorFinder;
 	
 	public void init(Payee noPayee, Category noCategory) throws IOException {
 		this.noPayee = noPayee;
 		this.noCategory = noCategory;
 		
 		Database db = DatabaseBuilder.open(new File(this.accessFilePath));		
-		this.acctCursor = CursorBuilder.createCursor(db.getTable("ACCT"));
-		this.payCursor = CursorBuilder.createCursor(db.getTable("PAY"));
-		this.catCursor = CursorBuilder.createCursor(this.catTable = db.getTable("CAT"));
-		this.parentCatCursor = CursorBuilder.createCursor(db.getTable("CAT"));
-		this.trnCursor = CursorBuilder.createCursor(db.getTable("TRN"));
-		this.trnXferCursor = CursorBuilder.createCursor(db.getTable("TRN_XFER"));
-		this.trnSplitCursor = CursorBuilder.createCursor(db.getTable("TRN_SPLIT"));
+		this.acctCursorSeq = CursorBuilder.createCursor(db.getTable("ACCT"));
+		this.payCursorSeq = CursorBuilder.createCursor(db.getTable("PAY"));
+		this.catCursorSeq = CursorBuilder.createCursor(this.catTable = db.getTable("CAT"));
+		this.parentCatCursorFinder = CursorBuilder.createCursor(db.getTable("CAT"));
+		this.trnCursorSeq = CursorBuilder.createCursor(db.getTable("TRN"));
+		this.trnCursorFinder = CursorBuilder.createCursor(db.getTable("TRN"));
+		this.trnXferCursorSeq = CursorBuilder.createCursor(db.getTable("TRN_XFER"));
+		this.trnSplitCursorSeq = CursorBuilder.createCursor(db.getTable("TRN_SPLIT"));
+		this.trnSplitCursorFinder = CursorBuilder.createCursor(db.getTable("TRN_SPLIT"));
 	}
 	
 	public Account getNextAccount() throws IOException {
 		// Create a new Account object (partial) with data from the ACCT table.
-		Row r = this.acctCursor.getNextRow();
+		Row r = this.acctCursorSeq.getNextRow();
 		
 		if (r != null) {
 			return new Account().
@@ -101,7 +109,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	
 	public Payee getNextPayee() throws IOException {
 		// Create a new Payee object (partial) with data from the PAY table.
-		Row r = this.payCursor.getNextRow();
+		Row r = this.payCursorSeq.getNextRow();
 		
 		if (r != null) {
 			return new Payee().
@@ -114,13 +122,13 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	
 	public Category getNextCategory() throws IOException {
 		// Create a new Category object (partial) with data from the CAT table.
-		Row childCategoryRow = this.catCursor.getNextRow();
+		Row childCategoryRow = this.catCursorSeq.getNextRow();
 		
 		if (childCategoryRow != null) {
 			Category c = new Category().setId(childCategoryRow.getInt("hcat"));
 			
-			if (this.parentCatCursor.findFirstRow(Collections.singletonMap("hcat", childCategoryRow.getInt("hcatParent")))) {
-				String parentCategoryName = (String) this.parentCatCursor.getCurrentRowValue(this.catTable.getColumn(FULL_NAME));
+			if (this.parentCatCursorFinder.findFirstRow(Collections.singletonMap("hcat", childCategoryRow.getInt("hcatParent")))) {
+				String parentCategoryName = (String) this.parentCatCursorFinder.getCurrentRowValue(this.catTable.getColumn(FULL_NAME));
 				
 				if (parentCategoryName.equals("INCOME") || parentCategoryName.equals("EXPENSE")) {
 					// This is a root category 
@@ -155,20 +163,20 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	
 	public Transaction getNextTransaction() throws IOException {
 		// Create a new Payment object with data from the TRN table.
-		Row r = this.trnCursor.getNextRow();
+		Row r = this.trnCursorSeq.getNextRow();
 		
 		if (r != null) {
 			Integer htrn = r.getInt("htrn");
 			
-			// Do NOT process child transactions, ie those that are part of a split
-			if ( ! this.trnSplitCursor.findFirstRow(Collections.singletonMap("htrnParent", htrn))) {
+			// Do NOT process child transactions, ie those that are part of a split transaction
+			if (! this.trnSplitCursorFinder.findFirstRow(Collections.singletonMap(TRANSACTION_ID, htrn))) {
 				
-				Transaction pt = new Transaction().
+				Transaction t = new Transaction().
 						setAccount(this.accountMap.get(Long.valueOf(r.getInt("hacct")))).
 						setAmount(Float.valueOf(r.getBigDecimal("amt").floatValue() * 100).longValue()).
 						setEntered(new Timestamp(r.getDate("dt").getTime())).
 						setMemo(r.getString("mMemo")).
-						setOrigId(r.getInt("htrn"))/*.
+						setOrigId(r.getInt(TRANSACTION_ID))/*.
 						setReconciled(false).
 						setReference("")*/;
 				
@@ -181,10 +189,10 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 					if (p == null) {
 						p = this.noPayee;
 					}
-					pt.setPayee(p);
+					t.setPayee(p);
 				}
 				else {
-					pt.setPayee(this.noPayee);
+					t.setPayee(this.noPayee);
 				}
 		
 				// Category might be null ...
@@ -196,15 +204,16 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 					if (c == null) {
 						c = this.noCategory;
 					}
-					pt.setCategory(c);
+					t.setCategory(c);
 				}
 				else {
-					pt.setCategory(this.noCategory);
+					t.setCategory(this.noCategory);
 				}
 		
-				return pt;
+				return t;
 			}
 			else {
+				LOG.debug(compose("Ignoring child transaction (split)", htrn));
 				return getNextTransaction();
 			}
 		}
@@ -212,8 +221,78 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		return null;
 	}
 	
+	public Transaction getNextSplitTransactions() throws IOException {
+		// Create a new SplitTransaction object with data from the TRN_SPLIT table.
+		Row r = this.trnSplitCursorSeq.getNextRow();
+		
+		if (r != null) {
+			Long parentId = new Long(r.getInt(TRANSACTION_PARENT_ID));
+			Long childId;
+			
+			// Has parent already been processed?
+			if (! this.processedParentTransactions.contains(parentId)) {		
+				Transaction result = new Transaction().setOrigId(parentId);
+				SplitTransaction st;
+				Row parentTransactionRow, childTransactionRow;
+				
+				// Find corresponding child transactions
+				Map<String, Long> parentCriteria = Collections.singletonMap(TRANSACTION_PARENT_ID, parentId);
+				if (this.trnSplitCursorFinder.findFirstRow(parentCriteria)) {
+					this.trnSplitCursorFinder.beforeFirst();
+				
+					while (this.trnSplitCursorFinder.findNextRow(parentCriteria)) {
+						parentTransactionRow = this.trnSplitCursorFinder.getCurrentRow();
+						childId = new Long(parentTransactionRow.getInt(TRANSACTION_ID));
+						
+						if (this.trnCursorFinder.findFirstRow(Collections.singletonMap(TRANSACTION_ID, childId))) {
+							childTransactionRow = this.trnCursorFinder.getCurrentRow();
+							st = new SplitTransaction().
+								// This parentId is an MSAccess id - needs updating by caller
+								setTransactionId(parentId).
+								setAmount(Float.valueOf(childTransactionRow.getBigDecimal("amt").floatValue() * 100).longValue()).
+								setMemo(childTransactionRow.getString("mMemo"));
+					
+							// Category might be null ...
+							Integer hcat = childTransactionRow.getInt("hcat");
+							Category c = null;
+							
+							if (hcat != null) {
+								c = this.categoryMap.get(Long.valueOf(hcat));
+								if (c == null) {
+									c = this.noCategory;
+								}
+								st.setCategory(c);
+							}
+							else {
+								st.setCategory(this.noCategory);
+							}
+					
+							result.getSplits().add(st);
+						}
+						else {
+							LOG.error(compose("Couldn't find child transaction", childId));
+						}
+					}
+					
+					// Mark this parent transaction as completed
+					this.processedParentTransactions.add(parentId);
+					return result;
+				}
+				else {
+					LOG.error(compose("Failed to identify parent transaction", parentId));
+				}
+			}
+			else {
+				// Skip this parent (already processed), and try the next
+				return getNextSplitTransactions();
+			}
+		}
+		
+		return null;
+	}
+	
 	public Long[] getNextTransfer() throws IOException {
-		Row r = this.trnXferCursor.getNextRow();
+		Row r = this.trnXferCursorSeq.getNextRow();
 		
 		if (r != null) {
 			return new Long[]{new Long(r.getInt("htrnLink")), new Long(r.getInt("htrnFrom"))};

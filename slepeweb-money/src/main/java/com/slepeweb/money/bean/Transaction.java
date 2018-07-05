@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Transaction {
+public class Transaction extends DbEntity {
 	
 	public static SimpleDateFormat SDF = new SimpleDateFormat("dd/MM''yyyy");
 	public static NumberFormat NF = NumberFormat.getInstance();
@@ -20,7 +20,7 @@ public class Transaction {
 	private Payee payee;
 	private Category category;
 	private Timestamp entered;
-	private boolean reconciled, split;
+	private boolean reconciled;
 	private Long amount;
 	private String reference = "", memo = "";
 	private List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
@@ -159,11 +159,7 @@ public class Transaction {
 	}
 
 	public boolean isSplit() {
-		return split;
-	}
-
-	public void setSplit(boolean split) {
-		this.split = split;
+		return getSplits().size() > 0;
 	}
 
 	public List<SplitTransaction> getSplits() {
@@ -196,7 +192,6 @@ public class Transaction {
 		result = prime * result + (reconciled ? 1231 : 1237);
 		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
 		result = prime * result + ((xferId == null) ? 0 : xferId.hashCode());
-		result = prime * result + (split ? 1231 : 1237);
 		return result;
 	}
 
@@ -252,5 +247,18 @@ public class Transaction {
 		} else if (!xferId.equals(other.xferId))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public boolean matches(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		
+		Transaction other = (Transaction) obj;
+		return getId() == other.getId() || getOrigId() == other.getOrigId();
 	}
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 
 public interface MSAccessService {
@@ -16,5 +17,6 @@ public interface MSAccessService {
 	Payee getNextPayee() throws IOException;
 	Category getNextCategory() throws IOException;
 	Transaction getNextTransaction() throws IOException;
+	Transaction getNextSplitTransactions() throws IOException;
 	Long[] getNextTransfer() throws IOException;
 }

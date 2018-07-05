@@ -1,23 +1,25 @@
 package com.slepeweb.money.bean;
 
-public class SplitTransaction {
+public class SplitTransaction extends DbEntity {
 	
+	private long id;
 	private Long transactionId;
 	private Category category;
 	private Long amount;
 	private String memo = "";
 	
-	/* NOT REQUIRED ?
+	@Override
 	public void assimilate(Object obj) {
-		if (obj instanceof PartPayment) {
-			PartPayment pt = (PartPayment) obj;
-			setCategory(pt.getCategory());
-			setCharge(pt.getCharge());
-			setMemo(pt.getMemo());
+		if (obj instanceof SplitTransaction) {
+			SplitTransaction st = (SplitTransaction) obj;
+			setTransactionId(st.getTransactionId());
+			setCategory(st.getCategory());
+			setAmount(st.getAmount());
+			setMemo(st.getMemo());
 		}
 	}
-	*/
 	
+	@Override
 	public boolean isDefined4Insert() {
 		return  
 			getTransactionId() != null &&
@@ -30,6 +32,14 @@ public class SplitTransaction {
 		return String.format("%s - %s", getCategory(), getAmountInPounds());
 	}
 	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	public String getAmountInPounds() {
 		return Transaction.DF.format(amount / 100.0);
 	}
@@ -111,6 +121,19 @@ public class SplitTransaction {
 		} else if (!transactionId.equals(other.transactionId))
 			return false;
 		return true;
+	}
+
+	@Override
+	public boolean matches(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		
+		SplitTransaction other = (SplitTransaction) obj;
+		return getId() == other.getId();
 	}
 
 }

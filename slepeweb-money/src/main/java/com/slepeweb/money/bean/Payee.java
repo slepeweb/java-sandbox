@@ -1,6 +1,6 @@
 package com.slepeweb.money.bean;
 
-public class Payee {
+public class Payee extends DbEntity {
 	private String name;
 	private long id;
 	
@@ -68,4 +68,8 @@ public class Payee {
 		return true;
 	}
 	
+	@Override
+	public boolean matches(Object obj) {
+		return equals(obj);
+	}
 }

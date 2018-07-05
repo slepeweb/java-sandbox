@@ -1,5 +1,6 @@
 package com.slepeweb.money.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -24,15 +25,16 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 	
 	public Transaction save(Transaction t) throws MissingDataException, DuplicateItemException {
 		if (t.isSplit()) {
-			List<SplitTransaction> revisedList = t.getSplits();
+			List<SplitTransaction> revisedList = new ArrayList<SplitTransaction>(t.getSplits().size());
+			revisedList.addAll(t.getSplits());
 			
-			// Delete existing part payments
+			// Delete existing splits
 			t = delete(t);
 			
-			// Insert latest part-payments
+			// Insert latest splits
 			for (SplitTransaction st : revisedList) {
 				if (st.isDefined4Insert()) {
-					insert(st);
+					t.getSplits().add(insert(st));
 				}
 				else {
 					String str = "Split transactions not saved - insufficient data";
@@ -71,8 +73,9 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 	public Transaction delete(Transaction t) {
 		if (this.jdbcTemplate.update("delete from splittransaction where transactionid = ?", t.getId()) > 0) {
 			LOG.warn(compose("Deleted split transactions", t.getId()));
-			t.getSplits().clear();
 		}
+		
+		t.getSplits().clear();
 		return t;
 	}	
 }

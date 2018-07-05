@@ -1,6 +1,6 @@
 package com.slepeweb.money.bean;
 
-public class Category {
+public class Category extends DbEntity {
 	private String major = "", minor = "";
 	private long id;
 	
@@ -82,4 +82,8 @@ public class Category {
 		return true;
 	}
 
+	@Override
+	public boolean matches(Object obj) {
+		return equals(obj);
+	}
 }

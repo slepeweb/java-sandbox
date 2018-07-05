@@ -1,13 +1,10 @@
 package com.slepeweb.money.service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
-import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -139,9 +136,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		}
 	}
 	
-	public Transaction saveSplitTransactions(Transaction pt) {
+	public Transaction saveSplitTransactions(Transaction t) {
 		try {
-			return this.splitTransactionService.save(pt);
+			return this.splitTransactionService.save(t);
 		}
 		catch (MissingDataException mde) {
 		}
@@ -193,66 +190,39 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return true;
 	}
 	
-	public boolean importSplit() {
-		/*
+	public Transaction importSplitTransactions() {
 		try {
-			Long[] ptArr = this.msAccessService.getNextTrnXfer();
-			if (ptArr != null) {
-				Transaction from = getPaymentByOrigId(ptArr[0]);
-				Transaction to = getPaymentByOrigId(ptArr[1]);
+			// This transaction is incomplete - only the splits are useable, although
+			// their transactionid property references an MSAccess htrn, and will need to be changed
+			Transaction result = this.msAccessService.getNextSplitTransactions();
+			
+			if (result != null ) {
+				// This transaction has the correct mssql id, but its splits will be empty
+				Transaction t = getTransactionByOrigId(result.getOrigId());
 				
-				if (from != null && to != null) {
-					this.paymentService.updateXferIds(from.getId(), to.getId());
-					return true;
+				if (t != null) {
+					// Use the imported splits
+					t.setSplits(result.getSplits());
+					
+					// Correct the transactionid properties of each split
+					for (SplitTransaction st : t.getSplits()) {
+						st.setTransactionId(t.getId());
+					}
+					
+					return t;
+				}
+				else {
+					LOG.error(String.format("Failed to identify parent transaction [%d]", result.getOrigId()));
+					// An empty transaction will be ignored by the caller
+					return new Transaction();
 				}
 			}
 		} 
-		catch (Exception e) {
-			LOG.error("Failed to read row of transaction transfer data", e);
-		}
-		*/
-
-		return false;
-	}
-	
-	@SuppressWarnings("unused")
-	private List<SplitTransaction> createSplits(String firstCategoryStr, Category noCategory, BufferedReader inf) {
-		List<SplitTransaction> list = new ArrayList<SplitTransaction>();
-		String line, code, value;
-		/*
-		PartPayment ppt = new PartPayment().setCategory(getCategory(firstCategoryStr));
-		
-		
-		try {
-			while ((line = inf.readLine()) != null) {
-				if (line.length() > 0) {
-					code = line.substring(0, 1);
-					value = line.substring(1);
-					
-					if (code.equals("^")) {
-						return list;
-					}
-					// There is always a Category record
-					else if (code.equals("S")) {
-						ppt.setCategory(getCategory(value));
-					}
-					// The memo record is optional
-					else if (code.equals("E")) {
-						ppt.setMemo(value);
-					}
-					// There is always a Charge record, marking the completion of the part-payment
-					else if (code.equals("$")) {
-						ppt.setCharge(parseCharge(value));
-						list.add(ppt);
-						ppt = new PartPayment().setCategory(noCategory);
-					}
-				}
-			}
-		}
 		catch (IOException e) {
-			LOG.error("Error reading input file", e);
+			LOG.error("Failed to read row of split transaction data", e);
 		}
-		*/
+
+		// No more split transactions to import
 		return null;
 	}
 	

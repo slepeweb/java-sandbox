@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.MoneyImportService;
 
@@ -21,8 +22,8 @@ public class MoneyImportManager {
 		
 		if (exe.init(mis)) {
 			//exe.importTransactions(mis);
-			exe.importTransfers(mis);
-			exe.importSplits(mis);
+			//exe.importTransfers(mis);
+			exe.importSplitTransactions(mis);
 		}
 		
 		LOG.info("... MoneyImportManager has finished");
@@ -43,6 +44,9 @@ public class MoneyImportManager {
 		Transaction pt;
 		long count = 0L;
 		
+		LOG.info("Importing transactions");
+		LOG.info("======================");
+		
 		while ((pt = mis.importTransaction()) != null) {
 			
 			// Has this payment already been imported?
@@ -51,24 +55,18 @@ public class MoneyImportManager {
 				if (++count % 100 == 0) {
 					System.out.print(String.format("%d ", count));
 				}
-				
-				/*
-				if (pt.isSplit()) {
-					for (PartPayment ppt : pt.getPartPayments()) {
-						ppt.setPaymentId(pt.getId());
-					}
-					mis.savePartPayments(pt);
-				}				
-				*/
 			}
 			else {
-				LOG.debug(String.format("Payment [%d] already imported", pt.getOrigId()));
+				LOG.debug(String.format("Transaction [%d] already imported", pt.getOrigId()));
 			}
 		}
 	}
 	
 	private void importTransfers(MoneyImportService mis) {
 		long count = 0L;
+		
+		LOG.info("Importing transaction transfer data");
+		LOG.info("===================================");
 		
 		while (mis.importTransfer()) {
 			if (++count % 100 == 0) {
@@ -77,12 +75,19 @@ public class MoneyImportManager {
 		}
 	}
 	
-	private void importSplits(MoneyImportService mis) {
+	private void importSplitTransactions(MoneyImportService mis) {
 		long count = 0L;
+		Transaction t;
 		
-		while (mis.importSplit()) {
-			if (++count % 100 == 0) {
-				System.out.print(String.format("%d ", count));
+		LOG.info("Importing split transactions");
+		LOG.info("============================");
+		
+		while ((t = mis.importSplitTransactions()) != null) {
+			if (! t.getSplits().isEmpty()) {
+				mis.saveSplitTransactions(t);
+				if (++count % 100 == 0) {
+					System.out.print(String.format("%d ", count));
+				}
 			}
 		}
 	}

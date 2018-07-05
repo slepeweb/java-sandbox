@@ -55,12 +55,13 @@ create table transaction
 
 create table splittransaction
 (
+	id int not null auto_increment,
 	transactionid int,
 	categoryid int,
 	amount int,
 	memo varchar(255),
 	
-	primary key (transactionid, categoryid),
+	primary key (id),
 	constraint foreign key (transactionid) references transaction(id) on delete cascade,
 	constraint foreign key (categoryid) references category(id) on delete cascade
 ) ENGINE=InnoDB;
