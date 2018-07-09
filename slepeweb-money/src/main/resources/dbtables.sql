@@ -27,6 +27,7 @@ create table account
 	id int not null auto_increment,
 	name varchar(255),
 	balance int,
+	closed boolean,
 	primary key (id),
 	unique key idx_account_name (name)
 ) ENGINE=InnoDB;

@@ -93,6 +93,21 @@ public class SplitTransaction extends DbEntity {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (equalsBarTransactionId(obj)) {
+			SplitTransaction other = (SplitTransaction) obj;
+			if (transactionId == null) {
+				if (other.transactionId != null)
+					return false;
+			} else if (!transactionId.equals(other.transactionId))
+				return false;
+			
+			return true;
+		}
+		
+		return false;	
+	}
+
+	public boolean equalsBarTransactionId(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -115,11 +130,7 @@ public class SplitTransaction extends DbEntity {
 				return false;
 		} else if (!memo.equals(other.memo))
 			return false;
-		if (transactionId == null) {
-			if (other.transactionId != null)
-				return false;
-		} else if (!transactionId.equals(other.transactionId))
-			return false;
+
 		return true;
 	}
 

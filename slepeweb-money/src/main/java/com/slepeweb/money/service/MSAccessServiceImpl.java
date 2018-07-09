@@ -47,8 +47,15 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	
 	private static Logger LOG = Logger.getLogger(MSAccessServiceImpl.class);
 	public static final String FULL_NAME = "szFull";
+	public static final String ACCOUNT_ID = "hacct";
+	public static final String PAYEE_ID = "hpay";
+	public static final String CATEGORY_ID = "hcat";
+	public static final String PARENT_CATEGORY_ID = "hcatParent";
 	public static final String TRANSACTION_ID = "htrn";
 	public static final String TRANSACTION_PARENT_ID = "htrnParent";
+	public static final String DATE_ENTERED = "dt";
+	public static final String MEMO = "mMemo";
+	public static final String AMOUNT = "amt";
 
 	private String accessFilePath = "/home/george/home.mdb";
 	
@@ -100,8 +107,8 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		
 		if (r != null) {
 			return new Account().
-					setId(r.getInt("hacct")).
-					setName(r.getString("szFull"));
+					setId(r.getInt(ACCOUNT_ID)).
+					setName(r.getString(FULL_NAME));
 		}
 		
 		return null;
@@ -113,8 +120,8 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		
 		if (r != null) {
 			return new Payee().
-					setId(r.getInt("hpay")).
-					setName(r.getString("szFull"));
+					setId(r.getInt(PAYEE_ID)).
+					setName(r.getString(FULL_NAME));
 		}
 		
 		return null;
@@ -125,9 +132,9 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		Row childCategoryRow = this.catCursorSeq.getNextRow();
 		
 		if (childCategoryRow != null) {
-			Category c = new Category().setId(childCategoryRow.getInt("hcat"));
+			Category c = new Category().setId(childCategoryRow.getInt(CATEGORY_ID));
 			
-			if (this.parentCatCursorFinder.findFirstRow(Collections.singletonMap("hcat", childCategoryRow.getInt("hcatParent")))) {
+			if (this.parentCatCursorFinder.findFirstRow(Collections.singletonMap("hcat", childCategoryRow.getInt(PARENT_CATEGORY_ID)))) {
 				String parentCategoryName = (String) this.parentCatCursorFinder.getCurrentRowValue(this.catTable.getColumn(FULL_NAME));
 				
 				if (parentCategoryName.equals("INCOME") || parentCategoryName.equals("EXPENSE")) {
@@ -166,50 +173,22 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		Row r = this.trnCursorSeq.getNextRow();
 		
 		if (r != null) {
-			Integer htrn = r.getInt("htrn");
+			Integer htrn = r.getInt(TRANSACTION_ID);
 			
 			// Do NOT process child transactions, ie those that are part of a split transaction
 			if (! this.trnSplitCursorFinder.findFirstRow(Collections.singletonMap(TRANSACTION_ID, htrn))) {
 				
 				Transaction t = new Transaction().
-						setAccount(this.accountMap.get(Long.valueOf(r.getInt("hacct")))).
-						setAmount(Float.valueOf(r.getBigDecimal("amt").floatValue() * 100).longValue()).
-						setEntered(new Timestamp(r.getDate("dt").getTime())).
-						setMemo(r.getString("mMemo")).
+						setAccount(this.accountMap.get(Long.valueOf(r.getInt(ACCOUNT_ID)))).
+						setAmount(Float.valueOf(r.getBigDecimal(AMOUNT).floatValue() * 100).longValue()).
+						setEntered(new Timestamp(r.getDate(DATE_ENTERED).getTime())).
+						setMemo(r.getString(MEMO)).
 						setOrigId(r.getInt(TRANSACTION_ID))/*.
 						setReconciled(false).
 						setReference("")*/;
 				
-				Integer h;
-	
-				// Payee might be null
-				h = r.getInt("hpay");
-				if (h != null) {
-					Payee p = this.payeeMap.get(Long.valueOf(h));
-					if (p == null) {
-						p = this.noPayee;
-					}
-					t.setPayee(p);
-				}
-				else {
-					t.setPayee(this.noPayee);
-				}
-		
-				// Category might be null ...
-				Integer hcat = r.getInt("hcat");
-				Category c = null;
-				
-				if (hcat != null) {
-					c = this.categoryMap.get(Long.valueOf(hcat));
-					if (c == null) {
-						c = this.noCategory;
-					}
-					t.setCategory(c);
-				}
-				else {
-					t.setCategory(this.noCategory);
-				}
-		
+				t.setPayee(identifyPayee(r.getInt(PAYEE_ID)));
+				t.setCategory(identifyCategory(r.getInt(CATEGORY_ID)));							
 				return t;
 			}
 			else {
@@ -249,24 +228,10 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 							st = new SplitTransaction().
 								// This parentId is an MSAccess id - needs updating by caller
 								setTransactionId(parentId).
-								setAmount(Float.valueOf(childTransactionRow.getBigDecimal("amt").floatValue() * 100).longValue()).
-								setMemo(childTransactionRow.getString("mMemo"));
+								setAmount(Float.valueOf(childTransactionRow.getBigDecimal(AMOUNT).floatValue() * 100).longValue()).
+								setMemo(childTransactionRow.getString(MEMO));
 					
-							// Category might be null ...
-							Integer hcat = childTransactionRow.getInt("hcat");
-							Category c = null;
-							
-							if (hcat != null) {
-								c = this.categoryMap.get(Long.valueOf(hcat));
-								if (c == null) {
-									c = this.noCategory;
-								}
-								st.setCategory(c);
-							}
-							else {
-								st.setCategory(this.noCategory);
-							}
-					
+							st.setCategory(identifyCategory(childTransactionRow.getInt(CATEGORY_ID)));					
 							result.getSplits().add(st);
 						}
 						else {
@@ -289,6 +254,36 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		}
 		
 		return null;
+	}
+	
+	private Payee identifyPayee(Integer hpay) {
+		// Payee might be null
+		if (hpay != null) {
+			Payee p = this.payeeMap.get(Long.valueOf(hpay));
+			if (p == null) {
+				p = this.noPayee;
+			}
+			return p;
+		}
+		else {
+			return this.noPayee;
+		}
+	}
+	
+	private Category identifyCategory(Integer hcat) {
+		// Category might be null ...
+		Category c = null;
+		
+		if (hcat != null) {
+			c = this.categoryMap.get(Long.valueOf(hcat));
+			if (c == null) {
+				c = this.noCategory;
+			}
+			return c;
+		}
+		else {
+			return this.noCategory;
+		}
 	}
 	
 	public Long[] getNextTransfer() throws IOException {

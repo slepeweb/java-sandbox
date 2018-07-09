@@ -16,7 +16,7 @@ public class Transaction extends DbEntity {
 	
 	private long id, origId;
 	private Account account;
-	private Long xferId;
+	private Long xferId = 0L;
 	private Payee payee;
 	private Category category;
 	private Timestamp entered;
@@ -195,8 +195,55 @@ public class Transaction extends DbEntity {
 		return result;
 	}
 
+	public boolean matchesSplits(Transaction other) {
+		if (! (isSplit() && other.isSplit())) {
+			return false;
+		}
+		
+		// Both transactions are split. Are they the same size?
+		if (getSplits().size() != other.getSplits().size()) {
+			return false;
+		}
+		
+		// Is each split identical?
+		for (int i = 0; i < getSplits().size(); i++) {
+			if (! getSplits().get(i).equalsBarTransactionId(other.getSplits().get(i))) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean matchesTransfer(Transaction other) {
+		if (! (isTransfer() && other.isTransfer())) {
+			return false;
+		}
+		
+		if (getTransferId() != other.getTransferId()) {
+			return false;
+		}
+		
+		return true;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
+		if (equalsBarTransferId(obj)) {
+			Transaction other = (Transaction) obj;
+			if (xferId == null) {
+				if (other.xferId != null)
+					return false;
+			} else if (!xferId.equals(other.xferId))
+				return false;
+			
+			return true;
+		}
+
+		return false;
+	}
+	
+	public boolean equalsBarTransferId(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -241,11 +288,7 @@ public class Transaction extends DbEntity {
 				return false;
 		} else if (!reference.equals(other.reference))
 			return false;
-		if (xferId == null) {
-			if (other.xferId != null)
-				return false;
-		} else if (!xferId.equals(other.xferId))
-			return false;
+
 		return true;
 	}
 	

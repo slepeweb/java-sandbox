@@ -14,5 +14,6 @@ public interface TransactionService {
 	List<Transaction> getTransactionsForAccount(long id);
 	List<Transaction> getTransactionsForAccount(long id, Timestamp from, Timestamp to);
 	Transaction save(Transaction p) throws MissingDataException, DuplicateItemException;
+	void update(Transaction from, Transaction to) throws MissingDataException, DuplicateItemException;
 	void updateTransfer(Long from, Long to) throws MissingDataException, DuplicateItemException;
 }

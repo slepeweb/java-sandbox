@@ -13,6 +13,7 @@ public interface MoneyImportService {
 	boolean importTransfer();
 	Transaction importSplitTransactions();
 	Transaction saveTransaction(Transaction pt);
+	void updateTransaction(Transaction ftom, Transaction to);
 	Transaction saveSplitTransactions(Transaction pt);
 	Account resetAccountBalance(Account a);
 	Transaction getTransactionByOrigId(long id);

@@ -15,8 +15,6 @@ import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
-import com.slepeweb.money.except.DuplicateItemException;
-import com.slepeweb.money.except.MissingDataException;
 
 @Service("moneyImportService")
 public class MoneyImportServiceImpl implements MoneyImportService {
@@ -82,9 +80,8 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 			try {
 				return this.payeeService.save(p);
 			}
-			catch (DuplicateItemException die) {
-			}
-			catch (MissingDataException mde) {
+			catch (Exception e) {
+				LOG.error("Failed to save no-payee", e);
 			}
 		}
 		else {
@@ -101,10 +98,8 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 			try {
 				return this.categoryService.save(c);
 			}
-			catch (DuplicateItemException die) {
-			}
-			catch (MissingDataException mde) {
-				
+			catch (Exception e) {
+				LOG.error("Failed to save no-category", e);
 			}
 		}
 		else {
@@ -118,21 +113,28 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		try {
 			return this.transactionService.save(pt);
 		}
-		catch (MissingDataException mde) {
-		}
-		catch (DuplicateItemException die) {
+		catch (Exception e) {
+			LOG.error("Failed to save transaction", e);
 		}
 		
 		return null;
+	}
+	
+	public void updateTransaction(Transaction dbRecord, Transaction t) {
+		try {
+			this.transactionService.update(dbRecord, t);
+		}
+		catch (Exception e) {
+			LOG.error("Failed to update transaction", e);
+		}
 	}
 	
 	public void updateTransfer(Long from, Long to) {
 		try {
 			this.transactionService.updateTransfer(from, to);
 		}
-		catch (MissingDataException mde) {
-		}
-		catch (DuplicateItemException die) {
+		catch (Exception e) {
+			LOG.error("Failed to update transfer", e);
 		}
 	}
 	
@@ -140,9 +142,8 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		try {
 			return this.splitTransactionService.save(t);
 		}
-		catch (MissingDataException mde) {
-		}
-		catch (DuplicateItemException die) {
+		catch (Exception e) {
+			LOG.error("Failed to save split transaction", e);
 		}
 		
 		return null;
@@ -174,7 +175,12 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 				}
 				
 				if (from != null && to != null) {
-					this.transactionService.updateTransfer(from.getId(), to.getId());
+					if (! (from.matchesTransfer(to) && to.matchesTransfer(from))) {
+						this.transactionService.updateTransfer(from.getId(), to.getId());
+					}
+					else {
+						LOG.debug(String.format("No change in transfer details [%d]", ptArr[1]));
+					}
 				}
 			}
 			else {
@@ -192,27 +198,34 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	
 	public Transaction importSplitTransactions() {
 		try {
+			Transaction imported = this.msAccessService.getNextSplitTransactions();
 			// This transaction is incomplete - only the splits are useable, although
 			// their transactionid property references an MSAccess htrn, and will need to be changed
-			Transaction result = this.msAccessService.getNextSplitTransactions();
 			
-			if (result != null ) {
+			if (imported != null ) {
 				// This transaction has the correct mssql id, but its splits will be empty
-				Transaction t = getTransactionByOrigId(result.getOrigId());
+				Transaction dbRecord = getTransactionByOrigId(imported.getOrigId());
 				
-				if (t != null) {
-					// Use the imported splits
-					t.setSplits(result.getSplits());
-					
-					// Correct the transactionid properties of each split
-					for (SplitTransaction st : t.getSplits()) {
-						st.setTransactionId(t.getId());
+				if (dbRecord != null) {
+					if (! dbRecord.matchesSplits(imported)) {
+						// Use the imported splits
+						dbRecord.setSplits(imported.getSplits());
+						
+						// Correct the transactionid properties of each split
+						for (SplitTransaction st : dbRecord.getSplits()) {
+							st.setTransactionId(dbRecord.getId());
+						}
+						
+						return dbRecord;
 					}
-					
-					return t;
+					else {
+						LOG.debug(String.format("No change in splits [%d]", imported.getOrigId()));
+						// An empty transaction will be ignored by the caller
+						return new Transaction();
+					}
 				}
 				else {
-					LOG.error(String.format("Failed to identify parent transaction [%d]", result.getOrigId()));
+					LOG.error(String.format("Failed to identify parent transaction [%d]", imported.getOrigId()));
 					// An empty transaction will be ignored by the caller
 					return new Transaction();
 				}

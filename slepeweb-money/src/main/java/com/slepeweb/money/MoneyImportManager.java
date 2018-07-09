@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.MoneyImportService;
 
@@ -21,8 +20,8 @@ public class MoneyImportManager {
 		MoneyImportManager exe = new MoneyImportManager();
 		
 		if (exe.init(mis)) {
-			//exe.importTransactions(mis);
-			//exe.importTransfers(mis);
+			exe.importTransactions(mis);
+			exe.importTransfers(mis);
 			exe.importSplitTransactions(mis);
 		}
 		
@@ -48,16 +47,17 @@ public class MoneyImportManager {
 		LOG.info("======================");
 		
 		while ((pt = mis.importTransaction()) != null) {
+			if (count++ % 100 == 0) {
+				LOG.info(String.format("Processed %d transactions", count));
+			}
 			
 			// Has this payment already been imported?
-			if (mis.getTransactionByOrigId(pt.getOrigId()) == null) {			
-				pt = mis.saveTransaction(pt);				
-				if (++count % 100 == 0) {
-					System.out.print(String.format("%d ", count));
-				}
+			Transaction dbRecord = mis.getTransactionByOrigId(pt.getOrigId());
+			if ( dbRecord == null) {			
+				mis.saveTransaction(pt);				
 			}
 			else {
-				LOG.debug(String.format("Transaction [%d] already imported", pt.getOrigId()));
+				mis.updateTransaction(dbRecord, pt);
 			}
 		}
 	}
@@ -69,8 +69,8 @@ public class MoneyImportManager {
 		LOG.info("===================================");
 		
 		while (mis.importTransfer()) {
-			if (++count % 100 == 0) {
-				System.out.print(String.format("%d ", count));
+			if (count++ % 100 == 0) {
+				LOG.info(String.format("Processed %d transfers", count));
 			}
 		}
 	}
@@ -83,11 +83,12 @@ public class MoneyImportManager {
 		LOG.info("============================");
 		
 		while ((t = mis.importSplitTransactions()) != null) {
-			if (! t.getSplits().isEmpty()) {
+			if (count++ % 100 == 0) {
+				LOG.info(String.format("Process %d split transactions", count));
+			}
+			
+			if (t.isSplit()) {
 				mis.saveSplitTransactions(t);
-				if (++count % 100 == 0) {
-					System.out.print(String.format("%d ", count));
-				}
 			}
 		}
 	}

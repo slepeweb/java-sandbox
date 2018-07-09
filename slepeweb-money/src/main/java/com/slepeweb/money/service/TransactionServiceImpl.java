@@ -64,16 +64,21 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	}
 
 	public void update(Transaction dbRecord, Transaction t) {
-		if (! dbRecord.equals(t)) {
+		if (! dbRecord.equalsBarTransferId(t)) {
 			dbRecord.assimilate(t);
 			
 			try {
 				this.jdbcTemplate.update(
-						"update transaction set amount = ?, reconciled = ?, transferid = ?, memo = ? " +
-						"where entered = ? and accountid = ? and payeeid = ? and categoryid = ? and reference = ?", 
-						dbRecord.getAmount(), dbRecord.isReconciled(), dbRecord.getTransferId(), dbRecord.getMemo(),
-						dbRecord.getEntered(), dbRecord.getAccount().getId(), dbRecord.getPayee().getId(),
-						dbRecord.getCategory().getId(), dbRecord.getReference());
+						"update transaction set entered = ?, " + 
+						"accountid = ?, payeeid = ?, categoryid = ?, " + 
+						"amount = ?, reconciled = ?, " +
+						"memo = ?, reference = ? " +
+						"where id = ?", 
+						dbRecord.getEntered(), 
+						dbRecord.getAccount().getId(), dbRecord.getPayee().getId(), dbRecord.getCategory().getId(), 
+						dbRecord.getAmount(), dbRecord.isReconciled(), 
+						dbRecord.getMemo(), dbRecord.getReference(),
+						dbRecord.getId());
 				
 				LOG.info(compose("Updated transaction", t));
 			}
@@ -82,7 +87,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			}
 		}
 		else {
-			LOG.info(compose("Transaction not modified", t));
+			LOG.debug(compose("Transaction not modified", t));
 		}
 	}
 
