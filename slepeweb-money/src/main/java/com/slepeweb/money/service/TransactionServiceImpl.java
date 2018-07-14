@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +16,15 @@ import com.slepeweb.money.except.MissingDataException;
 public class TransactionServiceImpl extends BaseServiceImpl implements TransactionService {
 	
 	private static Logger LOG = Logger.getLogger(TransactionServiceImpl.class);
+	@Autowired private SplitTransactionService splitTransactionService;
 	
 	private static final String SELECT = 
 			"select " +
-					"a.id as accountid, a.name as accountname, " + 
+					"a.id as accountid, a.name as accountname, a.openingbalance, a.closed, a.note, " + 
 					"p.id as payeeid, p.name as payeename, " + 
 					"c.id as categoryid, c.major, c.minor, " + 
 					"t.id, t.origid, t.entered, t.memo, t.reference, t.amount, t.reconciled, " +
-					"t.transferid " +
+					"t.transferid, t.split " +
 			"from transaction t " +
 					"join account a on a.id = t.accountid " + 
 					"join payee p on p.id = t.payeeid " +
@@ -47,11 +49,11 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into transaction (accountid, payeeid, categoryid, origid, entered, amount, " +
+					"insert into transaction (accountid, payeeid, categoryid, split, origid, entered, amount, " +
 					"reconciled, transferid, reference, memo) " +
-					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 					t.getAccount().getId(), t.getPayee().getId(), t.getCategory().getId(), 
-					t.getOrigId(), t.getEntered(), t.getAmount(),
+					t.isSplit(), t.getOrigId(), t.getEntered(), t.getAmount(),
 					t.isReconciled(), t.getTransferId(), t.getReference(), t.getMemo());
 			
 			t.setId(getLastInsertId());	
@@ -71,12 +73,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				this.jdbcTemplate.update(
 						"update transaction set entered = ?, " + 
 						"accountid = ?, payeeid = ?, categoryid = ?, " + 
-						"amount = ?, reconciled = ?, " +
+						"split = ?, amount = ?, reconciled = ?, " +
 						"memo = ?, reference = ? " +
 						"where id = ?", 
 						dbRecord.getEntered(), 
 						dbRecord.getAccount().getId(), dbRecord.getPayee().getId(), dbRecord.getCategory().getId(), 
-						dbRecord.getAmount(), dbRecord.isReconciled(), 
+						dbRecord.isSplit(), dbRecord.getAmount(), dbRecord.isReconciled(), 
 						dbRecord.getMemo(), dbRecord.getReference(),
 						dbRecord.getId());
 				
@@ -89,6 +91,14 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		else {
 			LOG.debug(compose("Transaction not modified", t));
 		}
+	}
+
+	public void updateSplit(Transaction t) {
+		this.jdbcTemplate.update(
+				"update transaction set split = ? where id = ?", 
+				t.isSplit(), t.getId());
+		
+		LOG.info(compose("Updated split flag for transaction", t));
 	}
 
 	public void updateTransfer(Long from, Long to) {
@@ -104,31 +114,51 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	}
 
 	public Transaction get(long id) {
-		return (Transaction) getFirstInList(this.jdbcTemplate.query(
-				SELECT + "where t.id = ?", 
-				new Object[]{id}, 
-				new RowMapperUtil.TransactionMapper()));
+		return get(SELECT + "where t.id = ?", new Object[]{id});
 	}
 
 	public Transaction getByOrigId(long origId) {
-		return (Transaction) getFirstInList(this.jdbcTemplate.query(
-				SELECT + "where t.origid = ?", 
-				new Object[]{origId}, 
-				new RowMapperUtil.TransactionMapper()));
+		return get(SELECT + "where t.origid = ?", new Object[]{origId});
+	}
+	
+	private Transaction get(String sql, Object[] params) {
+		Transaction t = (Transaction) getFirstInList(this.jdbcTemplate.query(
+				sql, params, new RowMapperUtil.TransactionMapper()));
+		
+		if (t != null && t.isSplit()) {
+			t.setSplits(this.splitTransactionService.get(t));
+		}
+		
+		return t;
 	}
 
 	public List<Transaction> getTransactionsForAccount(long accountId) {
-		return this.jdbcTemplate.query(
+		return getTransactionsForAccount(
 				SELECT + "where t.accountid = ? order by t.entered", 
-				new Object[]{accountId}, 
-				new RowMapperUtil.TransactionMapper());
+				new Object[]{accountId});
 	}
 	
 	public List<Transaction> getTransactionsForAccount(long accountId, Timestamp from, Timestamp to) {
-		return this.jdbcTemplate.query(
+		return getTransactionsForAccount(
 				SELECT + "where t.accountid = ? and t.entered >= ? and t.entered <= ? order by t.entered", 
-				new Object[]{accountId, from, to}, 
-				new RowMapperUtil.TransactionMapper());
+				new Object[]{accountId, from, to});
 	}
 	
+	private List<Transaction> getTransactionsForAccount(String sql, Object[] params) {
+		List<Transaction> list = this.jdbcTemplate.query(
+				sql, params, new RowMapperUtil.TransactionMapper());
+		
+		for (Transaction t : list) {
+			if (t.isSplit()) {
+				t.setSplits(this.splitTransactionService.get(t));
+			}
+		}
+		
+		return list;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public long getBalance(long accountId) {
+		return this.jdbcTemplate.queryForLong("select sum(amount) from transaction where accountid = ?", new Object[] {accountId});
+	}
 }

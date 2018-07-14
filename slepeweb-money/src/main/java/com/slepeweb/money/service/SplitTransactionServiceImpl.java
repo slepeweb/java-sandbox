@@ -18,8 +18,8 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 	private static Logger LOG = Logger.getLogger(SplitTransactionServiceImpl.class);
 	private static final String SELECT = 
 			"select " +
-					"st.transactionid, st.amount, st.memo" + 
-					"c.id as categoryid, c.major, c.minor, " + 
+					"st.transactionid, st.amount, st.memo, " + 
+					"c.id as categoryid, c.major, c.minor " + 
 			"from splittransaction st " +
 					"join category c on c.id = st.categoryid ";
 	

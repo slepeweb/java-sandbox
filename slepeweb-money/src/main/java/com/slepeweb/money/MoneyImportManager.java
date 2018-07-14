@@ -1,5 +1,9 @@
 package com.slepeweb.money;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -20,7 +24,7 @@ public class MoneyImportManager {
 		MoneyImportManager exe = new MoneyImportManager();
 		
 		if (exe.init(mis)) {
-			exe.importTransactions(mis);
+			exe.importTransactions(mis, args);
 			exe.importTransfers(mis);
 			exe.importSplitTransactions(mis);
 		}
@@ -39,25 +43,40 @@ public class MoneyImportManager {
 		}
 	}
 		
-	private void importTransactions(MoneyImportService mis) {
-		Transaction pt;
+	private void importTransactions(MoneyImportService mis, String[] args) {
+		Timestamp from = null;
+		Transaction t;
 		long count = 0L;
 		
 		LOG.info("Importing transactions");
 		LOG.info("======================");
 		
-		while ((pt = mis.importTransaction()) != null) {
+		if (args.length > 1) {
+			if (args[0].equals("from")) {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				try {
+					from = new Timestamp(sdf.parse(args[1]).getTime());
+				}
+				catch (ParseException e) {
+					LOG.fatal(String.format("Failed to parse date [%s]", args[0]), e);
+				}
+			}
+		}
+		
+		while ((t = mis.importTransaction()) != null) {
 			if (count++ % 100 == 0) {
 				LOG.info(String.format("Processed %d transactions", count));
 			}
 			
-			// Has this payment already been imported?
-			Transaction dbRecord = mis.getTransactionByOrigId(pt.getOrigId());
-			if ( dbRecord == null) {			
-				mis.saveTransaction(pt);				
-			}
-			else {
-				mis.updateTransaction(dbRecord, pt);
+			if (from == null || from.after(t.getEntered())) {
+				// Has this payment already been imported?
+				Transaction dbRecord = mis.getTransactionByOrigId(t.getOrigId());
+				if ( dbRecord == null) {			
+					mis.saveTransaction(t);				
+				}
+				else {
+					mis.updateTransaction(dbRecord, t);
+				}
 			}
 		}
 	}
@@ -84,7 +103,7 @@ public class MoneyImportManager {
 		
 		while ((t = mis.importSplitTransactions()) != null) {
 			if (count++ % 100 == 0) {
-				LOG.info(String.format("Process %d split transactions", count));
+				LOG.info(String.format("Processed %d split transactions", count));
 			}
 			
 			if (t.isSplit()) {

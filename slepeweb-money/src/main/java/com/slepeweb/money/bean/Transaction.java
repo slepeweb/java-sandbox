@@ -20,7 +20,7 @@ public class Transaction extends DbEntity {
 	private Payee payee;
 	private Category category;
 	private Timestamp entered;
-	private boolean reconciled;
+	private boolean split, reconciled;
 	private Long amount;
 	private String reference = "", memo = "";
 	private List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
@@ -159,9 +159,14 @@ public class Transaction extends DbEntity {
 	}
 
 	public boolean isSplit() {
-		return getSplits().size() > 0;
+		return this.split;
 	}
 
+	public Transaction setSplit(boolean split) {
+		this.split = split;
+		return this;
+	}
+	
 	public List<SplitTransaction> getSplits() {
 		return splits;
 	}

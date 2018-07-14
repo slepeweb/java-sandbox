@@ -16,4 +16,6 @@ public interface TransactionService {
 	Transaction save(Transaction p) throws MissingDataException, DuplicateItemException;
 	void update(Transaction from, Transaction to) throws MissingDataException, DuplicateItemException;
 	void updateTransfer(Long from, Long to) throws MissingDataException, DuplicateItemException;
+	void updateSplit(Transaction t);
+	long getBalance(long accountId);
 }

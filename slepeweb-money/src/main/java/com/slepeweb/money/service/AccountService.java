@@ -12,6 +12,4 @@ public interface AccountService {
 	Account get(long id);
 	List<Account> getAll();
 	Account save(Account f) throws MissingDataException, DuplicateItemException;
-	void updateBalance(Account a);
-	Account resetBalance(Account a);
 }

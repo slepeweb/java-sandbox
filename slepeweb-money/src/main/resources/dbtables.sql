@@ -26,8 +26,9 @@ create table account
 (
 	id int not null auto_increment,
 	name varchar(255),
-	balance int,
+	openingbalance int,
 	closed boolean,
+	note varchar(255),
 	primary key (id),
 	unique key idx_account_name (name)
 ) ENGINE=InnoDB;
@@ -40,8 +41,8 @@ create table transaction
 	accountid int,
 	payeeid int,
 	categoryid int,
-	reference varchar(255),
-	
+	split boolean,
+	reference varchar(255),	
 	amount int,
 	memo varchar(255),
 	reconciled boolean,

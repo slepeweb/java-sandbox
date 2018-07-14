@@ -32,47 +32,60 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		this.msAccessService.init(getNoPayee(), getNoCategory());
 		
 		// Get all accounts from MSAccess, save them in mysql, and store them in a temporary cache
-		Account a, acct;
-		while((acct = this.msAccessService.getNextAccount()) != null) {
-			a = getAccount(acct.getName());
-			if (a != null) {
-				this.msAccessService.cacheAccount(acct.getId(), a);
+		Account aRecord, a;
+		while((a = this.msAccessService.getNextAccount()) != null) {
+			aRecord = this.accountService.get(a.getName());
+			if (aRecord == null) {
+				try {
+					aRecord = this.accountService.save(a);
+				}
+				catch (Exception e) {
+					LOG.error("Failed to save account", e);
+				}
+			}
+			
+			if (aRecord != null) {
+				this.msAccessService.cacheAccount(a.getId(), aRecord);
 			}
 		}
 		
 		// Repeat for payments
-		Payee p, payee;
-		while((payee = this.msAccessService.getNextPayee()) != null) {
-			p = getPayee(payee.getName());
-			if (p != null) {
-				this.msAccessService.cachePayee(payee.getId(), p);
+		Payee pRecord, p;
+		while((p = this.msAccessService.getNextPayee()) != null) {
+			pRecord = this.payeeService.get(p.getName());
+			if (pRecord == null) {
+				try {
+					pRecord = this.payeeService.save(p);
+				}
+				catch (Exception e) {
+					LOG.error("Failed to save payee", e);
+				}
+			}
+			
+			if (pRecord != null) {
+				this.msAccessService.cachePayee(p.getId(), pRecord);
 			}
 		}
 		
 		// Repeat for categories
-		Category c, cat;
-		while((cat = this.msAccessService.getNextCategory()) != null) {
-			c = getCategory(cat.getMajor(), cat.getMinor());
-			if (c != null) {
-				this.msAccessService.cacheCategory(cat.getId(), c);
+		Category cRecord, c;
+		while((c = this.msAccessService.getNextCategory()) != null) {
+			cRecord = this.categoryService.get(c.getMajor(), c.getMinor());
+			if (cRecord == null) {
+				try {
+					cRecord = this.categoryService.save(c);
+				}
+				catch (Exception e) {
+					LOG.error("Failed to save category", e);
+				}
+			}
+			
+			if (cRecord != null) {
+				this.msAccessService.cacheCategory(c.getId(), cRecord);
 			}
 		}
 	}
-	
-	public Account getAccount(String accountName) {
-		Account a = this.accountService.get(accountName);
-		if (a == null) {
-			a = new Account().setName(accountName);
-			try {
-				a = this.accountService.save(a);
-			}
-			catch (Exception e) {
-				LOG.error("Failed to save account", e);
-			}
-		}
-		return a;
-	}
-	
+		
 	private Payee getNoPayee() {
 		Payee p = this.payeeService.get("");
 		if (p == null) {
@@ -140,6 +153,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	
 	public Transaction saveSplitTransactions(Transaction t) {
 		try {
+			this.transactionService.updateSplit(t);
 			return this.splitTransactionService.save(t);
 		}
 		catch (Exception e) {
@@ -202,7 +216,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 			// This transaction is incomplete - only the splits are useable, although
 			// their transactionid property references an MSAccess htrn, and will need to be changed
 			
-			if (imported != null ) {
+			if (imported != null) {
 				// This transaction has the correct mssql id, but its splits will be empty
 				Transaction dbRecord = getTransactionByOrigId(imported.getOrigId());
 				
@@ -210,6 +224,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 					if (! dbRecord.matchesSplits(imported)) {
 						// Use the imported splits
 						dbRecord.setSplits(imported.getSplits());
+						dbRecord.setSplit(imported.isSplit());
 						
 						// Correct the transactionid properties of each split
 						for (SplitTransaction st : dbRecord.getSplits()) {
@@ -237,41 +252,6 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 
 		// No more split transactions to import
 		return null;
-	}
-	
-	private Payee getPayee(String name) {
-		Payee pe = this.payeeService.get(name);
-		if (pe == null) {
-			pe = new Payee().setName(name);
-			try {
-				pe = this.payeeService.save(pe);
-			}
-			catch (Exception e) {
-				LOG.error("Failed to save payee", e);
-			}
-		}
-		return pe;
-	}
-	
-	private Category getCategory(String major, String minor) {
-		Category c = this.categoryService.get(major, minor);
-		if (c == null) {
-			c = new Category().setMajor(major).setMinor(minor);
-			try {
-				c = this.categoryService.save(c);
-			}
-			catch (Exception e) {
-				LOG.error("Failed to save category", e);
-			}
-		}
-		
-		return c;
-	}
-		
-	public Account resetAccountBalance(Account a) {
-		a = this.accountService.resetBalance(a);
-		LOG.info("Account balance updated");
-		return a;
 	}
 	
 	public Transaction getTransactionByOrigId(long id) {

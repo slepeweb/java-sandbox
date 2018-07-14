@@ -2,6 +2,7 @@ package com.slepeweb.money.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.HashMap;
@@ -101,6 +102,10 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		this.trnSplitCursorFinder = CursorBuilder.createCursor(db.getTable("TRN_SPLIT"));
 	}
 	
+	public static long decimal2long(BigDecimal dec) {
+		return Float.valueOf(dec.floatValue() * 100).longValue();
+	}
+	
 	public Account getNextAccount() throws IOException {
 		// Create a new Account object (partial) with data from the ACCT table.
 		Row r = this.acctCursorSeq.getNextRow();
@@ -108,7 +113,10 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		if (r != null) {
 			return new Account().
 					setId(r.getInt(ACCOUNT_ID)).
-					setName(r.getString(FULL_NAME));
+					setName(r.getString(FULL_NAME)).
+					setOpeningBalance(decimal2long(r.getBigDecimal("amtOpen"))).
+					setClosed(r.getBoolean("fClosed")).
+					setNote(r.getString("mComment"));
 		}
 		
 		return null;
@@ -169,7 +177,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	}
 	
 	public Transaction getNextTransaction() throws IOException {
-		// Create a new Payment object with data from the TRN table.
+		// Create a new Transaction object with data from the TRN table.
 		Row r = this.trnCursorSeq.getNextRow();
 		
 		if (r != null) {
@@ -200,8 +208,13 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		return null;
 	}
 	
+	/*
+	 * Returns a 'bare' Transaction object representing the parent, with just a few properties set, in particular:
+	 * 	- its child (ie split) transactions
+	 * 	- its origid
+	 * 	- its split status
+	 */
 	public Transaction getNextSplitTransactions() throws IOException {
-		// Create a new SplitTransaction object with data from the TRN_SPLIT table.
 		Row r = this.trnSplitCursorSeq.getNextRow();
 		
 		if (r != null) {
@@ -223,6 +236,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 						parentTransactionRow = this.trnSplitCursorFinder.getCurrentRow();
 						childId = new Long(parentTransactionRow.getInt(TRANSACTION_ID));
 						
+						// Find the child transaction in trn table
 						if (this.trnCursorFinder.findFirstRow(Collections.singletonMap(TRANSACTION_ID, childId))) {
 							childTransactionRow = this.trnCursorFinder.getCurrentRow();
 							st = new SplitTransaction().
@@ -233,6 +247,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 					
 							st.setCategory(identifyCategory(childTransactionRow.getInt(CATEGORY_ID)));					
 							result.getSplits().add(st);
+							result.setSplit(true);
 						}
 						else {
 							LOG.error(compose("Couldn't find child transaction", childId));

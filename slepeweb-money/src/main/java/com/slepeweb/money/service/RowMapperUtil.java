@@ -37,6 +37,7 @@ public class RowMapperUtil {
 					setAccount(makeAccountX(rs)).
 					setPayee(makePayeeX(rs)).
 					setCategory(makeCategoryX(rs)).
+					setSplit(rs.getBoolean("split")).
 					setEntered(rs.getTimestamp("entered")).
 					setXferId(rs.getLong("transferid")).
 					setReconciled(rs.getBoolean("reconciled")).
@@ -52,7 +53,7 @@ public class RowMapperUtil {
 		public SplitTransaction mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new SplitTransaction().
 					setTransactionId(rs.getLong("transactionid")).
-					setCategory(makeCategory(rs)).
+					setCategory(makeCategoryX(rs)).
 					setAmount(rs.getLong("amount")).
 					setMemo(rs.getString("memo"));
 		}
@@ -85,7 +86,9 @@ public class RowMapperUtil {
 		if (id != -1) {
 			return new Account().
 				setId(id).
-				setName(rs.getString(name));
+				setName(rs.getString(name)).
+				setClosed(rs.getBoolean("closed")).
+				setNote(rs.getString("note"));
 		}
 		return null;
 	}
