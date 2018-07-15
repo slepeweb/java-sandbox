@@ -108,7 +108,7 @@ public class Transaction extends DbEntity {
 	}
 
 	public boolean isTransfer() {
-		return this.xferId != null;
+		return this.xferId != null && this.xferId != 0;
 	}
 
 	public Long getTransferId() {
@@ -225,7 +225,7 @@ public class Transaction extends DbEntity {
 			return false;
 		}
 		
-		if (getTransferId() != other.getTransferId()) {
+		if (getTransferId() != other.getId() || other.getTransferId() != getId()) {
 			return false;
 		}
 		

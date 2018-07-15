@@ -12,6 +12,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.TransactionService;
+import com.slepeweb.money.service.Util;
 
 public class MoneyTransactionReporter {
 	private static Logger LOG = Logger.getLogger(MoneyTransactionReporter.class);
@@ -39,7 +40,7 @@ public class MoneyTransactionReporter {
 
 		for (long id : accounts) {
 			LOG.info("");
-			LOG.info(String.format("Balance for account [%d]: %d pence", id, transactionService.getBalance(id)));
+			LOG.info(String.format("Balance for account [%d]: %s", id, Util.formatPounds(transactionService.getBalance(id))));
 			LOG.info("================================================");
 			
 			for (Transaction t : transactionService.getTransactionsForAccount(id, from, to)) {

@@ -37,7 +37,7 @@ create table transaction
 (
 	id int not null auto_increment,
 	origid int,
-	entered timestamp,
+	entered timestamp default 0,
 	accountid int,
 	payeeid int,
 	categoryid int,

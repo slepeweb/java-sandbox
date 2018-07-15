@@ -122,9 +122,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	public Transaction saveTransaction(Transaction pt) {
+	public Transaction saveTransaction(Transaction t) {
 		try {
-			return this.transactionService.save(pt);
+			return this.transactionService.save(t);
 		}
 		catch (Exception e) {
 			LOG.error("Failed to save transaction", e);
@@ -189,7 +189,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 				}
 				
 				if (from != null && to != null) {
-					if (! (from.matchesTransfer(to) && to.matchesTransfer(from))) {
+					if (! (from.matchesTransfer(to))) {
 						this.transactionService.updateTransfer(from.getId(), to.getId());
 					}
 					else {
