@@ -87,6 +87,7 @@ public class RowMapperUtil {
 			return new Account().
 				setId(id).
 				setName(rs.getString(name)).
+				setOpeningBalance(rs.getLong("openingbalance")).
 				setClosed(rs.getBoolean("closed")).
 				setNote(rs.getString("note"));
 		}

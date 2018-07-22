@@ -3,11 +3,13 @@ package com.slepeweb.money.service;
 import java.math.BigDecimal;
 
 public class Util {
+	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
+	
 	public static long decimal2long(BigDecimal d) {
-		return Float.valueOf(d.floatValue() * 100).longValue();
+		return d.multiply(ONE_HUNDRED).longValue();
 	}
 	
 	public static String formatPounds(long pence) {
-		return String.format("%s£%.2f", pence < 0 ? "-" : "", pence / 100.0F);
+		return String.format("£%.2f", pence / 100.0F);
 	}
 }

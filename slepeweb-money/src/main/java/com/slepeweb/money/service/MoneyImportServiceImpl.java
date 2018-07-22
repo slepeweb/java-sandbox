@@ -178,6 +178,8 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		try {
 			Long[] ptArr = this.msAccessService.getNextTransfer();
 			if (ptArr != null) {
+				// If the transfer is for a future date, then the source and target transactions
+				// will not exist in the MySql database, causing errors to be logged.
 				Transaction from = getTransactionByOrigId(ptArr[0]);
 				if (from == null) {
 					LOG.error(String.format("Failed to identify source transaction [%d]", ptArr[0]));
@@ -217,7 +219,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 			// their transactionid property references an MSAccess htrn, and will need to be changed
 			
 			if (imported != null) {
-				// This transaction has the correct mssql id, but its splits will be empty
+				// This transaction (imported) has the correct mssql id, but its splits will be empty.
+				// Get the (full) corresponding transaction in MySql. This operation will fail
+				// if the transaction is for a future date, causing an error to be logged.
 				Transaction dbRecord = getTransactionByOrigId(imported.getOrigId());
 				
 				if (dbRecord != null) {

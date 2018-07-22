@@ -54,8 +54,8 @@ public class Transaction extends DbEntity {
 	
 	@Override
 	public String toString() {
-		return String.format("%s/%s: %s (%4$td/%4$tm/%4$tY)", this.account.getName(), getPayee(), 
-				getAmountInPounds(), getEntered().getTime());
+		return String.format("(%d / %d) %s | %s: %s (%6$td/%6$tm/%6$tY)", getId(), getOrigId(), 
+				this.account.getName(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
 	public long getOrigId() {

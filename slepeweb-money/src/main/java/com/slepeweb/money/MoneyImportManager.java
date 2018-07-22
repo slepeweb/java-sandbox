@@ -3,6 +3,7 @@ package com.slepeweb.money;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -47,6 +48,7 @@ public class MoneyImportManager {
 		Timestamp from = null;
 		Transaction t;
 		long count = 0L;
+		Timestamp now = new Timestamp(new Date().getTime());
 		
 		LOG.info("Importing transactions");
 		LOG.info("======================");
@@ -68,7 +70,8 @@ public class MoneyImportManager {
 				LOG.info(String.format("Processed %d transactions", count));
 			}
 			
-			if (from == null || from.after(t.getEntered())) {
+			// Does this transaction fit within required time window?
+			if ((from == null || from.after(t.getEntered())) && t.getEntered().before(now)) {
 				// Has this payment already been imported?
 				Transaction dbRecord = mis.getTransactionByOrigId(t.getOrigId());
 				if ( dbRecord == null) {			
