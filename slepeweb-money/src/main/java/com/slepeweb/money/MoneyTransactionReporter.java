@@ -82,6 +82,8 @@ public class MoneyTransactionReporter {
 								pack(String.valueOf(Util.formatPounds(balance)), 12));
 					}
 				}
+				
+				LOG.info(String.format("Report written to %s", filePath));
 			}
 		}
 		catch (FileNotFoundException e) {
