@@ -1,7 +1,6 @@
 package com.slepeweb.money.service;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -158,8 +157,23 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return list;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public long getBalance(long accountId) {
-		return this.jdbcTemplate.queryForLong("select sum(amount) from transaction where accountid = ? and entered <= ?", new Object[] {accountId, new Timestamp(new Date().getTime())});
+		return getBalance(accountId, null);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public long getBalance(long accountId, Timestamp to) {
+		StringBuilder sb = new StringBuilder("select sum(amount) from transaction where accountid = ? ");
+		int arrlen = 1 + (to != null ? 1 : 0);
+		Object[] params = new Object[arrlen];
+		int index = 0;
+		params[index++] = accountId;
+		
+		if (to != null) {
+			sb.append("and entered <= ? ");
+			params[index++] = to;
+		}		
+		
+		return this.jdbcTemplate.queryForLong("select sum(amount) from transaction where accountid = ? and entered <= ?", params);
 	}
 }

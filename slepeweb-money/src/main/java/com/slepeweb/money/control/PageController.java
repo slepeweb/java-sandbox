@@ -1,0 +1,70 @@
+package com.slepeweb.money.control;
+
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.slepeweb.money.bean.RunningBalance;
+import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.service.AccountService;
+import com.slepeweb.money.service.TransactionService;
+import com.slepeweb.money.service.Util;
+
+@Controller
+public class PageController extends BaseController {
+	
+	@Autowired private AccountService accountService;
+	@Autowired private TransactionService transactionService;
+	
+	@RequestMapping(value="/list/{monthOffset}")	
+	public String homepage(@PathVariable int monthOffset, ModelMap model) {
+		
+		Calendar today = Calendar.getInstance();
+		today.add(Calendar.MONTH, -monthOffset);
+		today.set(Calendar.DAY_OF_MONTH, today.getMaximum(Calendar.DAY_OF_MONTH));
+		
+		Calendar monthBeginning = Calendar.getInstance();
+		monthBeginning.add(Calendar.MONTH, -monthOffset);
+		monthBeginning.set(Calendar.DAY_OF_MONTH, 1);
+		
+		Timestamp from = new Timestamp(monthBeginning.getTimeInMillis());
+		Timestamp to = new Timestamp(today.getTimeInMillis());
+		long accountId = 20;
+		
+		List<Transaction> transactions = this.transactionService.getTransactionsForAccount(accountId, from, to);
+		int numTransactions = transactions.size();
+		RunningBalance[] runningBalances = new RunningBalance[numTransactions];
+		
+		long balanceEnd = this.transactionService.getBalance(accountId, to);
+		long balance = balanceEnd;
+		Transaction t;
+		
+		for (int i = numTransactions - 1; i >= 0; i--) {
+			t = transactions.get(i);
+			
+			if (t.isTransfer() && StringUtils.isBlank(t.getMemo())) {
+				Transaction tt = this.transactionService.get(t.getTransferId());
+				t.setMemo(String.format("(%s account '%s')", t.getAmount() < 0 ? "To " : "From ", tt.getAccount().getName()));
+			}
+			
+			runningBalances[i] = new RunningBalance(t).setBalance(Util.formatPounds(balance));
+			balance -= t.getAmount();			
+		}
+				
+		model.put("_account", this.accountService.get(accountId));
+		model.put("_transaction_list", runningBalances);
+		model.put("_balance", Util.formatPounds(balanceEnd));
+		model.put("_periodStart", Util.formatTimestamp(from));
+		model.put("_periodEnd", Util.formatTimestamp(to));
+		
+		return "home";
+	}
+
+}

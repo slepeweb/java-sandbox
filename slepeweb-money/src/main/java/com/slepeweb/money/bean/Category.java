@@ -18,7 +18,11 @@ public class Category extends DbEntity {
 	
 	@Override
 	public String toString() {
-		return String.format("%s:%s", getMajor(), getMinor());
+		StringBuilder sb = new StringBuilder(getMajor());
+		if (sb.length() > 0 && getMinor().length() > 0) {
+			sb.append(" > ").append(getMinor());
+		}
+		return sb.toString();
 	}
 	
 	public long getId() {

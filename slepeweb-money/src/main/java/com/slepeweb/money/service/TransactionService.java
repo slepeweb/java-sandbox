@@ -18,4 +18,5 @@ public interface TransactionService {
 	void updateTransfer(Long from, Long to) throws MissingDataException, DuplicateItemException;
 	void updateSplit(Transaction t);
 	long getBalance(long accountId);
+	long getBalance(long accountId, Timestamp to);
 }

@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.slepeweb.money.service.Util;
+
 public class Transaction extends DbEntity {
 	
 	public static SimpleDateFormat SDF = new SimpleDateFormat("dd/MM''yyyy");
@@ -28,17 +30,21 @@ public class Transaction extends DbEntity {
 	public void assimilate(Object obj) {
 		if (obj instanceof Transaction) {
 			Transaction t = (Transaction) obj;
-			setAccount(t.getAccount());
-			setPayee(t.getPayee());
-			setCategory(t.getCategory());
-			setEntered(t.getEntered());
-			setXferId(t.getTransferId());
-			setReconciled(t.isReconciled());
-			setAmount(t.getAmount());
-			setReference(t.getReference());
-			setMemo(t.getMemo());
-			setOrigId(t.getOrigId());
+			assimilate(t, this);
 		}
+	}
+	
+	protected void assimilate(Transaction source, Transaction target) {
+		target.setAccount(source.getAccount());
+		target.setPayee(source.getPayee());
+		target.setCategory(source.getCategory());
+		target.setEntered(source.getEntered());
+		target.setXferId(source.getTransferId());
+		target.setReconciled(source.isReconciled());
+		target.setAmount(source.getAmount());
+		target.setReference(source.getReference());
+		target.setMemo(source.getMemo());
+		target.setOrigId(source.getOrigId());
 	}
 	
 	public boolean isDefined4Insert() {
@@ -78,6 +84,10 @@ public class Transaction extends DbEntity {
 	
 	public Timestamp getEntered() {
 		return entered;
+	}
+	
+	public String getEnteredStr() {
+		return Util.formatTimestamp(getEntered());
 	}
 	
 	public Transaction setEntered(Timestamp entered) {
