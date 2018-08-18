@@ -104,46 +104,6 @@ function reloadTable() {
 			}
 		});
 
-		// Send contro messages to camera (spibox.py)
-		$("#button-photo,#button-stopgo").click(function() {
-			var msg = $(this).attr("value");
-			$.ajax({
-				mimeType : "application/json",
-				url : indexPath + "/putm?msg=" + msg + "&json=1",
-				dataType : "text",
-				cache : false
-			}).done(function(resp) {
-				var obj = $.parseJSON(resp)
-				$(".flash").empty().append(obj["msg"]);
-				window.setTimeout(updatePage, 2000);
-			}).fail(function(jqXHR, status) {
-				console.log(status);
-			});
-		});
-
-		// Send more control messages to camera (spibox.py)
-		$(".ctrl").change(function() {
-			var ctrl = $(this).attr("id");
-			var value = $(this).find(":selected").text();
-			var msg = ctrl + "," + value;
-			$.ajax({
-				mimeType : "application/json",
-				url : indexPath + "/camera?ctrl=" + ctrl + "&value=" + value,
-				dataType : "text",
-				cache : false
-			}).done(function(resp) {
-				var obj = $.parseJSON(resp)
-				$(".flash").empty().append(obj["msg"]);
-				manageButtons(obj);
-			}).fail(function(jqXHR, status) {
-				console.log(status);
-			});
-		});
-
-		$("#button-refresh").click(function(e) {
-			location.reload(true);
-		});
-
 	}).fail(function(jqXHR, status) {
 		console.log(status);
 	});
@@ -181,6 +141,46 @@ function updatePage() {
 // After page is fully loaded ...
 $(function() {
 	updatePage();
+
+	// Apply behaviour to photo and video buttons
+	$("#button-photo,#button-stopgo").click(function() {
+		var msg = $(this).attr("value");
+		$.ajax({
+			mimeType : "application/json",
+			url : indexPath + "/putm?msg=" + msg + "&json=1",
+			dataType : "text",
+			cache : false
+		}).done(function(resp) {
+			var obj = $.parseJSON(resp)
+			$(".flash").empty().append(obj["msg"]);
+			window.setTimeout(updatePage, 2000);
+		}).fail(function(jqXHR, status) {
+			console.log(status);
+		});
+	});
+
+	// Identify currently selected values for camera settings
+	$(".ctrl").change(function() {
+		var ctrl = $(this).attr("id");
+		var value = $(this).find(":selected").text();
+		var msg = ctrl + "," + value;
+		$.ajax({
+			mimeType : "application/json",
+			url : indexPath + "/camera?ctrl=" + ctrl + "&value=" + value,
+			dataType : "text",
+			cache : false
+		}).done(function(resp) {
+			var obj = $.parseJSON(resp)
+			$(".flash").empty().append(obj["msg"]);
+			manageButtons(obj);
+		}).fail(function(jqXHR, status) {
+			console.log(status);
+		});
+	});
+
+	$("#button-refresh").click(function(e) {
+		location.reload(true);
+	});
 
 	$(".controls-toggle").click(function() {
 		window.location = securePath;

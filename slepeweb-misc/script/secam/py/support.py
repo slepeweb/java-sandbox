@@ -35,7 +35,7 @@ class Support:
         return entries
 
     # Copy source_file to dropbox folder
-    def backup_file(self, source_file):
+    def backup_file(self, task, source_file):
         file_exists = False
         for d in self.get_videos_as_documents():
             if d.filename == source_file:
@@ -43,7 +43,8 @@ class Support:
                 break
                 
         if not file_exists:
-            return "File not found [%s]" % source_file, False 
+            task.add_event("File not found [%s]" % source_file)
+            return 
     
         access_token = '4wPGw33d4lcAAAAAAAAE2yEVxIuEqa8tJugyLWewvArmg79Hhd-9e9DUrDU4hKXj'
         dbx = dropbox.Dropbox(access_token)
@@ -52,7 +53,8 @@ class Support:
         try:
             dbx.users_get_current_account()
         except AuthError as err:
-            return "ERROR: Invalid access token", False
+            task.add_event("ERROR: Invalid access token")
+            return
             
         source_file_path = self.const.video_folder + source_file
         dest_file_path = '/' + source_file
@@ -64,14 +66,16 @@ class Support:
                 tmplt = "Failed to upload %s [%s]"
                 if (err.error.is_path() and
                         err.error.get_path().error.is_insufficient_space()):
-                    return tmplt % (source_file_path, "Insufficient space"), False
+                    task.add_event(tmplt % (source_file_path, "Insufficient space"))                    
                 elif err.user_message_text:
-                    return err.user_message_text, False
+                    task.add_event(err.user_message_text)                    
                 else:
-                    return tmplt % (source_file_path, err), False
+                    task.add_event(tmplt % (source_file_path, err)) 
                     
+                return
+                   
             self.update_backup_register(source_file)
-            return "Uploaded %s to dropbox path %s" % (source_file_path, dest_file_path), True
+            task.add_event("Uploaded %s to dropbox path %s" % (source_file_path, dest_file_path))
     
     def update_backup_register(self, backup_filename):
         # Identify videos stored locally on webserver; store in a dictionary
@@ -134,6 +138,7 @@ class Support:
     
     def convert2mp4(self, task, h264_path):
         mp4_path = h264_path.replace("h264", "mp4")
+        ok = True
 
         try:
             subprocess.check_call(["/usr/bin/MP4Box", "-add", h264_path, mp4_path], stdout=self.null_device, stderr=self.null_device)
@@ -142,8 +147,9 @@ class Support:
             task.add_event("deleted h264 file")
         except subprocess.CalledProcessError as e:
             task.add_event("*** error converting record_video file [%s]" % e)
+            ok = False
         
-        return mp4_path
+        return mp4_path, ok
     
 
     def start_mjpeg_stream(self, task, camera):
@@ -215,8 +221,10 @@ class Support:
         return file_path.split("/")[-1]
     
     def send_mail_and_backup_video(self, task, h264_path):
-        self.send_mail(task)    
-        mp4_path = self.convert2mp4(task, h264_path)    
-        msg, ok = self.backup_file(self.file_part(mp4_path))
-        task.add_event(msg)
+        self.send_mail(task)
+        mp4_path, ok = self.convert2mp4(task, h264_path)    
+            
+        if ok:
+            self.backup_file(task, self.file_part(mp4_path))
+
         task.log_history()
