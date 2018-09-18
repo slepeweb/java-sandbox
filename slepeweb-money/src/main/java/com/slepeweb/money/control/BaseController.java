@@ -1,5 +1,7 @@
 package com.slepeweb.money.control;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -38,6 +40,11 @@ public class BaseController {
 			}
 		}
 		return false;
+	}
+	
+	@ModelAttribute(value="_ctxPath")
+	protected String getWebContextPath(HttpServletRequest req) {
+		return req.getContextPath();
 	}
 	
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.money.bean.RunningBalance;
 import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.TransactionService;
 import com.slepeweb.money.service.Util;
@@ -38,9 +39,10 @@ public class PageController extends BaseController {
 		Timestamp to = new Timestamp(today.getTimeInMillis());
 		long accountId = 20;
 		
+		TransactionList tl = new TransactionList();
 		List<Transaction> transactions = this.transactionService.getTransactionsForAccount(accountId, from, to);
 		int numTransactions = transactions.size();
-		RunningBalance[] runningBalances = new RunningBalance[numTransactions];
+		tl.setRunningBalances(new RunningBalance[numTransactions]);
 		
 		long balanceEnd = this.transactionService.getBalance(accountId, to);
 		long balance = balanceEnd;
@@ -54,15 +56,16 @@ public class PageController extends BaseController {
 				t.setMemo(String.format("(%s account '%s')", t.getAmount() < 0 ? "To " : "From ", tt.getAccount().getName()));
 			}
 			
-			runningBalances[i] = new RunningBalance(t).setBalance(Util.formatPounds(balance));
+			tl.getRunningBalances()[i] = new RunningBalance(t).setBalance(Util.formatPounds(balance));
 			balance -= t.getAmount();			
 		}
 				
-		model.put("_account", this.accountService.get(accountId));
-		model.put("_transaction_list", runningBalances);
-		model.put("_balance", Util.formatPounds(balanceEnd));
-		model.put("_periodStart", Util.formatTimestamp(from));
-		model.put("_periodEnd", Util.formatTimestamp(to));
+		tl.setAccount(this.accountService.get(accountId)).
+			setPeriodStart(from).
+			setPeriodEnd(to).
+			setPage(monthOffset);
+		
+		model.addAttribute("_tl", tl);
 		
 		return "home";
 	}
