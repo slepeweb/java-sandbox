@@ -39,7 +39,7 @@ public class MoneyTransactionReporter {
 		Calendar today = Calendar.getInstance();
 		Calendar monthBeginning = Calendar.getInstance();
 		monthBeginning.set(Calendar.DAY_OF_MONTH, 1);
-		monthBeginning.add(Calendar.MONTH, -1);
+		monthBeginning.add(Calendar.MONTH, -3);
 		Timestamp from = new Timestamp(monthBeginning.getTimeInMillis());
 		Timestamp to = new Timestamp(today.getTimeInMillis());
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

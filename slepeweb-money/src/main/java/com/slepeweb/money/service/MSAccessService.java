@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
-import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 
 public interface MSAccessService {

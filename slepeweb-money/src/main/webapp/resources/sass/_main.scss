@@ -575,3 +575,20 @@
 	font-size: 0.9em;
 	color: #808080;
 }
+
+#trn_listing td {
+	vertical-align: top;
+	
+	&.date {
+		width: 10%;
+	}
+	&.amount {
+		width: 10%;
+	}
+	&.payee {
+		width: 20%;
+	}
+	&.memo {
+		width: 30%;
+	}
+}

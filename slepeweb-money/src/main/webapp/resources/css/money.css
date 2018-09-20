@@ -698,3 +698,19 @@ input[type="button"]:disabled,
   font-size: 0.9em;
   color: #808080;
 }
+
+#trn_listing td {
+  vertical-align: top;
+}
+#trn_listing td.date {
+  width: 10%;
+}
+#trn_listing td.amount {
+  width: 10%;
+}
+#trn_listing td.payee {
+  width: 20%;
+}
+#trn_listing td.memo {
+  width: 30%;
+}

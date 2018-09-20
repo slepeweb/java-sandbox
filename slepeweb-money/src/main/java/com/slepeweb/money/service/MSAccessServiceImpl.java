@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,7 +59,6 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	public static final String AMOUNT = "amt";
 
 	private String accessFilePath = "/home/george/home.mdb";
-	private Timestamp morning;
 	
 	/*
 	private String trnQuery = String.format(
@@ -196,12 +194,6 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 						setOrigId(r.getInt(TRANSACTION_ID))/*.
 						setReconciled(false).
 						setReference("")*/;
-				
-				if (this.morning == null) {
-					Calendar c = Calendar.getInstance();
-					c.set(Calendar.HOUR_OF_DAY, 0);
-					this.morning = new Timestamp(c.getTimeInMillis());
-				}
 				
 				t.setPayee(identifyPayee(r.getInt(PAYEE_ID)));
 				t.setCategory(identifyCategory(r.getInt(CATEGORY_ID)));							

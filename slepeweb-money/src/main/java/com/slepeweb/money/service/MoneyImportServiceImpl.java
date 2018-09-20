@@ -174,42 +174,15 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	public boolean importTransfer() {
+	public Long[] importTransfer() {
 		try {
-			Long[] ptArr = this.msAccessService.getNextTransfer();
-			if (ptArr != null) {
-				// If the transfer is for a future date, then the source and target transactions
-				// will not exist in the MySql database, causing errors to be logged.
-				Transaction from = getTransactionByOrigId(ptArr[0]);
-				if (from == null) {
-					LOG.error(String.format("Failed to identify source transaction [%d]", ptArr[0]));
-				}
-				
-				Transaction to = getTransactionByOrigId(ptArr[1]);
-				if (to == null) {
-					LOG.error(String.format("Failed to identify target transaction [%d]", ptArr[1]));
-				}
-				
-				if (from != null && to != null) {
-					if (! (from.matchesTransfer(to))) {
-						this.transactionService.updateTransfer(from.getId(), to.getId());
-					}
-					else {
-						LOG.debug(String.format("No change in transfer details [%d]", ptArr[1]));
-					}
-				}
-			}
-			else {
-				// Return false only when there are no more transfer records to import
-				return false;
-			}
+			return this.msAccessService.getNextTransfer();
 		} 
 		catch (Exception e) {
 			LOG.error("Failed to import transaction transfer", e);
 		}
 		
-		// More transfer records to follow
-		return true;
+		return null;
 	}
 	
 	public Transaction importSplitTransactions() {

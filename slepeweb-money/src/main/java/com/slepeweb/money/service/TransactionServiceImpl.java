@@ -174,6 +174,6 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			params[index++] = to;
 		}		
 		
-		return this.jdbcTemplate.queryForLong("select sum(amount) from transaction where accountid = ? and entered <= ?", params);
+		return this.jdbcTemplate.queryForLong(sb.toString(), params);
 	}
 }
