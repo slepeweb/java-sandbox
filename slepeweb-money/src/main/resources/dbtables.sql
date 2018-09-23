@@ -30,7 +30,8 @@ create table account
 	closed boolean,
 	note varchar(255),
 	primary key (id),
-	unique key idx_account_name (name)
+	unique key idx_account_name (name),
+	index idx_status (closed)
 ) ENGINE=InnoDB;
 
 create table transaction

@@ -11,5 +11,6 @@
 
 <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
-<script src="${_ctxPath}/resources/js/jquery.colorbox-min.js"></script>
+<%-- <script src="${_ctxPath}/resources/js/jquery.colorbox-min.js"></script> --%>
+<script src="${_ctxPath}/resources/js/money.js"></script>
 <!-- <script src="/resources/js/colorbox-impl.js"></script> -->

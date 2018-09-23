@@ -29,22 +29,24 @@ public class PageController extends BaseController {
 	public String homepage(@PathVariable int accountId, @PathVariable int monthOffset, ModelMap model) {
 		
 		Account a = this.accountService.get(accountId);
-		List<Account> allAccounts = this.accountService.getAll();
+		List<Account> allAccounts = this.accountService.getAll(false);
 		
 		if (a == null && allAccounts.size() > 0) {
 			a = allAccounts.get(0);
 		}
 		
-		Calendar today = Calendar.getInstance();
-		today.add(Calendar.MONTH, -(monthOffset - 1));
-		today.set(Calendar.DAY_OF_MONTH, today.getMaximum(Calendar.DAY_OF_MONTH));
+		Calendar monthEnd = Calendar.getInstance();
+		Util.zeroTimeOfDay(monthEnd);
+		monthEnd.add(Calendar.MONTH, -(monthOffset - 1));
+		monthEnd.set(Calendar.DAY_OF_MONTH, monthEnd.getMaximum(Calendar.DAY_OF_MONTH));
 		
 		Calendar monthBeginning = Calendar.getInstance();
+		Util.zeroTimeOfDay(monthBeginning);
 		monthBeginning.add(Calendar.MONTH, -(monthOffset - 1));
 		monthBeginning.set(Calendar.DAY_OF_MONTH, 1);
 		
 		Timestamp from = new Timestamp(monthBeginning.getTimeInMillis());
-		Timestamp to = new Timestamp(today.getTimeInMillis());
+		Timestamp to = new Timestamp(monthEnd.getTimeInMillis());
 		
 		TransactionList tl = new TransactionList();
 		List<Transaction> transactions = this.transactionService.getTransactionsForAccount(accountId, from, to);
@@ -63,7 +65,7 @@ public class PageController extends BaseController {
 				t.setMemo(String.format("(%s account '%s')", t.getAmount() < 0 ? "To " : "From ", tt.getAccount().getName()));
 			}
 			
-			tl.getRunningBalances()[i] = new RunningBalance(t).setBalance(Util.formatPounds(balance));
+			tl.getRunningBalances()[numTransactions - i - 1] = new RunningBalance(t).setBalance(Util.formatPounds(balance));
 			balance -= t.getAmount();			
 		}
 				

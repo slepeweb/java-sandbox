@@ -3,10 +3,10 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <mny:standardLayout>
-	<form id="account_selector">
-		<select>
+	<form>
+		<select id="account_selector">
 			<c:forEach items="${_accounts}" var="_account">
-				<option value="${_account.id}"<c:if test="${_account.id eq _tl.account.id}"> selected</c:if>>${_account.name} (${_account.id})</option>
+				<option value="${_account.id}"<c:if test="${_account.id eq _tl.account.id}"> selected</c:if>>${_account.name}</option>
 			</c:forEach>
 		</select>
 	</form>

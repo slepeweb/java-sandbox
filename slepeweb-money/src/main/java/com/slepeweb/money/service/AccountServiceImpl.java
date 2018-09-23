@@ -81,7 +81,11 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	}
 
 	public List<Account> getAll() {
-		return this.jdbcTemplate.query(
-			"select * from account order by name", new RowMapperUtil.AccountMapper());
+		return getAll(false);
+	}
+
+	public List<Account> getAll(boolean includingClosed) {
+		String sql = String.format("select * from account %s order by name", includingClosed ? "" : "where closed=false");
+		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
 	}
 }
