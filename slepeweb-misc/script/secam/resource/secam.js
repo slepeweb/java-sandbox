@@ -113,7 +113,7 @@ function manageLiveVideoPlayer(playing_live_video) {
 	if (playing_live_video) {
 		$("#video-table-wrapper").css("display", "none")
 		$("#controls").css("display", "none")
-		$("#live-video img").attr("src", "http://www.slepeweb.com:8083/?action=stream")
+		$("#live-video img").attr("src", "http://www.buttigieg.org.uk:8083/?action=stream")
 	} else {
 		$("#video-table-wrapper").css("display", "")
 		$("#controls").css("display", "")

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -16,6 +17,7 @@ import com.slepeweb.money.except.MissingDataException;
 public class TransactionServiceImpl extends BaseServiceImpl implements TransactionService {
 	
 	private static Logger LOG = Logger.getLogger(TransactionServiceImpl.class);
+	@Autowired private AccountService accountService;
 	@Autowired private SplitTransactionService splitTransactionService;
 	
 	private static final String SELECT = 
@@ -174,6 +176,8 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			params[index++] = to;
 		}		
 		
-		return this.jdbcTemplate.queryForLong(sb.toString(), params);
+		long sum = this.jdbcTemplate.queryForLong(sb.toString(), params);
+		Account a = this.accountService.get(accountId);
+		return a.getOpeningBalance() + sum;
 	}
 }
