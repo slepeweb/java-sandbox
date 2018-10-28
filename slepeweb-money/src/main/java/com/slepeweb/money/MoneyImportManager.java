@@ -3,12 +3,12 @@ package com.slepeweb.money;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.slepeweb.money.bean.TimeWindow;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.MoneyImportService;
 
@@ -23,13 +23,13 @@ public class MoneyImportManager {
 		ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");		
 		MoneyImportService mis = (MoneyImportService) context.getBean("moneyImportService");		
 		MoneyImportManager exe = new MoneyImportManager();
-		Timestamp from = null;
+		TimeWindow twin = new TimeWindow();
 		
 		if (args.length > 1) {
 			if (args[0].equals("from")) {
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				try {
-					from = new Timestamp(sdf.parse(args[1]).getTime());
+					twin.setFrom(new Timestamp(sdf.parse(args[1]).getTime()));
 				}
 				catch (ParseException e) {
 					LOG.fatal(String.format("Failed to parse date [%s]", args[0]), e);
@@ -37,18 +37,18 @@ public class MoneyImportManager {
 			}
 		}
 		
-		if (exe.init(mis)) {
-			exe.importTransactions(mis, from);
-			exe.importTransfers(mis, from);
-			exe.importSplitTransactions(mis, from);
+		if (exe.init(mis, twin)) {
+			exe.importTransactions(mis, twin);
+			exe.importTransfers(mis, twin);
+			exe.importSplitTransactions(mis, twin);
 		}
 		
 		LOG.info("... MoneyImportManager has finished");
 	}
 	
-	private boolean init(MoneyImportService mis) {
+	private boolean init(MoneyImportService mis, TimeWindow twin) {
 		try {
-			mis.init();
+			mis.init(twin);
 			return true;
 		}
 		catch (Exception e) {
@@ -57,37 +57,38 @@ public class MoneyImportManager {
 		}
 	}
 		
-	private void importTransactions(MoneyImportService mis, Timestamp from) {
+	private void importTransactions(MoneyImportService mis, TimeWindow twin) {
 		Transaction t;
 		long count = 0L;
-		Timestamp now = new Timestamp(new Date().getTime());
 		
+		LOG.info("======================");
 		LOG.info("Importing transactions");
 		LOG.info("======================");
 		
-		while ((t = mis.importTransaction()) != null) {
+		while ((t = mis.importTransaction(twin)) != null) {
 			if (count++ % 100 == 0) {
 				LOG.info(String.format("Processed %d transactions", count));
 			}
 			
-			// Does this transaction fit within required time window?
-			if ((from == null || t.getEntered().after(from)) && t.getEntered().before(now)) {
-				// Has this payment already been imported?
-				Transaction dbRecord = mis.getTransactionByOrigId(t.getOrigId());
-				if ( dbRecord == null) {			
-					mis.saveTransaction(t);				
-				}
-				else {
-					mis.updateTransaction(dbRecord, t);
-				}
+			// Has this payment already been imported?
+			Transaction dbRecord = mis.getTransactionByOrigId(t.getOrigId());
+			if ( dbRecord == null) {
+				// No - save a new record
+				mis.saveTransaction(t);				
+			}
+			else {
+				// Yes - update the existing record
+				mis.updateTransaction(dbRecord, t);
 			}
 		}
+		LOG.info(String.format("Processed %d transactions in TOTAL", count));
 	}
 	
-	private void importTransfers(MoneyImportService mis, Timestamp fromDate) {
+	private void importTransfers(MoneyImportService mis, TimeWindow twin) {
 		long count = 0L;
 		Long[] ptArr;
 		
+		LOG.info("===================================");
 		LOG.info("Importing transaction transfer data");
 		LOG.info("===================================");
 		
@@ -109,7 +110,7 @@ public class MoneyImportManager {
 				
 				// If the transfer is for a future date, then the source and target transactions
 				// will not exist in the MySql database, causing errors to be logged.
-				if (fromTrn != null && toTrn != null && (fromDate == null || fromTrn.getEntered().after(fromDate))) {
+				if (fromTrn != null && toTrn != null && (twin.getFrom() == null || fromTrn.getEntered().after(twin.getFrom()))) {
 					if (! (fromTrn.matchesTransfer(toTrn))) {
 						mis.updateTransfer(fromTrn.getId(), toTrn.getId());
 					}
@@ -119,12 +120,14 @@ public class MoneyImportManager {
 				}
 			}
 		}
+		LOG.info(String.format("Processed %d transfers in TOTAL", count));
 	}
 	
-	private void importSplitTransactions(MoneyImportService mis, Timestamp from) {
+	private void importSplitTransactions(MoneyImportService mis, TimeWindow twin) {
 		long count = 0L;
 		Transaction t;
 		
+		LOG.info("============================");
 		LOG.info("Importing split transactions");
 		LOG.info("============================");
 		
@@ -133,9 +136,10 @@ public class MoneyImportManager {
 				LOG.info(String.format("Processed %d split transactions", count));
 			}
 			
-			if (t.isSplit() && (from == null || t.getEntered().after(from))) {
+			if (t.isSplit() && (twin.getFrom() == null || t.getEntered().after(twin.getFrom()))) {
 				mis.saveSplitTransactions(t);
 			}
 		}
+		LOG.info(String.format("Processed %d split transactions in TOTAL", count));
 	}
 }

@@ -14,6 +14,7 @@ import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SplitTransaction;
+import com.slepeweb.money.bean.TimeWindow;
 import com.slepeweb.money.bean.Transaction;
 
 @Service("moneyImportService")
@@ -27,9 +28,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	@Autowired private SplitTransactionService splitTransactionService;
 	@Autowired private MSAccessService msAccessService;
 	
-	public void init() throws IOException {
+	public void init(TimeWindow twin) throws IOException {
 		// Create null entries for Payee and Category, if not already created
-		this.msAccessService.init(getNoPayee(), getNoCategory());
+		this.msAccessService.init(getNoPayee(), getNoCategory(), twin);
 		
 		// Get all accounts from MSAccess, save them in mysql, and store them in a temporary cache
 		Account aRecord, a;
@@ -163,9 +164,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	public Transaction importTransaction() {
+	public Transaction importTransaction(TimeWindow twin) {
 		try {
-			return this.msAccessService.getNextTransaction();
+			return this.msAccessService.getNextTransaction(twin);
 		} 
 		catch (IOException e) {
 			LOG.error("Failed to read row of transaction data", e);

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,12 +18,16 @@ import com.healthmarketscience.jackcess.Cursor;
 import com.healthmarketscience.jackcess.CursorBuilder;
 import com.healthmarketscience.jackcess.Database;
 import com.healthmarketscience.jackcess.DatabaseBuilder;
+import com.healthmarketscience.jackcess.Index;
+import com.healthmarketscience.jackcess.IndexBuilder;
+import com.healthmarketscience.jackcess.IndexCursor;
 import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SplitTransaction;
+import com.slepeweb.money.bean.TimeWindow;
 import com.slepeweb.money.bean.Transaction;
 
 /*
@@ -47,6 +52,16 @@ where tr1.htrn = trs.htrnParent and tr2.htrn = trs.htrn
 public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessService {
 	
 	private static Logger LOG = Logger.getLogger(MSAccessServiceImpl.class);
+	
+	public static final String ACCOUNT_TBL = "ACCT";
+	public static final String PAYEE_TBL = "PAY";
+	public static final String CATEGORY_TBL = "CAT";
+	public static final String TRANSACTION_TBL = "TRN";
+	public static final String TRANSACTION_XFER_TBL = "TRN_XFER";
+	public static final String TRANSACTION_SPLIT_TBL = "TRN_SPLIT";
+	
+	public static final String TRANSACTION_DATE_IDX = "TRN_DT_IDX";
+
 	public static final String FULL_NAME = "szFull";
 	public static final String ACCOUNT_ID = "hacct";
 	public static final String PAYEE_ID = "hpay";
@@ -57,22 +72,11 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	public static final String DATE_ENTERED = "dt";
 	public static final String MEMO = "mMemo";
 	public static final String AMOUNT = "amt";
+	public static final String OPENING_AMOUNT = "amtOpen";
+	public static final String CLOSED = "fClosed";
+	public static final String COMMENT = "mComment";
 
 	private String accessFilePath = "/home/george/home.mdb";
-	
-	/*
-	private String trnQuery = String.format(
-			"select " + 
-					"trn.htrn as %s, acct.szFull as %s, pay.szFull as %s, trn.dt as %s, trn.mMemo as %s, trn.amt as %s, " +
-					"parent.szFull as %s, child.szFull as %s "	+		
-			"from trn, cat child " +
-			"join acct on trn.hacct = acct.hacct " +
-			"left join pay on trn.hpay = pay.hpay " +
-			"left join cat parent on child.hcatParent=parent.hcat " +
-			"left join trn_split trs on trn.htrn = trs.htrn " +
-			"where trs.htrnParent is null", 
-				ORIG_ID, ACCOUNT, PAYEE, DATE_ENTERED, MEMO, AMOUNT, PARENT_CATEGORY, CHILD_CATEGORY);
-				*/
 	
 	private Map<Long, Account> accountMap = new HashMap<Long, Account>();
 	private Map<Long, Payee> payeeMap = new HashMap<Long, Payee>();
@@ -84,22 +88,35 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	
 	private Table catTable;
 	private Cursor acctCursorSeq, payCursorSeq, catCursorSeq, parentCatCursorFinder;
-	private Cursor trnCursorSeq, trnCursorFinder, trnXferCursorSeq, trnSplitCursorSeq, trnSplitCursorFinder;
+	private Cursor trnCursorFinder, trnXferCursorSeq, trnSplitCursorSeq, trnSplitCursorFinder;
+	private IndexCursor trnCursorSeq;
 	
-	public void init(Payee noPayee, Category noCategory) throws IOException {
+	public void init(Payee noPayee, Category noCategory, TimeWindow twin) throws IOException {
 		this.noPayee = noPayee;
 		this.noCategory = noCategory;
 		
-		Database db = DatabaseBuilder.open(new File(this.accessFilePath));		
-		this.acctCursorSeq = CursorBuilder.createCursor(db.getTable("ACCT"));
-		this.payCursorSeq = CursorBuilder.createCursor(db.getTable("PAY"));
-		this.catCursorSeq = CursorBuilder.createCursor(this.catTable = db.getTable("CAT"));
-		this.parentCatCursorFinder = CursorBuilder.createCursor(db.getTable("CAT"));
-		this.trnCursorSeq = CursorBuilder.createCursor(db.getTable("TRN"));
-		this.trnCursorFinder = CursorBuilder.createCursor(db.getTable("TRN"));
-		this.trnXferCursorSeq = CursorBuilder.createCursor(db.getTable("TRN_XFER"));
-		this.trnSplitCursorSeq = CursorBuilder.createCursor(db.getTable("TRN_SPLIT"));
-		this.trnSplitCursorFinder = CursorBuilder.createCursor(db.getTable("TRN_SPLIT"));
+		Database db = DatabaseBuilder.open(new File(this.accessFilePath));
+		Table trn = db.getTable(TRANSACTION_TBL);
+		Index transactionDateIndex = null;
+		try {
+			transactionDateIndex = trn.getIndex(TRANSACTION_DATE_IDX);
+		}
+		catch (IllegalArgumentException e) {
+			transactionDateIndex = new IndexBuilder(TRANSACTION_DATE_IDX).addColumns(DATE_ENTERED).addToTable(trn);
+		}
+
+		this.acctCursorSeq = CursorBuilder.createCursor(db.getTable(ACCOUNT_TBL));
+		this.payCursorSeq = CursorBuilder.createCursor(db.getTable(PAYEE_TBL));
+		this.catCursorSeq = CursorBuilder.createCursor(this.catTable = db.getTable(CATEGORY_TBL));
+		this.parentCatCursorFinder = CursorBuilder.createCursor(db.getTable(CATEGORY_TBL));
+		this.trnCursorSeq = CursorBuilder.createCursor(transactionDateIndex);
+		this.trnCursorFinder = CursorBuilder.createCursor(db.getTable(TRANSACTION_TBL));
+		this.trnXferCursorSeq = CursorBuilder.createCursor(db.getTable(TRANSACTION_XFER_TBL));
+		this.trnSplitCursorSeq = CursorBuilder.createCursor(db.getTable(TRANSACTION_SPLIT_TBL));
+		this.trnSplitCursorFinder = CursorBuilder.createCursor(db.getTable(TRANSACTION_SPLIT_TBL));
+		
+		// Locate the first transaction record within the given time window
+		this.trnCursorSeq.findClosestRowByEntry(new Date(twin.getFrom().getTime()));
 	}
 	
 	public static long decimal2long(BigDecimal dec) {
@@ -114,9 +131,9 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 			return new Account().
 					setId(r.getInt(ACCOUNT_ID)).
 					setName(r.getString(FULL_NAME)).
-					setOpeningBalance(decimal2long(r.getBigDecimal("amtOpen"))).
-					setClosed(r.getBoolean("fClosed")).
-					setNote(r.getString("mComment"));
+					setOpeningBalance(decimal2long(r.getBigDecimal(OPENING_AMOUNT))).
+					setClosed(r.getBoolean(CLOSED)).
+					setNote(r.getString(COMMENT));
 		}
 		
 		return null;
@@ -176,32 +193,46 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		this.categoryMap.put(origId, c);
 	}
 	
-	public Transaction getNextTransaction() throws IOException {
+	public Transaction getNextTransaction(TimeWindow twin) throws IOException {
+
+		this.trnCursorSeq.moveToNextRow();
+		if (this.trnCursorSeq.isAfterLast()) {
+			// No more transactions
+			return null;
+		}
+		
 		// Create a new Transaction object with data from the TRN table.
-		Row r = this.trnCursorSeq.getNextRow();
+		Row r = this.trnCursorSeq.getCurrentRow();
 		
 		if (r != null) {
-			Integer htrn = r.getInt(TRANSACTION_ID);
-			
-			// Do NOT process child transactions, ie those that are part of a split transaction
-			if (! this.trnSplitCursorFinder.findFirstRow(Collections.singletonMap(TRANSACTION_ID, htrn))) {
+			Date entered = r.getDate(DATE_ENTERED);
+			if (entered.before(twin.getTo())) {
+				Integer htrn = r.getInt(TRANSACTION_ID);
 				
-				Transaction t = new Transaction().
-						setAccount(this.accountMap.get(Long.valueOf(r.getInt(ACCOUNT_ID)))).
-						setAmount(Util.decimal2long(r.getBigDecimal(AMOUNT))).
-						setEntered(new Timestamp(r.getDate(DATE_ENTERED).getTime())).
-						setMemo(r.getString(MEMO)).
-						setOrigId(r.getInt(TRANSACTION_ID))/*.
-						setReconciled(false).
-						setReference("")*/;
-				
-				t.setPayee(identifyPayee(r.getInt(PAYEE_ID)));
-				t.setCategory(identifyCategory(r.getInt(CATEGORY_ID)));							
-				return t;
+				// Do NOT process child transactions, ie those that are part of a split transaction
+				if (! this.trnSplitCursorFinder.findFirstRow(Collections.singletonMap(TRANSACTION_ID, htrn))) {
+					
+					Transaction t = new Transaction().
+							setAccount(this.accountMap.get(Long.valueOf(r.getInt(ACCOUNT_ID)))).
+							setAmount(Util.decimal2long(r.getBigDecimal(AMOUNT))).
+							setEntered(new Timestamp(r.getDate(DATE_ENTERED).getTime())).
+							setMemo(r.getString(MEMO)).
+							setOrigId(r.getInt(TRANSACTION_ID))/*.
+							setReconciled(false).
+							setReference("")*/;
+					
+					t.setPayee(identifyPayee(r.getInt(PAYEE_ID)));
+					t.setCategory(identifyCategory(r.getInt(CATEGORY_ID)));							
+					return t;
+				}
+				else {
+					LOG.debug(compose("Ignoring child transaction (split)", htrn));
+					return getNextTransaction(twin);
+				}
 			}
 			else {
-				LOG.debug(compose("Ignoring child transaction (split)", htrn));
-				return getNextTransaction();
+				LOG.debug(compose("Transaction outside time window", entered));
+				return getNextTransaction(twin);
 			}
 		}
 		

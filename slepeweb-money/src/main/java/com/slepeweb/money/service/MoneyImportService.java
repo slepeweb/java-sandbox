@@ -2,11 +2,12 @@ package com.slepeweb.money.service;
 
 import java.io.IOException;
 
+import com.slepeweb.money.bean.TimeWindow;
 import com.slepeweb.money.bean.Transaction;
 
 public interface MoneyImportService {
-	void init() throws IOException;
-	Transaction importTransaction();
+	void init(TimeWindow twin) throws IOException;
+	Transaction importTransaction(TimeWindow twin);
 	Long[] importTransfer();
 	Transaction importSplitTransactions();
 	Transaction saveTransaction(Transaction pt);

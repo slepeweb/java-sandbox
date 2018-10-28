@@ -28,4 +28,20 @@ public class Util {
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 10);
 	}
+	
+	/**
+	 * Timestamp @to must always be non-null, as must @t.
+	 * Timestamp @from can be null.
+	 */
+	public static boolean isWithinTimeWindow(Timestamp from, Timestamp t, Timestamp to) {
+		if (to == null) {
+			return false;
+		}
+		else if (from != null) {
+			return t.after(from) && t.before(to);
+		}
+		else {
+			return t.before(to);
+		}
+	}
 }
