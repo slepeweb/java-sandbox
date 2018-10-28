@@ -4,12 +4,15 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.RunningBalance;
@@ -24,6 +27,27 @@ public class PageController extends BaseController {
 	
 	@Autowired private AccountService accountService;
 	@Autowired private TransactionService transactionService;
+	
+	@RequestMapping(value="/list/{accountId}")	
+	public RedirectView homepage(@PathVariable int accountId, HttpServletRequest req, ModelMap model) {
+ 
+		List<Transaction> l = this.transactionService.getLatestTransactionForAccount(accountId);
+		int monthOffset = 1;
+		
+		if (l.size() > 0) {
+			Timestamp ts = l.get(0).getEntered();
+			Calendar lastEntry = Util.today();
+			lastEntry.setTime(ts);
+			Calendar today = Util.today();
+			monthOffset = 
+					((today.get(Calendar.YEAR) - lastEntry.get(Calendar.YEAR)) * 12) +
+					(today.get(Calendar.MONTH) - lastEntry.get(Calendar.MONTH)) +
+					1;			
+		}
+		
+		model.clear();
+		return new RedirectView(String.format("%s/list/%d/%d", req.getContextPath(), accountId, monthOffset));
+	}
 	
 	@RequestMapping(value="/list/{accountId}/{monthOffset}")	
 	public String homepage(@PathVariable int accountId, @PathVariable int monthOffset, ModelMap model) {

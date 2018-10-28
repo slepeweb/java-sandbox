@@ -134,6 +134,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return t;
 	}
 
+	public List<Transaction> getLatestTransactionForAccount(long accountId) {
+		return getTransactionsForAccount(
+				SELECT + "where t.accountid = ? order by t.entered desc limit 1", 
+				new Object[]{accountId});
+	}
+	
 	public List<Transaction> getTransactionsForAccount(long accountId) {
 		return getTransactionsForAccount(
 				SELECT + "where t.accountid = ? order by t.entered", 

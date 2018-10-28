@@ -22,6 +22,12 @@ public class Util {
 		return "";
 	}
 	
+	public static Calendar today() {
+		Calendar c = Calendar.getInstance();
+		zeroTimeOfDay(c);
+		return c;
+	}
+	
 	public static void zeroTimeOfDay(Calendar c) {
 		c.set(Calendar.HOUR_OF_DAY, 0);
 		c.set(Calendar.MINUTE, 0);

@@ -76,7 +76,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	public static final String CLOSED = "fClosed";
 	public static final String COMMENT = "mComment";
 
-	private String accessFilePath = "/home/george/home.mdb";
+	private String accessFilePath = "/home/george/slepeweb-money/home.MDB";
 	
 	private Map<Long, Account> accountMap = new HashMap<Long, Account>();
 	private Map<Long, Payee> payeeMap = new HashMap<Long, Payee>();

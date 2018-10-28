@@ -30,6 +30,7 @@ public class MoneyImportManager {
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				try {
 					twin.setFrom(new Timestamp(sdf.parse(args[1]).getTime()));
+					LOG.info(String.format("Time window starts at %s", args[1]));
 				}
 				catch (ParseException e) {
 					LOG.fatal(String.format("Failed to parse date [%s]", args[0]), e);

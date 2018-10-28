@@ -5,7 +5,6 @@ JAR=~/slepeweb-money-import.jar
 LIBS=~/slepeweb-money-import_lib
 DIST=~/slepeweb-money
 MONEY=/media/george/Data/George/Kryptonite/home.MNY
-SUNRIISE=/media/george/Windows/Users/gbutt/Desktop/sunriise2-misc-master
 WORKING_MONEY=$DIST/home.MNY
 WORKING_MDB=$DIST/home.MDB
 FROM=""
@@ -24,13 +23,7 @@ done
 
 if [ ! -r $MONEY ]
 then
-	echo "*** Failed to locate MS Money file [$MONEY]"
-	exit 1
-fi
-
-if [ ! -d $SUNRIISE ]
-then
-	echo "*** Failed to locate MS Money conversion app [$SUNRIISE]"
+	echo "*** Failed to locate original MS Money file [$MONEY]"
 	exit 1
 fi
 
@@ -59,22 +52,17 @@ then
 fi
 
 cp $MONEY $WORKING_MONEY
-java -jar $SUNRIISE/out/sunriise-export-0.0.1-SNAPSHOT-exec.jar $WORKING_MONEY g1ga50ft $WORKING_MDB
+cd $DIST
+java -jar ./sunriise-export-0.0.1-SNAPSHOT-exec.jar $WORKING_MONEY g1ga50ft $WORKING_MDB
 
-if [ ! -r $WORKING_MDB ]
+if [ $? -ne 0 ]
 then
 	echo "*** Failed to output MS Access Database [$WORKING_MDB]"
 	exit 1
 fi
 
-if [ ! -d $DIST ]
-then
-	mkdir $DIST
-fi
-
 cd $DIST
 jar xvf $JAR
-#mv $DIST/resources/* $DIST
 
 cd
-java -cp $LIBS/*:$DIST:$DIST/resources com.slepeweb.money.MoneyImportManager $FROM
+java -cp $LIBS/*:$DIST:$DIST/resources com.slepeweb.money.MoneyImportManager from $FROM
