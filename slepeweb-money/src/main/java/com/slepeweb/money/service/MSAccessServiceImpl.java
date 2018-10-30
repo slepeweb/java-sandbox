@@ -7,9 +7,7 @@ import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -81,7 +79,6 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	private Map<Long, Account> accountMap = new HashMap<Long, Account>();
 	private Map<Long, Payee> payeeMap = new HashMap<Long, Payee>();
 	private Map<Long, Category> categoryMap = new HashMap<Long, Category>();
-	private Set<Long> processedParentTransactions = new HashSet<Long>();
 	
 	private Payee noPayee;
 	private Category noCategory;
@@ -239,67 +236,53 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		return null;
 	}
 	
-	/*
-	 * Returns a 'bare' Transaction object representing the parent, with just a few properties set, in particular:
-	 * 	- its child (ie split) transactions
-	 * 	- its origid
-	 * 	- its split status
-	 */
-	public Transaction getNextSplitTransactions() throws IOException {
+	public Transaction getNextSplitTransactionsParentOrigId() throws IOException {
 		Row r = this.trnSplitCursorSeq.getNextRow();
 		
 		if (r != null) {
-			Long parentId = new Long(r.getInt(TRANSACTION_PARENT_ID));
-			Long childId;
-			
-			// Has parent already been processed?
-			if (! this.processedParentTransactions.contains(parentId)) {		
-				Transaction result = new Transaction().setOrigId(parentId);
-				SplitTransaction st;
-				Row parentTransactionRow, childTransactionRow;
-				
-				// Find corresponding child transactions
-				Map<String, Long> parentCriteria = Collections.singletonMap(TRANSACTION_PARENT_ID, parentId);
-				if (this.trnSplitCursorFinder.findFirstRow(parentCriteria)) {
-					this.trnSplitCursorFinder.beforeFirst();
-				
-					while (this.trnSplitCursorFinder.findNextRow(parentCriteria)) {
-						parentTransactionRow = this.trnSplitCursorFinder.getCurrentRow();
-						childId = new Long(parentTransactionRow.getInt(TRANSACTION_ID));
-						
-						// Find the child transaction in trn table
-						if (this.trnCursorFinder.findFirstRow(Collections.singletonMap(TRANSACTION_ID, childId))) {
-							childTransactionRow = this.trnCursorFinder.getCurrentRow();
-							st = new SplitTransaction().
-								// This parentId is an MSAccess id - needs updating by caller
-								setTransactionId(parentId).
-								setAmount(Float.valueOf(childTransactionRow.getBigDecimal(AMOUNT).floatValue() * 100).longValue()).
-								setMemo(childTransactionRow.getString(MEMO));
-					
-							st.setCategory(identifyCategory(childTransactionRow.getInt(CATEGORY_ID)));					
-							result.getSplits().add(st);
-							result.setSplit(true);
-						}
-						else {
-							LOG.error(compose("Couldn't find child transaction", childId));
-						}
-					}
-					
-					// Mark this parent transaction as completed
-					this.processedParentTransactions.add(parentId);
-					return result;
-				}
-				else {
-					LOG.error(compose("Failed to identify parent transaction", parentId));
-				}
-			}
-			else {
-				// Skip this parent (already processed), and try the next
-				return getNextSplitTransactions();
-			}
+			return new Transaction().setOrigId(new Long(r.getInt(TRANSACTION_PARENT_ID)));
 		}
 		
 		return null;
+	}
+	
+	public void populateSplitTransactions(Transaction result) throws IOException {
+
+		Long parentId = result.getOrigId();
+		Long childId;		
+		SplitTransaction st;
+		Row parentTransactionRow, childTransactionRow;
+		
+		// Find corresponding child transactions
+		Map<String, Long> parentCriteria = Collections.singletonMap(TRANSACTION_PARENT_ID, parentId);
+		if (this.trnSplitCursorFinder.findFirstRow(parentCriteria)) {
+			this.trnSplitCursorFinder.beforeFirst();
+		
+			while (this.trnSplitCursorFinder.findNextRow(parentCriteria)) {
+				parentTransactionRow = this.trnSplitCursorFinder.getCurrentRow();
+				childId = new Long(parentTransactionRow.getInt(TRANSACTION_ID));
+				
+				// Find the child transaction in trn table
+				if (this.trnCursorFinder.findFirstRow(Collections.singletonMap(TRANSACTION_ID, childId))) {
+					childTransactionRow = this.trnCursorFinder.getCurrentRow();
+					st = new SplitTransaction().
+						// This parentId is an MSAccess id - needs updating by caller
+						setTransactionId(parentId).
+						setAmount(Float.valueOf(childTransactionRow.getBigDecimal(AMOUNT).floatValue() * 100).longValue()).
+						setMemo(childTransactionRow.getString(MEMO));
+			
+					st.setCategory(identifyCategory(childTransactionRow.getInt(CATEGORY_ID)));					
+					result.getSplits().add(st);
+					result.setSplit(true);
+				}
+				else {
+					LOG.error(compose("Couldn't find child transaction", childId));
+				}
+			}
+		}
+		else {
+			LOG.error(compose("Failed to identify parent transaction", parentId));
+		}
 	}
 	
 	private Payee identifyPayee(Integer hpay) {

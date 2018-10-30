@@ -36,15 +36,13 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		if (pt.isDefined4Insert()) {
 			// Insert record, regardless of whether it has already been inserted.
 			// (Take care with imports - should check whether already imported first!)
-			insert(pt);
+			return insert(pt);
 		}
 		else {
 			String t = "Transaction not saved - insufficient data";
 			LOG.error(compose(t, pt));
 			throw new MissingDataException(t);
 		}
-		
-		return pt;
 	}
 	
 	private Transaction insert(Transaction t) throws MissingDataException, DuplicateItemException {
@@ -67,7 +65,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		}
 	}
 
-	public void update(Transaction dbRecord, Transaction t) {
+	public Transaction update(Transaction dbRecord, Transaction t) {
 		if (! dbRecord.equalsBarTransferId(t)) {
 			dbRecord.assimilate(t);
 			
@@ -93,6 +91,8 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		else {
 			LOG.debug(compose("Transaction not modified", t));
 		}
+		
+		return dbRecord;
 	}
 
 	public void updateSplit(Transaction t) {

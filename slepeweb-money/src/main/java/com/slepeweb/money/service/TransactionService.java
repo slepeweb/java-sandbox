@@ -15,7 +15,7 @@ public interface TransactionService {
 	List<Transaction> getTransactionsForAccount(long id, Timestamp from, Timestamp to);
 	List<Transaction> getLatestTransactionForAccount(long accountId);
 	Transaction save(Transaction p) throws MissingDataException, DuplicateItemException;
-	void update(Transaction from, Transaction to) throws MissingDataException, DuplicateItemException;
+	Transaction update(Transaction from, Transaction to) throws MissingDataException, DuplicateItemException;
 	void updateTransfer(Long from, Long to) throws MissingDataException, DuplicateItemException;
 	void updateSplit(Transaction t);
 	long getBalance(long accountId);

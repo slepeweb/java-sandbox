@@ -17,6 +17,7 @@ public interface MSAccessService {
 	Payee getNextPayee() throws IOException;
 	Category getNextCategory() throws IOException;
 	Transaction getNextTransaction(TimeWindow twin) throws IOException;
-	Transaction getNextSplitTransactions() throws IOException;
+	Transaction getNextSplitTransactionsParentOrigId() throws IOException;
+	void populateSplitTransactions(Transaction t) throws IOException;
 	Long[] getNextTransfer() throws IOException;
 }

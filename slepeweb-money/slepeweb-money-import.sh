@@ -12,7 +12,7 @@ FROM=""
 while [[ $# -gt 0 ]]
 do
 case $1 in
-	-d)
+	-from)
 	FROM=$2
 	echo "Time window is from $FROM"
 	shift
@@ -65,4 +65,4 @@ cd $DIST
 jar xvf $JAR
 
 cd
-java -cp $LIBS/*:$DIST:$DIST/resources com.slepeweb.money.MoneyImportManager from $FROM
+java -cp $LIBS/*:$DIST:$DIST/resources com.slepeweb.money.MoneyImportManager -from $FROM

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
-import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.TimeWindow;
 import com.slepeweb.money.bean.Transaction;
 
@@ -134,12 +133,13 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	public void updateTransaction(Transaction dbRecord, Transaction t) {
+	public Transaction updateTransaction(Transaction dbRecord, Transaction t) {
 		try {
-			this.transactionService.update(dbRecord, t);
+			return this.transactionService.update(dbRecord, t);
 		}
 		catch (Exception e) {
 			LOG.error("Failed to update transaction", e);
+			return dbRecord;
 		}
 	}
 	
@@ -186,43 +186,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		return null;
 	}
 	
-	public Transaction importSplitTransactions() {
+	public Transaction importSplitTransactionsParentId() {
 		try {
-			Transaction imported = this.msAccessService.getNextSplitTransactions();
-			// This transaction is incomplete - only the splits are useable, although
-			// their transactionid property references an MSAccess htrn, and will need to be changed
-			
-			if (imported != null) {
-				// This transaction (imported) has the correct mssql id, but its splits will be empty.
-				// Get the (full) corresponding transaction in MySql. This operation will fail
-				// if the transaction is for a future date, causing an error to be logged.
-				Transaction dbRecord = getTransactionByOrigId(imported.getOrigId());
-				
-				if (dbRecord != null) {
-					if (! dbRecord.matchesSplits(imported)) {
-						// Use the imported splits
-						dbRecord.setSplits(imported.getSplits());
-						dbRecord.setSplit(imported.isSplit());
-						
-						// Correct the transactionid properties of each split
-						for (SplitTransaction st : dbRecord.getSplits()) {
-							st.setTransactionId(dbRecord.getId());
-						}
-						
-						return dbRecord;
-					}
-					else {
-						LOG.debug(String.format("No change in splits [%d]", imported.getOrigId()));
-						// An empty transaction will be ignored by the caller
-						return new Transaction();
-					}
-				}
-				else {
-					LOG.error(String.format("Failed to identify parent transaction [%d]", imported.getOrigId()));
-					// An empty transaction will be ignored by the caller
-					return new Transaction();
-				}
-			}
+			return this.msAccessService.getNextSplitTransactionsParentOrigId();			
 		} 
 		catch (IOException e) {
 			LOG.error("Failed to read row of split transaction data", e);
@@ -230,6 +196,15 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 
 		// No more split transactions to import
 		return null;
+	}
+	
+	public void populateSplitTransactions(Transaction t) {
+		try {
+			this.msAccessService.populateSplitTransactions(t);			
+		} 
+		catch (IOException e) {
+			LOG.error("Failed to read row of split transaction data", e);
+		}
 	}
 	
 	public Transaction getTransactionByOrigId(long id) {
