@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.NormalisedMonth;
+import com.slepeweb.money.bean.Pager;
 import com.slepeweb.money.bean.RunningBalance;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
@@ -31,26 +33,14 @@ public class PageController extends BaseController {
 	@RequestMapping(value="/list/{accountId}")	
 	public RedirectView homepage(@PathVariable int accountId, HttpServletRequest req, ModelMap model) {
  
-		List<Transaction> l = this.transactionService.getLatestTransactionForAccount(accountId);
-		int monthOffset = 1;
-		
-		if (l.size() > 0) {
-			Timestamp ts = l.get(0).getEntered();
-			Calendar lastEntry = Util.today();
-			lastEntry.setTime(ts);
-			Calendar today = Util.today();
-			monthOffset = 
-					((today.get(Calendar.YEAR) - lastEntry.get(Calendar.YEAR)) * 12) +
-					(today.get(Calendar.MONTH) - lastEntry.get(Calendar.MONTH)) +
-					1;			
-		}
-		
+		Timestamp end = this.transactionService.getTransactionDateForAccount(accountId, false);		
+		NormalisedMonth endMonth = new NormalisedMonth(end);
 		model.clear();
-		return new RedirectView(String.format("%s/list/%d/%d", req.getContextPath(), accountId, monthOffset));
+		return new RedirectView(String.format("%s/list/%d/%d", req.getContextPath(), accountId, endMonth.getIndex()));
 	}
 	
-	@RequestMapping(value="/list/{accountId}/{monthOffset}")	
-	public String homepage(@PathVariable int accountId, @PathVariable int monthOffset, ModelMap model) {
+	@RequestMapping(value="/list/{accountId}/{selectedMonthIndex}")	
+	public String homepage(@PathVariable int accountId, @PathVariable int selectedMonthIndex, ModelMap model) {
 		
 		Account a = this.accountService.get(accountId);
 		List<Account> allAccounts = this.accountService.getAll(false);
@@ -59,14 +49,26 @@ public class PageController extends BaseController {
 			a = allAccounts.get(0);
 		}
 		
-		Calendar monthEnd = Calendar.getInstance();
-		Util.zeroTimeOfDay(monthEnd);
-		monthEnd.add(Calendar.MONTH, -(monthOffset - 1));
+		NormalisedMonth firstMonth = new NormalisedMonth(this.transactionService.getTransactionDateForAccount(accountId, true));
+		NormalisedMonth lastMonth = new NormalisedMonth(this.transactionService.getTransactionDateForAccount(accountId, false));
+		NormalisedMonth selectedMonth = new NormalisedMonth(selectedMonthIndex);
+
+		if (selectedMonth.isBefore(firstMonth)) {
+			selectedMonth.set(firstMonth);
+		}
+		
+		if (selectedMonth.isAfter(lastMonth)) {
+			selectedMonth.set(lastMonth);
+		}
+			
+		Pager p = new Pager(firstMonth, selectedMonth, lastMonth);
+		
+		Calendar monthEnd = Util.today();
+		monthEnd.add(Calendar.MONTH, selectedMonth.getCalendarOffset());
 		monthEnd.set(Calendar.DAY_OF_MONTH, monthEnd.getMaximum(Calendar.DAY_OF_MONTH));
 		
-		Calendar monthBeginning = Calendar.getInstance();
-		Util.zeroTimeOfDay(monthBeginning);
-		monthBeginning.add(Calendar.MONTH, -(monthOffset - 1));
+		Calendar monthBeginning = Util.today();
+		monthBeginning.add(Calendar.MONTH, selectedMonth.getCalendarOffset());
 		monthBeginning.set(Calendar.DAY_OF_MONTH, 1);
 		
 		Timestamp from = new Timestamp(monthBeginning.getTimeInMillis());
@@ -97,7 +99,7 @@ public class PageController extends BaseController {
 			setAccount(a).
 			setPeriodStart(from).
 			setPeriodEnd(to).
-			setPage(monthOffset);
+			setPager(p);
 		
 		model.addAttribute("_tl", tl);
 		model.addAttribute("_accounts", allAccounts);

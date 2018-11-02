@@ -4,17 +4,23 @@
 	
 <mny:standardLayout>
 	<form>
-		<select id="account_selector">
+		<label>Select account:</label>
+		<select id="account-selector">
 			<c:forEach items="${_accounts}" var="_account">
 				<option value="${_account.id}"<c:if test="${_account.id eq _tl.account.id}"> selected</c:if>>${_account.name}</option>
 			</c:forEach>
 		</select>
 	</form>
 	
-	<h1>${_tl.account.name}</h1>
-	<h2>Period: ${_tl.period}</h2>
-	<p><span><a href="./${_tl.previous}">Previous</a></span><c:if 
-		test="${_tl.nextExists}"><span>&nbsp;</span><span><a href="./${_tl.next}">Next</a></span></c:if></p>
+	<p>
+		<c:if test="${_tl.pager.previous}"><span class="pager arrow"><a href="./${_tl.pager.previousMonth.index}"><i 
+			class="fas fa-angle-double-left" title="Previous"></i> Previous</a></span></c:if>
+		<c:forEach items="${_tl.pager.navigation}" var="_option">
+			<span class="pager <c:if test="${_option.selected}">selected</c:if>"><a href="./${_option.value}">${_option.name}</a></span>
+		</c:forEach>
+		<c:if test="${_tl.pager.next}"><span class="pager arrow"><a href="./${_tl.pager.nextMonth.index}">Next <i 
+			class="fas fa-angle-double-right" title="Previous"></i></a></span></c:if>
+	</p>
 	
 	<c:choose><c:when test="${not empty _tl.runningBalances}">
 	<table id="trn_listing">

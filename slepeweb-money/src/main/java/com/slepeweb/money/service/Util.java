@@ -50,4 +50,18 @@ public class Util {
 			return t.before(to);
 		}
 	}
+	
+	public static int monthsDifference(Timestamp from, Timestamp to) {
+		Calendar calA = Calendar.getInstance();
+		calA.setTime(from);
+		int monthA = calA.get(Calendar.MONTH);
+		int yearA = calA.get(Calendar.YEAR);
+		
+		Calendar calB = Calendar.getInstance();
+		calB.setTime(to);
+		int monthB = calB.get(Calendar.MONTH);
+		int yearB = calB.get(Calendar.YEAR);
+		
+		return (yearB - yearA) * 12 + (monthB - monthA) + 1;
+	}
 }

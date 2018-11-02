@@ -6,7 +6,7 @@ public class TransactionList {
 	private Account account;
 	private RunningBalance[] runningBalances;
 	private Timestamp periodStart, periodEnd;
-	private int page;
+	private Pager pager;
 	
 	public Account getAccount() {
 		return account;
@@ -44,29 +44,17 @@ public class TransactionList {
 		return this;
 	}
 	
-	public int getPage() {
-		return page;
+	public Pager getPager() {
+		return pager;
 	}
 	
-	public TransactionList setPage(int page) {
-		this.page = page;
+	public TransactionList setPager(Pager p) {
+		this.pager = p;
 		return this;
 	}
 	
 	public String getPeriod() {
 		// Use month and year of either start/end
 		return String.format("%1$tB %1$tY", getPeriodStart());
-	}
-	
-	public int getNext() {
-		return getPage() == 1 ? 1 : getPage() - 1;
-	}
-	
-	public int getPrevious() {
-		return getPage() + 1;
-	}
-	
-	public boolean isNextExists() {
-		return getPage() > 1;
-	}
+	}	
 }

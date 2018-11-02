@@ -13,7 +13,7 @@ public interface TransactionService {
 	Transaction getByOrigId(long id);
 	List<Transaction> getTransactionsForAccount(long id);
 	List<Transaction> getTransactionsForAccount(long id, Timestamp from, Timestamp to);
-	List<Transaction> getLatestTransactionForAccount(long accountId);
+	Timestamp getTransactionDateForAccount(long accountId, boolean first);
 	Transaction save(Transaction p) throws MissingDataException, DuplicateItemException;
 	Transaction update(Transaction from, Transaction to) throws MissingDataException, DuplicateItemException;
 	void updateTransfer(Long from, Long to) throws MissingDataException, DuplicateItemException;

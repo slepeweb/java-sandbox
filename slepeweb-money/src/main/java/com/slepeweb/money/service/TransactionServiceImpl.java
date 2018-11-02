@@ -1,6 +1,7 @@
 package com.slepeweb.money.service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -134,10 +135,19 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return t;
 	}
 
-	public List<Transaction> getLatestTransactionForAccount(long accountId) {
-		return getTransactionsForAccount(
-				SELECT + "where t.accountid = ? order by t.entered desc limit 1", 
-				new Object[]{accountId});
+	public Timestamp getTransactionDateForAccount(long accountId, boolean first) {
+		String sql = String.format("select entered from transaction where accountid = ? order by entered %s limit 1", 
+				first ? "" : "desc");
+		
+		List<Timestamp> list = this.jdbcTemplate.query(
+				sql,
+				new Object[]{accountId}, new RowMapperUtil.TransactionDateMapper());
+		
+		if (list.size() == 1) {
+			return list.get(0);
+		}
+		
+		return first ? new Timestamp(0L) : new Timestamp(new Date().getTime());
 	}
 	
 	public List<Transaction> getTransactionsForAccount(long accountId) {

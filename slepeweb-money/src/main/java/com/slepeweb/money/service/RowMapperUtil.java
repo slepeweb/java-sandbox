@@ -2,13 +2,14 @@ package com.slepeweb.money.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import org.springframework.jdbc.core.RowMapper;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
-import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 
 public class RowMapperUtil {
@@ -46,6 +47,12 @@ public class RowMapperUtil {
 					setMemo(rs.getString("memo")).
 					setId(rs.getLong("id")).
 					setOrigId(rs.getLong("origid"));
+		}
+	}
+	
+	public static final class TransactionDateMapper implements RowMapper<Timestamp> {
+		public Timestamp mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return rs.getTimestamp("entered");
 		}
 	}
 	
