@@ -13,13 +13,21 @@
 	</form>
 	
 	<p>
-		<c:if test="${_tl.pager.previous}"><span class="pager arrow"><a href="./${_tl.pager.previousMonth.index}"><i 
-			class="fas fa-angle-double-left" title="Previous"></i> Previous</a></span></c:if>
+		<c:if test="${_tl.pager.previous}"><span 
+				class="pager arrow left"><a href="./${_tl.pager.previousBlock.index}"><i 
+					class="fas fa-angle-double-left" title="Jump left"></i></a></span><span 
+				class="pager arrow left"><a href="./${_tl.pager.previousMonth.index}"><i 
+					class="fas fa-angle-left" title="Previous"></i>Previous</a></span></c:if>
+					
 		<c:forEach items="${_tl.pager.navigation}" var="_option">
 			<span class="pager <c:if test="${_option.selected}">selected</c:if>"><a href="./${_option.value}">${_option.name}</a></span>
 		</c:forEach>
-		<c:if test="${_tl.pager.next}"><span class="pager arrow"><a href="./${_tl.pager.nextMonth.index}">Next <i 
-			class="fas fa-angle-double-right" title="Previous"></i></a></span></c:if>
+		
+		<c:if test="${_tl.pager.next}"><span 
+			class="pager arrow right"><a href="./${_tl.pager.nextMonth.index}">Next<i 
+				class="fas fa-angle-right" title="Next"></i></a></span><span 
+			class="pager arrow right"><a href="./${_tl.pager.nextBlock.index}"><i 
+				class="fas fa-angle-double-right" title="Jump right"></i></a></span></c:if>
 	</p>
 	
 	<c:choose><c:when test="${not empty _tl.runningBalances}">

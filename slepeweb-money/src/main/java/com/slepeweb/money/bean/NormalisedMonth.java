@@ -37,14 +37,12 @@ public class NormalisedMonth {
 		this.index = nm.getIndex();
 	}
 	
-	public NormalisedMonth increment(int number) {
+	public void increment(int number) {
 		this.index -= number;
-		return this;
 	}
 	
-	public NormalisedMonth decrement(int number) {
+	public void decrement(int number) {
 		this.index += number;
-		return this;
 	}
 	
 	public int getCalendarOffset() {
@@ -53,6 +51,14 @@ public class NormalisedMonth {
 	
 	public boolean equals(NormalisedMonth nm) {
 		return getIndex() == nm.getIndex();
+	}
+	
+	public int distanceAfter(NormalisedMonth nm) {
+		return nm.getIndex() - getIndex();
+	}
+	
+	public int distanceBefore(NormalisedMonth nm) {
+		return -distanceAfter(nm);
 	}
 	
 	public boolean isBefore(NormalisedMonth nm) {

@@ -67,6 +67,12 @@ public class PageController extends BaseController {
 		monthEnd.add(Calendar.MONTH, selectedMonth.getCalendarOffset());
 		monthEnd.set(Calendar.DAY_OF_MONTH, monthEnd.getMaximum(Calendar.DAY_OF_MONTH));
 		
+		// Wind down month end for shorter months
+		int day = monthEnd.get(Calendar.DATE);
+		if (day < 4) {
+			monthEnd.add(Calendar.DATE, -day);
+		}
+		
 		Calendar monthBeginning = Util.today();
 		monthBeginning.add(Calendar.MONTH, selectedMonth.getCalendarOffset());
 		monthBeginning.set(Calendar.DAY_OF_MONTH, 1);

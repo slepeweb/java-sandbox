@@ -715,7 +715,7 @@ input[type="button"]:disabled,
 }
 
 .pager {
-  margin-left: 1em;
+  margin-right: 1em;
 }
 .pager.selected {
   font-size: 1.5em;
@@ -723,6 +723,12 @@ input[type="button"]:disabled,
 }
 .pager.arrow {
   font-size: 0.8em;
+}
+.pager.arrow.left {
+  margin-right: 2em;
+}
+.pager.arrow.right {
+  margin-left: 2em;
 }
 
 #account-selector {

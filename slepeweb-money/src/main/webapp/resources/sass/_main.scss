@@ -594,13 +594,19 @@
 }
 
 .pager {
-	margin-left: 1em;
+	margin-right: 1em;
 	&.selected {
 		font-size: 1.5em;
 		font-weight: bold;
 	}
 	&.arrow {
 		font-size: 0.8em;	
+		&.left {
+			margin-right: 2em;
+		}
+		&.right {
+			margin-left: 2em;
+		}
 	}
 }
 
