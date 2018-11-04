@@ -4,15 +4,12 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.NormalisedMonth;
@@ -30,17 +27,24 @@ public class PageController extends BaseController {
 	@Autowired private AccountService accountService;
 	@Autowired private TransactionService transactionService;
 	
+	@RequestMapping(value="/list")	
+	public String listNoAccount(ModelMap model) { 
+		List<Account> allAccounts = this.accountService.getAll(false);
+		if (allAccounts.size() > 0) {
+			return listNoMonth(allAccounts.get(0).getId(), model);
+		}
+		return null;
+	}
+	
 	@RequestMapping(value="/list/{accountId}")	
-	public RedirectView homepage(@PathVariable int accountId, HttpServletRequest req, ModelMap model) {
- 
+	public String listNoMonth(@PathVariable long accountId, ModelMap model) { 
 		Timestamp end = this.transactionService.getTransactionDateForAccount(accountId, false);		
 		NormalisedMonth endMonth = new NormalisedMonth(end);
-		model.clear();
-		return new RedirectView(String.format("%s/list/%d/%d", req.getContextPath(), accountId, endMonth.getIndex()));
+		return list(accountId, endMonth.getIndex(), model);
 	}
 	
 	@RequestMapping(value="/list/{accountId}/{selectedMonthIndex}")	
-	public String homepage(@PathVariable int accountId, @PathVariable int selectedMonthIndex, ModelMap model) {
+	public String list(@PathVariable long accountId, @PathVariable int selectedMonthIndex, ModelMap model) {
 		
 		Account a = this.accountService.get(accountId);
 		List<Account> allAccounts = this.accountService.getAll(false);
@@ -81,6 +85,7 @@ public class PageController extends BaseController {
 		Timestamp to = new Timestamp(monthEnd.getTimeInMillis());
 		
 		TransactionList tl = new TransactionList();
+		tl.setBalance(this.transactionService.getBalance(accountId));
 		List<Transaction> transactions = this.transactionService.getTransactionsForAccount(accountId, from, to);
 		int numTransactions = transactions.size();
 		tl.setRunningBalances(new RunningBalance[numTransactions]);
@@ -109,6 +114,7 @@ public class PageController extends BaseController {
 		
 		model.addAttribute("_tl", tl);
 		model.addAttribute("_accounts", allAccounts);
+		model.addAttribute("_accountId", accountId);
 		
 		return "home";
 	}

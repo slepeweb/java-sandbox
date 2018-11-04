@@ -736,3 +736,11 @@ input[type="button"]:disabled,
   font-size: 1.5em;
   font-weight: bold;
 }
+
+.scale_3-2 {
+  font-size: 1.5em;
+}
+
+.inline-block {
+  display: inline-block;
+}

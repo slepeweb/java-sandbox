@@ -2,11 +2,14 @@ package com.slepeweb.money.bean;
 
 import java.sql.Timestamp;
 
+import com.slepeweb.money.service.Util;
+
 public class TransactionList {
 	private Account account;
 	private RunningBalance[] runningBalances;
 	private Timestamp periodStart, periodEnd;
 	private Pager pager;
+	private long balance;
 	
 	public Account getAccount() {
 		return account;
@@ -56,5 +59,18 @@ public class TransactionList {
 	public String getPeriod() {
 		// Use month and year of either start/end
 		return String.format("%1$tB %1$tY", getPeriodStart());
+	}
+
+	public long getBalance() {
+		return balance;
+	}
+
+	public void setBalance(long balance) {
+		this.balance = balance;
 	}	
+	
+	public String getBalanceStr() {
+		return Util.formatPounds(getBalance());
+	}
+
 }

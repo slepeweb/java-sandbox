@@ -27,6 +27,14 @@ then
 	exit 1
 fi
 
+ant -f slepeweb-money.xml
+
+if [ $? -ne 0 ]
+then
+	echo "*** Failed to build jar file [$JAR]"
+	exit 1
+fi
+     
 if [ ! -r $JAR ]
 then
 	echo "*** Please export jar file [$JAR]"

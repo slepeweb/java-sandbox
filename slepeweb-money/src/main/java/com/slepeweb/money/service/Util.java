@@ -12,7 +12,7 @@ public class Util {
 	}
 	
 	public static String formatPounds(long pence) {
-		return String.format("%.2f", pence / 100.0F);
+		return String.format("%,.2f", pence / 100.0F);
 	}
 	
 	public static String formatTimestamp(Timestamp t) {

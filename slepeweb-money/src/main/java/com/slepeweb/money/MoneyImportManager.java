@@ -139,16 +139,16 @@ public class MoneyImportManager {
 	
 	private Transaction getCachedTransaction(long origId, MoneyImportService mis) {
 		Transaction t = this.transactionCache.get(origId);
-		if (t == null) {
-			// If not cached, look in the db
-			t = mis.getTransactionByOrigId(origId);
-			if (t == null) {
-				LOG.error(String.format("Failed to find transaction [%d] in MySQL database", origId));
-			}
-			else {
-				this.transactionCache.put(origId, t);
-			}
-		}
+//		if (t == null) {
+//			// If not cached, look in the db
+//			t = mis.getTransactionByOrigId(origId);
+//			if (t == null) {
+//				LOG.error(String.format("Failed to find transaction [%d] in MySQL database", origId));
+//			}
+//			else {
+//				this.transactionCache.put(origId, t);
+//			}
+//		}
 		
 		return t;
 	}
@@ -201,7 +201,7 @@ public class MoneyImportManager {
 				}
 			}
 			else {
-				LOG.error(String.format("Failed to identify parent transaction [%d]", parentId));
+				LOG.debug(String.format("Failed to identify parent transaction [%d]", parentId));
 			}
 			
 			// Mark this parent transaction as processed, regardless of success or failure
