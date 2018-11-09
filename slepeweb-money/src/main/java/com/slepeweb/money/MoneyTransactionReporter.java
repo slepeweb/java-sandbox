@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -42,7 +41,6 @@ public class MoneyTransactionReporter {
 		monthBeginning.add(Calendar.MONTH, -3);
 		Timestamp from = new Timestamp(monthBeginning.getTimeInMillis());
 		Timestamp to = new Timestamp(today.getTimeInMillis());
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		long balance = 0;
 		
 		// Open output file
@@ -75,7 +73,7 @@ public class MoneyTransactionReporter {
 						pw.println(
 								pack(String.valueOf(t.getId()), 8) + 
 								pack(String.valueOf(t.getOrigId()), 8) + 
-								pack(sdf.format(new Date(t.getEntered().getTime())), 16) + 
+								pack(Util.formatTimestamp(new Date(t.getEntered().getTime())), 16) + 
 								pack(t.getPayee().getName(), 40) + 
 								pack(t.getCategory().toString(), 40) + 
 								pack(t.getAmountInPounds(), 10) + 

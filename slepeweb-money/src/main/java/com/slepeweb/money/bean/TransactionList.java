@@ -8,7 +8,7 @@ public class TransactionList {
 	private Account account;
 	private RunningBalance[] runningBalances;
 	private Timestamp periodStart, periodEnd;
-	private Pager pager;
+	private MonthPager pager;
 	private long balance;
 	
 	public Account getAccount() {
@@ -47,11 +47,11 @@ public class TransactionList {
 		return this;
 	}
 	
-	public Pager getPager() {
+	public MonthPager getPager() {
 		return pager;
 	}
 	
-	public TransactionList setPager(Pager p) {
+	public TransactionList setPager(MonthPager p) {
 		this.pager = p;
 		return this;
 	}

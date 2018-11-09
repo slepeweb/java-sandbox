@@ -10,6 +10,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -21,17 +22,27 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	@Autowired private AccountService accountService;
 	@Autowired private SplitTransactionService splitTransactionService;
 	
+	private static final String FROM = 
+			"from transaction t " +
+			"join account a on a.id = t.accountid " + 
+			"join payee p on p.id = t.payeeid " +
+			"join category c on c.id = t.categoryid ";
+	
 	private static final String SELECT = 
 			"select " +
 					"a.id as accountid, a.name as accountname, a.openingbalance, a.closed, a.note, " + 
 					"p.id as payeeid, p.name as payeename, " + 
 					"c.id as categoryid, c.major, c.minor, " + 
 					"t.id, t.origid, t.entered, t.memo, t.reference, t.amount, t.reconciled, " +
-					"t.transferid, t.split " +
-			"from transaction t " +
-					"join account a on a.id = t.accountid " + 
-					"join payee p on p.id = t.payeeid " +
-					"join category c on c.id = t.categoryid ";
+					"t.transferid, t.split " + FROM;
+	
+	private static final String FLAT_SELECT = 
+			"select " +
+					"a.name as account, " + 
+					"p.name as payee, " + 
+					"c.major, c.minor, " + 
+					"t.entered, t.memo, t.reference, t.amount " + FROM;
+			;
 	
 	public Transaction save(Transaction pt) throws MissingDataException, DuplicateItemException {
 		if (pt.isDefined4Insert()) {
@@ -173,6 +184,13 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		}
 		
 		return list;
+	}
+	
+	public List<FlatTransaction> getTransactionsForCategory(long categoryId) {
+		return this.jdbcTemplate.query(
+				FLAT_SELECT + "where t.categoryid = ? order by t.entered desc", 
+				new Object[]{categoryId},
+				new RowMapperUtil.FlatTransactionMapper());
 	}
 	
 	public long getBalance(long accountId) {

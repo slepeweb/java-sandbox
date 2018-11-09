@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
@@ -53,6 +54,19 @@ public class RowMapperUtil {
 	public static final class TransactionDateMapper implements RowMapper<Timestamp> {
 		public Timestamp mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return rs.getTimestamp("entered");
+		}
+	}
+	
+	public static final class FlatTransactionMapper implements RowMapper<FlatTransaction> {
+		public FlatTransaction mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new FlatTransaction().
+					setAccount(rs.getString("account")).
+					setPayee(rs.getString("payee")).
+					setCategory(rs.getString("major") + " > " + rs.getString("minor")).
+					setEntered(rs.getTimestamp("entered")).
+					setAmount(rs.getLong("amount")).
+					setReference(rs.getString("reference")).
+					setMemo(rs.getString("memo"));
 		}
 	}
 	

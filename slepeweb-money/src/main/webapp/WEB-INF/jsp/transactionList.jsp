@@ -2,7 +2,7 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
-<c:set var="_urlPrefix">${_ctxPath}/list/${_accountId}</c:set>
+<c:set var="_urlPrefix">${_ctxPath}/transaction/list/${_accountId}</c:set>
 	
 <mny:standardLayout>
 	<div class="inline-block">
@@ -52,24 +52,44 @@
 			<tr>
 				<td class="date">${_trn.enteredStr}</td>
 				<td class="payee">${_trn.payee.name}</td>
-				<td class="payee">${_trn.split ? 'Total' : _trn.category}</td>
-				<td class="currency amount">${_trn.amountInPounds}</td>
-				<td class="memo">${_trn.memo}</td>
-				<td class="currency amount">${_trn.balance}</td>
 				
-				<c:if test="${_trn.split}">
+				<c:choose><c:when test="${not _trn.split}">
+					<td class="payee">${_trn.category}</td>
+					<td class="currency amount">${_trn.amountInPounds}</td>
+					<td class="memo">${_trn.memo}</td>
+				</c:when><c:otherwise>
+					<td>(Split transaction) Total:<br />
 						<c:forEach items="${_trn.splits}" var="_split">
-							<tr>
-								<td></td>
-								<td></td>
-								<td>${_split.category}</td>
-								<td>${_split.amountInPounds}</td>
-								<td>${_split.memo}</td>
-								<td></td>
-							</tr>
-						</c:forEach>
-				</c:if>
+								${_split.category}<br />
+						</c:forEach>						
+					</td>
+					<td class="currency amount">${_trn.amountInPounds}<br />
+						<c:forEach items="${_trn.splits}" var="_split">
+								${_split.amountInPounds}<br />
+						</c:forEach>						
+					</td>
+					<td> <br />
+						<c:forEach items="${_trn.splits}" var="_split">
+								${_split.memo}<br />
+						</c:forEach>						
+					</td>
+				</c:otherwise></c:choose>
+				
+				<td class="currency amount">${_trn.balance}</td>
 			</tr>
+
+			<c:if test="${_trn.split}">
+					<c:forEach items="${_trn.splits}" var="_split">
+						<tr>
+							<td></td>
+							<td></td>
+							<td>${_split.category}</td>
+							<td class="currency amount">${_split.amountInPounds}</td>
+							<td>${_split.memo}</td>
+							<td></td>
+						</tr>
+					</c:forEach>
+			</c:if>
 		</c:forEach>
 	</table>
 	</c:when><c:otherwise>

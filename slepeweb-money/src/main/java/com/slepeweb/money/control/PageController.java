@@ -1,8 +1,12 @@
 package com.slepeweb.money.control;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,39 +16,131 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.FlatTransaction;
+import com.slepeweb.money.bean.MonthPager;
+import com.slepeweb.money.bean.NamedList;
 import com.slepeweb.money.bean.NormalisedMonth;
 import com.slepeweb.money.bean.Pager;
+import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RunningBalance;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.service.AccountService;
+import com.slepeweb.money.service.CategoryService;
+import com.slepeweb.money.service.PayeeService;
 import com.slepeweb.money.service.TransactionService;
 import com.slepeweb.money.service.Util;
 
 @Controller
 public class PageController extends BaseController {
 	
+	private static final String CATEGORY_SEARCH = "_categorySearch";
+	
 	@Autowired private AccountService accountService;
+	@Autowired private PayeeService payeeService;
+	@Autowired private CategoryService categoryService;
 	@Autowired private TransactionService transactionService;
 	
-	@RequestMapping(value="/list")	
-	public String listNoAccount(ModelMap model) { 
+	@RequestMapping(value="/category/list")	
+	public String categoryList(ModelMap model) { 
+		List<NamedList<Category>> categories = new ArrayList<NamedList<Category>>();
+		NamedList<Category> mapping = null;
+		String lastName = null, nextName = null;
+		
+		for (Category c : this.categoryService.getAll()) {
+			if (c.getMajor().length() == 0) {
+				// This happens, not sure why
+				c.setMajor("(no major category)");
+			}
+			
+			if (c.getMinor().length() == 0) {
+				// This happens, not sure why
+				c.setMinor("(no minor category)");
+			}
+			
+			nextName = c.getMajor();
+			if (lastName == null || ! lastName.equals(nextName)) {
+				mapping = new NamedList<Category>(nextName, new ArrayList<Category>());
+				categories.add(mapping);
+				lastName = nextName;
+			}
+			
+			mapping.getObjects().add(c);
+		}
+		
+		model.addAttribute("_categories", categories);
+		return "categoryList";
+	}
+	
+	@RequestMapping(value="/payee/list")	
+	public String payeeList(ModelMap model) { 
+		List<NamedList<Payee>> payees = new ArrayList<NamedList<Payee>>();
+		NamedList<Payee> mapping = null;
+		String lastName = null, nextName = null;
+		
+		for (Payee p : this.payeeService.getAll()) {
+			if (p.getName().length() == 0) {
+				// This happens, not sure why
+				continue;
+			}
+			
+			nextName = p.getName().substring(0, 1).toUpperCase();
+			if (StringUtils.isNumeric(nextName)) {
+				nextName = "0";
+			}
+			
+			if (lastName == null || ! lastName.equals(nextName)) {
+				mapping = new NamedList<Payee>(nextName, new ArrayList<Payee>());
+				payees.add(mapping);
+				lastName = nextName;
+			}
+			
+			mapping.getObjects().add(p);
+		}
+		
+		model.addAttribute("_payees", payees);
+		return "payeeList";
+	}
+	
+	@RequestMapping(value="/account/list")	
+	public String accountList(ModelMap model) { 
+		List<Account> open = this.accountService.getAll(false);
+		List<Account> all = this.accountService.getAll(true);
+		
+		// Remove all open accounts from the 'all' collection
+		Iterator<Account> iter = all.iterator();
+		Account a;
+		while (iter.hasNext()) {
+			a = iter.next();
+			if (! a.isClosed()) {
+				iter.remove();
+			}
+		}
+		
+		model.addAttribute("_openAccounts", open);
+		model.addAttribute("_closedAccounts", all);
+		return "accountList";
+	}
+	
+	@RequestMapping(value="/transaction/list")	
+	public String transactionListNoAccount(ModelMap model) { 
 		List<Account> allAccounts = this.accountService.getAll(false);
 		if (allAccounts.size() > 0) {
-			return listNoMonth(allAccounts.get(0).getId(), model);
+			return transactionListNoMonth(allAccounts.get(0).getId(), model);
 		}
 		return null;
 	}
 	
-	@RequestMapping(value="/list/{accountId}")	
-	public String listNoMonth(@PathVariable long accountId, ModelMap model) { 
+	@RequestMapping(value="/transaction/list/{accountId}")	
+	public String transactionListNoMonth(@PathVariable long accountId, ModelMap model) { 
 		Timestamp end = this.transactionService.getTransactionDateForAccount(accountId, false);		
 		NormalisedMonth endMonth = new NormalisedMonth(end);
-		return list(accountId, endMonth.getIndex(), model);
+		return transactionList(accountId, endMonth.getIndex(), model);
 	}
 	
-	@RequestMapping(value="/list/{accountId}/{selectedMonthIndex}")	
-	public String list(@PathVariable long accountId, @PathVariable int selectedMonthIndex, ModelMap model) {
+	@RequestMapping(value="/transaction/list/{accountId}/{selectedMonthIndex}")	
+	public String transactionList(@PathVariable long accountId, @PathVariable int selectedMonthIndex, ModelMap model) {
 		
 		Account a = this.accountService.get(accountId);
 		List<Account> allAccounts = this.accountService.getAll(false);
@@ -65,7 +161,7 @@ public class PageController extends BaseController {
 			selectedMonth.set(lastMonth);
 		}
 			
-		Pager p = new Pager(firstMonth, selectedMonth, lastMonth);
+		MonthPager p = new MonthPager(firstMonth, selectedMonth, lastMonth);
 		
 		Calendar monthEnd = Util.today();
 		monthEnd.add(Calendar.MONTH, selectedMonth.getCalendarOffset());
@@ -99,7 +195,7 @@ public class PageController extends BaseController {
 			
 			if (t.isTransfer() && StringUtils.isBlank(t.getMemo())) {
 				Transaction tt = this.transactionService.get(t.getTransferId());
-				t.setMemo(String.format("(%s account '%s')", t.getAmount() < 0 ? "To " : "From ", tt.getAccount().getName()));
+				t.setMemo(String.format("(%s '%s')", t.getAmount() < 0 ? "To " : "From ", tt.getAccount().getName()));
 			}
 			
 			tl.getRunningBalances()[numTransactions - i - 1] = new RunningBalance(t).setBalance(Util.formatPounds(balance));
@@ -116,7 +212,39 @@ public class PageController extends BaseController {
 		model.addAttribute("_accounts", allAccounts);
 		model.addAttribute("_accountId", accountId);
 		
-		return "home";
+		return "transactionList";
 	}
 
+	@RequestMapping(value="/transaction/list/by/category/{categoryId}")	
+	public String transactionListByCategoryNoDate(@PathVariable long categoryId, 
+			HttpServletRequest req, ModelMap model) { 
+		
+		return transactionListByCategory(categoryId, 1, req, model);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/transaction/list/by/category/{categoryId}/{selectedPage}")	
+	public String transactionListByCategory(@PathVariable long categoryId, 
+			@PathVariable int selectedPage, HttpServletRequest req, ModelMap model) { 
+		
+		List<FlatTransaction> results = null;
+		if (selectedPage == 1) {
+			// Do a fresh search
+			results = this.transactionService.getTransactionsForCategory(categoryId);
+			req.getSession().setAttribute(CATEGORY_SEARCH, results);
+		}
+		else {
+			// Look for stored results
+			results = (List<FlatTransaction>) req.getSession().getAttribute(CATEGORY_SEARCH);
+			if (results == null) {
+				results = this.transactionService.getTransactionsForCategory(categoryId);
+				req.getSession().setAttribute(CATEGORY_SEARCH, results);
+			}
+		}
+		
+		Pager<FlatTransaction> pager = new Pager<FlatTransaction>(results, 50, selectedPage);
+		model.addAttribute("_pager", pager);
+		model.addAttribute("_category", this.categoryService.get(categoryId));
+		return "transactionListByCategory";
+	}
 }

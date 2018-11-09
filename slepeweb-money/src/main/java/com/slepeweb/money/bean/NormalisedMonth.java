@@ -1,6 +1,5 @@
 package com.slepeweb.money.bean;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -8,7 +7,6 @@ import com.slepeweb.money.service.Util;
 
 public class NormalisedMonth {
 	private int index;
-	public static SimpleDateFormat SDF = new SimpleDateFormat("MMMM");
 
 	public NormalisedMonth(NormalisedMonth nm) {
 		this(nm.getIndex());

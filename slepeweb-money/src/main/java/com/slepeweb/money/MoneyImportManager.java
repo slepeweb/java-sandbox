@@ -1,8 +1,6 @@
 package com.slepeweb.money;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -16,6 +14,7 @@ import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.TimeWindow;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.MoneyImportService;
+import com.slepeweb.money.service.Util;
 
 public class MoneyImportManager {
 	private static Logger LOG = Logger.getLogger(MoneyImportManager.class);
@@ -36,13 +35,13 @@ public class MoneyImportManager {
 		
 		if (args.length > 1) {
 			if (args[0].equals("-from")) {
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				try {
-					twin.setFrom(new Timestamp(sdf.parse(args[1]).getTime()));
+				Timestamp from = Util.parseTimestamp(args[1]);
+				if (from != null) {
+					twin.setFrom(from);
 					LOG.info(String.format("Time window starts at %s", args[1]));
 				}
-				catch (ParseException e) {
-					LOG.fatal(String.format("Failed to parse date [%s]", args[0]), e);
+				else {
+					LOG.fatal(String.format("Failed to parse date [%s]", args[1]));
 				}
 			}
 		}

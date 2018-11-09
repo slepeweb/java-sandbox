@@ -45,6 +45,8 @@ public class Transaction extends DbEntity {
 		target.setReference(source.getReference());
 		target.setMemo(source.getMemo());
 		target.setOrigId(source.getOrigId());
+		target.setSplit(source.isSplit());
+		target.setSplits(source.getSplits());
 	}
 	
 	public boolean isDefined4Insert() {

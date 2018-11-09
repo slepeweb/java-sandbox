@@ -2,10 +2,13 @@ package com.slepeweb.money.service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
+	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
 	
 	public static long decimal2long(BigDecimal d) {
 		return d.multiply(ONE_HUNDRED).longValue();
@@ -15,17 +18,30 @@ public class Util {
 		return String.format("%,.2f", pence / 100.0F);
 	}
 	
-	public static String formatTimestamp(Timestamp t) {
-		if (t != null) {
-			return String.format("%1$tY-%1$tm-%1$td", t);
+	public static String formatTimestamp(Date d) {
+		if (d != null) {
+			return SDF.format(d);
 		}
 		return "";
+	}
+	
+	public static Timestamp parseTimestamp(String s) {
+		try {
+			return new Timestamp(SDF.parse(s).getTime());
+		} 
+		catch (Exception e) {
+			return null;
+		}
 	}
 	
 	public static Calendar today() {
 		Calendar c = Calendar.getInstance();
 		zeroTimeOfDay(c);
 		return c;
+	}
+	
+	public static Timestamp today(Calendar c) {
+		return new Timestamp(c.getTimeInMillis());
 	}
 	
 	public static void zeroTimeOfDay(Calendar c) {

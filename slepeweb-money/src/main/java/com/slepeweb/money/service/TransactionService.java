@@ -3,6 +3,7 @@ package com.slepeweb.money.service;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -13,6 +14,7 @@ public interface TransactionService {
 	Transaction getByOrigId(long id);
 	List<Transaction> getTransactionsForAccount(long id);
 	List<Transaction> getTransactionsForAccount(long id, Timestamp from, Timestamp to);
+	List<FlatTransaction> getTransactionsForCategory(long categoryId);
 	Timestamp getTransactionDateForAccount(long accountId, boolean first);
 	Transaction save(Transaction p) throws MissingDataException, DuplicateItemException;
 	Transaction update(Transaction from, Transaction to) throws MissingDataException, DuplicateItemException;

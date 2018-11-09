@@ -5,6 +5,7 @@ public class Account extends Payee {
 	private long openingBalance = 0L;
 	private boolean closed;
 	private String note;
+	private long balance;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Account) {
@@ -58,5 +59,13 @@ public class Account extends Payee {
 	public Account setName(String s) {
 		super.setName(s);
 		return this;
+	}
+
+	public long getBalance() {
+		return balance;
+	}
+
+	public void setBalance(long balance) {
+		this.balance = balance;
 	}
 }

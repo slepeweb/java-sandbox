@@ -51,6 +51,9 @@ create table transaction
 	
 	primary key (id),
 	index idx_origid (origid),
+	index idx_transaction_account (accountid, entered desc),
+	index idx_transaction_payee (payeeid, entered desc),
+	index idx_transaction_category (categoryid, entered desc),
 	constraint foreign key (accountid) references account(id) on delete cascade,
 	constraint foreign key (payeeid) references payee(id) on delete cascade,
 	constraint foreign key (categoryid) references category(id) on delete cascade
