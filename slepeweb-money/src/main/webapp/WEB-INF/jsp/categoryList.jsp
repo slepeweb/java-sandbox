@@ -4,11 +4,13 @@
 	
 <mny:standardLayout>
 	<h2>Categories</h2>			
+	<p><strong>Total no. of categories = ${_count}</strong></p>
+	
 	<c:choose><c:when test="${not empty _categories}">
 	
 		<div id="accordion">		
 			<c:forEach items="${_categories}" var="_m">
-				<h3><i class="fas fa-bars category-menu"></i>&nbsp;&nbsp;${_m.name}</h3>
+				<h3>${_m.name}</h3>
 				<div>
 					<table>
 						<c:forEach items="${_m.objects}" var="_c">
@@ -34,3 +36,28 @@
 		<li class="category-menu-close">Close menu</li>
 	</ul>
 </div>
+
+<script>
+$(".category-menu").click(function(e){
+	var id = $(this).parent().attr("data-id");
+	var dialog = $("#category-menu-dialog");
+	if (dialog.css("visibility") == "visible") {
+		dialog.css("visibility", "hidden");
+		return;
+	}
+	
+	var menuOffset = $(this).offset();
+	dialog.offset({left: menuOffset.left - 150, top: menuOffset.top});		
+	dialog.css("visibility", "visible");
+	dialog.attr("data-id", id);
+});
+
+$(".category-menu-close").click(function(e){
+	$("#category-menu-dialog").css("visibility", "hidden");
+});
+
+$(".category-menu-find").click(function(e){
+	var id = $(this).parent().parent().attr("data-id");
+	window.location = "/money/transaction/list/by/category/" + id;
+});
+</script>

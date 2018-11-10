@@ -186,10 +186,19 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return list;
 	}
 	
-	public List<FlatTransaction> getTransactionsForCategory(long categoryId) {
+	public List<FlatTransaction> getTransactionsForCategory(long categoryId, int limit) {
 		return this.jdbcTemplate.query(
-				FLAT_SELECT + "where t.categoryid = ? order by t.entered desc", 
+				FLAT_SELECT + "where t.categoryid = ? order by t.entered desc " +
+						(limit > 0 ? String.format("limit %d", limit) : ""), 
 				new Object[]{categoryId},
+				new RowMapperUtil.FlatTransactionMapper());
+	}
+	
+	public List<FlatTransaction> getTransactionsForPayee(long payeeId, int limit) {
+		return this.jdbcTemplate.query(
+				FLAT_SELECT + "where t.payeeid = ? order by t.entered desc " +
+						(limit > 0 ? String.format("limit %d", limit) : ""), 
+				new Object[]{payeeId},
 				new RowMapperUtil.FlatTransactionMapper());
 	}
 	

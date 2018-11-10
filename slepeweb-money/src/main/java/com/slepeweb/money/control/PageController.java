@@ -35,6 +35,7 @@ import com.slepeweb.money.service.Util;
 @Controller
 public class PageController extends BaseController {
 	
+	private static final String PAYEE_SEARCH = "_payeeSearch";
 	private static final String CATEGORY_SEARCH = "_categorySearch";
 	
 	@Autowired private AccountService accountService;
@@ -47,8 +48,9 @@ public class PageController extends BaseController {
 		List<NamedList<Category>> categories = new ArrayList<NamedList<Category>>();
 		NamedList<Category> mapping = null;
 		String lastName = null, nextName = null;
+		List<Category> all = this.categoryService.getAll();
 		
-		for (Category c : this.categoryService.getAll()) {
+		for (Category c : all) {
 			if (c.getMajor().length() == 0) {
 				// This happens, not sure why
 				c.setMajor("(no major category)");
@@ -70,6 +72,7 @@ public class PageController extends BaseController {
 		}
 		
 		model.addAttribute("_categories", categories);
+		model.addAttribute("_count", all.size());
 		return "categoryList";
 	}
 	
@@ -78,8 +81,9 @@ public class PageController extends BaseController {
 		List<NamedList<Payee>> payees = new ArrayList<NamedList<Payee>>();
 		NamedList<Payee> mapping = null;
 		String lastName = null, nextName = null;
+		List<Payee> all = this.payeeService.getAll();
 		
-		for (Payee p : this.payeeService.getAll()) {
+		for (Payee p : all) {
 			if (p.getName().length() == 0) {
 				// This happens, not sure why
 				continue;
@@ -100,6 +104,7 @@ public class PageController extends BaseController {
 		}
 		
 		model.addAttribute("_payees", payees);
+		model.addAttribute("_count", all.size());
 		return "payeeList";
 	}
 	
@@ -216,35 +221,110 @@ public class PageController extends BaseController {
 	}
 
 	@RequestMapping(value="/transaction/list/by/category/{categoryId}")	
-	public String transactionListByCategoryNoDate(@PathVariable long categoryId, 
+	public String transactionListByCategoryNoPage(@PathVariable long categoryId, 
 			HttpServletRequest req, ModelMap model) { 
 		
 		return transactionListByCategory(categoryId, 1, req, model);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/transaction/list/by/category/{categoryId}/all")	
+	public String transactionListAllByCategoryNoPage(@PathVariable long categoryId, 
+			HttpServletRequest req, ModelMap model) { 
+		
+		return transactionListAllByCategory(categoryId, 1, req, model);
+	}
+	
 	@RequestMapping(value="/transaction/list/by/category/{categoryId}/{selectedPage}")	
 	public String transactionListByCategory(@PathVariable long categoryId, 
 			@PathVariable int selectedPage, HttpServletRequest req, ModelMap model) { 
 		
+		return getTransactionListByCategory(categoryId, selectedPage, 1000, req, model);
+	}
+	
+	@RequestMapping(value="/transaction/list/by/category/{categoryId}/{selectedPage}/all")	
+	public String transactionListAllByCategory(@PathVariable long categoryId, 
+			@PathVariable int selectedPage, HttpServletRequest req, ModelMap model) { 
+		
+		return getTransactionListByCategory(categoryId, selectedPage, 0, req, model);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String getTransactionListByCategory(long categoryId, 
+			int selectedPage, int limit, HttpServletRequest req, ModelMap model) {
+		
 		List<FlatTransaction> results = null;
 		if (selectedPage == 1) {
 			// Do a fresh search
-			results = this.transactionService.getTransactionsForCategory(categoryId);
+			results = this.transactionService.getTransactionsForCategory(categoryId, limit);
 			req.getSession().setAttribute(CATEGORY_SEARCH, results);
 		}
 		else {
 			// Look for stored results
 			results = (List<FlatTransaction>) req.getSession().getAttribute(CATEGORY_SEARCH);
 			if (results == null) {
-				results = this.transactionService.getTransactionsForCategory(categoryId);
+				results = this.transactionService.getTransactionsForCategory(categoryId, limit);
 				req.getSession().setAttribute(CATEGORY_SEARCH, results);
 			}
 		}
 		
-		Pager<FlatTransaction> pager = new Pager<FlatTransaction>(results, 50, selectedPage);
+		Pager<FlatTransaction> pager = new Pager<FlatTransaction>(results, 20, selectedPage);
 		model.addAttribute("_pager", pager);
 		model.addAttribute("_category", this.categoryService.get(categoryId));
+		model.addAttribute("_limit", limit); 
 		return "transactionListByCategory";
+	}
+
+	@RequestMapping(value="/transaction/list/by/payee/{payeeId}")	
+	public String transactionListByPayeeNoPage(@PathVariable long payeeId, 
+			HttpServletRequest req, ModelMap model) { 
+		
+		return transactionListByPayee(payeeId, 1, req, model);
+	}
+	
+	@RequestMapping(value="/transaction/list/by/payee/{payeeId}/all")	
+	public String transactionListAllByPayeeNoPage(@PathVariable long payeeId, 
+			HttpServletRequest req, ModelMap model) { 
+		
+		return transactionListAllByPayee(payeeId, 1, req, model);
+	}
+	
+	@RequestMapping(value="/transaction/list/by/payee/{payeeId}/{selectedPage}")	
+	public String transactionListByPayee(@PathVariable long payeeId, 
+			@PathVariable int selectedPage, HttpServletRequest req, ModelMap model) { 
+		
+		return getTransactionListByPayee(payeeId, selectedPage, 1000, req, model);
+	}
+	
+	@RequestMapping(value="/transaction/list/by/payee/{payeeId}/{selectedPage}/all")	
+	public String transactionListAllByPayee(@PathVariable long payeeId, 
+			@PathVariable int selectedPage, HttpServletRequest req, ModelMap model) { 
+		
+		return getTransactionListByPayee(payeeId, selectedPage, 0, req, model);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String getTransactionListByPayee(long payeeId, 
+			int selectedPage, int limit, HttpServletRequest req, ModelMap model) {
+		
+		List<FlatTransaction> results = null;
+		if (selectedPage == 1) {
+			// Do a fresh search
+			results = this.transactionService.getTransactionsForPayee(payeeId, limit);
+			req.getSession().setAttribute(PAYEE_SEARCH, results);
+		}
+		else {
+			// Look for stored results
+			results = (List<FlatTransaction>) req.getSession().getAttribute(PAYEE_SEARCH);
+			if (results == null) {
+				results = this.transactionService.getTransactionsForPayee(payeeId, limit);
+				req.getSession().setAttribute(PAYEE_SEARCH, results);
+			}
+		}
+		
+		Pager<FlatTransaction> pager = new Pager<FlatTransaction>(results, 20, selectedPage);
+		model.addAttribute("_pager", pager);
+		model.addAttribute("_payee", this.payeeService.get(payeeId));
+		model.addAttribute("_limit", limit); 
+		return "transactionListByPayee";
 	}
 }

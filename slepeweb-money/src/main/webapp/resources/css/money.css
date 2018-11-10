@@ -747,7 +747,7 @@ input[type="button"]:disabled,
   width: 100%;
 }
 
-#category-menu-dialog {
+#category-menu-dialog, #payee-menu-dialog {
   width: 200px;
   background-color: #ccc;
   visibility: hidden;

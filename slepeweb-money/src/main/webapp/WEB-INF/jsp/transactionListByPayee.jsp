@@ -2,11 +2,11 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
-<c:set var="_urlPrefix">${_ctxPath}/transaction/list/by/category/${_category.id}</c:set>
+<c:set var="_urlPrefix">${_ctxPath}/transaction/list/by/payee/${_payee.id}</c:set>
 	
 <mny:standardLayout>
 
-	<h2>Transactions for category '${_category}'</h2>	
+	<h2>Transactions for payee '${_payee}'</h2>	
 	
 	<p>
 		<strong>Total no. of transactions = ${_pager.totalHits}</strong>
@@ -37,21 +37,21 @@
 		<table id="trn_listing">
 			<tr>
 				<th>Date</th>
-				<th>Payee</th>
+				<th>Category</th>
 				<th>Amount</th>
 				<th>Memo</th>
 			</tr>
 			<c:forEach items="${_pager.page}" var="_trn">
 				<tr>
 					<td class="date">${_trn.enteredStr}</td>
-					<td class="payee">${_trn.payee}</td>
+					<td class="category">${_trn.category}</td>
 					<td class="currency amount">${_trn.amountInPounds}</td>
 					<td class="memo">${_trn.memo}</td>				
 				</tr>
 			</c:forEach>
 		</table>
 	</c:when><c:otherwise>
-		<p><strong>No transactions for this category</strong></p>
+		<p><strong>No transactions for this payee</strong></p>
 	</c:otherwise></c:choose>
 
 </mny:standardLayout>
