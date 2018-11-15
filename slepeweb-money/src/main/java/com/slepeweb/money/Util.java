@@ -1,4 +1,4 @@
-package com.slepeweb.money.service;
+package com.slepeweb.money;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;

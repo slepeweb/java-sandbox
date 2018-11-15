@@ -30,7 +30,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	
 	private static final String SELECT = 
 			"select " +
-					"a.id as accountid, a.name as accountname, a.openingbalance, a.closed, a.note, " + 
+					"a.id as accountid, a.name as accountname, a.type as accounttype, a.openingbalance, a.closed, a.note, " + 
 					"p.id as payeeid, p.name as payeename, " + 
 					"c.id as categoryid, c.major, c.minor, " + 
 					"t.id, t.origid, t.entered, t.memo, t.reference, t.amount, t.reconciled, " +

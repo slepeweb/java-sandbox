@@ -63,7 +63,7 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 			LOG.info(compose("Updated category", c));
 		}
 		else {
-			LOG.info(compose("Category not modified", c));
+			LOG.debug(compose("Category not modified", c));
 		}
 	}
 

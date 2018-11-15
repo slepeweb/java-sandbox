@@ -3,6 +3,7 @@ package com.slepeweb.money.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import com.slepeweb.money.except.MissingDataException;
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 	
 	private static Logger LOG = Logger.getLogger(AccountServiceImpl.class);
+	@Autowired private TransactionService transactionService;
 	
 	public Account save(Account a) throws MissingDataException, DuplicateItemException {
 		if (a.isDefined4Insert()) {
@@ -39,8 +41,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into account (name, openingbalance, closed, note) values (?, ?, ?, ?)", 
-					a.getName(), a.getOpeningBalance(), a.isClosed(), a.getNote());
+					"insert into account (name, type, openingbalance, closed, note) values (?, ?, ?, ?, ?)", 
+					a.getName(), a.getType(), a.getOpeningBalance(), a.isClosed(), a.getNote());
 			
 			a.setId(getLastInsertId());	
 			
@@ -57,13 +59,14 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 			dbRecord.assimilate(a);
 			
 			this.jdbcTemplate.update(
-					"update account set name = ?, openingbalance = ?, closed = ?, note = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getOpeningBalance(), dbRecord.isClosed(), dbRecord.getNote(), dbRecord.getId());
+					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getType(), dbRecord.getOpeningBalance(), dbRecord.isClosed(), 
+					dbRecord.getNote(), dbRecord.getId());
 			
 			LOG.info(compose("Updated account", a));
 		}
 		else {
-			LOG.info(compose("Account not modified", a));
+			LOG.debug(compose("Account not modified", a));
 		}
 	}
 
@@ -87,5 +90,16 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	public List<Account> getAll(boolean includingClosed) {
 		String sql = String.format("select * from account %s order by name", includingClosed ? "" : "where closed=false");
 		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
+	}
+	
+	public List<Account> getAllWithBalances() {
+		String sql = "select * from account where closed=false order by type, name";
+		List<Account> accounts =  this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
+		
+		for (Account a : accounts ) {
+			a.setBalance(this.transactionService.getBalance(a.getId()));
+		}
+		
+		return accounts;
 	}
 }

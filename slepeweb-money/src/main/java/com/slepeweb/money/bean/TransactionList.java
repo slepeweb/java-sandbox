@@ -2,7 +2,7 @@ package com.slepeweb.money.bean;
 
 import java.sql.Timestamp;
 
-import com.slepeweb.money.service.Util;
+import com.slepeweb.money.Util;
 
 public class TransactionList {
 	private Account account;

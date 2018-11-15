@@ -26,6 +26,7 @@ create table account
 (
 	id int not null auto_increment,
 	name varchar(255),
+	type enum ('current', 'savings', 'credit', 'pension'),
 	openingbalance int,
 	closed boolean,
 	note varchar(255),

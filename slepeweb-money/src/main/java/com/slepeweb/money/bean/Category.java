@@ -71,8 +71,6 @@ public class Category extends DbEntity {
 		if (getClass() != obj.getClass())
 			return false;
 		Category other = (Category) obj;
-		if (id != other.id)
-			return false;
 		if (major == null) {
 			if (other.major != null)
 				return false;

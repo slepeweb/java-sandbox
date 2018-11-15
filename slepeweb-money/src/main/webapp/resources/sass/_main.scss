@@ -572,7 +572,7 @@
 	color: #808080;
 }
 
-#trn_listing td {
+.trn_listing td {
 	vertical-align: top;
 	
 	&.date {
@@ -635,4 +635,9 @@
 	display: block;
 	float: none;
 	z-index: 1;
+}
+
+#navigation {
+	text-decoration: none;
+	list-style: none;
 }

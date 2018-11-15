@@ -34,54 +34,36 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		// Get all accounts from MSAccess, save them in mysql, and store them in a temporary cache
 		Account aRecord, a;
 		while((a = this.msAccessService.getNextAccount()) != null) {
-			aRecord = this.accountService.get(a.getName());
-			if (aRecord == null) {
-				try {
-					aRecord = this.accountService.save(a);
-				}
-				catch (Exception e) {
-					LOG.error("Failed to save account", e);
-				}
-			}
-			
-			if (aRecord != null) {
+			try {
+				aRecord = this.accountService.save(a);
 				this.msAccessService.cacheAccount(a.getId(), aRecord);
+			}
+			catch (Exception e) {
+				LOG.error("Failed to save account", e);
 			}
 		}
 		
 		// Repeat for payments
 		Payee pRecord, p;
 		while((p = this.msAccessService.getNextPayee()) != null) {
-			pRecord = this.payeeService.get(p.getName());
-			if (pRecord == null) {
-				try {
-					pRecord = this.payeeService.save(p);
-				}
-				catch (Exception e) {
-					LOG.error("Failed to save payee", e);
-				}
-			}
-			
-			if (pRecord != null) {
+			try {
+				pRecord = this.payeeService.save(p);
 				this.msAccessService.cachePayee(p.getId(), pRecord);
+			}
+			catch (Exception e) {
+				LOG.error("Failed to save payee", e);
 			}
 		}
 		
 		// Repeat for categories
 		Category cRecord, c;
 		while((c = this.msAccessService.getNextCategory()) != null) {
-			cRecord = this.categoryService.get(c.getMajor(), c.getMinor());
-			if (cRecord == null) {
-				try {
-					cRecord = this.categoryService.save(c);
-				}
-				catch (Exception e) {
-					LOG.error("Failed to save category", e);
-				}
-			}
-			
-			if (cRecord != null) {
+			try {
+				cRecord = this.categoryService.save(c);
 				this.msAccessService.cacheCategory(c.getId(), cRecord);
+			}
+			catch (Exception e) {
+				LOG.error("Failed to save category", e);
 			}
 		}
 	}

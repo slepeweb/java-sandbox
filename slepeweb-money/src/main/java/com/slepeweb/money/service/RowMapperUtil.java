@@ -95,19 +95,20 @@ public class RowMapperUtil {
 	}
 	
 	private static Account makeAccount(ResultSet rs) throws SQLException {
-		return makeAccount(rs, "id", "name");
+		return makeAccount(rs, "id", "name", "type");
 	}
 	
 	private static Account makeAccountX(ResultSet rs) throws SQLException {
-		return makeAccount(rs, "accountid", "accountname");
+		return makeAccount(rs, "accountid", "accountname", "accounttype");
 	}
 	
-	private static Account makeAccount(ResultSet rs, String idStr, String name) throws SQLException {
+	private static Account makeAccount(ResultSet rs, String idStr, String name, String type) throws SQLException {
 		long id = rs.getLong(idStr);
 		if (id != -1) {
 			return new Account().
 				setId(id).
 				setName(rs.getString(name)).
+				setType(rs.getString(type)).
 				setOpeningBalance(rs.getLong("openingbalance")).
 				setClosed(rs.getBoolean("closed")).
 				setNote(rs.getString("note"));

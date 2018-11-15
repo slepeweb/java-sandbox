@@ -85,6 +85,10 @@ html {
   .col-1-6 {
     width: 16.66667%;
   }
+
+  .col-5-6 {
+    width: 83.33333%;
+  }
 }
 .anchor {
   position: relative;
@@ -694,19 +698,19 @@ input[type="button"]:disabled,
   color: #808080;
 }
 
-#trn_listing td {
+.trn_listing td {
   vertical-align: top;
 }
-#trn_listing td.date {
+.trn_listing td.date {
   width: 10%;
 }
-#trn_listing td.amount {
+.trn_listing td.amount {
   width: 10%;
 }
-#trn_listing td.payee {
+.trn_listing td.payee {
   width: 20%;
 }
-#trn_listing td.memo {
+.trn_listing td.memo {
   width: 30%;
 }
 
@@ -759,4 +763,9 @@ input[type="button"]:disabled,
   display: block;
   float: none;
   z-index: 1;
+}
+
+#navigation {
+  text-decoration: none;
+  list-style: none;
 }

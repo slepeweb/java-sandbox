@@ -16,7 +16,6 @@ import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.TransactionService;
-import com.slepeweb.money.service.Util;
 
 public class MoneyTransactionReporter {
 	private static Logger LOG = Logger.getLogger(MoneyTransactionReporter.class);

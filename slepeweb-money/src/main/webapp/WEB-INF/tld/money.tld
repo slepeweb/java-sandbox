@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+    version="2.1">
+
+	<tlib-version>1.0</tlib-version>
+	<short-name>mon</short-name>
+	<uri>moneyTags</uri>
+
+<!-- 	<tag> -->
+<!-- 		<name>insertComponent</name> -->
+<!-- 		<tag-class>com.slepeweb.site.tags.InsertSingleComponentTag</tag-class> -->
+<!-- 		<body-content>empty</body-content> -->
+<!-- 		<attribute> -->
+<!-- 			<name>site</name> -->
+<!-- 			<required>true</required> -->
+<!-- 			<rtexprvalue>true</rtexprvalue> -->
+<!-- 		</attribute> -->
+<!-- 		<attribute> -->
+<!-- 			<name>component</name> -->
+<!-- 			<required>true</required> -->
+<!-- 			<rtexprvalue>true</rtexprvalue> -->
+<!-- 			<type>com.slepeweb.site.model.SimpleComponent</type> -->
+<!-- 		</attribute> -->
+<!-- 	</tag> -->
+	
+	<function>
+		<name>formatPounds</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.String formatPounds(long)</function-signature>
+	</function>
+	
+</taglib>

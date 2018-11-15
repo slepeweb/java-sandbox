@@ -12,5 +12,6 @@ public interface AccountService {
 	Account get(long id);
 	List<Account> getAll();
 	List<Account> getAll(boolean includingClosed);
+	List<Account> getAllWithBalances();
 	Account save(Account f) throws MissingDataException, DuplicateItemException;
 }

@@ -14,7 +14,6 @@ import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.TimeWindow;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.MoneyImportService;
-import com.slepeweb.money.service.Util;
 
 public class MoneyImportManager {
 	private static Logger LOG = Logger.getLogger(MoneyImportManager.class);

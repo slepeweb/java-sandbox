@@ -3,7 +3,7 @@ package com.slepeweb.money.bean;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.slepeweb.money.service.Util;
+import com.slepeweb.money.Util;
 
 public class NormalisedMonth {
 	private int index;

@@ -1,10 +1,12 @@
 package com.slepeweb.money.bean;
 
+import com.slepeweb.money.Util;
+
 public class Account extends Payee {
 	
 	private long openingBalance = 0L;
 	private boolean closed;
-	private String note;
+	private String note, type;
 	private long balance;
 	
 	public void assimilate(Object obj) {
@@ -17,6 +19,40 @@ public class Account extends Payee {
 		}
 	}
 		
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj) && accountEquals((Account) obj);
+	}
+	
+	private boolean accountEquals(Account a) {
+		if (closed != a.isClosed()) {
+			return false;
+		}
+		
+		if (openingBalance != a.getOpeningBalance()) {
+			return false;
+		}
+		
+		if (note == null) {
+			if (a.getNote() != null)
+				return false;
+		} else if (!note.equals(a.getNote()))
+			return false;
+				
+		/*
+		 * MSAccess doesn't know about account types, so this is commented out,
+		 * otherwise imports will always update accounts
+		 * 
+		if (type == null) {
+			if (a.getType() != null)
+				return false;
+		} else if (!type.equals(a.getType()))
+			return false;
+		*/
+		
+		return true;
+	}
+	
 	public long getOpeningBalance() {
 		return openingBalance;
 	}
@@ -61,11 +97,24 @@ public class Account extends Payee {
 		return this;
 	}
 
+	public String getBalanceStr() {
+		return Util.formatPounds(getBalance());
+	}
+
 	public long getBalance() {
 		return balance;
 	}
 
 	public void setBalance(long balance) {
 		this.balance = balance;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public Account setType(String type) {
+		this.type = type;
+		return this;
 	}
 }

@@ -63,7 +63,7 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 			LOG.info(compose("Updated payee", pe));
 		}
 		else {
-			LOG.info(compose("Payee not modified", pe));
+			LOG.debug(compose("Payee not modified", pe));
 		}
 	}
 

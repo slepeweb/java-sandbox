@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.slepeweb.money.service.Util;
+import com.slepeweb.money.Util;
 
 public class Transaction extends DbEntity {
 	

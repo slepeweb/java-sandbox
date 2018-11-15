@@ -39,7 +39,7 @@
 	</p>
 	
 	<c:choose><c:when test="${not empty _tl.runningBalances}">
-	<table id="trn_listing">
+	<table class="trn_listing">
 		<tr>
 			<th>Date</th>
 			<th>Payee</th>
