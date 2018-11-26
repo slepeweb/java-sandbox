@@ -15,7 +15,7 @@
 					<table>
 						<c:forEach items="${_m.objects}" var="_p">
 							<tr>
-								<td data-id="${_p.id}"><i class="fas fa-bars payee-menu"></i>&nbsp;&nbsp;${_p.name}</td>
+								<td data-id="${_p.id}"><i class="fas fa-bars menu-icon"></i>&nbsp;&nbsp;${_p.name}</td>
 							</tr>
 						</c:forEach>
 					</table>
@@ -28,38 +28,4 @@
 	</c:otherwise></c:choose>
 </mny:standardLayout>
 
-<div id="payee-menu-dialog">
-	<ul>
-		<li>Edit</li>
-		<li>Delete</li>
-		<li class="payee-menu-find">Find transactions</li>
-		<li class="payee-menu-close">Close menu</li>
-	</ul>
-</div>
-
-
-<script>
-$(".payee-menu").click(function(e){
-	var id = $(this).parent().attr("data-id");
-	var dialog = $("#payee-menu-dialog");
-	if (dialog.css("visibility") == "visible") {
-		dialog.css("visibility", "hidden");
-		return;
-	}
-	
-	var menuOffset = $(this).offset();
-	dialog.offset({left: menuOffset.left - 150, top: menuOffset.top});		
-	dialog.css("visibility", "visible");
-	dialog.attr("data-id", id);
-	e.stopPropagation();
-});
-
-$(".payee-menu-close").click(function(e){
-	$("#payee-menu-dialog").css("visibility", "hidden");
-});
-
-$(".payee-menu-find").click(function(e){
-	var id = $(this).parent().parent().attr("data-id");
-	window.location = "/money/transaction/list/by/payee/" + id;
-});
-</script>
+<mny:menuActionDialog target="/money/transaction/list/by/payee/" />

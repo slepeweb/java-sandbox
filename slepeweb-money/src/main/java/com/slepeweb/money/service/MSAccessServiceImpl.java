@@ -127,7 +127,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		
 		if (r != null) {
 			return new Account().
-					setId(r.getInt(ACCOUNT_ID)).
+					setOrigId(r.getInt(ACCOUNT_ID)).
 					setName(r.getString(FULL_NAME)).
 					setOpeningBalance(decimal2long(r.getBigDecimal(OPENING_AMOUNT))).
 					setClosed(r.getBoolean(CLOSED)).
@@ -143,7 +143,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		
 		if (r != null) {
 			return new Payee().
-					setId(r.getInt(PAYEE_ID)).
+					setOrigId(r.getInt(PAYEE_ID)).
 					setName(r.getString(FULL_NAME));
 		}
 		
@@ -155,22 +155,23 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		Row childCategoryRow = this.catCursorSeq.getNextRow();
 		
 		if (childCategoryRow != null) {
-			Category c = new Category().setId(childCategoryRow.getInt(CATEGORY_ID));
+			String childCategoryName = childCategoryRow.getString(FULL_NAME);
+			Category c = new Category().setOrigId(childCategoryRow.getInt(CATEGORY_ID));
 			
 			if (this.parentCatCursorFinder.findFirstRow(Collections.singletonMap("hcat", childCategoryRow.getInt(PARENT_CATEGORY_ID)))) {
 				String parentCategoryName = (String) this.parentCatCursorFinder.getCurrentRowValue(this.catTable.getColumn(FULL_NAME));
 				
 				if (parentCategoryName.equals("INCOME") || parentCategoryName.equals("EXPENSE")) {
 					// This is a root category 
-					c.setMajor(childCategoryRow.getString(FULL_NAME));
+					c.setMajor(childCategoryName);
 				}
 				else {
 					c.setMajor(parentCategoryName);
-					c.setMinor(childCategoryRow.getString(FULL_NAME));
+					c.setMinor(childCategoryName);
 				}
 			}
 			else {
-				c.setMajor(childCategoryRow.getString(FULL_NAME));
+				c.setMajor(childCategoryName);
 			}
 			
 			return c;

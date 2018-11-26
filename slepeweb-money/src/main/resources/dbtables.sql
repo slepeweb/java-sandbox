@@ -8,29 +8,38 @@ drop table if exists category;
 create table category
 (
 	id int not null auto_increment,
+	origid int,
 	major varchar(255),
 	minor varchar(255),
 	primary key (id),
+	index idx_category_origid (origid),
 	unique key idx_category (major, minor)
 ) ENGINE=InnoDB;
 
 create table payee
 (
 	id int not null auto_increment,
+	origid int,
 	name varchar(255),
 	primary key (id),
+	index idx_payee_origid (origid),
 	unique key idx_payee_name (name)
 ) ENGINE=InnoDB;
 
 create table account
 (
 	id int not null auto_increment,
+	origid int,
 	name varchar(255),
 	type enum ('current', 'savings', 'credit', 'pension'),
 	openingbalance int,
 	closed boolean,
 	note varchar(255),
+	sortcode varchar(6),
+	accountno varchar(8),
+	rollno varchar(16),
 	primary key (id),
+	index idx_account_origid (origid),
 	unique key idx_account_name (name),
 	index idx_status (closed)
 ) ENGINE=InnoDB;
@@ -51,7 +60,7 @@ create table transaction
 	transferid int,
 	
 	primary key (id),
-	index idx_origid (origid),
+	index idx_transaction_origid (origid),
 	index idx_transaction_account (accountid, entered desc),
 	index idx_transaction_payee (payeeid, entered desc),
 	index idx_transaction_category (categoryid, entered desc),

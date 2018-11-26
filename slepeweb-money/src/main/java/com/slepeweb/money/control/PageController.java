@@ -65,6 +65,7 @@ public class PageController extends BaseController {
 			summary.set(index, Pair.of(a.getType(), total));
 		}
 		
+		grandTotal += total;
 		model.addAttribute("_accounts", all);
 		model.addAttribute("_summary", summary);
 		model.addAttribute("_grandTotal", grandTotal);

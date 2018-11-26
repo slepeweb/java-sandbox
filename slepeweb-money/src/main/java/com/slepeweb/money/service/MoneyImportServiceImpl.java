@@ -32,11 +32,19 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		this.msAccessService.init(getNoPayee(), getNoCategory(), twin);
 		
 		// Get all accounts from MSAccess, save them in mysql, and store them in a temporary cache
-		Account aRecord, a;
-		while((a = this.msAccessService.getNextAccount()) != null) {
+		Account mysqlAccount, accessAccount;
+		while((accessAccount = this.msAccessService.getNextAccount()) != null) {
 			try {
-				aRecord = this.accountService.save(a);
-				this.msAccessService.cacheAccount(a.getId(), aRecord);
+				mysqlAccount = this.accountService.getByOrigId(accessAccount.getOrigId());
+				
+				if (mysqlAccount != null) {
+					mysqlAccount = this.accountService.update(mysqlAccount, accessAccount);
+				}
+				else {
+					mysqlAccount = this.accountService.save(accessAccount);
+				}
+				
+				this.msAccessService.cacheAccount(accessAccount.getOrigId(), mysqlAccount);
 			}
 			catch (Exception e) {
 				LOG.error("Failed to save account", e);
@@ -44,11 +52,19 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		}
 		
 		// Repeat for payments
-		Payee pRecord, p;
-		while((p = this.msAccessService.getNextPayee()) != null) {
+		Payee mysqlPayee, accessPayee;
+		while((accessPayee = this.msAccessService.getNextPayee()) != null) {
 			try {
-				pRecord = this.payeeService.save(p);
-				this.msAccessService.cachePayee(p.getId(), pRecord);
+				mysqlPayee = this.payeeService.getByOrigId(accessPayee.getOrigId());
+				
+				if (mysqlPayee != null) {
+					mysqlPayee = this.payeeService.update(mysqlPayee, accessPayee);
+				}
+				else {
+					mysqlPayee = this.payeeService.save(accessPayee);
+				}
+				
+				this.msAccessService.cachePayee(accessPayee.getOrigId(), mysqlPayee);
 			}
 			catch (Exception e) {
 				LOG.error("Failed to save payee", e);
@@ -56,11 +72,19 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		}
 		
 		// Repeat for categories
-		Category cRecord, c;
-		while((c = this.msAccessService.getNextCategory()) != null) {
+		Category mysqlCategory, accessCategory;
+		while((accessCategory = this.msAccessService.getNextCategory()) != null) {
 			try {
-				cRecord = this.categoryService.save(c);
-				this.msAccessService.cacheCategory(c.getId(), cRecord);
+				mysqlCategory = this.categoryService.getByOrigId(accessCategory.getOrigId());
+				
+				if (mysqlCategory != null) {
+					mysqlCategory = this.categoryService.update(mysqlCategory, accessCategory);
+				}
+				else {
+					mysqlCategory = this.categoryService.save(accessCategory);
+				}
+				
+				this.msAccessService.cacheCategory(accessCategory.getOrigId(), mysqlCategory);
 			}
 			catch (Exception e) {
 				LOG.error("Failed to save category", e);

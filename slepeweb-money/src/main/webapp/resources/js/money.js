@@ -25,4 +25,10 @@ $(function() {
 	$("#lift-limit").click(function(e){
 		window.location = window.location + "/all";
 	});
+	
+//	$(".nav-hide").click(function(e){
+//		$("nav").animate({
+//			width: '2px'
+//		}, "slow");
+//	});
 });	

@@ -391,6 +391,9 @@
 		td {
 			padding: 0.3em;
   		vertical-align: middle;
+  		&.highlighted {
+  			background-color: yellow;
+  		}
 		}
 
 		th {
@@ -626,7 +629,7 @@
 	width: 100%;
 }
 
-#category-menu-dialog, #payee-menu-dialog {
+#menu-action-dialog {
 	width: 200px;
 	background-color: #ccc;
 	visibility: hidden;
@@ -635,6 +638,15 @@
 	display: block;
 	float: none;
 	z-index: 1;
+	
+	ul {
+		list-style: none;
+	}
+	
+	.menu-close {
+		float: right;
+		margin-right: 5px;
+	}
 }
 
 #navigation {

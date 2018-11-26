@@ -8,6 +8,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
 
@@ -17,32 +18,32 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	private static Logger LOG = Logger.getLogger(AccountServiceImpl.class);
 	@Autowired private TransactionService transactionService;
 	
-	public Account save(Account a) throws MissingDataException, DuplicateItemException {
+	public Account save(Account a) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (a.isDefined4Insert()) {
-			Account dbRecord = get(a.getName());		
-			if (dbRecord != null) {
-				update(dbRecord, a);
-				return dbRecord;
+			if (a.isInDatabase()) {
+				Account dbRecord = get(a.getId());		
+				if (dbRecord != null) {
+					return update(dbRecord, a);
+				}
+				else {
+					throw new DataInconsistencyException(error(LOG, "Account does not exist in DB", a));
+				}
 			}
 			else {
-				insert(a);
+				return insert(a);
 			}
 		}
 		else {
-			String t = "Account not saved - insufficient data";
-			LOG.error(compose(t, a));
-			throw new MissingDataException(t);
+			throw new MissingDataException(error(LOG, "Account not saved - insufficient data", a));
 		}
-		
-		return a;
 	}
 	
 	private Account insert(Account a) throws MissingDataException, DuplicateItemException {
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into account (name, type, openingbalance, closed, note) values (?, ?, ?, ?, ?)", 
-					a.getName(), a.getType(), a.getOpeningBalance(), a.isClosed(), a.getNote());
+					"insert into account (origid, name, type, openingbalance, closed, note) values (?, ?, ?, ?, ?, ?)", 
+					a.getOrigId(), a.getName(), a.getType(), a.getOpeningBalance(), a.isClosed(), a.getNote());
 			
 			a.setId(getLastInsertId());	
 			
@@ -54,7 +55,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		}
 	}
 
-	private void update(Account dbRecord, Account a) {
+	public Account update(Account dbRecord, Account a) {
 		if (! dbRecord.equals(a)) {
 			dbRecord.assimilate(a);
 			
@@ -68,6 +69,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		else {
 			LOG.debug(compose("Account not modified", a));
 		}
+		
+		return dbRecord;
 	}
 
 	public Account get(String name) {
@@ -76,6 +79,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
 	public Account get(long id) {
 		return get("select * from account where id = ?", new Object[]{id});
+	}
+	
+	public Account getByOrigId(long id) {
+		return get("select * from account where origid = ?", new Object[]{id});
 	}
 	
 	private Account get(String sql, Object[] params) {

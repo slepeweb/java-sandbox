@@ -8,9 +8,8 @@
 		<table>			
 			<c:forEach items="${list}" var="_a">
 				<tr>
-					<td class="name">${_a.name}</td>
-					<td class="type"></td>
-					<td class="balance amount"></td>
+					<td class="name" data-id="${_a.id}"><i class="fas fa-bars menu-icon"></i>&nbsp;&nbsp;${_a.name}</td>
+					<td class="type">${_a.type}</td>
 				</tr>
 			</c:forEach>
 		</table>

@@ -7,6 +7,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
 
@@ -15,32 +16,33 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 	
 	private static Logger LOG = Logger.getLogger(PayeeServiceImpl.class);
 	
-	public Payee save(Payee pe) throws MissingDataException, DuplicateItemException {
+	public Payee save(Payee pe) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (pe.isDefined4Insert()) {
-			Payee dbRecord = get(pe.getName());		
-			if (dbRecord != null) {
-				update(dbRecord, pe);
-				return dbRecord;
+			if (pe.isInDatabase()) {
+				Payee dbRecord = get(pe.getId());	
+				if (dbRecord != null) {
+					update(dbRecord, pe);
+					return dbRecord;
+				}
+				else {
+					throw new DataInconsistencyException(error(LOG, "Payee does not exist in DB", pe));
+				}
 			}
 			else {
-				insert(pe);
+				return insert(pe);
 			}
 		}
 		else {
-			String t = "Payee not saved - insufficient data";
-			LOG.error(compose(t, pe));
-			throw new MissingDataException(t);
+			throw new MissingDataException(error(LOG, "Payee not saved - insufficient data", pe));
 		}
-		
-		return pe;
 	}
 	
 	private Payee insert(Payee pe) throws MissingDataException, DuplicateItemException {
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into payee (name) values (?)", 
-					pe.getName());
+					"insert into payee (origid, name) values (?, ?)", 
+					pe.getOrigId(), pe.getName());
 			
 			pe.setId(getLastInsertId());	
 			
@@ -52,7 +54,7 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 		}
 	}
 
-	private void update(Payee dbRecord, Payee pe) {
+	public Payee update(Payee dbRecord, Payee pe) {
 		if (! dbRecord.equals(pe)) {
 			dbRecord.assimilate(pe);
 			
@@ -65,6 +67,8 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 		else {
 			LOG.debug(compose("Payee not modified", pe));
 		}
+		
+		return dbRecord;
 	}
 
 	public Payee get(String name) {
@@ -73,6 +77,10 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 
 	public Payee get(long id) {
 		return get("select * from payee where id = ?", new Object[]{id});
+	}
+	
+	public Payee getByOrigId(long id) {
+		return get("select * from payee where origid = ?", new Object[]{id});
 	}
 	
 	private Payee get(String sql, Object[] params) {
@@ -84,4 +92,5 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 		return this.jdbcTemplate.query(
 			"select * from payee order by name", new RowMapperUtil.PayeeMapper());
 	}
+	
 }

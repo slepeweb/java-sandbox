@@ -2,7 +2,6 @@ package com.slepeweb.money.bean;
 
 public class SplitTransaction extends DbEntity {
 	
-	private long id;
 	private Long transactionId;
 	private Category category;
 	private Long amount;
@@ -32,14 +31,6 @@ public class SplitTransaction extends DbEntity {
 		return String.format("%s - %s", getCategory(), getAmountInPounds());
 	}
 	
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
 	public String getAmountInPounds() {
 		return Transaction.DF.format(amount / 100.0);
 	}

@@ -493,6 +493,9 @@ table td {
   padding: 0.3em;
   vertical-align: middle;
 }
+table td.highlighted {
+  background-color: yellow;
+}
 table th {
   color: #666;
   font-size: 0.9em;
@@ -751,7 +754,7 @@ input[type="button"]:disabled,
   width: 100%;
 }
 
-#category-menu-dialog, #payee-menu-dialog {
+#menu-action-dialog {
   width: 200px;
   background-color: #ccc;
   visibility: hidden;
@@ -763,6 +766,13 @@ input[type="button"]:disabled,
   display: block;
   float: none;
   z-index: 1;
+}
+#menu-action-dialog ul {
+  list-style: none;
+}
+#menu-action-dialog .menu-close {
+  float: right;
+  margin-right: 5px;
 }
 
 #navigation {

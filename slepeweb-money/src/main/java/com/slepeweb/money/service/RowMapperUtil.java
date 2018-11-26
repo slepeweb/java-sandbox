@@ -81,52 +81,53 @@ public class RowMapperUtil {
 	}
 	
 	private static Payee makePayee(ResultSet rs) throws SQLException {
-		return makePayee(rs, "id", "name");
+		return makePayee(rs, "id", "origid", "name");
 	}
 	
 	private static Payee makePayeeX(ResultSet rs) throws SQLException {
-		return makePayee(rs, "payeeid", "payeename");
+		return makePayee(rs, "payeeid", "payeeorigid", "payeename");
 	}
 	
-	private static Payee makePayee(ResultSet rs, String idStr, String name) throws SQLException {
+	private static Payee makePayee(ResultSet rs, String idStr, String origIdStr, String name) throws SQLException {
 		return new Payee().
 			setId(rs.getLong(idStr)).
+			setOrigId(rs.getLong(origIdStr)).
 			setName(rs.getString(name));
 	}
 	
 	private static Account makeAccount(ResultSet rs) throws SQLException {
-		return makeAccount(rs, "id", "name", "type");
+		return makeAccount(rs, "id", "origid", "name", "type");
 	}
 	
 	private static Account makeAccountX(ResultSet rs) throws SQLException {
-		return makeAccount(rs, "accountid", "accountname", "accounttype");
+		return makeAccount(rs, "accountid", "accountorigid", "accountname", "accounttype");
 	}
 	
-	private static Account makeAccount(ResultSet rs, String idStr, String name, String type) throws SQLException {
-		long id = rs.getLong(idStr);
-		if (id != -1) {
-			return new Account().
-				setId(id).
-				setName(rs.getString(name)).
-				setType(rs.getString(type)).
-				setOpeningBalance(rs.getLong("openingbalance")).
-				setClosed(rs.getBoolean("closed")).
-				setNote(rs.getString("note"));
-		}
-		return null;
+	private static Account makeAccount(ResultSet rs, String idStr, String origIdStr, 
+			String name, String type) throws SQLException {
+		
+		return new Account().
+			setId(rs.getLong(idStr)).
+			setOrigId(rs.getLong(origIdStr)).
+			setName(rs.getString(name)).
+			setType(rs.getString(type)).
+			setOpeningBalance(rs.getLong("openingbalance")).
+			setClosed(rs.getBoolean("closed")).
+			setNote(rs.getString("note"));
 	}
 	
 	private static Category makeCategory(ResultSet rs) throws SQLException {
-		return makeCategory(rs, "id", "major", "minor");
+		return makeCategory(rs, "id", "origid", "major", "minor");
 	}
 	
 	private static Category makeCategoryX(ResultSet rs) throws SQLException {
-		return makeCategory(rs, "categoryid", "major", "minor");
+		return makeCategory(rs, "categoryid", "categoryorigid", "major", "minor");
 	}
 	
-	private static Category makeCategory(ResultSet rs, String id, String major, String minor) throws SQLException {
+	private static Category makeCategory(ResultSet rs, String id, String origId, String major, String minor) throws SQLException {
 		return new Category().
 			setId(rs.getLong(id)).
+			setOrigId(rs.getLong(origId)).
 			setMajor(rs.getString(major)).
 			setMinor(rs.getString(minor));
 	}

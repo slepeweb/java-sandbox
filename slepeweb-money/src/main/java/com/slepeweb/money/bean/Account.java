@@ -11,8 +11,9 @@ public class Account extends Payee {
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Account) {
+			super.assimilate(obj);
+			
 			Account a = (Account) obj;
-			setName(a.getName());
 			setOpeningBalance(a.getOpeningBalance()).
 			setClosed(a.isClosed()).
 			setNote(a.getNote());
@@ -88,6 +89,12 @@ public class Account extends Payee {
 	@Override
 	public Account setId(long id) {
 		super.setId(id);
+		return this;
+	}
+	
+	@Override
+	public Account setOrigId(long id) {
+		super.setOrigId(id);
 		return this;
 	}
 	

@@ -2,7 +2,6 @@ package com.slepeweb.money.bean;
 
 public class Payee extends DbEntity {
 	private String name;
-	private long id;
 	
 	public boolean isAccount() {
 		return false;
@@ -12,6 +11,7 @@ public class Payee extends DbEntity {
 		if (obj instanceof Payee) {
 			Payee pe = (Payee) obj;
 			setName(pe.getName());
+			setOrigId(pe.getOrigId());
 		}
 	}
 	
@@ -25,12 +25,15 @@ public class Payee extends DbEntity {
 		return getName();
 	}
 	
-	public long getId() {
-		return id;
+	@Override
+	public Payee setId(long id) {
+		super.setId(id);
+		return this;
 	}
 	
-	public Payee setId(long id) {
-		this.id = id;
+	@Override
+	public Payee setOrigId(long origId) {
+		super.setOrigId(origId);
 		return this;
 	}
 	
@@ -65,11 +68,13 @@ public class Payee extends DbEntity {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		
+		// TODO: resolve this question:
+		
+//		if (origId != other.origId) {
+//			return false;
+//		}
+		
 		return true;
-	}
-	
-	@Override
-	public boolean matches(Object obj) {
-		return equals(obj);
-	}
+	}	
 }

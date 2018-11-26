@@ -2,6 +2,7 @@ package com.slepeweb.money.service;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -71,4 +72,8 @@ public class BaseServiceImpl {
 		return String.format(sb.toString(), args);
 	}
 
+	protected String error(Logger log, String s, Object o) {
+		log.error(compose(s, o.toString()));
+		return s;
+	}
 }

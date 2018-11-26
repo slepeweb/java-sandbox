@@ -34,7 +34,7 @@
 	</p>
 
 	<c:choose><c:when test="${not empty _pager.results}">
-		<table id="trn_listing">
+		<table class="trn_listing">
 			<tr>
 				<th>Date</th>
 				<th>Payee</th>

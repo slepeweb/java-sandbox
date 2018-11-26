@@ -19,7 +19,7 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 	private static final String SELECT = 
 			"select " +
 					"st.transactionid, st.amount, st.memo, " + 
-					"c.id as categoryid, c.major, c.minor " + 
+					"c.id as categoryid, c.origid as categoryorigid, c.major, c.minor " + 
 			"from splittransaction st " +
 					"join category c on c.id = st.categoryid ";
 	
@@ -37,9 +37,7 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 					t.getSplits().add(insert(st));
 				}
 				else {
-					String str = "Split transactions not saved - insufficient data";
-					LOG.error(compose(str, t));
-					throw new MissingDataException(str);
+					throw new MissingDataException(error(LOG, "Split transactions not saved - insufficient data", t));
 				}
 			}
 		}

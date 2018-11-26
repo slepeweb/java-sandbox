@@ -2,13 +2,13 @@ package com.slepeweb.money.bean;
 
 public class Category extends DbEntity {
 	private String major = "", minor = "";
-	private long id;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Category) {
 			Category c = (Category) obj;
 			setMajor(c.getMajor());
 			setMinor(c.getMinor());
+			setOrigId(c.getOrigId());
 		}
 	}
 	
@@ -25,15 +25,16 @@ public class Category extends DbEntity {
 		return sb.toString();
 	}
 	
-	public long getId() {
-		return id;
-	}
-	
 	public Category setId(long id) {
-		this.id = id;
+		super.setId(id);
 		return this;
 	}
 	
+	public Category setOrigId(long origId) {
+		super.setOrigId(origId);
+		return this;
+	}
+
 	public String getMajor() {
 		return this.major;
 	}
@@ -56,7 +57,6 @@ public class Category extends DbEntity {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((major == null) ? 0 : major.hashCode());
 		result = prime * result + ((minor == null) ? 0 : minor.hashCode());
 		return result;
@@ -82,10 +82,5 @@ public class Category extends DbEntity {
 		} else if (!minor.equals(other.minor))
 			return false;
 		return true;
-	}
-
-	@Override
-	public boolean matches(Object obj) {
-		return equals(obj);
 	}
 }

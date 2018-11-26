@@ -7,6 +7,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
 
@@ -15,12 +16,17 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 	
 	private static Logger LOG = Logger.getLogger(CategoryServiceImpl.class);
 	
-	public Category save(Category c) throws MissingDataException, DuplicateItemException {
+	public Category save(Category c) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (c.isDefined4Insert()) {
-			Category dbRecord = get(c.getMajor(), c.getMinor());		
-			if (dbRecord != null) {
-				update(dbRecord, c);
-				return dbRecord;
+			if (c.isInDatabase()) {
+				Category dbRecord = get(c.getId());		
+				if (dbRecord != null) {
+					update(dbRecord, c);
+					return dbRecord;
+				}
+				else {
+					throw new DataInconsistencyException(error(LOG, "Categroy does not exist in DB", c));
+				}
 			}
 			else {
 				insert(c);
@@ -39,8 +45,8 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into category (major, minor) values (?, ?)", 
-					c.getMajor(), c.getMinor());
+					"insert into category (origid, major, minor) values (?, ?, ?)", 
+					c.getOrigId(), c.getMajor(), c.getMinor());
 			
 			c.setId(getLastInsertId());	
 			
@@ -52,7 +58,7 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 		}
 	}
 
-	private void update(Category dbRecord, Category c) {
+	public Category update(Category dbRecord, Category c) {
 		if (! dbRecord.equals(c)) {
 			dbRecord.assimilate(c);
 			
@@ -65,6 +71,8 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 		else {
 			LOG.debug(compose("Category not modified", c));
 		}
+		
+		return dbRecord;
 	}
 
 	public Category get(String major, String minor) {
@@ -73,6 +81,10 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 
 	public Category get(long id) {
 		return get("select * from category where id = ?", new Object[]{id});
+	}
+	
+	public Category getByOrigId(long id) {
+		return get("select * from category where origid = ?", new Object[]{id});
 	}
 	
 	private Category get(String sql, Object[] params) {

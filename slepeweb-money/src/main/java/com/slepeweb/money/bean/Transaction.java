@@ -307,18 +307,5 @@ public class Transaction extends DbEntity {
 			return false;
 
 		return true;
-	}
-	
-	@Override
-	public boolean matches(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		
-		Transaction other = (Transaction) obj;
-		return getId() == other.getId() || getOrigId() == other.getOrigId();
-	}
+	}	
 }
