@@ -15,7 +15,8 @@
 					<table>
 						<c:forEach items="${_m.objects}" var="_p">
 							<tr>
-								<td data-id="${_p.id}"><i class="fas fa-bars menu-icon"></i>&nbsp;&nbsp;${_p.name}</td>
+								<td class="name">${_p.name}</td>
+								<td class="menu-icon" data-id="${_p.id}"><i class="fas fa-bars"></i></td>
 							</tr>
 						</c:forEach>
 					</table>

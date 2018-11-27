@@ -76,6 +76,7 @@
 				</c:otherwise></c:choose>
 				
 				<td class="currency amount">${_trn.balance}</td>
+				<td data-id="${_trn.id}" class="menu-icon"><i class="fas fa-bars"></i></td>
 			</tr>
 
 			<c:if test="${_trn.split}">
@@ -96,3 +97,5 @@
 		<p><strong>No transactions this month</strong></p>
 	</c:otherwise></c:choose>
 </mny:standardLayout>
+
+<mny:menuActionDialog target="none" />

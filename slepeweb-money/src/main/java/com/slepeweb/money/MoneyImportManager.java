@@ -117,6 +117,7 @@ public class MoneyImportManager {
 				Transaction toTrn = getCachedTransaction(ptArr[1], mis);
 				
 				if (fromTrn == null || toTrn == null) {
+					LOG.warn(String.format("Missing transaction data in cache [%d/%d]", ptArr[0], ptArr[1]));
 					continue;
 				}
 				
@@ -173,7 +174,7 @@ public class MoneyImportManager {
 			
 			// This imported transaction (partialTransaction) will have the correct MSAccess original id, 
 			// and its splits will be empty.
-			// Get the (full) corresponding transaction: first try the cache, otherwise the database. 
+			// Get the (full) corresponding transaction from the cache. 
 			Transaction fullTransaction = getCachedTransaction(parentId, mis);
 			
 			if (fullTransaction != null) {
@@ -199,7 +200,7 @@ public class MoneyImportManager {
 				}
 			}
 			else {
-				LOG.debug(String.format("Failed to identify parent transaction [%d]", parentId));
+				LOG.warn(String.format("Parent transaction [%d] not in cache", parentId));
 			}
 			
 			// Mark this parent transaction as processed, regardless of success or failure

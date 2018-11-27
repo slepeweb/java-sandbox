@@ -11,7 +11,7 @@
 		<li class="${_menuCloseClass}"><i class="far fa-window-close"></i></li>
 		<li>Edit</li>
 		<li>Delete</li>
-		<li class="${_menuFindClass}">Find transactions</li>
+		<c:if test="${target ne 'none'}"><li class="${_menuFindClass}">Find transactions</li></c:if>
 	</ul>
 </div>
 
@@ -19,10 +19,12 @@
 <script>
 $(".${_menuIconClass}").click(function(e){
 	var dialog = $("#${_menuDialogId}");
-	var td = $(this).parent();
-	var id = td.attr("data-id");
+	var menuIconCell = $(this);
+	var menuIconRow = menuIconCell.parent();
+	var id = menuIconCell.attr("data-id");
 	var menuOffset = $(this).offset();
-	dialog.offset({left: menuOffset.left, top: menuOffset.top + 28});		
+	
+	dialog.offset({left: menuOffset.left - 174, top: menuOffset.top + 28});		
 	dialog.css("visibility", "visible");
 	dialog.attr("data-id", id);
 	
@@ -30,7 +32,7 @@ $(".${_menuIconClass}").click(function(e){
 	$(".highlighted").removeClass("highlighted");
 	
 	// Highlight selected cell
-	td.addClass("highlighted");
+	menuIconRow.addClass("highlighted");
 	e.stopPropagation();
 });
 

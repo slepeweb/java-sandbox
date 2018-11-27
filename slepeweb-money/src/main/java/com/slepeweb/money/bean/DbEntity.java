@@ -33,6 +33,8 @@ public abstract class DbEntity {
 	/*
 	 * The matches() method should indicate that two objects of the same class represent the
 	 * same row in the corresponding database table.
+	 * 
+	 * NOTE that this method is not currently used, raising the question whether it was ill-informed ... ?
 	 */
 	public boolean matches(Object obj) {
 		if (this == obj)

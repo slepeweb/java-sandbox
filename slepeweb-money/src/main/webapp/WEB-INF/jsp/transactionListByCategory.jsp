@@ -47,6 +47,7 @@
 					<td class="payee">${_trn.payee}</td>
 					<td class="currency amount">${_trn.amountInPounds}</td>
 					<td class="memo">${_trn.memo}</td>				
+					<td data-id="${_trn.id}" class="menu-icon"><i class="fas fa-bars"></i></td>
 				</tr>
 			</c:forEach>
 		</table>
@@ -55,3 +56,5 @@
 	</c:otherwise></c:choose>
 
 </mny:standardLayout>
+
+<mny:menuActionDialog target="none" />

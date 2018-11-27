@@ -385,14 +385,20 @@
 				&:nth-child(2n + 1) {
 					background-color: $color-border2-bg;
 				}
+				
+	  		&.highlighted {
+	  			background-color: yellow;
+	  		}
+  		
 			}
 		}
 
 		td {
 			padding: 0.3em;
   		vertical-align: middle;
-  		&.highlighted {
-  			background-color: yellow;
+  		
+  		&.menu-icon {
+  			width: 1.5em;
   		}
 		}
 
