@@ -20,6 +20,17 @@
 		<p><strong>Today's balance: <span class="scale_3-2">&pound;${_tl.balanceStr}</span></strong></p>
 	</div>
 	
+	<c:if test="${fn:length(_yearSelector) gt 1}">
+		<form>
+			<label>Select year: </label>
+			<select id="year-selector">
+				<c:forEach items="${_yearSelector}" var="_o">
+					<option value="${_o.value}"<c:if test="${_o.selected}"> selected</c:if>>${_o.name}</option>
+				</c:forEach>
+			</select>
+		</form>
+	</c:if>
+		
 	<p>
 		<c:if test="${_tl.pager.previous}"><span 
 				class="pager arrow left"><a href="${_urlPrefix}/${_tl.pager.previousBlock.index}"><i 

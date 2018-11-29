@@ -47,6 +47,12 @@ public class NormalisedMonth {
 		return -(getIndex() - 1);
 	}
 	
+	public int getYear() {
+		Calendar cal = Util.today();
+		cal.add(Calendar.MONTH, getCalendarOffset());
+		return cal.get(Calendar.YEAR);
+	}
+
 	public boolean equals(NormalisedMonth nm) {
 		return getIndex() == nm.getIndex();
 	}
@@ -82,4 +88,5 @@ public class NormalisedMonth {
 	public void setIndex(int i) {
 		this.index = i;
 	}
+
 }

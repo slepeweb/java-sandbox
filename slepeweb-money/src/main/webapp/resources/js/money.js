@@ -5,6 +5,12 @@ $(function() {
 		window.location = webContext + "/transaction/list/" + accountId;
 	});
 	
+	$("#year-selector").change(function(e) {	
+		var accountId = $("#account-selector").find(":selected").val();
+		var monthId = $("#year-selector").find(":selected").val();
+		window.location = webContext + "/transaction/list/" + accountId + "/" + monthId;;
+	});
+	
 //	$("#tabs").tabs({
 //		active: 1,
 //		collapsible: true

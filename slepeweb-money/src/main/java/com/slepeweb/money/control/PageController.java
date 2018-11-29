@@ -23,6 +23,7 @@ import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.MonthPager;
 import com.slepeweb.money.bean.NamedList;
 import com.slepeweb.money.bean.NormalisedMonth;
+import com.slepeweb.money.bean.Option;
 import com.slepeweb.money.bean.Pager;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RunningBalance;
@@ -200,8 +201,6 @@ public class PageController extends BaseController {
 			selectedMonth.set(lastMonth);
 		}
 			
-		MonthPager p = new MonthPager(firstMonth, selectedMonth, lastMonth);
-		
 		Calendar monthEnd = Util.today();
 		monthEnd.add(Calendar.MONTH, selectedMonth.getCalendarOffset());
 		monthEnd.set(Calendar.DAY_OF_MONTH, monthEnd.getMaximum(Calendar.DAY_OF_MONTH));
@@ -240,18 +239,40 @@ public class PageController extends BaseController {
 			tl.getRunningBalances()[numTransactions - i - 1] = new RunningBalance(t).setBalance(Util.formatPounds(balance));
 			balance -= t.getAmount();			
 		}
-				
+		
+		MonthPager pager = new MonthPager(firstMonth, selectedMonth, lastMonth);
+		
 		tl.
 			setAccount(a).
 			setPeriodStart(from).
 			setPeriodEnd(to).
-			setPager(p);
+			setPager(pager);
 		
 		model.addAttribute("_tl", tl);
 		model.addAttribute("_accounts", allAccounts);
 		model.addAttribute("_accountId", accountId);
+		model.addAttribute("_yearSelector", buildMonthSelector(pager));
 		
 		return "transactionList";
+	}
+	
+	private List<Option> buildMonthSelector(MonthPager pager) {
+		
+		List<Option> yearSelector = new ArrayList<Option>();
+		int numYears = pager.getFirstMonth().distanceBefore(pager.getLastMonth()) / 12;
+		Calendar today = Util.today();
+		int thisYear = today.get(Calendar.YEAR);
+		NormalisedMonth m = new NormalisedMonth(today.getTime());
+		Option o;
+				
+		for (int i = 0; i <= numYears; i++) {
+			o = new Option(m.getIndex(), String.valueOf(thisYear - i));
+			yearSelector.add(o);
+			o.setSelected(m.getYear() == pager.getSelectedMonth().getYear());
+			m.decrement(12);
+		}
+		
+		return yearSelector;
 	}
 
 	@RequestMapping(value="/transaction/list/by/category/{categoryId}")	
