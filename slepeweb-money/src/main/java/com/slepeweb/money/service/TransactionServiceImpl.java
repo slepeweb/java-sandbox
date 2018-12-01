@@ -42,9 +42,28 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 					"a.name as account, " + 
 					"p.name as payee, " + 
 					"c.major, c.minor, " + 
-					"t.entered, t.memo, t.reference, t.amount " + FROM;
+					"t.id, t.entered as entered, t.memo, t.reference, t.amount " + FROM;
 			;
 	
+	private static final String FLAT_SELECT_CATEGORY = 
+			"(" + FLAT_SELECT +
+			"where c.id = ?) " +
+			"union " +
+			"(select " +
+					"a.name as account, " + 
+					"p.name as payee, " + 
+					"c.major, c.minor, " + 
+					"t.id, t.entered as entered, st.memo, t.reference, st.amount " + 
+			"from splittransaction st " +
+					"join transaction t on t.id = st.transactionid " + 
+					"join account a on a.id = t.accountid " + 
+					"join payee p on p.id = t.payeeid " +
+					"join category c on c.id = st.categoryid " +
+			"where c.id = ?) " +
+			"order by entered desc"
+			;
+	
+			
 	public Transaction save(Transaction pt) throws MissingDataException, DuplicateItemException {
 		if (pt.isDefined4Insert()) {
 			// Insert record, regardless of whether it has already been inserted.
@@ -189,9 +208,9 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	
 	public List<FlatTransaction> getTransactionsForCategory(long categoryId, int limit) {
 		return this.jdbcTemplate.query(
-				FLAT_SELECT + "where t.categoryid = ? order by t.entered desc " +
-						(limit > 0 ? String.format("limit %d", limit) : ""), 
-				new Object[]{categoryId},
+				FLAT_SELECT_CATEGORY +
+						(limit > 0 ? String.format(" limit %d", limit) : ""), 
+				new Object[]{categoryId, categoryId},
 				new RowMapperUtil.FlatTransactionMapper());
 	}
 	

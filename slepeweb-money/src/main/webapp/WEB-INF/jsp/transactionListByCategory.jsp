@@ -37,6 +37,7 @@
 		<table class="trn_listing">
 			<tr>
 				<th>Date</th>
+				<th>Account</th>
 				<th>Payee</th>
 				<th>Amount</th>
 				<th>Memo</th>
@@ -44,10 +45,11 @@
 			<c:forEach items="${_pager.page}" var="_trn">
 				<tr>
 					<td class="date">${_trn.enteredStr}</td>
+					<td class="account">${_trn.account}</td>
 					<td class="payee">${_trn.payee}</td>
 					<td class="currency amount">${_trn.amountInPounds}</td>
 					<td class="memo">${_trn.memo}</td>				
-					<td data-id="${_trn.id}" class="menu-icon"><i class="fas fa-bars"></i></td>
+					<td class="menu-icon" data-id="${_trn.id}"><i class="fas fa-bars"></i></td>
 				</tr>
 			</c:forEach>
 		</table>

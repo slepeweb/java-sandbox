@@ -303,6 +303,9 @@ public class PageController extends BaseController {
 		return getTransactionListByCategory(categoryId, selectedPage, 0, req, model);
 	}
 	
+	/*
+	 * TODO: this does not take into account payments in split transactions.
+	 */
 	@SuppressWarnings("unchecked")
 	private String getTransactionListByCategory(long categoryId, 
 			int selectedPage, int limit, HttpServletRequest req, ModelMap model) {

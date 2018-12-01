@@ -3,9 +3,8 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <mny:standardLayout>
-	<h2>Money App</h2>			
+	<h2>Money Dashboard</h2>			
 	<c:choose><c:when test="${not empty _accounts}">
-		<h3>Open accounts</h3>
 		<table class="trn_listing">
 			<c:forEach items="${_accounts}" var="_a">
 				<tr>

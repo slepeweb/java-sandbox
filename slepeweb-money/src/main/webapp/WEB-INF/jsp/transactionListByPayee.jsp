@@ -36,6 +36,7 @@
 	<c:choose><c:when test="${not empty _pager.results}">
 		<table class="trn_listing">
 			<tr>
+				<th>Account</th>
 				<th>Date</th>
 				<th>Category</th>
 				<th>Amount</th>
@@ -44,10 +45,11 @@
 			<c:forEach items="${_pager.page}" var="_trn">
 				<tr>
 					<td class="date">${_trn.enteredStr}</td>
+					<td class="account">${_trn.account}</td>
 					<td class="category">${_trn.category}</td>
 					<td class="currency amount">${_trn.amountInPounds}</td>
 					<td class="memo">${_trn.memo}</td>				
-					<td class="menu-icon" data-id="none"><i class="fas fa-bars"></i></td>
+					<td class="menu-icon" data-id="${_trn.id}"><i class="fas fa-bars"></i></td>
 				</tr>
 			</c:forEach>
 		</table>

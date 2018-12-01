@@ -8,7 +8,7 @@ public class FlatTransaction {
 
 	private Timestamp entered;
 	private String payee, category, account, memo, reference;
-	private long amount;
+	private long id, amount;
 	
 	@Override
 	public String toString() {
@@ -16,6 +16,15 @@ public class FlatTransaction {
 				getAccount(), getPayee(), Util.formatPounds(getAmount()), getEntered());
 	}
 	
+	public long getId() {
+		return id;
+	}
+
+	public FlatTransaction setId(long id) {
+		this.id = id;
+		return this;
+	}
+
 	public Timestamp getEntered() {
 		return entered;
 	}

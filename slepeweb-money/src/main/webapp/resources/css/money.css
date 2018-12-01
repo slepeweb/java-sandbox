@@ -706,15 +706,18 @@ input[type="button"]:disabled,
 
 .trn_listing td {
   vertical-align: top;
+  /* 	&.payee { */
+  /* 		width: 20%; */
+  /* 	} */
+  /* 	&.category { */
+  /* 		width: 20%; */
+  /* 	} */
 }
 .trn_listing td.date {
   width: 10%;
 }
 .trn_listing td.amount {
   width: 10%;
-}
-.trn_listing td.payee {
-  width: 20%;
 }
 .trn_listing td.memo {
   width: 30%;
