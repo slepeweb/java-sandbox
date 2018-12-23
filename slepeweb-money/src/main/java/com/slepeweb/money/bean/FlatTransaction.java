@@ -1,14 +1,22 @@
 package com.slepeweb.money.bean;
 
-import java.sql.Timestamp;
+import java.util.Date;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.beans.Field;
 
 import com.slepeweb.money.Util;
 
 public class FlatTransaction {
 
-	private Timestamp entered;
-	private String payee, category, account, memo, reference;
-	private long id, amount;
+	@Field("id") private String id;
+	@Field("entered") private Date entered;
+	@Field("amount") private Long amount;
+	@Field("account") private String account;
+	@Field("payee") private String payee;
+	@Field("major") private String majorCategory;
+	@Field("minor") private String minorCategory;
+	@Field("memo") private String memo;
 	
 	@Override
 	public String toString() {
@@ -16,16 +24,16 @@ public class FlatTransaction {
 				getAccount(), getPayee(), Util.formatPounds(getAmount()), getEntered());
 	}
 	
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public FlatTransaction setId(long id) {
+	public FlatTransaction setId(String id) {
 		this.id = id;
 		return this;
 	}
 
-	public Timestamp getEntered() {
+	public Date getEntered() {
 		return entered;
 	}
 	
@@ -33,7 +41,7 @@ public class FlatTransaction {
 		return Util.formatTimestamp(getEntered());
 	}
 	
-	public FlatTransaction setEntered(Timestamp entered) {
+	public FlatTransaction setEntered(Date entered) {
 		this.entered = entered;
 		return this;
 	}
@@ -47,13 +55,26 @@ public class FlatTransaction {
 		return this;
 	}
 	
-	public String getCategory() {
-		return category;
+	public String getMajorCategory() {
+		return majorCategory;
 	}
-	
-	public FlatTransaction setCategory(String category) {
-		this.category = category;
+
+	public FlatTransaction setMajorCategory(String s) {
+		this.majorCategory = s;
 		return this;
+	}
+
+	public String getMinorCategory() {
+		return minorCategory;
+	}
+
+	public FlatTransaction setMinorCategory(String s) {
+		this.minorCategory = s;
+		return this;
+	}
+
+	public String getCategory() {
+		return getMajorCategory() + (StringUtils.isNotBlank(getMinorCategory()) ? " > " + getMinorCategory() : "");
 	}
 	
 	public String getAccount() {
@@ -84,15 +105,6 @@ public class FlatTransaction {
 	
 	public FlatTransaction setAmount(long amount) {
 		this.amount = amount;
-		return this;
-	}
-
-	public String getReference() {
-		return reference;
-	}
-
-	public FlatTransaction setReference(String reference) {
-		this.reference = reference;
 		return this;
 	}
 }

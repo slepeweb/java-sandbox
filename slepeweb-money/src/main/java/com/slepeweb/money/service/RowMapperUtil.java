@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.slepeweb.money.bean.Account;
@@ -60,16 +59,16 @@ public class RowMapperUtil {
 	
 	public static final class FlatTransactionMapper implements RowMapper<FlatTransaction> {
 		public FlatTransaction mapRow(ResultSet rs, int rowNum) throws SQLException {
-			String minor = rs.getString("minor");
 			
 			return new FlatTransaction().
-					setId(rs.getLong("id")).
+					setId(rs.getString("id")).
 					setAccount(rs.getString("account")).
 					setPayee(rs.getString("payee")).
-					setCategory(rs.getString("major") + (StringUtils.isNotBlank(minor) ? " > " + minor : "")).
+					setMajorCategory(rs.getString("major")).
+					setMinorCategory(rs.getString("minor")).
 					setEntered(rs.getTimestamp("entered")).
 					setAmount(rs.getLong("amount")).
-					setReference(rs.getString("reference")).
+//					setReference(rs.getString("reference")).
 					setMemo(rs.getString("memo"));
 		}
 	}
@@ -77,6 +76,7 @@ public class RowMapperUtil {
 	public static final class SplitTransactionMapper implements RowMapper<SplitTransaction> {
 		public SplitTransaction mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new SplitTransaction().
+					setId(rs.getLong("id")).
 					setTransactionId(rs.getLong("transactionid")).
 					setCategory(makeCategoryX(rs)).
 					setAmount(rs.getLong("amount")).

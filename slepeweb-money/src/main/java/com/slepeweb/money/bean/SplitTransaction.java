@@ -31,6 +31,11 @@ public class SplitTransaction extends DbEntity {
 		return String.format("%s - %s", getCategory(), getAmountInPounds());
 	}
 	
+	public SplitTransaction setId(long id) {
+		super.setId(id);
+		return this;
+	}
+	
 	public String getAmountInPounds() {
 		return Transaction.DF.format(amount / 100.0);
 	}

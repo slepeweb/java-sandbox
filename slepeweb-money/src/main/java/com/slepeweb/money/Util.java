@@ -80,4 +80,16 @@ public class Util {
 		
 		return (yearB - yearA) * 12 + (monthB - monthA) + 1;
 	}
+	
+	public static boolean isPositive(String str) {
+		if (str != null) {
+			String s = str.trim();
+			return 
+					s.equalsIgnoreCase("yes") ||
+					s.equalsIgnoreCase("true") ||
+					s.equalsIgnoreCase("1");
+		}
+		
+		return false;
+	}
 }

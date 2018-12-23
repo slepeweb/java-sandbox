@@ -19,31 +19,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
-import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.MonthPager;
 import com.slepeweb.money.bean.NamedList;
 import com.slepeweb.money.bean.NormalisedMonth;
 import com.slepeweb.money.bean.Option;
-import com.slepeweb.money.bean.Pager;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RunningBalance;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
+import com.slepeweb.money.bean.solr.SolrConfig;
+import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
+import com.slepeweb.money.service.SolrService;
 import com.slepeweb.money.service.TransactionService;
 
 @Controller
 public class PageController extends BaseController {
 	
-	private static final String PAYEE_SEARCH = "_payeeSearch";
-	private static final String CATEGORY_SEARCH = "_categorySearch";
+//	private static final String PAYEE_SEARCH = "_payeeSearch";
+//	private static final String CATEGORY_SEARCH = "_categorySearch";
 	
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
 	@Autowired private CategoryService categoryService;
 	@Autowired private TransactionService transactionService;
+	@Autowired private SolrService solrService;
 	
 	@RequestMapping(value="/")	
 	public String dashboard(ModelMap model) { 
@@ -303,32 +305,14 @@ public class PageController extends BaseController {
 		return getTransactionListByCategory(categoryId, selectedPage, 0, req, model);
 	}
 	
-	/*
-	 * TODO: this does not take into account payments in split transactions.
-	 */
-	@SuppressWarnings("unchecked")
 	private String getTransactionListByCategory(long categoryId, 
 			int selectedPage, int limit, HttpServletRequest req, ModelMap model) {
 		
-		List<FlatTransaction> results = null;
-		if (selectedPage == 1) {
-			// Do a fresh search
-			results = this.transactionService.getTransactionsForCategory(categoryId, limit);
-			req.getSession().setAttribute(CATEGORY_SEARCH, results);
-		}
-		else {
-			// Look for stored results
-			results = (List<FlatTransaction>) req.getSession().getAttribute(CATEGORY_SEARCH);
-			if (results == null) {
-				results = this.transactionService.getTransactionsForCategory(categoryId, limit);
-				req.getSession().setAttribute(CATEGORY_SEARCH, results);
-			}
-		}
-		
-		Pager<FlatTransaction> pager = new Pager<FlatTransaction>(results, 20, selectedPage);
-		model.addAttribute("_pager", pager);
+		SolrParams params = new SolrParams(new SolrConfig()).setCategoryId(categoryId).setPageNum(selectedPage);
+		model.addAttribute("_response", this.solrService.query(params));
 		model.addAttribute("_category", this.categoryService.get(categoryId));
 		model.addAttribute("_limit", limit); 
+		
 		return "transactionListByCategory";
 	}
 
@@ -360,29 +344,25 @@ public class PageController extends BaseController {
 		return getTransactionListByPayee(payeeId, selectedPage, 0, req, model);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private String getTransactionListByPayee(long payeeId, 
 			int selectedPage, int limit, HttpServletRequest req, ModelMap model) {
 		
-		List<FlatTransaction> results = null;
-		if (selectedPage == 1) {
-			// Do a fresh search
-			results = this.transactionService.getTransactionsForPayee(payeeId, limit);
-			req.getSession().setAttribute(PAYEE_SEARCH, results);
-		}
-		else {
-			// Look for stored results
-			results = (List<FlatTransaction>) req.getSession().getAttribute(PAYEE_SEARCH);
-			if (results == null) {
-				results = this.transactionService.getTransactionsForPayee(payeeId, limit);
-				req.getSession().setAttribute(PAYEE_SEARCH, results);
-			}
-		}
-		
-		Pager<FlatTransaction> pager = new Pager<FlatTransaction>(results, 20, selectedPage);
-		model.addAttribute("_pager", pager);
+		SolrParams params = new SolrParams(new SolrConfig()).setPayeeId(payeeId).setPageNum(selectedPage);
+		model.addAttribute("_response", this.solrService.query(params));
 		model.addAttribute("_payee", this.payeeService.get(payeeId));
 		model.addAttribute("_limit", limit); 
+		
 		return "transactionListByPayee";
+	}
+	
+	@RequestMapping(value="/index")	
+	public String index() { 
+		for (Transaction t : this.transactionService.getTransactionsForAccount(94L, 
+				Util.parseTimestamp("2000-01-01"), Util.parseTimestamp("2018-12-31"))) {
+			
+			this.solrService.save(t);
+		}
+		
+		return null;
 	}
 }

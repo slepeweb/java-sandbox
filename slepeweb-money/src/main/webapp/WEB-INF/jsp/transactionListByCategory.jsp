@@ -3,14 +3,15 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <c:set var="_urlPrefix">${_ctxPath}/transaction/list/by/category/${_category.id}</c:set>
+<c:set var="_pager" value="${_response.pager}" />
 	
 <mny:standardLayout>
 
 	<h2>Transactions for category '${_category}'</h2>	
 	
 	<p>
-		<strong>Total no. of transactions = ${_pager.totalHits}</strong>
-		<c:if test="${_pager.totalHits eq _limit}">
+		<strong>Total no. of transactions = ${_response.totalHits}</strong>
+		<c:if test="${_response.totalHits eq _limit}">
 			<button id="lift-limit">Lift limit</button>
 		</c:if>
 	</p>
@@ -42,7 +43,7 @@
 				<th>Amount</th>
 				<th>Memo</th>
 			</tr>
-			<c:forEach items="${_pager.page}" var="_trn">
+			<c:forEach items="${_pager.results}" var="_trn">
 				<tr>
 					<td class="date">${_trn.enteredStr}</td>
 					<td class="account">${_trn.account}</td>

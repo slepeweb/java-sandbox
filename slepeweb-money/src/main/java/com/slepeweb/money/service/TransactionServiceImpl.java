@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.bean.solr.SolrConfig;
+import com.slepeweb.money.bean.solr.SolrParams;
+import com.slepeweb.money.bean.solr.SolrResponse;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
 
@@ -21,6 +24,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	private static Logger LOG = Logger.getLogger(TransactionServiceImpl.class);
 	@Autowired private AccountService accountService;
 	@Autowired private SplitTransactionService splitTransactionService;
+	@Autowired private SolrService solrService;
 	
 	private static final String FROM = 
 			"from transaction t " +
@@ -68,7 +72,9 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		if (pt.isDefined4Insert()) {
 			// Insert record, regardless of whether it has already been inserted.
 			// (Take care with imports - should check whether already imported first!)
-			return insert(pt);
+			Transaction t = insert(pt);
+			this.solrService.save(t);
+			return t;
 		}
 		else {
 			String t = "Transaction not saved - insufficient data";
@@ -124,6 +130,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			LOG.debug(compose("Transaction not modified", t));
 		}
 		
+		this.solrService.save(dbRecord);
 		return dbRecord;
 	}
 
@@ -220,6 +227,14 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 						(limit > 0 ? String.format("limit %d", limit) : ""), 
 				new Object[]{payeeId},
 				new RowMapperUtil.FlatTransactionMapper());
+	}
+	
+	public SolrResponse<FlatTransaction> getTransactionsForPayee(long id) {
+		return this.solrService.query(new SolrParams(new SolrConfig()).setPayeeId(id));
+	}
+	
+	public SolrResponse<FlatTransaction> getTransactionsForCategory(long id) {
+		return this.solrService.query(new SolrParams(new SolrConfig()).setCategoryId(id));
 	}
 	
 	public long getBalance(long accountId) {

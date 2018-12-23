@@ -18,17 +18,19 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 	private static Logger LOG = Logger.getLogger(SplitTransactionServiceImpl.class);
 	private static final String SELECT = 
 			"select " +
-					"st.transactionid, st.amount, st.memo, " + 
+					"st.id, st.transactionid, st.amount, st.memo, " + 
 					"c.id as categoryid, c.origid as categoryorigid, c.major, c.minor " + 
 			"from splittransaction st " +
 					"join category c on c.id = st.categoryid ";
-	
 	public Transaction save(Transaction t) throws MissingDataException, DuplicateItemException {
 		if (t.isSplit()) {
 			List<SplitTransaction> revisedList = new ArrayList<SplitTransaction>(t.getSplits().size());
 			revisedList.addAll(t.getSplits());
 			
-			// Delete existing splits
+			/*
+			 * Transaction t is fully defined, but the number and the content of its splits may have changed.
+			 * So, first we'll delete the transaction's existing splits from the database.
+			 */
 			t = delete(t);
 			
 			// Insert latest splits
@@ -39,7 +41,7 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 				else {
 					throw new MissingDataException(error(LOG, "Split transactions not saved - insufficient data", t));
 				}
-			}
+			}			
 		}
 		
 		return t;

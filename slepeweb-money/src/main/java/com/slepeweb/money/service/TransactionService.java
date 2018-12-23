@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.bean.solr.SolrResponse;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
 
@@ -23,4 +24,6 @@ public interface TransactionService {
 	void updateSplit(Transaction t);
 	long getBalance(long accountId);
 	long getBalance(long accountId, Timestamp to);
+	SolrResponse<FlatTransaction> getTransactionsForPayee(long id);
+	SolrResponse<FlatTransaction> getTransactionsForCategory(long id);
 }
