@@ -176,7 +176,7 @@ public class SolrServiceImpl implements SolrService {
 				//				LOG.info(String.format("Solr query: [%s]", q.getFilterQueries().toString()));				
 
 				// Category searches can only apply to transactions which are NOT splits
-				q.addFilterQuery("split:" + String.valueOf(params.getCategoryId() != null));
+				q.addFilterQuery("split:" + String.valueOf(params.getCategoryId() == null));
 
 				try {
 					QueryResponse qr = getClient().query(q);
