@@ -89,19 +89,6 @@
 				<td class="currency amount">${_trn.balance}</td>
 				<td data-id="${_trn.id}" class="menu-icon"><i class="fas fa-bars"></i></td>
 			</tr>
-
-			<c:if test="${_trn.split}">
-					<c:forEach items="${_trn.splits}" var="_split">
-						<tr>
-							<td></td>
-							<td></td>
-							<td>${_split.category}</td>
-							<td class="currency amount">${_split.amountInPounds}</td>
-							<td>${_split.memo}</td>
-							<td></td>
-						</tr>
-					</c:forEach>
-			</c:if>
 		</c:forEach>
 	</table>
 	</c:when><c:otherwise>

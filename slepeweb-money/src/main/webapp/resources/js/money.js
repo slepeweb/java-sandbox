@@ -17,7 +17,7 @@ $(function() {
 //	});
 	
 	$("#accordion").accordion({
-		active: 1,
+		active: false,
 		collapsible: true,
 		heightStyle: content
 	});

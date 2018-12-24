@@ -73,4 +73,4 @@ cd $DIST
 jar xvf $JAR
 
 cd
-java -cp $LIBS/*:$DIST:$DIST/resources com.slepeweb.money.MoneyImportManager -from $FROM
+java -cp $LIBS/*:$DIST com.slepeweb.money.MoneyImportManager -from $FROM

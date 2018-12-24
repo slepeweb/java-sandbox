@@ -26,6 +26,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	@Autowired private TransactionService transactionService;
 	@Autowired private SplitTransactionService splitTransactionService;
 	@Autowired private MSAccessService msAccessService;
+	@Autowired private SolrService solrService;
 	
 	public void init(TimeWindow twin) throws IOException {
 		// Create null entries for Payee and Category, if not already created
@@ -161,7 +162,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	public Transaction saveSplitTransactions(Transaction t) {
 		try {
 			this.transactionService.updateSplit(t);
-			return this.splitTransactionService.save(t);
+			t = this.splitTransactionService.save(t);
+			this.solrService.save(t);
+			return t;
 		}
 		catch (Exception e) {
 			LOG.error("Failed to save split transaction", e);

@@ -6,4 +6,4 @@
   <field name="major" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="minor" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="memo" type="text_en" multiValued="false" indexed="true" required="false" stored="true"/>
-  <!--<copyField source="title" dest="_text_"/>-->
+  <field name="split" type="boolean" multiValued="false" indexed="true" required="true" stored="true"/>

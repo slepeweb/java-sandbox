@@ -17,6 +17,7 @@ public class FlatTransaction {
 	@Field("major") private String majorCategory;
 	@Field("minor") private String minorCategory;
 	@Field("memo") private String memo;
+	@Field("split") private boolean split;
 	
 	@Override
 	public String toString() {
@@ -24,6 +25,15 @@ public class FlatTransaction {
 				getAccount(), getPayee(), Util.formatPounds(getAmount()), getEntered());
 	}
 	
+	public boolean isSplit() {
+		return split;
+	}
+
+	public FlatTransaction setSplit(boolean split) {
+		this.split = split;
+		return this;
+	}
+
 	public String getId() {
 		return id;
 	}

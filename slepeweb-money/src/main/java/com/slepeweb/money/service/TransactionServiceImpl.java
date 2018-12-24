@@ -194,6 +194,9 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				new Object[]{accountId});
 	}
 	
+	/*
+	 * TODO: why are transactions not sorted by reverse date here?
+	 */
 	public List<Transaction> getTransactionsForAccount(long accountId, Timestamp from, Timestamp to) {
 		return getTransactionsForAccount(
 				SELECT + "where t.accountid = ? and t.entered >= ? and t.entered <= ? order by t.entered", 
