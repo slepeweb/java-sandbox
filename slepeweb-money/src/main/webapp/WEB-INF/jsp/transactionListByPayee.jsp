@@ -47,7 +47,7 @@
 				<tr>
 					<td class="date">${_trn.enteredStr}</td>
 					<td class="account">${_trn.account}</td>
-					<td class="category">${_trn.category}</td>
+					<td class="category"><c:choose><c:when test="${_trn.type eq '1'}">[Split transaction]</c:when><c:otherwise>${_trn.category}</c:otherwise></c:choose></td>
 					<td class="currency amount">${_trn.amountInPounds}</td>
 					<td class="memo">${_trn.memo}</td>				
 					<td class="menu-icon" data-id="${_trn.id}"><i class="fas fa-bars"></i></td>

@@ -29,4 +29,4 @@
 	</c:otherwise></c:choose>
 </mny:standardLayout>
 
-<mny:menuActionDialog target="/money/transaction/list/by/category/" />
+<mny:menuActionDialog target="/money/transaction/list/by/category/" disable="delete" />

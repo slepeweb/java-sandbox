@@ -72,12 +72,14 @@ public class SolrServiceImpl implements SolrService {
 	public boolean save(Transaction t) {
 		if (isEnabled()) {
 			try {
-				getClient().addBean(makeDoc(t));
+				FlatTransaction parent = makeDoc(t);
 
 				if (t.isSplit()) {
 					getClient().addBeans(makeDocsFromSplits(t));
+					parent.setType(1);
 				}
 
+				getClient().addBean(parent);
 				this.client.commit();
 				LOG.debug("Transaction(s) successfully indexed by Solr");
 				return true;
@@ -142,6 +144,7 @@ public class SolrServiceImpl implements SolrService {
 			SolrResponse<FlatTransaction> response = new SolrResponse<FlatTransaction>(params);
 			SolrQuery q;
 			StringBuilder sb = new StringBuilder();
+			boolean isCategorySearch = false;
 
 			if (params.getPayeeId() != null) {
 				Payee p = this.payeeService.get(params.getPayeeId());
@@ -151,6 +154,7 @@ public class SolrServiceImpl implements SolrService {
 			}
 
 			if (params.getCategoryId() != null) {
+				isCategorySearch = true;
 				Category c = this.categoryService.get(params.getCategoryId());
 				if (c != null) {
 					if (StringUtils.isNotBlank(c.getMinor())) {
@@ -165,6 +169,13 @@ public class SolrServiceImpl implements SolrService {
 			if (StringUtils.isNotBlank(params.getMemo())) {
 				appendField(sb, "memo", params.getMemo());
 			}
+			
+			if (isCategorySearch) {
+				sb.append(" AND (type:0 OR type:2)");
+			}
+			else {
+				sb.append(" AND (type:0 OR type:1)");
+			}
 
 			if (sb.length() > 0) {
 				q = new SolrQuery(sb.toString());
@@ -174,9 +185,6 @@ public class SolrServiceImpl implements SolrService {
 				q.setStart(params.getStart());
 				q.setRows(params.getPageSize());
 				//				LOG.info(String.format("Solr query: [%s]", q.getFilterQueries().toString()));				
-
-				// Category searches can only apply to transactions which are NOT splits
-				q.addFilterQuery("split:" + String.valueOf(params.getCategoryId() == null));
 
 				try {
 					QueryResponse qr = getClient().query(q);
@@ -220,7 +228,7 @@ public class SolrServiceImpl implements SolrService {
 				setMajorCategory(t.getCategory().getMajor()).
 				setMinorCategory(t.getCategory().getMinor()).
 				setMemo(t.getMemo()).
-				setSplit(t.isSplit());
+				setType(0);
 	}
 
 	/*
@@ -239,7 +247,7 @@ public class SolrServiceImpl implements SolrService {
 					setMajorCategory(st.getCategory().getMajor()).
 					setMinorCategory(st.getCategory().getMinor()).
 					setMemo(st.getMemo()).
-					setSplit(false));
+					setType(2));
 		}
 
 		return list;

@@ -89,13 +89,11 @@ public class PageController extends BaseController {
 		
 		for (Category c : all) {
 			if (c.getMajor().length() == 0) {
-				// This happens, not sure why
-				c.setMajor("(no major category)");
+				c.setMajor("(None)");
 			}
 			
 			if (c.getMinor().length() == 0) {
-				// This happens, not sure why
-				c.setMinor("(no minor category)");
+				c.setMinor("(all sub-categories)");
 			}
 			
 			nextName = c.getMajor();

@@ -1,5 +1,6 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
-	attribute name="target" required="true" rtexprvalue="true" %>
+	attribute name="target" required="true" rtexprvalue="true" %><%@ 
+	attribute name="disable" required="false" rtexprvalue="true" %>
 
 <c:set var="_menuIconClass" value="menu-icon" />
 <c:set var="_menuDialogId" value="menu-action-dialog" />
@@ -9,8 +10,8 @@
 <div id="${_menuDialogId}">
 	<ul>
 		<li class="${_menuCloseClass}"><i class="far fa-window-close"></i></li>
-		<li>Edit</li>
-		<li>Delete</li>
+		<c:if test="${not fn:contains(disable, 'edit')}"><li>Edit</li></c:if>
+		<c:if test="${not fn:contains(disable, 'delete')}"><li>Delete</li></c:if>
 		<c:if test="${target ne 'none'}"><li class="${_menuFindClass}">Find transactions</li></c:if>
 	</ul>
 </div>
