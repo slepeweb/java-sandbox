@@ -96,4 +96,9 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 		return this.jdbcTemplate.query(
 			"select * from category order by major, minor", new RowMapperUtil.CategoryMapper());
 	}
+	
+	public List<String> getAllMajorValues() {
+		return this.jdbcTemplate.queryForList(
+			"select distinct major from category order by major", java.lang.String.class);
+	}
 }

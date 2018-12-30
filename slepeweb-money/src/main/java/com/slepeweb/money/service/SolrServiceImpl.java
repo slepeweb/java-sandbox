@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.Util;
+import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
@@ -29,10 +30,9 @@ public class SolrServiceImpl implements SolrService {
 	private static Logger LOG = Logger.getLogger(SolrServiceImpl.class);
 	private static final String SPACE = " ";
 
-	@Autowired
-	private PayeeService payeeService;
-	@Autowired
-	private CategoryService categoryService;
+	@Autowired private AccountService accountService;
+	@Autowired private PayeeService payeeService;
+	@Autowired private CategoryService categoryService;
 
 	//@Value("${solr.enabled:no}") 
 	private String solrIsEnabled = "yes";
@@ -144,12 +144,21 @@ public class SolrServiceImpl implements SolrService {
 			SolrResponse<FlatTransaction> response = new SolrResponse<FlatTransaction>(params);
 			SolrQuery q;
 			StringBuilder sb = new StringBuilder();
-			boolean isCategorySearch = false;
+			boolean isCriteriaSet = false, isCategorySearch = false;
+
+			if (params.getAccountId() != null) {
+				Account a = this.accountService.get(params.getAccountId());
+				if (a != null) {
+					appendField(sb, "account", a.getName());
+					isCriteriaSet = true;
+				}
+			}
 
 			if (params.getPayeeId() != null) {
 				Payee p = this.payeeService.get(params.getPayeeId());
 				if (p != null) {
 					appendField(sb, "payee", p.getName());
+					isCriteriaSet = true;
 				}
 			}
 
@@ -163,46 +172,59 @@ public class SolrServiceImpl implements SolrService {
 					} else {
 						appendField(sb, "major", c.getMajor());
 					}
+					isCriteriaSet = true;
 				}
+			}
+			else if (StringUtils.isNotBlank(params.getMajorCategory())) {
+				isCategorySearch = true;
+				appendField(sb, "major", params.getMajorCategory());
+				isCriteriaSet = true;
 			}
 
 			if (StringUtils.isNotBlank(params.getMemo())) {
 				appendField(sb, "memo", params.getMemo());
+				isCriteriaSet = true;
 			}
 			
-			if (isCategorySearch) {
-				sb.append(" AND (type:0 OR type:2)");
+			if (isCriteriaSet) {
+				if (isCategorySearch) {
+					sb.append(" AND (type:0 OR type:2)");
+				}
+				else {
+					sb.append(" AND (type:0 OR type:1)");
+				}
+	
+				if (sb.length() > 0) {
+					q = new SolrQuery(sb.toString());
+					//				q.add("defType", "dismax");
+					//			q.add("qf", "title^10 subtitle^4 bodytext");
+					q.addSort("entered", SolrQuery.ORDER.desc);
+					q.setStart(params.getStart());
+					q.setRows(params.getPageSize());
+					//				LOG.info(String.format("Solr query: [%s]", q.getFilterQueries().toString()));				
+	
+					try {
+						QueryResponse qr = getClient().query(q);
+						response.setResults(qr.getBeans(FlatTransaction.class));
+						response.setTotalHits(qr.getResults().getNumFound());
+						LOG.info(String.format("Query returned %d results [%s]", response.getResults().size(),
+								qr.getHeader().toString()));
+	
+						response.setPager(new SolrPager<FlatTransaction>(response.getTotalHits(), response.getResults(),
+								params.getConfig().getPageSize(), params.getPageNum()));
+	
+						return response;
+	
+					} catch (Exception e) {
+						response.setError(true);
+						response.setMessage("Search system error");
+						LOG.error(response.getMessage(), e);
+					}
+				}
 			}
 			else {
-				sb.append(" AND (type:0 OR type:1)");
-			}
-
-			if (sb.length() > 0) {
-				q = new SolrQuery(sb.toString());
-				//				q.add("defType", "dismax");
-				//			q.add("qf", "title^10 subtitle^4 bodytext");
-				q.addSort("entered", SolrQuery.ORDER.desc);
-				q.setStart(params.getStart());
-				q.setRows(params.getPageSize());
-				//				LOG.info(String.format("Solr query: [%s]", q.getFilterQueries().toString()));				
-
-				try {
-					QueryResponse qr = getClient().query(q);
-					response.setResults(qr.getBeans(FlatTransaction.class));
-					response.setTotalHits(qr.getResults().getNumFound());
-					LOG.info(String.format("Query returned %d results [%s]", response.getResults().size(),
-							qr.getHeader().toString()));
-
-					response.setPager(new SolrPager<FlatTransaction>(response.getTotalHits(), response.getResults(),
-							params.getConfig().getPageSize(), params.getPageNum()));
-
-					return response;
-
-				} catch (Exception e) {
-					response.setError(true);
-					response.setMessage("Search system error");
-					LOG.error(response.getMessage(), e);
-				}
+				response.setError(true);
+				response.setMessage("No search criteria provided");
 			}
 
 			response.setTotalHits(0);

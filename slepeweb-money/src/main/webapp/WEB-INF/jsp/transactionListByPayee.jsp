@@ -16,44 +16,10 @@
 		</c:if>
 	</p>
 	
-	<p>
-		<c:if test="${_pager.previous}"><span 
-				class="pager arrow left"><a href="${_urlPrefix}/${_pager.previousBlock}"><i 
-					class="fas fa-angle-double-left" title="Jump left"></i></a></span><span 
-				class="pager arrow left"><a href="${_urlPrefix}/${_pager.previousSelection}"><i 
-					class="fas fa-angle-left" title="Previous"></i>Previous</a></span></c:if>
-					
-		<c:forEach items="${_pager.navigation}" var="_option">
-			<span class="pager <c:if test="${_option.selected}">selected</c:if>"><a href="${_urlPrefix}/${_option.value}">${_option.name}</a></span>
-		</c:forEach>
-		
-		<c:if test="${_pager.next}"><span 
-			class="pager arrow right"><a href="${_urlPrefix}/${_pager.nextSelection}">Next<i 
-				class="fas fa-angle-right" title="Next"></i></a></span><span 
-			class="pager arrow right"><a href="${_urlPrefix}/${_pager.nextBlock}"><i 
-				class="fas fa-angle-double-right" title="Jump right"></i></a></span></c:if>
-	</p>
+	<mny:pager urlPrefix="${_urlPrefix}" pager="${_pager}" />
 
 	<c:choose><c:when test="${not empty _pager.results}">
-		<table class="trn_listing">
-			<tr>
-				<th>Account</th>
-				<th>Date</th>
-				<th>Category</th>
-				<th>Amount</th>
-				<th>Memo</th>
-			</tr>
-			<c:forEach items="${_pager.results}" var="_trn">
-				<tr>
-					<td class="date">${_trn.enteredStr}</td>
-					<td class="account">${_trn.account}</td>
-					<td class="category"><c:choose><c:when test="${_trn.type eq '1'}">[Split transaction]</c:when><c:otherwise>${_trn.category}</c:otherwise></c:choose></td>
-					<td class="currency amount">${_trn.amountInPounds}</td>
-					<td class="memo">${_trn.memo}</td>				
-					<td class="menu-icon" data-id="${_trn.id}"><i class="fas fa-bars"></i></td>
-				</tr>
-			</c:forEach>
-		</table>
+		<mny:flatTransactionTable pager="${_pager}" disable="payee" />
 	</c:when><c:otherwise>
 		<p><strong>No transactions for this payee</strong></p>
 	</c:otherwise></c:choose>

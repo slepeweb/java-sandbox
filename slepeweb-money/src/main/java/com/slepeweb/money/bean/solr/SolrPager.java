@@ -26,11 +26,13 @@ public class SolrPager<T> {
 	private static int BLOCK = 7;
 	private int selectedPage, pageSize, maxPages;
 	private List<T> searchResultsPage;
+	private long totalHits;
 	
 	public SolrPager(long totalHits, List<T> searchResultsPage, int pageSize, int selected) {
 		this.searchResultsPage = searchResultsPage;
 		this.pageSize = pageSize;
 		this.selectedPage = selected;
+		this.totalHits = totalHits;
 		
 		long n = Long.valueOf((totalHits - 1) / this.pageSize) + 1;
 		this.maxPages = (int) n;
@@ -71,6 +73,10 @@ public class SolrPager<T> {
 		return getMaxPages() - p + 1;
 	}
 	
+	public void setTotalHits(long totalHits) {
+		this.totalHits = totalHits;
+	}
+
 	public int getSelectedPage() {
 		return selectedPage;
 	}
@@ -153,8 +159,8 @@ public class SolrPager<T> {
 		return searchResultsPage;
 	}
 
-	public int getTotalHits() {
-		return getResults().size();
+	public long getTotalHits() {
+		return this.totalHits;
 	}
 
 	/*
@@ -172,4 +178,8 @@ public class SolrPager<T> {
 		return getResults().subList(start, end);
 	}
 	 */
+	
+	public boolean isVisible() {
+		return getMaxPages() > 1;
+	}
 }

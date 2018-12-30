@@ -8,16 +8,52 @@ import org.apache.commons.lang3.StringUtils;
 public class SolrParams {
 
 	private SolrConfig config;
-	private String memo;
-	private Long payeeId, categoryId;
+	private String memo, majorCategory;
+	private Long accountId, payeeId, categoryId;
 	private int pageNum, pageSize;
 
 	public SolrParams(SolrConfig config) {
 		this.config = config;
 	}
 	
+	public String getUrlParameters() {
+		StringBuilder sb = new StringBuilder();
+		if (getAccountId() != null) {
+			appendParam(sb, "accountId", getAccountId());
+		}
+		
+		if (getPayeeId() != null) {
+			appendParam(sb, "payeeId", getPayeeId());
+		}
+		
+		if (getCategoryId() != null) {
+			appendParam(sb, "categoryId", getCategoryId());
+		}
+		
+		if (StringUtils.isNotBlank(getMajorCategory())) {
+			appendParam(sb, "category", getMajorCategory());
+		}
+		
+		if (StringUtils.isNotBlank(getMemo())) {
+			appendParam(sb, "memo", getMemo());
+		}
+		
+		return sb.toString();
+	}
+	
+	private void appendParam(StringBuilder sb, String fieldName, Long fieldValue) {
+		appendParam(sb, fieldName, String.valueOf(fieldValue));
+	}
+	
+	private void appendParam(StringBuilder sb, String fieldName, String fieldValue) {
+		if (sb.length() > 0) {
+			sb.append("&");
+		}
+		sb.append(fieldName).append("=").append(clean(fieldValue));
+	}
+	
 	public String getMemo() {
-		return memo;
+		return this.memo == null ? "" : this.memo;
 	}
 
 	public SolrParams setMemo(String memo) {
@@ -25,8 +61,21 @@ public class SolrParams {
 		return this;
 	}
 
+	public String getMajorCategory() {
+		return this.majorCategory == null ? "" : this.majorCategory;
+	}
+
+	public SolrParams setMajorCategory(String majorCategory) {
+		this.majorCategory = majorCategory;
+		return this;
+	}
+
 	public Long getPayeeId() {
 		return payeeId;
+	}
+
+	public String getPayeeIdStr() {
+		return getPayeeId() == null ? "" : String.valueOf(getPayeeId());
 	}
 
 	public SolrParams setPayeeId(Long payeeId) {
@@ -34,12 +83,62 @@ public class SolrParams {
 		return this;
 	}
 
+	public SolrParams setPayeeId(String payeeId) {
+		if (StringUtils.isNumeric(payeeId)) {
+			this.payeeId = Long.valueOf(payeeId);
+		}
+		else {
+			this.payeeId = null;
+		}
+		
+		return this;
+	}
+
 	public Long getCategoryId() {
 		return categoryId;
 	}
 
+	public String getCategoryIdStr() {
+		return getCategoryId() == null ? "" : String.valueOf(getCategoryId());
+	}
+
 	public SolrParams setCategoryId(Long categoryId) {
 		this.categoryId = categoryId;
+		return this;
+	}
+
+	public SolrParams setCategoryId(String categoryId) {
+		if (StringUtils.isNumeric(categoryId)) {
+			this.categoryId = Long.valueOf(categoryId);
+		}
+		else {
+			this.categoryId = null;
+		}
+		
+		return this;
+	}
+
+	public Long getAccountId() {
+		return accountId;
+	}
+
+	public String getAccountIdStr() {
+		return getAccountId() == null ? "" : String.valueOf(getAccountId());
+	}
+
+	public SolrParams setAccountId(Long accountId) {
+		this.accountId = accountId;
+		return this;
+	}
+
+	public SolrParams setAccountId(String accountId) {
+		if (StringUtils.isNumeric(accountId)) {
+			this.accountId = Long.valueOf(accountId);
+		}
+		else {
+			this.accountId = null;
+		}
+		
 		return this;
 	}
 
@@ -87,7 +186,6 @@ public class SolrParams {
 		return sb.toString();
 	}
 	
-	@SuppressWarnings("unused")
 	private String clean(String s) {
 		String cleaned = s.replaceAll("[<>]", " ");
 		try {

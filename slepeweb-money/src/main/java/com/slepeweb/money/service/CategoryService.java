@@ -15,4 +15,5 @@ public interface CategoryService {
 	List<Category> getAll();
 	Category save(Category p) throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	Category update(Category existing, Category with);
+	List<String> getAllMajorValues();
 }
