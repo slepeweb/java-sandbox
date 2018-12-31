@@ -666,3 +666,13 @@
 #year-selector {
 	width: 6em;
 }
+
+.flash {
+	margin-left: 3em;
+	&.success {
+		color: green;
+	}
+	&.failure {
+		color: red;	
+	}
+}

@@ -789,3 +789,13 @@ input[type="button"]:disabled,
 #year-selector {
   width: 6em;
 }
+
+.flash {
+  margin-left: 3em;
+}
+.flash.success {
+  color: green;
+}
+.flash.failure {
+  color: red;
+}

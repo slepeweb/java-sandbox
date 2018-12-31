@@ -16,7 +16,8 @@ public class Account extends Payee {
 			Account a = (Account) obj;
 			setOpeningBalance(a.getOpeningBalance()).
 			setClosed(a.isClosed()).
-			setNote(a.getNote());
+			setNote(a.getNote()).
+			setType(a.getType());
 		}
 	}
 		
@@ -39,17 +40,12 @@ public class Account extends Payee {
 				return false;
 		} else if (!note.equals(a.getNote()))
 			return false;
-				
-		/*
-		 * MSAccess doesn't know about account types, so this is commented out,
-		 * otherwise imports will always update accounts
-		 * 
+
 		if (type == null) {
 			if (a.getType() != null)
 				return false;
 		} else if (!type.equals(a.getType()))
 			return false;
-		*/
 		
 		return true;
 	}

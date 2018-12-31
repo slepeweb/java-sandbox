@@ -4,7 +4,7 @@
 	attribute name="pager" type="com.slepeweb.money.bean.solr.SolrPager" required="true" rtexprvalue="true" %><%@ 
 	attribute name="params" required="false" rtexprvalue="true" %>
 
-<p><strong>Found ${pager.totalHits} search results</strong></p>
+<p><strong>Found ${pager.totalHits} matching transactions</strong></p>
 
 <c:if test="${pager.visible}">
 	<c:set var="_queryString" value="" />

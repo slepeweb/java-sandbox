@@ -16,6 +16,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
@@ -38,9 +39,6 @@ import com.slepeweb.money.service.TransactionService;
 
 @Controller
 public class PageController extends BaseController {
-	
-//	private static final String PAYEE_SEARCH = "_payeeSearch";
-//	private static final String CATEGORY_SEARCH = "_categorySearch";
 	
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
@@ -406,4 +404,35 @@ public class PageController extends BaseController {
 		return "advancedSearch";
 	}
 	
+	@RequestMapping(value="/account/edit/{accountId}", method=RequestMethod.GET)
+	public String accountForm(@PathVariable long accountId, ModelMap model) {
+		
+		model.addAttribute("_account", this.accountService.get(accountId));
+		return "accountForm";
+	}
+	
+	@RequestMapping(value="/account/update", method=RequestMethod.POST)
+	public RedirectView accountUpdate(HttpServletRequest req, ModelMap model) {
+		
+		Account a = new Account().
+				setId(Long.valueOf(req.getParameter("id"))).
+				setName(req.getParameter("name")).
+				setType(req.getParameter("type")).
+				setClosed(! req.getParameter("status").equals("open")).
+				setOpeningBalance(Util.parsePounds(req.getParameter("opening"))).
+				setNote(req.getParameter("note"));
+		
+		String flash;
+		
+		try {
+			this.accountService.save(a);
+			flash="success|Successfully updated";
+		}
+		catch (Exception e) {
+			flash="failure|Failed to update account";
+		}
+	
+		return new RedirectView(String.format("%s/account/edit/%d?flash=%s", 
+				req.getContextPath(), a.getId(), Util.encodeUrl(flash)));
+	}
 }

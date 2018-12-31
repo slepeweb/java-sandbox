@@ -1,6 +1,8 @@
 package com.slepeweb.money;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -16,6 +18,17 @@ public class Util {
 	
 	public static String formatPounds(long pence) {
 		return String.format("%,.2f", pence / 100.0F);
+	}
+	
+	public static long parsePounds(String value) {
+		String[] parts = value.split("\\.");
+		if (parts.length == 1) {
+			return Long.valueOf(parts[0]);
+		}
+		else if (parts.length == 2){
+			return ((Long.valueOf(parts[0])).longValue() * 100) + (Long.valueOf(parts[1])).longValue();
+		}
+		return 0L;
 	}
 	
 	public static String formatTimestamp(Date d) {
@@ -92,4 +105,13 @@ public class Util {
 		
 		return false;
 	}
+	
+	public static String encodeUrl(String s) {
+		try {
+			return URLEncoder.encode(s, "utf-8");
+		}
+		catch (UnsupportedEncodingException e) {}
+		return s;
+	}
+
 }
