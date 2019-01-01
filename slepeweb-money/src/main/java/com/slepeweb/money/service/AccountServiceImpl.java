@@ -16,7 +16,9 @@ import com.slepeweb.money.except.MissingDataException;
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 	
 	private static Logger LOG = Logger.getLogger(AccountServiceImpl.class);
+
 	@Autowired private TransactionService transactionService;
+	@Autowired private SolrService solrService;
 	
 	public Account save(Account a) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (a.isDefined4Insert()) {
@@ -108,5 +110,12 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		}
 		
 		return accounts;
+	}
+	
+	public int delete(long id) {
+		Account a = get(id);
+		int num = this.jdbcTemplate.update("delete from account where id = ?", id);
+		this.solrService.removeTransactionsByAccount(a.getName());
+		return num;
 	}
 }

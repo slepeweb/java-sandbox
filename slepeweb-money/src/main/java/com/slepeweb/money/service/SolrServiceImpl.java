@@ -93,23 +93,23 @@ public class SolrServiceImpl implements SolrService {
 
 	public boolean removeTransactionsById(long transactionId) {
 		// Note that split transactions have an id that begins with the parent transaction
-		return removeTransactions(String.format("id:%d-*", transactionId));
+		return removeTransactions(String.format("id:%d*", transactionId));
 	}
 
 	public boolean removeTransactionsByAccount(String name) {
-		return removeTransactions(String.format("account:%s", name));
+		return removeTransactions(String.format("account:\"%s\"", name));
 	}
 
 	public boolean removeTransactionsByPayee(String name) {
-		return removeTransactions(String.format("payee:%s", name));
+		return removeTransactions(String.format("payee:\"%s\"", name));
 	}
 
 	public boolean removeTransactionsByCategory(String major, String minor) {
 		if (StringUtils.isNotBlank(major)) {
 			if (StringUtils.isNotBlank(minor)) {
-				return removeTransactions(String.format("major:%s AND minor:%s", major, minor));
+				return removeTransactions(String.format("major:\"%s\" AND minor:\"%s\"", major, minor));
 			} else {
-				return removeTransactions(String.format("major:%s", major));
+				return removeTransactions(String.format("major:\"%s\"", major));
 			}
 		}
 

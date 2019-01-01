@@ -2,27 +2,33 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<mny:flash />
+	
 <mny:standardLayout>
 
-	<c:set var="_flashMessage" value="" />
-	<c:set var="_flashType" value="" />
-	<c:if test="${not empty param.flash}">
-		<c:set var="_flashMessage" value="${fn:substringAfter(param.flash, '|')}" />
-		<c:set var="_flashType" value="${fn:substringBefore(param.flash, '|')}" />
+	<c:set var="_buttonLabel" value="Add account" />
+	<c:set var="_pageHeading" value="Add new account" />
+	<c:if test="${_formMode eq 'update'}">
+		<c:set var="_buttonLabel" value="Update account" />
+	<c:set var="_pageHeading" value="Update account" />
 	</c:if>
+	
 
-	<h2>Edit account details <c:if test="${not empty param.flash}"><span 
+	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
 	
 	<form method="post" action="${_ctxPath}/account/update">	  
 	    <table>
-		    <tr>
-		        <td class="heading"><label for="identifier">Id</label></td>
-		        <td><input disabled="disabled" name="identifier" placeholder="Unique id" value="${_account.id}" /></td>
-		    </tr>
+	    	<c:if test="${_formMode eq 'update'}">
+			    <tr>
+			        <td class="heading"><label for="identifier">Id</label></td>
+			        <td><input type="text" readonly name="identifier" placeholder="Unique id" value="${_account.id}" /></td>
+			    </tr>
+		    </c:if>
+		    
 		    <tr>
 		        <td class="heading"><label for="name">Name</label></td>
-		        <td><input name="name" placeholder="Account name" value="${_account.name}" /></td>
+		        <td><input type="text" name="name" placeholder="Enter account name" value="${_account.name}" /></td>
 		    </tr>
 		    <tr>
 		        <td class="heading"><label for="type">Type</label></td>
@@ -45,7 +51,7 @@
 		    </tr>
 		    <tr>
 		        <td class="heading"><label for="opening">Opening balance</label></td>
-		        <td><input name="opening" placeholder="Enter opening balance in pounds and pence" 
+		        <td><input type="text" name="opening" placeholder="Enter opening balance in pounds and pence" 
 		        	value="${mon:formatPounds(_account.openingBalance)}" /></td>
 		    </tr>
 		    <tr>
@@ -55,9 +61,47 @@
 		    </tr>
 			</table> 
 			
-			<br />
-	    <input type="submit" value="Update" /> 
+	    <input type="submit" value="${_buttonLabel}" /> 
+			<c:if test="${_formMode eq 'update'}">
+	    	<input type="button" value="Delete account?" id="delete-button" /> 
+	    </c:if>
 	    <input type="hidden" name="id" value="${_account.id}" />   
+	    <input type="hidden" name="formMode" value="${_formMode}" />   
 	</form>		  	
 		
 </mny:standardLayout>
+
+<script>
+$(function() {
+	$("#delete-dialog").dialog({
+		autoOpen: false, 
+		modal: true,
+		buttons: [
+			{
+				text: "Cancel",
+				icon: "ui-icon-arrowreturnthick-1-w",
+				click: function() {
+					$(this).dialog("close");
+				}
+			},
+			{
+				text: "Delete",
+				icon: "ui-icon-alert",
+				click: function() {
+					window.location = webContext + "/account/delete/" + ${_account.id} + "?t=" + ${_timestamp};
+				}
+			}
+		]
+	});
+	
+	$("#delete-button").click(function(e){
+		$("#delete-dialog").dialog("open");
+	});
+
+});
+</script>
+
+<div id="delete-dialog" title="Delete account">
+	Deleting an account will also delete ALL transactions to/from that account. Are you sure
+	you wish to proceed?
+</div>

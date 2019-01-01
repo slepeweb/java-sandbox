@@ -3,6 +3,7 @@ package com.slepeweb.money.control;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -404,15 +405,28 @@ public class PageController extends BaseController {
 		return "advancedSearch";
 	}
 	
-	@RequestMapping(value="/account/edit/{accountId}", method=RequestMethod.GET)
-	public String accountForm(@PathVariable long accountId, ModelMap model) {
+	@RequestMapping(value="/account/add", method=RequestMethod.GET)
+	public String accountAddForm(ModelMap model) {
+		
+		model.addAttribute("_account", new Account());
+		model.addAttribute("_formMode", "add");
+		return "accountForm";
+	}
+	
+	@RequestMapping(value="/account/form/{accountId}", method=RequestMethod.GET)
+	public String accountUpdateForm(@PathVariable long accountId, ModelMap model) {
 		
 		model.addAttribute("_account", this.accountService.get(accountId));
+		model.addAttribute("_formMode", "update");
+		model.addAttribute("_timestamp", new Date().getTime());
 		return "accountForm";
 	}
 	
 	@RequestMapping(value="/account/update", method=RequestMethod.POST)
 	public RedirectView accountUpdate(HttpServletRequest req, ModelMap model) {
+		
+		String flash;	
+		boolean isUpdateMode = req.getParameter("formMode").equals("update");
 		
 		Account a = new Account().
 				setId(Long.valueOf(req.getParameter("id"))).
@@ -422,17 +436,40 @@ public class PageController extends BaseController {
 				setOpeningBalance(Util.parsePounds(req.getParameter("opening"))).
 				setNote(req.getParameter("note"));
 		
-		String flash;
-		
 		try {
 			this.accountService.save(a);
-			flash="success|Successfully updated";
+			flash = String.format("success|Account successfully %s", isUpdateMode ? "updated" : "added");
 		}
 		catch (Exception e) {
-			flash="failure|Failed to update account";
+			flash = String.format("failure|Failed to %s account", isUpdateMode ? "update" : "add new");
 		}
 	
-		return new RedirectView(String.format("%s/account/edit/%d?flash=%s", 
+		return new RedirectView(String.format("%s/account/form/%d?flash=%s", 
 				req.getContextPath(), a.getId(), Util.encodeUrl(flash)));
 	}
+	
+	@RequestMapping(value="/account/delete/{accountId}", method=RequestMethod.GET)
+	public RedirectView accountDelete(@PathVariable long accountId, HttpServletRequest req, ModelMap model) {
+		
+		String flash;		
+		long now = new Date().getTime();
+		long timestamp = Long.valueOf(req.getParameter("t"));
+		
+		if ((now - timestamp) < (5 * 60 * 1000)) {		
+			try {
+				this.accountService.delete(accountId);
+				flash="success|Account successfully deleted";
+			}
+			catch (Exception e) {
+				flash="failure|Failed to delete account";
+			}
+		}
+		else {
+			flash = "failure|Failed to delete account - authorisation failure";		
+		}
+		
+		return new RedirectView(String.format("%s/account/list?flash=%s", 
+				req.getContextPath(), Util.encodeUrl(flash)));
+	}
+	
 }

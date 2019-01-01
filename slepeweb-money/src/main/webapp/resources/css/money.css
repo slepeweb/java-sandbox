@@ -494,7 +494,7 @@ table tbody tr.highlighted {
 }
 table td {
   padding: 0.3em;
-  vertical-align: middle;
+  vertical-align: top;
 }
 table td.menu-icon {
   width: 1.5em;
@@ -792,10 +792,19 @@ input[type="button"]:disabled,
 
 .flash {
   margin-left: 3em;
+  background-color: lightgrey;
+  border: 2px solid black;
+  border-radius: 5px;
+  padding: 0.5em;
 }
 .flash.success {
   color: green;
 }
 .flash.failure {
   color: red;
+}
+
+#delete-button {
+  background-color: red;
+  float: right;
 }

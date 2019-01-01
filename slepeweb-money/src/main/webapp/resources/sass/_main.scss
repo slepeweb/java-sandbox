@@ -395,7 +395,7 @@
 
 		td {
 			padding: 0.3em;
-  		vertical-align: middle;
+  		vertical-align: top;
   		
   		&.menu-icon {
   			width: 1.5em;
@@ -669,10 +669,20 @@
 
 .flash {
 	margin-left: 3em;
+	background-color: lightgrey;
+	border: 2px solid black;
+	border-radius: 5px;
+	padding: 0.5em;
+	
 	&.success {
 		color: green;
 	}
 	&.failure {
 		color: red;	
 	}
+}
+
+#delete-button {
+	background-color: red;
+	float: right;
 }

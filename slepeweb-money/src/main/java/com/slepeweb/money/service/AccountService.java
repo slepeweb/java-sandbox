@@ -17,4 +17,5 @@ public interface AccountService {
 	List<Account> getAllWithBalances();
 	Account save(Account f) throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	Account update(Account existing, Account with);
+	int delete(long id);
 }
