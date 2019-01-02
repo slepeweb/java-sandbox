@@ -17,5 +17,3 @@
 		<p><strong>No accounts defined</strong></p>
 	</c:otherwise></c:choose>
 </mny:standardLayout>
-
-<mny:menuActionDialog target="/money/transaction/list/" />

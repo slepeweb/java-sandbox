@@ -194,6 +194,20 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				new Object[]{accountId});
 	}
 	
+	@SuppressWarnings("deprecation")
+	public long getNumTransactionsForAccount(long accountId) {
+		return this.jdbcTemplate.queryForLong(
+				"select count(*) from transaction where accountid = ?", 
+				new Object[]{accountId});
+	}
+	
+	@SuppressWarnings("deprecation")
+	public long getNumTransactionsForPayee(long payeeId) {
+		return this.jdbcTemplate.queryForLong(
+				"select count(*) from transaction where payeeid = ?", 
+				new Object[]{payeeId});
+	}
+	
 	/*
 	 * TODO: why are transactions not sorted by reverse date here?
 	 */

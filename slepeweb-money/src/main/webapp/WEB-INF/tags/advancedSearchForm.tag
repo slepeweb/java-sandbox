@@ -8,7 +8,7 @@
 	<c:set var="_selectedMemoTerms" value="${_response.params.memo}" />
 </c:if>
 
-<form method="post" action="${_ctxPath}/search">	  
+<form method="post" action="${_ctxPath}/search/">	  
     <table>
 	    <tr>
 	        <td class="heading"><label for="accountId">Account</label></td>

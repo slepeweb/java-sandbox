@@ -185,6 +185,9 @@ public class SolrServiceImpl implements SolrService {
 				q.setQuery(String.format("memo:%s", params.getMemo()));
 				isCriteriaSet = true;
 			}
+			else {
+				q.setQuery("*:*");
+			}
 			
 			if (isCriteriaSet) {
 				if (isCategorySearch) {

@@ -26,4 +26,6 @@ public interface TransactionService {
 	long getBalance(long accountId, Timestamp to);
 	SolrResponse<FlatTransaction> getTransactionsForPayee(long id);
 	SolrResponse<FlatTransaction> getTransactionsForCategory(long id);
+	long getNumTransactionsForAccount(long accountId);
+	long getNumTransactionsForPayee(long payeeId);
 }

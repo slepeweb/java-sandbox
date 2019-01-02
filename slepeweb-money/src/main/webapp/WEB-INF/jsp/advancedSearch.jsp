@@ -8,5 +8,4 @@
 	<mny:advancedSearchForm />
 	<mny:advancedSearchResults />
 	
-	
 </mny:standardLayout>

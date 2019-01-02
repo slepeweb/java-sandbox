@@ -3,6 +3,7 @@ package com.slepeweb.money.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import com.slepeweb.money.except.MissingDataException;
 public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 	
 	private static Logger LOG = Logger.getLogger(PayeeServiceImpl.class);
+	@Autowired private SolrService solrService;
 	
 	public Payee save(Payee pe) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (pe.isDefined4Insert()) {
@@ -93,4 +95,10 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 			"select * from payee order by name", new RowMapperUtil.PayeeMapper());
 	}
 	
+	public int delete(long id) {
+		Payee p = get(id);
+		int num = this.jdbcTemplate.update("delete from payee where id = ?", id);
+		this.solrService.removeTransactionsByPayee(p.getName());
+		return num;
+	}	
 }

@@ -10,7 +10,6 @@
 				<tr>
 					<td class="name"><a href="${_ctxPath}/account/form/${_a.id}">${_a.name}</a></td>
 					<td class="type">${_a.type}</td>
-					<td class="menu-icon" data-id="${_a.id}"><i class="fas fa-bars"></i></td>
 				</tr>
 			</c:forEach>
 		</table>

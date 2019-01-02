@@ -15,4 +15,5 @@ public interface PayeeService {
 	List<Payee> getAll();
 	Payee save(Payee p) throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	Payee update(Payee existing, Payee with);
+	int delete(long id);
 }

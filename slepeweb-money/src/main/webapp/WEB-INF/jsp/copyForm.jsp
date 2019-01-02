@@ -71,4 +71,40 @@
 		
 </mny:standardLayout>
 
-<mny:entityDeletionDialog entity="account" />
+<script>
+$(function() {
+	$("#delete-dialog").dialog({
+		autoOpen: false, 
+		modal: true,
+		buttons: [
+			{
+				text: "Cancel",
+				icon: "ui-icon-arrowreturnthick-1-w",
+				click: function() {
+					$(this).dialog("close");
+				}
+			},
+			{
+				text: "Delete",
+				icon: "ui-icon-alert",
+				click: function() {
+					window.location = webContext + "/account/delete/" + ${_account.id} + "?t=" + ${_timestamp};
+				}
+			}
+		]
+	});
+	
+	$("#delete-button").click(function(e){
+		var d = $("#delete-dialog");
+		var s = d.html();
+		d.html(s.replace("__N__", "${_numDeletableTransactions}"));
+		d.dialog("open");
+	});
+
+});
+</script>
+
+<div id="delete-dialog" title="Delete account">
+	Deleting this account will also delete __N__ transactions to/from this account. Are you sure
+	you wish to proceed?
+</div>
