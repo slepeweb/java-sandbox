@@ -21,14 +21,14 @@ public class BaseController {
 	}
 	
 	
-	@ModelAttribute(value="_isGuest")
-	protected boolean isGuest(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, "SWS_GUEST");
+	@ModelAttribute(value="_isUser")
+	protected boolean isUser(@AuthenticationPrincipal User u) {
+		return hasAuthority(u, "MONEY_USER");
 	}
 	
 	@ModelAttribute(value="_isAdmin")
 	protected boolean isAdmin(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, "SWS_ADMIN");
+		return hasAuthority(u, "MONEY_ADMIN");
 	}
 	
 	private boolean hasAuthority(User u, String name) {

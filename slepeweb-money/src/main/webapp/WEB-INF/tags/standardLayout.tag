@@ -12,14 +12,19 @@
 	
 		<div id="main-wrapper">
 			<div id="main" class="container">
-					<div class="row">
-						<div class="col-1-6">
-							<mny:navigation />
-						</div>
-						<div class="col-5-6">
-							<jsp:doBody />
-						</div>
+				
+				<div class="row">
+					<c:if test="${not empty _user}">
+						<span id="user-welcome" class="right"><i class="far fa-user"></i>&nbsp;Welcome ${_user.username}</span>
+					</c:if>
+					
+					<div class="col-1-6">
+						<mny:navigation />
 					</div>
+					<div class="col-5-6">
+						<jsp:doBody />
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -28,5 +33,6 @@
 			<mny:footer />
 		</div>
 	
+		<mny:userMenuDialog /> 
 	</body>
 </html>

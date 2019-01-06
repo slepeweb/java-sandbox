@@ -71,4 +71,4 @@
 		
 </mny:standardLayout>
 
-<mny:entityDeletionDialog entity="account" />
+<mny:entityDeletionDialog entity="account" mode="${_formMode}" id="${_account.id}" />

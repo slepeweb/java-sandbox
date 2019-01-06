@@ -28,7 +28,7 @@
 		    
 		    <tr>
 		        <td class="heading"><label for="name">Name</label></td>
-		        <td><input type="text" name="name" placeholder="Enter account name" value="${_payee.name}" /></td>
+		        <td><input type="text" name="name" placeholder="Enter payee name" value="${_payee.name}" /></td>
 		    </tr>
 			</table> 
 			
@@ -42,4 +42,4 @@
 		
 </mny:standardLayout>
 
-<mny:entityDeletionDialog entity="payee" />
+<mny:entityDeletionDialog entity="payee" mode="${_formMode}" id="${_payee.id}"/>

@@ -760,7 +760,7 @@ input[type="button"]:disabled,
   width: 100%;
 }
 
-#menu-action-dialog {
+#menu-action-dialog, #user-menu {
   width: 200px;
   background-color: #ccc;
   visibility: hidden;
@@ -773,12 +773,23 @@ input[type="button"]:disabled,
   float: none;
   z-index: 1;
 }
-#menu-action-dialog ul {
+#menu-action-dialog ul, #user-menu ul {
   list-style: none;
 }
-#menu-action-dialog .menu-close {
+#menu-action-dialog .menu-close, #user-menu .menu-close {
   float: right;
   margin-right: 5px;
+}
+
+#user-menu {
+  width: 150px;
+}
+#user-menu ul {
+  margin-left: -20px;
+}
+
+#user-welcome {
+  cursor: pointer;
 }
 
 #navigation {
@@ -806,5 +817,13 @@ input[type="button"]:disabled,
 
 #delete-button {
   background-color: red;
+  float: right;
+}
+
+span.flash {
+  font-size: smaller;
+}
+
+.right {
   float: right;
 }

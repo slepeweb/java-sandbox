@@ -638,7 +638,7 @@
 	width: 100%;
 }
 
-#menu-action-dialog {
+#menu-action-dialog, #user-menu {
 	width: 200px;
 	background-color: #ccc;
 	visibility: hidden;
@@ -656,6 +656,17 @@
 		float: right;
 		margin-right: 5px;
 	}
+}
+
+#user-menu {
+	width: 150px;
+	ul {
+		margin-left: -20px;
+	}
+}
+
+#user-welcome {
+	cursor: pointer;
 }
 
 #navigation {
@@ -684,5 +695,13 @@
 
 #delete-button {
 	background-color: red;
+	float: right;
+}
+
+span.flash {
+	font-size: smaller;
+}
+
+.right {
 	float: right;
 }

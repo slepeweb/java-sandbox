@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
@@ -60,6 +61,23 @@ public class PageController extends BaseController {
 		return dashboard(model);
 	}
 
+	@RequestMapping(value="/login")
+	public String loginForm(
+		@RequestParam(value="error", required = false) String error,
+		@RequestParam(value="logout", required = false) String logout,
+		ModelMap model) {
+ 
+		if (error != null) {
+			model.addAttribute("error", "Invalid username and password!");
+		}
+ 
+		if (logout != null) {
+			model.addAttribute("msg", "You've been successfully logged out.");
+		}
+ 
+		return "loginForm"; 
+	}
+	
 	@RequestMapping(value="/category/list")	
 	public String categoryList(ModelMap model) { 
 		List<NamedList<Category>> categories = new ArrayList<NamedList<Category>>();

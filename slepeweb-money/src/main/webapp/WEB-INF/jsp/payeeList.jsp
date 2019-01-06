@@ -5,9 +5,11 @@
 <mny:flash />
 
 <mny:standardLayout>
-	<h2>Payees <c:if test="${not empty param.flash}"><span 
+	<h2 class="inline-block">Payees <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
 					
+	<div class="right"><a href="add">New payee</a></div>
+	
 	<p><strong>Total no. of payees = ${_count}</strong></p>
 
 	<c:choose><c:when test="${not empty _payees}">

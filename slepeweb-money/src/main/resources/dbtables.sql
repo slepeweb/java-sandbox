@@ -81,3 +81,32 @@ create table splittransaction
 	constraint foreign key (transactionid) references transaction(id) on delete cascade,
 	constraint foreign key (categoryid) references category(id) on delete cascade
 ) ENGINE=InnoDB;
+
+create table role
+(
+	id int not null auto_increment,
+  name varchar(255) NOT NULL,
+	primary key (id),
+	unique key idx_role_name (name)
+) ENGINE=InnoDB;
+
+create table user
+(
+	id int not null auto_increment,
+  name varchar(32),
+  alias varchar(32),
+  password varchar(255),
+  enabled smallint,
+  demo_user smallint,
+	primary key (id),
+	unique key idx_user_alias (alias)
+) ENGINE=InnoDB;
+
+create table userrole
+(
+  userid int NOT NULL,
+  roleid int NOT NULL,
+  primary key (userid, roleid),
+	constraint foreign key (userid) references user(id) on delete cascade,
+	constraint foreign key (roleid) references role(id) on delete cascade
+) ENGINE=InnoDB;

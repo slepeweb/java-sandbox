@@ -1,6 +1,11 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="target" required="true" rtexprvalue="true" %><%@ 
 	attribute name="disable" required="false" rtexprvalue="true" %>
+	
+<%--
+	This tag was used to provide a menu for each item in a list, offering 'Edit' and 'Delete' (etc) menu options.
+	It is currently redundant, but is being retained for reference.
+ --%>
 
 <c:set var="_menuIconClass" value="menu-icon" />
 <c:set var="_menuDialogId" value="menu-action-dialog" />

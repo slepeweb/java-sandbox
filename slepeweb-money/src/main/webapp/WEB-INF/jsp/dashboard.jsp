@@ -3,7 +3,7 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <mny:standardLayout>
-	<h2>Money Dashboard</h2>			
+	<h1>Money Dashboard</h1>			
 	<c:choose><c:when test="${not empty _accounts}">
 		<table class="trn_listing">
 			<c:forEach items="${_accounts}" var="_a">

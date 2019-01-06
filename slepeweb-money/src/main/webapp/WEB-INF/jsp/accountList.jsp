@@ -5,9 +5,11 @@
 <mny:flash />
 
 <mny:standardLayout>
-	<h2>Accounts <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>		
-			
+	<h2 class="inline-block">Accounts <c:if test="${not empty param.flash}"><span 
+		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
+		
+	<div class="right"><a href="add">New account</a></div>
+	
 	<c:choose><c:when test="${not empty _openAccounts or not empty _closedAccounts}">
 		<div id="accordion-accounts">
 			<mny:accountList list="${_openAccounts}" heading="Open accounts" />
