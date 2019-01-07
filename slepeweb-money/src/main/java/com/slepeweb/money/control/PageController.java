@@ -12,11 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.Category;
-import com.slepeweb.money.bean.NamedList;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.AccountService;
-import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.SolrService;
 import com.slepeweb.money.service.TransactionService;
 
@@ -24,7 +21,6 @@ import com.slepeweb.money.service.TransactionService;
 public class PageController extends BaseController {
 	
 	@Autowired private AccountService accountService;
-	@Autowired private CategoryService categoryService;
 	@Autowired private TransactionService transactionService;
 	@Autowired private SolrService solrService;
 	
@@ -76,37 +72,6 @@ public class PageController extends BaseController {
 		}
  
 		return "loginForm"; 
-	}
-	
-	@RequestMapping(value="/category/list")	
-	public String categoryList(ModelMap model) { 
-		List<NamedList<Category>> categories = new ArrayList<NamedList<Category>>();
-		NamedList<Category> mapping = null;
-		String lastName = null, nextName = null;
-		List<Category> all = this.categoryService.getAll();
-		
-		for (Category c : all) {
-			if (c.getMajor().length() == 0) {
-				c.setMajor("(None)");
-			}
-			
-			if (c.getMinor().length() == 0) {
-				c.setMinor("(all sub-categories)");
-			}
-			
-			nextName = c.getMajor();
-			if (lastName == null || ! lastName.equals(nextName)) {
-				mapping = new NamedList<Category>(nextName, new ArrayList<Category>());
-				categories.add(mapping);
-				lastName = nextName;
-			}
-			
-			mapping.getObjects().add(c);
-		}
-		
-		model.addAttribute("_categories", categories);
-		model.addAttribute("_count", all.size());
-		return "categoryList";
 	}
 	
 	@RequestMapping(value="/index")	

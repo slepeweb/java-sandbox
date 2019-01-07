@@ -3,6 +3,7 @@ package com.slepeweb.money.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import com.slepeweb.money.except.MissingDataException;
 public class CategoryServiceImpl extends BaseServiceImpl implements CategoryService {
 	
 	private static Logger LOG = Logger.getLogger(CategoryServiceImpl.class);
+	@Autowired private SolrService solrService;
 	
 	public Category save(Category c) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (c.isDefined4Insert()) {
@@ -101,4 +103,11 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 		return this.jdbcTemplate.queryForList(
 			"select distinct major from category order by major", java.lang.String.class);
 	}
+
+	public int delete(long id) {
+		Category c = get(id);
+		int num = this.jdbcTemplate.update("delete from category where id = ?", id);
+		this.solrService.removeTransactionsByCategory(c.getMajor(), c.getMinor());
+		return num;
+	}	
 }

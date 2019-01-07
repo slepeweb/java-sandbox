@@ -3,6 +3,7 @@ package com.slepeweb.money.bean;
 import java.util.List;
 
 public class NamedList<T> {
+	private long id;
 	private String name;
 	private List<T> objects;
 	
@@ -11,6 +12,14 @@ public class NamedList<T> {
 		return this.name;
 	}
 	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	public NamedList(String s, List<T> list) {
 		this.name = s;
 		this.objects = list;

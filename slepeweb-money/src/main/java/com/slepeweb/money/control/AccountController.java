@@ -1,12 +1,12 @@
 package com.slepeweb.money.control;
 
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,7 +59,6 @@ public class AccountController extends BaseController {
 		
 		model.addAttribute("_account", this.accountService.get(accountId));
 		model.addAttribute("_formMode", "update");
-		model.addAttribute("_timestamp", new Date().getTime());
 		model.addAttribute("_numDeletableTransactions", this.transactionService.getNumTransactionsForAccount(accountId));
 		return "accountForm";
 	}
@@ -94,10 +93,10 @@ public class AccountController extends BaseController {
 	public RedirectView delete(@PathVariable long accountId, HttpServletRequest req, ModelMap model) {
 		
 		String flash;		
-		long now = new Date().getTime();
-		long timestamp = Long.valueOf(req.getParameter("t"));
+		User u = (User) model.get(USER);
+		long numDeletables = this.transactionService.getNumTransactionsForAccount(accountId);
 		
-		if ((now - timestamp) < (5 * 60 * 1000)) {		
+		if ((u != null && u.getUsername().equals("MONEY_ADMIN")) || numDeletables == 0) {		
 			try {
 				this.accountService.delete(accountId);
 				flash="success|Account successfully deleted";

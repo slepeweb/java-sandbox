@@ -1,13 +1,13 @@
 package com.slepeweb.money.control;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,7 +73,6 @@ public class PayeeController extends BaseController {
 		
 		model.addAttribute("_payee", this.payeeService.get(payeeId));
 		model.addAttribute("_formMode", "update");
-		model.addAttribute("_timestamp", new Date().getTime());
 		model.addAttribute("_numDeletableTransactions", this.transactionService.getNumTransactionsForPayee(payeeId));
 		return "payeeForm";
 	}
@@ -104,10 +103,10 @@ public class PayeeController extends BaseController {
 	public RedirectView delete(@PathVariable long payeeId, HttpServletRequest req, ModelMap model) {
 		
 		String flash;		
-		long now = new Date().getTime();
-		long timestamp = Long.valueOf(req.getParameter("t"));
+		User u = (User) model.get(USER);
+		long numDeletables = this.transactionService.getNumTransactionsForPayee(payeeId);
 		
-		if ((now - timestamp) < (5 * 60 * 1000)) {		
+		if ((u != null && u.getUsername().equals("MONEY_ADMIN")) || numDeletables == 0) {		
 			try {
 				this.payeeService.delete(payeeId);
 				flash="success|Payee successfully deleted";

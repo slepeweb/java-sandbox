@@ -3,7 +3,11 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <mny:standardLayout>
-	<h2>Categories</h2>			
+	<h2 class="inline-block">Categories <c:if test="${not empty param.flash}"><span 
+		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>			
+	
+	<div class="right"><a href="add">New category</a></div>
+	
 	<p><strong>Total no. of categories = ${_count}</strong></p>
 	
 	<c:choose><c:when test="${not empty _categories}">
@@ -15,8 +19,7 @@
 					<table>
 						<c:forEach items="${_m.objects}" var="_c">
 							<tr>
-								<td class="name">${_c.minor}</td>
-								<td data-id="${_c.id}" class="menu-icon"><i class="fas fa-bars"></i></td>
+								<td class="name"><a href="form/${_c.id}">${_c.minor}</a></td>
 							</tr>
 						</c:forEach>
 					</table>
@@ -28,5 +31,3 @@
 		<p><strong>No categories defined</strong></p>
 	</c:otherwise></c:choose>
 </mny:standardLayout>
-
-<mny:menuActionDialog target="/money/transaction/list/by/category/" disable="delete" />

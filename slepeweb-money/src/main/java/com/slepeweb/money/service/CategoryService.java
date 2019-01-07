@@ -16,4 +16,5 @@ public interface CategoryService {
 	Category save(Category p) throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	Category update(Category existing, Category with);
 	List<String> getAllMajorValues();
+	int delete(long id);
 }
