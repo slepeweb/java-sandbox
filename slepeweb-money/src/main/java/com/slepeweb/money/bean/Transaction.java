@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.slepeweb.money.Util;
@@ -21,7 +22,7 @@ public class Transaction extends DbEntity {
 	private Long xferId = 0L;
 	private Payee payee;
 	private Category category;
-	private Timestamp entered;
+	private Timestamp entered = new Timestamp(new Date().getTime());
 	private boolean split, reconciled;
 	private Long amount;
 	private String reference = "", memo = "";

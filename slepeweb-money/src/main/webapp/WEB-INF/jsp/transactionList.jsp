@@ -5,6 +5,8 @@
 <c:set var="_urlPrefix">${_ctxPath}/transaction/list/${_accountId}</c:set>
 	
 <mny:standardLayout>
+	<div class="right"><a href="add">New transaction</a></div>
+	
 	<div class="inline-block">
 		<form>
 			<label>Select account:</label>
@@ -61,7 +63,7 @@
 		</tr>
 		<c:forEach items="${_tl.runningBalances}" var="_trn">
 			<tr>
-				<td class="date">${_trn.enteredStr}</td>
+				<td class="date"><a href="${_ctxPath}/transaction/form/${_trn.id}">${_trn.enteredStr}</a></td>
 				<td class="payee">${_trn.payee.name}</td>
 				
 				<c:choose><c:when test="${not _trn.split}">
@@ -87,7 +89,6 @@
 				</c:otherwise></c:choose>
 				
 				<td class="currency amount">${_trn.balance}</td>
-				<td data-id="${_trn.id}" class="menu-icon"><i class="fas fa-bars"></i></td>
 			</tr>
 		</c:forEach>
 	</table>
@@ -95,5 +96,3 @@
 		<p><strong>No transactions this month</strong></p>
 	</c:otherwise></c:choose>
 </mny:standardLayout>
-
-<mny:menuActionDialog target="none" />

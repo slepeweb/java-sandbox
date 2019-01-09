@@ -13,12 +13,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.MonthPager;
 import com.slepeweb.money.bean.NormalisedMonth;
 import com.slepeweb.money.bean.Option;
+import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RunningBalance;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
@@ -228,5 +232,86 @@ public class TransactionController extends BaseController {
 		model.addAttribute("_limit", limit); 
 		
 		return "transactionListByPayee";
+	}	
+
+	@RequestMapping(value="/add", method=RequestMethod.GET)
+	public String addForm(ModelMap model) {
+		
+		model.addAttribute("_transaction", new Transaction());
+		model.addAttribute("_formMode", "add");
+		model.addAttribute("_allAccounts", this.accountService.getAll(false));
+		model.addAttribute("_allPayees", this.payeeService.getAll());
+		model.addAttribute("_allMajorCategories", this.categoryService.getAllMajorValues());		
+		return "transactionForm";
+	}
+	
+	@RequestMapping(value="/form/{transactionId}", method=RequestMethod.GET)
+	public String updateForm(@PathVariable long transactionId, ModelMap model) {
+		
+		Transaction t = this.transactionService.get(transactionId);
+		model.addAttribute("_transaction", t);
+		model.addAttribute("_formMode", "update");
+		model.addAttribute("_allAccounts", this.accountService.getAll(false));
+		model.addAttribute("_allPayees", this.payeeService.getAll());
+		model.addAttribute("_allMajorCategories", this.categoryService.getAllMajorValues());
+		model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
+		model.addAttribute("_numDeletableTransactions", 0);
+		return "transactionForm";
+	}
+	
+	@RequestMapping(value="/update", method=RequestMethod.POST)
+	public RedirectView update(HttpServletRequest req, ModelMap model) {
+		
+		String flash;	
+		boolean isUpdateMode = req.getParameter("formMode").equals("update");
+		
+		Account a = this.accountService.get(Long.valueOf(req.getParameter("account")));
+		Payee p = this.payeeService.get(Long.valueOf(req.getParameter("payee")));
+		Category c = this.categoryService.get(req.getParameter("major"), req.getParameter("minor"));
+		Transaction t = 
+				new Transaction().
+				setId(Long.valueOf(req.getParameter("id")));
+		
+		if (a != null && p != null && c != null) {
+			t.
+				setAccount(a).
+				setPayee(p).
+				setCategory(c).
+				setEntered(Util.parseTimestamp(req.getParameter("entered"))).
+				setMemo(req.getParameter("memo")).
+				setAmount(Util.parsePounds(req.getParameter("amount")));
+			
+			try {
+				this.transactionService.save(t);
+				flash = String.format("success|Transaction successfully %s", isUpdateMode ? "updated" : "added");
+			}
+			catch (Exception e) {
+				flash = String.format("failure|Missing key data [%s]", e.getMessage());
+			}
+		}
+		else {
+			flash = String.format("failure|Failed to %s transaction", isUpdateMode ? "update" : "add new");
+		}
+	
+		return new RedirectView(String.format("%s/transaction/form/%d?flash=%s", 
+				req.getContextPath(), t.getId(), Util.encodeUrl(flash)));
+	}
+	
+	@RequestMapping(value="/delete/{transactionId}", method=RequestMethod.GET)
+	public RedirectView delete(@PathVariable long transactionId, HttpServletRequest req, ModelMap model) {
+		
+		String flash;
+		Transaction t = this.transactionService.get(transactionId);
+		
+		try {
+			this.transactionService.delete(transactionId);
+			flash="success|Transaction successfully deleted";
+		}
+		catch (Exception e) {
+			flash="failure|Failed to delete transaction";
+		}
+		
+		return new RedirectView(String.format("%s/transaction/list/%d?flash=%s", 
+				req.getContextPath(), t.getAccount().getId(), Util.encodeUrl(flash)));
 	}	
 }

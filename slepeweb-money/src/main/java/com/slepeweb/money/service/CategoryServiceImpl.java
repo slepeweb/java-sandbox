@@ -104,6 +104,12 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 			"select distinct major from category order by major", java.lang.String.class);
 	}
 
+	public List<String> getAllMinorValues(String major) {
+		return this.jdbcTemplate.queryForList(
+			"select distinct minor from category where major = ? order by minor", new Object[]{major}, 
+				java.lang.String.class);
+	}
+
 	public int delete(long id) {
 		Category c = get(id);
 		int num = this.jdbcTemplate.update("delete from category where id = ?", id);

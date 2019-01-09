@@ -827,3 +827,7 @@ span.flash {
 .right {
   float: right;
 }
+
+.opaque50 {
+  opacity: 0.5;
+}

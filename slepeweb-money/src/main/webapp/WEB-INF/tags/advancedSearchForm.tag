@@ -45,7 +45,7 @@
 	    </tr>
 	    <tr>
 	        <td class="heading"><label for="memo">Memo</label></td>
-	        <td><input name="memo" placeholder="Terms that might be in the memo field" value="${_selectedMemoTerms}" /></td>
+	        <td><input type="text" name="memo" placeholder="Terms that might be in the memo field" value="${_selectedMemoTerms}" /></td>
 	    </tr>
 		</table> 
 		

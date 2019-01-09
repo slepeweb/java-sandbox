@@ -20,7 +20,7 @@
 	<form method="post" action="${_ctxPath}/account/update">	  
 	    <table>
 	    	<c:if test="${_formMode eq 'update'}">
-			    <tr>
+			    <tr class="opaque50">
 			        <td class="heading"><label for="identifier">Id</label></td>
 			        <td><input type="text" readonly name="identifier" placeholder="Unique id" value="${_account.id}" /></td>
 			    </tr>

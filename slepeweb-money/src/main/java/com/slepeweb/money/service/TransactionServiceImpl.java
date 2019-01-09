@@ -282,4 +282,10 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		Account a = this.accountService.get(accountId);
 		return a.getOpeningBalance() + sum;
 	}
+
+	public int delete(long id) {
+		int num = this.jdbcTemplate.update("delete from transaction where id = ?", id);
+		this.solrService.removeTransactionsById(id);
+		return num;
+	}	
 }

@@ -39,7 +39,11 @@ $(function() {
 
 <c:if test="${mode eq 'update' and (_isAdmin or _numDeletableTransactions eq 0)}">
 	<div id="delete-dialog" title="Delete ${entity}">
-		Deleting this ${level}${entity} will also delete __N__ corresponding transactions. Are you sure
-		you wish to proceed?
+		<c:choose><c:when test="${entity eq 'transaction'}">
+			Are you sure you wish to delete this transaction? NOTE: that this action can NOT be un-done.
+		</c:when><c:otherwise>
+			Deleting this ${level}${entity} will also delete __N__ corresponding transactions. Are you sure
+			you wish to proceed?
+		</c:otherwise></c:choose>
 	</div>
 </c:if>

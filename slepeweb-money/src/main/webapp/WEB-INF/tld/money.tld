@@ -32,4 +32,10 @@
 		<function-signature>java.lang.String formatPounds(long)</function-signature>
 	</function>
 	
+	<function>
+		<name>formatTimestamp</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.String formatTimestamp(java.util.Date)</function-signature>
+	</function>
+	
 </taglib>
