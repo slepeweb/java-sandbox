@@ -13,6 +13,8 @@
 	<c:set var="_pageHeading" value="Update transaction" />
 	</c:if>
 	
+	<c:if test="${_formMode eq 'update'}"><div class="right"><a href="../add">New transaction</a></div></c:if>
+	
 	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
 	
@@ -66,7 +68,6 @@
 		        <td class="heading"><label for="major">Category</label></td>
 		        <td>
 		        	<select name="major">
-			        	<option value="">Choose ...</option>
 			        	<c:forEach items="${_allMajorCategories}" var="_c">
 			        		<option value="${_c}" <c:if test="${_c eq _transaction.category.major}">selected</c:if>>${_c}</option>
 			        	</c:forEach>
@@ -78,7 +79,6 @@
 		        <td class="heading"><label for="minor">Sub-category</label></td>
 		        <td>
 		        	<select name="minor">
-			        	<option value="">Choose ...</option>
 			        	<c:forEach items="${_allMinorCategories}" var="_c">
 			        		<option value="${_c}" <c:if test="${_c eq _transaction.category.minor}">selected</c:if>>${_c}</option>
 			        	</c:forEach>
@@ -116,6 +116,22 @@
 			dateFormat: "yy-mm-dd",
 			changeMonth: true,
 			changeYear: true
+		});
+		
+		$("select[name='major']").change(function(e) {	
+			var major = $(this).find(":selected").val();
+			$.ajax(webContext + "/rest/category/minor/list/" + major, {
+				type: "GET",
+				cache: false,
+				dataType: "json",
+				success: function(obj, status, z) {
+					var select = $("select[name='minor']");
+					select.empty();
+					$.each(obj.data, function(index, minor) {
+						select.append("<option value='" + minor + "'>" + minor + "</option>");
+					});
+				}
+			});
 		});
 	});
 </script>

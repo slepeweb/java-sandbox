@@ -15,6 +15,7 @@ import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
+import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
 
@@ -68,13 +69,25 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			;
 	
 			
-	public Transaction save(Transaction pt) throws MissingDataException, DuplicateItemException {
+	public Transaction save(Transaction pt) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (pt.isDefined4Insert()) {
-			// Insert record, regardless of whether it has already been inserted.
-			// (Take care with imports - should check whether already imported first!)
-			Transaction t = insert(pt);
-			this.solrService.save(t);
-			return t;
+			Transaction result;
+			
+			if (pt.isInDatabase()) {
+				Transaction dbRecord = get(pt.getId());		
+				if (dbRecord != null) {
+					result = update(dbRecord, pt);
+				}
+				else {
+					throw new DataInconsistencyException(error(LOG, "Transaction does not exist in DB", pt));
+				}
+			}
+			else {
+				result = insert(pt);
+			}
+			
+			this.solrService.save(result);
+			return result;
 		}
 		else {
 			String t = "Transaction not saved - insufficient data";

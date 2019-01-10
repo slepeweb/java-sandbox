@@ -23,12 +23,16 @@ public class Util {
 	public static long parsePounds(String value) {
 		String[] parts = value.split("\\.");
 		if (parts.length == 1) {
-			return Long.valueOf(parts[0]);
+			return Long.valueOf(cleanAmount(parts[0]));
 		}
 		else if (parts.length == 2){
-			return ((Long.valueOf(parts[0])).longValue() * 100) + (Long.valueOf(parts[1])).longValue();
+			return ((Long.valueOf(cleanAmount(parts[0])).longValue() * 100) + (Long.valueOf(parts[1])).longValue());
 		}
 		return 0L;
+	}
+	
+	private static String cleanAmount(String s) {
+		return s.replaceAll(",", "");
 	}
 	
 	public static String formatTimestamp(Date d) {
