@@ -19,29 +19,29 @@
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
 	
 	<form method="post" action="${_ctxPath}/transaction/update">	  
-	    <table>
+	    <table id="trn-form">
 	    	<c:if test="${_formMode eq 'update'}">
 			    <tr class="opaque50">
-			        <td class="heading"><label for="identifier">Id</label></td>
+			        <td class="heading"><label>Id</label></td>
 			        <td><input type="text" readonly name="identifier" value="${_transaction.id}" /></td>
 			    </tr>
 			    
 			    <c:if test="${_transaction.origId gt 0}">
 				    <tr class="opaque50">
-				        <td class="heading"><label for="origid">Original id</label></td>
+				        <td class="heading"><label>Original id</label></td>
 				        <td><input type="text" readonly name="origid" value="${_transaction.origId}" /></td>
 				    </tr>
 			    </c:if>
 		    </c:if>
 		    
 		    <tr>
-		        <td class="heading"><label for="entered">Date</label></td>
+		        <td class="heading"><label>Date</label></td>
 		        <td><input type="text" class="datepicker" name="entered" 
 		        	placeholder="Enter transaction date" value="${mon:formatTimestamp(_transaction.entered)}" /></td>
 		    </tr>
 
 		    <tr>
-		        <td class="heading"><label for="account">Account</label></td>
+		        <td class="heading"><label>${mon:tertiaryOp(_transaction.debit, 'From', 'To')} account</label></td>
 		        <td>
 		        	<select name="account">
 			        	<option value="">Choose ...</option>
@@ -51,9 +51,29 @@
 		        	</select>
 		        </td>
 		    </tr>
-
+		    
 		    <tr>
-		        <td class="heading"><label for="payee">Payee</label></td>
+		        <td class="heading"><label>Payment type</label></td>
+		        <td>
+		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="payment" ${mon:tertiaryOp(_transaction.transfer, '', 'checked=checked')} /> Payment</span>
+		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="transfer" ${mon:tertiaryOp(_transaction.transfer, 'checked=checked', '')} /> Transfer</span>
+		        </td>
+		    </tr>
+
+		    <tr class="transfer">
+		        <td class="heading"><label>${mon:tertiaryOp(_transaction.debit, 'To', 'From')} account</label></td>
+		        <td>
+		        	<select name="xferaccount">
+			        	<option value="">Choose ...</option>
+			        	<c:forEach items="${_allAccounts}" var="_a">
+			        		<option value="${_a.id}" <c:if test="${_a.id eq _xferAccount.id}">selected</c:if>>${_a.name}</option>
+			        	</c:forEach>
+		        	</select>
+		        </td>
+		    </tr>
+
+		    <tr class="payment">
+		        <td class="heading"><label>Payee</label></td>
 		        <td>
 		        	<select name="payee">
 			        	<option value="">Choose ...</option>
@@ -64,8 +84,13 @@
 		        </td>
 		    </tr>
 
-		    <tr>
-		        <td class="heading"><label for="major">Category</label></td>
+				<tr>
+		      <td class="heading"><label>Split?</label></td>
+					<td><input type="checkbox" name="split" ${mon:tertiaryOp(_transaction.split, 'checked=checked', '')} /></td>
+				</tr>
+								
+		    <tr class="splits-false">
+		        <td class="heading"><label>Category</label></td>
 		        <td>
 		        	<select name="major">
 			        	<c:forEach items="${_allMajorCategories}" var="_c">
@@ -75,8 +100,8 @@
 		        </td>
 		    </tr>
 
-		    <tr>
-		        <td class="heading"><label for="minor">Sub-category</label></td>
+		    <tr class="splits-false">
+		        <td class="heading"><label>Sub-category</label></td>
 		        <td>
 		        	<select name="minor">
 			        	<c:forEach items="${_allMinorCategories}" var="_c">
@@ -86,13 +111,45 @@
 		        </td>
 		    </tr>
 
+		    <tr class="splits-true">
+		        <td class="heading"><label>Splits</label></td>
+		        <td>
+		        	<table>
+		        		<c:forEach items="${_allSplits}" var="_split" varStatus="_status">
+		        			<tr>
+		        				<td>
+						        	<select name="major_${_status.count}">
+							        	<c:forEach items="${_split.allMajors}" var="_c">
+							        		<option value="${_c}" <c:if test="${_c eq _split.category.major}">selected</c:if>>${_c}</option>
+							        	</c:forEach>
+						        	</select>
+		        				</td>
+		        				<td>
+						        	<select name="minor_${_status.count}">
+							        	<c:forEach items="${_split.allMinors}" var="_c">
+							        		<option value="${_c}" <c:if test="${_c eq _split.category.minor}">selected</c:if>>${_c}</option>
+							        	</c:forEach>
+						        	</select>
+		        				</td>
+		        				<td>
+		        					<input type="text" name="memo_${_status.count}" placeholder="Enter any relevant notes" value="${_split.memo}" />
+		        				</td>
+		        				<td>
+		        					<input type="text" name="amount_${_status.count}" placeholder="Enter amount" value="${mon:formatPounds(_split.amount)}" />
+		        				</td>
+		        			</tr>
+		        		</c:forEach>
+	        		</table>
+		        </td>
+		    </tr>
+		    
 		    <tr>
-		        <td class="heading"><label for="memo">Notes</label></td>
+		        <td class="heading"><label>Notes</label></td>
 		        <td><input type="text" name="memo" placeholder="Enter any relevant notes" value="${_transaction.memo}" /></td>
 		    </tr>
-
+		    
 		    <tr>
-		        <td class="heading"><label for="amount">Amount</label></td>
+		        <td class="heading"><label>Total amount</label></td>
 		        <td><input type="text" name="amount" placeholder="Enter amount" value="${mon:formatPounds(_transaction.amount)}" /></td>
 		    </tr>
 
@@ -133,5 +190,38 @@
 				}
 			});
 		});
+		
+		var _alternatesStyleSetter = function(test, truesSelector, falsesSelector) {
+			var trues = $(truesSelector);
+			var falses = $(falsesSelector);
+			
+			if (test) {
+				trues.css("display", "table-cell");
+				falses.css("display", "none");
+			}
+			else {
+				trues.css("display", "none");
+				falses.css("display", "table-cell");
+			}			
+		}
+		
+		var _splitsTrueSelector = ".splits-true td";
+		var _splitsFalseSelector = ".splits-false td";
+		var _paymentTrueSelector = ".payment td";
+		var _paymentFalseSelector = ".transfer td";
+		var _splitCheckboxSelector = "input[name='split']";
+		var _paymentTypeRadioSelector = "input[name='paymenttype']";
+		
+		$(_splitCheckboxSelector).change(function(e) {	
+			_alternatesStyleSetter($(this).prop("checked"), _splitsTrueSelector, _splitsFalseSelector);
+		});
+		
+		$(_paymentTypeRadioSelector).change(function(e) {	
+			_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "payment", _paymentTrueSelector, _paymentFalseSelector);
+		});
+		
+		_alternatesStyleSetter($(_splitCheckboxSelector).prop("checked"), _splitsTrueSelector, _splitsFalseSelector);
+		_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "payment", _paymentTrueSelector, _paymentFalseSelector);
+		
 	});
 </script>

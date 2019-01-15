@@ -38,4 +38,10 @@
 		<function-signature>java.lang.String formatTimestamp(java.util.Date)</function-signature>
 	</function>
 	
+	<function>
+		<name>tertiaryOp</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.Object tertiaryOp(boolean, java.lang.Object, java.lang.Object)</function-signature>
+	</function>
+	
 </taglib>

@@ -118,4 +118,7 @@ public class Util {
 		return s;
 	}
 
+	public static Object tertiaryOp(boolean test, Object trueResult, Object falseResult) {
+		return test ? trueResult : falseResult;
+	}
 }

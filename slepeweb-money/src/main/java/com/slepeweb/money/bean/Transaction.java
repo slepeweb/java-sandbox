@@ -67,6 +67,10 @@ public class Transaction extends DbEntity {
 				this.account.getName(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
+	public boolean isDebit() {
+		return getAmount() == null || getAmount() < 0L;
+	}
+	
 	public long getOrigId() {
 		return origId;
 	}

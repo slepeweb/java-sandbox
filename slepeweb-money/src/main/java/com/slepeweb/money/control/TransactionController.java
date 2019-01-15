@@ -24,6 +24,8 @@ import com.slepeweb.money.bean.NormalisedMonth;
 import com.slepeweb.money.bean.Option;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RunningBalance;
+import com.slepeweb.money.bean.SplitTransaction;
+import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.bean.solr.SolrConfig;
@@ -235,28 +237,67 @@ public class TransactionController extends BaseController {
 	}	
 
 	@RequestMapping(value="/add", method=RequestMethod.GET)
-	public String addForm(ModelMap model) {
-		
-		model.addAttribute("_transaction", new Transaction());
-		model.addAttribute("_formMode", "add");
-		model.addAttribute("_allAccounts", this.accountService.getAll(false));
-		model.addAttribute("_allPayees", this.payeeService.getAll());
-		model.addAttribute("_allMajorCategories", this.categoryService.getAllMajorValues());		
+	public String addForm(ModelMap model) {		
+		populateForm(model, new Transaction(), "add");
 		return "transactionForm";
 	}
 	
 	@RequestMapping(value="/form/{transactionId}", method=RequestMethod.GET)
 	public String updateForm(@PathVariable long transactionId, ModelMap model) {
 		
-		Transaction t = this.transactionService.get(transactionId);
-		model.addAttribute("_transaction", t);
-		model.addAttribute("_formMode", "update");
-		model.addAttribute("_allAccounts", this.accountService.getAll(false));
-		model.addAttribute("_allPayees", this.payeeService.getAll());
-		model.addAttribute("_allMajorCategories", this.categoryService.getAllMajorValues());
-		model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
-		model.addAttribute("_numDeletableTransactions", 0);
+		populateForm(model, this.transactionService.get(transactionId), "update");
 		return "transactionForm";
+	}
+	
+	private void populateForm(ModelMap model, Transaction t, String mode) {		
+		model.addAttribute("_transaction", t);
+		model.addAttribute("_formMode", mode);
+		model.addAttribute("_allAccounts", this.accountService.getAll(true));
+		model.addAttribute("_allPayees", this.payeeService.getAll());
+		model.addAttribute("_numDeletableTransactions", 0);
+		
+		List<String> allMajors = this.categoryService.getAllMajorValues();
+		model.addAttribute("_allMajorCategories", allMajors);
+		
+		if (t.getCategory() != null) {
+			model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
+		}
+		
+		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
+		SplitTransactionFormComponent c;
+		
+		for (SplitTransaction st : t.getSplits()) {
+			c = new SplitTransactionFormComponent().
+					setCategory(st.getCategory()).
+					setAllMajors(allMajors).
+					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor())).
+					setMemo(st.getMemo()).
+					setAmount(st.getAmount());
+			arr.add(c);
+		}
+		
+		int len = arr.size();
+		boolean extended = false;
+		
+		// Do we need to pad out the list?
+		if (len < 3) {
+			for (int i = len; i < 3; i++) {
+				arr.add(new SplitTransactionFormComponent().setAllMajors(allMajors));
+				extended = true;
+			}
+		}
+		
+		// If we didn'd pad out, that means we had 3 or more splits. In this case, provide 1 empty slot.
+		if (! extended) {
+			arr.add(new SplitTransactionFormComponent().setAllMajors(allMajors));
+		}
+		
+		model.addAttribute("_allSplits", arr);
+		
+		if (t.isTransfer()) {
+			Account to = this.transactionService.get(t.getTransferId()).getAccount();
+			model.addAttribute("_xferAccount", to);	
+		}
 	}
 	
 	@RequestMapping(value="/update", method=RequestMethod.POST)
