@@ -75,12 +75,7 @@
 		    <tr class="payment">
 		        <td class="heading"><label>Payee</label></td>
 		        <td>
-		        	<select name="payee">
-			        	<option value="">Choose ...</option>
-			        	<c:forEach items="${_allPayees}" var="_p">
-			        		<option value="${_p.id}" <c:if test="${_p.id eq _transaction.payee.id}">selected</c:if>>${_p.name}</option>
-			        	</c:forEach>
-		        	</select>
+		         	 <input type="text" id="payee-selector" name="payee" value="${_transaction.payee.name}" />
 		        </td>
 		    </tr>
 
@@ -175,14 +170,42 @@
 			changeYear: true
 		});
 		
-		$("select[name='major']").change(function(e) {	
+	  $.ajax({
+	    url: webContext + "/rest/payee/list/all",
+	    type: "GET",
+	    contentType: "application/json",
+	    dataType: "json",
+	    success: function(data) {
+	      // init the widget with response data and let it do the filtering
+	      $("#payee-selector").autocomplete({
+	        source: data,
+	        minLength: 2
+	      });
+	    },
+	    error: function(x, t, m) {
+	      console.trace();
+	      if (!(console == 'undefined')) {
+	        console.log("ERROR: " + x + t + m);
+	      }
+	      console.log(" At the end");
+	    }
+	  });
+		  
+	  $("select[name^='major']").change(function(e) {	
 			var major = $(this).find(":selected").val();
+			var name = $(this).attr("name");
+			var split = name.length > 5;
+			var index = -1;
+			if (split) {
+				index = name.substring("major".length + 1);
+			}
+			
 			$.ajax(webContext + "/rest/category/minor/list/" + major, {
 				type: "GET",
 				cache: false,
 				dataType: "json",
 				success: function(obj, status, z) {
-					var select = $("select[name='minor']");
+					var select = $("select[name='minor" + (split ? "_" + index : "") + "']");
 					select.empty();
 					$.each(obj.data, function(index, minor) {
 						select.append("<option value='" + minor + "'>" + minor + "</option>");

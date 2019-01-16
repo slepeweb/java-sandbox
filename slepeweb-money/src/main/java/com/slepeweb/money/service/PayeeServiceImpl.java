@@ -2,6 +2,7 @@ package com.slepeweb.money.service;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -74,7 +75,15 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 	}
 
 	public Payee get(String name) {
-		return get("select * from payee where name = ?", new Object[]{name});
+		Payee p = get("select * from payee where name = ?", new Object[]{name});
+		if (p != null) {
+			return p;
+		}
+		return getNoPayee();
+	}
+	
+	public Payee getNoPayee() {
+		return get("");
 	}
 
 	public Payee get(long id) {

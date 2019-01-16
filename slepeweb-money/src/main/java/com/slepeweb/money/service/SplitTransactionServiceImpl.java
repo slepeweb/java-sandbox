@@ -22,6 +22,7 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 					"c.id as categoryid, c.origid as categoryorigid, c.major, c.minor " + 
 			"from splittransaction st " +
 					"join category c on c.id = st.categoryid ";
+	
 	public Transaction save(Transaction t) throws MissingDataException, DuplicateItemException {
 		if (t.isSplit()) {
 			List<SplitTransaction> revisedList = new ArrayList<SplitTransaction>(t.getSplits().size());

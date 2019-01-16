@@ -86,6 +86,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				result = insert(pt);
 			}
 			
+			result = this.splitTransactionService.save(result);
 			this.solrService.save(result);
 			return result;
 		}

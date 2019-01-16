@@ -10,6 +10,7 @@ import com.slepeweb.money.except.MissingDataException;
 
 public interface PayeeService {
 	Payee get(String name);
+	Payee getNoPayee();
 	Payee get(long id);
 	Payee getByOrigId(long id);
 	List<Payee> getAll();

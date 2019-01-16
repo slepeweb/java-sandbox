@@ -239,20 +239,20 @@ public class TransactionController extends BaseController {
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String addForm(ModelMap model) {		
 		populateForm(model, new Transaction(), "add");
+		model.addAttribute("_allAccounts", this.accountService.getAll(false));
 		return "transactionForm";
 	}
 	
 	@RequestMapping(value="/form/{transactionId}", method=RequestMethod.GET)
-	public String updateForm(@PathVariable long transactionId, ModelMap model) {
-		
+	public String updateForm(@PathVariable long transactionId, ModelMap model) {		
 		populateForm(model, this.transactionService.get(transactionId), "update");
+		model.addAttribute("_allAccounts", this.accountService.getAll(true));
 		return "transactionForm";
 	}
 	
 	private void populateForm(ModelMap model, Transaction t, String mode) {		
 		model.addAttribute("_transaction", t);
 		model.addAttribute("_formMode", mode);
-		model.addAttribute("_allAccounts", this.accountService.getAll(true));
 		model.addAttribute("_allPayees", this.payeeService.getAll());
 		model.addAttribute("_numDeletableTransactions", 0);
 		
@@ -305,37 +305,67 @@ public class TransactionController extends BaseController {
 		
 		String flash;	
 		boolean isUpdateMode = req.getParameter("formMode").equals("update");
-		
-		Account a = this.accountService.get(Long.valueOf(req.getParameter("account")));
-		Payee p = this.payeeService.get(Long.valueOf(req.getParameter("payee")));
+		boolean isTransfer = req.getParameter("paymenttype").equals("transfer");
+				
+		Account a = this.accountService.get(Util.toLong(req.getParameter("account")));
+		Payee p = this.payeeService.get(req.getParameter("payee"));
 		Category c = this.categoryService.get(req.getParameter("major"), req.getParameter("minor"));
+		
 		Transaction t = 
 				new Transaction().
-				setId(Long.valueOf(req.getParameter("id")));
-		
-		if (a != null && p != null && c != null) {
-			t.
+				setId(Util.toLong(req.getParameter("id"))).
+				setOrigId(Util.toLong(req.getParameter("origid"))).
 				setAccount(a).
 				setPayee(p).
 				setCategory(c).
 				setEntered(Util.parseTimestamp(req.getParameter("entered"))).
 				setMemo(req.getParameter("memo")).
-				setAmount(Util.parsePounds(req.getParameter("amount")));
+				setAmount(Util.parsePounds(req.getParameter("amount"))).
+				setSplit(Util.isPositive(req.getParameter("split")));
+		
+		if (t.isSplit()) {
+			t.setCategory(this.categoryService.getNoCategory());
 			
-			try {
-				this.transactionService.save(t);
-				flash = String.format("success|Transaction successfully %s", isUpdateMode ? "updated" : "added");
+			int index = 1;
+			SplitTransaction st;
+			
+			do {
+				st = new SplitTransaction().
+					setCategory(this.categoryService.get(
+							req.getParameter("major_" + index), 
+							req.getParameter("major_" + index))).
+					setMemo(req.getParameter("memo_" + index)).
+					setAmount(Util.parsePounds(req.getParameter("amount_" + index)));
+				
+				if (st.isPopulated()) {
+					t.getSplits().add(st);
+					index++;
+				}
+				else {
+					index = -1;
+				}
 			}
-			catch (Exception e) {
-				flash = String.format("failure|Missing key data [%s]", e.getMessage());
-			}
+			while (index > 0);
 		}
-		else {
-			flash = String.format("failure|Failed to %s transaction", isUpdateMode ? "update" : "add new");
+		
+		if (isTransfer) {
+			t.setXferId(Long.valueOf(req.getParameter("xferaccount")));
+			t.setPayee(this.payeeService.getNoPayee());
+		}
+		
+		try {
+			this.transactionService.save(t);
+			flash = String.format("success|Transaction successfully %s", isUpdateMode ? "updated" : "added");
+			
+			return new RedirectView(String.format("%s/transaction/form/%d?flash=%s", 
+					req.getContextPath(), t.getId(), Util.encodeUrl(flash)));
+		}
+		catch (Exception e) {
+			flash = String.format("failure|Missing key data [%s]", e.getMessage());
 		}
 	
-		return new RedirectView(String.format("%s/transaction/form/%d?flash=%s", 
-				req.getContextPath(), t.getId(), Util.encodeUrl(flash)));
+		return new RedirectView(String.format("%s/transaction/list/%d?flash=%s", 
+				req.getContextPath(), t.getAccount().getId(), Util.encodeUrl(flash)));
 	}
 	
 	@RequestMapping(value="/delete/{transactionId}", method=RequestMethod.GET)

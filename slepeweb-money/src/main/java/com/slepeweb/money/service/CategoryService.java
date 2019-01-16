@@ -10,6 +10,7 @@ import com.slepeweb.money.except.MissingDataException;
 
 public interface CategoryService {
 	Category get(String major, String minor);
+	Category getNoCategory();
 	Category get(long id);
 	Category getByOrigId(long id);
 	List<Category> getAll();

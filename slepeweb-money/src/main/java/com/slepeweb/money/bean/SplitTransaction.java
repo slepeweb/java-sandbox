@@ -36,6 +36,10 @@ public class SplitTransaction extends DbEntity {
 		return this;
 	}
 	
+	public boolean isPopulated() {
+		return getCategory() != null && getAmount() != null;
+	}
+	
 	public String getAmountInPounds() {
 		return Transaction.DF.format(amount / 100.0);
 	}

@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
@@ -21,12 +23,14 @@ public class Util {
 	}
 	
 	public static long parsePounds(String value) {
-		String[] parts = value.split("\\.");
-		if (parts.length == 1) {
-			return Long.valueOf(cleanAmount(parts[0]));
-		}
-		else if (parts.length == 2){
-			return ((Long.valueOf(cleanAmount(parts[0])).longValue() * 100) + (Long.valueOf(parts[1])).longValue());
+		if (StringUtils.isNotBlank(value)) {
+			String[] parts = value.split("\\.");
+			if (parts.length == 1) {
+				return Long.valueOf(cleanAmount(parts[0]));
+			}
+			else if (parts.length == 2){
+				return ((Long.valueOf(cleanAmount(parts[0])).longValue() * 100) + (Long.valueOf(parts[1])).longValue());
+			}
 		}
 		return 0L;
 	}
@@ -120,5 +124,13 @@ public class Util {
 
 	public static Object tertiaryOp(boolean test, Object trueResult, Object falseResult) {
 		return test ? trueResult : falseResult;
+	}
+	
+	public static Long toLong(String s) {
+		if (StringUtils.isNumeric(s)) {
+			return Long.valueOf(s);
+		}
+		
+		return 0L;
 	}
 }
