@@ -17,6 +17,13 @@ public class FlatTransaction {
 	@Field("major") private String majorCategory;
 	@Field("minor") private String minorCategory;
 	@Field("memo") private String memo;
+	
+	/*
+	 * type has the following possible values:
+	 * 0 - transaction document has NO splits
+	 * 1 - transaction document HAS splits
+	 * 2 - transaction document represents a split
+	 */
 	@Field("type") private int type;
 	
 	@Override

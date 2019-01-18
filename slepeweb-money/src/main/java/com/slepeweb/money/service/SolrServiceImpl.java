@@ -72,8 +72,14 @@ public class SolrServiceImpl implements SolrService {
 	public boolean save(Transaction t) {
 		if (isEnabled()) {
 			try {
+				// Remove all documents matching this transaction's id. This is possibly
+				// the simplest way of dealing with changes in splits
+				removeTransactionsById(t.getId());
+				
+				// Make a solr document representing the transaction
 				FlatTransaction parent = makeDoc(t);
 
+				// Make solr documents for each split transaction
 				if (t.isSplit()) {
 					getClient().addBeans(makeDocsFromSplits(t));
 					parent.setType(1);

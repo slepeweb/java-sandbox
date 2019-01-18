@@ -86,8 +86,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				result = insert(pt);
 			}
 			
+			// Also save this transaction's splits, if any
 			result = this.splitTransactionService.save(result);
+			
+			// Update solr regarding the transaction AND its splits, if any
 			this.solrService.save(result);
+			
 			return result;
 		}
 		else {
@@ -298,7 +302,16 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	}
 
 	public int delete(long id) {
-		int num = this.jdbcTemplate.update("delete from transaction where id = ?", id);
+		// First check whether this is a transfer; if so, delete the parallel transaction too
+		int num = 0;
+		Transaction t = get(id);
+		if (t.isTransfer()) {
+			num += this.jdbcTemplate.update("delete from transaction where id = ?", t.getTransferId());
+			this.solrService.removeTransactionsById(t.getTransferId());
+		}
+		
+		num += this.jdbcTemplate.update("delete from transaction where id = ?", id);
+		
 		this.solrService.removeTransactionsById(id);
 		return num;
 	}	

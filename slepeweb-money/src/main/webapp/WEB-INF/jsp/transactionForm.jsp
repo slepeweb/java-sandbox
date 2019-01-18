@@ -79,7 +79,7 @@
 		        </td>
 		    </tr>
 
-				<tr>
+				<tr class="hide-if-transfer">
 		      <td class="heading"><label>Split?</label></td>
 					<td><input type="checkbox" name="split" ${mon:tertiaryOp(_transaction.split, 'checked=checked', '')} /></td>
 				</tr>
@@ -156,6 +156,7 @@
 	    </c:if>
 	    <input type="hidden" name="id" value="${_transaction.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   
+	    <input type="hidden" name="origxferid" value="${_transaction.transferId}" />   
 	</form>		  	
 		
 </mny:standardLayout>
@@ -214,37 +215,38 @@
 			});
 		});
 		
-		var _alternatesStyleSetter = function(test, truesSelector, falsesSelector) {
-			var trues = $(truesSelector);
-			var falses = $(falsesSelector);
+		var _alternatesStyleSetter = function(test, visiblesSelector, nonVisiblesSelector) {
+			var visibles = $(visiblesSelector);
+			var nonVisibles = $(nonVisiblesSelector);
 			
 			if (test) {
-				trues.css("display", "table-cell");
-				falses.css("display", "none");
+				visibles.css("display", "table-cell");
+				nonVisibles.css("display", "none");
 			}
 			else {
-				trues.css("display", "none");
-				falses.css("display", "table-cell");
+				visibles.css("display", "none");
+				nonVisibles.css("display", "table-cell");
 			}			
 		}
 		
-		var _splitsTrueSelector = ".splits-true td";
-		var _splitsFalseSelector = ".splits-false td";
-		var _paymentTrueSelector = ".payment td";
-		var _paymentFalseSelector = ".transfer td";
+		var _splitsTrueVisibles = ".splits-true td";
+		var _splitsFalseVisibles = ".splits-false td";
+		var _paymentTrueVisibles = ".payment td";
+		var _paymentFalseVisibles = ".transfer td";
 		var _splitCheckboxSelector = "input[name='split']";
 		var _paymentTypeRadioSelector = "input[name='paymenttype']";
 		
 		$(_splitCheckboxSelector).change(function(e) {	
-			_alternatesStyleSetter($(this).prop("checked"), _splitsTrueSelector, _splitsFalseSelector);
+			_alternatesStyleSetter($(this).prop("checked"), _splitsTrueVisibles, _splitsFalseVisibles);
 		});
 		
 		$(_paymentTypeRadioSelector).change(function(e) {	
-			_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "payment", _paymentTrueSelector, _paymentFalseSelector);
+			_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "transfer", "none", ".hide-if-transfer, .splits-false td");
+			_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "payment", _paymentTrueVisibles, _paymentFalseVisibles);
 		});
 		
-		_alternatesStyleSetter($(_splitCheckboxSelector).prop("checked"), _splitsTrueSelector, _splitsFalseSelector);
-		_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "payment", _paymentTrueSelector, _paymentFalseSelector);
-		
+		_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "transfer", "none", ".hide-if-transfer");
+		_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "payment", _paymentTrueVisibles, _paymentFalseVisibles);
+		_alternatesStyleSetter($(_splitCheckboxSelector).prop("checked"), _splitsTrueVisibles, _splitsFalseVisibles);
 	});
 </script>

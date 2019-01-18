@@ -239,20 +239,19 @@ public class TransactionController extends BaseController {
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String addForm(ModelMap model) {		
 		populateForm(model, new Transaction(), "add");
-		model.addAttribute("_allAccounts", this.accountService.getAll(false));
 		return "transactionForm";
 	}
 	
 	@RequestMapping(value="/form/{transactionId}", method=RequestMethod.GET)
 	public String updateForm(@PathVariable long transactionId, ModelMap model) {		
 		populateForm(model, this.transactionService.get(transactionId), "update");
-		model.addAttribute("_allAccounts", this.accountService.getAll(true));
 		return "transactionForm";
 	}
 	
 	private void populateForm(ModelMap model, Transaction t, String mode) {		
 		model.addAttribute("_transaction", t);
 		model.addAttribute("_formMode", mode);
+		model.addAttribute("_allAccounts", this.accountService.getAll(false));
 		model.addAttribute("_allPayees", this.payeeService.getAll());
 		model.addAttribute("_numDeletableTransactions", 0);
 		
@@ -306,6 +305,9 @@ public class TransactionController extends BaseController {
 		String flash;	
 		boolean isUpdateMode = req.getParameter("formMode").equals("update");
 		boolean isTransfer = req.getParameter("paymenttype").equals("transfer");
+		long transferId = Util.toLong(req.getParameter("xferaccount"));
+		long origTransferId = Util.toLong(req.getParameter("origxferid"));
+		boolean wasTransfer = origTransferId > 0;
 				
 		Account a = this.accountService.get(Util.toLong(req.getParameter("account")));
 		Payee p = this.payeeService.get(req.getParameter("payee"));
@@ -346,6 +348,24 @@ public class TransactionController extends BaseController {
 				}
 			}
 			while (index > 0);
+		}
+		
+		// TODO: complete
+		if (! wasTransfer) {
+			if (isTransfer) {
+				// Create new parallel transaction
+			}
+		}
+		else {			
+			if (isTransfer) {
+				if (origTransferId != transferId) {
+					// Delete original parallel transaction
+					// Create parallel transaction
+				}
+			}
+			else {
+				// Delete original parallel transaction
+			}
 		}
 		
 		if (isTransfer) {
