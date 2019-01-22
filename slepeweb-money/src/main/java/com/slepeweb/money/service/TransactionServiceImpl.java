@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.bean.Transfer;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
@@ -69,36 +70,124 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			;
 	
 			
-	public Transaction save(Transaction pt) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
+	public Transaction save(Transaction pt) 
+			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
+		
+		return save(pt, false);
+	}
+		
+	private Transaction save(Transaction pt, boolean ignoreMirror) 
+			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
+		
+		Account mirrorAccount = null;
+		boolean isTransfer = pt instanceof Transfer;
+		Transfer tt = null;
+		
+		if (isTransfer) {
+			tt = (Transfer) pt;
+			mirrorAccount = tt.getMirrorAccount();
+		}
+		
+		Transaction originalTransaction = get(pt.getId());
+		Transaction mirror = null;
+		long originalTransferId = originalTransaction == null ? 0L : originalTransaction.getTransferId();
+		
 		if (pt.isDefined4Insert()) {
-			Transaction result;
+			Transaction t;
 			
 			if (pt.isInDatabase()) {
-				Transaction dbRecord = get(pt.getId());		
+				Transaction dbRecord = get(pt.getId());	
 				if (dbRecord != null) {
-					result = update(dbRecord, pt);
+					t = update(dbRecord, pt);
 				}
 				else {
 					throw new DataInconsistencyException(error(LOG, "Transaction does not exist in DB", pt));
 				}
 			}
 			else {
-				result = insert(pt);
+				t = insert(pt);
 			}
 			
 			// Also save this transaction's splits, if any
-			result = this.splitTransactionService.save(result);
+			t = this.splitTransactionService.save(t);			
+			
+			// Manage mirror transaction, as applicable, including Solr updates for same
+			if (! ignoreMirror) {
+				mirror = manageMirror(t, originalTransferId, mirrorAccount);
+				
+				if (mirror != null) {
+					mirror = save(mirror, true);
+					
+					// Bind two transactions together
+					t = save(t.setXferId(mirror.getId()));
+				}
+			}
 			
 			// Update solr regarding the transaction AND its splits, if any
-			this.solrService.save(result);
+			this.solrService.save(t);
 			
-			return result;
+			return t;
 		}
 		else {
 			String t = "Transaction not saved - insufficient data";
 			LOG.error(compose(t, pt));
 			throw new MissingDataException(t);
 		}
+	}
+	
+	/*
+	 * This method has to do one of 3 things:
+	 * 	1) Create a new mirror transaction, and bind to the master
+	 * 	2) Update an existing mirror transaction
+	 * 	3) Delete an existing mirror transaction, should the master change back to a normal payment
+	 * 
+	 * Must only be called for Transfer objects, and NOT Transaction objects.
+	 */
+	private Transaction manageMirror(Transaction t, long originalTransferId, Account mirrorAccount) 
+			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
+		
+		Transaction mirror = null;
+		
+		if (originalTransferId > 0 && mirrorAccount == null) {
+			// Case 3) delete the original mirror transaction
+			delete(originalTransferId, true);
+			this.solrService.removeTransactionsById(originalTransferId);
+		}
+		else if (originalTransferId == 0 && mirrorAccount != null) {
+			// Case 1) create a new mirror transaction
+			mirror = mirrorTransaction(t, new Transaction(), mirrorAccount);
+			this.solrService.save(mirror);
+		}
+		else if (originalTransferId > 0 && mirrorAccount != null) {
+			// Case 2) update an existing mirror
+			Transaction origMirrorTransaction = get(originalTransferId);
+			if (origMirrorTransaction != null) {
+				mirror = mirrorTransaction(t, origMirrorTransaction, mirrorAccount);
+				this.solrService.save(mirror);
+			}
+		}
+		
+		return mirror;
+	}
+	
+	/*
+	 * Populate and save a mirror transaction, and link it to the master transaction.
+	 * Solr is NOT updated here.
+	 */
+	private Transaction mirrorTransaction(Transaction t, Transaction base, Account transferAccount)
+			 throws MissingDataException, DuplicateItemException, DataInconsistencyException { 
+		
+		// Create new mirror transaction
+		Transaction mirror = base.
+				setXferId(t.getId()).
+				setAccount(transferAccount).
+				setPayee(t.getPayee()).
+				setCategory(t.getCategory()).
+				setEntered(t.getEntered()).
+				setMemo(t.getMemo()).
+				setAmount(- t.getAmount());
+		
+		return mirror;
 	}
 	
 	private Transaction insert(Transaction t) throws MissingDataException, DuplicateItemException {
@@ -122,7 +211,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	}
 
 	public Transaction update(Transaction dbRecord, Transaction t) {
-		if (! dbRecord.equalsBarTransferId(t)) {
+		if (! dbRecord.equals(t)) {
 			dbRecord.assimilate(t);
 			
 			try {
@@ -130,12 +219,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 						"update transaction set entered = ?, " + 
 						"accountid = ?, payeeid = ?, categoryid = ?, " + 
 						"split = ?, amount = ?, reconciled = ?, " +
-						"memo = ?, reference = ? " +
+						"memo = ?, reference = ?, transferid = ? " +
 						"where id = ?", 
 						dbRecord.getEntered(), 
 						dbRecord.getAccount().getId(), dbRecord.getPayee().getId(), dbRecord.getCategory().getId(), 
 						dbRecord.isSplit(), dbRecord.getAmount(), dbRecord.isReconciled(), 
-						dbRecord.getMemo(), dbRecord.getReference(),
+						dbRecord.getMemo(), dbRecord.getReference(), dbRecord.getTransferId(),
 						dbRecord.getId());
 				
 				LOG.info(compose("Updated transaction", t));
@@ -186,6 +275,14 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		if (t != null && t.isSplit()) {
 			t.setSplits(this.splitTransactionService.get(t));
+		}
+		
+		if (t != null && t.getTransferId() != null && t.getTransferId() > 0) {
+			Transaction mirror = (Transaction) getFirstInList(this.jdbcTemplate.query(
+					SELECT + "where t.id = ?", new Object[]{t.getTransferId()}, new RowMapperUtil.TransactionMapper()));
+			Account mirrorAccount = this.accountService.get(mirror.getAccount().getId());
+			Transfer tt = new Transfer(t).setMirrorAccount(mirrorAccount);
+			return tt;
 		}
 		
 		return t;
@@ -302,16 +399,20 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	}
 
 	public int delete(long id) {
+		return delete(id, false);
+	}
+	
+	public int delete(long id, boolean ignoreMirror) {
 		// First check whether this is a transfer; if so, delete the parallel transaction too
 		int num = 0;
 		Transaction t = get(id);
-		if (t.isTransfer()) {
+		
+		if (! ignoreMirror && t.isTransfer()) {
 			num += this.jdbcTemplate.update("delete from transaction where id = ?", t.getTransferId());
 			this.solrService.removeTransactionsById(t.getTransferId());
 		}
 		
-		num += this.jdbcTemplate.update("delete from transaction where id = ?", id);
-		
+		num += this.jdbcTemplate.update("delete from transaction where id = ?", id);		
 		this.solrService.removeTransactionsById(id);
 		return num;
 	}	

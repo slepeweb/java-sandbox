@@ -17,7 +17,6 @@ public class Transaction extends DbEntity {
 	public static DecimalFormat DF = new DecimalFormat("#.00");
 	public static DecimalFormat DF_TOTAL = new DecimalFormat("###,###");
 	
-	private long id, origId;
 	private Account account;
 	private Long xferId = 0L;
 	private Payee payee;
@@ -71,15 +70,10 @@ public class Transaction extends DbEntity {
 		return getAmount() == null || getAmount() < 0L;
 	}
 	
-	public long getOrigId() {
-		return origId;
+	public boolean isTransfer() {
+		return this instanceof Transfer;
 	}
-
-	public Transaction setOrigId(long origId) {
-		this.origId = origId;
-		return this;
-	}
-
+	
 	public Account getAccount() {
 		return this.account;
 	}
@@ -124,9 +118,9 @@ public class Transaction extends DbEntity {
 		return this;
 	}
 
-	public boolean isTransfer() {
-		return this.xferId != null && this.xferId != 0;
-	}
+//	public boolean isTransfer() {
+//		return false;
+//	}
 
 	public Long getTransferId() {
 		return this.xferId;
@@ -192,12 +186,15 @@ public class Transaction extends DbEntity {
 		this.splits = partPayments;
 	}
 
-	public long getId() {
-		return id;
+	@Override
+	public Transaction setId(long id) {
+		super.setId(id);
+		return this;
 	}
 
-	public Transaction setId(long id) {
-		this.id = id;
+	@Override
+	public Transaction setOrigId(long id) {
+		super.setOrigId(id);
 		return this;
 	}
 
@@ -212,6 +209,7 @@ public class Transaction extends DbEntity {
 		result = prime * result + ((memo == null) ? 0 : memo.hashCode());
 		result = prime * result + ((payee == null) ? 0 : payee.hashCode());
 		result = prime * result + (reconciled ? 1231 : 1237);
+		result = prime * result + (split ? 1231 : 1237);
 		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
 		result = prime * result + ((xferId == null) ? 0 : xferId.hashCode());
 		return result;
@@ -238,10 +236,6 @@ public class Transaction extends DbEntity {
 	}
 	
 	public boolean matchesTransfer(Transaction other) {
-		if (! (isTransfer() && other.isTransfer())) {
-			return false;
-		}
-		
 		if (getTransferId() != other.getId() || other.getTransferId() != getId()) {
 			return false;
 		}
@@ -309,6 +303,8 @@ public class Transaction extends DbEntity {
 			if (other.reference != null)
 				return false;
 		} else if (!reference.equals(other.reference))
+			return false;
+		if (split != other.split)
 			return false;
 
 		return true;

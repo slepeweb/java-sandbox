@@ -1,5 +1,7 @@
 package com.slepeweb.money.bean;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class SplitTransaction extends DbEntity {
 	
 	private Long transactionId;
@@ -37,7 +39,7 @@ public class SplitTransaction extends DbEntity {
 	}
 	
 	public boolean isPopulated() {
-		return getCategory() != null && getAmount() != null;
+		return getCategory() != null && StringUtils.isNotBlank(getCategory().getMajor()) && getAmount() != null;
 	}
 	
 	public String getAmountInPounds() {

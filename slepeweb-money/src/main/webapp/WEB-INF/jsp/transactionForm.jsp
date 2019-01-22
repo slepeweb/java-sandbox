@@ -57,6 +57,7 @@
 		        <td>
 		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="payment" ${mon:tertiaryOp(_transaction.transfer, '', 'checked=checked')} /> Payment</span>
 		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="transfer" ${mon:tertiaryOp(_transaction.transfer, 'checked=checked', '')} /> Transfer</span>
+		        	<c:if test="${_transaction.transfer}"><span class="radio-horiz right"><a href="${_ctxPath}/transaction/form/${_transaction.transferId}">Mirror</a></span></c:if>
 		        </td>
 		    </tr>
 
@@ -66,25 +67,25 @@
 		        	<select name="xferaccount">
 			        	<option value="">Choose ...</option>
 			        	<c:forEach items="${_allAccounts}" var="_a">
-			        		<option value="${_a.id}" <c:if test="${_a.id eq _xferAccount.id}">selected</c:if>>${_a.name}</option>
+			        		<option value="${_a.id}" <c:if test="${_transaction.transfer and _a.id eq _transaction.mirrorAccount.id}">selected</c:if>>${_a.name}</option>
 			        	</c:forEach>
 		        	</select>
 		        </td>
 		    </tr>
 
-		    <tr class="payment">
+		    <tr class="payee">
 		        <td class="heading"><label>Payee</label></td>
 		        <td>
 		         	 <input type="text" id="payee-selector" name="payee" value="${_transaction.payee.name}" />
 		        </td>
 		    </tr>
 
-				<tr class="hide-if-transfer">
+				<tr class="splits-q">
 		      <td class="heading"><label>Split?</label></td>
 					<td><input type="checkbox" name="split" ${mon:tertiaryOp(_transaction.split, 'checked=checked', '')} /></td>
 				</tr>
 								
-		    <tr class="splits-false">
+		    <tr class="category">
 		        <td class="heading"><label>Category</label></td>
 		        <td>
 		        	<select name="major">
@@ -95,7 +96,7 @@
 		        </td>
 		    </tr>
 
-		    <tr class="splits-false">
+		    <tr class="category">
 		        <td class="heading"><label>Sub-category</label></td>
 		        <td>
 		        	<select name="minor">
@@ -106,7 +107,7 @@
 		        </td>
 		    </tr>
 
-		    <tr class="splits-true">
+		    <tr class="splits-list">
 		        <td class="heading"><label>Splits</label></td>
 		        <td>
 		        	<table>
@@ -215,38 +216,34 @@
 			});
 		});
 		
-		var _alternatesStyleSetter = function(test, visiblesSelector, nonVisiblesSelector) {
-			var visibles = $(visiblesSelector);
-			var nonVisibles = $(nonVisiblesSelector);
-			
-			if (test) {
-				visibles.css("display", "table-cell");
-				nonVisibles.css("display", "none");
-			}
-			else {
-				visibles.css("display", "none");
-				nonVisibles.css("display", "table-cell");
-			}			
+		var _setComponentVisibilities = function() {
+				
+				if ($("input[name='paymenttype']:checked").val() == "transfer") {
+					// Set from for transfer between accounts
+					$(".payee td, .category td, .splits-q td, .splits-list td").css("display", "none");
+					$(".transfer td").css("display", "table-cell");
+				}
+				else {
+					// Set form for a payment
+					$(".payee td, .category td, .splits-q td").css("display", "table-cell");
+					$(".transfer td").css("display", "none");
+					
+					// Is it a split-payment?
+					if ($("input[name='split']").prop("checked")) {
+						$(".category td").css("display", "none");
+						$(".splits-list td").css("display", "table-cell");
+					}
+					else {
+						$(".splits-list td").css("display", "none");
+						$(".category td").css("display", "table-cell");
+					}
+				}
 		}
 		
-		var _splitsTrueVisibles = ".splits-true td";
-		var _splitsFalseVisibles = ".splits-false td";
-		var _paymentTrueVisibles = ".payment td";
-		var _paymentFalseVisibles = ".transfer td";
-		var _splitCheckboxSelector = "input[name='split']";
-		var _paymentTypeRadioSelector = "input[name='paymenttype']";
-		
-		$(_splitCheckboxSelector).change(function(e) {	
-			_alternatesStyleSetter($(this).prop("checked"), _splitsTrueVisibles, _splitsFalseVisibles);
+		$("input[name='split'], input[name='paymenttype']").change(function(e) {	
+			_setComponentVisibilities();
 		});
 		
-		$(_paymentTypeRadioSelector).change(function(e) {	
-			_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "transfer", "none", ".hide-if-transfer, .splits-false td");
-			_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "payment", _paymentTrueVisibles, _paymentFalseVisibles);
-		});
-		
-		_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "transfer", "none", ".hide-if-transfer");
-		_alternatesStyleSetter($(_paymentTypeRadioSelector + ":checked").val() == "payment", _paymentTrueVisibles, _paymentFalseVisibles);
-		_alternatesStyleSetter($(_splitCheckboxSelector).prop("checked"), _splitsTrueVisibles, _splitsFalseVisibles);
+		_setComponentVisibilities();
 	});
 </script>

@@ -5,7 +5,7 @@
 <c:set var="_urlPrefix">${_ctxPath}/transaction/list/${_accountId}</c:set>
 	
 <mny:standardLayout>
-	<div class="right"><a href="../add">New transaction</a></div>
+	<div class="right"><a href="../add/${_tl.account.id}">New transaction</a></div>
 	
 	<div class="inline-block">
 		<form>

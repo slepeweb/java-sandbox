@@ -33,6 +33,7 @@ public class SolrServiceImpl implements SolrService {
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
 	@Autowired private CategoryService categoryService;
+	@Autowired private TransactionService transactionService;
 
 	//@Value("${solr.enabled:no}") 
 	private String solrIsEnabled = "yes";
@@ -48,8 +49,14 @@ public class SolrServiceImpl implements SolrService {
 	private SolrClient getClient() {
 		if (isEnabled()) {
 			if (this.client == null) {
-				this.client = new HttpSolrClient(this.serverUrl);
-				LOG.info(String.format("Initialised solr server [%s]", this.serverUrl));
+				try {
+					this.client = new HttpSolrClient(this.serverUrl);
+					LOG.info(String.format("Initialised solr server [%s]", this.serverUrl));
+				}
+				catch (Exception e) {
+					LOG.error("Failed to initialise Solr");
+					this.solrIsEnabled = "no";
+				}
 			}
 		}
 		return this.client;
@@ -83,6 +90,9 @@ public class SolrServiceImpl implements SolrService {
 				if (t.isSplit()) {
 					getClient().addBeans(makeDocsFromSplits(t));
 					parent.setType(1);
+				}
+				else if (t.isTransfer()) {
+					getClient().addBean(makeDoc(this.transactionService.get(t.getTransferId())));
 				}
 
 				getClient().addBean(parent);

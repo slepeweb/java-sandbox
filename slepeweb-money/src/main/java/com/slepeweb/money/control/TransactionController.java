@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -30,6 +31,7 @@ import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
+import com.slepeweb.money.bean.Transfer;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
@@ -39,6 +41,8 @@ import com.slepeweb.money.service.TransactionService;
 @Controller
 @RequestMapping(value="/transaction")
 public class TransactionController extends BaseController {
+	
+	private static Logger LOG = Logger.getLogger(TransactionController.class);
 	
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
@@ -242,8 +246,14 @@ public class TransactionController extends BaseController {
 		return "transactionForm";
 	}
 	
+	@RequestMapping(value="/add/{accountId}", method=RequestMethod.GET)
+	public String addFormForAccount(@PathVariable long accountId, ModelMap model) {		
+		populateForm(model, new Transaction().setAccount(this.accountService.get(accountId)), "add");
+		return "transactionForm";
+	}
+	
 	@RequestMapping(value="/form/{transactionId}", method=RequestMethod.GET)
-	public String updateForm(@PathVariable long transactionId, ModelMap model) {		
+	public String updateForm(@PathVariable long transactionId, ModelMap model) {
 		populateForm(model, this.transactionService.get(transactionId), "update");
 		return "transactionForm";
 	}
@@ -305,37 +315,55 @@ public class TransactionController extends BaseController {
 		String flash;	
 		boolean isUpdateMode = req.getParameter("formMode").equals("update");
 		boolean isTransfer = req.getParameter("paymenttype").equals("transfer");
-		long transferId = Util.toLong(req.getParameter("xferaccount"));
-		long origTransferId = Util.toLong(req.getParameter("origxferid"));
-		boolean wasTransfer = origTransferId > 0;
-				
+		long mirrorAccountId = Util.toLong(req.getParameter("xferaccount"));
+		boolean isSplit = Util.isPositive(req.getParameter("split"));
+		
 		Account a = this.accountService.get(Util.toLong(req.getParameter("account")));
-		Payee p = this.payeeService.get(req.getParameter("payee"));
-		Category c = this.categoryService.get(req.getParameter("major"), req.getParameter("minor"));
+		Payee noPayee = this.payeeService.getNoPayee();
+		Category noCategory = this.categoryService.getNoCategory();
+		Transaction t;
 		
-		Transaction t = 
-				new Transaction().
-				setId(Util.toLong(req.getParameter("id"))).
-				setOrigId(Util.toLong(req.getParameter("origid"))).
-				setAccount(a).
-				setPayee(p).
-				setCategory(c).
-				setEntered(Util.parseTimestamp(req.getParameter("entered"))).
-				setMemo(req.getParameter("memo")).
-				setAmount(Util.parsePounds(req.getParameter("amount"))).
-				setSplit(Util.isPositive(req.getParameter("split")));
-		
-		if (t.isSplit()) {
-			t.setCategory(this.categoryService.getNoCategory());
+		if (isTransfer) {
+			// Override setting on form - 'splt' has no meaning with transfers
+			isSplit = false;
 			
+			t = new Transfer().setMirrorAccount(this.accountService.get(mirrorAccountId));
+			t.
+				setPayee(noPayee).
+				setCategory(noCategory);
+		}
+		else {
+			t = new Transaction().
+				setPayee(this.payeeService.get(req.getParameter("payee")));
+			
+			if (isSplit) {
+				t.setCategory(noCategory);
+			}
+			else {
+				t.setCategory(this.categoryService.get(req.getParameter("major"), req.getParameter("minor")));
+			}
+		}
+		
+		t.		
+			setId(Util.toLong(req.getParameter("id"))).
+			setOrigId(Util.toLong(req.getParameter("origid"))).
+			setAccount(a).
+			setEntered(Util.parseTimestamp(req.getParameter("entered"))).
+			setMemo(req.getParameter("memo")).
+			setAmount(Util.parsePounds(req.getParameter("amount"))).
+			setSplit(isSplit);
+		
+		// Note: Transfers can NOT have split transactions
+		if (isSplit) {
 			int index = 1;
 			SplitTransaction st;
 			
 			do {
 				st = new SplitTransaction().
+					setTransactionId(t.getId()).
 					setCategory(this.categoryService.get(
 							req.getParameter("major_" + index), 
-							req.getParameter("major_" + index))).
+							req.getParameter("minor_" + index))).
 					setMemo(req.getParameter("memo_" + index)).
 					setAmount(Util.parsePounds(req.getParameter("amount_" + index)));
 				
@@ -350,38 +378,14 @@ public class TransactionController extends BaseController {
 			while (index > 0);
 		}
 		
-		// TODO: complete
-		if (! wasTransfer) {
-			if (isTransfer) {
-				// Create new parallel transaction
-			}
-		}
-		else {			
-			if (isTransfer) {
-				if (origTransferId != transferId) {
-					// Delete original parallel transaction
-					// Create parallel transaction
-				}
-			}
-			else {
-				// Delete original parallel transaction
-			}
-		}
-		
-		if (isTransfer) {
-			t.setXferId(Long.valueOf(req.getParameter("xferaccount")));
-			t.setPayee(this.payeeService.getNoPayee());
-		}
-		
-		try {
-			this.transactionService.save(t);
+		if (save(t) != null) {
 			flash = String.format("success|Transaction successfully %s", isUpdateMode ? "updated" : "added");
-			
+		
 			return new RedirectView(String.format("%s/transaction/form/%d?flash=%s", 
-					req.getContextPath(), t.getId(), Util.encodeUrl(flash)));
+				req.getContextPath(), t.getId(), Util.encodeUrl(flash)));
 		}
-		catch (Exception e) {
-			flash = String.format("failure|Missing key data [%s]", e.getMessage());
+		else {
+			flash = "failure|Failed to save transaction";
 		}
 	
 		return new RedirectView(String.format("%s/transaction/list/%d?flash=%s", 
@@ -404,5 +408,15 @@ public class TransactionController extends BaseController {
 		
 		return new RedirectView(String.format("%s/transaction/list/%d?flash=%s", 
 				req.getContextPath(), t.getAccount().getId(), Util.encodeUrl(flash)));
+	}	
+	
+	private Transaction save(Transaction t) {
+		try {
+			return this.transactionService.save(t);
+		}
+		catch (Exception e) {
+			LOG.error("Failed to save transaction", e);
+			return null;
+		}
 	}	
 }

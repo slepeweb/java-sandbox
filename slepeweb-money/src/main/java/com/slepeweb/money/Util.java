@@ -23,13 +23,17 @@ public class Util {
 	}
 	
 	public static long parsePounds(String value) {
-		if (StringUtils.isNotBlank(value)) {
-			String[] parts = value.split("\\.");
+		String val = value.trim();		
+		if (StringUtils.isNotBlank(val)) {
+			long multiplier = val.startsWith("-") ? -1L : 1L;
+
+			String[] parts = val.split("\\.");
 			if (parts.length == 1) {
 				return Long.valueOf(cleanAmount(parts[0]));
 			}
 			else if (parts.length == 2){
-				return ((Long.valueOf(cleanAmount(parts[0])).longValue() * 100) + (Long.valueOf(parts[1])).longValue());
+				return ((Long.valueOf(cleanAmount(parts[0])).longValue() * 100) + 
+						(multiplier * (Long.valueOf(parts[1])).longValue()));
 			}
 		}
 		return 0L;
@@ -108,6 +112,7 @@ public class Util {
 			return 
 					s.equalsIgnoreCase("yes") ||
 					s.equalsIgnoreCase("true") ||
+					s.equalsIgnoreCase("on") ||
 					s.equalsIgnoreCase("1");
 		}
 		
