@@ -8,8 +8,12 @@ public class SplitTransactionFormComponent {
 	private Category category;
 	private List<String> allMajors = new ArrayList<String>();
 	private List<String> allMinors = new ArrayList<String>();
-	private Long amount;
+	private long amount;
 	private String memo = "";
+	
+	public boolean isDebit() {
+		return getAmount() <= 0L;
+	}
 	
 	public Category getCategory() {
 		return category;
@@ -42,8 +46,12 @@ public class SplitTransactionFormComponent {
 		return Transaction.DF.format(amount / 100.0);
 	}
 	
-	public Long getAmount() {
+	public long getAmount() {
 		return amount;
+	}
+	
+	public long getAmountValue() {
+		return isDebit() ? getAmount() * -1L : getAmount();
 	}
 	
 	public SplitTransactionFormComponent setAmount(Long value) {

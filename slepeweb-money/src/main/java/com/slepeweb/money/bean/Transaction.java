@@ -18,12 +18,12 @@ public class Transaction extends DbEntity {
 	public static DecimalFormat DF_TOTAL = new DecimalFormat("###,###");
 	
 	private Account account;
-	private Long xferId = 0L;
+	private long xferId = 0L;
 	private Payee payee;
 	private Category category;
 	private Timestamp entered = new Timestamp(new Date().getTime());
 	private boolean split, reconciled;
-	private Long amount;
+	private long amount;
 	private String reference = "", memo = "";
 	private List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
 	
@@ -67,7 +67,7 @@ public class Transaction extends DbEntity {
 	}
 	
 	public boolean isDebit() {
-		return getAmount() == null || getAmount() < 0L;
+		return getAmount() <= 0L;
 	}
 	
 	public boolean isTransfer() {
@@ -96,15 +96,19 @@ public class Transaction extends DbEntity {
 		return this;
 	}
 	
-	public Long getAmount() {
+	public long getAmount() {
 		return amount;
+	}
+	
+	public long getAmountValue() {
+		return isDebit() ? getAmount() * -1L : getAmount();
 	}
 	
 	public String getAmountInPounds() {
 		return Transaction.DF.format(amount / 100.0);
 	}
 	
-	public Transaction setAmount(Long value) {
+	public Transaction setAmount(long value) {
 		this.amount = value;
 		return this;
 	}
@@ -122,12 +126,12 @@ public class Transaction extends DbEntity {
 //		return false;
 //	}
 
-	public Long getTransferId() {
+	public long getTransferId() {
 		return this.xferId;
 	}
 
-	public Transaction setXferId(Long transfer) {
-		this.xferId = transfer;
+	public Transaction setXferId(long id) {
+		this.xferId = id;
 		return this;
 	}
 
@@ -204,14 +208,14 @@ public class Transaction extends DbEntity {
 		int result = 1;
 		result = prime * result + ((account == null) ? 0 : account.hashCode());
 		result = prime * result + ((category == null) ? 0 : category.hashCode());
-		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
+		result = prime * result + (int) (amount ^ (amount >>> 32));
 		result = prime * result + ((entered == null) ? 0 : entered.hashCode());
 		result = prime * result + ((memo == null) ? 0 : memo.hashCode());
 		result = prime * result + ((payee == null) ? 0 : payee.hashCode());
 		result = prime * result + (reconciled ? 1231 : 1237);
 		result = prime * result + (split ? 1231 : 1237);
 		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
-		result = prime * result + ((xferId == null) ? 0 : xferId.hashCode());
+		result = prime * result + (int) (xferId ^ (xferId >>> 32));
 		return result;
 	}
 
@@ -247,12 +251,24 @@ public class Transaction extends DbEntity {
 	public boolean equals(Object obj) {
 		if (equalsBarTransferId(obj)) {
 			Transaction other = (Transaction) obj;
-			if (xferId == null) {
-				if (other.xferId != null)
-					return false;
-			} else if (!xferId.equals(other.xferId))
+			if (xferId != other.xferId)
 				return false;
-			
+//			public int hashCode() {
+//			final int prime = 31;
+//			int result = 1;
+//			result = prime * result + ((account == null) ? 0 : account.hashCode());
+//			result = prime * result + ((category == null) ? 0 : category.hashCode());
+//			result = prime * result + ((amount == null) ? 0 : amount.hashCode());
+//			result = prime * result + ((entered == null) ? 0 : entered.hashCode());
+//			result = prime * result + ((memo == null) ? 0 : memo.hashCode());
+//			result = prime * result + ((payee == null) ? 0 : payee.hashCode());
+//			result = prime * result + (reconciled ? 1231 : 1237);
+//			result = prime * result + (split ? 1231 : 1237);
+//			result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+//			result = prime * result + ((xferId == null) ? 0 : xferId.hashCode());
+//			return result;
+//		}
+
 			return true;
 		}
 
@@ -277,10 +293,7 @@ public class Transaction extends DbEntity {
 				return false;
 		} else if (!category.equals(other.category))
 			return false;
-		if (amount == null) {
-			if (other.amount != null)
-				return false;
-		} else if (!amount.equals(other.amount))
+		if (amount != other.amount)
 			return false;
 		if (entered == null) {
 			if (other.entered != null)

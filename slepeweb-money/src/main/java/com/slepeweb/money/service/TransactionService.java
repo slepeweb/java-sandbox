@@ -30,6 +30,5 @@ public interface TransactionService {
 	long getNumTransactionsForAccount(long accountId);
 	long getNumTransactionsForPayee(long payeeId);
 	long getNumTransactionsForCategory(long categoryId);
-	int delete(long id, boolean ignoreParallel);
 	int delete(long id);
 }

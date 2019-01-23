@@ -51,6 +51,7 @@ public class SolrServiceImpl implements SolrService {
 			if (this.client == null) {
 				try {
 					this.client = new HttpSolrClient(this.serverUrl);
+					this.client.ping();
 					LOG.info(String.format("Initialised solr server [%s]", this.serverUrl));
 				}
 				catch (Exception e) {
@@ -69,7 +70,7 @@ public class SolrServiceImpl implements SolrService {
 				DocumentObjectBinder binder = new DocumentObjectBinder();
 				return binder.getBean(FlatTransaction.class, doc);
 			} catch (Exception e) {
-				LOG.error("Failed to retrieve Solr document", e);
+				LOG.error(String.format("Failed to retrieve Solr document: %s", e.getMessage()));
 			}
 		}
 
@@ -100,7 +101,7 @@ public class SolrServiceImpl implements SolrService {
 				LOG.debug("Transaction(s) successfully indexed by Solr");
 				return true;
 			} catch (Exception e) {
-				LOG.error("Solr failed to index transaction(s)", e);
+				LOG.error(String.format("Solr failed to index transaction(s): %s", e.getMessage()));
 			}
 		}
 
@@ -141,7 +142,7 @@ public class SolrServiceImpl implements SolrService {
 				LOG.debug("Document(s) successfully removed from Solr index");
 				return true;
 			} catch (Exception e) {
-				LOG.error("Solr failed to remove document(s) from Solr index", e);
+				LOG.error(String.format("Solr failed to remove document(s) from Solr index: %s", e.getMessage()));
 			}
 		}
 
@@ -235,7 +236,7 @@ public class SolrServiceImpl implements SolrService {
 				} catch (Exception e) {
 					response.setError(true);
 					response.setMessage("Search system error");
-					LOG.error(response.getMessage(), e);
+					LOG.error(String.format(response.getMessage(), e.getMessage()));
 				}
 			}
 			else {

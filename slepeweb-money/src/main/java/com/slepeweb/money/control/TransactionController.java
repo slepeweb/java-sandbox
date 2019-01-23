@@ -316,7 +316,8 @@ public class TransactionController extends BaseController {
 		boolean isUpdateMode = req.getParameter("formMode").equals("update");
 		boolean isTransfer = req.getParameter("paymenttype").equals("transfer");
 		long mirrorAccountId = Util.toLong(req.getParameter("xferaccount"));
-		boolean isSplit = Util.isPositive(req.getParameter("split"));
+		boolean isSplit = req.getParameter("paymenttype").equals("split");
+		long multiplier = req.getParameter("debitorcredit").equals("debit") ? -1L : 1L;
 		
 		Account a = this.accountService.get(Util.toLong(req.getParameter("account")));
 		Payee noPayee = this.payeeService.getNoPayee();
@@ -350,7 +351,7 @@ public class TransactionController extends BaseController {
 			setAccount(a).
 			setEntered(Util.parseTimestamp(req.getParameter("entered"))).
 			setMemo(req.getParameter("memo")).
-			setAmount(Util.parsePounds(req.getParameter("amount"))).
+			setAmount(Util.parsePounds(req.getParameter("amount")) * multiplier).
 			setSplit(isSplit);
 		
 		// Note: Transfers can NOT have split transactions
@@ -365,7 +366,7 @@ public class TransactionController extends BaseController {
 							req.getParameter("major_" + index), 
 							req.getParameter("minor_" + index))).
 					setMemo(req.getParameter("memo_" + index)).
-					setAmount(Util.parsePounds(req.getParameter("amount_" + index)));
+					setAmount(Util.parsePounds(req.getParameter("amount_" + index)) * multiplier);
 				
 				if (st.isPopulated()) {
 					t.getSplits().add(st);

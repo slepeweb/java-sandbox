@@ -41,7 +41,7 @@
 		    </tr>
 
 		    <tr>
-		        <td class="heading"><label>${mon:tertiaryOp(_transaction.debit, 'From', 'To')} account</label></td>
+		        <td class="heading"><label>Account</label></td>
 		        <td>
 		        	<select name="account">
 			        	<option value="">Choose ...</option>
@@ -55,14 +55,19 @@
 		    <tr>
 		        <td class="heading"><label>Payment type</label></td>
 		        <td>
-		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="payment" ${mon:tertiaryOp(_transaction.transfer, '', 'checked=checked')} /> Payment</span>
-		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="transfer" ${mon:tertiaryOp(_transaction.transfer, 'checked=checked', '')} /> Transfer</span>
+		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="standard" 
+		        		${mon:tertiaryOp(_formMode eq 'add' or (not _transaction.split and not _transaction.transfer), 'checked=checked', '')} /> Standard</span>
+		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="split" 
+		        		${mon:tertiaryOp(_transaction.split, 'checked=checked', '')} /> Split</span>
+		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="transfer" 
+		        		${mon:tertiaryOp(_transaction.transfer, 'checked=checked', '')} /> Transfer</span>
+		        		
 		        	<c:if test="${_transaction.transfer}"><span class="radio-horiz right"><a href="${_ctxPath}/transaction/form/${_transaction.transferId}">Mirror</a></span></c:if>
 		        </td>
 		    </tr>
 
 		    <tr class="transfer">
-		        <td class="heading"><label>${mon:tertiaryOp(_transaction.debit, 'To', 'From')} account</label></td>
+		        <td class="heading"><label>Transfer a/c</label></td>
 		        <td>
 		        	<select name="xferaccount">
 			        	<option value="">Choose ...</option>
@@ -80,10 +85,10 @@
 		        </td>
 		    </tr>
 
-				<tr class="splits-q">
+				<%--<tr class="splits-q">
 		      <td class="heading"><label>Split?</label></td>
 					<td><input type="checkbox" name="split" ${mon:tertiaryOp(_transaction.split, 'checked=checked', '')} /></td>
-				</tr>
+				</tr> --%>
 								
 		    <tr class="category">
 		        <td class="heading"><label>Category</label></td>
@@ -131,7 +136,7 @@
 		        					<input type="text" name="memo_${_status.count}" placeholder="Enter any relevant notes" value="${_split.memo}" />
 		        				</td>
 		        				<td>
-		        					<input type="text" name="amount_${_status.count}" placeholder="Enter amount" value="${mon:formatPounds(_split.amount)}" />
+		        					<input type="text" name="amount_${_status.count}" placeholder="Enter amount" value="${mon:formatPounds(_split.amountValue)}" />
 		        				</td>
 		        			</tr>
 		        		</c:forEach>
@@ -146,7 +151,14 @@
 		    
 		    <tr>
 		        <td class="heading"><label>Total amount</label></td>
-		        <td><input type="text" name="amount" placeholder="Enter amount" value="${mon:formatPounds(_transaction.amount)}" /></td>
+		        <td>
+		        	<span class="inline-block radio-horiz"><input type="text" name="amount" placeholder="Enter amount" 
+		        		value="${mon:formatPounds(_transaction.amountValue)}" /></span>
+		        	<span class="radio-horiz"><input type="radio" name="debitorcredit" value="debit" 
+		        		${mon:tertiaryOp(_formMode eq 'add' or _transaction.debit, 'checked=checked', '')} /> Debit</span>
+		        	<span class="radio-horiz"><input type="radio" name="debitorcredit" value="credit" 
+		        		${mon:tertiaryOp(not _transaction.debit, 'checked=checked', '')} /> Credit</span>
+		        </td>
 		    </tr>
 
 			</table> 
@@ -216,31 +228,25 @@
 			});
 		});
 		
-		var _setComponentVisibilities = function() {
-				
-				if ($("input[name='paymenttype']:checked").val() == "transfer") {
-					// Set from for transfer between accounts
-					$(".payee td, .category td, .splits-q td, .splits-list td").css("display", "none");
-					$(".transfer td").css("display", "table-cell");
-				}
-				else {
-					// Set form for a payment
-					$(".payee td, .category td, .splits-q td").css("display", "table-cell");
-					$(".transfer td").css("display", "none");
-					
-					// Is it a split-payment?
-					if ($("input[name='split']").prop("checked")) {
-						$(".category td").css("display", "none");
-						$(".splits-list td").css("display", "table-cell");
-					}
-					else {
-						$(".splits-list td").css("display", "none");
-						$(".category td").css("display", "table-cell");
-					}
-				}
+		var _setComponentVisibilities = function() {				
+			var paymentType = $("input[name='paymenttype']:checked").val();
+			
+			if (paymentType == "standard") {
+				// Set form for a standard/normal transaction
+				$(".payee td, .category td").css("display", "table-cell");
+				$(".transfer td, .splits-list td").css("display", "none");
+			}
+			else if (paymentType == "transfer") {
+				$(".payee td, .category td, .splits-list td").css("display", "none");
+				$(".transfer td").css("display", "table-cell");
+			}
+			else if (paymentType == "split") {				
+				$(".category td").css("display", "none");
+				$(".splits-list td").css("display", "table-cell");
+			}
 		}
 		
-		$("input[name='split'], input[name='paymenttype']").change(function(e) {	
+		$("input[name='paymenttype']").change(function(e) {	
 			_setComponentVisibilities();
 		});
 		

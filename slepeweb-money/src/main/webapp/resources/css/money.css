@@ -727,6 +727,9 @@ input[type="button"]:disabled,
 #trn-form tr td:first-child {
   width: 130px;
 }
+#trn-form tr input[name="amount"] {
+  width: 130px;
+}
 
 .pager {
   margin-right: 1em;

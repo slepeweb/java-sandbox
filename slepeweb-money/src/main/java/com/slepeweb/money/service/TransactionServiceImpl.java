@@ -277,7 +277,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			t.setSplits(this.splitTransactionService.get(t));
 		}
 		
-		if (t != null && t.getTransferId() != null && t.getTransferId() > 0) {
+		if (t != null && t.getTransferId() > 0) {
 			Transaction mirror = (Transaction) getFirstInList(this.jdbcTemplate.query(
 					SELECT + "where t.id = ?", new Object[]{t.getTransferId()}, new RowMapperUtil.TransactionMapper()));
 			Account mirrorAccount = this.accountService.get(mirror.getAccount().getId());
@@ -402,14 +402,13 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return delete(id, false);
 	}
 	
-	public int delete(long id, boolean ignoreMirror) {
+	private int delete(long id, boolean ignoreMirror) {
 		// First check whether this is a transfer; if so, delete the parallel transaction too
 		int num = 0;
 		Transaction t = get(id);
 		
 		if (! ignoreMirror && t.isTransfer()) {
-			num += this.jdbcTemplate.update("delete from transaction where id = ?", t.getTransferId());
-			this.solrService.removeTransactionsById(t.getTransferId());
+			num += delete(t.getTransferId(), true);
 		}
 		
 		num += this.jdbcTemplate.update("delete from transaction where id = ?", id);		
