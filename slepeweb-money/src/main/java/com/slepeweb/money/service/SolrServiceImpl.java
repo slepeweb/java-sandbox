@@ -33,7 +33,6 @@ public class SolrServiceImpl implements SolrService {
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
 	@Autowired private CategoryService categoryService;
-	@Autowired private TransactionService transactionService;
 
 	//@Value("${solr.enabled:no}") 
 	private String solrIsEnabled = "yes";
@@ -52,11 +51,10 @@ public class SolrServiceImpl implements SolrService {
 				try {
 					this.client = new HttpSolrClient(this.serverUrl);
 					this.client.ping();
-					LOG.info(String.format("Initialised solr server [%s]", this.serverUrl));
+					LOG.info(String.format("Solr server is available [%s]", this.serverUrl));
 				}
 				catch (Exception e) {
-					LOG.error("Failed to initialise Solr");
-					this.solrIsEnabled = "no";
+					LOG.error(String.format("Solr server is NOT available [%s]: %s", this.serverUrl, e.getMessage()));
 				}
 			}
 		}
@@ -70,7 +68,7 @@ public class SolrServiceImpl implements SolrService {
 				DocumentObjectBinder binder = new DocumentObjectBinder();
 				return binder.getBean(FlatTransaction.class, doc);
 			} catch (Exception e) {
-				LOG.error(String.format("Failed to retrieve Solr document: %s", e.getMessage()));
+				LOG.error(String.format("Failed to retrieve document: %s", e.getMessage()));
 			}
 		}
 
@@ -80,9 +78,11 @@ public class SolrServiceImpl implements SolrService {
 	public boolean save(Transaction t) {
 		if (isEnabled()) {
 			try {
-				// Remove all documents matching this transaction's id. This is possibly
-				// the simplest way of dealing with changes in splits
-				removeTransactionsById(t.getId());
+				if (t.getPrevious() != null && t.getPrevious().isSplit()) {
+					if (! removeChildTransactionsById(t.getId())) {
+						return false;
+					}
+				}
 				
 				// Make a solr document representing the transaction
 				FlatTransaction parent = makeDoc(t);
@@ -92,25 +92,30 @@ public class SolrServiceImpl implements SolrService {
 					getClient().addBeans(makeDocsFromSplits(t));
 					parent.setType(1);
 				}
-				else if (t.isTransfer()) {
-					getClient().addBean(makeDoc(this.transactionService.get(t.getTransferId())));
-				}
 
 				getClient().addBean(parent);
-				this.client.commit();
-				LOG.debug("Transaction(s) successfully indexed by Solr");
-				return true;
-			} catch (Exception e) {
-				LOG.error(String.format("Solr failed to index transaction(s): %s", e.getMessage()));
+				
+				if (commit()) {
+					LOG.info(String.format("Transaction indexed by Solr [%d]", t.getId()));
+					return true;
+				}
+			} 
+			catch (Exception e) {
+				LOG.error(String.format("Solr failed to index transaction(s): %s [%d]", e.getMessage(), t.getId()));
 			}
 		}
 
 		return false;
 	}
+	
+	private boolean removeChildTransactionsById(long transactionId) {
+		// Note that split transactions have an id that begins with the parent transaction
+		return removeTransactions(String.format("id:%d-*", transactionId));
+	}
 
 	public boolean removeTransactionsById(long transactionId) {
-		// Note that split transactions have an id that begins with the parent transaction
-		return removeTransactions(String.format("id:%d*", transactionId));
+		return removeTransactions(String.format("id:%d", transactionId)) &&
+				removeChildTransactionsById(transactionId);
 	}
 
 	public boolean removeTransactionsByAccount(String name) {
@@ -138,11 +143,10 @@ public class SolrServiceImpl implements SolrService {
 			try {
 				// Note that split transactions have an id that begins with the parent transaction
 				getClient().deleteByQuery(query);
-				this.client.commit();
-				LOG.debug("Document(s) successfully removed from Solr index");
+				LOG.debug(String.format("Document(s) removed from Solr [%s]", query));
 				return true;
 			} catch (Exception e) {
-				LOG.error(String.format("Solr failed to remove document(s) from Solr index: %s", e.getMessage()));
+				LOG.error(String.format("Solr failed to remove document(s) from Solr: %s [%s]", e.getMessage(), query));
 			}
 		}
 
@@ -298,5 +302,18 @@ public class SolrServiceImpl implements SolrService {
 			sb.append(SPACE);
 		}
 		sb.append(s);
+	}
+	
+	public boolean commit() {
+		if (isEnabled()) {
+			try {
+				this.client.commit();
+				LOG.info("Solr successfully committed changes");
+				return true;
+			} catch (Exception e) {
+				LOG.error(String.format("Solr failed to commit changes: %s", e.getMessage()));
+			}
+		}
+		return false;
 	}
 }

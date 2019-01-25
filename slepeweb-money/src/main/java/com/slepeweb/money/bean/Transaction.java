@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.slepeweb.money.Util;
 
-public class Transaction extends DbEntity {
+public class Transaction extends DbEntity implements Cloneable {
 	
 	public static SimpleDateFormat SDF = new SimpleDateFormat("dd/MM''yyyy");
 	public static NumberFormat NF = NumberFormat.getInstance();
@@ -26,6 +26,7 @@ public class Transaction extends DbEntity {
 	private long amount;
 	private String reference = "", memo = "";
 	private List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
+	private Transaction previous;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Transaction) {
@@ -47,6 +48,14 @@ public class Transaction extends DbEntity {
 		target.setOrigId(source.getOrigId());
 		target.setSplit(source.isSplit());
 		target.setSplits(source.getSplits());
+	}
+	
+	@Override 
+	public Object clone() throws CloneNotSupportedException {
+		Transaction t = new Transaction();
+		t.assimilate(this);
+		t.setId(getId());
+		return t;
 	}
 	
 	public boolean isDefined4Insert() {
@@ -199,6 +208,15 @@ public class Transaction extends DbEntity {
 	@Override
 	public Transaction setOrigId(long id) {
 		super.setOrigId(id);
+		return this;
+	}
+
+	public Transaction getPrevious() {
+		return previous;
+	}
+
+	public Transaction setPrevious(Transaction previous) {
+		this.previous = previous;
 		return this;
 	}
 

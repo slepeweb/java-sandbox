@@ -82,15 +82,21 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		Account mirrorAccount = null;
 		boolean isTransfer = pt instanceof Transfer;
 		Transfer tt = null;
+		Transaction previous = null;
 		
 		if (isTransfer) {
 			tt = (Transfer) pt;
 			mirrorAccount = tt.getMirrorAccount();
 		}
 		
-		Transaction originalTransaction = get(pt.getId());
+		try {
+			previous = (Transaction) pt.clone();
+		}
+		catch (CloneNotSupportedException e) {
+			LOG.error(String.format("Failed to clone transaction [%s]: %s", pt, e.getMessage()));
+		}
+		
 		Transaction mirror = null;
-		long originalTransferId = originalTransaction == null ? 0L : originalTransaction.getTransferId();
 		
 		if (pt.isDefined4Insert()) {
 			Transaction t;
@@ -110,16 +116,20 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			
 			// Also save this transaction's splits, if any
 			t = this.splitTransactionService.save(t);			
+			t.setPrevious(previous);
 			
 			// Manage mirror transaction, as applicable, including Solr updates for same
 			if (! ignoreMirror) {
-				mirror = manageMirror(t, originalTransferId, mirrorAccount);
+				mirror = manageMirror(t, mirrorAccount);
 				
 				if (mirror != null) {
+					// Recursive call to save(), but for the mirror transaction
 					mirror = save(mirror, true);
 					
-					// Bind two transactions together
-					t = save(t.setXferId(mirror.getId()));
+					// Bind two transactions together.
+					// Note that mirror is already bound to t, by manageMirror().
+					t.setXferId(mirror.getId());
+					updateTransfer(t.getId(), mirror.getId());
 				}
 			}
 			
@@ -143,27 +153,31 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	 * 
 	 * Must only be called for Transfer objects, and NOT Transaction objects.
 	 */
-	private Transaction manageMirror(Transaction t, long originalTransferId, Account mirrorAccount) 
+	private Transaction manageMirror(Transaction t, Account mirrorAccount) 
 			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		
-		Transaction mirror = null;
-		
-		if (originalTransferId > 0 && mirrorAccount == null) {
-			// Case 3) delete the original mirror transaction
-			delete(originalTransferId, true);
-			this.solrService.removeTransactionsById(originalTransferId);
+		if (t.getPrevious() == null) {
+			LOG.error("Usage error: Transaction t must have 'previous' property set");
+			return null;
 		}
-		else if (originalTransferId == 0 && mirrorAccount != null) {
+		
+		Transaction mirror = null;
+		long previousTransferId = t.getPrevious().getTransferId();
+		
+		if (previousTransferId > 0 && mirrorAccount == null) {
+			// Case 3) delete the original mirror transaction
+			delete(previousTransferId, true);
+			this.solrService.removeTransactionsById(previousTransferId);
+		}
+		else if (previousTransferId == 0 && mirrorAccount != null) {
 			// Case 1) create a new mirror transaction
 			mirror = mirrorTransaction(t, new Transaction(), mirrorAccount);
-			this.solrService.save(mirror);
 		}
-		else if (originalTransferId > 0 && mirrorAccount != null) {
+		else if (previousTransferId > 0 && mirrorAccount != null) {
 			// Case 2) update an existing mirror
-			Transaction origMirrorTransaction = get(originalTransferId);
+			Transaction origMirrorTransaction = get(previousTransferId);
 			if (origMirrorTransaction != null) {
 				mirror = mirrorTransaction(t, origMirrorTransaction, mirrorAccount);
-				this.solrService.save(mirror);
 			}
 		}
 		
@@ -237,7 +251,6 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			LOG.debug(compose("Transaction not modified", t));
 		}
 		
-		this.solrService.save(dbRecord);
 		return dbRecord;
 	}
 
@@ -249,16 +262,16 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		LOG.info(compose("Updated split flag for transaction", t));
 	}
 
-	public void updateTransfer(Long from, Long to) {
+	public void updateTransfer(Long id, Long mirrorId) {
 		this.jdbcTemplate.update(
 				"update transaction set transferid = ? where id = ?", 
-				to, from);
+				mirrorId, id);
 		
 		this.jdbcTemplate.update(
 				"update transaction set transferid = ? where id = ?", 
-				from, to);
+				id, mirrorId);
 		
-		LOG.info(compose("Updated transfer details", from, to));
+		LOG.info(compose("Updated transfer details", id, mirrorId));
 	}
 
 	public Transaction get(long id) {
@@ -412,7 +425,6 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		}
 		
 		num += this.jdbcTemplate.update("delete from transaction where id = ?", id);		
-		this.solrService.removeTransactionsById(id);
 		return num;
 	}	
 }
