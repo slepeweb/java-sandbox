@@ -14,8 +14,8 @@ public class FlatTransaction {
 	@Field("amount") private Long amount;
 	@Field("account") private String account;
 	@Field("payee") private String payee;
-	@Field("major") private String majorCategory;
-	@Field("minor") private String minorCategory;
+	@Field("major") private String majorCategory = "";
+	@Field("minor") private String minorCategory = "";
 	@Field("memo") private String memo;
 	
 	/*

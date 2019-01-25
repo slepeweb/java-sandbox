@@ -80,7 +80,7 @@ public class Transaction extends DbEntity implements Cloneable {
 	}
 	
 	public boolean isTransfer() {
-		return this instanceof Transfer;
+		return this instanceof Transfer || getTransferId() > 0L;
 	}
 	
 	public Account getAccount() {

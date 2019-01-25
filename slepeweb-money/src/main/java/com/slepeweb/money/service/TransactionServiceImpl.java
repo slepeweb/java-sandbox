@@ -84,16 +84,13 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		Transfer tt = null;
 		Transaction previous = null;
 		
+		if (pt.getId() > 0) {
+			previous = get(pt.getId());
+		}
+		
 		if (isTransfer) {
 			tt = (Transfer) pt;
 			mirrorAccount = tt.getMirrorAccount();
-		}
-		
-		try {
-			previous = (Transaction) pt.clone();
-		}
-		catch (CloneNotSupportedException e) {
-			LOG.error(String.format("Failed to clone transaction [%s]: %s", pt, e.getMessage()));
 		}
 		
 		Transaction mirror = null;
@@ -156,17 +153,16 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	private Transaction manageMirror(Transaction t, Account mirrorAccount) 
 			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		
-		if (t.getPrevious() == null) {
-			LOG.error("Usage error: Transaction t must have 'previous' property set");
-			return null;
-		}
-		
 		Transaction mirror = null;
-		long previousTransferId = t.getPrevious().getTransferId();
+		long previousTransferId = 0L;
+		
+		if (t.getPrevious() != null) {
+			previousTransferId = t.getPrevious().getTransferId();
+		}		
 		
 		if (previousTransferId > 0 && mirrorAccount == null) {
 			// Case 3) delete the original mirror transaction
-			delete(previousTransferId, true);
+			LOG.info(String.format("Deleted %d transaction(s)", delete(previousTransferId, true)));
 			this.solrService.removeTransactionsById(previousTransferId);
 		}
 		else if (previousTransferId == 0 && mirrorAccount != null) {
@@ -290,12 +286,15 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			t.setSplits(this.splitTransactionService.get(t));
 		}
 		
-		if (t != null && t.getTransferId() > 0) {
+		if (t != null && t.isTransfer()) {
 			Transaction mirror = (Transaction) getFirstInList(this.jdbcTemplate.query(
 					SELECT + "where t.id = ?", new Object[]{t.getTransferId()}, new RowMapperUtil.TransactionMapper()));
-			Account mirrorAccount = this.accountService.get(mirror.getAccount().getId());
-			Transfer tt = new Transfer(t).setMirrorAccount(mirrorAccount);
-			return tt;
+			
+			if (mirror != null) {
+				Account mirrorAccount = this.accountService.get(mirror.getAccount().getId());
+				Transfer tt = new Transfer(t).setMirrorAccount(mirrorAccount);
+				return tt;
+			}
 		}
 		
 		return t;
