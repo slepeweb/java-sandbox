@@ -5,7 +5,7 @@ public class RunningBalance extends Transaction {
 	private String balance;
 	
 	public RunningBalance(Transaction t) {
-		assimilate(t, this);
+		assimilate(t);
 		setId(t.getId());
 	}
 

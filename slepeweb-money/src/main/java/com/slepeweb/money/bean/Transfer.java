@@ -10,7 +10,7 @@ public class Transfer extends Transaction {
 	public Transfer() {}
 	
 	public Transfer(Transaction t) {
-		assimilate(t, this);
+		assimilate(t);
 		setId(t.getId());
 		setOrigId(t.getOrigId());
 	}
@@ -19,7 +19,7 @@ public class Transfer extends Transaction {
 	public void assimilate(Object obj) {
 		if (obj instanceof Transaction) {
 			Transaction t = (Transaction) obj;
-			super.assimilate(t, this);
+			super.assimilate(t);
 		}
 		
 		if (obj instanceof Transfer) {

@@ -66,11 +66,15 @@
 				<td class="date"><a href="${_ctxPath}/transaction/form/${_trn.id}">${_trn.enteredStr}</a></td>
 				<td class="payee">${_trn.payee.name}</td>
 				
-				<c:choose><c:when test="${not _trn.split}">
-					<td class="payee">${_trn.category}</td>
+				<c:choose><c:when test="${not _trn.split and not _trn.transfer}">
+					<td class="category">${_trn.category}</td>
 					<td class="currency amount">${_trn.amountInPounds}</td>
 					<td class="memo">${_trn.memo}</td>
-				</c:when><c:otherwise>
+				</c:when><c:when test="${_trn.transfer}">
+					<td class="category">Transfer</td>
+					<td class="currency amount">${_trn.amountInPounds}</td>
+					<td class="memo">${_trn.memo}</td>
+				</c:when><c:when test="${_trn.split}">
 					<td>(Split transaction) Total:<br />
 						<c:forEach items="${_trn.splits}" var="_split">
 								${_split.category}<br />
@@ -86,7 +90,7 @@
 								${_split.memo}<br />
 						</c:forEach>						
 					</td>
-				</c:otherwise></c:choose>
+				</c:when></c:choose>
 				
 				<td class="currency amount">${_trn.balance}</td>
 			</tr>

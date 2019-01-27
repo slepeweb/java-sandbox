@@ -36,6 +36,7 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 			
 			// Insert latest splits
 			for (SplitTransaction st : revisedList) {
+				st.setTransactionId(t.getId());
 				if (st.isDefined4Insert()) {
 					t.getSplits().add(insert(st));
 				}
@@ -57,6 +58,7 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 					st.getTransactionId(), st.getCategory().getId(), st.getAmount(), st.getMemo());
 			
 			LOG.info(compose("Added new split transaction", st));		
+			st.setId(getLastInsertId());	
 			return st;
 		}
 		catch (DuplicateKeyException e) {

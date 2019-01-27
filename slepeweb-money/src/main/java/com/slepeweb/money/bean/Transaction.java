@@ -29,25 +29,27 @@ public class Transaction extends DbEntity implements Cloneable {
 	private Transaction previous;
 	
 	public void assimilate(Object obj) {
-		if (obj instanceof Transaction) {
-			Transaction t = (Transaction) obj;
-			assimilate(t, this);
-		}
+		Transaction source = (Transaction) obj;
+		setAccount(source.getAccount());
+		setPayee(source.getPayee());
+		setCategory(source.getCategory());
+		setEntered(source.getEntered());
+		setXferId(source.getTransferId());
+		setReconciled(source.isReconciled());
+		setAmount(source.getAmount());
+		setReference(source.getReference());
+		setMemo(source.getMemo());
+		setOrigId(source.getOrigId());
+		setSplit(source.isSplit());
+		
+		assimilateSplits(source);
 	}
 	
-	protected void assimilate(Transaction source, Transaction target) {
-		target.setAccount(source.getAccount());
-		target.setPayee(source.getPayee());
-		target.setCategory(source.getCategory());
-		target.setEntered(source.getEntered());
-		target.setXferId(source.getTransferId());
-		target.setReconciled(source.isReconciled());
-		target.setAmount(source.getAmount());
-		target.setReference(source.getReference());
-		target.setMemo(source.getMemo());
-		target.setOrigId(source.getOrigId());
-		target.setSplit(source.isSplit());
-		target.setSplits(source.getSplits());
+	public void assimilateSplits(Transaction source) {
+		getSplits().clear();
+		for (SplitTransaction st : source.getSplits()) {
+			getSplits().add(st.setTransactionId(getId()));
+		}
 	}
 	
 	@Override 

@@ -69,6 +69,10 @@ public class Util {
 		return new Timestamp(c.getTimeInMillis());
 	}
 	
+	public static Timestamp now() {
+		return today(Calendar.getInstance());
+	}
+	
 	public static void zeroTimeOfDay(Calendar c) {
 		c.set(Calendar.HOUR_OF_DAY, 0);
 		c.set(Calendar.MINUTE, 0);

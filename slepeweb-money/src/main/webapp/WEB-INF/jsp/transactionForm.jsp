@@ -13,12 +13,13 @@
 	<c:set var="_pageHeading" value="Update transaction" />
 	</c:if>
 	
-	<c:if test="${_formMode eq 'update'}">
-		<div class="right">
+	<div class="right">
+		<c:if test="${_formMode eq 'update'}">
 			<a href="../add">New transaction</a><br />
-			<a href="../list/${_transaction.account.id}">List transactions</a>
-		</div>
-	</c:if>
+			<a href="../copy/${_transaction.id}">Copy this transaction</a><br />
+		</c:if>
+		<a href="../list/${_transaction.account.id}">List transactions</a>
+	</div>
 	
 	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	

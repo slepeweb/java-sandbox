@@ -112,7 +112,10 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			}
 			
 			// Also save this transaction's splits, if any
-			t = this.splitTransactionService.save(t);			
+			t = this.splitTransactionService.save(t);
+			
+			// Keep a reference to the previous revision of this transaction, for
+			// when we update mirror transactions
 			t.setPrevious(previous);
 			
 			// Manage mirror transaction, as applicable, including Solr updates for same

@@ -120,7 +120,7 @@ public class TransactionController extends BaseController {
 			
 			if (t.isTransfer() && StringUtils.isBlank(t.getMemo())) {
 				Transaction tt = this.transactionService.get(t.getTransferId());
-				t.setMemo(String.format("(%s '%s')", t.getAmount() < 0 ? "To " : "From ", tt.getAccount().getName()));
+				t.setMemo(String.format("%s '%s'", t.isDebit() ? "To " : "From ", tt.getAccount().getName()));
 			}
 			
 			tl.getRunningBalances()[numTransactions - i - 1] = new RunningBalance(t).setBalance(Util.formatPounds(balance));
@@ -258,12 +258,19 @@ public class TransactionController extends BaseController {
 		return "transactionForm";
 	}
 	
-	private void populateForm(ModelMap model, Transaction t, String mode) {		
+	private void populateForm(ModelMap model, Transaction t, String mode) {	
+		
+		List<Account> allAccounts = this.accountService.getAll(false);
+		if (! allAccounts.contains(t.getAccount())) {
+			allAccounts.add(t.getAccount());
+		}
+		
 		model.addAttribute("_transaction", t);
 		model.addAttribute("_formMode", mode);
-		model.addAttribute("_allAccounts", this.accountService.getAll(false));
+		model.addAttribute("_allAccounts", allAccounts);
 		model.addAttribute("_allPayees", this.payeeService.getAll());
 		model.addAttribute("_numDeletableTransactions", 0);
+		
 		
 		List<String> allMajors = this.categoryService.getAllMajorValues();
 		model.addAttribute("_allMajorCategories", allMajors);
@@ -304,8 +311,11 @@ public class TransactionController extends BaseController {
 		model.addAttribute("_allSplits", arr);
 		
 		if (t.isTransfer()) {
-			Account to = this.transactionService.get(t.getTransferId()).getAccount();
-			model.addAttribute("_xferAccount", to);	
+			Transfer tt = (Transfer) t;
+			model.addAttribute("_xferAccount", tt.getMirrorAccount());
+			if (! allAccounts.contains(tt.getMirrorAccount())) {
+				allAccounts.add(tt.getMirrorAccount());
+			}
 		}
 	}
 	
@@ -368,6 +378,7 @@ public class TransactionController extends BaseController {
 					setMemo(req.getParameter("memo_" + index)).
 					setAmount(Util.parsePounds(req.getParameter("amount_" + index)) * multiplier);
 				
+				// The transactionId for each SplitTransaction will be assigned within TransactionService.save(t).
 				if (st.isPopulated()) {
 					t.getSplits().add(st);
 					index++;
@@ -409,6 +420,13 @@ public class TransactionController extends BaseController {
 		
 		return new RedirectView(String.format("%s/transaction/list/%d?flash=%s", 
 				req.getContextPath(), t.getAccount().getId(), Util.encodeUrl(flash)));
+	}	
+	
+	@RequestMapping(value="/copy/{transactionId}", method=RequestMethod.GET)
+	public String copy(@PathVariable long transactionId, HttpServletRequest req, ModelMap model) {
+		populateForm(model, this.transactionService.get(transactionId).
+				setId(0L).setOrigId(0L).setEntered(Util.now()), "add");
+		return "transactionForm";
 	}	
 	
 	private Transaction save(Transaction t) {
