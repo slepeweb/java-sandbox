@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RestResponse;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
+import com.slepeweb.money.service.SolrService;
 
 
 @Controller
@@ -25,6 +27,7 @@ public class RestController extends BaseController {
 	//private static Logger LOG = Logger.getLogger(SiteRestController.class);
 	@Autowired private CategoryService categoryService;
 	@Autowired private PayeeService payeeService;
+	@Autowired private SolrService solrService;
 
 	@RequestMapping(value="/category/minor/list/{major}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
@@ -43,5 +46,11 @@ public class RestController extends BaseController {
 		}
 		
 		return allPayeeNames;
+	}
+	
+	@RequestMapping(value="/transaction/latest/bypayee/{payeeName}", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public FlatTransaction getRecentTransaction(@PathVariable String payeeName, ModelMap model) {	
+		return this.solrService.queryLatestTransactionByPayee(payeeName);
 	}
 }

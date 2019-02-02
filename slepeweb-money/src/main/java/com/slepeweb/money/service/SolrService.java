@@ -13,4 +13,5 @@ public interface SolrService {
 	boolean removeTransactionsByCategory(String major, String minor);
 	SolrResponse<FlatTransaction> query(SolrParams p);
 	FlatTransaction getDocument(long transactionId);
+	FlatTransaction queryLatestTransactionByPayee(String payee);
 }

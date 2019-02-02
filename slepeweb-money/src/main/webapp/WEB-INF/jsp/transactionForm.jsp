@@ -2,6 +2,11 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<c:set var="_extraCss" scope="request">
+	.ui-autocomplete-loading {
+		background: white url("${_ctxPath}/resources/images/progress-indicator.gif") right center no-repeat;
+	}
+</c:set>
 <mny:flash />
 	
 <mny:standardLayout>
@@ -28,28 +33,28 @@
 	    <table id="trn-form">
 	    	<c:if test="${_formMode eq 'update'}">
 			    <tr class="opaque50">
-			        <td class="heading"><label>Id</label></td>
-			        <td><input type="text" readonly name="identifier" value="${_transaction.id}" /></td>
+			        <td class="heading"><label for="identifier">Id</label></td>
+			        <td><input id="identifier" type="text" readonly name="identifier" value="${_transaction.id}" /></td>
 			    </tr>
 			    
 			    <c:if test="${_transaction.origId gt 0}">
 				    <tr class="opaque50">
-				        <td class="heading"><label>Original id</label></td>
-				        <td><input type="text" readonly name="origid" value="${_transaction.origId}" /></td>
+				        <td class="heading"><label for="origid">Original id</label></td>
+				        <td><input id="origid" type="text" readonly name="origid" value="${_transaction.origId}" /></td>
 				    </tr>
 			    </c:if>
 		    </c:if>
 		    
 		    <tr>
-		        <td class="heading"><label>Date</label></td>
-		        <td><input type="text" class="datepicker" name="entered" 
+		        <td class="heading"><label for="entered">Date</label></td>
+		        <td><input id="entered" type="text" class="datepicker" name="entered" 
 		        	placeholder="Enter transaction date" value="${mon:formatTimestamp(_transaction.entered)}" /></td>
 		    </tr>
 
 		    <tr>
-		        <td class="heading"><label>Account</label></td>
+		        <td class="heading"><label for="account">Account</label></td>
 		        <td>
-		        	<select name="account">
+		        	<select id="account" name="account">
 			        	<option value="">Choose ...</option>
 			        	<c:forEach items="${_allAccounts}" var="_a">
 			        		<option value="${_a.id}" <c:if test="${_a.id eq _transaction.account.id}">selected</c:if>>${_a.name}</option>
@@ -61,11 +66,11 @@
 		    <tr>
 		        <td class="heading"><label>Payment type</label></td>
 		        <td>
-		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="standard" 
+		        	<span class="radio-horiz"><input id="standard" type="radio" name="paymenttype" value="standard" 
 		        		${mon:tertiaryOp(_formMode eq 'add' or (not _transaction.split and not _transaction.transfer), 'checked=checked', '')} /> Standard</span>
-		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="split" 
+		        	<span class="radio-horiz"><input id="split" type="radio" name="paymenttype" value="split" 
 		        		${mon:tertiaryOp(_transaction.split, 'checked=checked', '')} /> Split</span>
-		        	<span class="radio-horiz"><input type="radio" name="paymenttype" value="transfer" 
+		        	<span class="radio-horiz"><input id="transfer" type="radio" name="paymenttype" value="transfer" 
 		        		${mon:tertiaryOp(_transaction.transfer, 'checked=checked', '')} /> Transfer</span>
 		        		
 		        	<c:if test="${_transaction.transfer}"><span class="radio-horiz right"><a href="${_ctxPath}/transaction/form/${_transaction.transferId}">Mirror</a></span></c:if>
@@ -73,9 +78,9 @@
 		    </tr>
 
 		    <tr class="transfer">
-		        <td class="heading"><label>Transfer a/c</label></td>
+		        <td class="heading"><label for="xferaccount">Transfer a/c</label></td>
 		        <td>
-		        	<select name="xferaccount">
+		        	<select id="xferaccount" name="xferaccount">
 			        	<option value="">Choose ...</option>
 			        	<c:forEach items="${_allAccounts}" var="_a">
 			        		<option value="${_a.id}" <c:if test="${_transaction.transfer and _a.id eq _transaction.mirrorAccount.id}">selected</c:if>>${_a.name}</option>
@@ -85,9 +90,9 @@
 		    </tr>
 
 		    <tr class="payee">
-		        <td class="heading"><label>Payee</label></td>
+		        <td class="heading"><label for="payee">Payee</label></td>
 		        <td>
-		         	 <input type="text" id="payee-selector" name="payee" value="${_transaction.payee.name}" />
+		         	 <input id="payee" type="text" name="payee" value="${_transaction.payee.name}" />
 		        </td>
 		    </tr>
 
@@ -97,9 +102,9 @@
 				</tr> --%>
 								
 		    <tr class="category">
-		        <td class="heading"><label>Category</label></td>
+		        <td class="heading"><label for="major">Category</label></td>
 		        <td>
-		        	<select name="major">
+		        	<select id="major" name="major">
 			        	<c:forEach items="${_allMajorCategories}" var="_c">
 			        		<option value="${_c}" <c:if test="${_c eq _transaction.category.major}">selected</c:if>>${_c}</option>
 			        	</c:forEach>
@@ -108,9 +113,9 @@
 		    </tr>
 
 		    <tr class="category">
-		        <td class="heading"><label>Sub-category</label></td>
+		        <td class="heading"><label for="minor">Sub-category</label></td>
 		        <td>
-		        	<select name="minor">
+		        	<select id="minor" name="minor">
 			        	<c:forEach items="${_allMinorCategories}" var="_c">
 			        		<option value="${_c}" <c:if test="${_c eq _transaction.category.minor}">selected</c:if>>${_c}</option>
 			        	</c:forEach>
@@ -151,18 +156,18 @@
 		    </tr>
 		    
 		    <tr>
-		        <td class="heading"><label>Notes</label></td>
-		        <td><input type="text" name="memo" placeholder="Enter any relevant notes" value="${_transaction.memo}" /></td>
+		        <td class="heading"><label for="memo">Notes</label></td>
+		        <td><input id="memo" type="text" name="memo" placeholder="Enter any relevant notes" value="${_transaction.memo}" /></td>
 		    </tr>
 		    
 		    <tr>
-		        <td class="heading"><label>Total amount</label></td>
+		        <td class="heading"><label for="amount">Total amount</label></td>
 		        <td>
-		        	<span class="inline-block radio-horiz"><input type="text" name="amount" placeholder="Enter amount" 
+		        	<span class="inline-block radio-horiz"><input id="amount" type="text" name="amount" placeholder="Enter amount" 
 		        		value="${mon:formatPounds(_transaction.amountValue)}" /></span>
-		        	<span class="radio-horiz"><input type="radio" name="debitorcredit" value="debit" 
+		        	<span class="radio-horiz"><input id="debit" type="radio" name="debitorcredit" value="debit" 
 		        		${mon:tertiaryOp(_formMode eq 'add' or _transaction.debit, 'checked=checked', '')} /> Debit</span>
-		        	<span class="radio-horiz"><input type="radio" name="debitorcredit" value="credit" 
+		        	<span class="radio-horiz"><input id="credit" type="radio" name="debitorcredit" value="credit" 
 		        		${mon:tertiaryOp(not _transaction.debit, 'checked=checked', '')} /> Credit</span>
 		        </td>
 		    </tr>
@@ -197,30 +202,34 @@
 	    dataType: "json",
 	    success: function(data) {
 	      // init the widget with response data and let it do the filtering
-	      $("#payee-selector").autocomplete({
+	      $("#payee").autocomplete({
 	        source: data,
 	        minLength: 2
 	      });
 	    },
 	    error: function(x, t, m) {
 	      console.trace();
+	      /*
 	      if (!(console == 'undefined')) {
 	        console.log("ERROR: " + x + t + m);
 	      }
 	      console.log(" At the end");
+	      */
 	    }
 	  });
-		  
-	  $("select[name^='major']").change(function(e) {	
-			var major = $(this).find(":selected").val();
-			var name = $(this).attr("name");
+	  
+	  var _updateMinorCategories = function() {
+		  var deferred = $.Deferred();
+		  var majorEle = $("select[name^='major']");
+			var majorVal = majorEle.find(":selected").val();
+			var name = majorEle.attr("name");
 			var split = name.length > 5;
 			var index = -1;
 			if (split) {
 				index = name.substring("major".length + 1);
 			}
 			
-			$.ajax(webContext + "/rest/category/minor/list/" + major, {
+			$.ajax(webContext + "/rest/category/minor/list/" + majorVal, {
 				type: "GET",
 				cache: false,
 				dataType: "json",
@@ -230,10 +239,79 @@
 					$.each(obj.data, function(index, minor) {
 						select.append("<option value='" + minor + "'>" + minor + "</option>");
 					});
+					
+					deferred.resolve("Categories updated");
+				},
+				error: function(x, t, m) {
+					deferred.reject(x + t + m);
 				}
 			});
+			
+			return deferred.promise();
+	  }
+		  
+	  $("select[name^='major']").change(function(e) {	
+		  var promet = _updateMinorCategories();
+		  promet.done(function(res){
+			  //window.alert(res);
+		  });
+		  
+		  promet.fail(function(res){
+			  //window.alert(res);
+		  });
 		});
 		
+	  $("#payee").change(function(e) {	
+			var payeeName = $(this).val();
+			var major = $("select[name='major']").find(":selected").val();
+			var memo = $("input[name='memo']").val();
+			
+			if (! major) {
+		  	$.ajax({
+			    url: webContext + "/rest/transaction/latest/bypayee/" + payeeName,
+			    type: "GET",
+			    contentType: "application/json",
+			    dataType: "json",
+			    success: function(trn) {
+			      $("select[name='major']").val(trn.majorCategory);
+					  var promet = _updateMinorCategories();
+					  promet.done(function(res) {						  
+					      if (! memo) {
+						      $("input[name='memo']").val(trn.memo);
+					      }
+					      $("select[name='minor']").val(trn.minorCategory);
+					      
+					      var amountStr = trn.amountInPounds;
+					      var len = amountStr.length;					      
+					      if (len > 0 && amountStr.substring(0, 1) == '-') {
+					    	  amountStr = amountStr.substring(1);
+					      }
+					      
+					      if (trn.amount < 0) {
+					    	  $("#debit").prop("checked", true);
+					    	  //$("#credit").prop("checked", false);
+					      }
+					      else {
+					    	  //$("#debit").prop("checked", false);
+					    	  $("#credit").prop("checked", true);
+					      }
+					      
+					      $("#amount").val(amountStr);
+					  });
+			    },
+			    error: function(x, t, m) {
+			      console.trace();
+			      /*
+			      if (!(console == 'undefined')) {
+			        console.log("ERROR: " + x + t + m);
+			      }
+			      console.log(" At the end");
+			      */
+			    }
+			  });
+			}
+	  });
+	  
 		var _setComponentVisibilities = function() {				
 			var paymentType = $("input[name='paymenttype']:checked").val();
 			

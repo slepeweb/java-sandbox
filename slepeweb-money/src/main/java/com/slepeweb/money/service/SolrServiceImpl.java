@@ -256,6 +256,31 @@ public class SolrServiceImpl implements SolrService {
 		return null;
 	}
 
+	public FlatTransaction queryLatestTransactionByPayee(String payee) {
+		if (isEnabled()) {
+			SolrQuery q = new SolrQuery();
+			q.setQuery("*:*");
+			q.addFilterQuery(String.format("payee:\"%s\"", payee));
+			q.addFilterQuery(String.format("type:%d OR type:%d", 0, 1));
+			q.addSort("entered", SolrQuery.ORDER.desc);
+			q.setStart(0);
+			q.setRows(1);
+
+			try {
+				QueryResponse qr = getClient().query(q);
+				List<FlatTransaction> list = qr.getBeans(FlatTransaction.class);
+				if (list.size() > 0) {
+					return list.get(0);
+				}
+
+			} catch (Exception e) {
+				LOG.error(String.format("Search failure: %s", e.getMessage()));
+			}
+		}
+
+		return null;
+	}
+
 	/*
 	 * This solr document is made from a transaction that is NOT split
 	 */

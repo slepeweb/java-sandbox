@@ -34,11 +34,14 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		
 		// Get all accounts from MSAccess, save them in mysql, and store them in a temporary cache
 		Account mysqlAccount, accessAccount;
+
 		while((accessAccount = this.msAccessService.getNextAccount()) != null) {
 			try {
 				mysqlAccount = this.accountService.getByOrigId(accessAccount.getOrigId());
 				
 				if (mysqlAccount != null) {
+					// Do not overwrite the account type field
+					accessAccount.setType(mysqlAccount.getType());
 					mysqlAccount = this.accountService.update(mysqlAccount, accessAccount);
 				}
 				else {
