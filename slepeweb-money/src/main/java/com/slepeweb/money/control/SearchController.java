@@ -32,7 +32,7 @@ public class SearchController extends BaseController {
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	public String form(ModelMap model) {
 		
-		model.addAttribute("_allAccounts", this.accountService.getAll(false));
+		model.addAttribute("_allAccounts", this.accountService.getAll(true));
 		
 		List<Payee> payees = this.payeeService.getAll();
 		if (payees.size() > 0 && StringUtils.isBlank(payees.get(0).getName())) {
@@ -57,14 +57,16 @@ public class SearchController extends BaseController {
 	@RequestMapping(value="/{page}", method=RequestMethod.GET)
 	public String results(@PathVariable int page, HttpServletRequest req, ModelMap model) {
 		
+		// Payee may be specified by either name or id, but not both!
 		SolrParams params = 
 			new SolrParams(new SolrConfig()).
-			setAccountId(req.getParameter("accountId")).
+			setAccountId(req.getParameter("account")).
 			setPayeeId(req.getParameter("payeeId")).
+			setPayeeName(req.getParameter("payee")).
 			setMajorCategory(req.getParameter("category")).
 			setMemo(req.getParameter("memo")).
 			setPageNum(page);
-		
+				
 		model.addAttribute("_response", this.solrService.query(params));				
 		form(model);
 		return "advancedSearch";

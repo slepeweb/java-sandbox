@@ -160,6 +160,14 @@ public class SolrServiceImpl implements SolrService {
 		}
 		sb.append(String.format("%s:\"%s\"", field, value));
 	}
+	
+	private Payee filterByPayee(Payee p, SolrQuery q, SolrParams params) {
+		if (p != null) {
+			q.addFilterQuery(String.format("payee:\"%s\"", p.getName()));
+			params.setPayeeName(p.getName());
+		}
+		return p;
+	}
 
 	public SolrResponse<FlatTransaction> query(SolrParams params) {
 		if (isEnabled()) {
@@ -175,12 +183,17 @@ public class SolrServiceImpl implements SolrService {
 				}
 			}
 
+			Payee p;
 			if (params.getPayeeId() != null) {
-				Payee p = this.payeeService.get(params.getPayeeId());
-				if (p != null) {
-					q.addFilterQuery(String.format("payee:\"%s\"", p.getName()));
+				if (filterByPayee(p = this.payeeService.get(params.getPayeeId()), q, params) != null) {
+					params.setPayeeName(p.getName());
 					isCriteriaSet = true;
 				}
+			}
+			else if (StringUtils.isNotBlank(params.getPayeeName()) && 
+					filterByPayee(p = this.payeeService.get(params.getPayeeName()), q, params) != null) {
+				params.setPayeeId(p.getId());
+				isCriteriaSet = true;
 			}
 
 			if (params.getCategoryId() != null) {

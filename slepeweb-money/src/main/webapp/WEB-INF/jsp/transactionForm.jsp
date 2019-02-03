@@ -20,7 +20,7 @@
 	
 	<div class="right">
 		<c:if test="${_formMode eq 'update'}">
-			<a href="../add">New transaction</a><br />
+			<a href="../add/${_transaction.account.id}">New transaction</a><br />
 			<a href="../copy/${_transaction.id}">Copy this transaction</a><br />
 		</c:if>
 		<a href="../list/${_transaction.account.id}">List transactions</a>
@@ -195,28 +195,7 @@
 			changeYear: true
 		});
 		
-	  $.ajax({
-	    url: webContext + "/rest/payee/list/all",
-	    type: "GET",
-	    contentType: "application/json",
-	    dataType: "json",
-	    success: function(data) {
-	      // init the widget with response data and let it do the filtering
-	      $("#payee").autocomplete({
-	        source: data,
-	        minLength: 2
-	      });
-	    },
-	    error: function(x, t, m) {
-	      console.trace();
-	      /*
-	      if (!(console == 'undefined')) {
-	        console.log("ERROR: " + x + t + m);
-	      }
-	      console.log(" At the end");
-	      */
-	    }
-	  });
+	  <mny:payeeAutocompleter />
 	  
 	  var _updateMinorCategories = function() {
 		  var deferred = $.Deferred();

@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 public class SolrParams {
 
 	private SolrConfig config;
-	private String memo, majorCategory;
+	private String memo, majorCategory, payeeName;
 	private Long accountId, payeeId, categoryId;
 	private int pageNum, pageSize;
 
@@ -52,6 +52,17 @@ public class SolrParams {
 		sb.append(fieldName).append("=").append(clean(fieldValue));
 	}
 	
+	public String getPayeeName() {
+		return payeeName;
+	}
+
+	public SolrParams setPayeeName(String payeeName) {
+		if (StringUtils.isNotBlank(payeeName)) {
+			this.payeeName = payeeName;
+		}
+		return this;
+	}
+
 	public String getMemo() {
 		return this.memo == null ? "" : this.memo;
 	}
