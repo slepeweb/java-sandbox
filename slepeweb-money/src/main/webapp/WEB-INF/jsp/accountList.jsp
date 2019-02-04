@@ -10,6 +10,8 @@
 		
 	<div class="right"><a href="add">New account</a></div>
 	
+	<p><strong>${fn:length(_openAccounts)} Open accounts, ${fn:length(_closedAccounts)} Closed accounts</strong></p>
+
 	<c:choose><c:when test="${not empty _openAccounts or not empty _closedAccounts}">
 		<div id="accordion-accounts">
 			<mny:accountList list="${_openAccounts}" heading="Open accounts" />

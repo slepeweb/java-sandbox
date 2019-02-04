@@ -216,7 +216,9 @@ public class SolrServiceImpl implements SolrService {
 			}
 
 			if (StringUtils.isNotBlank(params.getMemo())) {
-				q.setQuery(String.format("memo:%s", params.getMemo()));
+				q.setQuery(params.getMemo());
+				q.add("defType", "dismax");
+				q.add("qf", "memo");
 				isCriteriaSet = true;
 			}
 			else {
@@ -231,8 +233,6 @@ public class SolrServiceImpl implements SolrService {
 					q.addFilterQuery(String.format("type:%d OR type:%d", 0, 1));
 				}
 	
-				//				q.add("defType", "dismax");
-				//			q.add("qf", "title^10 subtitle^4 bodytext");
 				q.addSort("entered", SolrQuery.ORDER.desc);
 				q.setStart(params.getStart());
 				q.setRows(params.getPageSize());
