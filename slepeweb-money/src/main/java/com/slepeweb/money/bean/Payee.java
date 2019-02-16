@@ -1,5 +1,7 @@
 package com.slepeweb.money.bean;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Payee extends DbEntity {
 	private String name;
 	
@@ -22,7 +24,7 @@ public class Payee extends DbEntity {
 	
 	@Override
 	public String toString() {
-		return getName();
+		return StringUtils.isNotBlank(getName()) ? getName() : "[blank]";
 	}
 	
 	@Override

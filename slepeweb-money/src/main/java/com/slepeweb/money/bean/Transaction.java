@@ -73,8 +73,8 @@ public class Transaction extends DbEntity implements Cloneable {
 	
 	@Override
 	public String toString() {
-		return String.format("(%d / %d) %s | %s: %s (%6$td/%6$tm/%6$tY)", getId(), getOrigId(), 
-				this.account.getName(), getPayee(), getAmountInPounds(), getEntered().getTime());
+		return String.format("(id: %d / %d) A.%s | P.%s: £%s (%6$td/%6$tm/%6$tY)", getId(), getOrigId(), 
+				getAccount(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
 	public boolean isDebit() {

@@ -78,11 +78,7 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 	}
 
 	public Category get(String major, String minor) {
-		Category c = get("select * from category where major = ? and minor = ?", new Object[]{major, minor});
-		if (c != null) {
-			return c;
-		}
-		return getNoCategory();
+		return get("select * from category where major = ? and minor = ?", new Object[]{major, minor});
 	}
 	
 	public Category getNoCategory() {

@@ -34,6 +34,7 @@
 		        <td class="heading"><label for="type">Type</label></td>
 		        <td>
 		        	<select name="type">
+		        		<option value=""></option>
 		        		<c:forTokens items="current,savings,credit,pension" var="_t" delims=",">
 		        			<option value="${_t}" <c:if test="${_t eq _account.type}">selected</c:if>>${_t}</option>
 		        		</c:forTokens>

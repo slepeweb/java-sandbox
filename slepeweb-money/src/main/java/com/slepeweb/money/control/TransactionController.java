@@ -332,6 +332,7 @@ public class TransactionController extends BaseController {
 		Account a = this.accountService.get(Util.toLong(req.getParameter("account")));
 		Payee noPayee = this.payeeService.getNoPayee();
 		Category noCategory = this.categoryService.getNoCategory();
+		Category c;
 		Transaction t;
 		
 		if (isTransfer) {
@@ -351,7 +352,8 @@ public class TransactionController extends BaseController {
 				t.setCategory(noCategory);
 			}
 			else {
-				t.setCategory(this.categoryService.get(req.getParameter("major"), req.getParameter("minor")));
+				c = this.categoryService.get(req.getParameter("major"), req.getParameter("minor"));
+				t.setCategory(c == null ? noCategory : c);
 			}
 		}
 		

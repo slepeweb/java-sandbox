@@ -22,7 +22,12 @@ public class Category extends DbEntity {
 		if (sb.length() > 0 && getMinor().length() > 0) {
 			sb.append(" > ").append(getMinor());
 		}
-		return sb.toString();
+		
+		if (sb.length() > 0) {
+			return sb.toString();
+		}
+		
+		return "[blank]";
 	}
 	
 	public Category setId(long id) {

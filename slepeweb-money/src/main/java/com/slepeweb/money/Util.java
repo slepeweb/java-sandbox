@@ -15,7 +15,7 @@ public class Util {
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
 	
 	public static long decimal2long(BigDecimal d) {
-		return d.multiply(ONE_HUNDRED).longValue();
+		return  d != null ? d.multiply(ONE_HUNDRED).longValue() : -1L;
 	}
 	
 	public static String formatPounds(long pence) {
