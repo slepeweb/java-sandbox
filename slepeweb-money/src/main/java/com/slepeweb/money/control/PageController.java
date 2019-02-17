@@ -7,10 +7,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.AccountService;
@@ -74,15 +74,13 @@ public class PageController extends BaseController {
 		return "loginForm"; 
 	}
 	
-	@RequestMapping(value="/index")	
-	public String index() { 
-		for (Transaction t : this.transactionService.getTransactionsForAccount(94L, 
-				Util.parseTimestamp("2000-01-01"), Util.parseTimestamp("2018-12-31"))) {
-			
+	@RequestMapping(value="/index/{accountId}")	
+	public String index(@PathVariable long accountId) { 
+		for (Transaction t : this.transactionService.getTransactionsForAccount(accountId)) {			
 			this.solrService.save(t);
 		}
 		
-		return null;
+		return "advancedSearch";
 	}
 	
 }

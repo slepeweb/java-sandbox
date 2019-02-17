@@ -12,9 +12,9 @@
 <form method="post" action="${_ctxPath}/search/">	  
     <table>
 	    <tr>
-	        <td class="heading"><label for="account">Account</label></td>
+	        <td class="heading"><label for="accountId">Account</label></td>
 	        <td>
-	        	<select id="account" name="account">
+	        	<select id="accountId" name="accountId">
 	        	<option value=""></option>
 	        		<c:forEach items="${_allAccounts}" var="_a">
 	        			<option value="${_a.id}" <c:if test="${_a.id eq _selectedAccountId}">selected</c:if>>${_a.name}</option>

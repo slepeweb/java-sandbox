@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class AcornAccessServiceImpl extends BaseServiceImpl implements AcornAcce
 	private Map<Long, Account> accountMap = new HashMap<Long, Account>();
 	private Map<Long, AcornCategory> categoryMap = new HashMap<Long, AcornCategory>();
 	
-	private Account johnDoe;
+	private Account johnDoeAccount;
 	private Payee noPayee, johnReeks;
 	private AcornCategory noCategory;
 	private Cursor acctCursorSeq, trnCursorSeq;
@@ -63,7 +64,7 @@ public class AcornAccessServiceImpl extends BaseServiceImpl implements AcornAcce
 		this.noPayee = noPayee;
 		this.johnReeks = johnReeks;
 		this.noCategory = noCategory;
-		this.johnDoe = johnDoeAccount;
+		this.johnDoeAccount = johnDoeAccount;
 		
 		Database db = DatabaseBuilder.open(new File(this.accessFilePath));
 		this.acctCursorSeq = CursorBuilder.createCursor(db.getTable(ACCOUNT_TBL));
@@ -128,18 +129,28 @@ public class AcornAccessServiceImpl extends BaseServiceImpl implements AcornAcce
 	
 	public Transaction getNextTransaction() throws IOException {
 
-		Row r = this.trnCursorSeq.getNextRow();		
+		Row r = this.trnCursorSeq.getNextRow();	
+		
 		if (r != null) {
 			Long fromId = int2Long(r.getInt(FROM_ACCOUNT_ID));
 			Long toId = int2Long(r.getInt(TO_ACCOUNT_ID));
+			Date date = r.getDate(DATE_ENTERED);
+			
+			// Last row in acorn data has all null values
+			if (date == null) {
+				return null;
+			}
 			
 			Transaction t = new Transaction().
 					setOrigId(Long.valueOf(r.getInt("ID"))).
+					// Default to johnDoe, noPayee, noCategory, and debit amounts
+					setAccount(this.johnDoeAccount).
 					setPayee(this.noPayee).
 					setCategory(this.noCategory).
 					setAmount(- Util.decimal2long(r.getBigDecimal(AMOUNT))).
-					setEntered(new Timestamp(r.getDate(DATE_ENTERED).getTime())).
+					setEntered(new Timestamp(date.getTime())).
 					setMemo(r.getString(MEMO)).
+					// Identify as 'acorn' for purpose of re-runs
 					setReference("acorn");
 			
 			Account leftAccount = this.accountMap.get(fromId);
@@ -154,7 +165,7 @@ public class AcornAccessServiceImpl extends BaseServiceImpl implements AcornAcce
 				if (rightAccount != null) {
 					// 'to' is an account - must be a transfer from one account to another
 					Transfer tt = new Transfer(t);
-					tt.setAccount(rightAccount);
+					tt.setMirrorAccount(rightAccount);
 					return tt;
 				}
 				else if (rightCategory != null) {
@@ -163,17 +174,21 @@ public class AcornAccessServiceImpl extends BaseServiceImpl implements AcornAcce
 				}
 			}
 			else if (leftCategory != null) {
-				// This must be a credit payment into an account
-				t.setAmount(- t.getAmount());
 				t.setCategory(leftCategory);
-				t.setAccount(rightAccount != null ? rightAccount : this.johnDoe);	
-
-				if (leftCategory.getTitle().equals(AcornCategory.JOHN_REEKS)) {
-					t.setPayee(this.johnReeks);
+				
+				if (rightAccount != null) {
+					// This must be a credit payment into an account
+					t.setAmount(- t.getAmount());
+					t.setAccount(rightAccount);	
+	
+					// Special hack !!!
+					if (leftCategory.getTitle().equals(AcornCategory.JOHN_REEKS)) {
+						t.setPayee(this.johnReeks);
+					}
 				}
 			}
 			else {
-				t.setAccount(johnDoe);
+				t.setMemo(String.format("%s [%s]", t.getMemo(), "CHECK DATA"));
 				LOG.warn(String.format("Failed to categorise transaction [%s]", t));
 			}
 			

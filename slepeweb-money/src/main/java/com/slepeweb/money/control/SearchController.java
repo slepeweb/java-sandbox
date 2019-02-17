@@ -60,7 +60,7 @@ public class SearchController extends BaseController {
 		// Payee may be specified by either name or id, but not both!
 		SolrParams params = 
 			new SolrParams(new SolrConfig()).
-			setAccountId(req.getParameter("account")).
+			setAccountId(req.getParameter("accountId")).
 			setPayeeId(req.getParameter("payeeId")).
 			setPayeeName(req.getParameter("payee")).
 			setMajorCategory(req.getParameter("category")).
