@@ -324,6 +324,10 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				new Object[]{accountId});
 	}
 	
+	public List<Transaction> getAll() {
+		return getTransactionsForAccount(SELECT + "order by t.entered", new Object[]{});
+	}
+	
 	@SuppressWarnings("deprecation")
 	public long getNumTransactionsForAccount(long accountId) {
 		return this.jdbcTemplate.queryForLong(

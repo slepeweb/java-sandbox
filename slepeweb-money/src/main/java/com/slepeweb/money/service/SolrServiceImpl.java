@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,8 @@ import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
-import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.bean.solr.SolrIterator;
 import com.slepeweb.money.bean.solr.SolrPager;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
@@ -40,6 +41,7 @@ public class SolrServiceImpl implements SolrService {
 	private String serverUrl = "http://localhost:8983/solr/money";
 
 	private SolrClient client;
+	private ConcurrentUpdateSolrClient batchingClient;
 
 	public boolean isEnabled() {
 		return Util.isPositive(this.solrIsEnabled);
@@ -60,6 +62,22 @@ public class SolrServiceImpl implements SolrService {
 		}
 		return this.client;
 	}
+	
+	private ConcurrentUpdateSolrClient getBatchingClient() {
+		if (isEnabled()) {
+			if (this.batchingClient == null) {
+				try {
+					this.batchingClient = new ConcurrentUpdateSolrClient(this.serverUrl, 100, 5);
+					this.batchingClient.ping();
+					LOG.info(String.format("Solr server is available for bulk updates [%s]", this.serverUrl));
+				}
+				catch (Exception e) {
+					LOG.error(String.format("Solr server is NOT available for bulk updates [%s]: %s", this.serverUrl, e.getMessage()));
+				}
+			}
+		}
+		return this.batchingClient;
+	}
 
 	public FlatTransaction getDocument(long transactionId) {
 		if (isEnabled()) {
@@ -78,33 +96,30 @@ public class SolrServiceImpl implements SolrService {
 	public boolean save(Transaction t) {
 		if (isEnabled()) {
 			try {
-				if (t.getPrevious() != null && t.getPrevious().isSplit()) {
-					if (! removeChildTransactionsById(t.getId())) {
-						return false;
-					}
-				}
-				
-				// Make a solr document representing the transaction
-				FlatTransaction parent = makeDoc(t);
-
-				// Make solr documents for each split transaction
-				if (t.isSplit()) {
-					getClient().addBeans(makeDocsFromSplits(t));
-					parent.setType(1);
-				}
-
-				getClient().addBean(parent);
-				
-				if (commit()) {
-					LOG.info(String.format("Transaction indexed by Solr [%d]", t.getId()));
-					return true;
-				}
-			} 
+				getClient().addBeans(t.toDocumentList());
+				return commit(getClient());
+			}
 			catch (Exception e) {
 				LOG.error(String.format("Solr failed to index transaction(s): %s [%d]", e.getMessage(), t.getId()));
 			}
 		}
-
+		
+		return false;
+	}
+	
+	public boolean save(List<Transaction> list) {
+		if (isEnabled()) {
+			SolrIterator iter = new SolrIterator(list.iterator());
+			
+			try {
+				getBatchingClient().addBeans(iter);
+				return commit(getBatchingClient());
+			}
+			catch (Exception e) {
+				LOG.error(String.format("Solr failed to index transaction batch: %s", e.getMessage()));
+			}
+		}
+		
 		return false;
 	}
 	
@@ -294,46 +309,6 @@ public class SolrServiceImpl implements SolrService {
 		return null;
 	}
 
-	/*
-	 * This solr document is made from a transaction that is NOT split
-	 */
-	private FlatTransaction makeDoc(Transaction t) {
-		FlatTransaction doc = new FlatTransaction();
-
-		return doc.
-				setId(String.valueOf(t.getId())).
-				setEntered(t.getEntered()).
-				setAmount(t.getAmount()).
-				setAccount(t.getAccount().getName()).
-				setPayee(t.getPayee().getName()).
-				setMajorCategory(t.getCategory().getMajor()).
-				setMinorCategory(t.getCategory().getMinor()).
-				setMemo(t.getMemo()).
-				setType(0);
-	}
-
-	/*
-	 * These (multiple) solr documents are made from SPLIT transactions
-	 */
-	private List<FlatTransaction> makeDocsFromSplits(Transaction t) {
-		List<FlatTransaction> list = new ArrayList<FlatTransaction>();
-
-		for (SplitTransaction st : t.getSplits()) {
-			list.add(new FlatTransaction().
-					setId(String.format("%d-%d", t.getId(), st.getId())).
-					setEntered(t.getEntered()).
-					setAmount(st.getAmount()).
-					setAccount(t.getAccount().getName()).
-					setPayee(t.getPayee().getName()).
-					setMajorCategory(st.getCategory().getMajor()).
-					setMinorCategory(st.getCategory().getMinor()).
-					setMemo(st.getMemo()).
-					setType(2));
-		}
-
-		return list;
-	}
-
 	@SuppressWarnings("unused")
 	private void append(StringBuilder sb, String s) {
 		if (sb.length() > 0) {
@@ -342,10 +317,10 @@ public class SolrServiceImpl implements SolrService {
 		sb.append(s);
 	}
 	
-	public boolean commit() {
+	public boolean commit(SolrClient client) {
 		if (isEnabled()) {
 			try {
-				this.client.commit();
+				client.commit();
 				LOG.info("Solr successfully committed changes");
 				return true;
 			} catch (Exception e) {

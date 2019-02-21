@@ -77,6 +77,62 @@ public class Transaction extends DbEntity implements Cloneable {
 				getAccount(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
+	public List<FlatTransaction> toDocumentList() {
+		List<FlatTransaction> list = new ArrayList<FlatTransaction>();
+		
+		// Make a solr document representing the transaction
+		FlatTransaction parent = toDocument();
+		list.add(parent);
+
+		// Make solr documents for each split transaction
+		if (isSplit()) {
+			list.addAll(splitsToDocuments());
+			parent.setType(1);
+		}
+
+		return list;
+	}
+
+	/*
+	 * This solr document is made from a transaction that is NOT split
+	 */
+	private FlatTransaction toDocument() {
+		FlatTransaction doc = new FlatTransaction();
+
+		return doc.
+				setId(String.valueOf(getId())).
+				setEntered(getEntered()).
+				setAmount(getAmount()).
+				setAccount(getAccount().getName()).
+				setPayee(getPayee().getName()).
+				setMajorCategory(getCategory().getMajor()).
+				setMinorCategory(getCategory().getMinor()).
+				setMemo(getMemo()).
+				setType(0);
+	}
+
+	/*
+	 * These (multiple) solr documents are made from SPLIT transactions
+	 */
+	private List<FlatTransaction> splitsToDocuments() {
+		List<FlatTransaction> list = new ArrayList<FlatTransaction>();
+
+		for (SplitTransaction st : getSplits()) {
+			list.add(new FlatTransaction().
+					setId(String.format("%d-%d", getId(), st.getId())).
+					setEntered(getEntered()).
+					setAmount(st.getAmount()).
+					setAccount(getAccount().getName()).
+					setPayee(getPayee().getName()).
+					setMajorCategory(st.getCategory().getMajor()).
+					setMinorCategory(st.getCategory().getMinor()).
+					setMemo(st.getMemo()).
+					setType(2));
+		}
+
+		return list;
+	}
+
 	public boolean isDebit() {
 		return getAmount() <= 0L;
 	}
