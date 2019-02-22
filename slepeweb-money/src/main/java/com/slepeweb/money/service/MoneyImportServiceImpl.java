@@ -145,7 +145,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	
 	public Transaction updateTransaction(Transaction dbRecord, Transaction t) {
 		try {
-			return this.transactionService.update(dbRecord, t);
+			t = this.transactionService.update(dbRecord, t);
+			this.solrService.save(t);
+			return t;
 		}
 		catch (Exception e) {
 			LOG.error("Failed to update transaction", e);

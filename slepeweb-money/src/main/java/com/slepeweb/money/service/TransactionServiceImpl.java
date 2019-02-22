@@ -240,14 +240,14 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 						dbRecord.getMemo(), dbRecord.getReference(), dbRecord.getTransferId(),
 						dbRecord.getId());
 				
-				LOG.info(compose("Updated transaction", t));
+				LOG.info(compose("Updated transaction", dbRecord));
 			}
 			catch (DuplicateKeyException e) {
-				LOG.error(compose("Duplicate key", t));
+				LOG.error(compose("Duplicate key", dbRecord));
 			}
 		}
 		else {
-			LOG.debug(compose("Transaction not modified", t));
+			LOG.debug(compose("Transaction not modified", dbRecord));
 		}
 		
 		return dbRecord;
@@ -428,9 +428,11 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		if (! ignoreMirror && t.isTransfer()) {
 			num += delete(t.getTransferId(), true);
+			this.solrService.removeTransactionsById(t.getTransferId());
 		}
 		
 		num += this.jdbcTemplate.update("delete from transaction where id = ?", id);		
+		this.solrService.removeTransactionsById(id);
 		return num;
 	}	
 }

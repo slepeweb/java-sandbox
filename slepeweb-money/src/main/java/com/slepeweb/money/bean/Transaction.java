@@ -77,16 +77,16 @@ public class Transaction extends DbEntity implements Cloneable {
 				getAccount(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
-	public List<FlatTransaction> toDocumentList() {
+	public List<FlatTransaction> flatten() {
 		List<FlatTransaction> list = new ArrayList<FlatTransaction>();
 		
 		// Make a solr document representing the transaction
-		FlatTransaction parent = toDocument();
+		FlatTransaction parent = flattenParent();
 		list.add(parent);
 
 		// Make solr documents for each split transaction
 		if (isSplit()) {
-			list.addAll(splitsToDocuments());
+			list.addAll(flattenSplits());
 			parent.setType(1);
 		}
 
@@ -96,7 +96,7 @@ public class Transaction extends DbEntity implements Cloneable {
 	/*
 	 * This solr document is made from a transaction that is NOT split
 	 */
-	private FlatTransaction toDocument() {
+	private FlatTransaction flattenParent() {
 		FlatTransaction doc = new FlatTransaction();
 
 		return doc.
@@ -114,7 +114,7 @@ public class Transaction extends DbEntity implements Cloneable {
 	/*
 	 * These (multiple) solr documents are made from SPLIT transactions
 	 */
-	private List<FlatTransaction> splitsToDocuments() {
+	private List<FlatTransaction> flattenSplits() {
 		List<FlatTransaction> list = new ArrayList<FlatTransaction>();
 
 		for (SplitTransaction st : getSplits()) {

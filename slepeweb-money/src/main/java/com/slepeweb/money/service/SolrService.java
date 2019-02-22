@@ -10,7 +10,9 @@ import com.slepeweb.money.bean.solr.SolrResponse;
 public interface SolrService {
 	boolean save(Transaction i);
 	boolean save(List<Transaction> i);
+	boolean removeAllTransactions();
 	boolean removeTransactionsById(long transactionId);
+	boolean removeChildTransactionsById(long transactionId);
 	boolean removeTransactionsByAccount(String name);
 	boolean removeTransactionsByPayee(String name);
 	boolean removeTransactionsByCategory(String major, String minor);

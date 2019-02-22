@@ -79,6 +79,7 @@ public class PageController extends BaseController {
 		
 	@RequestMapping(value="/index")	
 	public RedirectView indexEverything(HttpServletRequest req) { 
+		this.solrService.removeAllTransactions();
 		this.solrService.save(this.transactionService.getAll());
 		return new RedirectView(String.format("%s/search/?flash=%s", 
 				req.getContextPath(), Util.encodeUrl("success|Indexing complete")));
@@ -86,6 +87,8 @@ public class PageController extends BaseController {
 	
 	@RequestMapping(value="/index/{accountId}")	
 	public RedirectView index(@PathVariable long accountId, HttpServletRequest req) { 
+		Account a = this.accountService.get(accountId);
+		this.solrService.removeTransactionsByAccount(a.getName());
 		this.solrService.save(this.transactionService.getTransactionsForAccount(accountId));
 		return new RedirectView(String.format("%s/search/?flash=%s", 
 				req.getContextPath(), Util.encodeUrl("success|Indexing complete")));

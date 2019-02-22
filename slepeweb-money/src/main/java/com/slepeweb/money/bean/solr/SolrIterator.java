@@ -22,7 +22,7 @@ public class SolrIterator implements Iterator<FlatTransaction> {
 	@Override
 	public FlatTransaction next() {
 		if (! this.flatties.hasNext()) {
-			this.flatties = this.transactions.next().toDocumentList().iterator();
+			this.flatties = this.transactions.next().flatten().iterator();
 		}
 		return this.flatties.next();
 	}

@@ -3,6 +3,9 @@ drop table if exists transaction;
 drop table if exists account;
 drop table if exists payee;
 drop table if exists category;
+drop table if exists userrole;
+drop table if exists role;
+drop table if exists user;
 
 
 create table category

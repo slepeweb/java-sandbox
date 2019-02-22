@@ -96,7 +96,8 @@ public class SolrServiceImpl implements SolrService {
 	public boolean save(Transaction t) {
 		if (isEnabled()) {
 			try {
-				getClient().addBeans(t.toDocumentList());
+				removeChildTransactionsById(t.getId());
+				getClient().addBeans(t.flatten());
 				return commit(getClient());
 			}
 			catch (Exception e) {
@@ -123,7 +124,7 @@ public class SolrServiceImpl implements SolrService {
 		return false;
 	}
 	
-	private boolean removeChildTransactionsById(long transactionId) {
+	public boolean removeChildTransactionsById(long transactionId) {
 		// Note that split transactions have an id that begins with the parent transaction
 		return removeTransactions(String.format("id:%d-*", transactionId));
 	}
@@ -151,6 +152,10 @@ public class SolrServiceImpl implements SolrService {
 		}
 
 		return false;
+	}
+
+	public boolean removeAllTransactions() {
+		return removeTransactions("*:*");
 	}
 
 	private boolean removeTransactions(String query) {
@@ -321,7 +326,7 @@ public class SolrServiceImpl implements SolrService {
 		if (isEnabled()) {
 			try {
 				client.commit();
-				LOG.info("Solr successfully committed changes");
+				LOG.debug("Solr successfully committed changes");
 				return true;
 			} catch (Exception e) {
 				LOG.error(String.format("Solr failed to commit changes: %s", e.getMessage()));
