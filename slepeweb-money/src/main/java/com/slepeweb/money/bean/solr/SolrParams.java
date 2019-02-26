@@ -2,8 +2,11 @@ package com.slepeweb.money.bean.solr;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.slepeweb.money.Util;
 
 public class SolrParams {
 
@@ -11,6 +14,7 @@ public class SolrParams {
 	private String memo, majorCategory, payeeName;
 	private Long accountId, payeeId, categoryId;
 	private int pageNum, pageSize;
+	private Date from, to;
 
 	public SolrParams(SolrConfig config) {
 		this.config = config;
@@ -52,6 +56,38 @@ public class SolrParams {
 		sb.append(fieldName).append("=").append(clean(fieldValue));
 	}
 	
+	public Date getFrom() {
+		return from;
+	}
+
+	public SolrParams setFrom(String from) {
+		if (StringUtils.isNotBlank(from)) {
+			setFrom((Date) Util.parseSolrDate(from + "T00:00:00Z"));
+		}
+		return this;
+	}
+
+	public SolrParams setFrom(Date from) {
+		this.from = from;
+		return this;
+	}
+
+	public Date getTo() {
+		return to;
+	}
+
+	public SolrParams setTo(String to) {
+		if (StringUtils.isNotBlank(to)) {
+			setTo((Date) Util.parseSolrDate(to + "T23:59:59Z"));
+		}
+		return this;
+	}
+
+	public SolrParams setTo(Date to) {
+		this.to = to;
+		return this;
+	}
+
 	public String getPayeeName() {
 		return payeeName;
 	}

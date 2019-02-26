@@ -65,6 +65,8 @@ public class SearchController extends BaseController {
 			setPayeeName(req.getParameter("payee")).
 			setMajorCategory(req.getParameter("category")).
 			setMemo(req.getParameter("memo")).
+			setFrom(req.getParameter("from")).
+			setTo(req.getParameter("to")).
 			setPageNum(page);
 				
 		model.addAttribute("_response", this.solrService.query(params));				

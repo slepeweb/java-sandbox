@@ -7,6 +7,8 @@
 	<c:set var="_selectedPayeeName" value="${_response.params.payeeName}" />
 	<c:set var="_selectedMajorCategory" value="${_response.params.majorCategory}" />
 	<c:set var="_selectedMemoTerms" value="${_response.params.memo}" />
+	<c:set var="_selectedFrom" value="${mon:formatTimestamp(_response.params.from)}" />
+	<c:set var="_selectedTo" value="${mon:formatTimestamp(_response.params.to)}" />
 </c:if>
 
 <form method="post" action="${_ctxPath}/search/">	  
@@ -41,6 +43,16 @@
 	        <td class="heading"><label for="memo">Memo</label></td>
 	        <td><input id="memo" type="text" name="memo" placeholder="Terms that might be in the memo field" value="${_selectedMemoTerms}" /></td>
 	    </tr>
+	    <tr>
+	        <td class="heading"><label for="from">From date</label></td>
+	        <td><input class="datepicker" id="from" type="text" name="from" value="${_selectedFrom}"
+	        	placeholder="Optional search window start date" /></td>
+	    </tr>
+	    <tr>
+	        <td class="heading"><label for="to">To date</label></td>
+	        <td><input class="datepicker" id="to" type="text" name="to" value="${_selectedTo}"
+	        	placeholder="Optional search window end date" /></td>
+	    </tr>
 		</table> 
 		
 		<br />
@@ -49,6 +61,12 @@
 
 <script>
 	$(function() {
+		$(".datepicker").datepicker({
+			dateFormat: "yy-mm-dd",
+			changeMonth: true,
+			changeYear: true
+		});
+		
 		<mny:payeeAutocompleter />
 	});
 </script>

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+	public static final SimpleDateFormat SOLR_SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
 	public static long decimal2long(BigDecimal d) {
 		return  d != null ? d.multiply(ONE_HUNDRED).longValue() : -1L;
@@ -50,9 +51,25 @@ public class Util {
 		return "";
 	}
 	
+	public static String formatSolrDate(Date d) {
+		if (d != null) {
+			return SOLR_SDF.format(d);
+		}
+		return "";
+	}
+	
 	public static Timestamp parseTimestamp(String s) {
 		try {
 			return new Timestamp(SDF.parse(s).getTime());
+		} 
+		catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static Date parseSolrDate(String s) {
+		try {
+			return SOLR_SDF.parse(s);
 		} 
 		catch (Exception e) {
 			return null;

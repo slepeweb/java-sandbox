@@ -1,6 +1,7 @@
 package com.slepeweb.money.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -243,6 +244,13 @@ public class SolrServiceImpl implements SolrService {
 			}
 			else {
 				q.setQuery("*:*");
+			}
+			
+			if (params.getFrom() != null || params.getTo() != null) {
+				String from = params.getFrom() == null ? "*" : Util.formatSolrDate(params.getFrom());
+				String to = params.getTo() == null ? "*" : Util.formatSolrDate(params.getTo());
+				q.addFilterQuery(String.format("entered:[%s TO %s]", from, to));
+				isCriteriaSet = true;
 			}
 			
 			if (isCriteriaSet) {
