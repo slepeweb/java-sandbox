@@ -10,6 +10,9 @@ import com.slepeweb.money.Util;
 
 public class SolrParams {
 
+	public static final String START_OF_DAY = "T00:00:00Z";
+	public static final String END_OF_DAY = "T23:59:59Z";
+	
 	private SolrConfig config;
 	private String memo, majorCategory, payeeName;
 	private Long accountId, payeeId, categoryId;
@@ -62,7 +65,7 @@ public class SolrParams {
 
 	public SolrParams setFrom(String from) {
 		if (StringUtils.isNotBlank(from)) {
-			setFrom((Date) Util.parseSolrDate(from + "T00:00:00Z"));
+			setFrom((Date) Util.parseSolrDate(from + START_OF_DAY));
 		}
 		return this;
 	}
@@ -78,7 +81,7 @@ public class SolrParams {
 
 	public SolrParams setTo(String to) {
 		if (StringUtils.isNotBlank(to)) {
-			setTo((Date) Util.parseSolrDate(to + "T23:59:59Z"));
+			setTo((Date) Util.parseSolrDate(to + END_OF_DAY));
 		}
 		return this;
 	}

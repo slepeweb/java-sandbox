@@ -4,7 +4,7 @@
 	
 <mny:standardLayout>
 	<div class="right">
-		<a href="index">Re-index ALL</a><br />
+		<a href="index/bydates">Re-index</a><br />
 	</div>
 	
 	<h2>Money Dashboard</h2>

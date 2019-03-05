@@ -3,29 +3,20 @@ package com.slepeweb.money.control;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.view.RedirectView;
 
-import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.service.AccountService;
-import com.slepeweb.money.service.SolrService;
-import com.slepeweb.money.service.TransactionService;
 
 @Controller
 public class PageController extends BaseController {
 	
 	@Autowired private AccountService accountService;
-	@Autowired private TransactionService transactionService;
-	@Autowired private SolrService solrService;
 	
 	@RequestMapping(value="/")	
 	public String dashboard(ModelMap model) { 
@@ -77,21 +68,4 @@ public class PageController extends BaseController {
 		return "loginForm"; 
 	}
 		
-	@RequestMapping(value="/index")	
-	public RedirectView indexEverything(HttpServletRequest req) { 
-		this.solrService.removeAllTransactions();
-		this.solrService.save(this.transactionService.getAll());
-		return new RedirectView(String.format("%s/search/?flash=%s", 
-				req.getContextPath(), Util.encodeUrl("success|Indexing complete")));
-	}
-	
-	@RequestMapping(value="/index/{accountId}")	
-	public RedirectView index(@PathVariable long accountId, HttpServletRequest req) { 
-		Account a = this.accountService.get(accountId);
-		this.solrService.removeTransactionsByAccount(a.getName());
-		this.solrService.save(this.transactionService.getTransactionsForAccount(accountId));
-		return new RedirectView(String.format("%s/search/?flash=%s", 
-				req.getContextPath(), Util.encodeUrl("success|Indexing complete")));
-	}
-	
 }

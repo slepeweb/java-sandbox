@@ -43,7 +43,8 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 					"t.id, t.origid, t.entered, t.memo, t.reference, t.amount, t.reconciled, " +
 					"t.transferid, t.split " + FROM;
 	
-	private static final String FLAT_SELECT = 
+	/*
+	 private static final String FLAT_SELECT = 
 			"select " +
 					"a.name as account, " + 
 					"p.name as payee, " + 
@@ -68,6 +69,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			"where c.id = ?) " +
 			"order by entered desc"
 			;
+	*/
 	
 			
 	public Transaction save(Transaction pt) 
@@ -319,13 +321,19 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	}
 	
 	public List<Transaction> getTransactionsForAccount(long accountId) {
-		return getTransactionsForAccount(
+		return getTransactions(
 				SELECT + "where t.accountid = ? order by t.entered", 
 				new Object[]{accountId});
 	}
 	
+	public List<Transaction> getTransactionsByDate(Date from, Date to) {
+		return getTransactions(
+				SELECT + "where t.entered >= ? and t.entered <= ? order by t.entered", 
+				new Object[]{from, to});
+	}
+	
 	public List<Transaction> getAll() {
-		return getTransactionsForAccount(SELECT + "order by t.entered", new Object[]{});
+		return getTransactions(SELECT + "order by t.entered", new Object[]{});
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -353,12 +361,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	 * TODO: why are transactions not sorted by reverse date here?
 	 */
 	public List<Transaction> getTransactionsForAccount(long accountId, Timestamp from, Timestamp to) {
-		return getTransactionsForAccount(
+		return getTransactions(
 				SELECT + "where t.accountid = ? and t.entered >= ? and t.entered <= ? order by t.entered", 
 				new Object[]{accountId, from, to});
 	}
 	
-	private List<Transaction> getTransactionsForAccount(String sql, Object[] params) {
+	private List<Transaction> getTransactions(String sql, Object[] params) {
 		List<Transaction> list = this.jdbcTemplate.query(
 				sql, params, new RowMapperUtil.TransactionMapper());
 		
@@ -371,6 +379,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return list;
 	}
 	
+	/*
 	public List<FlatTransaction> getTransactionsForCategory(long categoryId, int limit) {
 		return this.jdbcTemplate.query(
 				FLAT_SELECT_CATEGORY +
@@ -386,6 +395,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				new Object[]{payeeId},
 				new RowMapperUtil.FlatTransactionMapper());
 	}
+	*/
 	
 	public SolrResponse<FlatTransaction> getTransactionsForPayee(long id) {
 		return this.solrService.query(new SolrParams(new SolrConfig()).setPayeeId(id));

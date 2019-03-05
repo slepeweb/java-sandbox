@@ -159,6 +159,11 @@ public class SolrServiceImpl implements SolrService {
 		return removeTransactions("*:*");
 	}
 
+	public boolean removeTransactionsByDate(Date start, Date end) {
+		return removeTransactions(String.format("entered:[%s TO %s]", 
+				Util.formatSolrDate(start), Util.formatSolrDate(end)));
+	}
+
 	private boolean removeTransactions(String query) {
 		if (isEnabled()) {
 			try {

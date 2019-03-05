@@ -1,6 +1,7 @@
 package com.slepeweb.money.service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import com.slepeweb.money.bean.FlatTransaction;
@@ -17,8 +18,9 @@ public interface TransactionService {
 	List<Transaction> getAll();
 	List<Transaction> getTransactionsForAccount(long id);
 	List<Transaction> getTransactionsForAccount(long id, Timestamp from, Timestamp to);
-	List<FlatTransaction> getTransactionsForCategory(long categoryId, int limit);
-	List<FlatTransaction> getTransactionsForPayee(long payeeId, int limit);
+	List<Transaction> getTransactionsByDate(Date from, Date to);
+	//List<FlatTransaction> getTransactionsForCategory(long categoryId, int limit);
+	//List<FlatTransaction> getTransactionsForPayee(long payeeId, int limit);
 	Timestamp getTransactionDateForAccount(long accountId, boolean first);
 	Transaction save(Transaction p) throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	Transaction update(Transaction from, Transaction to) throws MissingDataException, DuplicateItemException;
