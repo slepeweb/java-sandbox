@@ -2,6 +2,7 @@ package com.slepeweb.money.service;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -78,7 +79,15 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 	}
 
 	public Category get(String major, String minor) {
-		return get("select * from category where major = ? and minor = ?", new Object[]{major, minor});
+		Category c = get("select * from category where major = ? and minor = ?", new Object[]{major, minor});
+		if (c != null) {
+			return c;
+		}
+		else if (StringUtils.isNotBlank(major)) {		
+			return getNoCategory();
+		}
+		
+		return null;
 	}
 	
 	public Category getNoCategory() {

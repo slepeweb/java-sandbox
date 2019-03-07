@@ -43,35 +43,6 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 					"t.id, t.origid, t.entered, t.memo, t.reference, t.amount, t.reconciled, " +
 					"t.transferid, t.split " + FROM;
 	
-	/*
-	 private static final String FLAT_SELECT = 
-			"select " +
-					"a.name as account, " + 
-					"p.name as payee, " + 
-					"c.major, c.minor, " + 
-					"t.id, t.entered as entered, t.memo, t.reference, t.amount " + FROM;
-			;
-	
-	private static final String FLAT_SELECT_CATEGORY = 
-			"(" + FLAT_SELECT +
-			"where c.id = ?) " +
-			"union " +
-			"(select " +
-					"a.name as account, " + 
-					"p.name as payee, " + 
-					"c.major, c.minor, " + 
-					"t.id, t.entered as entered, st.memo, t.reference, st.amount " + 
-			"from splittransaction st " +
-					"join transaction t on t.id = st.transactionid " + 
-					"join account a on a.id = t.accountid " + 
-					"join payee p on p.id = t.payeeid " +
-					"join category c on c.id = st.categoryid " +
-			"where c.id = ?) " +
-			"order by entered desc"
-			;
-	*/
-	
-			
 	public Transaction save(Transaction pt) 
 			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		
@@ -172,7 +143,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		}
 		else if (previousTransferId == 0 && mirrorAccount != null) {
 			// Case 1) create a new mirror transaction
-			mirror = mirrorTransaction(t, new Transaction(), mirrorAccount);
+			mirror = mirrorTransaction(t, new Transaction().setSource(-1), mirrorAccount);
 		}
 		else if (previousTransferId > 0 && mirrorAccount != null) {
 			// Case 2) update an existing mirror
@@ -208,12 +179,16 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	private Transaction insert(Transaction t) throws MissingDataException, DuplicateItemException {
 		
 		try {
+			/* 
+			 * The source column is set on first entry, and never updated.
+			 * It is only relevant to the import of MSMoney data.
+			 */
 			this.jdbcTemplate.update(
-					"insert into transaction (accountid, payeeid, categoryid, split, origid, entered, amount, " +
+					"insert into transaction (accountid, payeeid, categoryid, split, source, origid, entered, amount, " +
 					"reconciled, transferid, reference, memo) " +
-					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 					t.getAccount().getId(), t.getPayee().getId(), t.getCategory().getId(), 
-					t.isSplit(), t.getOrigId(), t.getEntered(), t.getAmount(),
+					t.isSplit(), t.getSource(), t.getOrigId(), t.getEntered(), t.getAmount(),
 					t.isReconciled(), t.getTransferId(), t.getReference(), t.getMemo());
 			
 			t.setId(getLastInsertId());	
@@ -279,29 +254,24 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return get(SELECT + "where t.id = ?", new Object[]{id});
 	}
 
-	public Transaction getByOrigId(long origId) {
-		return get(SELECT + "where t.origid = ?", new Object[]{origId});
+	public Transaction getByOrigId(int source, long origId) {
+		return get(SELECT + "where t.source = ? and t.origid = ?", new Object[]{source, origId});
 	}
 	
 	private Transaction get(String sql, Object[] params) {
 		Transaction t = (Transaction) getFirstInList(this.jdbcTemplate.query(
 				sql, params, new RowMapperUtil.TransactionMapper()));
 		
-		if (t != null && t.isSplit()) {
-			t.setSplits(this.splitTransactionService.get(t));
-		}
-		
-		if (t != null && t.isTransfer()) {
-			Transaction mirror = (Transaction) getFirstInList(this.jdbcTemplate.query(
-					SELECT + "where t.id = ?", new Object[]{t.getTransferId()}, new RowMapperUtil.TransactionMapper()));
+		if (t != null) {
+			if (t.isSplit()) {
+				t.setSplitsService(this.splitTransactionService);
+			}
 			
-			if (mirror != null) {
-				Account mirrorAccount = this.accountService.get(mirror.getAccount().getId());
-				Transfer tt = new Transfer(t).setMirrorAccount(mirrorAccount);
-				return tt;
+			if (t.isTransfer()) {
+				return new Transfer(t).setTransactionService(this);
 			}
 		}
-		
+								
 		return t;
 	}
 
@@ -378,24 +348,6 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		return list;
 	}
-	
-	/*
-	public List<FlatTransaction> getTransactionsForCategory(long categoryId, int limit) {
-		return this.jdbcTemplate.query(
-				FLAT_SELECT_CATEGORY +
-						(limit > 0 ? String.format(" limit %d", limit) : ""), 
-				new Object[]{categoryId, categoryId},
-				new RowMapperUtil.FlatTransactionMapper());
-	}
-	
-	public List<FlatTransaction> getTransactionsForPayee(long payeeId, int limit) {
-		return this.jdbcTemplate.query(
-				FLAT_SELECT + "where t.payeeid = ? order by t.entered desc " +
-						(limit > 0 ? String.format("limit %d", limit) : ""), 
-				new Object[]{payeeId},
-				new RowMapperUtil.FlatTransactionMapper());
-	}
-	*/
 	
 	public SolrResponse<FlatTransaction> getTransactionsForPayee(long id) {
 		return this.solrService.query(new SolrParams(new SolrConfig()).setPayeeId(id));

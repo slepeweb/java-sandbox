@@ -3,9 +3,6 @@ drop table if exists transaction;
 drop table if exists account;
 drop table if exists payee;
 drop table if exists category;
-drop table if exists userrole;
-drop table if exists role;
-drop table if exists user;
 
 
 create table category
@@ -50,6 +47,13 @@ create table account
 create table transaction
 (
 	id int not null auto_increment,
+	/*
+	 * source indicates where the data came from:
+	 * 		2 - Acorn data
+	 * 		1 - MSMoney
+	 * 		0 - interactive input
+	 */
+	source int,
 	origid int,
 	entered timestamp default 0,
 	accountid int,
@@ -63,7 +67,7 @@ create table transaction
 	transferid int,
 	
 	primary key (id),
-	index idx_transaction_origid (origid),
+	index idx_transaction_origid (source, origid),
 	index idx_transaction_account (accountid, entered desc),
 	index idx_transaction_payee (payeeid, entered desc),
 	index idx_transaction_category (categoryid, entered desc),

@@ -216,9 +216,8 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 							setAmount(Util.decimal2long(r.getBigDecimal(AMOUNT))).
 							setEntered(new Timestamp(r.getDate(DATE_ENTERED).getTime())).
 							setMemo(r.getString(MEMO)).
-							setOrigId(r.getInt(TRANSACTION_ID))/*.
-							setReconciled(false).
-							setReference("")*/;
+							setSource(1).
+							setOrigId(r.getInt(TRANSACTION_ID));
 					
 					t.setPayee(identifyPayee(r.getInt(PAYEE_ID)));
 					t.setCategory(identifyCategory(r.getInt(CATEGORY_ID)));							

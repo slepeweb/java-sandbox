@@ -94,6 +94,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 				LOG.error("Failed to save category", e);
 			}
 		}
+		
+		// Wipe out any existing transactions in solr
+		this.solrService.removeTransactionsByDate(twin.getFrom(), twin.getTo());
 	}
 		
 	private Payee getNoPayee() {
@@ -222,7 +225,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	}
 	
 	public Transaction getTransactionByOrigId(long id) {
-		return this.transactionService.getByOrigId(id);
+		return this.transactionService.getByOrigId(1, id);
 	}
 	
 	@SuppressWarnings("unused")

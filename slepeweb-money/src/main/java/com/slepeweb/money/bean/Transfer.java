@@ -1,11 +1,11 @@
 package com.slepeweb.money.bean;
 
-import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.service.TransactionService;
 
 public class Transfer extends Transaction {
 
 	private Account mirrorAccount;
+	private TransactionService transactionService;
 	
 	public Transfer() {}
 	
@@ -28,8 +28,19 @@ public class Transfer extends Transaction {
 		}
 	}
 		
+	public Transfer setTransactionService(TransactionService transactionService) {
+		this.transactionService = transactionService;
+		return this;
+	}
+
 	public Account getMirrorAccount() {
-		return mirrorAccount;
+		if (this.mirrorAccount == null && this.transactionService != null) {
+			Transaction t = this.transactionService.get(getTransferId());
+			if (t != null) {
+				this.mirrorAccount = t.getAccount();
+			}
+		}
+		return this.mirrorAccount == null ? new Account().setName("Uknown") : this.mirrorAccount;
 	}
 
 	public Transfer setMirrorAccount(Account mirrorAccount) {

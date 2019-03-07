@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.slepeweb.money.Util;
+import com.slepeweb.money.service.SplitTransactionService;
 
 public class Transaction extends DbEntity implements Cloneable {
 	
@@ -17,6 +18,7 @@ public class Transaction extends DbEntity implements Cloneable {
 	public static DecimalFormat DF = new DecimalFormat("#.00");
 	public static DecimalFormat DF_TOTAL = new DecimalFormat("###,###");
 	
+	private int source;
 	private Account account;
 	private long xferId = 0L;
 	private Payee payee;
@@ -25,8 +27,9 @@ public class Transaction extends DbEntity implements Cloneable {
 	private boolean split, reconciled;
 	private long amount;
 	private String reference = "", memo = "";
-	private List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
+	private List<SplitTransaction> splits;
 	private Transaction previous;
+	private SplitTransactionService splitsService;
 	
 	public void assimilate(Object obj) {
 		Transaction source = (Transaction) obj;
@@ -40,6 +43,7 @@ public class Transaction extends DbEntity implements Cloneable {
 		setReference(source.getReference());
 		setMemo(source.getMemo());
 		setOrigId(source.getOrigId());
+		setSource(source.getSource());
 		setSplit(source.isSplit());
 		
 		assimilateSplits(source);
@@ -77,6 +81,19 @@ public class Transaction extends DbEntity implements Cloneable {
 				getAccount(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
+	public int getSource() {
+		return source;
+	}
+
+	public Transaction setSource(int source) {
+		this.source = source;
+		return this;
+	}
+
+	public void setSplitsService(SplitTransactionService splitsService) {
+		this.splitsService = splitsService;
+	}
+
 	public List<FlatTransaction> flatten() {
 		List<FlatTransaction> list = new ArrayList<FlatTransaction>();
 		
@@ -189,10 +206,6 @@ public class Transaction extends DbEntity implements Cloneable {
 		return this;
 	}
 
-//	public boolean isTransfer() {
-//		return false;
-//	}
-
 	public long getTransferId() {
 		return this.xferId;
 	}
@@ -250,7 +263,15 @@ public class Transaction extends DbEntity implements Cloneable {
 	}
 	
 	public List<SplitTransaction> getSplits() {
-		return splits;
+		if (this.splits == null) {
+			if (isSplit() && this.splitsService != null) {
+				this.splits = this.splitsService.get(this);
+			}
+			else {
+				this.splits = new ArrayList<SplitTransaction>();
+			}
+		}
+		return this.splits;
 	}
 
 	public void setSplits(List<SplitTransaction> partPayments) {
@@ -329,21 +350,6 @@ public class Transaction extends DbEntity implements Cloneable {
 			Transaction other = (Transaction) obj;
 			if (xferId != other.xferId)
 				return false;
-//			public int hashCode() {
-//			final int prime = 31;
-//			int result = 1;
-//			result = prime * result + ((account == null) ? 0 : account.hashCode());
-//			result = prime * result + ((category == null) ? 0 : category.hashCode());
-//			result = prime * result + ((amount == null) ? 0 : amount.hashCode());
-//			result = prime * result + ((entered == null) ? 0 : entered.hashCode());
-//			result = prime * result + ((memo == null) ? 0 : memo.hashCode());
-//			result = prime * result + ((payee == null) ? 0 : payee.hashCode());
-//			result = prime * result + (reconciled ? 1231 : 1237);
-//			result = prime * result + (split ? 1231 : 1237);
-//			result = prime * result + ((reference == null) ? 0 : reference.hashCode());
-//			result = prime * result + ((xferId == null) ? 0 : xferId.hashCode());
-//			return result;
-//		}
 
 			return true;
 		}

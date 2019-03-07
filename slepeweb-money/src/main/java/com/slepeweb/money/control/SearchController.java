@@ -1,5 +1,6 @@
 package com.slepeweb.money.control;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -89,14 +90,19 @@ public class SearchController extends BaseController {
 	public RedirectView indexByDatesAction(HttpServletRequest req) { 
 		String startStr = req.getParameter("from");
 		String endStr = req.getParameter("to");
+		Calendar mark = Util.today();
+		mark.add(Calendar.DATE, 1);
+		Util.zeroTimeOfDay(mark);
 		
-		if (StringUtils.isBlank(startStr) || StringUtils.isBlank(endStr)) {
-			return new RedirectView(String.format("%s/search/?flash=%s", 
-					req.getContextPath(), Util.encodeUrl("failure|Indexing not possible - Incomplete dates")));	
-		}
+		Date start = StringUtils.isBlank(startStr) ? 
+				new Date(0L) :
+					Util.parseSolrDate(startStr + SolrParams.START_OF_DAY);
+			
+		Date end = StringUtils.isBlank(endStr) ? 
+				mark.getTime() :
+					Util.parseSolrDate(endStr + SolrParams.END_OF_DAY);
 		
-		Date start = Util.parseSolrDate(startStr + SolrParams.START_OF_DAY);
-		Date end = Util.parseSolrDate(endStr + SolrParams.END_OF_DAY);
+		
 		this.solrService.removeTransactionsByDate(start, end);
 		boolean ok = this.solrService.save(this.transactionService.getTransactionsByDate(start, end));
 		

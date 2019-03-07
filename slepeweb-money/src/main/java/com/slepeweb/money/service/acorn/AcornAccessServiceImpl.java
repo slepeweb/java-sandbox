@@ -143,15 +143,14 @@ public class AcornAccessServiceImpl extends BaseServiceImpl implements AcornAcce
 			
 			Transaction t = new Transaction().
 					setOrigId(Long.valueOf(r.getInt("ID"))).
+					setSource(2).
 					// Default to johnDoe, noPayee, noCategory, and debit amounts
 					setAccount(this.johnDoeAccount).
 					setPayee(this.noPayee).
 					setCategory(this.noCategory).
 					setAmount(- Util.decimal2long(r.getBigDecimal(AMOUNT))).
 					setEntered(new Timestamp(date.getTime())).
-					setMemo(r.getString(MEMO)).
-					// Identify as 'acorn' for purpose of re-runs
-					setReference("acorn");
+					setMemo(r.getString(MEMO));
 			
 			Account leftAccount = this.accountMap.get(fromId);
 			Account rightAccount = this.accountMap.get(toId);
@@ -166,6 +165,15 @@ public class AcornAccessServiceImpl extends BaseServiceImpl implements AcornAcce
 					// 'to' is an account - must be a transfer from one account to another
 					Transfer tt = new Transfer(t);
 					tt.setMirrorAccount(rightAccount);
+					
+					/*
+					 * The Acorn database doesn't store mirror transactions, so what should we set
+					 * origId to? Using -1L
+					 */
+					if (tt.getOrigId() == 0L) {
+						tt.setOrigId(-1L);
+					}
+					
 					return tt;
 				}
 				else if (rightCategory != null) {
