@@ -10,12 +10,8 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.Transfer;
-import com.slepeweb.money.bean.solr.SolrConfig;
-import com.slepeweb.money.bean.solr.SolrParams;
-import com.slepeweb.money.bean.solr.SolrResponse;
 import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -268,7 +264,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			}
 			
 			if (t.isTransfer()) {
-				return new Transfer(t).setTransactionService(this);
+				return ((Transfer) t).setTransactionService(this);
 			}
 		}
 								
@@ -327,9 +323,6 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				new Object[]{categoryId});
 	}
 	
-	/*
-	 * TODO: why are transactions not sorted by reverse date here?
-	 */
 	public List<Transaction> getTransactionsForAccount(long accountId, Timestamp from, Timestamp to) {
 		return getTransactions(
 				SELECT + "where t.accountid = ? and t.entered >= ? and t.entered <= ? order by t.entered", 
@@ -342,19 +335,15 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		for (Transaction t : list) {
 			if (t.isSplit()) {
-				t.setSplits(this.splitTransactionService.get(t));
+				t.setSplitsService(this.splitTransactionService);
+			}
+			
+			if (t.isTransfer()) {
+				((Transfer) t).setTransactionService(this);
 			}
 		}
 		
 		return list;
-	}
-	
-	public SolrResponse<FlatTransaction> getTransactionsForPayee(long id) {
-		return this.solrService.query(new SolrParams(new SolrConfig()).setPayeeId(id));
-	}
-	
-	public SolrResponse<FlatTransaction> getTransactionsForCategory(long id) {
-		return this.solrService.query(new SolrParams(new SolrConfig()).setCategoryId(id));
 	}
 	
 	public long getBalance(long accountId) {

@@ -12,6 +12,7 @@ import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.bean.Transfer;
 
 public class RowMapperUtil {
 
@@ -35,19 +36,23 @@ public class RowMapperUtil {
 	
 	public static final class TransactionMapper implements RowMapper<Transaction> {
 		public Transaction mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new Transaction().
+			long transferId = rs.getLong("transferid");
+			Transaction t = transferId > 0 ? new Transfer() : new Transaction();
+			
+			return t.
 					setAccount(makeAccountX(rs)).
 					setPayee(makePayeeX(rs)).
 					setCategory(makeCategoryX(rs)).
 					setSplit(rs.getBoolean("split")).
 					setEntered(rs.getTimestamp("entered")).
-					setXferId(rs.getLong("transferid")).
+					setXferId(transferId).
 					setReconciled(rs.getBoolean("reconciled")).
 					setAmount(rs.getLong("amount")).
 					setReference(rs.getString("reference")).
 					setMemo(rs.getString("memo")).
 					setId(rs.getLong("id")).
 					setOrigId(rs.getLong("origid"));
+			
 		}
 	}
 	
