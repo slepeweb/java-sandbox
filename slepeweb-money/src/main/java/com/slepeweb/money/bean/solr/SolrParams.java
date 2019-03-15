@@ -14,7 +14,7 @@ public class SolrParams {
 	public static final String END_OF_DAY = "T23:59:59Z";
 	
 	private SolrConfig config;
-	private String memo, majorCategory, payeeName;
+	private String memo, majorCategory, minorCategory, payeeName;
 	private Long accountId, payeeId, categoryId;
 	private int pageNum, pageSize;
 	private Date from, to;
@@ -117,6 +117,15 @@ public class SolrParams {
 
 	public SolrParams setMajorCategory(String majorCategory) {
 		this.majorCategory = majorCategory;
+		return this;
+	}
+
+	public String getMinorCategory() {
+		return minorCategory;
+	}
+
+	public SolrParams setMinorCategory(String minorCategory) {
+		this.minorCategory = minorCategory;
 		return this;
 	}
 

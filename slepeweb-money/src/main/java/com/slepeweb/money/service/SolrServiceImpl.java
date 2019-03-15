@@ -239,6 +239,10 @@ public class SolrServiceImpl implements SolrService {
 				isCategorySearch = true;
 				q.addFilterQuery(String.format("major:\"%s\"", params.getMajorCategory()));
 				isCriteriaSet = true;
+				
+				if (StringUtils.isNotBlank(params.getMinorCategory())) {
+					q.addFilterQuery(String.format("minor:\"%s\"", params.getMinorCategory()));
+				}
 			}
 
 			if (StringUtils.isNotBlank(params.getMemo())) {

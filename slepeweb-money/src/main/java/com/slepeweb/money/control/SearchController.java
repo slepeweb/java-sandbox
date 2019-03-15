@@ -1,5 +1,6 @@
 package com.slepeweb.money.control;
 
+import java.awt.geom.Rectangle2D;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +8,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.graphics2d.svg.SVGGraphics2D;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -17,9 +23,11 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
+import com.slepeweb.money.bean.solr.SolrResponse;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
@@ -128,4 +136,81 @@ public class SearchController extends BaseController {
 				req.getContextPath(), Util.encodeUrl("success|Indexing complete")));
 	}
 	
+	@RequestMapping(value="/chart/by/categories", method=RequestMethod.GET)
+	public String chartByCategories(ModelMap model) {
+ 
+		int baseYear = 2000;
+		Calendar from = Util.today();
+		int lastYear = from.get(Calendar.YEAR);
+		
+		// from is Jan 1
+		from.set(Calendar.DATE, 1);
+		from.set(Calendar.MONTH, 0);
+		
+		// to is Dec 31
+		Calendar to = Calendar.getInstance();
+		to.setTime(from.getTime());
+		to.set(Calendar.DATE, 31);
+		to.set(Calendar.MONTH, 11);
+		
+		DefaultCategoryDataset ds = new DefaultCategoryDataset();
+		String[][] categories = new String[][] {
+				new String[] {"Food", "Groceries"},
+				new String[] {"Laguna", "Diesel"},
+				new String[] {"Clothing"},
+				new String[] {"Holiday"}
+		};
+		
+		long amount;
+		SolrResponse<FlatTransaction> resp;
+		SolrParams p = new SolrParams(new SolrConfig().setPageSize(10000));
+		
+		for (String[] parts : categories) {
+			p.setMajorCategory(parts[0]);
+			p.setMinorCategory(parts.length > 1 ? parts[1] : null);				
+			
+			for (int year = baseYear; year < lastYear; year++) {
+				from.set(Calendar.YEAR,  year);
+				to.set(Calendar.YEAR,  year);
+				p.setFrom(from.getTime());
+				p.setTo(to.getTime());
+				amount = 0;
+				
+				resp = this.solrService.query(p);
+				
+				for (FlatTransaction ft : resp.getResults()) {
+					amount += ft.getAmount();
+				}
+				
+				ds.addValue((int) (-amount / 100), 
+						parts[0] + (parts.length > 1 ? " -> " + parts[1] : ""),
+						Integer.valueOf(year));
+			}
+		}
+	 
+		JFreeChart chart = ChartFactory.createLineChart(
+		         "Category spend report", "Years", "Spend (£)",
+		         ds,
+		         PlotOrientation.VERTICAL, true, true, false);
+		
+		SVGGraphics2D svg2d = new SVGGraphics2D(1000, 600);
+	    chart.draw(svg2d,new Rectangle2D.Double(0, 0, 1000, 600));
+	    model.addAttribute("_chartSVG", svg2d.getSVGElement());
+		
+		/*
+		File lineChart = new File( "/tmp/LineChart.jpeg" ); 
+		
+	    try {
+			ChartUtils.saveChartAsJPEG(lineChart , chart, 1000 ,600);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+	    
+	    model.addAttribute("_chartPath", lineChart.getAbsolutePath());
+		*/
+		
+		return "chart"; 
+	}
+		
 }
