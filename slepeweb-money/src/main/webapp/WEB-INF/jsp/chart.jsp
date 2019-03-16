@@ -4,6 +4,10 @@
 	
 <mny:standardLayout>
 	<h1>Chart</h1>
-	${_chartSVG}
+	<c:choose><c:when test="${not empty noCategoriesSpecified}">
+		<p>No categories specified - please <a href="${_ctxPath}/chart/by/categories${queryString}">try again</a>.</p>
+	</c:when><c:otherwise>
+		${_chartSVG}
+	</c:otherwise></c:choose>
 </mny:standardLayout>
 	

@@ -1,8 +1,10 @@
 package com.slepeweb.money.control;
 
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +44,7 @@ public class SearchController extends BaseController {
 	@Autowired private CategoryService categoryService;
 	@Autowired private TransactionService transactionService;
 	@Autowired private SolrService solrService;
+	@Autowired private CategoryController categoryController;
 	
 	@RequestMapping(value="/search", method=RequestMethod.GET)
 	public String form(ModelMap model) {
@@ -136,12 +139,76 @@ public class SearchController extends BaseController {
 				req.getContextPath(), Util.encodeUrl("success|Indexing complete")));
 	}
 	
+	private int getChartFromYear(HttpServletRequest req) {
+		int baseYearDflt = 2000;		
+		int baseYear = baseYearDflt;
+		String fromYearParam = req.getParameter("from");
+		
+		if (StringUtils.isNumeric(fromYearParam)) {
+			baseYear = Integer.valueOf(fromYearParam).intValue();
+			if (baseYear < 1970) {
+				baseYear = baseYearDflt;
+			}
+		}
+		
+		return baseYear;
+	}
+	
+	private int getChartNumYears(HttpServletRequest req) {
+		int numYearsDflt = 10;		
+		int numYears = numYearsDflt;		
+		String numYearsParam = req.getParameter("numYears");
+		
+		if (StringUtils.isNumeric(numYearsParam)) {
+			numYears = Integer.valueOf(numYearsParam).intValue();
+			if (numYears < 2 || numYears > 20) {
+				numYears = numYearsDflt;
+			}
+		}
+		
+		return numYears;
+	}
+	
 	@RequestMapping(value="/chart/by/categories", method=RequestMethod.GET)
-	public String chartByCategories(ModelMap model) {
- 
-		int baseYear = 2000;
+	public String chartByCategories(HttpServletRequest req, ModelMap model) {
+		this.categoryController.categoryList(model);
+		model.addAttribute("_fromYear", getChartFromYear(req));
+		model.addAttribute("_numYears", getChartNumYears(req));
+		return "chartInput";
+	}
+	
+	@RequestMapping(value="/chart/by/categories/out", method=RequestMethod.POST)
+	public String chartByCategoriesOutput(HttpServletRequest req, ModelMap model) {
+		
+		int baseYear = getChartFromYear(req);		
+		int numYears = getChartNumYears(req);		
+		List<String[]> categories = new ArrayList<String[]>();
+		
+		Enumeration<String> enumer = req.getParameterNames();
+		String name, value;
+		String[] splits;
+		
+		while(enumer.hasMoreElements()) {
+			name = enumer.nextElement();
+			if (name.matches("_\\d+")) {
+				value = req.getParameter(name);
+				splits = value.split("\\|");
+				
+				if (splits.length < 2 || splits[1].startsWith("(no")) {
+					splits[1] = "";
+				}
+				categories.add(splits);
+			}
+		}
+		
+		if (categories.size() == 0) {
+			model.addAttribute("noCategoriesSpecified", 1);
+			model.addAttribute("queryString", String.format("?from=%d&numYears=%d", baseYear, numYears));
+			return "chart";
+		}
+		
 		Calendar from = Util.today();
-		int lastYear = from.get(Calendar.YEAR);
+		int currentYear = from.get(Calendar.YEAR);
 		
 		// from is Jan 1
 		from.set(Calendar.DATE, 1);
@@ -153,23 +220,19 @@ public class SearchController extends BaseController {
 		to.set(Calendar.DATE, 31);
 		to.set(Calendar.MONTH, 11);
 		
-		DefaultCategoryDataset ds = new DefaultCategoryDataset();
-		String[][] categories = new String[][] {
-				new String[] {"Food", "Groceries"},
-				new String[] {"Laguna", "Diesel"},
-				new String[] {"Clothing"},
-				new String[] {"Holiday"}
-		};
+		DefaultCategoryDataset ds = new DefaultCategoryDataset();		
 		
 		long amount;
 		SolrResponse<FlatTransaction> resp;
 		SolrParams p = new SolrParams(new SolrConfig().setPageSize(10000));
+		int yearCounter;
 		
 		for (String[] parts : categories) {
 			p.setMajorCategory(parts[0]);
-			p.setMinorCategory(parts.length > 1 ? parts[1] : null);				
+			p.setMinorCategory(parts.length > 1 ? parts[1] : null);		
+			yearCounter = 0;
 			
-			for (int year = baseYear; year < lastYear; year++) {
+			for (int year = baseYear; yearCounter++ < numYears && year < currentYear; year++) {
 				from.set(Calendar.YEAR,  year);
 				to.set(Calendar.YEAR,  year);
 				p.setFrom(from.getTime());
@@ -196,19 +259,6 @@ public class SearchController extends BaseController {
 		SVGGraphics2D svg2d = new SVGGraphics2D(1000, 600);
 	    chart.draw(svg2d,new Rectangle2D.Double(0, 0, 1000, 600));
 	    model.addAttribute("_chartSVG", svg2d.getSVGElement());
-		
-		/*
-		File lineChart = new File( "/tmp/LineChart.jpeg" ); 
-		
-	    try {
-			ChartUtils.saveChartAsJPEG(lineChart , chart, 1000 ,600);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-	    
-	    model.addAttribute("_chartPath", lineChart.getAbsolutePath());
-		*/
 		
 		return "chart"; 
 	}
