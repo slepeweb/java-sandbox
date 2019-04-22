@@ -4,7 +4,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +24,12 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.chart.ChartCategory;
+import com.slepeweb.money.bean.chart.ChartCategoryGroup;
+import com.slepeweb.money.bean.chart.ChartProperties;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
@@ -38,6 +41,8 @@ import com.slepeweb.money.service.TransactionService;
 
 @Controller
 public class SearchController extends BaseController {
+	
+	private static final String CHART_PROPS_ATTR = "_chartProps";
 	
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
@@ -172,38 +177,51 @@ public class SearchController extends BaseController {
 	@RequestMapping(value="/chart/by/categories", method=RequestMethod.GET)
 	public String chartByCategories(HttpServletRequest req, ModelMap model) {
 		this.categoryController.categoryList(model);
-		model.addAttribute("_fromYear", getChartFromYear(req));
-		model.addAttribute("_numYears", getChartNumYears(req));
+		
+		ChartProperties props = (ChartProperties) req.getSession().getAttribute(CHART_PROPS_ATTR);
+		if (props == null) {
+			props = new ChartProperties();
+		}
+		
+		model.addAttribute(CHART_PROPS_ATTR, props);
 		return "chartInput";
 	}
 	
 	@RequestMapping(value="/chart/by/categories/out", method=RequestMethod.POST)
 	public String chartByCategoriesOutput(HttpServletRequest req, ModelMap model) {
 		
-		int baseYear = getChartFromYear(req);		
-		int numYears = getChartNumYears(req);		
-		List<String[]> categories = new ArrayList<String[]>();
+		ChartProperties props = new ChartProperties();
+		req.getSession().setAttribute(CHART_PROPS_ATTR, props);
 		
-		Enumeration<String> enumer = req.getParameterNames();
-		String name, value;
-		String[] splits;
+		props.setFromYear(getChartFromYear(req));		
+		props.setNumYears(getChartNumYears(req));		
+		//List<String[]> categories = new ArrayList<String[]>();
+		String groupName, major, minor;
+		ChartCategoryGroup group;
 		
-		while(enumer.hasMoreElements()) {
-			name = enumer.nextElement();
-			if (name.matches("_\\d+")) {
-				value = req.getParameter(name);
-				splits = value.split("\\|");
-				
-				if (splits.length < 2 || splits[1].startsWith("(no")) {
-					splits[1] = "";
+		for (int groupId = 1; groupId < 5; groupId++) {
+			groupName = req.getParameter(String.format("group-%d-name", groupId));
+			if (StringUtils.isNotBlank(groupName)) {
+				if (props.getGroups().size() < groupId) {
+					props.getGroups().add(new ChartCategoryGroup());
 				}
-				categories.add(splits);
+				group = props.getGroups().get(groupId - 1);
+				group.setLabel(groupName);
+				
+				for (int i = 1; i <= ChartCategory.MAX; i++) {
+					major = req.getParameter(String.format("major-%d-%d", groupId, i));
+					minor = req.getParameter(String.format("minor-%d-%d", groupId, i));
+					
+					group.getCategories().get(i - 1).
+						setMajor(major).
+						setMinor(minor).
+						setOptions(this.categoryService.getAllMinorValues(major));
+				}
 			}
 		}
 		
-		if (categories.size() == 0) {
+		if (! props.isReady()) {
 			model.addAttribute("noCategoriesSpecified", 1);
-			model.addAttribute("queryString", String.format("?from=%d&numYears=%d", baseYear, numYears));
 			return "chart";
 		}
 		
@@ -225,14 +243,18 @@ public class SearchController extends BaseController {
 		long amount;
 		SolrResponse<FlatTransaction> resp;
 		SolrParams p = new SolrParams(new SolrConfig().setPageSize(10000));
+		p.setCategories(new ArrayList<Category>());
 		int yearCounter;
 		
-		for (String[] parts : categories) {
-			p.setMajorCategory(parts[0]);
-			p.setMinorCategory(parts.length > 1 ? parts[1] : null);		
+		for (ChartCategoryGroup g : props.getGroups()) {
+			
+			for (ChartCategory cc : g.getCategories()) {
+				p.getCategories().add(new Category().setMajor(cc.getMajor()).setMinor(cc.getMinor()));
+			}
+			
 			yearCounter = 0;
 			
-			for (int year = baseYear; yearCounter++ < numYears && year < currentYear; year++) {
+			for (int year = props.getFromYear(); yearCounter++ < props.getNumYears() && year < currentYear; year++) {
 				from.set(Calendar.YEAR,  year);
 				to.set(Calendar.YEAR,  year);
 				p.setFrom(from.getTime());
@@ -246,12 +268,12 @@ public class SearchController extends BaseController {
 				}
 				
 				ds.addValue((int) (-amount / 100), 
-						parts[0] + (parts.length > 1 ? " -> " + parts[1] : ""),
+						g.getLabel(),
 						Integer.valueOf(year));
 			}
 		}
 	 
-		JFreeChart chart = ChartFactory.createLineChart(
+		JFreeChart chart = ChartFactory.createBarChart(
 		         "Category spend report", "Years", "Spend (£)",
 		         ds,
 		         PlotOrientation.VERTICAL, true, true, false);

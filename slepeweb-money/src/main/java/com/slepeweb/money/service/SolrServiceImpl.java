@@ -244,6 +244,21 @@ public class SolrServiceImpl implements SolrService {
 					q.addFilterQuery(String.format("minor:\"%s\"", params.getMinorCategory()));
 				}
 			}
+			else if (params.getCategories() != null && params.getCategories().size() > 0) {
+				isCategorySearch = true;
+				StringBuilder sb = new StringBuilder();
+				for (Category c : params.getCategories()) {
+					if (StringUtils.isNotBlank(c.getMajor())) {
+						if (sb.length() > 0) {
+							sb.append(" OR ");
+						}
+						sb.append(String.format("(major:%s AND minor:%s)", c.getMajor(), c.getMinor()));
+					}
+				}
+				
+				q.addFilterQuery(sb.toString());
+				isCriteriaSet = true;
+			}
 
 			if (StringUtils.isNotBlank(params.getMemo())) {
 				q.setQuery(params.getMemo());

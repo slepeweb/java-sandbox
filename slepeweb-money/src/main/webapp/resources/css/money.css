@@ -318,6 +318,13 @@ input[type="email"],
 select {
   height: 2em;
 }
+input[type="text"].inline,
+input[type="password"].inline,
+input[type="email"].inline,
+select.inline {
+  display: inline-block;
+  width: 90%;
+}
 
 textarea {
   padding: 0.75em 1em;
@@ -842,4 +849,11 @@ span.flash {
 
 .radio-horiz {
   margin-right: 3em;
+}
+
+#category-groupings .width25 {
+  width: 25%;
+}
+#category-groupings .width50 {
+  width: 50%;
 }

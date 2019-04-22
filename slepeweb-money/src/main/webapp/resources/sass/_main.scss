@@ -211,6 +211,11 @@
 	input[type="email"],
 	select {
 		height: $size-element-height;
+		
+		&.inline {
+			display: inline-block;
+			width: 90%;
+		}
 	}
 
 	textarea {
@@ -725,4 +730,14 @@ span.flash {
 
 .radio-horiz {
 	margin-right: 3em;
+}
+
+#category-groupings {
+	.width25 {
+		width: 25%;
+	}
+	
+	.width50 {
+		width: 50%;
+	}
 }

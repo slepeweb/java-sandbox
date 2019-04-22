@@ -44,4 +44,11 @@
 		<function-signature>java.lang.Object tertiaryOp(boolean, java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 	
+	<function>
+		<name>buildChartPropertyMarkup</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.String buildChartPropertyMarkup(com.slepeweb.money.bean.chart.ChartProperties, 
+			java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+	
 </taglib>

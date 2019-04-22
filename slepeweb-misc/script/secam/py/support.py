@@ -179,7 +179,7 @@ class Support:
     def send_mail(self, task):
         mail_from = "donna@buttigieg.org.uk"
         mail_to = "george@buttigieg.org.uk"
-        web_page = "http://www.slepeweb.com/secam/app/py/index.py"
+        web_page = "http://secam.slepeweb.com/py/index.py"
         mail_body = """
         A security alarm (#%d) has been raised @ %s.
         

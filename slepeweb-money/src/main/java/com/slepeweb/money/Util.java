@@ -10,6 +10,10 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.slepeweb.money.bean.chart.ChartCategory;
+import com.slepeweb.money.bean.chart.ChartCategoryGroup;
+import com.slepeweb.money.bean.chart.ChartProperties;
+
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
@@ -158,5 +162,50 @@ public class Util {
 		}
 		
 		return 0L;
+	}
+	
+	public static String buildChartPropertyMarkup(ChartProperties props, String outerTemplate, String innerTemplate, 
+			String categoryOptionsTemplate) {
+		
+		StringBuilder allGroups = new StringBuilder();
+		StringBuilder optionsForGroup = new StringBuilder();
+		StringBuilder innerBuilder;
+		String outer, inner;
+		int groupId = 0, optionsId;
+		
+		for (ChartCategoryGroup group : props.getGroups()) {
+			groupId++;
+			outer = outerTemplate.
+					replaceAll("\\[groupId\\]", String.valueOf(groupId)).
+					replace("[label]", group.getLabel());
+			inner = "";
+			innerBuilder = new StringBuilder();
+			optionsId = 0;
+			
+			for (ChartCategory cc : group.getCategories()) {
+				optionsId++;
+				inner = innerTemplate.
+						replaceAll("\\[groupId\\]", String.valueOf(groupId)).
+						replaceAll("\\[counter\\]", String.valueOf(optionsId)).
+						replace("[major]", cc.getMajor());
+				
+				optionsForGroup = new StringBuilder();
+				
+				for (String minor : cc.getOptions()) {
+					optionsForGroup.append(categoryOptionsTemplate.
+							replace("[minor]", minor).
+							replace("[selected]", minor.equals(cc.getMinor()) ? "selected" : "" ));
+				}
+				
+				inner = inner.replace("__categoryOptionsTemplate__", optionsForGroup.toString());
+				innerBuilder.append(inner);
+			}
+			
+			outer = outer.replace("__innerTemplate__", innerBuilder.toString());
+			allGroups.append(outer);
+		}
+		
+		return allGroups.toString();
+		
 	}
 }

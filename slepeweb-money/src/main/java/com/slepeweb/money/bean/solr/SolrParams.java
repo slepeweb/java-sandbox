@@ -3,10 +3,12 @@ package com.slepeweb.money.bean.solr;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.money.Util;
+import com.slepeweb.money.bean.Category;
 
 public class SolrParams {
 
@@ -15,6 +17,7 @@ public class SolrParams {
 	
 	private SolrConfig config;
 	private String memo, majorCategory, minorCategory, payeeName;
+	private List<Category> categories;
 	private Long accountId, payeeId, categoryId;
 	private int pageNum, pageSize;
 	private Date from, to;
@@ -256,5 +259,14 @@ public class SolrParams {
 
 	public SolrConfig getConfig() {
 		return config;
+	}
+
+	public List<Category> getCategories() {
+		return categories;
+	}
+
+	public SolrParams setCategories(List<Category> categories) {
+		this.categories = categories;
+		return this;
 	}
 }
