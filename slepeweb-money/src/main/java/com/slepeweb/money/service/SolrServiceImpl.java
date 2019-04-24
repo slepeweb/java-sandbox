@@ -252,7 +252,13 @@ public class SolrServiceImpl implements SolrService {
 						if (sb.length() > 0) {
 							sb.append(" OR ");
 						}
-						sb.append(String.format("(major:%s AND minor:%s)", c.getMajor(), c.getMinor()));
+						
+						if (StringUtils.isBlank(c.getMinor())) {
+							sb.append(String.format("major:\"%s\"", c.getMajor()));
+						}
+						else {
+							sb.append(String.format("(major:\"%s\" AND minor:\"%s\")", c.getMajor(), c.getMinor()));
+						}
 					}
 				}
 				
@@ -305,7 +311,7 @@ public class SolrServiceImpl implements SolrService {
 				} catch (Exception e) {
 					response.setError(true);
 					response.setMessage("Search system error");
-					LOG.error(String.format(response.getMessage(), e.getMessage()));
+					LOG.error(String.format(response.getMessage() + "[%s]", e.getMessage()));
 				}
 			}
 			else {

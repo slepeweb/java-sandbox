@@ -857,3 +857,7 @@ span.flash {
 #category-groupings .width50 {
   width: 50%;
 }
+
+.trash-category-group {
+  margin-top: 2.7em;
+}

@@ -7,6 +7,7 @@
    <tr class="category-group">
        <td class="width25">
        	<input id="group-[groupId]-name" type="text" name="group-[groupId]-name" value="[label]" />
+       	<div class="trash-category-group"><i class="far fa-trash-alt" title="Remove this category group"></i></div>
        </td>
        <td>
        	__innerTemplate__
@@ -27,6 +28,8 @@
 	 	<select class="width50 inline" id="minor-[groupId]-[counter]" name="minor-[groupId]-[counter]">
 	 	__categoryOptionsTemplate__
 	 	</select>
+	 	
+	 	<span class="trash-category"><i class="far fa-trash-alt" title="Remove this category"></i></span>
 	</div>
 </c:set>
 	
@@ -73,8 +76,13 @@
 </mny:standardLayout>
 
 <script>
+var _outerTemplate='${mon:compactMarkup(_outerTemplate)}';
+var _innerTemplate='${mon:compactMarkup(_innerTemplate)}';
+var _categoryOptionsTemplate='${mon:compactMarkup(_categoryOptionsTemplate)}';
+
 $(function() {
-  var _updateMinorCategories = function(majorEle) {
+
+	var _updateMinorCategories = function(majorEle) {
 	  var deferred = $.Deferred();
 		var minorEle = majorEle.next();
 		
@@ -86,7 +94,8 @@ $(function() {
 				success: function(obj, status, z) {
 					minorEle.empty();
 					$.each(obj.data, function(index, minor) {
-						minorEle.append("<option value='" + minor + "'>" + minor + "</option>");
+						var markup = _categoryOptionsTemplate.replace(/\[minor\]/g, minor).replace(/\[selected\]/, "");
+						minorEle.append(markup);
 					});
 					
 					deferred.resolve("Categories updated");
@@ -104,35 +113,33 @@ $(function() {
   }
   
   var _addCategoryGroup = function(c) {
-	    var str = '<tr class="category-group">';
-	    str = str.concat('<td class="width25">');
-	    str = str.concat('<input id="group-' + c + '-name" type="text" name="group-' + c + '-name" value="Group ' + c + '" />');
-	    str = str.concat('</td>');
-	    str = str.concat('<td>');
+		var inner = "";
+    for (var i = 1; i <= 3; i++) {
+			inner += _innerTemplate.
+				replace(/\[groupId\]/g, parseInt(c)).
+				replace(/\[counter\]/g, parseInt(i)).
+				replace("[major]", "").
+				replace("__categoryOptionsTemplate__", "");
+    }
+    
+		var outer = _outerTemplate.
+			replace(/\[groupId\]/g, parseInt(c)).
+			replace("[label]", "Group " + c).
+			replace("__innerTemplate__", inner);
 	    
-	    for (var i = 1; i <= 3; i++) {
-		    str = str.concat('<div>');
-		    str = str.concat('<span class="inline">' + i + '</span>');
-		    str = str.concat('<input class="width25 inline" id="major-' + c + '-' + i + '" type="text" name="major-' + c + '-' + i + '" list="majors" />');
-		    str = str.concat('<select class="width50 inline" id="minor-' + c + '-' + i + '" name="minor-' + c + '-' + i + '"></select>');
-		    str = str.concat('</div>');
-	    }
-	    
-	    str = str.concat('</td>');
-	    str = str.concat('</tr>');
-	    
-		  if (c > 1) {
-		  	$(".category-group").first().parent().append(str);
-  		}
-		  else {
-			  $("#category-groupings").append(str);
-		  }
-		  
-		  _addChangeBehaviour();
+	  if (c > 1) {
+	  	$(".category-group").first().parent().append(outer);
+ 		}
+	  else {
+		  $("#category-groupings").append(outer);
+	  }
+	  
+	  _applyCategoryChangeBehaviour();
+	  _applyTrashingBehaviour();
   }
   
-  var _addChangeBehaviour = function() {
-	  $("input[id^='major']").change(function(e) {	
+  var _applyCategoryChangeBehaviour = function() {
+	  $("input[id^='major']").off().change(function(e) {	
 		  var promet = _updateMinorCategories($(this));
 		  promet.done(function(res){
 			  //window.alert(res);
@@ -141,17 +148,31 @@ $(function() {
 		  promet.fail(function(res){
 			  //window.alert(res);
 		  });
-		});
+		});	  
+ }
+  
+  var _applyTrashingBehaviour = function() {
+	  $(".trash-category-group").off().click(function(e) {
+		  $(this).parent().parent().remove();
+	  });
 	  
-  }
+	  $(".trash-category").off().click(function(e) {
+		  var input = $(this).prev().prev();
+		  input.val("");
+		  input.next().val("");
+	  });
+ }
   
-  _addChangeBehaviour();
-  
+  _applyCategoryChangeBehaviour();
+    
   $("#add-group-button").click(function(e) {	
 	  var numGroups = $(".category-group").length;
 	  _addCategoryGroup(numGroups + 1);
 	  e.stopPropagation();
+	  _applyTrashingBehaviour();
   });
   
+  _applyCategoryChangeBehaviour();
+  _applyTrashingBehaviour();
 });
 </script>

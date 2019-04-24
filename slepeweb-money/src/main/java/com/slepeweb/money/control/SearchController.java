@@ -181,6 +181,7 @@ public class SearchController extends BaseController {
 		ChartProperties props = (ChartProperties) req.getSession().getAttribute(CHART_PROPS_ATTR);
 		if (props == null) {
 			props = new ChartProperties();
+			props.getGroups().get(0).setLabel("Group 1");
 		}
 		
 		model.addAttribute(CHART_PROPS_ATTR, props);

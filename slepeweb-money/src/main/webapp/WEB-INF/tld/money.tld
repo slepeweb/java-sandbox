@@ -51,4 +51,10 @@
 			java.lang.String, java.lang.String, java.lang.String)</function-signature>
 	</function>
 	
+	<function>
+		<name>compactMarkup</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.String compactMarkup(java.lang.String)</function-signature>
+	</function>
+	
 </taglib>

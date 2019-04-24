@@ -208,4 +208,8 @@ public class Util {
 		return allGroups.toString();
 		
 	}
+	
+	public static String compactMarkup(String in) {
+		return in.replaceAll("\\n", "").replaceAll("\\r", "");
+	}
 }
