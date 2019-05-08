@@ -9,6 +9,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -29,6 +31,7 @@ import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.chart.ChartCategory;
 import com.slepeweb.money.bean.chart.ChartCategoryGroup;
+import com.slepeweb.money.bean.chart.ChartFormCounter;
 import com.slepeweb.money.bean.chart.ChartProperties;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
@@ -178,10 +181,16 @@ public class SearchController extends BaseController {
 	public String chartByCategories(HttpServletRequest req, ModelMap model) {
 		this.categoryController.categoryList(model);
 		
-		ChartProperties props = (ChartProperties) req.getSession().getAttribute(CHART_PROPS_ATTR);
+		ChartProperties props = null;
+		if (req.getParameterMap().containsKey("repeat")) {
+			props = (ChartProperties) req.getSession().getAttribute(CHART_PROPS_ATTR);
+		}
+		
 		if (props == null) {
 			props = new ChartProperties();
-			props.getGroups().get(0).setLabel("Group 1");
+			ChartCategoryGroup g = new ChartCategoryGroup().setLabel("Group 1");
+			g.getCategories().add(new ChartCategory());
+			props.getGroups().add(g);
 		}
 		
 		model.addAttribute(CHART_PROPS_ATTR, props);
@@ -192,31 +201,58 @@ public class SearchController extends BaseController {
 	public String chartByCategoriesOutput(HttpServletRequest req, ModelMap model) {
 		
 		ChartProperties props = new ChartProperties();
-		req.getSession().setAttribute(CHART_PROPS_ATTR, props);
-		
 		props.setFromYear(getChartFromYear(req));		
 		props.setNumYears(getChartNumYears(req));		
-		//List<String[]> categories = new ArrayList<String[]>();
 		String groupName, major, minor;
 		ChartCategoryGroup group;
+		ChartCategory cat;
 		
-		for (int groupId = 1; groupId < 5; groupId++) {
+		req.getSession().setAttribute(CHART_PROPS_ATTR, props);
+		
+		String jsonStr = req.getParameter("counterStore");
+		List<ChartFormCounter> counters = fromJson(new TypeReference<List<ChartFormCounter>>() {}, jsonStr);
+		int numGroups = counters.size();
+		int numCategories;
+		int n = 0, m;
+		
+		for (int groupId = 1; groupId < 10; groupId++) {
 			groupName = req.getParameter(String.format("group-%d-name", groupId));
+			
 			if (StringUtils.isNotBlank(groupName)) {
-				if (props.getGroups().size() < groupId) {
-					props.getGroups().add(new ChartCategoryGroup());
-				}
-				group = props.getGroups().get(groupId - 1);
+				group = new ChartCategoryGroup();
+				props.getGroups().add(group);
 				group.setLabel(groupName);
 				
-				for (int i = 1; i <= ChartCategory.MAX; i++) {
+				// How many categories are in this group?
+				numCategories = 0;
+				for (ChartFormCounter c : counters) {
+					if (c.getGroupId() == groupId) {
+						numCategories = c.getCategoryCount();
+						break;
+					}
+				}
+								
+				m = 0;	
+				for (int i = 1; i < 10; i++) {
 					major = req.getParameter(String.format("major-%d-%d", groupId, i));
 					minor = req.getParameter(String.format("minor-%d-%d", groupId, i));
 					
-					group.getCategories().get(i - 1).
-						setMajor(major).
-						setMinor(minor).
-						setOptions(this.categoryService.getAllMinorValues(major));
+					if (StringUtils.isNotBlank(major)) {					
+						cat = new ChartCategory().
+							setMajor(major).
+							setMinor(minor).
+							setOptions(this.categoryService.getAllMinorValues(major));
+						
+						group.getCategories().add(cat);
+						
+						if (++m >= numCategories) {
+							break;
+						}
+					}
+				}
+				
+				if (++n >= numGroups) {
+					break;
 				}
 			}
 		}
@@ -243,11 +279,13 @@ public class SearchController extends BaseController {
 		
 		long amount;
 		SolrResponse<FlatTransaction> resp;
-		SolrParams p = new SolrParams(new SolrConfig().setPageSize(10000));
-		p.setCategories(new ArrayList<Category>());
+		SolrParams p;
 		int yearCounter;
 		
 		for (ChartCategoryGroup g : props.getGroups()) {
+			
+			p = new SolrParams(new SolrConfig().setPageSize(10000));
+			p.setCategories(new ArrayList<Category>());
 			
 			for (ChartCategory cc : g.getCategories()) {
 				p.getCategories().add(new Category().setMajor(cc.getMajor()).setMinor(cc.getMinor()));
@@ -256,8 +294,8 @@ public class SearchController extends BaseController {
 			yearCounter = 0;
 			
 			for (int year = props.getFromYear(); yearCounter++ < props.getNumYears() && year < currentYear; year++) {
-				from.set(Calendar.YEAR,  year);
-				to.set(Calendar.YEAR,  year);
+				from.set(Calendar.YEAR, year);
+				to.set(Calendar.YEAR, year);
 				p.setFrom(from.getTime());
 				p.setTo(to.getTime());
 				amount = 0;
@@ -286,4 +324,20 @@ public class SearchController extends BaseController {
 		return "chart"; 
 	}
 		
+	/*
+	 * This method allows us to de-serialize a json string into a list of objects. This is a neater way
+	 * than returning a convenience object with a single property that is the list we are after.
+	 * 
+	 * (I don't know how this works, but it does!)
+	 */
+	public static <T> T fromJson(final TypeReference<T> type, final String jsonPacket) {
+
+		T data = null;
+		try {
+			data = new ObjectMapper().readValue(jsonPacket, type);
+		} catch (Exception e) {
+			// Handle the problem
+		}
+		return data;
+	}
 }

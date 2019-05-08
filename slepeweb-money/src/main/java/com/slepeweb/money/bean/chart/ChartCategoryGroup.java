@@ -5,8 +5,6 @@ import java.util.List;
 
 public class ChartCategoryGroup {
 	
-	public static final int MAX = 5;
-
 	private String label = "";
 	private List<ChartCategory> categories = new ArrayList<ChartCategory>();
 	
@@ -19,14 +17,8 @@ public class ChartCategoryGroup {
 		return this;
 	}
 	
-	// Always returns at least 3 options
 	public List<ChartCategory> getCategories() {
-		if (this.categories.size() < ChartCategory.MAX) {
-			for (int i = this.categories.size(); i < ChartCategory.MAX; i++) {
-				this.categories.add(new ChartCategory());
-			}
-		}
-		return categories;
+		return this.categories;
 	}
 	
 	public ChartCategoryGroup setCategories(List<ChartCategory> cats) {

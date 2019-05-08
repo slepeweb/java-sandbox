@@ -7,8 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ChartCategory {
 	
-	public static final int MAX = 3;
-
 	private String major = "", minor = "";
 	private List<String> options = new ArrayList<String>();
 	

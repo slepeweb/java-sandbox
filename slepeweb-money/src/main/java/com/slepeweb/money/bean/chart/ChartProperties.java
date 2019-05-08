@@ -27,10 +27,7 @@ public class ChartProperties {
 	}
 
 	public List<ChartCategoryGroup> getGroups() {
-		if (this.groups.size() == 0) {
-			this.groups.add(new ChartCategoryGroup());
-		}
-		return groups;
+		return this.groups;
 	}
 
 	public ChartProperties setGroups(List<ChartCategoryGroup> groups) {
