@@ -45,10 +45,17 @@
 	</function>
 	
 	<function>
-		<name>buildChartPropertyMarkup</name>
+		<name>buildChartCategoryInputMarkup</name>
 		<function-class>com.slepeweb.money.Util</function-class>
-		<function-signature>java.lang.String buildChartPropertyMarkup(com.slepeweb.money.bean.chart.ChartProperties, 
+		<function-signature>java.lang.String buildChartCategoryInputMarkup(com.slepeweb.money.bean.ChartProperties, 
 			java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+	
+	<function>
+		<name>buildMinorCategoryInputMarkup</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.String buildMinorCategoryInputMarkup(com.slepeweb.money.bean.CategoryGroup, 
+			java.lang.String, java.lang.String)</function-signature>
 	</function>
 	
 	<function>

@@ -1,6 +1,6 @@
-package com.slepeweb.money.bean.chart;
+package com.slepeweb.money.bean;
 
-public class ChartFormCounter {
+public class MultiCategoryCounter {
 	
 	private int groupId, categoryCount, lastCategoryId;
 

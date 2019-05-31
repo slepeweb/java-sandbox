@@ -1,4 +1,4 @@
-package com.slepeweb.money.bean.chart;
+package com.slepeweb.money.bean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 public class ChartProperties {
 
 	private int fromYear = 2000, numYears = 20;
-	private List<ChartCategoryGroup> groups = new ArrayList<ChartCategoryGroup>();
+	private List<CategoryGroup> groups = new ArrayList<CategoryGroup>();
 	
 	public int getFromYear() {
 		return fromYear;
@@ -26,18 +26,18 @@ public class ChartProperties {
 		return this;
 	}
 
-	public List<ChartCategoryGroup> getGroups() {
+	public List<CategoryGroup> getGroups() {
 		return this.groups;
 	}
 
-	public ChartProperties setGroups(List<ChartCategoryGroup> groups) {
+	public ChartProperties setGroups(List<CategoryGroup> groups) {
 		this.groups = groups;
 		return this;
 	}
 	
 	public boolean isReady() {
-		for (ChartCategoryGroup g : getGroups()) {
-			for (ChartCategory c : g.getCategories()) {
+		for (CategoryGroup g : getGroups()) {
+			for (CategoryInput c : g.getCategories()) {
 				if (c.isReady()) {
 					return true;
 				}

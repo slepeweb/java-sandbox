@@ -2,6 +2,7 @@ package com.slepeweb.money.bean;
 
 public class Category extends DbEntity {
 	private String major = "", minor = "";
+	private boolean exclude;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Category) {
@@ -58,6 +59,15 @@ public class Category extends DbEntity {
 		return this;
 	}
 	
+	public boolean isExclude() {
+		return exclude;
+	}
+
+	public Category setExclude(boolean exclude) {
+		this.exclude = exclude;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

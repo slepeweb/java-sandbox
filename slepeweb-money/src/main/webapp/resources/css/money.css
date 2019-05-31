@@ -851,10 +851,16 @@ span.flash {
   margin-right: 3em;
 }
 
-#category-groupings .width25 {
+#multi-category-groupings .width15 {
+  width: 15%;
+}
+#multi-category-groupings .width20 {
+  width: 20%;
+}
+#multi-category-groupings .width25 {
   width: 25%;
 }
-#category-groupings .width50 {
+#multi-category-groupings .width50 {
   width: 50%;
 }
 

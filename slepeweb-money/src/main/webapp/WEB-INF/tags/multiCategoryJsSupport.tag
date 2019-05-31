@@ -1,6 +1,6 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
-var storageSelector = ".chart #counter-store";
+var storageSelector = ".multi-category-input #counter-store";
 
 var store = function(counters) {
 	$(storageSelector).val(JSON.stringify(counters));
@@ -43,7 +43,7 @@ var remove = function(counters, groupId) {
 
 var counters = [];
 
-$(".category-group").each(function(i){
+$(".multi-category-group").each(function(i){
 	var cCount = $(this).find(".category-inputs").length;
 	var group = {groupId: i + 1, categoryCount: cCount, lastCategoryId: cCount};
 	counters.push(group);

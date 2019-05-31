@@ -10,6 +10,15 @@
 		<p>No categories specified - please <a href="${_ctxPath}/chart/by/categories${queryString}">try again</a>.</p>
 	</c:when><c:otherwise>
 		${_chartSVG}
+		
+		<table>
+			<tr><th>Label</th><th>Categories</th></tr>
+			<c:forEach items="${_chartProps.groups}" var="_group">
+				<tr>
+					<td>${_group.label}</td><td>${_group.filterStr}</td>
+				</tr>
+			</c:forEach>
+		</table>
 	</c:otherwise></c:choose>
 </mny:standardLayout>
 	

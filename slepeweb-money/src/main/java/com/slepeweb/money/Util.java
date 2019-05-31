@@ -10,9 +10,9 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.money.bean.chart.ChartCategory;
-import com.slepeweb.money.bean.chart.ChartCategoryGroup;
-import com.slepeweb.money.bean.chart.ChartProperties;
+import com.slepeweb.money.bean.CategoryInput;
+import com.slepeweb.money.bean.CategoryGroup;
+import com.slepeweb.money.bean.ChartProperties;
 
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
@@ -164,7 +164,7 @@ public class Util {
 		return 0L;
 	}
 	
-	public static String buildChartPropertyMarkup(ChartProperties props, String outerTemplate, String innerTemplate, 
+	public static String buildChartCategoryInputMarkup(ChartProperties props, String outerTemplate, String innerTemplate, 
 			String categoryOptionsTemplate) {
 		
 		StringBuilder allGroups = new StringBuilder();
@@ -173,7 +173,7 @@ public class Util {
 		String outer, inner;
 		int groupId = 0, optionsId;
 		
-		for (ChartCategoryGroup group : props.getGroups()) {
+		for (CategoryGroup group : props.getGroups()) {
 			groupId++;
 			outer = outerTemplate.
 					replaceAll("\\[groupId\\]", String.valueOf(groupId)).
@@ -182,12 +182,14 @@ public class Util {
 			innerBuilder = new StringBuilder();
 			optionsId = 0;
 			
-			for (ChartCategory cc : group.getCategories()) {
+			for (CategoryInput cc : group.getCategories()) {
 				optionsId++;
 				inner = innerTemplate.
 						replaceAll("\\[groupId\\]", String.valueOf(groupId)).
 						replaceAll("\\[counter\\]", String.valueOf(optionsId)).
-						replace("[major]", cc.getMajor());
+						replace("[major]", cc.getMajor()).
+						replace("[exclude-selected]", cc.isExclude() ? "selected" : "").
+						replace("[include-selected]", ! cc.isExclude() ? "selected" : "");
 				
 				optionsForGroup = new StringBuilder();
 				
@@ -201,12 +203,46 @@ public class Util {
 				innerBuilder.append(inner);
 			}
 			
-			outer = outer.replace("__innerTemplate__", innerBuilder.toString());
+			outer = outer.replace("__innerTemplate__", 
+					buildMinorCategoryInputMarkup(group, innerTemplate, categoryOptionsTemplate));
+			
 			allGroups.append(outer);
 		}
 		
 		return allGroups.toString();
 		
+	}
+	
+	public static String buildMinorCategoryInputMarkup(CategoryGroup group, String innerTemplate, 
+			String categoryOptionsTemplate) {
+		
+		StringBuilder minorCategoryOptions = new StringBuilder();
+		StringBuilder innerBuilder = new StringBuilder();
+		String inner;
+		int optionsId = 0;
+		
+		for (CategoryInput cc : group.getCategories()) {
+			optionsId++;
+			inner = innerTemplate.
+					replaceAll("\\[groupId\\]", String.valueOf(group.getId())).
+					replaceAll("\\[counter\\]", String.valueOf(optionsId)).
+					replace("[major]", cc.getMajor()).
+					replace("[exclude-selected]", cc.isExclude() ? "selected" : "").
+					replace("[include-selected]", ! cc.isExclude() ? "selected" : "");
+			
+			minorCategoryOptions = new StringBuilder();
+			
+			for (String minor : cc.getOptions()) {
+				minorCategoryOptions.append(categoryOptionsTemplate.
+						replace("[minor]", minor).
+						replace("[selected]", minor.equals(cc.getMinor()) ? "selected" : "" ));
+			}
+			
+			inner = inner.replace("__categoryOptionsTemplate__", minorCategoryOptions.toString());
+			innerBuilder.append(inner);
+		}
+		
+		return innerBuilder.toString();		
 	}
 	
 	public static String compactMarkup(String in) {

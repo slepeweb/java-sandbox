@@ -27,12 +27,12 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.CategoryInput;
+import com.slepeweb.money.bean.CategoryGroup;
+import com.slepeweb.money.bean.MultiCategoryCounter;
+import com.slepeweb.money.bean.ChartProperties;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
-import com.slepeweb.money.bean.chart.ChartCategory;
-import com.slepeweb.money.bean.chart.ChartCategoryGroup;
-import com.slepeweb.money.bean.chart.ChartFormCounter;
-import com.slepeweb.money.bean.chart.ChartProperties;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
@@ -56,6 +56,7 @@ public class SearchController extends BaseController {
 	
 	@RequestMapping(value="/search", method=RequestMethod.GET)
 	public String form(ModelMap model) {
+		this.categoryController.categoryList(model);
 		
 		model.addAttribute("_allAccounts", this.accountService.getAll(true));
 		
@@ -65,11 +66,10 @@ public class SearchController extends BaseController {
 		}
 		model.addAttribute("_allPayees", payees);
 		
-		List<String> categories = this.categoryService.getAllMajorValues();
-		if (categories.size() > 0 && StringUtils.isBlank(categories.get(0))) {
-			categories.remove(0);
-		}
-		model.addAttribute("_allMajorCategories", categories);
+		// Create a single, default category group
+		CategoryGroup grp = new CategoryGroup().setId(1).setLabel("unset");
+		grp.getCategories().add(new CategoryInput().setId(1));
+		model.addAttribute("_categoryGroup", grp);
 		
 		return "advancedSearch";
 	}
@@ -88,11 +88,17 @@ public class SearchController extends BaseController {
 			setAccountId(req.getParameter("accountId")).
 			setPayeeId(req.getParameter("payeeId")).
 			setPayeeName(req.getParameter("payee")).
-			setMajorCategory(req.getParameter("category")).
+			//setCategories(readMultiCategoryInput(req, 1, 10)).
 			setMemo(req.getParameter("memo")).
 			setFrom(req.getParameter("from")).
 			setTo(req.getParameter("to")).
 			setPageNum(page);
+		
+		String jsonStr = req.getParameter("counterStore");
+		List<MultiCategoryCounter> counters = fromJson(new TypeReference<List<MultiCategoryCounter>>() {}, jsonStr);
+		int groupId = 1;
+		List<CategoryInput> inputs = readMultiCategoryInput(req, groupId, getNumCategoriesForGroup(counters, groupId));
+		params.setCategories(adaptCategoryData(inputs));
 				
 		model.addAttribute("_response", this.solrService.query(params));				
 		form(model);
@@ -177,6 +183,9 @@ public class SearchController extends BaseController {
 		return numYears;
 	}
 	
+	/*
+	 * Chart properties input form
+	 */
 	@RequestMapping(value="/chart/by/categories", method=RequestMethod.GET)
 	public String chartByCategories(HttpServletRequest req, ModelMap model) {
 		this.categoryController.categoryList(model);
@@ -186,10 +195,11 @@ public class SearchController extends BaseController {
 			props = (ChartProperties) req.getSession().getAttribute(CHART_PROPS_ATTR);
 		}
 		
+		// Create a default single-category group
 		if (props == null) {
 			props = new ChartProperties();
-			ChartCategoryGroup g = new ChartCategoryGroup().setLabel("Group 1");
-			g.getCategories().add(new ChartCategory());
+			CategoryGroup g = new CategoryGroup().setLabel("Group 1").setId(1);
+			g.getCategories().add(new CategoryInput());
 			props.getGroups().add(g);
 		}
 		
@@ -197,59 +207,42 @@ public class SearchController extends BaseController {
 		return "chartInput";
 	}
 	
+	/*
+	 * Process chart properties and produce corresponding chart.
+	 */
 	@RequestMapping(value="/chart/by/categories/out", method=RequestMethod.POST)
 	public String chartByCategoriesOutput(HttpServletRequest req, ModelMap model) {
 		
 		ChartProperties props = new ChartProperties();
 		props.setFromYear(getChartFromYear(req));		
 		props.setNumYears(getChartNumYears(req));		
-		String groupName, major, minor;
-		ChartCategoryGroup group;
-		ChartCategory cat;
+		String groupName;
+		CategoryGroup group;
 		
 		req.getSession().setAttribute(CHART_PROPS_ATTR, props);
+		model.addAttribute(CHART_PROPS_ATTR, props);
 		
 		String jsonStr = req.getParameter("counterStore");
-		List<ChartFormCounter> counters = fromJson(new TypeReference<List<ChartFormCounter>>() {}, jsonStr);
+		List<MultiCategoryCounter> counters = fromJson(new TypeReference<List<MultiCategoryCounter>>() {}, jsonStr);
 		int numGroups = counters.size();
 		int numCategories;
-		int n = 0, m;
-		
+		int n = 0;
+				
 		for (int groupId = 1; groupId < 10; groupId++) {
 			groupName = req.getParameter(String.format("group-%d-name", groupId));
 			
 			if (StringUtils.isNotBlank(groupName)) {
-				group = new ChartCategoryGroup();
+				group = new CategoryGroup().
+						setLabel(groupName).
+						setId(groupId);
+				
 				props.getGroups().add(group);
-				group.setLabel(groupName);
 				
 				// How many categories are in this group?
-				numCategories = 0;
-				for (ChartFormCounter c : counters) {
-					if (c.getGroupId() == groupId) {
-						numCategories = c.getCategoryCount();
-						break;
-					}
-				}
-								
-				m = 0;	
-				for (int i = 1; i < 10; i++) {
-					major = req.getParameter(String.format("major-%d-%d", groupId, i));
-					minor = req.getParameter(String.format("minor-%d-%d", groupId, i));
-					
-					if (StringUtils.isNotBlank(major)) {					
-						cat = new ChartCategory().
-							setMajor(major).
-							setMinor(minor).
-							setOptions(this.categoryService.getAllMinorValues(major));
-						
-						group.getCategories().add(cat);
-						
-						if (++m >= numCategories) {
-							break;
-						}
-					}
-				}
+				numCategories = getNumCategoriesForGroup(counters, groupId);
+				
+				// Read category criteria from form inputs
+				group.setCategories(readMultiCategoryInput(req, groupId, numCategories));
 				
 				if (++n >= numGroups) {
 					break;
@@ -282,14 +275,10 @@ public class SearchController extends BaseController {
 		SolrParams p;
 		int yearCounter;
 		
-		for (ChartCategoryGroup g : props.getGroups()) {
+		for (CategoryGroup grp : props.getGroups()) {
 			
 			p = new SolrParams(new SolrConfig().setPageSize(10000));
-			p.setCategories(new ArrayList<Category>());
-			
-			for (ChartCategory cc : g.getCategories()) {
-				p.getCategories().add(new Category().setMajor(cc.getMajor()).setMinor(cc.getMinor()));
-			}
+			p.setCategories(adaptCategoryData(grp.getCategories()));
 			
 			yearCounter = 0;
 			
@@ -307,7 +296,7 @@ public class SearchController extends BaseController {
 				}
 				
 				ds.addValue((int) (-amount / 100), 
-						g.getLabel(),
+						grp.getLabel(),
 						Integer.valueOf(year));
 			}
 		}
@@ -339,5 +328,59 @@ public class SearchController extends BaseController {
 			// Handle the problem
 		}
 		return data;
+	}
+	
+	private List<Category> adaptCategoryData(List<CategoryInput> list) {
+		List<Category> categories = new ArrayList<Category>();
+		
+		for (CategoryInput cc : list) {
+			categories.add(new Category().
+					setMajor(cc.getMajor()).
+					setMinor(cc.getMinor()).
+					setExclude(cc.isExclude()));
+		}
+		
+		return categories;
+	}
+
+	private List<CategoryInput> readMultiCategoryInput(HttpServletRequest req, int groupId, int numCategories) {
+		int m = 0;	
+		String major, minor;
+		boolean excluded;
+		CategoryInput cat;
+		List<CategoryInput>	list = new ArrayList<CategoryInput>();
+		
+		for (int i = 1; i < 10; i++) {
+			major = req.getParameter(String.format("major-%d-%d", groupId, i));
+			minor = req.getParameter(String.format("minor-%d-%d", groupId, i));
+			excluded = Util.isPositive(req.getParameter(String.format("logic-%d-%d", groupId, i)));
+			
+			if (StringUtils.isNotBlank(major)) {					
+				cat = new CategoryInput().
+					setMajor(major).
+					setMinor(minor).
+					setExclude(excluded).
+					setOptions(this.categoryService.getAllMinorValues(major));
+				
+				list.add(cat);
+				
+				if (++m >= numCategories) {
+					break;
+				}
+			}
+		}
+		
+		return list;
+	}
+	
+	// How many categories are in this group?
+	private int getNumCategoriesForGroup(List<MultiCategoryCounter> counters, int groupId) {
+		for (MultiCategoryCounter c : counters) {
+			if (c.getGroupId() == groupId) {
+				return c.getCategoryCount();
+			}
+		}
+		
+		return 0;
 	}
 }

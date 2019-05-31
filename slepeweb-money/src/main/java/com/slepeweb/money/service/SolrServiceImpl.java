@@ -245,24 +245,32 @@ public class SolrServiceImpl implements SolrService {
 				}
 			}
 			else if (params.getCategories() != null && params.getCategories().size() > 0) {
+				// This category-based search is specific to charting functionality.
+				// First, split the category list into included/excluded categories.
 				isCategorySearch = true;
-				StringBuilder sb = new StringBuilder();
+				List<Category> 
+					includeList = new ArrayList<Category>(), 
+					excludeList = new ArrayList<Category>();
+				
 				for (Category c : params.getCategories()) {
-					if (StringUtils.isNotBlank(c.getMajor())) {
-						if (sb.length() > 0) {
-							sb.append(" OR ");
-						}
-						
-						if (StringUtils.isBlank(c.getMinor())) {
-							sb.append(String.format("major:\"%s\"", c.getMajor()));
-						}
-						else {
-							sb.append(String.format("(major:\"%s\" AND minor:\"%s\")", c.getMajor(), c.getMinor()));
-						}
+					if (! c.isExclude()) {
+						includeList.add(c);
+					}
+					else {
+						excludeList.add(c);
 					}
 				}
 				
-				q.addFilterQuery(sb.toString());
+				StringBuilder includeStr = setCategoryFilter(includeList);
+				StringBuilder excludeStr = setCategoryFilter(excludeList);
+				
+				if (excludeStr.length() > 0) {
+					q.addFilterQuery(includeStr.append(" AND -(").append(excludeStr).append(")").toString());
+				}
+				else {
+					q.addFilterQuery(includeStr.toString());
+				}
+				
 				isCriteriaSet = true;
 			}
 
@@ -325,6 +333,26 @@ public class SolrServiceImpl implements SolrService {
 		}
 
 		return null;
+	}
+	
+	private StringBuilder setCategoryFilter(List<Category> list) {
+		StringBuilder sb = new StringBuilder();
+		for (Category c : list) {
+			if (StringUtils.isNotBlank(c.getMajor())) {
+				if (sb.length() > 0) {
+					sb.append(" OR ");
+				}
+				
+				if (StringUtils.isBlank(c.getMinor())) {
+					sb.append(String.format("major:\"%s\"", c.getMajor()));
+				}
+				else {
+					sb.append(String.format("(major:\"%s\" AND minor:\"%s\")", c.getMajor(), c.getMinor()));
+				}
+			}
+		}
+		
+		return sb;
 	}
 
 	public FlatTransaction queryLatestTransactionByPayee(String payee) {
