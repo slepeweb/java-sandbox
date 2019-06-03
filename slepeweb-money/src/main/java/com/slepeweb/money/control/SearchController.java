@@ -26,12 +26,11 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.Category;
-import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.CategoryGroup;
-import com.slepeweb.money.bean.MultiCategoryCounter;
+import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.ChartProperties;
 import com.slepeweb.money.bean.FlatTransaction;
+import com.slepeweb.money.bean.MultiCategoryCounter;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
@@ -46,6 +45,7 @@ import com.slepeweb.money.service.TransactionService;
 public class SearchController extends BaseController {
 	
 	private static final String CHART_PROPS_ATTR = "_chartProps";
+	private static final String SEARCH_CRITERIA_ATTR = "_searchCriteria";
 	
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
@@ -56,7 +56,7 @@ public class SearchController extends BaseController {
 	
 	@RequestMapping(value="/search", method=RequestMethod.GET)
 	public String form(ModelMap model) {
-		this.categoryController.categoryList(model);
+		//this.categoryController.categoryList(model);
 		
 		model.addAttribute("_allAccounts", this.accountService.getAll(true));
 		
@@ -69,7 +69,7 @@ public class SearchController extends BaseController {
 		// Create a single, default category group
 		CategoryGroup grp = new CategoryGroup().setId(1).setLabel("unset");
 		grp.getCategories().add(new CategoryInput().setId(1));
-		model.addAttribute("_categoryGroup", grp);
+		model.addAttribute(SEARCH_CRITERIA_ATTR, grp);
 		
 		return "advancedSearch";
 	}
@@ -79,7 +79,7 @@ public class SearchController extends BaseController {
 		return results(1, req, model);
 	}
 	
-	@RequestMapping(value="/search/{page}", method=RequestMethod.GET)
+	@RequestMapping(value="/search/{page}", method=RequestMethod.POST)
 	public String results(@PathVariable int page, HttpServletRequest req, ModelMap model) {
 		
 		// Payee may be specified by either name or id, but not both!
@@ -88,7 +88,6 @@ public class SearchController extends BaseController {
 			setAccountId(req.getParameter("accountId")).
 			setPayeeId(req.getParameter("payeeId")).
 			setPayeeName(req.getParameter("payee")).
-			//setCategories(readMultiCategoryInput(req, 1, 10)).
 			setMemo(req.getParameter("memo")).
 			setFrom(req.getParameter("from")).
 			setTo(req.getParameter("to")).
@@ -98,10 +97,20 @@ public class SearchController extends BaseController {
 		List<MultiCategoryCounter> counters = fromJson(new TypeReference<List<MultiCategoryCounter>>() {}, jsonStr);
 		int groupId = 1;
 		List<CategoryInput> inputs = readMultiCategoryInput(req, groupId, getNumCategoriesForGroup(counters, groupId));
-		params.setCategories(adaptCategoryData(inputs));
+		CategoryGroup grp = new CategoryGroup().setId(1).setCategories(inputs);
+		params.setCategories(grp.toCategoryList());
 				
 		model.addAttribute("_response", this.solrService.query(params));				
-		form(model);
+		model.addAttribute(SEARCH_CRITERIA_ATTR, grp);				
+
+		model.addAttribute("_allAccounts", this.accountService.getAll(true));
+		
+		List<Payee> payees = this.payeeService.getAll();
+		if (payees.size() > 0 && StringUtils.isBlank(payees.get(0).getName())) {
+			payees.remove(0);
+		}
+		model.addAttribute("_allPayees", payees);
+
 		return "advancedSearch";
 	}	
 	
@@ -278,7 +287,7 @@ public class SearchController extends BaseController {
 		for (CategoryGroup grp : props.getGroups()) {
 			
 			p = new SolrParams(new SolrConfig().setPageSize(10000));
-			p.setCategories(adaptCategoryData(grp.getCategories()));
+			p.setCategories(grp.toCategoryList());
 			
 			yearCounter = 0;
 			
@@ -330,19 +339,6 @@ public class SearchController extends BaseController {
 		return data;
 	}
 	
-	private List<Category> adaptCategoryData(List<CategoryInput> list) {
-		List<Category> categories = new ArrayList<Category>();
-		
-		for (CategoryInput cc : list) {
-			categories.add(new Category().
-					setMajor(cc.getMajor()).
-					setMinor(cc.getMinor()).
-					setExclude(cc.isExclude()));
-		}
-		
-		return categories;
-	}
-
 	private List<CategoryInput> readMultiCategoryInput(HttpServletRequest req, int groupId, int numCategories) {
 		int m = 0;	
 		String major, minor;

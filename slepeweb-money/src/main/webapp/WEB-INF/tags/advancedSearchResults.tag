@@ -13,7 +13,7 @@
 		<c:if test="${not empty _response.pager.results}">
 			<mny:flatTransactionTable pager="${_response.pager}" />
 		</c:if>
-		
+			
 	</c:otherwise></c:choose>
 </c:if>
 	

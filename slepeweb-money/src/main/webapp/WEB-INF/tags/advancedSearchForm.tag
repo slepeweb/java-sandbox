@@ -13,7 +13,7 @@
 
 <mny:multiCategoryInputSupport />
 
-<form class="multi-category-input" method="post" action="${_ctxPath}/search/">	  
+<form id="advanced-search-form" class="multi-category-input" method="post" action="${_ctxPath}/search/">	  
     <table id="multi-category-groupings">
 	    <tr>
 	        <td class="heading"><label for="accountId">Account</label></td>
@@ -35,16 +35,8 @@
 	    <tr class="multi-category-group">
 	        <td class="heading"><label for="category">Category(s)</label></td>
 	        <td>
-	        	${mon:buildMinorCategoryInputMarkup(_categoryGroup, _innerTemplate, _categoryOptionsTemplate)}
+	        	${mon:buildMinorCategoryInputMarkup(_searchCriteria, _innerTemplate, _categoryOptionsTemplate)}
 						<button class="add-category-button" type="button" data-groupid="1">+ category</button>
-	        <%--
-	        	<select id="category" name="category">
-	        		<option value=""></option>
-	        		<c:forEach items="${_allMajorCategories}" var="_s">
-	        			<option value="${_s}" <c:if test="${_s eq _selectedMajorCategory}">selected</c:if>>${_s}</option>
-	        		</c:forEach>
-	        	</select>
-	        	 --%>
 	        </td>
 	    </tr>
 	    

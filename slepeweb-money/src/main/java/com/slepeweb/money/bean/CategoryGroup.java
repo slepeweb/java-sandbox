@@ -11,6 +11,19 @@ public class CategoryGroup {
 	private int id;
 	private List<CategoryInput> categories = new ArrayList<CategoryInput>();
 	
+	public List<Category> toCategoryList() {
+		List<Category> categories = new ArrayList<Category>();
+		
+		for (CategoryInput cc : getCategories()) {
+			categories.add(new Category().
+					setMajor(cc.getMajor()).
+					setMinor(cc.getMinor()).
+					setExclude(cc.isExclude()));
+		}
+		
+		return categories;
+	}
+
 	public String getFilterStr() {
 		StringBuilder sb = new StringBuilder();
 		for (CategoryInput cc : this.categories) {

@@ -10,8 +10,8 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.CategoryGroup;
+import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.ChartProperties;
 
 public class Util {

@@ -11,5 +11,19 @@
 			
 	<mny:advancedSearchForm />
 	<mny:advancedSearchResults />
+
+	<script>
+		$(function() {
+			$(".pager a").click(function (e) {
+				var action = $(this).attr("href");
+				console.log("href is " + action);
+				var form = $("#advanced-search-form");
+				form.attr("action", action);
+				form.submit();
+				e.preventDefault();
+				e.stopPropagation();
+			});
+		});
+	</script>
 	
 </mny:standardLayout>
