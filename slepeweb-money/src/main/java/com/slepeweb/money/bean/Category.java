@@ -1,5 +1,8 @@
 package com.slepeweb.money.bean;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+@JsonIgnoreProperties({"defined4Insert", "inDatabase", "legacy"})
 public class Category extends DbEntity {
 	private String major = "", minor = "";
 	private boolean exclude;

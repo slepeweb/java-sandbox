@@ -16,13 +16,19 @@
 		$(function() {
 			$(".pager a").click(function (e) {
 				var action = $(this).attr("href");
-				console.log("href is " + action);
 				var form = $("#advanced-search-form");
 				form.attr("action", action);
 				form.submit();
 				e.preventDefault();
 				e.stopPropagation();
 			});
+			
+			$("#save-search-button").click(function (e) {
+				var form = $("#advanced-search-form");
+				form.attr("action", webContext + "/search/save/advanced");
+				form.submit();
+			});
+
 		});
 	</script>
 	

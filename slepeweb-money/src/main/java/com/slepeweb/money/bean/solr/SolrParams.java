@@ -6,10 +6,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonSetter;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
 
+@JsonIgnoreProperties({"start", "urlParameters", "hrefBase", "accountIdStr", "payeeIdStr", "categoryIdStr"})
 public class SolrParams {
 
 	public static final String START_OF_DAY = "T00:00:00Z";
@@ -22,6 +25,9 @@ public class SolrParams {
 	private int pageNum, pageSize;
 	private Date from, to;
 
+	// For Jackson
+	public SolrParams() {}
+	
 	public SolrParams(SolrConfig config) {
 		this.config = config;
 	}
@@ -66,6 +72,7 @@ public class SolrParams {
 		return from;
 	}
 
+	@JsonSetter("from")
 	public SolrParams setFrom(String from) {
 		if (StringUtils.isNotBlank(from)) {
 			setFrom((Date) Util.parseSolrDate(from + START_OF_DAY));
@@ -89,6 +96,7 @@ public class SolrParams {
 		return this;
 	}
 
+	@JsonSetter("to")
 	public SolrParams setTo(Date to) {
 		this.to = to;
 		return this;
@@ -140,6 +148,7 @@ public class SolrParams {
 		return getPayeeId() == null ? "" : String.valueOf(getPayeeId());
 	}
 
+	@JsonSetter("payeeId")
 	public SolrParams setPayeeId(Long payeeId) {
 		this.payeeId = payeeId;
 		return this;
@@ -164,6 +173,7 @@ public class SolrParams {
 		return getCategoryId() == null ? "" : String.valueOf(getCategoryId());
 	}
 
+	@JsonSetter("categoryId")
 	public SolrParams setCategoryId(Long categoryId) {
 		this.categoryId = categoryId;
 		return this;
@@ -188,6 +198,7 @@ public class SolrParams {
 		return getAccountId() == null ? "" : String.valueOf(getAccountId());
 	}
 
+	@JsonSetter("accountId")
 	public SolrParams setAccountId(Long accountId) {
 		this.accountId = accountId;
 		return this;
@@ -227,6 +238,7 @@ public class SolrParams {
 		return (getPageNum() - 1) * getPageSize();
 	}
 
+	@JsonSetter("pageNum")
 	public SolrParams setPageNum(int pageNum) {
 		this.pageNum = pageNum;
 		return this;

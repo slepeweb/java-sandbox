@@ -35,7 +35,7 @@
 	    <tr class="multi-category-group">
 	        <td class="heading"><label for="category">Category(s)</label></td>
 	        <td>
-	        	${mon:buildMinorCategoryInputMarkup(_searchCriteria, _innerTemplate, _categoryOptionsTemplate)}
+	        	${mon:buildMinorCategoryInputMarkup(_categoryGroup, _innerTemplate, _categoryOptionsTemplate)}
 						<button class="add-category-button" type="button" data-groupid="1">+ category</button>
 	        </td>
 	    </tr>
@@ -62,6 +62,7 @@
 		<br />
 		<input id="counter-store" type="hidden" name="counterStore" value="" />
     <input type="submit" value="Search" />    
+    <input id="save-search-button" type="button" value="Save" />    
 </form>		  	
 
 <script>

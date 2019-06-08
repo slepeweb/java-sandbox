@@ -10,6 +10,7 @@ import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.Transfer;
@@ -86,6 +87,17 @@ public class RowMapperUtil {
 					setCategory(makeCategoryX(rs)).
 					setAmount(rs.getLong("amount")).
 					setMemo(rs.getString("memo"));
+		}
+	}
+	
+	public static final class SavedSearchMapper implements RowMapper<SavedSearch> {
+		public SavedSearch mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new SavedSearch().
+					setId(rs.getLong("id")).
+					setSaved(rs.getTimestamp("saved")).
+					setName(rs.getString("name")).
+					setType(rs.getString("type")).
+					setJson(rs.getString("json"));
 		}
 	}
 	

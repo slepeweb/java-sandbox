@@ -1,6 +1,7 @@
 package com.slepeweb.money.control;
 
 import java.awt.geom.Rectangle2D;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.jfree.chart.ChartFactory;
@@ -26,37 +28,47 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.CategoryGroup;
 import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.ChartProperties;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.MultiCategoryCounter;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
+import com.slepeweb.money.service.SavedSearchService;
 import com.slepeweb.money.service.SolrService;
 import com.slepeweb.money.service.TransactionService;
 
 @Controller
 public class SearchController extends BaseController {
 	
+	private static Logger LOG = Logger.getLogger(SearchController.class);
+	
 	private static final String CHART_PROPS_ATTR = "_chartProps";
-	private static final String SEARCH_CRITERIA_ATTR = "_searchCriteria";
+	private static final String CATEGORY_GROUP_ATTR = "_categoryGroup";
+	private static final String SEARCH_RESPONSE_ATTR = "_response";
+	private static final String TYPE_ADVANCED = "advanced";
+	private static final String ALL_ACCOUNTS_ATTR = "_allAccounts";
+	private static final String ALL_PAYEES_ATTR = "_allPayees";
+	//private static final String TYPE_CHART = "chart";
 	
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
 	@Autowired private CategoryService categoryService;
 	@Autowired private TransactionService transactionService;
 	@Autowired private SolrService solrService;
+	@Autowired private SavedSearchService savedSearchService;
 	@Autowired private CategoryController categoryController;
 	
 	@RequestMapping(value="/search", method=RequestMethod.GET)
 	public String form(ModelMap model) {
-		//this.categoryController.categoryList(model);
 		
 		model.addAttribute("_allAccounts", this.accountService.getAll(true));
 		
@@ -69,7 +81,7 @@ public class SearchController extends BaseController {
 		// Create a single, default category group
 		CategoryGroup grp = new CategoryGroup().setId(1).setLabel("unset");
 		grp.getCategories().add(new CategoryInput().setId(1));
-		model.addAttribute(SEARCH_CRITERIA_ATTR, grp);
+		model.addAttribute(CATEGORY_GROUP_ATTR, grp);
 		
 		return "advancedSearch";
 	}
@@ -82,16 +94,7 @@ public class SearchController extends BaseController {
 	@RequestMapping(value="/search/{page}", method=RequestMethod.POST)
 	public String results(@PathVariable int page, HttpServletRequest req, ModelMap model) {
 		
-		// Payee may be specified by either name or id, but not both!
-		SolrParams params = 
-			new SolrParams(new SolrConfig()).
-			setAccountId(req.getParameter("accountId")).
-			setPayeeId(req.getParameter("payeeId")).
-			setPayeeName(req.getParameter("payee")).
-			setMemo(req.getParameter("memo")).
-			setFrom(req.getParameter("from")).
-			setTo(req.getParameter("to")).
-			setPageNum(page);
+		SolrParams params = getAdvancedSearchCriteriaFromRequest(req).setPageNum(page);
 		
 		String jsonStr = req.getParameter("counterStore");
 		List<MultiCategoryCounter> counters = fromJson(new TypeReference<List<MultiCategoryCounter>>() {}, jsonStr);
@@ -100,18 +103,102 @@ public class SearchController extends BaseController {
 		CategoryGroup grp = new CategoryGroup().setId(1).setCategories(inputs);
 		params.setCategories(grp.toCategoryList());
 				
-		model.addAttribute("_response", this.solrService.query(params));				
-		model.addAttribute(SEARCH_CRITERIA_ATTR, grp);				
+		model.addAttribute(SEARCH_RESPONSE_ATTR, this.solrService.query(params));				
+		model.addAttribute(CATEGORY_GROUP_ATTR, grp);				
+		model.addAttribute(ALL_ACCOUNTS_ATTR, this.accountService.getAll(true));
+		model.addAttribute(ALL_PAYEES_ATTR, getAllPayees());
 
-		model.addAttribute("_allAccounts", this.accountService.getAll(true));
-		
+		return "advancedSearch";
+	}	
+	
+	private List<Payee> getAllPayees() {
 		List<Payee> payees = this.payeeService.getAll();
 		if (payees.size() > 0 && StringUtils.isBlank(payees.get(0).getName())) {
 			payees.remove(0);
 		}
-		model.addAttribute("_allPayees", payees);
+		return payees;
+	}
+	
+	private SolrParams getAdvancedSearchCriteriaFromRequest(HttpServletRequest req) {
+		// Payee may be specified by either name or id, but not both!
+		return 
+			new SolrParams(new SolrConfig()).
+			setAccountId(req.getParameter("accountId")).
+			setPayeeId(req.getParameter("payeeId")).
+			setPayeeName(req.getParameter("payee")).
+			setMemo(req.getParameter("memo")).
+			setFrom(req.getParameter("from")).
+			setTo(req.getParameter("to")).
+			setPageNum(1);
+	}
+	
+	@RequestMapping(value="/search/save/list", method=RequestMethod.GET)
+	public String listSearches(ModelMap model) {
+		model.addAttribute("_list", this.savedSearchService.getAll());
+		return "savedSearchList";
+	}
+	
+	@RequestMapping(value="/search/save/advanced", method=RequestMethod.POST)
+	public RedirectView saveAdvanced(HttpServletRequest req, ModelMap model) {
+		
+		// Payee may be specified by either name or id, but not both!
+		SolrParams params = getAdvancedSearchCriteriaFromRequest(req);
+		
+		String countersJson = req.getParameter("counterStore");
+		List<MultiCategoryCounter> counters = fromJson(new TypeReference<List<MultiCategoryCounter>>() {}, countersJson);
+		int groupId = 1;
+		List<CategoryInput> inputs = readMultiCategoryInput(req, groupId, getNumCategoriesForGroup(counters, groupId));
+		CategoryGroup grp = new CategoryGroup().setId(1).setCategories(inputs);
+		params.setCategories(grp.toCategoryList());
+				
+		SavedSearch ss = new SavedSearch().
+				setType(TYPE_ADVANCED).
+				setName("Example saved search identifier").
+				setJson(toJson(params)).
+				setSaved(new Timestamp(new Date().getTime()));
+		
+		String flash;
+		
+		try {
+			this.savedSearchService.save(ss);
+			flash = "success|Search successfully saved";
+		}
+		catch (Exception e) {
+			flash = "failure|Failed to save search";
+		}
 
-		return "advancedSearch";
+		return new RedirectView(String.format("%s/search/save/list?flash=%s", 
+				req.getContextPath(), Util.encodeUrl(flash)));
+	}	
+	
+	@RequestMapping(value="/search/save/repeat", method=RequestMethod.GET)
+	public String repeatSaved(HttpServletRequest req, ModelMap model) {
+		
+		if (req.getParameter("type").equals("advanced")) {
+			String jsonStr = req.getParameter("json");
+			SolrParams params = toSolrParams(jsonStr);				
+			model.addAttribute(SEARCH_RESPONSE_ATTR, this.solrService.query(params));		
+			
+			CategoryGroup grp = new CategoryGroup();
+			CategoryInput ci;
+			for (Category c : params.getCategories()) {
+				ci = new CategoryInput().
+						setMajor(c.getMajor()).
+						setMinor(c.getMinor()).
+						setOptions(this.categoryService.getAllMinorValues(c.getMajor()));
+				ci.setExclude(c.isExclude());
+				grp.getCategories().add(ci);
+						
+			}
+			
+			model.addAttribute(CATEGORY_GROUP_ATTR, grp);				
+			model.addAttribute(ALL_ACCOUNTS_ATTR, this.accountService.getAll(true));
+			model.addAttribute(ALL_PAYEES_ATTR, getAllPayees());
+
+			return "advancedSearch";
+		}
+
+		return "";
 	}	
 	
 	@RequestMapping(value="/index/by/dates", method=RequestMethod.GET)
@@ -328,7 +415,7 @@ public class SearchController extends BaseController {
 	 * 
 	 * (I don't know how this works, but it does!)
 	 */
-	public static <T> T fromJson(final TypeReference<T> type, final String jsonPacket) {
+	private static <T> T fromJson(final TypeReference<T> type, final String jsonPacket) {
 
 		T data = null;
 		try {
@@ -337,6 +424,40 @@ public class SearchController extends BaseController {
 			// Handle the problem
 		}
 		return data;
+	}
+	
+	/*
+	private static <T> T fromJson(final Class<T> type, final String jsonPacket) {
+
+		T data = null;
+		try {
+			data = new ObjectMapper().readValue(jsonPacket, type);
+		} catch (Exception e) {
+			LOG.error("Jackson marshalling error", e);
+		}
+		return data;
+	}
+	*/
+	
+	private static SolrParams toSolrParams(String jsonPacket) {
+
+		try {
+			return new ObjectMapper().readValue(jsonPacket, SolrParams.class);
+		} catch (Exception e) {
+			LOG.error("Jackson marshalling error", e);
+		}
+		return null;
+	}
+	
+	private static String toJson(Object o) {
+
+		String s = null;
+		try {
+			s = new ObjectMapper().writeValueAsString(o);
+		} catch (Exception e) {
+			LOG.error("Jackson marshalling error", e);
+		}
+		return s;
 	}
 	
 	private List<CategoryInput> readMultiCategoryInput(HttpServletRequest req, int groupId, int numCategories) {

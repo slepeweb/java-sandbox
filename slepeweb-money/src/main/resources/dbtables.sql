@@ -3,6 +3,7 @@ drop table if exists transaction;
 drop table if exists account;
 drop table if exists payee;
 drop table if exists category;
+drop table if exists search;
 
 
 create table category
@@ -117,3 +118,16 @@ create table userrole
 	constraint foreign key (userid) references user(id) on delete cascade,
 	constraint foreign key (roleid) references role(id) on delete cascade
 ) ENGINE=InnoDB;
+
+create table search
+(
+	id int not null auto_increment,
+	saved timestamp default 0,
+  name varchar(255) NOT NULL,
+  type enum ('advanced', 'chart'),
+  json varchar(1023) NOT NULL,
+	primary key (id),
+	index idx_search (saved desc, name)
+) ENGINE=InnoDB;
+
+
