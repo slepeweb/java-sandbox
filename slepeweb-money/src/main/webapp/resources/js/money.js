@@ -11,11 +11,6 @@ $(function() {
 		window.location = webContext + "/transaction/list/" + accountId + "/" + monthId;;
 	});
 	
-//	$("#tabs").tabs({
-//		active: 1,
-//		collapsible: true
-//	});
-	
 	$("#accordion").accordion({
 		active: false,
 		collapsible: true,
@@ -32,9 +27,4 @@ $(function() {
 		window.location = window.location + "/all";
 	});
 	
-//	$(".nav-hide").click(function(e){
-//		$("nav").animate({
-//			width: '2px'
-//		}, "slow");
-//	});
 });	

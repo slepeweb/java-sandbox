@@ -5,7 +5,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -134,7 +136,28 @@ public class SearchController extends BaseController {
 	
 	@RequestMapping(value="/search/save/list", method=RequestMethod.GET)
 	public String listSearches(ModelMap model) {
-		model.addAttribute("_list", this.savedSearchService.getAll());
+		
+		// Organise searches into respective groups, by search type
+		List<SavedSearch> all = this.savedSearchService.getAll();
+		List<SavedSearch> group;
+		List<String> groupTypes = new ArrayList<String>();
+		Map<String,List<SavedSearch>> map = new HashMap<String,List<SavedSearch>>();
+		
+		for (SavedSearch ss : all) {
+			if (! groupTypes.contains(ss.getType())) {
+				groupTypes.add(ss.getType());
+				group = new ArrayList<SavedSearch>();
+				map.put(ss.getType(), group);
+			}
+			else {
+				group = map.get(ss.getType());
+			}
+			
+			group.add(ss);
+		}
+		
+		model.addAttribute("_types", groupTypes);
+		model.addAttribute("_map", map);
 		return "savedSearchList";
 	}
 	
@@ -153,7 +176,7 @@ public class SearchController extends BaseController {
 				
 		SavedSearch ss = new SavedSearch().
 				setType(TYPE_ADVANCED).
-				setName("Example saved search identifier").
+				setName(req.getParameter("save-identifier")).
 				setJson(toJson(params)).
 				setSaved(new Timestamp(new Date().getTime()));
 		
@@ -179,7 +202,7 @@ public class SearchController extends BaseController {
 			SolrParams params = toSolrParams(jsonStr);				
 			model.addAttribute(SEARCH_RESPONSE_ATTR, this.solrService.query(params));		
 			
-			CategoryGroup grp = new CategoryGroup();
+			CategoryGroup grp = new CategoryGroup().setId(1);
 			CategoryInput ci;
 			for (Category c : params.getCategories()) {
 				ci = new CategoryInput().

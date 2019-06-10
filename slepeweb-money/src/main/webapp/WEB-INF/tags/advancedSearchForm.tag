@@ -62,7 +62,12 @@
 		<br />
 		<input id="counter-store" type="hidden" name="counterStore" value="" />
     <input type="submit" value="Search" />    
-    <input id="save-search-button" type="button" value="Save" />    
+    
+    <c:if test="${not empty _response}">
+    	OR <input id="save-search-button" type="button" value="Save" /> 
+	    <input id="saved-search-identifier" type="text" name="save-identifier" 
+	    	placeholder="Provide an identifier for this search" value="" />
+    </c:if>
 </form>		  	
 
 <script>
