@@ -12,6 +12,11 @@
 	
 	#tabs {
 		margin-top: 4em;
+		font-size: 1em;
+	}
+	
+	#form-tab, #results-tab {
+		padding: 0.5em;
 	}
 </c:set>
 

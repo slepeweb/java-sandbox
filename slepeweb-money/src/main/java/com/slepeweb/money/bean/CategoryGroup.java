@@ -3,8 +3,11 @@ package com.slepeweb.money.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import com.slepeweb.money.bean.CategoryInput;
 
+@JsonIgnoreProperties({"filterStr"})
 public class CategoryGroup {
 	
 	private String label = "";

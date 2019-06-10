@@ -17,7 +17,7 @@
 					<table>
 						<c:forEach items="${_list}" var="_ss">
 							<tr>
-								<td>${_ss.saved}</td>
+								<td><a href="${_ctxPath}/search/save/edit/${_ss.id}">${_ss.saved}</a></td>
 								<td>${_ss.name}</td>
 								<td><i class="far fa-caret-square-right" title="Execute this search"
 									data-params="${mon:encodeUrl(_ss.json)}" data-type="${_ss.type}"></i></td>

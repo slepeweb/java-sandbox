@@ -59,7 +59,7 @@ public class SearchController extends BaseController {
 	private static final String TYPE_ADVANCED = "advanced";
 	private static final String ALL_ACCOUNTS_ATTR = "_allAccounts";
 	private static final String ALL_PAYEES_ATTR = "_allPayees";
-	//private static final String TYPE_CHART = "chart";
+	private static final String TYPE_CHART = "chart";
 	
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
@@ -70,7 +70,7 @@ public class SearchController extends BaseController {
 	@Autowired private CategoryController categoryController;
 	
 	@RequestMapping(value="/search", method=RequestMethod.GET)
-	public String form(ModelMap model) {
+	public String advancedSearchForm(ModelMap model) {
 		
 		model.addAttribute("_allAccounts", this.accountService.getAll(true));
 		
@@ -89,12 +89,12 @@ public class SearchController extends BaseController {
 	}
 	
 	@RequestMapping(value="/search", method=RequestMethod.POST)
-	public String resultsDefault(HttpServletRequest req, ModelMap model) {
-		return results(1, req, model);
+	public String advancedSearchResultsDefault(HttpServletRequest req, ModelMap model) {
+		return advancedSearchResults(1, req, model);
 	}
 	
 	@RequestMapping(value="/search/{page}", method=RequestMethod.POST)
-	public String results(@PathVariable int page, HttpServletRequest req, ModelMap model) {
+	public String advancedSearchResults(@PathVariable int page, HttpServletRequest req, ModelMap model) {
 		
 		SolrParams params = getAdvancedSearchCriteriaFromRequest(req).setPageNum(page);
 		
@@ -134,8 +134,46 @@ public class SearchController extends BaseController {
 			setPageNum(1);
 	}
 	
+	private ChartProperties getChartSearchCriteriaFromRequest(HttpServletRequest req) {
+		ChartProperties props = new ChartProperties();
+		props.setFromYear(getChartFromYear(req));		
+		props.setNumYears(getChartNumYears(req));		
+		String groupName;
+		CategoryGroup group;
+		
+		String jsonStr = req.getParameter("counterStore");
+		List<MultiCategoryCounter> counters = fromJson(new TypeReference<List<MultiCategoryCounter>>() {}, jsonStr);
+		int numGroups = counters.size();
+		int numCategories;
+		int n = 0;
+				
+		for (int groupId = 1; groupId < 10; groupId++) {
+			groupName = req.getParameter(String.format("group-%d-name", groupId));
+			
+			if (StringUtils.isNotBlank(groupName)) {
+				group = new CategoryGroup().
+						setLabel(groupName).
+						setId(groupId);
+				
+				props.getGroups().add(group);
+				
+				// How many categories are in this group?
+				numCategories = getNumCategoriesForGroup(counters, groupId);
+				
+				// Read category criteria from form inputs
+				group.setCategories(readMultiCategoryInput(req, groupId, numCategories));
+				
+				if (++n >= numGroups) {
+					break;
+				}
+			}
+		}
+		
+		return props;
+	}
+	
 	@RequestMapping(value="/search/save/list", method=RequestMethod.GET)
-	public String listSearches(ModelMap model) {
+	public String listSavedSearches(ModelMap model) {
 		
 		// Organise searches into respective groups, by search type
 		List<SavedSearch> all = this.savedSearchService.getAll();
@@ -162,7 +200,7 @@ public class SearchController extends BaseController {
 	}
 	
 	@RequestMapping(value="/search/save/advanced", method=RequestMethod.POST)
-	public RedirectView saveAdvanced(HttpServletRequest req, ModelMap model) {
+	public RedirectView saveAdvancedSearchParameters(HttpServletRequest req, ModelMap model) {
 		
 		// Payee may be specified by either name or id, but not both!
 		SolrParams params = getAdvancedSearchCriteriaFromRequest(req);
@@ -194,11 +232,35 @@ public class SearchController extends BaseController {
 				req.getContextPath(), Util.encodeUrl(flash)));
 	}	
 	
-	@RequestMapping(value="/search/save/repeat", method=RequestMethod.GET)
-	public String repeatSaved(HttpServletRequest req, ModelMap model) {
+	@RequestMapping(value="/search/save/chart", method=RequestMethod.POST)
+	public RedirectView saveChartParameters(HttpServletRequest req, ModelMap model) {
 		
+		ChartProperties props = getChartSearchCriteriaFromRequest(req);
+		SavedSearch ss = new SavedSearch().
+				setType(TYPE_CHART).
+				setName(req.getParameter("save-identifier")).
+				setJson(toJson(props)).
+				setSaved(new Timestamp(new Date().getTime()));
+		
+		String flash;
+		
+		try {
+			this.savedSearchService.save(ss);
+			flash = "success|Search successfully saved";
+		}
+		catch (Exception e) {
+			flash = "failure|Failed to save search";
+		}
+
+		return new RedirectView(String.format("%s/search/save/list?flash=%s", 
+				req.getContextPath(), Util.encodeUrl(flash)));
+	}	
+	
+	@RequestMapping(value="/search/save/repeat", method=RequestMethod.GET)
+	public String repeatSavedSearch(HttpServletRequest req, ModelMap model) {
+		
+		String jsonStr = req.getParameter("json");
 		if (req.getParameter("type").equals("advanced")) {
-			String jsonStr = req.getParameter("json");
 			SolrParams params = toSolrParams(jsonStr);				
 			model.addAttribute(SEARCH_RESPONSE_ATTR, this.solrService.query(params));		
 			
@@ -219,6 +281,10 @@ public class SearchController extends BaseController {
 			model.addAttribute(ALL_PAYEES_ATTR, getAllPayees());
 
 			return "advancedSearch";
+		}
+		else if (req.getParameter("type").equals("chart")) {
+			ChartProperties props = toChartProperties(jsonStr);				
+			return chartByCategoriesOutput(props, req, model);
 		}
 
 		return "";
@@ -264,7 +330,7 @@ public class SearchController extends BaseController {
 	}
 	
 	@RequestMapping(value="/index/by/account/{accountId}")	
-	public RedirectView index(@PathVariable long accountId, HttpServletRequest req) { 
+	public RedirectView indexByAccount(@PathVariable long accountId, HttpServletRequest req) { 
 		Account a = this.accountService.get(accountId);
 		this.solrService.removeTransactionsByAccount(a.getName());
 		this.solrService.save(this.transactionService.getTransactionsForAccount(accountId));
@@ -306,7 +372,7 @@ public class SearchController extends BaseController {
 	 * Chart properties input form
 	 */
 	@RequestMapping(value="/chart/by/categories", method=RequestMethod.GET)
-	public String chartByCategories(HttpServletRequest req, ModelMap model) {
+	public String chartByCategoriesForm(HttpServletRequest req, ModelMap model) {
 		this.categoryController.categoryList(model);
 		
 		ChartProperties props = null;
@@ -323,7 +389,7 @@ public class SearchController extends BaseController {
 		}
 		
 		model.addAttribute(CHART_PROPS_ATTR, props);
-		return "chartInput";
+		return "chart";
 	}
 	
 	/*
@@ -332,42 +398,12 @@ public class SearchController extends BaseController {
 	@RequestMapping(value="/chart/by/categories/out", method=RequestMethod.POST)
 	public String chartByCategoriesOutput(HttpServletRequest req, ModelMap model) {
 		
-		ChartProperties props = new ChartProperties();
-		props.setFromYear(getChartFromYear(req));		
-		props.setNumYears(getChartNumYears(req));		
-		String groupName;
-		CategoryGroup group;
-		
-		req.getSession().setAttribute(CHART_PROPS_ATTR, props);
+		ChartProperties props = getChartSearchCriteriaFromRequest(req);
+		return chartByCategoriesOutput(props, req, model);
+	}
+	
+	private String chartByCategoriesOutput(ChartProperties props, HttpServletRequest req, ModelMap model) {
 		model.addAttribute(CHART_PROPS_ATTR, props);
-		
-		String jsonStr = req.getParameter("counterStore");
-		List<MultiCategoryCounter> counters = fromJson(new TypeReference<List<MultiCategoryCounter>>() {}, jsonStr);
-		int numGroups = counters.size();
-		int numCategories;
-		int n = 0;
-				
-		for (int groupId = 1; groupId < 10; groupId++) {
-			groupName = req.getParameter(String.format("group-%d-name", groupId));
-			
-			if (StringUtils.isNotBlank(groupName)) {
-				group = new CategoryGroup().
-						setLabel(groupName).
-						setId(groupId);
-				
-				props.getGroups().add(group);
-				
-				// How many categories are in this group?
-				numCategories = getNumCategoriesForGroup(counters, groupId);
-				
-				// Read category criteria from form inputs
-				group.setCategories(readMultiCategoryInput(req, groupId, numCategories));
-				
-				if (++n >= numGroups) {
-					break;
-				}
-			}
-		}
 		
 		if (! props.isReady()) {
 			model.addAttribute("noCategoriesSpecified", 1);
@@ -466,6 +502,16 @@ public class SearchController extends BaseController {
 
 		try {
 			return new ObjectMapper().readValue(jsonPacket, SolrParams.class);
+		} catch (Exception e) {
+			LOG.error("Jackson marshalling error", e);
+		}
+		return null;
+	}
+	
+	private static ChartProperties toChartProperties(String jsonPacket) {
+
+		try {
+			return new ObjectMapper().readValue(jsonPacket, ChartProperties.class);
 		} catch (Exception e) {
 			LOG.error("Jackson marshalling error", e);
 		}

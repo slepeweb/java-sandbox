@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+@JsonIgnoreProperties({"ready"})
 public class CategoryInput extends Category {
 	
 	private List<String> options = new ArrayList<String>();
