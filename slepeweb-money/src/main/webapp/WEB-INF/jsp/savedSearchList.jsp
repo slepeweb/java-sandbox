@@ -5,7 +5,7 @@
 <mny:flash />
 		
 <mny:standardLayout>
-	<h2>Saved searches <c:if test="${not empty param.flash}"><span 
+	<h2>Saved search update <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
 	
 	<c:choose><c:when test="${not empty _types}">

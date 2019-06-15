@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
-@JsonIgnoreProperties({"ready"})
+@JsonIgnoreProperties({"ready", "defined4Insert", "inDatabase", "legacy"})
 public class CategoryInput extends Category {
 	
 	private List<String> options = new ArrayList<String>();

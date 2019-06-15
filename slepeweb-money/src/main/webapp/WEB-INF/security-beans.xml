@@ -11,9 +11,6 @@
 		<intercept-url pattern="/account/delete" access="hasRole('MONEY_ADMIN')" />
 		<intercept-url pattern="/payee/delete" access="hasRole('MONEY_ADMIN')" />
 		<intercept-url pattern="/category/delete" access="hasRole('MONEY_ADMIN')" />
-<!-- 		<intercept-url pattern="/account/**" access="hasRole('MONEY_USER')" /> -->
-<!-- 		<intercept-url pattern="/payee/**" access="hasRole('MONEY_USER')" /> -->
-<!-- 		<intercept-url pattern="/category/**" access="hasRole('MONEY_USER')" /> -->
 		<intercept-url pattern="/login" access="permitAll" />
 		<intercept-url pattern="/resources/**" access="permitAll" />
 		<intercept-url pattern="/**" access="hasRole('MONEY_USER')" />

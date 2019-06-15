@@ -256,6 +256,48 @@ public class SearchController extends BaseController {
 				req.getContextPath(), Util.encodeUrl(flash)));
 	}	
 	
+	@RequestMapping(value="/search/save/edit/{id}", method=RequestMethod.GET)
+	public String savedSearchUpdateForm(@PathVariable int id, HttpServletRequest req, ModelMap model) {
+		model.addAttribute("_ss", this.savedSearchService.get(id));
+		model.addAttribute("_numDeletableTransactions", 0);
+		return "savedSearchForm";
+	}
+	
+	@RequestMapping(value="/search/save/edit/{id}", method=RequestMethod.POST)
+	public RedirectView savedSearchUpdateAction(@PathVariable int id, HttpServletRequest req, ModelMap model) {
+		SavedSearch ss = this.savedSearchService.get(id);
+		ss.setName(req.getParameter("name"));
+		String flash;
+		
+		try {
+			this.savedSearchService.save(ss);
+			flash = "success|Search label successfully updated";
+		}
+		catch (Exception e) {
+			flash = "failure|Failed to update search label";
+		}
+		
+		return new RedirectView(String.format("%s/search/save/list?flash=%s", 
+				req.getContextPath(), Util.encodeUrl(flash)));
+	}
+	
+	@RequestMapping(value="/search/save/delete/{id}", method=RequestMethod.GET)
+	public RedirectView savedSearchDeleteAction(@PathVariable int id, HttpServletRequest req, ModelMap model) {
+		SavedSearch ss = this.savedSearchService.get(id);
+		String flash;
+		
+		try {
+			this.savedSearchService.delete(ss.getId());
+			flash = "success|Saved search successfully deleted";
+		}
+		catch (Exception e) {
+			flash = "failure|Failed to delete saved search";
+		}
+		
+		return new RedirectView(String.format("%s/search/save/list?flash=%s", 
+				req.getContextPath(), Util.encodeUrl(flash)));
+	}
+	
 	@RequestMapping(value="/search/save/repeat", method=RequestMethod.GET)
 	public String repeatSavedSearch(HttpServletRequest req, ModelMap model) {
 		

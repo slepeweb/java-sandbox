@@ -239,6 +239,10 @@ pre code {
   overflow-x: auto;
 }
 
+header {
+  background-color: #dd9;
+  line-height: 1.0em;
+}
 header p {
   color: #bbb;
   position: relative;
@@ -805,11 +809,18 @@ input[type="button"]:disabled,
 
 #user-welcome {
   cursor: pointer;
+  margin-right: 2em;
+  margin-top: 1.0em;
 }
 
 #navigation {
   text-decoration: none;
   list-style: none;
+  display: inline-block;
+}
+#navigation li {
+  display: inline-block;
+  margin-right: 3em;
 }
 
 #year-selector {

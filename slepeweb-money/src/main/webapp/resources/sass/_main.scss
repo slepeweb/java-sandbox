@@ -135,6 +135,9 @@
 	}
 
 	header {
+		background-color: #dd9;
+		line-height: 1.0em;
+		
 		p {
 			color: $color-fg-light;
 			position: relative;
@@ -685,11 +688,19 @@
 
 #user-welcome {
 	cursor: pointer;
+	margin-right: 2em;
+	margin-top: 1.0em;
 }
 
 #navigation {
 	text-decoration: none;
 	list-style: none;
+	display: inline-block;
+	
+	li {
+		display: inline-block;
+		margin-right: 3em;
+	}
 }
 
 #year-selector {
