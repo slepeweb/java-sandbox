@@ -3,7 +3,7 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <mny:standardLayout>
-	<h2>Categories</h2>			
+	<h2 class="inline-block">Categories</h2>			
 	
 	<div class="right"><a href="add">New category</a></div>
 	

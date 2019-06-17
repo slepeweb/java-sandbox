@@ -11,17 +11,21 @@
 	}
 	
 	#tabs {
-		margin-top: 4em;
+		font-size: 1em;
 	}
 	
 	#form-tab, #results-tab {
 		padding: 0.5em;
 	}
+
+	input[type="submit"] {
+		margin-top: 1.0em;
+	}
 </c:set>
 
 <mny:standardLayout>
 
-	<h2>Chart <c:if test="${not empty param.flash}"><span 
+	<h2 class="inline-block">Chart <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
 			
 	<div class="right"><a href="${_ctxPath}/search/save/list">Saved searches</a></div>
@@ -30,9 +34,11 @@
 		<ul>
 			<li><a href="#form-tab">Form</a></li>
 			<li><a href="#results-tab">Results</a></li>
+			<li><a href="#data-tab">Data</a></li>
 		</ul>
 		<div id="form-tab"><mny:chartForm /></div>		
 		<div id="results-tab"><mny:chartResults /></div>
+		<div id="data-tab"><mny:chartData /></div>
 	</div>
 
 	<script>

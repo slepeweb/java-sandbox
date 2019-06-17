@@ -1,9 +1,7 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
-	
-<mny:multiCategoryInputSupport />
 
-<h3>Time window</h3>	
+<mny:multiCategoryInputSupport />
 
 <form id="chart-form" class="multi-category-input" method="post" action="${_ctxPath}/chart/by/categories/out">
 	<table>
@@ -18,8 +16,6 @@
 	        	value="${_chartProps.numYears}" /></td>
 	    </tr>
 	</table>
-	
-	<h3>Category groupings</h3>	
 	
 	<table id="multi-category-groupings">
 		<%-- The parameters to this function call are created by <mny:multiCategoryInputSupport />, called earlier --%>

@@ -164,6 +164,10 @@ public class Util {
 		return 0L;
 	}
 	
+	public static float toPounds(long pence) {
+		return pence / 100;
+	}
+	
 	public static String buildChartCategoryInputMarkup(ChartProperties props, String outerTemplate, String innerTemplate, 
 			String categoryOptionsTemplate) {
 		

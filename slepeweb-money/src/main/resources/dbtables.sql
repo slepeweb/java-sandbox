@@ -125,7 +125,7 @@ create table search
 	saved timestamp default 0,
   name varchar(255) NOT NULL,
   type enum ('advanced', 'chart'),
-  json varchar(1023) NOT NULL,
+  json varchar(4095) NOT NULL,
 	primary key (id),
 	index idx_search (saved desc, name)
 ) ENGINE=InnoDB;

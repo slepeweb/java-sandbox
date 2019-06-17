@@ -7,7 +7,7 @@
 		<a href="/money/index/by/dates">Re-index</a><br />
 	</div>
 	
-	<h2>Money Dashboard</h2>
+	<h2>Dashboard</h2>
 					
 	<c:choose><c:when test="${not empty _accounts}">
 		<table class="trn_listing">

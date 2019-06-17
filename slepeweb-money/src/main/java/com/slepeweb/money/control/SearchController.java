@@ -33,6 +33,7 @@ import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.CategoryGroup;
 import com.slepeweb.money.bean.CategoryInput;
+import com.slepeweb.money.bean.ChartData;
 import com.slepeweb.money.bean.ChartProperties;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.MultiCategoryCounter;
@@ -470,16 +471,32 @@ public class SearchController extends BaseController {
 		long amount;
 		SolrResponse<FlatTransaction> resp;
 		SolrParams p;
-		int yearCounter;
+		ChartData chartData;
+
+		List<Integer> years = new ArrayList<Integer>();
+	    model.addAttribute("_years", years);
+	    for (int i = props.getFromYear(); i < (props.getFromYear() + props.getNumYears()) && i < currentYear; i++) {
+	    	years.add(i);
+	    }
+
+	    List<String> labels = new ArrayList<String>();
+	    model.addAttribute("_chartLabels", labels);
+		Map<String, ChartData> data = new HashMap<String, ChartData>();
+	    model.addAttribute("_chartDataMap", data);
+	    
+	    int startYear = props.getFromYear();
+	    int endYear = startYear + props.getNumYears() - 1;
 		
 		for (CategoryGroup grp : props.getGroups()) {
 			
+			labels.add(grp.getLabel());
+			chartData = new ChartData().setLabel(grp.getLabel());
+			data.put(grp.getLabel(), chartData);
+			
 			p = new SolrParams(new SolrConfig().setPageSize(10000));
 			p.setCategories(grp.toCategoryList());
-			
-			yearCounter = 0;
-			
-			for (int year = props.getFromYear(); yearCounter++ < props.getNumYears() && year < currentYear; year++) {
+						
+			for (int year = props.getFromYear(); year < endYear && year < currentYear; year++) {
 				from.set(Calendar.YEAR, year);
 				to.set(Calendar.YEAR, year);
 				p.setFrom(from.getTime());
@@ -492,14 +509,16 @@ public class SearchController extends BaseController {
 					amount += ft.getAmount();
 				}
 				
-				ds.addValue((int) (-amount / 100), 
+				ds.addValue(Util.toPounds(-amount), 
 						grp.getLabel(),
 						Integer.valueOf(year));
+				
+				chartData.getData().put(year, -amount);
 			}
 		}
 	 
 		JFreeChart chart = ChartFactory.createBarChart(
-		         "Category spend report", "Years", "Spend (Â£)",
+		         "Category spend report", "Years", "Spend (£)",
 		         ds,
 		         PlotOrientation.VERTICAL, true, true, false);
 		
