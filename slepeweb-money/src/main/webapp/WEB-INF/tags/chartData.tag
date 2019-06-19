@@ -9,24 +9,30 @@
 			<c:set var="_year" value="${_chartProps.fromYear}" />
 			<c:set var="_numGroups" value="${fn:length(_chartDataMap)}" />
 			
-			<c:forEach items="${_chartLabels}" var="_label">
-				<tr>
+			<tr>
+				<th></th>
+				<c:forEach items="${_chartLabels}" var="_label">
 					<th>${_label}</th>
-					<c:forEach items="${_years}" var="_year">
+				</c:forEach>
+			</tr>
+			
+			<c:forEach items="${_years}" var="_year">
+				<tr>
+					<th>${_year}</th>
+					<c:forEach items="${_chartLabels}" var="_label">
 						<c:set var="_list" value="${_chartDataMap[_label]}" />
 						<td>${mon:tertiaryOp(not empty _list, mon:formatPounds(_list.data[_year]), "")}</td>
 					</c:forEach>
-					<td>${mon:formatPounds(_chartDataMap[_label].total)}</td>
 				</tr>
 			</c:forEach>
 			
 			<tr>
-				<th>Year</th>
-				<c:forEach items="${_years}" var="_year">
-					<th>${_year}</th>
-				</c:forEach>
 				<th>Totals</th>
+				<c:forEach items="${_chartLabels}" var="_label">
+					<td>${mon:formatPounds(_chartDataMap[_label].total)}</td>
+				</c:forEach>
 			</tr>
+			
 		</table>
 	</c:if>
 </c:otherwise></c:choose>

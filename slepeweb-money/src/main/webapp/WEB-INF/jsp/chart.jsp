@@ -17,6 +17,10 @@
 	#form-tab, #results-tab {
 		padding: 0.5em;
 	}
+	
+	#data-tab th {
+		font-size: 1.2em;
+	}
 
 	input[type="submit"] {
 		margin-top: 1.0em;
