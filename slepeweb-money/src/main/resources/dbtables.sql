@@ -1,5 +1,7 @@
 drop table if exists splittransaction;
 drop table if exists transaction;
+drop table if exists scheduledtransaction;
+drop table if exists scheduledsplit;
 drop table if exists account;
 drop table if exists payee;
 drop table if exists category;
@@ -90,10 +92,44 @@ create table splittransaction
 	constraint foreign key (categoryid) references category(id) on delete cascade
 ) ENGINE=InnoDB;
 
+create table scheduledtransaction
+(
+	id int not null auto_increment,
+	label varchar(255),	
+	dayofmonth int,
+	lastentered timestamp default 0,
+	accountid int,
+	mirrorid int,
+	payeeid int,
+	categoryid int,
+	split boolean,
+	reference varchar(255),	
+	amount int,
+	memo varchar(255),
+	
+	primary key (id),
+	constraint foreign key (accountid) references account(id) on delete cascade,
+	constraint foreign key (payeeid) references payee(id) on delete cascade,
+	constraint foreign key (categoryid) references category(id) on delete cascade
+) ENGINE=InnoDB;
+
+create table scheduledsplit
+(
+	id int not null auto_increment,
+	scheduledtransactionid int,
+	categoryid int,
+	amount int,
+	memo varchar(255),
+	
+	primary key (id),
+	constraint foreign key (scheduledtransactionid) references scheduledtransaction(id) on delete cascade,
+	constraint foreign key (categoryid) references category(id) on delete cascade
+) ENGINE=InnoDB;
+
 create table role
 (
 	id int not null auto_increment,
-  name varchar(255) NOT NULL,
+	name varchar(255) NOT NULL,
 	primary key (id),
 	unique key idx_role_name (name)
 ) ENGINE=InnoDB;
@@ -101,20 +137,20 @@ create table role
 create table user
 (
 	id int not null auto_increment,
-  name varchar(32),
-  alias varchar(32),
-  password varchar(255),
-  enabled smallint,
-  demo_user smallint,
+	name varchar(32),
+	alias varchar(32),
+	password varchar(255),
+	enabled smallint,
+	demo_user smallint,
 	primary key (id),
 	unique key idx_user_alias (alias)
 ) ENGINE=InnoDB;
 
 create table userrole
 (
-  userid int NOT NULL,
-  roleid int NOT NULL,
-  primary key (userid, roleid),
+	userid int NOT NULL,
+	roleid int NOT NULL,
+	primary key (userid, roleid),
 	constraint foreign key (userid) references user(id) on delete cascade,
 	constraint foreign key (roleid) references role(id) on delete cascade
 ) ENGINE=InnoDB;
@@ -123,9 +159,9 @@ create table search
 (
 	id int not null auto_increment,
 	saved timestamp default 0,
-  name varchar(255) NOT NULL,
-  type enum ('advanced', 'chart'),
-  json varchar(4095) NOT NULL,
+	name varchar(255) NOT NULL,
+	type enum ('advanced', 'chart'),
+	json varchar(4095) NOT NULL,
 	primary key (id),
 	index idx_search (saved desc, name)
 ) ENGINE=InnoDB;

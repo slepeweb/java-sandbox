@@ -11,7 +11,7 @@ import java.util.List;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.service.SplitTransactionService;
 
-public class Transaction extends DbEntity implements Cloneable {
+public class Transaction extends DbEntity {
 	
 	public static SimpleDateFormat SDF = new SimpleDateFormat("dd/MM''yyyy");
 	public static NumberFormat NF = NumberFormat.getInstance();
@@ -54,14 +54,6 @@ public class Transaction extends DbEntity implements Cloneable {
 		for (SplitTransaction st : source.getSplits()) {
 			getSplits().add(st.setTransactionId(getId()));
 		}
-	}
-	
-	@Override 
-	public Object clone() throws CloneNotSupportedException {
-		Transaction t = new Transaction();
-		t.assimilate(this);
-		t.setId(getId());
-		return t;
 	}
 	
 	public boolean isDefined4Insert() {

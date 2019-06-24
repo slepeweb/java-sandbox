@@ -283,12 +283,9 @@ public class TransactionController extends BaseController {
 		SplitTransactionFormComponent c;
 		
 		for (SplitTransaction st : t.getSplits()) {
-			c = new SplitTransactionFormComponent().
-					setCategory(st.getCategory()).
+			c = new SplitTransactionFormComponent(st).
 					setAllMajors(allMajors).
-					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor())).
-					setMemo(st.getMemo()).
-					setAmount(st.getAmount());
+					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor()));
 			arr.add(c);
 		}
 		

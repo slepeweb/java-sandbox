@@ -11,6 +11,20 @@ public class SplitTransactionFormComponent {
 	private long amount;
 	private String memo = "";
 	
+	public SplitTransactionFormComponent() {}
+	
+	public SplitTransactionFormComponent(SplitTransaction st) {
+		setCategory(st.getCategory()).
+		setAmount(st.getAmount()).
+		setMemo(st.getMemo());
+	}
+	
+	public SplitTransactionFormComponent(ScheduledSplitBak st) {
+		setCategory(new Category().setMajor(st.getMajorCategory()).setMinor(st.getMinorCategory())).
+		setAmount(st.getAmount()).
+		setMemo(st.getMemo());
+	}
+	
 	public boolean isDebit() {
 		return getAmount() <= 0L;
 	}

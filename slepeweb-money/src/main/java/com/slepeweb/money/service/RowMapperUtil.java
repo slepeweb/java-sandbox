@@ -11,6 +11,8 @@ import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
+import com.slepeweb.money.bean.ScheduledSplitBak;
+import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.Transfer;
@@ -152,4 +154,41 @@ public class RowMapperUtil {
 			setMajor(rs.getString(major)).
 			setMinor(rs.getString(minor));
 	}
+
+	public static final class ScheduledTransactionMapper implements RowMapper<ScheduledTransaction> {
+		public ScheduledTransaction mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new ScheduledTransaction().
+					setLabel(rs.getString("label")).
+					setAccountId(rs.getLong("accountid")).
+					setAccount(rs.getString("accountname")).
+					setMirrorId(rs.getLong("mirrorid")).
+					setMirror(rs.getString("mirrorname")).
+					setPayeeId(rs.getLong("payeeid")).
+					setPayee(rs.getString("payeename")).
+					setCategoryId(rs.getLong("categoryid")).
+					setMajorCategory(rs.getString("major")).
+					setMinorCategory(rs.getString("minor")).
+					setSplit(rs.getBoolean("split")).
+					setLastEntered(rs.getTimestamp("lastentered")).
+					setAmount(rs.getLong("amount")).
+					setReference(rs.getString("reference")).
+					setMemo(rs.getString("memo")).
+					setId(rs.getLong("id")).
+					setDay(rs.getInt("dayofmonth"));
+		}
+	}
+	
+	public static final class ScheduledSplitMapper implements RowMapper<ScheduledSplitBak> {
+		public ScheduledSplitBak mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new ScheduledSplitBak().
+					setId(rs.getLong("id")).
+					setScheduledTransactionId(rs.getLong("scheduledtransactionid")).
+					setCategoryId(rs.getLong("categoryid")).
+					setMajorCategory(rs.getString("major")).
+					setMinorCategory(rs.getString("minor")).
+					setAmount(rs.getLong("amount")).
+					setMemo(rs.getString("memo"));
+		}
+	}
+	
 }
