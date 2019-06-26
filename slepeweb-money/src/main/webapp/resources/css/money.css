@@ -820,7 +820,7 @@ input[type="button"]:disabled,
 }
 #navigation li {
   display: inline-block;
-  margin-right: 3em;
+  margin-right: 2em;
 }
 
 #year-selector {

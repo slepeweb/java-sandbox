@@ -43,6 +43,8 @@ $(function() {
 			Are you sure you wish to delete this transaction? NOTE: that this action can NOT be un-done.
 		</c:when><c:when test="${entity eq 'search/save'}">
 			Are you sure you wish to delete this search?
+		</c:when><c:when test="${entity eq 'schedule'}">
+			Are you sure you wish to delete this schedule?
 		</c:when><c:otherwise>
 			Deleting this ${level}${entity} will also delete __N__ corresponding transactions. Are you sure
 			you wish to proceed?

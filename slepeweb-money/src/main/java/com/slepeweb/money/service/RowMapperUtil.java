@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.slepeweb.money.bean.Account;
@@ -11,7 +12,6 @@ import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
-import com.slepeweb.money.bean.ScheduledSplitBak;
 import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
@@ -157,35 +157,54 @@ public class RowMapperUtil {
 
 	public static final class ScheduledTransactionMapper implements RowMapper<ScheduledTransaction> {
 		public ScheduledTransaction mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new ScheduledTransaction().
+			ScheduledTransaction scht = 
+					new ScheduledTransaction().
 					setLabel(rs.getString("label")).
-					setAccountId(rs.getLong("accountid")).
-					setAccount(rs.getString("accountname")).
-					setMirrorId(rs.getLong("mirrorid")).
-					setMirror(rs.getString("mirrorname")).
-					setPayeeId(rs.getLong("payeeid")).
-					setPayee(rs.getString("payeename")).
-					setCategoryId(rs.getLong("categoryid")).
-					setMajorCategory(rs.getString("major")).
-					setMinorCategory(rs.getString("minor")).
+					setDay(rs.getInt("dayofmonth"));
+			
+			scht.
+					setAccount(
+							new Account().
+							setId(rs.getLong("accountid")).
+							setName(rs.getString("accountname"))).
+					setPayee(
+							new Payee().
+							setId(rs.getLong("payeeid")).
+							setName(rs.getString("payeename"))).
+					setCategory(
+							new Category().
+							setId(rs.getLong("categoryid")).
+							setMajor(rs.getString("major")).
+							setMinor(rs.getString("minor"))).
 					setSplit(rs.getBoolean("split")).
-					setLastEntered(rs.getTimestamp("lastentered")).
+					setEntered(rs.getTimestamp("lastentered")).
 					setAmount(rs.getLong("amount")).
 					setReference(rs.getString("reference")).
 					setMemo(rs.getString("memo")).
-					setId(rs.getLong("id")).
-					setDay(rs.getInt("dayofmonth"));
+					setId(rs.getLong("id"));
+			
+			String mirrorName = rs.getString("mirrorname");
+			if (StringUtils.isNotBlank(mirrorName)) {
+				scht.setMirror(							
+						new Account().
+						setId(rs.getLong("mirrorid")).
+						setName(rs.getString("mirrorname")));
+			}
+			
+			return scht;
 		}
 	}
 	
-	public static final class ScheduledSplitMapper implements RowMapper<ScheduledSplitBak> {
-		public ScheduledSplitBak mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new ScheduledSplitBak().
+	public static final class ScheduledSplitMapper implements RowMapper<SplitTransaction> {
+		public SplitTransaction mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new SplitTransaction().
 					setId(rs.getLong("id")).
-					setScheduledTransactionId(rs.getLong("scheduledtransactionid")).
-					setCategoryId(rs.getLong("categoryid")).
-					setMajorCategory(rs.getString("major")).
-					setMinorCategory(rs.getString("minor")).
+					setTransactionId(rs.getLong("scheduledtransactionid")).
+					setCategory(
+							new Category().
+							setId(rs.getLong("categoryid")).
+							setMajor(rs.getString("major")).
+							setMinor(rs.getString("minor"))).
 					setAmount(rs.getLong("amount")).
 					setMemo(rs.getString("memo"));
 		}

@@ -6,8 +6,8 @@
 	
 <mny:standardLayout>
 	<div class="right">
-		<a href="add/${_tl.account.id}">New transaction</a><br />
-		<a href="../../index/${_tl.account.id}">Re-index</a><br />
+		<a href="${_ctxPath}/transaction/add/${_tl.account.id}">New transaction</a><br />
+		<a href="${_ctxPath}/index/by/account/${_tl.account.id}">Re-index</a><br />
 	</div>
 	
 	<div class="inline-block">

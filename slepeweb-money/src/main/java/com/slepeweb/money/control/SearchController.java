@@ -475,7 +475,7 @@ public class SearchController extends BaseController {
 
 		List<Integer> years = new ArrayList<Integer>();
 	    model.addAttribute("_years", years);
-	    for (int i = props.getFromYear(); i < (props.getFromYear() + props.getNumYears()) && i < currentYear; i++) {
+	    for (int i = props.getFromYear(); i < (props.getFromYear() + props.getNumYears()) && i <= currentYear; i++) {
 	    	years.add(i);
 	    }
 
@@ -485,7 +485,7 @@ public class SearchController extends BaseController {
 	    model.addAttribute("_chartDataMap", data);
 	    
 	    int startYear = props.getFromYear();
-	    int endYear = startYear + props.getNumYears() - 1;
+	    int endYear = startYear + props.getNumYears();
 		
 		for (CategoryGroup grp : props.getGroups()) {
 			
@@ -496,7 +496,7 @@ public class SearchController extends BaseController {
 			p = new SolrParams(new SolrConfig().setPageSize(10000));
 			p.setCategories(grp.toCategoryList());
 						
-			for (int year = props.getFromYear(); year < endYear && year < currentYear; year++) {
+			for (int year = props.getFromYear(); year < endYear && year <= currentYear; year++) {
 				from.set(Calendar.YEAR, year);
 				to.set(Calendar.YEAR, year);
 				p.setFrom(from.getTime());

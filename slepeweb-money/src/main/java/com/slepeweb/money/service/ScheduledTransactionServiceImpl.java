@@ -31,7 +31,7 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 					"m.id as mirrorid, m.name as mirrorname, " +
 					"p.id as payeeid, p.name as payeename, " +
 					"c.id as categoryid, c.major, c.minor, " +
-					"t.label, t.dayofmonth, " +
+					"t.id, t.label, t.dayofmonth, " +
 					"t.lastentered, t.memo, t.reference, t.amount, " +
 					"t.split " + FROM;
 	
@@ -70,11 +70,13 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into scheduledtransaction (label, dayofmonth, accountid, mirrorid, payeeid, " +
+					"insert into scheduledtransaction (label, dayofmonth, lastentered, accountid, mirrorid, payeeid, " +
 					"categoryid, split, amount, reference, memo) " +
-					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-					scht.getLabel(), scht.getDay(),
-					scht.getAccountId(), scht.getMirrorId(), scht.getPayeeId(), scht.getCategoryId(), 
+					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+					scht.getLabel(), scht.getDay(), scht.getEntered(),
+					scht.getAccount().getId(), 
+					scht.getMirror() != null ? scht.getMirror().getId() : null, 
+					scht.getPayee().getId(), scht.getCategory().getId(), 
 					scht.isSplit(), scht.getAmount(),
 					scht.getReference(), scht.getMemo());
 			
@@ -99,8 +101,9 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 						"memo = ?, reference = ? " +
 						"where id = ?", 
 						dbRecord.getLabel(), dbRecord.getDay(),
-						dbRecord.getAccountId(), dbRecord.getMirrorId(), dbRecord.getPayeeId(), 
-						dbRecord.getCategoryId(),
+						dbRecord.getAccount().getId(), 
+						dbRecord.getMirror() != null ? dbRecord.getMirror().getId() : null, 
+						dbRecord.getPayee().getId(), dbRecord.getCategory().getId(),
 						dbRecord.isSplit(), dbRecord.getAmount(),  
 						dbRecord.getMemo(), dbRecord.getReference(), 
 						dbRecord.getId());
@@ -120,7 +123,7 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 
 	public void updateSplit(ScheduledTransaction t) {
 		this.jdbcTemplate.update(
-				"update transaction set split = ? where id = ?", 
+				"update scheduledtransaction set split = ? where id = ?", 
 				t.isSplit(), t.getId());
 		
 		LOG.info(compose("Updated split flag for transaction", t));
@@ -136,7 +139,7 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	}
 
 	public List<ScheduledTransaction> getAll() {
-		return getTransactions(SELECT + "order by t.lastentered", new Object[]{});
+		return getTransactions(SELECT + "order by t.label", new Object[]{});
 	}
 	
 	private List<ScheduledTransaction> getTransactions(String sql, Object[] params) {

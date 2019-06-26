@@ -18,12 +18,11 @@
 	<c:set var="_pageHeading" value="Update schedule" />
 	</c:if>
 	
-	<div class="right">
-		<c:if test="${_formMode eq 'update'}">
+	<c:if test="${_formMode eq 'update'}">
+		<div class="right">
 			<a href="${_ctxPath}/schedule/add">New schedule</a><br />
-		</c:if>
-		<a href="${_ctxPath}/schedule/list">List schedules</a>
-	</div>
+		</div>
+	</c:if>
 	
 	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
@@ -38,9 +37,17 @@
 		    </c:if>
 		    
 		    <tr>
+		        <td class="heading"><label for="label">Name</label></td>
+		        <td>
+		        	<input id="label" type="text" name="label" placeholder="Provide an identifier for this schedule" value="${_schedule.label}">
+		        </td>
+		    </tr>
+
+		    <tr>
 		        <td class="heading"><label for="day">Day of month</label></td>
 		        <td>
-		        	<select id="day" type="text" name="day" placeholder="Enter day of month" value="${_schedule.day}">
+		        	<select id="day" name="day">
+			        	<option value="">Choose ...</option>
 		        		<c:forEach items="${_daysOfMonth}" var="_day">
 		        			<option value="${_day}" <c:if test="${_day eq _schedule.day}">selected</c:if>>${_day}</option>
 		        		</c:forEach>
@@ -54,7 +61,7 @@
 		        	<select id="account" name="account">
 			        	<option value="">Choose ...</option>
 			        	<c:forEach items="${_allAccounts}" var="_a">
-			        		<option value="${_a.id}" <c:if test="${_a.id eq _schedule.accountId}">selected</c:if>>${_a.name}</option>
+			        		<option value="${_a.id}" <c:if test="${_a.id eq _schedule.account.id}">selected</c:if>>${_a.name}</option>
 			        	</c:forEach>
 		        	</select>
 		        </td>
@@ -78,7 +85,7 @@
 		        	<select id="xferaccount" name="xferaccount">
 			        	<option value="">Choose ...</option>
 			        	<c:forEach items="${_allAccounts}" var="_a">
-			        		<option value="${_a.id}" <c:if test="${_schedule.transfer and _a.id eq _schedule.mirrorId}">selected</c:if>>${_a.name}</option>
+			        		<option value="${_a.id}" <c:if test="${_schedule.transfer and _a.id eq _schedule.mirror.id}">selected</c:if>>${_a.name}</option>
 			        	</c:forEach>
 		        	</select>
 		        </td>
@@ -87,7 +94,7 @@
 		    <tr class="payee">
 		        <td class="heading"><label for="payee">Payee</label></td>
 		        <td>
-		         	 <input id="payee" type="text" name="payee" value="${_schedule.payee}" />
+		         	 <input id="payee" type="text" name="payee" value="${_schedule.payee.name}" />
 		        </td>
 		    </tr>
 
@@ -96,7 +103,7 @@
 		        <td>
 		        	<select id="major" name="major">
 			        	<c:forEach items="${_allMajorCategories}" var="_c">
-			        		<option value="${_c}" <c:if test="${_c eq _schedule.majorCategory}">selected</c:if>>${_c}</option>
+			        		<option value="${_c}" <c:if test="${_c eq _schedule.category.major}">selected</c:if>>${_c}</option>
 			        	</c:forEach>
 		        	</select>
 		        </td>
@@ -107,7 +114,7 @@
 		        <td>
 		        	<select id="minor" name="minor">
 			        	<c:forEach items="${_allMinorCategories}" var="_c">
-			        		<option value="${_c}" <c:if test="${_c eq _schedule.minorCategory}">selected</c:if>>${_c}</option>
+			        		<option value="${_c}" <c:if test="${_c eq _schedule.category.minor}">selected</c:if>>${_c}</option>
 			        	</c:forEach>
 		        	</select>
 		        </td>
@@ -178,128 +185,12 @@
 		
 </mny:standardLayout>
 
-<mny:entityDeletionDialog entity="transaction" mode="${_formMode}" id="${_schedule.id}"/>
+<mny:entityDeletionDialog entity="schedule" mode="${_formMode}" id="${_schedule.id}"/>
 
 <script>
 	$(function() {
 	  <mny:payeeAutocompleter />
-	  
-	  var _updateMinorCategories = function() {
-		  var deferred = $.Deferred();
-		  var majorEle = $("select[name^='major']");
-			var majorVal = majorEle.find(":selected").val();
-			var name = majorEle.attr("name");
-			var split = name.length > 5;
-			var index = -1;
-			if (split) {
-				index = name.substring("major".length + 1);
-			}
-			
-			$.ajax(webContext + "/rest/category/minor/list/" + majorVal, {
-				type: "GET",
-				cache: false,
-				dataType: "json",
-				success: function(obj, status, z) {
-					var select = $("select[name='minor" + (split ? "_" + index : "") + "']");
-					select.empty();
-					$.each(obj.data, function(index, minor) {
-						select.append("<option value='" + minor + "'>" + minor + "</option>");
-					});
-					
-					deferred.resolve("Categories updated");
-				},
-				error: function(x, t, m) {
-					deferred.reject(x + t + m);
-				}
-			});
-			
-			return deferred.promise();
-	  }
-		  
-	  $("select[name^='major']").change(function(e) {	
-		  var promet = _updateMinorCategories();
-		  promet.done(function(res){
-			  //window.alert(res);
-		  });
-		  
-		  promet.fail(function(res){
-			  //window.alert(res);
-		  });
-		});
-		
-	  $("#payee").change(function(e) {	
-			var payeeName = $(this).val();
-			var major = $("select[name='major']").find(":selected").val();
-			var memo = $("input[name='memo']").val();
-			
-			if (! major) {
-		  	$.ajax({
-			    url: webContext + "/rest/transaction/latest/bypayee/" + payeeName,
-			    type: "GET",
-			    contentType: "application/json",
-			    dataType: "json",
-			    success: function(trn) {
-			      $("select[name='major']").val(trn.majorCategory);
-					  var promet = _updateMinorCategories();
-					  promet.done(function(res) {						  
-					      if (! memo) {
-						      $("input[name='memo']").val(trn.memo);
-					      }
-					      $("select[name='minor']").val(trn.minorCategory);
-					      
-					      var amountStr = trn.amountInPounds;
-					      var len = amountStr.length;					      
-					      if (len > 0 && amountStr.substring(0, 1) == '-') {
-					    	  amountStr = amountStr.substring(1);
-					      }
-					      
-					      if (trn.amount < 0) {
-					    	  $("#debit").prop("checked", true);
-					    	  //$("#credit").prop("checked", false);
-					      }
-					      else {
-					    	  //$("#debit").prop("checked", false);
-					    	  $("#credit").prop("checked", true);
-					      }
-					      
-					      $("#amount").val(amountStr);
-					  });
-			    },
-			    error: function(x, t, m) {
-			      console.trace();
-			      /*
-			      if (!(console == 'undefined')) {
-			        console.log("ERROR: " + x + t + m);
-			      }
-			      console.log(" At the end");
-			      */
-			    }
-			  });
-			}
-	  });
-	  
-		var _setComponentVisibilities = function() {				
-			var paymentType = $("input[name='paymenttype']:checked").val();
-			
-			if (paymentType == "standard") {
-				// Set form for a standard/normal transaction
-				$(".payee td, .category td").css("display", "table-cell");
-				$(".transfer td, .splits-list td").css("display", "none");
-			}
-			else if (paymentType == "transfer") {
-				$(".payee td, .category td, .splits-list td").css("display", "none");
-				$(".transfer td").css("display", "table-cell");
-			}
-			else if (paymentType == "split") {				
-				$(".category td, .transfer td").css("display", "none");
-				$(".splits-list td").css("display", "table-cell");
-			}
-		}
-		
-		$("input[name='paymenttype']").change(function(e) {	
-			_setComponentVisibilities();
-		});
-		
-		_setComponentVisibilities();
+	  <mny:minorCategoryUpdates />
+	  <mny:splitVisibilities />
 	});
 </script>

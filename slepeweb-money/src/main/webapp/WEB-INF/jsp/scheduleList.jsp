@@ -14,11 +14,17 @@
 	
 	<c:choose><c:when test="${fn:length(_scheduled) > 0}">
 		<table>
+			<tr>
+				<th>Name</th>
+				<th>Day of month</th>
+				<th>Last entered</th>
+			</tr>
+			
 			<c:forEach items="${_scheduled}" var="_schedule">
 				<tr>
 					<td><a href="${_ctxPath}/schedule/edit/${_schedule.id}">${_schedule.label}</a></td>
 					<td>${_schedule.day}</td>
-					<td>${_schedule.lastEntered}</td>
+					<td>${_schedule.entered}</td>
 				</tr>
 			</c:forEach>			
 		</table>

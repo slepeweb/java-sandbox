@@ -1,5 +1,6 @@
 package com.slepeweb.money.control;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +19,8 @@ import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
-import com.slepeweb.money.bean.ScheduledSplitBak;
 import com.slepeweb.money.bean.ScheduledTransaction;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
@@ -39,43 +40,24 @@ public class ScheduledTransactionController extends BaseController {
 	
 	private void populateForm(ModelMap model, ScheduledTransaction t, String mode) {	
 		
-		Account a = this.accountService.get(t.getAccountId());
-		Account m = null;
-		if (t.getMirrorId() > 0) {
-			m = this.accountService.get(t.getMirrorId());
-		}
-		
 		List<Account> allAccounts = this.accountService.getAll(false);
+		List<String> allMajors = this.categoryService.getAllMajorValues();
 
-		Payee p = this.payeeService.get(t.getPayee());
-		Category c = this.categoryService.get(t.getMajorCategory(), t.getMinorCategory());
-		
+		model.addAttribute("_schedule", t);
 		model.addAttribute("_daysOfMonth", getDaysOfMonth());
-		model.addAttribute("_scheduledTransaction", t);
-		model.addAttribute("_account", a);
-		model.addAttribute("_mirror", m);
-		model.addAttribute("_payee", p);
-		model.addAttribute("_category", c);
 		model.addAttribute("_formMode", mode);
 		model.addAttribute("_allAccounts", allAccounts);
-		model.addAttribute("_allPayees", this.payeeService.getAll());
-		
-		List<String> allMajors = this.categoryService.getAllMajorValues();
+		model.addAttribute("_allPayees", this.payeeService.getAll());		
 		model.addAttribute("_allMajorCategories",allMajors );		
-		model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(c.getMajor()));
+		model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
 		
 		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
 		SplitTransactionFormComponent fc;
-		Category sc;
 		
-		for (ScheduledSplitBak st : this.scheduledSplitService.get(t.getId())) {
-			sc = this.categoryService.get(st.getCategoryId());
-			fc = new SplitTransactionFormComponent().
-					setCategory(sc).
+		for (SplitTransaction st : this.scheduledSplitService.get(t.getId())) {
+			fc = new SplitTransactionFormComponent(st).
 					setAllMajors(allMajors).
-					setAllMinors(this.categoryService.getAllMinorValues(sc.getMajor())).
-					setMemo(st.getMemo()).
-					setAmount(st.getAmount());
+					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor()));
 			arr.add(fc);
 		}
 		
@@ -105,8 +87,14 @@ public class ScheduledTransactionController extends BaseController {
 	}
 	
 	@RequestMapping(value="/add", method=RequestMethod.GET)
-	public String addForm(ModelMap model) {		
-		populateForm(model, new ScheduledTransaction(), "add");
+	public String addForm(ModelMap model) {
+		ScheduledTransaction scht = new ScheduledTransaction();
+		scht.
+				setAccount(new Account().setName("")).
+				setPayee(new Payee().setName("")).
+				setCategory(new Category().setMajor("").setMinor(""));
+		
+		populateForm(model, scht, "add");
 		return "scheduleForm";
 	}
 	
@@ -117,19 +105,19 @@ public class ScheduledTransactionController extends BaseController {
 	}
 	
 	@RequestMapping(value="/save", method=RequestMethod.POST)
-	public RedirectView update(HttpServletRequest req, ModelMap model) {
+	public RedirectView save(HttpServletRequest req, ModelMap model) {
 		
 		boolean isSplit = req.getParameter("paymenttype").equals("split");
 		long multiplier = req.getParameter("debitorcredit").equals("debit") ? -1L : 1L;
 
 		String flash;	
 		boolean isUpdateMode = req.getParameter("formMode").equals("update");
-		Account a = this.accountService.get(req.getParameter("account"));
+		Account a = this.accountService.get(Long.valueOf(req.getParameter("account")));
 		
 		Account m = null;
 		String mirror = req.getParameter("xferaccount");
 		if (StringUtils.isNotBlank(mirror)) {
-			m = this.accountService.get(mirror);
+			m = this.accountService.get(Long.valueOf(mirror));
 		}
 		
 		Payee p = this.payeeService.get(req.getParameter("payee"));
@@ -143,22 +131,30 @@ public class ScheduledTransactionController extends BaseController {
 		}
 		
 		ScheduledTransaction scht = new ScheduledTransaction().
-				setId(Long.valueOf(req.getParameter("id"))).
 				setLabel(req.getParameter("label")).
 				setDay(Integer.parseInt(req.getParameter("day"))).
-				setAccountId(a.getId()).
-				setMirrorId(m != null ? m.getId() : 0L).
-				setPayeeId(p.getId()).
-				setCategoryId(c.getId()).
-				setAmount(Util.parsePounds(req.getParameter("amount"))).
+				setMirror(m);
+
+		scht.
+				setAccount(a).
+				setPayee(p).
+				setCategory(c).
+				setAmount(Util.parsePounds(req.getParameter("amount")) * multiplier).
 				setMemo(req.getParameter("memo")).
 				setReference(req.getParameter("reference")).
 				setSplit(isSplit);
 		
+		if (isUpdateMode) {
+			scht.setId(Long.valueOf(req.getParameter("id")));
+		}
+		else {
+			scht.setEntered(new Timestamp(0L));
+		}
+		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
 			int index = 1;
-			ScheduledSplitBak st;
+			SplitTransaction st;
 			Category sc;
 			
 			do {
@@ -166,9 +162,9 @@ public class ScheduledTransactionController extends BaseController {
 						req.getParameter("major_" + index), 
 						req.getParameter("minor_" + index));
 				
-				st = new ScheduledSplitBak().
-					setScheduledTransactionId(scht.getId()).
-					setCategoryId(sc.getId()).
+				st = new SplitTransaction().
+					setTransactionId(scht.getId()).
+					setCategory(sc).
 					setMemo(req.getParameter("memo_" + index)).
 					setAmount(Util.parsePounds(req.getParameter("amount_" + index)) * multiplier);
 				
@@ -186,15 +182,15 @@ public class ScheduledTransactionController extends BaseController {
 		
 		
 		try {
-			this.scheduledTransactionService.save(scht);
+			scht = this.scheduledTransactionService.save(scht);
 			flash = String.format("success|Scheduled transaction successfully %s", isUpdateMode ? "updated" : "added");
 		}
 		catch (Exception e) {
 			flash = String.format("failure|Failed to %s scheduled transaction", isUpdateMode ? "update" : "add new");
 		}
 	
-		return new RedirectView(String.format("%s/schedule/edit/%d?flash=%s", 
-				req.getContextPath(), scht.getId(), Util.encodeUrl(flash)));
+		return new RedirectView(String.format("%s/schedule/list?flash=%s", 
+				req.getContextPath(), Util.encodeUrl(flash)));
 	}
 	
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.GET)
@@ -212,14 +208,6 @@ public class ScheduledTransactionController extends BaseController {
 		return new RedirectView(String.format("%s/schedule/list?flash=%s", 
 				req.getContextPath(), Util.encodeUrl(flash)));
 	}	
-	
-	private long toLong(HttpServletRequest req, String s) {
-		if (StringUtils.isNotBlank(s)) {
-			return Util.toLong(req.getParameter(s));
-		}
-		return 0L;
-		
-	}
 	
 	private List<Integer> getDaysOfMonth() {
 		List<Integer> list = new ArrayList<Integer>(28);

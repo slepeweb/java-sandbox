@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import com.slepeweb.money.bean.ScheduledSplitBak;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -25,7 +25,7 @@ public class ScheduledSplitServiceImpl extends BaseServiceImpl implements Schedu
 	
 	public ScheduledTransaction save(ScheduledTransaction t) throws MissingDataException, DuplicateItemException {
 		if (t.isSplit()) {
-			List<ScheduledSplitBak> revisedList = new ArrayList<ScheduledSplitBak>(t.getSplits().size());
+			List<SplitTransaction> revisedList = new ArrayList<SplitTransaction>(t.getSplits().size());
 			revisedList.addAll(t.getSplits());
 			
 			/*
@@ -35,8 +35,8 @@ public class ScheduledSplitServiceImpl extends BaseServiceImpl implements Schedu
 			t = delete(t);
 			
 			// Insert latest splits
-			for (ScheduledSplitBak st : revisedList) {
-				st.setScheduledTransactionId(t.getId());
+			for (SplitTransaction st : revisedList) {
+				st.setTransactionId(t.getId());
 				if (st.isDefined4Insert()) {
 					t.getSplits().add(insert(st));
 				}
@@ -49,13 +49,13 @@ public class ScheduledSplitServiceImpl extends BaseServiceImpl implements Schedu
 		return t;
 	}
 	
-	private ScheduledSplitBak insert(ScheduledSplitBak st) throws MissingDataException, DuplicateItemException {
+	private SplitTransaction insert(SplitTransaction st) throws MissingDataException, DuplicateItemException {
 		
 		try {
 			this.jdbcTemplate.update(
 					"insert into scheduledsplit (scheduledtransactionid, categoryid, amount, memo) " +
 					"values (?, ?, ?, ?)", 
-					st.getScheduledTransactionId(), st.getCategoryId(), st.getAmount(), st.getMemo());
+					st.getTransactionId(), st.getCategory().getId(), st.getAmount(), st.getMemo());
 			
 			LOG.info(compose("Added new split scheduled transaction", st));		
 			st.setId(getLastInsertId());	
@@ -66,7 +66,7 @@ public class ScheduledSplitServiceImpl extends BaseServiceImpl implements Schedu
 		}
 	}
 
-	public List<ScheduledSplitBak> get(long id) {
+	public List<SplitTransaction> get(long id) {
 		return this.jdbcTemplate.query(
 				SELECT + " where st.scheduledtransactionid = ?", 
 				new Object[]{id}, 
