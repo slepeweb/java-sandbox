@@ -8,6 +8,11 @@ public class ScheduledTransaction extends Transaction {
 	private String label = "";
 	private Account mirror;
 	
+	@Override
+	public String toString() {
+		return getLabel() + ": " + super.toString();
+	}
+	
 	public void assimilate(Object obj) {
 		super.assimilate(obj);
 		ScheduledTransaction source = (ScheduledTransaction) obj;
@@ -31,11 +36,6 @@ public class ScheduledTransaction extends Transaction {
 			super.isDefined4Insert() &&
 			StringUtils.isNotBlank(getLabel()) &&
 			getDay() > 0;
-	}
-	
-	@Override
-	public String toString() {
-		return getLabel();
 	}
 	
 	public boolean isTransfer() {

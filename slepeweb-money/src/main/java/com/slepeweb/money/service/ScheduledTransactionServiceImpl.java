@@ -134,8 +134,16 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	}
 
 	private ScheduledTransaction get(String sql, Object[] params) {
-		return (ScheduledTransaction) getFirstInList(this.jdbcTemplate.query(
+		ScheduledTransaction t = (ScheduledTransaction) getFirstInList(this.jdbcTemplate.query(
 				sql, params, new RowMapperUtil.ScheduledTransactionMapper()));
+		
+		if (t != null) {
+			if (t.isSplit()) {
+				t.getSplits().addAll(this.scheduledSplitService.get(t.getId()));
+			}
+		}
+
+		return t;
 	}
 
 	public List<ScheduledTransaction> getAll() {
@@ -150,4 +158,11 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	public int delete(long id) {
 		return this.jdbcTemplate.update("delete from scheduledtransaction where id = ?", id);		
 	}	
+	
+	public void updateLastEntered(ScheduledTransaction t) {
+		this.jdbcTemplate.update("update scheduledtransaction set lastentered = ? where id = ?", 
+				t.getEntered(), t.getId());
+		LOG.info(compose("Updated lastentered for scheduled transaction", t));
+	}
+
 }

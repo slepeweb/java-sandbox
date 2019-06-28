@@ -63,4 +63,36 @@
 		</property>
 	</bean>
 	
+<!-- 	
+	
+	<bean id="scheduledTransactionTask" class="com.slepeweb.money.ScheduledTransactionTask" />
+ 
+    <bean name="scheduledTransactionJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass" value="com.slepeweb.money.ScheduledTransactionJob" />
+        <property name="jobDataAsMap">
+          <map>
+            <entry key="task" value-ref="scheduledTransactionTask" />
+          </map>
+        </property>
+    </bean>
+	 
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+		<property name="jobDetail" ref="scheduledTransactionJob" />  
+		<property name="cronExpression" value="* 0/5 * * * ?" />  
+	</bean>
+	  
+ 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
+		<property name="jobDetails">  
+			<list>  
+				<ref bean="scheduledTransactionJob" />  
+			</list>  
+		</property>  
+		<property name="triggers">  
+			<list>  
+				<ref bean="cronTrigger" />  
+			</list>  
+		</property>  
+	</bean>
+	 -->  
+		
 </beans>

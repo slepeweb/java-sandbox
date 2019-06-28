@@ -73,6 +73,32 @@ public class Transaction extends DbEntity {
 				getAccount(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
+	public static Transaction adapt(ScheduledTransaction scht) {
+		Transaction t = new Transaction();
+		if (scht.getMirror() != null) {
+			t = new Transfer();
+		}
+		
+		t.
+			setAccount(scht.getAccount()).
+			setPayee(scht.getPayee()).
+			setCategory(scht.getCategory()).
+			setEntered(scht.getEntered()).
+			setAmount(scht.getAmount()).
+			setReference(scht.getReference()).
+			setMemo(scht.getMemo()).
+			setSplit(scht.isSplit());
+		
+		if (t.isTransfer()) {
+			t.setXferId(scht.getMirror().getId());
+			Transfer tr = (Transfer) t;
+			tr.setMirrorAccount(scht.getMirror());
+		}
+
+		t.setSplits(scht.getSplits());
+		return t;
+	}
+	
 	public int getSource() {
 		return source;
 	}
