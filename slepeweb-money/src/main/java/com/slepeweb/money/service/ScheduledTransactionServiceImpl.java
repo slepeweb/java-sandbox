@@ -137,10 +137,8 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 		ScheduledTransaction t = (ScheduledTransaction) getFirstInList(this.jdbcTemplate.query(
 				sql, params, new RowMapperUtil.ScheduledTransactionMapper()));
 		
-		if (t != null) {
-			if (t.isSplit()) {
-				t.getSplits().addAll(this.scheduledSplitService.get(t.getId()));
-			}
+		if (t != null && t.isSplit()) {
+			t.setSplits(this.scheduledSplitService);
 		}
 
 		return t;
@@ -151,8 +149,16 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	}
 	
 	private List<ScheduledTransaction> getTransactions(String sql, Object[] params) {
-		return this.jdbcTemplate.query(
+		List<ScheduledTransaction> all = this.jdbcTemplate.query(
 				sql, params, new RowMapperUtil.ScheduledTransactionMapper());
+		
+		for (ScheduledTransaction scht : all) {
+			if (scht.isSplit()) {
+				scht.setSplits(this.scheduledSplitService);
+			}
+		}
+		
+		return all;
 	}
 	
 	public int delete(long id) {

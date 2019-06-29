@@ -174,7 +174,7 @@
 
 			</table> 
 			
-	    <input type="submit" value="${_buttonLabel}" /> 
+	    <input id="submit-button" type="submit" value="${_buttonLabel}" /> 
 			<c:if test="${_formMode eq 'update'}">
 	    	<input type="button" value="Delete transaction?" id="delete-button" /> 
 	    </c:if>
@@ -183,11 +183,18 @@
 	    <input type="hidden" name="origxferid" value="${_transaction.transferId}" />   
 	</form>		  	
 		
+	<div id="splits-error-dialog" title="Error: splits don't match total">
+		The split amounts do NOT match the total amount. Please correct in
+		order to submit the form. (Total = __totalamount__, Splits = __splitamounts__)
+	</div>
+
 </mny:standardLayout>
 
 <mny:entityDeletionDialog entity="transaction" mode="${_formMode}" id="${_transaction.id}"/>
 
 <script>
+	var _isSplit = ${mon:tertiaryOp(_transaction.split, "true", "false")};
+	
 	$(function() {
 		$(".datepicker").datepicker({
 			dateFormat: "yy-mm-dd",
@@ -199,7 +206,6 @@
 	  <mny:minorCategoryUpdates />
 	  <mny:splitVisibilities />
 	  <mny:transactionAutofill />	
-	  
-	  // TODO: check amount matches total of split amounts
+	  <mny:splitTransactionChecker />
 	});
 </script>

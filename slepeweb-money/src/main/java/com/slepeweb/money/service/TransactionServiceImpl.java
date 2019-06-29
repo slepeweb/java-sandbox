@@ -260,7 +260,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		if (t != null) {
 			if (t.isSplit()) {
-				t.setSplitsService(this.splitTransactionService);
+				t.setSplits(this.splitTransactionService);
 			}
 			
 			if (t.isTransfer()) {
@@ -335,7 +335,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		for (Transaction t : list) {
 			if (t.isSplit()) {
-				t.setSplitsService(this.splitTransactionService);
+				t.setSplits(this.splitTransactionService);
 			}
 			
 			if (t.isTransfer()) {

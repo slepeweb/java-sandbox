@@ -2,6 +2,8 @@ package com.slepeweb.money.bean;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.slepeweb.money.service.ScheduledSplitService;
+
 public class ScheduledTransaction extends Transaction {
 	
 	private int day;
@@ -40,6 +42,10 @@ public class ScheduledTransaction extends Transaction {
 	
 	public boolean isTransfer() {
 		return getMirror() != null && getMirror().getId() > 0L;
+	}
+	
+	public void setSplits(ScheduledSplitService svc) {
+		setSplits(svc.get(getId()));
 	}
 	
 	public int getDay() {

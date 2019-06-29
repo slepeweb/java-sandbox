@@ -25,7 +25,6 @@ import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
-import com.slepeweb.money.service.ScheduledSplitService;
 import com.slepeweb.money.service.ScheduledTransactionService;
 
 @Controller
@@ -36,7 +35,6 @@ public class ScheduledTransactionController extends BaseController {
 	@Autowired private PayeeService payeeService;
 	@Autowired private CategoryService categoryService;
 	@Autowired private ScheduledTransactionService scheduledTransactionService;
-	@Autowired private ScheduledSplitService scheduledSplitService;
 	
 	private void populateForm(ModelMap model, ScheduledTransaction t, String mode) {	
 		
@@ -54,7 +52,7 @@ public class ScheduledTransactionController extends BaseController {
 		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
 		SplitTransactionFormComponent fc;
 		
-		for (SplitTransaction st : this.scheduledSplitService.get(t.getId())) {
+		for (SplitTransaction st : t.getSplits()) {
 			fc = new SplitTransactionFormComponent(st).
 					setAllMajors(allMajors).
 					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor()));

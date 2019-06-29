@@ -27,9 +27,8 @@ public class Transaction extends DbEntity {
 	private boolean split, reconciled;
 	private long amount;
 	private String reference = "", memo = "";
-	private List<SplitTransaction> splits;
+	private List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
 	private Transaction previous;
-	private SplitTransactionService splitsService;
 	
 	public void assimilate(Object obj) {
 		Transaction source = (Transaction) obj;
@@ -106,10 +105,6 @@ public class Transaction extends DbEntity {
 	public Transaction setSource(int source) {
 		this.source = source;
 		return this;
-	}
-
-	public void setSplitsService(SplitTransactionService splitsService) {
-		this.splitsService = splitsService;
 	}
 
 	public List<FlatTransaction> flatten() {
@@ -281,19 +276,15 @@ public class Transaction extends DbEntity {
 	}
 	
 	public List<SplitTransaction> getSplits() {
-		if (this.splits == null) {
-			if (isSplit() && this.splitsService != null) {
-				this.splits = this.splitsService.get(this);
-			}
-			else {
-				this.splits = new ArrayList<SplitTransaction>();
-			}
-		}
 		return this.splits;
 	}
 
 	public void setSplits(List<SplitTransaction> partPayments) {
 		this.splits = partPayments;
+	}
+
+	public void setSplits(SplitTransactionService svc) {
+		setSplits(svc.get(this));
 	}
 
 	@Override

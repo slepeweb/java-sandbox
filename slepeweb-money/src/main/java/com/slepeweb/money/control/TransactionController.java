@@ -76,6 +76,10 @@ public class TransactionController extends BaseController {
 			a = allAccounts.get(0);
 		}
 		
+		if (a != null && a.isClosed()) {
+			allAccounts.add(a);
+		}
+		
 		NormalisedMonth firstMonth = new NormalisedMonth(this.transactionService.getTransactionDateForAccount(accountId, true));
 		NormalisedMonth lastMonth = new NormalisedMonth(this.transactionService.getTransactionDateForAccount(accountId, false));
 		NormalisedMonth selectedMonth = new NormalisedMonth(selectedMonthIndex);
