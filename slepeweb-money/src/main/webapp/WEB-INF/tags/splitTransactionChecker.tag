@@ -1,23 +1,28 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 $("#submit-button").click(function(e){
-	checkSplits();
+	checkSplits(e);
 });
 
-var checkSplits = function() {
+var checkSplits = function(e) {
+  var _isSplit = $("input[name='paymenttype']:checked").val() == 'split';
+  
   if (_isSplit) {
 	  var sum = 0;
 	  $("input[name^='amount_']").each(function(i, ele){
-		  sum += parseFloat($(ele).val());
+		  sum += parseFloat($(ele).val().replace(",", ""));
 	  });
 	  
-	  var total = parseFloat($("input[name='amount']").val());
+	  var total = parseFloat($("input[name='amount']").val().replace(",", ""));
 	  if (Math.abs(total - sum) > 0.001) {
 			var d = $("#splits-error-dialog");
 			var s = d.html();
 			d.html(s.replace("__totalamount__", total.toString()).replace("__splitamounts__", sum.toFixed(2)));
 			d.dialog("open");
+			
+		if (e) {
 		  e.preventDefault();
+		}
 	  }
   }
 }

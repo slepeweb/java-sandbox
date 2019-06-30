@@ -183,7 +183,7 @@
 	    <input type="hidden" name="origxferid" value="${_transaction.transferId}" />   
 	</form>		  	
 		
-	<div id="splits-error-dialog" title="Error: splits don't match total">
+	<div id="splits-error-dialog" title="Splits error">
 		The split amounts do NOT match the total amount. Please correct in
 		order to submit the form. (Total = __totalamount__, Splits = __splitamounts__)
 	</div>
@@ -193,8 +193,6 @@
 <mny:entityDeletionDialog entity="transaction" mode="${_formMode}" id="${_transaction.id}"/>
 
 <script>
-	var _isSplit = ${mon:tertiaryOp(_transaction.split, "true", "false")};
-	
 	$(function() {
 		$(".datepicker").datepicker({
 			dateFormat: "yy-mm-dd",
