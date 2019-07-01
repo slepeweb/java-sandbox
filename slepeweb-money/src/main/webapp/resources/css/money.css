@@ -862,16 +862,16 @@ span.flash {
   margin-right: 3em;
 }
 
-#multi-category-groupings .width15 {
+#multi-category-groupings .width15, #year-ranges .width15 {
   width: 15%;
 }
-#multi-category-groupings .width20 {
+#multi-category-groupings .width20, #year-ranges .width20 {
   width: 20%;
 }
-#multi-category-groupings .width25 {
+#multi-category-groupings .width25, #year-ranges .width25 {
   width: 25%;
 }
-#multi-category-groupings .width50 {
+#multi-category-groupings .width50, #year-ranges .width50 {
   width: 50%;
 }
 

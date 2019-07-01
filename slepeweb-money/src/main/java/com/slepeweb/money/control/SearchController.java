@@ -122,6 +122,15 @@ public class SearchController extends BaseController {
 		return payees;
 	}
 	
+	private List<Integer> getYearRange() {
+		List<Integer> range = new ArrayList<Integer>();
+		Calendar cal = Calendar.getInstance();
+		for (int y = 1990; y <= cal.get(Calendar.YEAR); y++) {
+			range.add(y);
+		}
+		return range;
+	}
+	
 	private SolrParams getAdvancedSearchCriteriaFromRequest(HttpServletRequest req) {
 		// Payee may be specified by either name or id, but not both!
 		return 
@@ -137,8 +146,15 @@ public class SearchController extends BaseController {
 	
 	private ChartProperties getChartSearchCriteriaFromRequest(HttpServletRequest req) {
 		ChartProperties props = new ChartProperties();
-		props.setFromYear(getChartFromYear(req));		
-		props.setNumYears(getChartNumYears(req));		
+		props.setFromYear(getChartYear(req, "from", 2015));		
+		props.setToYear(getChartYear(req, "to", 2019));		
+		
+		if (props.getToYear() < props.getFromYear()) {
+			int tmp = props.getFromYear();
+			props.setFromYear(props.getToYear());
+			props.setToYear(tmp);
+		}
+		
 		String groupName;
 		CategoryGroup group;
 		
@@ -381,34 +397,14 @@ public class SearchController extends BaseController {
 				req.getContextPath(), Util.encodeUrl("success|Indexing complete")));
 	}
 	
-	private int getChartFromYear(HttpServletRequest req) {
-		int baseYearDflt = 2000;		
-		int baseYear = baseYearDflt;
-		String fromYearParam = req.getParameter("from");
+	private int getChartYear(HttpServletRequest req, String formElementName, int dflt) {
+		String yearStr = req.getParameter(formElementName);
 		
-		if (StringUtils.isNumeric(fromYearParam)) {
-			baseYear = Integer.valueOf(fromYearParam).intValue();
-			if (baseYear < 1970) {
-				baseYear = baseYearDflt;
-			}
+		if (StringUtils.isNumeric(yearStr)) {
+			return Integer.valueOf(yearStr).intValue();
 		}
 		
-		return baseYear;
-	}
-	
-	private int getChartNumYears(HttpServletRequest req) {
-		int numYearsDflt = 10;		
-		int numYears = numYearsDflt;		
-		String numYearsParam = req.getParameter("numYears");
-		
-		if (StringUtils.isNumeric(numYearsParam)) {
-			numYears = Integer.valueOf(numYearsParam).intValue();
-			if (numYears < 2 || numYears > 20) {
-				numYears = numYearsDflt;
-			}
-		}
-		
-		return numYears;
+		return dflt;
 	}
 	
 	/*
@@ -418,20 +414,13 @@ public class SearchController extends BaseController {
 	public String chartByCategoriesForm(HttpServletRequest req, ModelMap model) {
 		this.categoryController.categoryList(model);
 		
-		ChartProperties props = null;
-		if (req.getParameterMap().containsKey("repeat")) {
-			props = (ChartProperties) req.getSession().getAttribute(CHART_PROPS_ATTR);
-		}
-		
-		// Create a default single-category group
-		if (props == null) {
-			props = new ChartProperties();
-			CategoryGroup g = new CategoryGroup().setLabel("Group 1").setId(1);
-			g.getCategories().add(new CategoryInput());
-			props.getGroups().add(g);
-		}
+		ChartProperties props = new ChartProperties();
+		CategoryGroup g = new CategoryGroup().setLabel("Group 1").setId(1);
+		g.getCategories().add(new CategoryInput());
+		props.getGroups().add(g);
 		
 		model.addAttribute(CHART_PROPS_ATTR, props);
+		model.addAttribute("_yearRange", getYearRange());
 		return "chart";
 	}
 	
@@ -446,6 +435,7 @@ public class SearchController extends BaseController {
 	}
 	
 	private String chartByCategoriesOutput(ChartProperties props, HttpServletRequest req, ModelMap model) {
+		model.addAttribute("_yearRange", getYearRange());
 		model.addAttribute(CHART_PROPS_ATTR, props);
 		
 		if (! props.isReady()) {
@@ -475,7 +465,7 @@ public class SearchController extends BaseController {
 
 		List<Integer> years = new ArrayList<Integer>();
 	    model.addAttribute("_years", years);
-	    for (int i = props.getFromYear(); i < (props.getFromYear() + props.getNumYears()) && i <= currentYear; i++) {
+	    for (int i = props.getFromYear(); i < (props.getFromYear() + props.getToYear()) && i <= currentYear; i++) {
 	    	years.add(i);
 	    }
 
@@ -485,7 +475,7 @@ public class SearchController extends BaseController {
 	    model.addAttribute("_chartDataMap", data);
 	    
 	    int startYear = props.getFromYear();
-	    int endYear = startYear + props.getNumYears();
+	    int endYear = startYear + props.getToYear();
 		
 		for (CategoryGroup grp : props.getGroups()) {
 			
@@ -545,19 +535,6 @@ public class SearchController extends BaseController {
 		}
 		return data;
 	}
-	
-	/*
-	private static <T> T fromJson(final Class<T> type, final String jsonPacket) {
-
-		T data = null;
-		try {
-			data = new ObjectMapper().readValue(jsonPacket, type);
-		} catch (Exception e) {
-			LOG.error("Jackson marshalling error", e);
-		}
-		return data;
-	}
-	*/
 	
 	private static SolrParams toSolrParams(String jsonPacket) {
 

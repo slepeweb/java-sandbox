@@ -96,11 +96,6 @@
 		        </td>
 		    </tr>
 
-				<%--<tr class="splits-q">
-		      <td class="heading"><label>Split?</label></td>
-					<td><input type="checkbox" name="split" ${mon:tertiaryOp(_transaction.split, 'checked=checked', '')} /></td>
-				</tr> --%>
-								
 		    <tr class="category">
 		        <td class="heading"><label for="major">Category</label></td>
 		        <td>

@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @JsonIgnoreProperties({"ready"})
 public class ChartProperties {
 
-	private int fromYear = 2000, numYears = 20;
+	private int fromYear = 2015, toYear = 2019;
 	private List<CategoryGroup> groups = new ArrayList<CategoryGroup>();
 	
 	public int getFromYear() {
@@ -20,12 +20,12 @@ public class ChartProperties {
 		return this;
 	}
 	
-	public int getNumYears() {
-		return numYears;
+	public int getToYear() {
+		return toYear;
 	}
 	
-	public ChartProperties setNumYears(int numYears) {
-		this.numYears = numYears;
+	public ChartProperties setToYear(int to) {
+		this.toYear = to;
 		return this;
 	}
 

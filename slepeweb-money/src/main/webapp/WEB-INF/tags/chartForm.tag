@@ -4,16 +4,26 @@
 <mny:multiCategoryInputSupport />
 
 <form id="chart-form" class="multi-category-input" method="post" action="${_ctxPath}/chart/by/categories/out">
-	<table>
+	<table id="year-ranges">
 	    <tr>
-	        <td class="heading"><label for="from">From year</label></td>
-	        <td><input id="from" type="text" name="from" placeholder="Enter (for example) '2000'"
-	        	value="${_chartProps.fromYear}" /></td>
+	        <td class="heading width25"><label for="from">From year</label></td>
+	        <td>
+	        	<select id="from" name="from">
+					<c:forEach items="${_yearRange}" var="_year">
+						<option value="${_year}" <c:if test="${_chartProps.fromYear eq _year}">selected</c:if>>${_year}</option>
+					</c:forEach>
+	        	</select>
+	        </td>
 	    </tr>
 	    <tr>
-	        <td class="heading"><label for="numYears">No. of years</label></td>
-	        <td><input id="numYears" type="text" name="numYears" placeholder="Enter (for example) '10'"
-	        	value="${_chartProps.numYears}" /></td>
+	        <td class="heading width25"><label for="to">To year</label></td>
+	        <td>
+				<select id="to" name="to">
+					<c:forEach items="${_yearRange}" var="_year">
+						<option value="${_year}" <c:if test="${_chartProps.toYear eq _year}">selected</c:if>>${_year}</option>
+					</c:forEach>
+	        	</select>
+	        </td>
 	    </tr>
 	</table>
 	
