@@ -7,7 +7,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,19 +21,10 @@ import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.SplitTransactionFormComponent;
-import com.slepeweb.money.service.AccountService;
-import com.slepeweb.money.service.CategoryService;
-import com.slepeweb.money.service.PayeeService;
-import com.slepeweb.money.service.ScheduledTransactionService;
 
 @Controller
 @RequestMapping(value="/schedule")
 public class ScheduledTransactionController extends BaseController {
-	
-	@Autowired private AccountService accountService;
-	@Autowired private PayeeService payeeService;
-	@Autowired private CategoryService categoryService;
-	@Autowired private ScheduledTransactionService scheduledTransactionService;
 	
 	private void populateForm(ModelMap model, ScheduledTransaction t, String mode) {	
 		

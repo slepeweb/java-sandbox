@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,18 +15,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RestResponse;
-import com.slepeweb.money.service.CategoryService;
-import com.slepeweb.money.service.PayeeService;
-import com.slepeweb.money.service.SolrService;
 
 
 @Controller
 @RequestMapping("/rest")
 public class RestController extends BaseController {
 	//private static Logger LOG = Logger.getLogger(SiteRestController.class);
-	@Autowired private CategoryService categoryService;
-	@Autowired private PayeeService payeeService;
-	@Autowired private SolrService solrService;
 
 	@RequestMapping(value="/category/minor/list/{major}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody

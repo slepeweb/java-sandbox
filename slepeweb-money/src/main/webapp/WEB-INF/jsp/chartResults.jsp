@@ -5,11 +5,6 @@
 <mny:flash />
 
 <c:set var="_extraCss" scope="request">
-	#saved-search-identifier {
-		width: 50%;
-		display: inline;
-	}
-	
 	#tabs {
 		font-size: 1em;
 	}
@@ -27,13 +22,13 @@
 	}
 </c:set>
 
+<c:set var="_formActionUrl" scope="request">/chart/post/${_ss.id }</c:set>
+
 <mny:standardLayout>
 
-	<h2 class="inline-block">Chart <c:if test="${not empty param.flash}"><span 
+	<h2 class="inline-block">Chart results <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
 			
-	<div class="right"><a href="${_ctxPath}/search/save/list">Saved searches</a></div>
-
 	<div id="tabs">
 		<ul>
 			<li><a href="#form-tab">Form</a></li>
@@ -47,12 +42,6 @@
 
 	<script>
 		$(function() {
-			$("#save-search-button").click(function (e) {
-				var form = $("#chart-form");
-				form.attr("action", webContext + "/search/save/chart");
-				form.submit();
-			});
-
 			$("#tabs").tabs({
 				active: ${mon:tertiaryOp(not empty _chartSVG, 1, 0)}
 			});

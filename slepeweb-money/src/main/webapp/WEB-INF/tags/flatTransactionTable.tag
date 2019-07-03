@@ -5,8 +5,8 @@
 
 <table class="trn_listing">
 	<tr>
-		<th>Account</th>
 		<th>Date</th>
+		<th>Account</th>
 		<c:if test="${not fn:contains(disable, 'payee')}"><th>Payee</th></c:if>
 		<c:if test="${not fn:contains(disable, 'category')}"><th>Category</th></c:if>
 		<th>Amount</th>

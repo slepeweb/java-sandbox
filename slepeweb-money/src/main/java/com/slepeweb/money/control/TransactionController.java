@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,26 +28,15 @@ import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
+import com.slepeweb.money.bean.Transfer;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
-import com.slepeweb.money.bean.Transfer;
-import com.slepeweb.money.service.AccountService;
-import com.slepeweb.money.service.CategoryService;
-import com.slepeweb.money.service.PayeeService;
-import com.slepeweb.money.service.SolrService;
-import com.slepeweb.money.service.TransactionService;
 
 @Controller
 @RequestMapping(value="/transaction")
 public class TransactionController extends BaseController {
 	
 	private static Logger LOG = Logger.getLogger(TransactionController.class);
-	
-	@Autowired private AccountService accountService;
-	@Autowired private PayeeService payeeService;
-	@Autowired private CategoryService categoryService;
-	@Autowired private TransactionService transactionService;
-	@Autowired private SolrService solrService;
 	
 	@RequestMapping(value="/list")	
 	public String listNoAccount(ModelMap model) { 

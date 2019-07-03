@@ -3,8 +3,16 @@
 
 <mny:multiCategoryInputSupport />
 
-<form id="chart-form" class="multi-category-input" method="post" action="${_ctxPath}/chart/by/categories/out">
+<form id="chart-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">
 	<table id="year-ranges">
+	    <tr>
+	        <td class="heading width25"><label for="name">Title</label></td>
+	        <td>
+	        	<input type="text" id="name" name="name"
+    				placeholder="Provide a title for this chart" value="${_ss.name}" />
+	        	
+	        </td>
+	    </tr>
 	    <tr>
 	        <td class="heading width25"><label for="from">From year</label></td>
 	        <td>
@@ -36,11 +44,13 @@
 	<br />
 	
 	<input id="counter-store" type="hidden" name="counterStore" value="" />
-	<input type="submit" value="Submit" />
 	
-   <c:if test="${not empty _chartSVG}">
-   	OR <input id="save-search-button" type="button" value="Save" /> 
-    <input id="saved-search-identifier" type="text" name="save-identifier" 
-    	placeholder="Provide an identifier for this search" value="" />
-   </c:if>
+	<c:choose><c:when test="${_formMode eq 'create'}">
+		<input type="submit" value="Save" />
+	</c:when><c:when test="${_formMode eq 'update'}">
+		<input type="submit" value="Update" />
+		<input type="button" value="Delete chart?" id="delete-button" />
+	</c:when><c:when test="${_formMode eq 'execute'}">
+		<input type="submit" value="Update and re-execute" /> 
+	</c:when></c:choose>
 </form>			

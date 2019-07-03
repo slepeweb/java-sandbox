@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -17,15 +16,10 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.NamedList;
-import com.slepeweb.money.service.CategoryService;
-import com.slepeweb.money.service.TransactionService;
 
 @Controller
 @RequestMapping(value="/category")
 public class CategoryController extends BaseController {
-	
-	@Autowired private CategoryService categoryService;
-	@Autowired private TransactionService transactionService;
 	
 	@RequestMapping(value="/list")	
 	public String categoryList(ModelMap model) { 

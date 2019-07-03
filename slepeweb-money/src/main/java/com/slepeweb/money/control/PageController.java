@@ -4,19 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.service.AccountService;
 
 @Controller
 public class PageController extends BaseController {
-	
-	@Autowired private AccountService accountService;
 	
 	@RequestMapping(value="/")	
 	public String dashboard(ModelMap model) { 

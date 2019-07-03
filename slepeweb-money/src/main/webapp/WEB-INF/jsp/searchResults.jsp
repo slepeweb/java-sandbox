@@ -19,13 +19,13 @@
 	}
 </c:set>
 
+<c:set var="_formActionUrl" scope="request">/search/action/${_ss.id}</c:set>
+
 <mny:standardLayout>
 
 	<h2 class="inline-block">Advanced search <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
 			
-	<div class="right"><a href="${_ctxPath}/search/save/list">Saved searches</a></div>
-
 	<div id="tabs">
 		<ul>
 			<li><a href="#form-tab">Form</a></li>
