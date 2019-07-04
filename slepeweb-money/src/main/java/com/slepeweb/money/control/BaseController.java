@@ -20,6 +20,7 @@ import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.MultiCategoryCounter;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
@@ -30,6 +31,15 @@ import com.slepeweb.money.service.TransactionService;
 
 @Controller
 public class BaseController {
+
+	protected static final String FORM_MODE_ATTR = "_formMode";
+	protected static final String JSON_ATTR = "_json";
+	protected static final String SAVED_SEARCH_ATTR = "_ss";
+	
+	protected static final String CREATE_MODE = "create";
+	protected static final String UPDATE_MODE = "update";
+	protected static final String EXECUTE_MODE = "execute";
+
 	private static Logger LOG = Logger.getLogger(BaseController.class);
 	public static final String USER = "_user";
 	
@@ -49,6 +59,31 @@ public class BaseController {
 		return payees;
 	}
 
+	protected List<SavedSearch> filterSavedSearches(String type) {
+		List<SavedSearch> searches = new ArrayList<SavedSearch>();
+		
+		for (SavedSearch ss : this.savedSearchService.getAll()) {
+			if (ss.getType().equals(type)) {			
+				searches.add(ss);
+			}
+		}
+		
+		return searches;
+	}
+	
+	protected String saveSearch(SavedSearch ss) {
+		String flash;
+		try {
+			this.savedSearchService.save(ss);
+			flash = "success|Search successfully updated";
+		}
+		catch (Exception e) {
+			flash = "failure|Failed to update search";
+		}
+		
+		return flash;
+	}
+	
 	/*
 	 * This method allows us to de-serialize a json string into a list of objects. This is a neater way
 	 * than returning a convenience object with a single property that is the list we are after.
@@ -84,22 +119,24 @@ public class BaseController {
 		CategoryInput cat;
 		List<CategoryInput>	list = new ArrayList<CategoryInput>();
 		
-		for (int i = 1; i < 10; i++) {
-			major = req.getParameter(String.format("major-%d-%d", groupId, i));
-			minor = req.getParameter(String.format("minor-%d-%d", groupId, i));
-			excluded = Util.isPositive(req.getParameter(String.format("logic-%d-%d", groupId, i)));
-			
-			if (StringUtils.isNotBlank(major)) {					
-				cat = new CategoryInput().
-					setMajor(major).
-					setMinor(minor).
-					setExclude(excluded).
-					setOptions(this.categoryService.getAllMinorValues(major));
+		if (numCategories > 0) {
+			for (int i = 1; i < 10; i++) {
+				major = req.getParameter(String.format("major-%d-%d", groupId, i));
+				minor = req.getParameter(String.format("minor-%d-%d", groupId, i));
+				excluded = Util.isPositive(req.getParameter(String.format("logic-%d-%d", groupId, i)));
 				
-				list.add(cat);
-				
-				if (++m >= numCategories) {
-					break;
+				if (StringUtils.isNotBlank(major)) {					
+					cat = new CategoryInput().
+						setMajor(major).
+						setMinor(minor).
+						setExclude(excluded).
+						setOptions(this.categoryService.getAllMinorValues(major));
+					
+					list.add(cat);
+					
+					if (++m >= numCategories) {
+						break;
+					}
 				}
 			}
 		}
@@ -109,14 +146,17 @@ public class BaseController {
 	
 	// How many categories are in this group?
 	protected int getNumCategoriesForGroup(List<MultiCategoryCounter> counters, int groupId) {
-		for (MultiCategoryCounter c : counters) {
-			if (c.getGroupId() == groupId) {
-				return c.getCategoryCount();
+		if (counters != null) {
+			for (MultiCategoryCounter c : counters) {
+				if (c.getGroupId() == groupId) {
+					return c.getCategoryCount();
+				}
 			}
 		}
 		
 		return 0;
 	}
+	
 	@ModelAttribute(value=USER)
 	protected User getUser(@AuthenticationPrincipal User u) {
 		LOG.trace(String.format("Model attribute (_user): [%s]", u));

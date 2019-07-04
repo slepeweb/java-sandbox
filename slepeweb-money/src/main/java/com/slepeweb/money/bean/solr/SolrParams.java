@@ -72,7 +72,6 @@ public class SolrParams {
 		return from;
 	}
 
-	@JsonSetter("from")
 	public SolrParams setFrom(String from) {
 		if (StringUtils.isNotBlank(from)) {
 			setFrom((Date) Util.parseSolrDate(from + START_OF_DAY));
@@ -82,6 +81,14 @@ public class SolrParams {
 
 	public SolrParams setFrom(Date from) {
 		this.from = from;
+		return this;
+	}
+
+	@JsonSetter("from")
+	public SolrParams setFrom(long from) {
+		if (from > 0L) {
+			this.from = new Date(from);
+		}
 		return this;
 	}
 
@@ -96,9 +103,16 @@ public class SolrParams {
 		return this;
 	}
 
-	@JsonSetter("to")
 	public SolrParams setTo(Date to) {
 		this.to = to;
+		return this;
+	}
+
+	@JsonSetter("to")
+	public SolrParams setTo(long to) {
+		if (to > 0L) {
+			this.to = new Date(to);
+		}
 		return this;
 	}
 

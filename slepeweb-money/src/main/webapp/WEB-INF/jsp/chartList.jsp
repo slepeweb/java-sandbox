@@ -5,11 +5,11 @@
 <mny:flash />
 		
 <mny:standardLayout>
+	<div class="right"><a href="${_ctxPath}/chart/create">New chart</a></div>
+	
 	<h2>Chart list <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
 		
-	<div class="right"><a href="${_ctxPath}/chart/create">New chart</a></div>
-	
 	<c:choose><c:when test="${not empty _charts}">
 		<table>
 			<tr>

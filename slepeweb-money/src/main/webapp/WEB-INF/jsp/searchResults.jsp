@@ -19,7 +19,7 @@
 	}
 </c:set>
 
-<c:set var="_formActionUrl" scope="request">/search/action/${_ss.id}</c:set>
+<c:set var="_formActionUrl" scope="request">/search/post/${_ss.id}</c:set>
 
 <mny:standardLayout>
 
@@ -36,22 +36,7 @@
 	</div>
 
 	<script>
-		$(function() {
-			$(".pager a").click(function (e) {
-				var action = $(this).attr("href");
-				var form = $("#advanced-search-form");
-				form.attr("action", action);
-				form.submit();
-				e.preventDefault();
-				e.stopPropagation();
-			});
-			
-			$("#save-search-button").click(function (e) {
-				var form = $("#advanced-search-form");
-				form.attr("action", webContext + "/search/save/advanced");
-				form.submit();
-			});
-
+		$(function() {	
 			$("#tabs").tabs({
 				active: ${mon:tertiaryOp(not empty _response, 1, 0)}
 			});

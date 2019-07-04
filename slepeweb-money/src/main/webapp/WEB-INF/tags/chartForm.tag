@@ -49,8 +49,17 @@
 		<input type="submit" value="Save" />
 	</c:when><c:when test="${_formMode eq 'update'}">
 		<input type="submit" value="Update" />
+		<input type="button" value="Cancel" id="cancel-button" />
 		<input type="button" value="Delete chart?" id="delete-button" />
 	</c:when><c:when test="${_formMode eq 'execute'}">
 		<input type="submit" value="Update and re-execute" /> 
 	</c:when></c:choose>
 </form>			
+
+<script>
+	$(function() {
+		$("#cancel-button").click(function(e){
+			window.location = webContext + "/chart/list"
+		});
+	});
+</script>

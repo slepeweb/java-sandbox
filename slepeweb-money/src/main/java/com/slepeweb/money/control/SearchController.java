@@ -1,7 +1,6 @@
 package com.slepeweb.money.control;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,81 +31,78 @@ public class SearchController extends BaseController {
 	
 	private static Logger LOG = Logger.getLogger(SearchController.class);
 	
-	private static final String CATEGORY_GROUP_ATTR = "_categoryGroup";
-	private static final String SEARCH_RESPONSE_ATTR = "_response";
-	private static final String TYPE_ADVANCED = "advanced";
 	private static final String ALL_ACCOUNTS_ATTR = "_allAccounts";
 	private static final String ALL_PAYEES_ATTR = "_allPayees";
+	private static final String CATEGORY_GROUP_ATTR = "_categoryGroup";
+	private static final String PARAMS_ATTR = "_params";
+	private static final String SEARCH_LIST_ATTR = "_searches";
+	private static final String SEARCH_RESPONSE_ATTR = "_response";
+	
+	private static final String ADVANCED_TYPE = "advanced";
+	
+	private static final String FORM_VIEW = "searchForm";
+	private static final String LIST_VIEW = "searchList";
+	private static final String RESULTS_VIEW = "searchResults";
+	
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public String list(ModelMap model) {
-		
-		List<SavedSearch> all = this.savedSearchService.getAll();
-		List<SavedSearch> searches = new ArrayList<SavedSearch>();
-		
-		for (SavedSearch ss : all) {
-			if (ss.getType().equals("advanced")) {			
-				searches.add(ss);
-			}
-		}
-		
-		model.addAttribute("_searches", searches);
-		return "searchList";
+		model.addAttribute(SEARCH_LIST_ATTR, filterSavedSearches(ADVANCED_TYPE));
+		return LIST_VIEW;
 	}
 	
 	// Empty search definition form, for adding a new search
 	@RequestMapping(value="/create", method=RequestMethod.GET)
 	public String create(ModelMap model) {
 		
-		model.addAttribute("_allAccounts", this.accountService.getAll(true));
-		model.addAttribute("_allPayees", getAllPayees());
+		model.addAttribute(ALL_ACCOUNTS_ATTR, this.accountService.getAll(true));
+		model.addAttribute(ALL_PAYEES_ATTR, getAllPayees());
 		
 		// Create a single, default category group
+		model.addAttribute(CATEGORY_GROUP_ATTR, emptyCategoryGroup());		
+		model.addAttribute(FORM_MODE_ATTR, CREATE_MODE);
+		return FORM_VIEW;
+	}
+	
+	private CategoryGroup emptyCategoryGroup() {
 		CategoryGroup grp = new CategoryGroup().setId(1).setLabel("unset");
 		grp.getCategories().add(new CategoryInput().setId(1));
-		model.addAttribute(CATEGORY_GROUP_ATTR, grp);
-		
-		model.addAttribute("_formMode", "create");
-		return "searchForm";
+		return grp;
 	}
 	
-	// Execute the search using form data
-	@RequestMapping(value="/action/{id}", method=RequestMethod.POST)
-	public String action(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-		return actionPage(id, 1, req, model);
-	}
-	
-	// Execute the search using form data, for a specific page
-	@RequestMapping(value="/action/{id}/{page}", method=RequestMethod.POST)
-	public String actionPage(@PathVariable int id, @PathVariable int page, HttpServletRequest req, ModelMap model) {
+	// Execute the search using form data, for a specific page.
+	// Also save the search.
+	@RequestMapping(value="/post/{id}", method=RequestMethod.POST)
+	public String post(@PathVariable int id, HttpServletRequest req, ModelMap model) {
 		
-		SolrParams params = getSearchCriteriaFromRequest(req).setPageNum(page);
+		SolrParams params = getSearchCriteriaFromRequest(req).setPageNum(1);
 		SavedSearch ss = this.savedSearchService.get(id);
 		params.setCategories(getCategoriesFromRequest(req));
 				
 		ss.
-				setType(TYPE_ADVANCED).
+				setType(ADVANCED_TYPE).
 				setName(req.getParameter("name")).
 				setJson(toJson(params)).
 				setSaved(new Timestamp(new Date().getTime()));
 		
-		try {
-			this.savedSearchService.save(ss);
-		}
-		catch (Exception e) {
-			LOG.error(String.format("Failed to save search [%s]", ss));
-		}
-				
-		model.addAttribute("_ss", ss);		
-		model.addAttribute("_params", params);		
-		model.addAttribute(SEARCH_RESPONSE_ATTR, this.solrService.query(params));				
+		saveSearch(ss);
+		setCommonModelAttributes(ss, params, EXECUTE_MODE, model);		
+		return RESULTS_VIEW;
+	}	
+	
+	private void setCommonModelAttributes(SavedSearch ss, SolrParams params, String formMode, ModelMap model) {
+		model.addAttribute(SAVED_SEARCH_ATTR, ss);		
+		model.addAttribute(PARAMS_ATTR, params);		
 		model.addAttribute(CATEGORY_GROUP_ATTR, getCategoryGroup(params.getCategories()));				
 		model.addAttribute(ALL_ACCOUNTS_ATTR, this.accountService.getAll(true));
 		model.addAttribute(ALL_PAYEES_ATTR, getAllPayees());
-		model.addAttribute("_formMode", "execute");
-		
-		return "searchResults";
-	}	
+		model.addAttribute(JSON_ATTR, Util.encodeUrl(toJson(params)));		
+		model.addAttribute(FORM_MODE_ATTR, formMode);
+
+		if (formMode.equals(EXECUTE_MODE)) {
+			model.addAttribute(SEARCH_RESPONSE_ATTR, this.solrService.query(params));				
+		}
+	}
 	
 	private SolrParams getSearchCriteriaFromRequest(HttpServletRequest req) {
 		// Payee may be specified by either name or id, but not both!
@@ -138,20 +134,12 @@ public class SearchController extends BaseController {
 		params.setCategories(getCategoriesFromRequest(req));
 				
 		SavedSearch ss = new SavedSearch().
-				setType(TYPE_ADVANCED).
+				setType(ADVANCED_TYPE).
 				setName(req.getParameter("name")).
 				setJson(toJson(params)).
 				setSaved(new Timestamp(new Date().getTime()));
 		
-		String flash;
-		
-		try {
-			this.savedSearchService.save(ss);
-			flash = "success|Search successfully saved";
-		}
-		catch (Exception e) {
-			flash = "failure|Failed to save search";
-		}
+		String flash = saveSearch(ss);
 
 		return new RedirectView(String.format("%s/search/list?flash=%s", 
 				req.getContextPath(), Util.encodeUrl(flash)));
@@ -164,15 +152,9 @@ public class SearchController extends BaseController {
 		SavedSearch ss = this.savedSearchService.get(id);
 		SolrParams params = toSolrParams(ss.getJson());
 		
-		model.addAttribute("_ss", ss);
-		model.addAttribute("_params", params);
 		model.addAttribute("_numDeletableTransactions", 0);
-		model.addAttribute("_allAccounts", this.accountService.getAll(true));
-		model.addAttribute("_allPayees", getAllPayees());
-		model.addAttribute(CATEGORY_GROUP_ATTR, getCategoryGroup(params.getCategories()));				
-
-		model.addAttribute("_formMode", "update");
-		return "searchForm";
+		setCommonModelAttributes(ss, params, UPDATE_MODE, model);		
+		return FORM_VIEW;
 	}
 	
 	// Update an existing search on form submission
@@ -186,15 +168,7 @@ public class SearchController extends BaseController {
 				setName(req.getParameter("name")).
 				setJson(toJson(params));
 		
-		String flash;
-		
-		try {
-			this.savedSearchService.save(ss);
-			flash = "success|Search successfully updated";
-		}
-		catch (Exception e) {
-			flash = "failure|Failed to update search";
-		}
+		String flash = saveSearch(ss);	
 		
 		return new RedirectView(String.format("%s/search/list?flash=%s", 
 				req.getContextPath(), Util.encodeUrl(flash)));
@@ -221,35 +195,40 @@ public class SearchController extends BaseController {
 	// Execute a saved search
 	@RequestMapping(value="/get/{id}", method=RequestMethod.GET)
 	public String get(@PathVariable int id, HttpServletRequest req, ModelMap model) {
+		return get(id, 1, req, model);
+	}
+	
+	// Execute the search
+	@RequestMapping(value="/get/{id}/{page}", method=RequestMethod.GET)
+	public String get(@PathVariable int id, @PathVariable int page, HttpServletRequest req, ModelMap model) {
 		
-		String jsonStr = req.getParameter("json");
-		SolrParams params = toSolrParams(jsonStr);
+		SavedSearch ss = this.savedSearchService.get(id);
+		SolrParams params = toSolrParams(ss.getJson()).setPageNum(page);
 		
-		model.addAttribute("_ss", this.savedSearchService.get(id));		
-		model.addAttribute("_params", params);		
-		model.addAttribute(SEARCH_RESPONSE_ATTR, this.solrService.query(params));		
-		model.addAttribute(CATEGORY_GROUP_ATTR, getCategoryGroup(params.getCategories()));				
-		model.addAttribute(ALL_ACCOUNTS_ATTR, this.accountService.getAll(true));
-		model.addAttribute(ALL_PAYEES_ATTR, getAllPayees());
-		model.addAttribute("_formMode", "execute");
-
-		return "searchResults";
+		model.addAttribute(SAVED_SEARCH_ATTR, ss);		
+		setCommonModelAttributes(ss, params, EXECUTE_MODE, model);		
+		return RESULTS_VIEW;
 	}	
 	
 	private CategoryGroup getCategoryGroup(List<Category> categories) {
 		CategoryGroup grp = new CategoryGroup().setId(1);
 		CategoryInput ci;
-		for (Category c : categories) {
-			ci = new CategoryInput().
-					setMajor(c.getMajor()).
-					setMinor(c.getMinor()).
-					setOptions(this.categoryService.getAllMinorValues(c.getMajor()));
-			ci.setExclude(c.isExclude());
-			grp.getCategories().add(ci);
-					
+		
+		if (categories.size() > 0) {
+			for (Category c : categories) {
+				ci = new CategoryInput().
+						setMajor(c.getMajor()).
+						setMinor(c.getMinor()).
+						setOptions(this.categoryService.getAllMinorValues(c.getMajor()));
+				ci.setExclude(c.isExclude());
+				grp.getCategories().add(ci);
+						
+			}
+			
+			return grp;
 		}
 		
-		return grp;
+		return emptyCategoryGroup();
 	}
 	
 	private static SolrParams toSolrParams(String jsonPacket) {

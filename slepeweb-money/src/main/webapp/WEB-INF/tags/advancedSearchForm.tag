@@ -75,6 +75,7 @@
 			<input type="submit" value="Save" />
 		</c:when><c:when test="${_formMode eq 'update'}">
 			<input type="submit" value="Update" />
+			<input id="cancel-button" type="button" value="Cancel" />
 			<input type="button" value="Delete search" id="delete-button" />
 		</c:when><c:when test="${_formMode eq 'execute'}">
 			<input type="submit" value="Update and re-execute" /> 
@@ -88,6 +89,10 @@
 			dateFormat: "yy-mm-dd",
 			changeMonth: true,
 			changeYear: true
+		});
+		
+		$("#cancel-button").click(function(e){
+			window.location = webContext + "/search/list"
 		});
 		
 		<mny:payeeAutocompleter />

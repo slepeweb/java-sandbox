@@ -46,6 +46,12 @@ public class ChartController extends BaseController {
 	
 	private static Logger LOG = Logger.getLogger(ChartController.class);	
 	private static final String CHART_PROPS_ATTR = "_chartProps";
+	private static final String YEAR_RANGE_ATTR = "_yearRange";
+	private static final String CHART_TYPE = "chart";
+	
+	private static String FORM_VIEW = "chartForm";
+	private static String LIST_VIEW = "chartList";
+	private static String RESULTS_VIEW = "chartResults";
 	
 	@Autowired private CategoryController categoryController;
 	
@@ -59,22 +65,26 @@ public class ChartController extends BaseController {
 		g.getCategories().add(new CategoryInput());
 		props.getGroups().add(g);
 		
-		model.addAttribute("_formMode", "create");
-		model.addAttribute(CHART_PROPS_ATTR, props);
-		model.addAttribute("_yearRange", getYearRange());
-		return "chartForm";
+		setCommonModelAttributes(null, CREATE_MODE, model);
+		return FORM_VIEW;
 	}
 	
 	// Form to update an existing chart
 	@RequestMapping(value="/edit/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable int id, HttpServletRequest req, ModelMap model) {
 		SavedSearch ss = this.savedSearchService.get(id);
-		model.addAttribute("_ss", ss);
 		model.addAttribute("_numDeletableTransactions", 0);		
+		setCommonModelAttributes(ss, UPDATE_MODE, model);
+		return FORM_VIEW;
+	}
+	
+	private void setCommonModelAttributes(SavedSearch ss, String formMode, ModelMap model) {
+		if (ss != null) {
+			model.addAttribute(SAVED_SEARCH_ATTR, ss);
+		}
 		model.addAttribute(CHART_PROPS_ATTR, toProperties(ss.getJson()));
-		model.addAttribute("_formMode", "update");
-		model.addAttribute("_yearRange", getYearRange());
-		return "chartForm";
+		model.addAttribute(FORM_MODE_ATTR, formMode);
+		model.addAttribute(YEAR_RANGE_ATTR, getYearRange());
 	}
 	
 	// Handle form submission for updating an existing chart
@@ -160,18 +170,8 @@ public class ChartController extends BaseController {
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public String list(ModelMap model) {
-		
-		List<SavedSearch> all = this.savedSearchService.getAll();
-		List<SavedSearch> charts = new ArrayList<SavedSearch>();
-		
-		for (SavedSearch ss : all) {
-			if (ss.getType().equals("chart")) {			
-				charts.add(ss);
-			}
-		}
-		
-		model.addAttribute("_charts", charts);
-		return "chartList";
+		model.addAttribute("_charts", filterSavedSearches("chart"));
+		return LIST_VIEW;
 	}
 	
 	// Handle form submission for creating a new chart
@@ -187,14 +187,14 @@ public class ChartController extends BaseController {
 	private String save(SavedSearch ss, ChartProperties props, HttpServletRequest req, ModelMap model) {
 		
 		ss.
-				setType("chart").
+				setType(CHART_TYPE).
 				setName(req.getParameter("name")).
 				setJson(toJson(props)).
 				setSaved(new Timestamp(new Date().getTime()));
 		
 		try {
 			ss = this.savedSearchService.save(ss);
-			model.addAttribute("_ss", ss);
+			model.addAttribute(SAVED_SEARCH_ATTR, ss);
 			return "success|Chart successfully saved";
 		}
 		catch (Exception e) {
@@ -205,8 +205,8 @@ public class ChartController extends BaseController {
 	// Produces a chart from a GET request (ie a link)
 	@RequestMapping(value="/get/{id}", method=RequestMethod.GET)
 	public String get(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-		model.addAttribute("_formMode", "execute");
-		model.addAttribute("_ss", this.savedSearchService.get(id));
+		model.addAttribute(FORM_MODE_ATTR, EXECUTE_MODE);
+		model.addAttribute(SAVED_SEARCH_ATTR, this.savedSearchService.get(id));
 		String jsonStr = req.getParameter("json");
 		ChartProperties props = toProperties(jsonStr);				
 		return search(props, req, model);
@@ -230,7 +230,7 @@ public class ChartController extends BaseController {
 		String flash = save(this.savedSearchService.get(id), props, req, model);
 		
 		if (flash.startsWith("success")) {
-			model.addAttribute("_formMode", "execute");
+			model.addAttribute(FORM_MODE_ATTR, EXECUTE_MODE);
 			return search(props, req, model);
 		}
 		
@@ -239,12 +239,12 @@ public class ChartController extends BaseController {
 
 	
 	private String search(ChartProperties props, HttpServletRequest req, ModelMap model) {
-		model.addAttribute("_yearRange", getYearRange());
+		model.addAttribute(YEAR_RANGE_ATTR, getYearRange());
 		model.addAttribute(CHART_PROPS_ATTR, props);
 		
 		if (! props.isReady()) {
 			model.addAttribute("noCategoriesSpecified", 1);
-			return "chartResults";
+			return RESULTS_VIEW;
 		}
 		
 		Calendar from = Util.today();
@@ -320,7 +320,7 @@ public class ChartController extends BaseController {
 	    chart.draw(svg2d,new Rectangle2D.Double(0, 0, 1000, 600));
 	    model.addAttribute("_chartSVG", svg2d.getSVGElement());
 		
-		return "chartResults"; 
+		return RESULTS_VIEW; 
 	}
 		
 	private static ChartProperties toProperties(String jsonPacket) {

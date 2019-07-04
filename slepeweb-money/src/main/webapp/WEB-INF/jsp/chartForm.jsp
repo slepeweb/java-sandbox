@@ -8,6 +8,10 @@
 	input[type="submit"] {
 		margin-top: 1.0em;
 	}
+	
+	#cancel-button {
+		background-color: #54937f;
+	}
 </c:set>
 
 <c:choose><c:when test="${_formMode eq 'create'}">

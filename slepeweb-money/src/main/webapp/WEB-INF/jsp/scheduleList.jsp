@@ -6,7 +6,7 @@
 		
 <mny:standardLayout>
 	<div class="right">
-		<a href="${_ctxPath}/schedule/add">New schedule</a><br />
+		<a href="${_ctxPath}/schedule/add">New schedule</a>
 	</div>
 
 	<h2>Scheduled Transactions <c:if test="${not empty param.flash}"><span 
