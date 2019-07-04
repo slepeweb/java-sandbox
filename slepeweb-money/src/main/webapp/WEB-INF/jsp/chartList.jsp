@@ -22,7 +22,7 @@
 					<td><a href="${_ctxPath}/chart/edit/${_ss.id}">${_ss.saved}</a></td>
 					<td>${_ss.name}</td>
 					<td><i class="far fa-caret-square-right" title="Execute this search"
-						data-params="${mon:encodeUrl(_ss.json)}" data-id="${_ss.id}"></i></td>
+						data-id="${_ss.id}"></i></td>
 				</tr>
 			</c:forEach>			
 		</table>					
@@ -33,9 +33,8 @@
 	<script>
 		$(function() {
 			$(".fa-caret-square-right").click(function (e) {
-				var params = $(this).attr("data-params");
 				var id = $(this).attr("data-id");
-				window.location = webContext + "/chart/get/" + id + "?json=" + params;
+				window.location = webContext + "/chart/get/" + id;
 			});				
 		});
 	</script>

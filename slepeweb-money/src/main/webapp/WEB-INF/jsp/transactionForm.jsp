@@ -169,10 +169,13 @@
 
 			</table> 
 			
-	    <input id="submit-button" type="submit" value="${_buttonLabel}" /> 
-			<c:if test="${_formMode eq 'update'}">
+			<input id="submit-button" type="submit" value="${_buttonLabel}" /> 
+			<input id="cancel-button" type="button" value="Cancel" /> 
+			
+		<c:if test="${_formMode eq 'update'}">
 	    	<input type="button" value="Delete transaction?" id="delete-button" /> 
 	    </c:if>
+	    
 	    <input type="hidden" name="id" value="${_transaction.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   
 	    <input type="hidden" name="origxferid" value="${_transaction.transferId}" />   
@@ -200,5 +203,11 @@
 	  <mny:splitVisibilities />
 	  <mny:transactionAutofill />	
 	  <mny:splitTransactionChecker />
+	  
+		$("#cancel-button").click(function(e){
+			window.location = webContext + "/transaction/list/${_transaction.account.id}"
+		});
+		
+
 	});
 </script>

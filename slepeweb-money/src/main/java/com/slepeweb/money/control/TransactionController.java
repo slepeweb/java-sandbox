@@ -38,7 +38,7 @@ public class TransactionController extends BaseController {
 	
 	private static Logger LOG = Logger.getLogger(TransactionController.class);
 	
-	@RequestMapping(value="/list")	
+	@RequestMapping(value="/list", method=RequestMethod.GET)	
 	public String listNoAccount(ModelMap model) { 
 		List<Account> allAccounts = this.accountService.getAll(false);
 		if (allAccounts.size() > 0) {

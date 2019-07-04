@@ -60,11 +60,6 @@ public class ChartController extends BaseController {
 	public String create(HttpServletRequest req, ModelMap model) {
 		this.categoryController.categoryList(model);
 		
-		ChartProperties props = new ChartProperties();
-		CategoryGroup g = new CategoryGroup().setLabel("Group 1").setId(1);
-		g.getCategories().add(new CategoryInput());
-		props.getGroups().add(g);
-		
 		setCommonModelAttributes(null, CREATE_MODE, model);
 		return FORM_VIEW;
 	}
@@ -81,10 +76,23 @@ public class ChartController extends BaseController {
 	private void setCommonModelAttributes(SavedSearch ss, String formMode, ModelMap model) {
 		if (ss != null) {
 			model.addAttribute(SAVED_SEARCH_ATTR, ss);
+			model.addAttribute(CHART_PROPS_ATTR, toProperties(ss.getJson()));
 		}
-		model.addAttribute(CHART_PROPS_ATTR, toProperties(ss.getJson()));
+		else {
+			model.addAttribute(CHART_PROPS_ATTR, getDefaultChartProperties());
+		}
+		
 		model.addAttribute(FORM_MODE_ATTR, formMode);
 		model.addAttribute(YEAR_RANGE_ATTR, getYearRange());
+	}
+	
+	private ChartProperties getDefaultChartProperties() {
+		ChartProperties props = new ChartProperties().setTitle("No title");
+		CategoryGroup g = new CategoryGroup().setLabel("Group 1").setId(1);
+		g.getCategories().add(new CategoryInput());
+		props.getGroups().add(g);
+		
+		return props;
 	}
 	
 	// Handle form submission for updating an existing chart
@@ -125,6 +133,7 @@ public class ChartController extends BaseController {
 	
 	private ChartProperties getSearchCriteriaFromRequest(HttpServletRequest req) {
 		ChartProperties props = new ChartProperties();
+		props.setTitle(req.getParameter("name"));
 		props.setFromYear(getYear(req, "from", 2015));		
 		props.setToYear(getYear(req, "to", 2019));		
 		
@@ -205,10 +214,10 @@ public class ChartController extends BaseController {
 	// Produces a chart from a GET request (ie a link)
 	@RequestMapping(value="/get/{id}", method=RequestMethod.GET)
 	public String get(@PathVariable int id, HttpServletRequest req, ModelMap model) {
+		SavedSearch ss = this.savedSearchService.get(id);
 		model.addAttribute(FORM_MODE_ATTR, EXECUTE_MODE);
-		model.addAttribute(SAVED_SEARCH_ATTR, this.savedSearchService.get(id));
-		String jsonStr = req.getParameter("json");
-		ChartProperties props = toProperties(jsonStr);				
+		model.addAttribute(SAVED_SEARCH_ATTR, ss);
+		ChartProperties props = toProperties(ss.getJson());				
 		return search(props, req, model);
 	}	
 	
@@ -312,7 +321,7 @@ public class ChartController extends BaseController {
 		}
 	 
 		JFreeChart chart = ChartFactory.createBarChart(
-		         "Category spend report", "Years", "Spend (£)",
+		         props.getTitle(), "Years", "Spend (£)",
 		         ds,
 		         PlotOrientation.VERTICAL, true, true, false);
 		

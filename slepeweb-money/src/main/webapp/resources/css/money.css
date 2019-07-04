@@ -846,6 +846,10 @@ input[type="button"]:disabled,
   float: right;
 }
 
+#cancel-button {
+  background-color: #54937f;
+}
+
 span.flash {
   font-size: smaller;
 }
@@ -880,5 +884,9 @@ span.flash {
 }
 
 .add-category-button {
+  margin-top: 1.0em;
+}
+
+input[type="submit"] {
   margin-top: 1.0em;
 }

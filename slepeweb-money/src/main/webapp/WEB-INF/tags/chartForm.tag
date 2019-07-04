@@ -47,6 +47,7 @@
 	
 	<c:choose><c:when test="${_formMode eq 'create'}">
 		<input type="submit" value="Save" />
+		<input id="cancel-button" type="button" value="Cancel" />
 	</c:when><c:when test="${_formMode eq 'update'}">
 		<input type="submit" value="Update" />
 		<input type="button" value="Cancel" id="cancel-button" />

@@ -8,6 +8,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @JsonIgnoreProperties({"ready"})
 public class ChartProperties {
 
+	private String title = "";
 	private int fromYear = 2015, toYear = 2019;
 	private List<CategoryGroup> groups = new ArrayList<CategoryGroup>();
 	
@@ -38,6 +39,15 @@ public class ChartProperties {
 		return this;
 	}
 	
+	public String getTitle() {
+		return title;
+	}
+
+	public ChartProperties setTitle(String title) {
+		this.title = title;
+		return this;
+	}
+
 	public boolean isReady() {
 		for (CategoryGroup g : getGroups()) {
 			for (CategoryInput c : g.getCategories()) {

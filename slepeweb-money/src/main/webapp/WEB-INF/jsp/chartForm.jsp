@@ -4,16 +4,6 @@
 	
 <mny:flash />
 
-<c:set var="_extraCss" scope="request">
-	input[type="submit"] {
-		margin-top: 1.0em;
-	}
-	
-	#cancel-button {
-		background-color: #54937f;
-	}
-</c:set>
-
 <c:choose><c:when test="${_formMode eq 'create'}">
 	<c:set var="_pageHeading" value="Create new chart" scope="request" />
 	<c:set var="_formActionUrl" scope="request">/chart/save</c:set>

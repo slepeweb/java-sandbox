@@ -175,12 +175,13 @@
 
 			</table> 
 			
-	    <input id="submit-button" type="submit" value="${_buttonLabel}" /> 
+			<input id="submit-button" type="submit" value="${_buttonLabel}" /> 
+			<input id="cancel-button" type="button" value="Cancel" /> 
 			<c:if test="${_formMode eq 'update'}">
-	    	<input type="button" value="Delete scheduled transaction?" id="delete-button" /> 
-	    </c:if>
-	    <input type="hidden" name="id" value="${_schedule.id}" />   
-	    <input type="hidden" name="formMode" value="${_formMode}" />   
+	    		<input type="button" value="Delete scheduled transaction?" id="delete-button" /> 
+			</c:if>
+			<input type="hidden" name="id" value="${_schedule.id}" />   
+			<input type="hidden" name="formMode" value="${_formMode}" />   
 	</form>	
 	
 	<div id="splits-error-dialog" title="Splits error">
@@ -198,5 +199,26 @@
 	  <mny:minorCategoryUpdates />
 	  <mny:splitVisibilities />
 	  <mny:splitTransactionChecker />
+	  
+		$("#cancel-button").click(function(e){
+			window.location = webContext + "/schedule/list"
+		});
 	});
 </script>
+
+<script>
+	$(function() {
+		$(".datepicker").datepicker({
+			dateFormat: "yy-mm-dd",
+			changeMonth: true,
+			changeYear: true
+		});
+		
+		$("#cancel-button").click(function(e){
+			window.location = webContext + "/schedule/list"
+		});
+		
+		<mny:payeeAutocompleter />
+	});
+</script>
+
