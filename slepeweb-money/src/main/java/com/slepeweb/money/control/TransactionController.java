@@ -29,8 +29,6 @@ import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.bean.Transfer;
-import com.slepeweb.money.bean.solr.SolrConfig;
-import com.slepeweb.money.bean.solr.SolrParams;
 
 @Controller
 @RequestMapping(value="/transaction")
@@ -154,84 +152,6 @@ public class TransactionController extends BaseController {
 		return yearSelector;
 	}
 
-	@RequestMapping(value="/list/by/category/{categoryId}")	
-	public String listByCategoryNoPage(@PathVariable long categoryId, 
-			HttpServletRequest req, ModelMap model) { 
-		
-		return listByCategory(categoryId, 1, req, model);
-	}
-	
-	@RequestMapping(value="/list/by/category/{categoryId}/all")	
-	public String listAllByCategoryNoPage(@PathVariable long categoryId, 
-			HttpServletRequest req, ModelMap model) { 
-		
-		return listAllByCategory(categoryId, 1, req, model);
-	}
-	
-	@RequestMapping(value="/list/by/category/{categoryId}/{selectedPage}")	
-	public String listByCategory(@PathVariable long categoryId, 
-			@PathVariable int selectedPage, HttpServletRequest req, ModelMap model) { 
-		
-		return getListByCategory(categoryId, selectedPage, 1000, req, model);
-	}
-	
-	@RequestMapping(value="/list/by/category/{categoryId}/{selectedPage}/all")	
-	public String listAllByCategory(@PathVariable long categoryId, 
-			@PathVariable int selectedPage, HttpServletRequest req, ModelMap model) { 
-		
-		return getListByCategory(categoryId, selectedPage, 0, req, model);
-	}
-	
-	private String getListByCategory(long categoryId, 
-			int selectedPage, int limit, HttpServletRequest req, ModelMap model) {
-		
-		SolrParams params = new SolrParams(new SolrConfig()).setCategoryId(categoryId).setPageNum(selectedPage);
-		model.addAttribute("_response", this.solrService.query(params));
-		model.addAttribute("_category", this.categoryService.get(categoryId));
-		model.addAttribute("_limit", limit); 
-		
-		return "transactionListByCategory";
-	}
-
-	@RequestMapping(value="/list/by/payee/{payeeId}")	
-	public String listByPayeeNoPage(@PathVariable long payeeId, 
-			HttpServletRequest req, ModelMap model) { 
-		
-		return listByPayee(payeeId, 1, req, model);
-	}
-	
-	@RequestMapping(value="/list/by/payee/{payeeId}/all")	
-	public String listAllByPayeeNoPage(@PathVariable long payeeId, 
-			HttpServletRequest req, ModelMap model) { 
-		
-		return listAllByPayee(payeeId, 1, req, model);
-	}
-	
-	@RequestMapping(value="/list/by/payee/{payeeId}/{selectedPage}")	
-	public String listByPayee(@PathVariable long payeeId, 
-			@PathVariable int selectedPage, HttpServletRequest req, ModelMap model) { 
-		
-		return getListByPayee(payeeId, selectedPage, 1000, req, model);
-	}
-	
-	@RequestMapping(value="/list/by/payee/{payeeId}/{selectedPage}/all")	
-	public String listAllByPayee(@PathVariable long payeeId, 
-			@PathVariable int selectedPage, HttpServletRequest req, ModelMap model) { 
-		
-		return getListByPayee(payeeId, selectedPage, 0, req, model);
-	}
-	
-	private String getListByPayee(long payeeId, 
-			int selectedPage, int limit, HttpServletRequest req, ModelMap model) {
-		
-		SolrParams params = new SolrParams(new SolrConfig()).setPayeeId(payeeId).setPageNum(selectedPage);
-		model.addAttribute("_response", this.solrService.query(params));
-		model.addAttribute("_payee", this.payeeService.get(payeeId));
-		model.addAttribute("_limit", limit); 
-		
-		return "transactionListByPayee";
-	}	
-
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String addForm(ModelMap model) {		
 		populateForm(model, new Transaction(), "add");
@@ -325,7 +245,7 @@ public class TransactionController extends BaseController {
 		Transaction t;
 		
 		if (isTransfer) {
-			// Override setting on form - 'splt' has no meaning with transfers
+			// Override setting on form - 'split' has no meaning with transfers
 			isSplit = false;
 			
 			t = new Transfer().setMirrorAccount(this.accountService.get(mirrorAccountId));
