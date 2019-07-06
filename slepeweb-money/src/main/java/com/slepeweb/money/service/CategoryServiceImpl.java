@@ -79,6 +79,11 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 	}
 
 	public Category get(String major, String minor) {
+		// Form submission will offer a null value for minor if <select> hasn't been populated.
+		if (minor == null) {
+			minor = "";
+		}
+		
 		Category c = get("select * from category where major = ? and minor = ?", new Object[]{major, minor});
 		if (c != null) {
 			return c;

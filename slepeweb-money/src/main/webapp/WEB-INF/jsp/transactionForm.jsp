@@ -186,28 +186,13 @@
 		order to submit the form. (Total = __totalamount__, Splits = __splitamounts__)
 	</div>
 
+	<mny:entityDeletionDialog entity="transaction" mode="${_formMode}" id="${_transaction.id}"/>
+	
+	<script>
+		<mny:transactionFormRuntimeFunctions />
+		$(function() {		
+			<mny:transactionFormOnReady />
+		});
+	</script>
+
 </mny:standardLayout>
-
-<mny:entityDeletionDialog entity="transaction" mode="${_formMode}" id="${_transaction.id}"/>
-
-<script>
-	$(function() {
-		$(".datepicker").datepicker({
-			dateFormat: "yy-mm-dd",
-			changeMonth: true,
-			changeYear: true
-		});
-		
-	  <mny:payeeAutocompleter />
-	  <mny:minorCategoryUpdates />
-	  <mny:splitVisibilities />
-	  <mny:transactionAutofill />	
-	  <mny:splitTransactionChecker />
-	  
-		$("#cancel-button").click(function(e){
-			window.location = webContext + "/transaction/list/${_transaction.account.id}"
-		});
-		
-
-	});
-</script>
