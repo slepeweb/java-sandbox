@@ -80,7 +80,8 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				t = insert(pt);
 			}
 			
-			// Also save this transaction's splits, if any
+			// Also save the new transaction's splits, if any
+			t.assimilateSplits(pt);
 			t = this.splitTransactionService.save(t);
 			
 			// Keep a reference to the previous revision of this transaction, for

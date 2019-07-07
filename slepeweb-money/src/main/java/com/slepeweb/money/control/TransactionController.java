@@ -30,6 +30,25 @@ import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.bean.Transfer;
 
+
+/*
+ * TODO: Things to look at:
+ * - DONE: Should we set Payee on transfers? YES - This is how MSMoney worked.
+ * - DONE: Why is memo field not set on form for split transactions? It is now.
+ * - DONE: Splits not being saved on transaction. Corrected.
+ * - Need to store the last selected account on the transaction list page, so that
+ *   the list menu can refer to it
+ * - DONE: redundant jsps?
+ * 		- transactionListByCategory
+ * 		- transactionListByPayee
+ * - No way to remove a category from split transactions
+ * - If you have 3 splits, then blank out no. 2, then only the first is saved.
+ * - Fourth split on form breaks update
+ * - DONE: Add one split; save; add another split; results in 3 splits, not two.
+ * - Provide option to ignore split errors
+ */
+
+
 @Controller
 @RequestMapping(value="/transaction")
 public class TransactionController extends BaseController {
