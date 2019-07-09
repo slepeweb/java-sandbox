@@ -12,6 +12,9 @@
 </c:if>
 
 <mny:multiCategoryInputSupport />
+<mny:multiCategoryJavascript />
+<mny:minorCategoryUpdatesJavascript />
+<mny:payeeAutocompleterJavascript />
 
 <form id="advanced-search-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">	  
     <table id="multi-category-groupings">
@@ -94,9 +97,7 @@
 		
 		$("#cancel-button").click(function(e){
 			window.location = webContext + "/search/list"
-		});
-		
-		<mny:payeeAutocompleter />
+		});		
 	});
 </script>
 	

@@ -88,7 +88,8 @@
 								${_split.amountInPounds}<br />
 						</c:forEach>						
 					</td>
-					<td> <br />
+					<td> 
+						${_trn.memo}<br />
 						<c:forEach items="${_trn.splits}" var="_split">
 								${_split.memo}<br />
 						</c:forEach>						

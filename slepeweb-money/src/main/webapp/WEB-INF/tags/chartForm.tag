@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <mny:multiCategoryInputSupport />
+<mny:multiCategoryJavascript />
+<mny:minorCategoryUpdatesJavascript />
 
 <form id="chart-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">
 	<table id="year-ranges">

@@ -57,6 +57,7 @@ public class SearchController extends BaseController {
 		
 		model.addAttribute(ALL_ACCOUNTS_ATTR, this.accountService.getAll(true));
 		model.addAttribute(ALL_PAYEES_ATTR, getAllPayees());
+		model.addAttribute(CategoryController.ALL_MAJOR_CATEGORIES_ATTR, this.categoryService.getAllMajorValues());
 		
 		// Create a single, default category group
 		model.addAttribute(CATEGORY_GROUP_ATTR, emptyCategoryGroup());		
@@ -153,6 +154,7 @@ public class SearchController extends BaseController {
 		SolrParams params = toSolrParams(ss.getJson());
 		
 		model.addAttribute("_numDeletableTransactions", 0);
+		model.addAttribute(CategoryController.ALL_MAJOR_CATEGORIES_ATTR, this.categoryService.getAllMajorValues());
 		setCommonModelAttributes(ss, params, UPDATE_MODE, model);		
 		return FORM_VIEW;
 	}
