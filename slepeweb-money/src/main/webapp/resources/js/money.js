@@ -13,18 +13,16 @@ $(function() {
 	
 	$("#accordion").accordion({
 		active: false,
-		collapsible: true,
-		heightStyle: content
+		collapsible: true /*,
+		heightStyle: content */
 	});
 	
 	$("#accordion-accounts").accordion({
 		active: 0,
-		collapsible: true,
+		collapsible: true /*,
 		heightStyle: content
+		*/
 	});
 		
-	$("#lift-limit").click(function(e){
-		window.location = window.location + "/all";
-	});
 	
 });	

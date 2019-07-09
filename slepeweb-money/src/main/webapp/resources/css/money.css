@@ -866,16 +866,16 @@ span.flash {
   margin-right: 3em;
 }
 
-#multi-category-groupings .width15, #year-ranges .width15 {
+#multi-category-groupings .width15, #year-ranges .width15, #transaction-form .width15 {
   width: 15%;
 }
-#multi-category-groupings .width20, #year-ranges .width20 {
+#multi-category-groupings .width20, #year-ranges .width20, #transaction-form .width20 {
   width: 20%;
 }
-#multi-category-groupings .width25, #year-ranges .width25 {
+#multi-category-groupings .width25, #year-ranges .width25, #transaction-form .width25 {
   width: 25%;
 }
-#multi-category-groupings .width50, #year-ranges .width50 {
+#multi-category-groupings .width50, #year-ranges .width50, #transaction-form .width50 {
   width: 50%;
 }
 

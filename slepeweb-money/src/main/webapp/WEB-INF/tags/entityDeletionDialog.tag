@@ -21,7 +21,7 @@ $(function() {
 				text: "Delete",
 				icon: "ui-icon-alert",
 				click: function() {
-					window.location = webContext + "/${entity}/delete/" + ${id};
+					window.location = webContext + "/${entity}/delete/" + "${id}";
 				}
 			}
 		]

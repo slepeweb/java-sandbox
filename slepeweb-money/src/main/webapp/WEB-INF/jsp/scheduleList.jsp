@@ -41,11 +41,13 @@
 				window.location = webContext + "/search/save/repeat?type=" + type + "&json=" + params;
 			});	
 			
+			/*
 			$("#accordion-ss").accordion({
 				active: false,
 				collapsible: true,
 				heightStyle: content
 			});
+			*/
 		});
 	</script>
 	

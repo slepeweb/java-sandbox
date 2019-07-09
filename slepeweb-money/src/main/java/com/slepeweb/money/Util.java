@@ -7,12 +7,14 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.money.bean.CategoryGroup;
 import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.ChartProperties;
+import com.slepeweb.money.bean.SplitTransactionFormComponent;
 
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
@@ -251,5 +253,38 @@ public class Util {
 	
 	public static String compactMarkup(String in) {
 		return in.replaceAll("\\n", "").replaceAll("\\r", "");
+	}
+
+	public static String buildSplitInputMarkup(List<SplitTransactionFormComponent> splits, 
+			String innerTemplate, String splitOptionsTemplate) {
+		
+		StringBuilder splitOptions = new StringBuilder();
+		StringBuilder innerBuilder = new StringBuilder();
+		String inner;
+		int optionsId = 0;
+		
+		for (SplitTransactionFormComponent comp : splits) {
+			optionsId++;
+			inner = innerTemplate.
+					replaceAll("\\[counter\\]", String.valueOf(optionsId)).
+					replace("[major]", comp.getCategory().getMajor());
+			
+			splitOptions = new StringBuilder();
+			
+			for (String minor : comp.getAllMinors()) {
+				splitOptions.append(splitOptionsTemplate.
+						replace("[minor]", minor).
+						replace("[selected]", minor.equals(comp.getCategory().getMinor()) ? "selected" : "" ));
+			}
+			
+			inner = inner.
+					replace("__splitOptionsTemplate__", splitOptions.toString()).
+					replace("[memo]", comp.getMemo()).
+					replace("[amount]", formatPounds(comp.getAmount()));
+			
+			innerBuilder.append(inner);
+		}
+		
+		return innerBuilder.toString();		
 	}
 }

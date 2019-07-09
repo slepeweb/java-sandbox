@@ -57,7 +57,14 @@
 		<function-signature>java.lang.String buildMinorCategoryInputMarkup(com.slepeweb.money.bean.CategoryGroup, 
 			java.lang.String, java.lang.String)</function-signature>
 	</function>
-	
+
+	<function>
+		<name>buildSplitInputMarkup</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.String buildSplitInputMarkup(java.util.List, 
+			java.lang.String, java.lang.String)</function-signature>
+	</function>
+
 	<function>
 		<name>compactMarkup</name>
 		<function-class>com.slepeweb.money.Util</function-class>

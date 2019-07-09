@@ -1,5 +1,7 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
+<!-- multiCategoryInputSupport.tag -->
+
 <c:set var="_outerTemplate" scope="request">
    <tr class="multi-category-group">
        <td class="width25">
@@ -44,158 +46,8 @@
 </c:set>
 
 <datalist id="majors">
-		<c:forEach items="${_categories}" var="_m">
-				<option value="${_m.name}" />
+		<c:forEach items="${_allMajorCategories}" var="_major">
+				<option value="${_major}" />
 		</c:forEach>
 </datalist>
-		
-<script>
-var _outerTemplate='${mon:compactMarkup(_outerTemplate)}';
-var _innerTemplate='${mon:compactMarkup(_innerTemplate)}';
-var _categoryOptionsTemplate='${mon:compactMarkup(_categoryOptionsTemplate)}';
-var _elementCounter = "_counters"
 
-$(function() {
-
-	/*
-		Given the major category in the <input> element, update the associated <select>
-		element with corresponding minor values
-	*/
-	var updateMinorCategories = function(majorEle) {
-	  var deferred = $.Deferred();
-		var minorEle = majorEle.next();
-		
-		if (majorEle.val().length > 0) {
-			$.ajax(webContext + "/rest/category/minor/list/" + majorEle.val(), {
-				type: "GET",
-				cache: false,
-				dataType: "json",
-				success: function(obj, status, z) {
-					minorEle.empty();
-					$.each(obj.data, function(index, minor) {
-						var markup = _categoryOptionsTemplate.replace(/\[minor\]/g, minor).replace(/\[selected\]/, "");
-						minorEle.append(markup);
-					});
-					
-					deferred.resolve("Categories updated");
-				},
-				error: function(x, t, m) {
-					deferred.reject(x + t + m);
-				}
-			});
-	  }
-	  else {
-		  minorEle.empty();
-	  }
-		
-		return deferred.promise();
-  }
-  
-  var addCategoryGroup = function(groupId) {
-		var inner = _innerTemplate.
-				replace(/\[groupId\]/g, parseInt(groupId)).
-				replace(/\[counter\]/g, "1").
-				replace("[major]", "").
-				replace("__categoryOptionsTemplate__", "");
-    
-		var outer = _outerTemplate.
-			replace(/\[groupId\]/g, parseInt(groupId)).
-			replace("[label]", "Group " + groupId).
-			replace("__innerTemplate__", inner);
-	    
-	  if (groupId > 1) {
-	  	$(".multi-category-group").first().parent().append(outer);
- 		}
-	  else {
-		  $("#multi-category-groupings").append(outer);
-	  }
-	  
-	  var counters = retrieve();
-	  var nextId = getNextGroupId(counters);
-	  counters.push({groupId: nextId, categoryCount: 1, lastCategoryId: 1});
-	  store(counters);
-	  
-	  resetCategoryChangeBehaviour();
-	  resetButtonClickBehaviours();
-	}
-  
-  var addCategory = function(button) {
-	  var groupIdStr = button.attr("data-groupid");
-	  var groupId = parseInt(groupIdStr);
-	  var categoryId = -1;
-
-	  // Identify the corresponding array element (allowing for group deletions)	  
-	  var counters = retrieve();
-	  var group = getGroup(counters, groupId);
-	  if (group) {
-		  group.categoryCount += 1;
-		  group.lastCategoryId += 1;
-		  categoryId = group.lastCategoryId;
-		  store(counters);
-	  }
-	  
-		var inner = _innerTemplate.
-				replace(/\[groupId\]/g, groupIdStr).
-				replace(/\[counter\]/g, categoryId.toString()).
-				replace("[major]", "").
-				replace("__categoryOptionsTemplate__", "");
-  		  
-		var lastDiv = button.prev();
-		lastDiv.append(inner);
-	  	  		  
-	  resetCategoryChangeBehaviour();
-	  resetButtonClickBehaviours();
-}
-
-  // Event handlers (behavious)
-  var resetCategoryChangeBehaviour = function() {
-	  $("input[id^='major']").off().change(function(e) {	
-		  var promet = updateMinorCategories($(this));
-		  promet.done(function(res){
-			  //window.alert(res);
-		  });
-		  
-		  promet.fail(function(res){
-			  //window.alert(res);
-		  });
-		});	  
- }
-  
-  var resetButtonClickBehaviours = function() {
-	  $("#add-group-button").off().click(function(e) {	
-		  var counters = retrieve();
-		  addCategoryGroup(getNextGroupId(counters));
-		  e.stopPropagation();
-	  });
-
-	  $(".add-category-button").off().click(function(e) {
-		  addCategory($(this));
-		  e.stopPropagation();
-	  });
-	  
-	  $(".trash-multi-category-group").off().click(function(e) {
-		  var groupIdStr = $(this).attr("data-groupid");
-		  $(this).parent().parent().remove();
-		  var counters = retrieve();
-		  remove(counters, parseInt(groupIdStr));
-		  store(counters);
-		});
-
-	  $(".trash-category").off().click(function(e) {
-		  var groupIdStr = $(this).attr("data-groupid");
-		  $(this).parent().remove();
-		  var counters = retrieve();
-		  var group = getGroup(counters, parseInt(groupIdStr));
-		  if (group != null) {
-			  group.categoryCount -= 1;
-			  store(counters);
-		  }
-	  });
-}
-  
-  resetCategoryChangeBehaviour();
-  resetButtonClickBehaviours();
-  
-  <mny:multiCategoryJsSupport />
-});
-</script>

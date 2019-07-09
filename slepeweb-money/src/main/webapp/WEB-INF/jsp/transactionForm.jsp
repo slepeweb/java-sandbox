@@ -7,6 +7,7 @@
 		background: white url("${_ctxPath}/resources/images/progress-indicator.gif") right center no-repeat;
 	}
 </c:set>
+
 <mny:flash />
 	
 <mny:standardLayout>
@@ -15,8 +16,11 @@
 	<c:set var="_pageHeading" value="Add new transaction" />
 	<c:if test="${_formMode eq 'update'}">
 		<c:set var="_buttonLabel" value="Update transaction" />
-	<c:set var="_pageHeading" value="Update transaction" />
+		<c:set var="_pageHeading" value="Update transaction" />
 	</c:if>
+	
+	<mny:multiSplitInputSupport />
+	<mny:multiSplitJavascript />
 	
 	<div class="right">
 		<c:if test="${_formMode eq 'update'}">
@@ -29,7 +33,7 @@
 	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
 	
-	<form method="post" action="${_ctxPath}/transaction/update">	  
+	<form id="transaction-form" method="post" action="${_ctxPath}/transaction/update">	  
 	    <table id="trn-form">
 	    	<c:if test="${_formMode eq 'update'}">
 			    <tr class="opaque50">
@@ -99,12 +103,13 @@
 		    <tr class="category">
 		        <td class="heading"><label for="major">Category</label></td>
 		        <td>
-		        	<select id="major" name="major">
-			        	<c:forEach items="${_allMajorCategories}" var="_c">
-			        		<option value="${_c}" <c:if test="${_c eq _transaction.category.major}">selected</c:if>>${_c}</option>
-			        	</c:forEach>
-		        	</select>
-		        </td>
+					 	<input class="width25 inline" 
+					 		id="major" 
+					 		type="text" 
+					 		name="major" 
+					 		list="majors" 
+					 		value="${_transaction.category.major}" />
+					</td>
 		    </tr>
 
 		    <tr class="category">
@@ -121,32 +126,8 @@
 		    <tr class="splits-list">
 		        <td class="heading"><label>Splits</label></td>
 		        <td>
-		        	<table>
-		        		<c:forEach items="${_allSplits}" var="_split" varStatus="_status">
-		        			<tr>
-		        				<td>
-						        	<select name="major_${_status.count}">
-							        	<c:forEach items="${_split.allMajors}" var="_c">
-							        		<option value="${_c}" <c:if test="${_c eq _split.category.major}">selected</c:if>>${_c}</option>
-							        	</c:forEach>
-						        	</select>
-		        				</td>
-		        				<td>
-						        	<select name="minor_${_status.count}">
-							        	<c:forEach items="${_split.allMinors}" var="_c">
-							        		<option value="${_c}" <c:if test="${_c eq _split.category.minor}">selected</c:if>>${_c}</option>
-							        	</c:forEach>
-						        	</select>
-		        				</td>
-		        				<td>
-		        					<input type="text" name="memo_${_status.count}" placeholder="Enter any relevant notes" value="${_split.memo}" />
-		        				</td>
-		        				<td>
-		        					<input type="text" name="amount_${_status.count}" placeholder="Enter amount" value="${mon:formatPounds(_split.amountValue)}" />
-		        				</td>
-		        			</tr>
-		        		</c:forEach>
-	        		</table>
+	        			${mon:buildSplitInputMarkup(_allSplits, _innerTemplate, _minorCategoryOptionsTemplate)}
+						<button id="add-split-button" type="button">+ split</button>
 		        </td>
 		    </tr>
 		    
@@ -179,6 +160,7 @@
 	    <input type="hidden" name="id" value="${_transaction.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   
 	    <input type="hidden" name="origxferid" value="${_transaction.transferId}" />   
+		<input id="counter-store" type="hidden" name="counterStore" value="" />
 	</form>		  	
 		
 	<div id="splits-error-dialog" title="Splits error">
@@ -187,12 +169,8 @@
 	</div>
 
 	<mny:entityDeletionDialog entity="transaction" mode="${_formMode}" id="${_transaction.id}"/>
+	<mny:transactionFormJavascript />
+	<mny:minorCategoryUpdatesJavascript />
+	<mny:payeeAutocompleterJavascript autofill="${true}" />
 	
-	<script>
-		<mny:transactionFormRuntimeFunctions />
-		$(function() {		
-			<mny:transactionFormOnReady />
-		});
-	</script>
-
 </mny:standardLayout>

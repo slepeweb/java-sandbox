@@ -21,6 +21,8 @@ import com.slepeweb.money.bean.NamedList;
 @RequestMapping(value="/category")
 public class CategoryController extends BaseController {
 	
+	public static final String ALL_MAJOR_CATEGORIES_ATTR = "_allMajorCategories";
+	
 	@RequestMapping(value="/list")	
 	public String categoryList(ModelMap model) { 
 		List<NamedList<Category>> categories = new ArrayList<NamedList<Category>>();
@@ -57,7 +59,7 @@ public class CategoryController extends BaseController {
 		
 		model.addAttribute("_category", new Category());
 		model.addAttribute("_formMode", "add");
-		model.addAttribute("_allMajorCategories", this.categoryService.getAllMajorValues());
+		model.addAttribute(ALL_MAJOR_CATEGORIES_ATTR, this.categoryService.getAllMajorValues());
 		
 		return "categoryForm";
 	}
@@ -67,7 +69,7 @@ public class CategoryController extends BaseController {
 		
 		model.addAttribute("_category", this.categoryService.get(categoryId));
 		model.addAttribute("_formMode", "update");
-		model.addAttribute("_allMajorCategories", this.categoryService.getAllMajorValues());
+		model.addAttribute(ALL_MAJOR_CATEGORIES_ATTR, this.categoryService.getAllMajorValues());
 		model.addAttribute("_numDeletableTransactions", this.transactionService.getNumTransactionsForCategory(categoryId));
 		return "categoryForm";
 	}

@@ -220,22 +220,6 @@ public class TransactionController extends BaseController {
 			arr.add(c);
 		}
 		
-		int len = arr.size();
-		boolean extended = false;
-		
-		// Do we need to pad out the list?
-		if (len < 3) {
-			for (int i = len; i < 3; i++) {
-				arr.add(new SplitTransactionFormComponent().setAllMajors(allMajors));
-				extended = true;
-			}
-		}
-		
-		// If we didn'd pad out, that means we had 3 or more splits. In this case, provide 1 empty slot.
-		if (! extended) {
-			arr.add(new SplitTransactionFormComponent().setAllMajors(allMajors));
-		}
-		
 		model.addAttribute("_allSplits", arr);
 		
 		if (t.isTransfer()) {
@@ -303,10 +287,10 @@ public class TransactionController extends BaseController {
 				st = new SplitTransaction().
 					setTransactionId(t.getId()).
 					setCategory(this.categoryService.get(
-							req.getParameter("major_" + index), 
-							req.getParameter("minor_" + index))).
-					setMemo(req.getParameter("memo_" + index)).
-					setAmount(Util.parsePounds(req.getParameter("amount_" + index)) * multiplier);
+							req.getParameter("major-" + index), 
+							req.getParameter("minor-" + index))).
+					setMemo(req.getParameter("memo-" + index)).
+					setAmount(Util.parsePounds(req.getParameter("amount-" + index)) * multiplier);
 				
 				// The transactionId for each SplitTransaction will be assigned within TransactionService.save(t).
 				if (st.isPopulated()) {
