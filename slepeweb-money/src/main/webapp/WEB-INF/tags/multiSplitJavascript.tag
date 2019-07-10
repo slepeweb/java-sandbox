@@ -21,8 +21,7 @@
 			replace(/\[memo\]/, "").
 			replace(/\[amount\]/, "");
 		
-		var row = button.parent().parent();
-		$(inner).insertBefore(row);
+		$(inner).insertBefore(button);
 		_resetSplitButtonClickBehaviours();
 	}
 	
@@ -32,7 +31,7 @@
 		});
 		
 		$(".trash-split").off().click(function(e) {
-			$(this).parent().parent().remove();
+			$(this).parent().remove();
 			var counters = retrieve();
 			counters.splitCount -= 1;
 			_storeSplitCounters(counters);

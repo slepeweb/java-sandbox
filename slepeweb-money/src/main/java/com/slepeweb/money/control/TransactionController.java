@@ -280,6 +280,17 @@ public class TransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
+			/* TODO - Handle splits, using lastSplitId to identify range of splits
+			 * 
+			String countersJson = req.getParameter("counterStore");
+			MultiSplitCounter counters = fromJson(new TypeReference<MultiSplitCounter>() {}, countersJson);
+			List<CategoryInput> inputs = readMultiCategoryInput(req, counters.get);
+			CategoryGroup grp = new CategoryGroup().setId(1).setCategories(inputs);
+			return grp.toCategoryList();
+			*/
+
+			
+			
 			int index = 1;
 			SplitTransaction st;
 			

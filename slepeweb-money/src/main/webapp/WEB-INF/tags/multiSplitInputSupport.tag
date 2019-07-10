@@ -12,12 +12,12 @@
 	 		list="majors" 
 	 		value="[major]" />
 	 		
-	 	<select class="width50 inline" id="minor-[counter]" name="minor-[counter]">
+	 	<select class="width25 inline" id="minor-[counter]" name="minor-[counter]">
 	 	__splitOptionsTemplate__
 	 	</select>
 	 	
-		<input type="text" name="memo-[counter]" placeholder="Enter any relevant notes" value="[memo]" />
-		<input type="text" name="amount-[counter]" placeholder="Enter amount" value="[amount]" />
+		<input class="width25 inline" type="text" name="memo-[counter]" placeholder="Enter any relevant notes" value="[memo]" />
+		<input class="width15 inline" type="text" name="amount-[counter]" placeholder="Enter amount" value="[amount]" />
  		<span class="trash-split"><i class="far fa-trash-alt" title="Remove this split"></i></span>
 	</div>
 </c:set>
