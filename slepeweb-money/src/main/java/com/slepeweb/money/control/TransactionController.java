@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.type.TypeReference;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,10 +21,12 @@ import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.MonthPager;
+import com.slepeweb.money.bean.MultiSplitCounter;
 import com.slepeweb.money.bean.NormalisedMonth;
 import com.slepeweb.money.bean.Option;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RunningBalance;
+import com.slepeweb.money.bean.SplitInput;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.bean.Transaction;
@@ -280,39 +283,23 @@ public class TransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			/* TODO - Handle splits, using lastSplitId to identify range of splits
-			 * 
 			String countersJson = req.getParameter("counterStore");
 			MultiSplitCounter counters = fromJson(new TypeReference<MultiSplitCounter>() {}, countersJson);
-			List<CategoryInput> inputs = readMultiCategoryInput(req, counters.get);
-			CategoryGroup grp = new CategoryGroup().setId(1).setCategories(inputs);
-			return grp.toCategoryList();
-			*/
-
-			
-			
-			int index = 1;
 			SplitTransaction st;
 			
-			do {
+			for (SplitInput in : readMultiSplitInput(req, counters)) {
 				st = new SplitTransaction().
 					setTransactionId(t.getId()).
-					setCategory(this.categoryService.get(
-							req.getParameter("major-" + index), 
-							req.getParameter("minor-" + index))).
-					setMemo(req.getParameter("memo-" + index)).
-					setAmount(Util.parsePounds(req.getParameter("amount-" + index)) * multiplier);
+					setCategory(this.categoryService.get(in.getMajor(), in.getMinor())).
+					setMemo(in.getMemo()).
+					// TODO: need to avoid negative amounts on form - use <select> for debit/credit
+					setAmount(in.getAmount());
 				
 				// The transactionId for each SplitTransaction will be assigned within TransactionService.save(t).
 				if (st.isPopulated()) {
 					t.getSplits().add(st);
-					index++;
-				}
-				else {
-					index = -1;
 				}
 			}
-			while (index > 0);
 		}
 		
 		if (save(t) != null) {

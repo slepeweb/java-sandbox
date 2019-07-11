@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.MultiCategoryCounter;
+import com.slepeweb.money.bean.MultiSplitCounter;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
+import com.slepeweb.money.bean.SplitInput;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
@@ -139,6 +141,46 @@ public class BaseController {
 					}
 				}
 			}
+		}
+		
+		return list;
+	}
+	
+	protected List<SplitInput> readMultiSplitInput(HttpServletRequest req, MultiSplitCounter counters) {
+		int count = 0;	
+		String major, minor;
+		SplitInput cat;
+		List<SplitInput> list = new ArrayList<SplitInput>();
+		
+		if (counters.getLastSplitId() > 0) {
+			for (int i = 1; i < 10; i++) {
+				major = req.getParameter(String.format("major-%d", i));
+				minor = req.getParameter(String.format("minor-%d", i));
+				
+				if (StringUtils.isNotBlank(major)) {					
+					cat = new SplitInput();
+					cat.
+						setMajor(major).
+						setMinor(minor).
+						setOptions(this.categoryService.getAllMinorValues(major));
+					
+					cat.
+						setMemo(req.getParameter(String.format("memo-%d", i))).
+						setAmount(req.getParameter(String.format("amount-%d", i)));
+					
+					list.add(cat);
+					count++;
+					
+					if (i >= counters.getLastSplitId()) {
+						break;
+					}
+				}
+			}
+		}
+		
+		if (count != counters.getSplitCount()) {
+			LOG.warn(String.format("Split counters mis-match: Expected %d splits, but identified %d", 
+					counters.getSplitCount(), count));
 		}
 		
 		return list;
