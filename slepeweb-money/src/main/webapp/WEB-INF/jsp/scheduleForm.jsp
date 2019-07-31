@@ -24,6 +24,9 @@
 		</div>
 	</c:if>
 	
+	<mny:multiSplitInputSupport />
+	<mny:multiSplitJavascript />
+	
 	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
 	
@@ -101,11 +104,12 @@
 		    <tr class="category">
 		        <td class="heading"><label for="major">Category</label></td>
 		        <td>
-		        	<select id="major" name="major">
-			        	<c:forEach items="${_allMajorCategories}" var="_c">
-			        		<option value="${_c}" <c:if test="${_c eq _schedule.category.major}">selected</c:if>>${_c}</option>
-			        	</c:forEach>
-		        	</select>
+						 	<input class="width25 inline" 
+						 		id="major" 
+						 		type="text" 
+						 		name="major" 
+						 		list="majors" 
+						 		value="${_schedule.category.major}" />
 		        </td>
 		    </tr>
 
@@ -192,19 +196,9 @@
 </mny:standardLayout>
 
 <mny:entityDeletionDialog entity="schedule" mode="${_formMode}" id="${_schedule.id}"/>
-
-<script>
-	$(function() {
-	  <mny:payeeAutocompleter />
-	  <mny:minorCategoryUpdates />
-	  <mny:splitVisibilities />
-	  <mny:splitTransactionChecker />
-	  
-		$("#cancel-button").click(function(e){
-			window.location = webContext + "/schedule/list"
-		});
-	});
-</script>
+<mny:transactionFormJavascript />
+<mny:minorCategoryUpdatesJavascript />
+<mny:payeeAutocompleterJavascript />
 
 <script>
 	$(function() {
@@ -217,8 +211,6 @@
 		$("#cancel-button").click(function(e){
 			window.location = webContext + "/schedule/list"
 		});
-		
-		<mny:payeeAutocompleter />
 	});
 </script>
 

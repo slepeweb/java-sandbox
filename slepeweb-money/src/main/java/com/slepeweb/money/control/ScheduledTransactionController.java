@@ -136,7 +136,9 @@ public class ScheduledTransactionController extends BaseController {
 			scht.setId(Long.valueOf(req.getParameter("id")));
 		}
 		else {
-			scht.setEntered(new Timestamp(0L));
+			// Set the 'date last entered' field to some arbirary date a long time ago,
+			// BUT NOT ZERO, since this is used as the test for an unset field.
+			scht.setEntered(new Timestamp(32000L));
 		}
 		
 		// Note: Transfers can NOT have split transactions
