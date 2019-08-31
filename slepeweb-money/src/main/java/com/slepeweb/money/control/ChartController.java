@@ -321,7 +321,7 @@ public class ChartController extends BaseController {
 		}
 	 
 		JFreeChart chart = ChartFactory.createBarChart(
-		         props.getTitle(), "Years", "Spend (£)",
+		         props.getTitle(), "Years", "Spend (Â£)",
 		         ds,
 		         PlotOrientation.VERTICAL, true, true, false);
 		

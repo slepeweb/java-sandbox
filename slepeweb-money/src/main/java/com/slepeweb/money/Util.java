@@ -88,12 +88,12 @@ public class Util {
 		return c;
 	}
 	
-	public static Timestamp today(Calendar c) {
+	public static Timestamp toTimestamp(Calendar c) {
 		return new Timestamp(c.getTimeInMillis());
 	}
 	
 	public static Timestamp now() {
-		return today(Calendar.getInstance());
+		return toTimestamp(Calendar.getInstance());
 	}
 	
 	public static void zeroTimeOfDay(Calendar c) {
@@ -101,6 +101,27 @@ public class Util {
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 10);
+	}
+	
+	public static void startOfYear(Calendar c) {
+		c.set(Calendar.DATE, 1);
+		c.set(Calendar.MONTH, 0);
+		zeroTimeOfDay(c);
+	}
+	
+	public static void endOfYear(Calendar c) {
+		c.set(Calendar.DATE, 31);
+		c.set(Calendar.MONTH, 11);
+		c.set(Calendar.HOUR_OF_DAY, 23);
+		c.set(Calendar.MINUTE, 59);
+		c.set(Calendar.SECOND, 59);
+		c.set(Calendar.MILLISECOND, 10);
+	}
+	
+	public static int getYear(Date d) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(d);
+		return cal.get(Calendar.YEAR);
 	}
 	
 	/**

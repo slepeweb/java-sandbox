@@ -92,6 +92,15 @@ public class RowMapperUtil {
 		}
 	}
 	
+	public static final class NakedTransactionMapper implements RowMapper<Transaction> {
+		public Transaction mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new Transaction().
+					setEntered(rs.getTimestamp("entered")).
+					setXferId(rs.getLong("transferid")).
+					setAmount(rs.getLong("amount"));			
+		}
+	}
+	
 	public static final class SavedSearchMapper implements RowMapper<SavedSearch> {
 		public SavedSearch mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new SavedSearch().

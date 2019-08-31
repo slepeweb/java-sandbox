@@ -112,6 +112,11 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		return accounts;
 	}
 	
+	public List<Account> getAssets() {
+		String sql = "select * from account where type in ('current', 'savings', 'pension') order by name";
+		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
+	}
+	
 	public int delete(long id) {
 		Account a = get(id);
 		int num = this.jdbcTemplate.update("delete from account where id = ?", id);
