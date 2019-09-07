@@ -28,6 +28,15 @@ public class Transfer extends Transaction {
 		}
 	}
 		
+	protected FlatTransaction flattenParent() {
+		FlatTransaction doc = super.flattenParent();
+
+		return doc.
+				setMajorCategory("Transfer").
+				setMinorCategory("").
+				setMemo(String.format("%s '%s'", isDebit() ? "To" : "From", getMirrorAccount().getName()));
+	}
+
 	public Transfer setTransactionService(TransactionService transactionService) {
 		this.transactionService = transactionService;
 		return this;

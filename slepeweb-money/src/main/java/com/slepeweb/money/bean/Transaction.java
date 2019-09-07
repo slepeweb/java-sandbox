@@ -126,7 +126,7 @@ public class Transaction extends DbEntity {
 	/*
 	 * This solr document is made from a transaction that is NOT split
 	 */
-	private FlatTransaction flattenParent() {
+	protected FlatTransaction flattenParent() {
 		FlatTransaction doc = new FlatTransaction();
 
 		return doc.
