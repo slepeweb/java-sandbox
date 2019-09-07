@@ -51,27 +51,45 @@ public class AssetController extends BaseController {
 		Transaction mirror;
 		List<String> validAccountTypes = Arrays.asList(new String[] {"current", "savings", "pension"});
 		DefaultCategoryDataset ds = new DefaultCategoryDataset();
-		Long balance;
+		Long openingBalance, closingBalance;
 		
-		// Work out starting balances of asset accounts
+		// Work out opening and closing balances of asset accounts
 		Map<Integer, Long> yearlyOpeningBalance = new HashMap<Integer, Long>();
-		int year, minYear = 2020;
+		Map<Integer, Long> yearlyClosingBalance = new HashMap<Integer, Long>();
+		int openingYear, closingYear, minYear = 2020;
 
 		for (Account a : this.accountService.getAssets()) {
-			year = Util.getYear(this.transactionService.getTransactionDateForAccount(a.getId(), true));
-			balance = yearlyOpeningBalance.get(year);
-			if (balance == null) {
-				balance = new Long(0L);	
-				yearlyOpeningBalance.put(year, balance);
-			}
-			yearlyOpeningBalance.put(year, balance + a.getOpeningBalance());
+			openingYear = Util.getYear(this.transactionService.getTransactionDateForAccount(a.getId(), true));
+			openingBalance = yearlyOpeningBalance.get(openingYear);
 			
-			if (year < minYear) {
-				minYear = year;
+			if (openingBalance == null) {
+				openingBalance = new Long(0L);	
+			}
+			
+			// Note that there could be more than one account that was opened in a given year
+			yearlyOpeningBalance.put(openingYear, openingBalance + a.getOpeningBalance());
+			
+			if (a.isClosed()) {
+				closingYear = Util.getYear(this.transactionService.getTransactionDateForAccount(a.getId(), false));
+				closingBalance = yearlyClosingBalance.get(closingYear);
+				
+				if (closingBalance == null) {
+					closingBalance = new Long(0L);	
+				}
+				
+				// Note that there could be more than one account that was closed in a given year
+				yearlyClosingBalance.put(closingYear, closingBalance + this.transactionService.getBalance(a.getId()));				
+			}
+			
+			if (openingYear < minYear) {
+				minYear = openingYear;
 			}
 		}
 		
 		int thisYear = Util.getYear(new Date());
+		YearlyAssetStatus totalStatus = new YearlyAssetStatus(thisYear);
+		model.addAttribute("_totals", totalStatus);
+		
 		long overallBalance = 0L;
 		List<YearlyAssetStatus> data = new ArrayList<YearlyAssetStatus>();
 		model.addAttribute("_data", data);
@@ -83,9 +101,16 @@ public class AssetController extends BaseController {
 			history.add(assetStatus);
 			
 			// Do we apply any opening balances to this year?
-			balance = yearlyOpeningBalance.get(yearStepper);
-			if (balance != null) {
-				assetStatus.count(balance);
+			openingBalance = yearlyOpeningBalance.get(yearStepper);
+			if (openingBalance != null) {
+				assetStatus.credit(openingBalance);
+			}
+			
+			// Do we remove any non-zero closing balances to this year?
+			// (If the account is closed, it shouldn't have any funds in it, but some older ones do!)
+			closingBalance = yearlyClosingBalance.get(yearStepper);
+			if (closingBalance != null) {
+				assetStatus.debit(closingBalance);
 			}
 			
 			for (Transaction t : this.assetService.get(Util.toTimestamp(from), Util.toTimestamp(to))) {
@@ -104,6 +129,7 @@ public class AssetController extends BaseController {
 			}
 			
 			overallBalance += assetStatus.getNetAmount();
+			totalStatus.add(assetStatus);
 			data.add(assetStatus);
 			
 			ds.addValue(Util.toPounds(assetStatus.getIncome()), INCOME_LABEL, Integer.valueOf(yearStepper));

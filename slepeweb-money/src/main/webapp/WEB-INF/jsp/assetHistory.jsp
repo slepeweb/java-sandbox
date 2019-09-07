@@ -9,16 +9,16 @@
 		font-size: 1em;
 	}
 	
-	#form-tab, #results-tab {
-		padding: 0.5em;
-	}
-	
 	#data-tab th {
 		font-size: 1.2em;
 	}
+	
+	.debit {
+		color: red;
+	}
 
-	input[type="submit"] {
-		margin-top: 1.0em;
+	.totals {
+		font-size: 1.5em;
 	}
 </c:set>
 
@@ -29,11 +29,9 @@
 			
 	<div id="tabs">
 		<ul>
-			<li><a href="#form-tab">Form</a></li>
 			<li><a href="#results-tab">Results</a></li>
 			<li><a href="#data-tab">Data</a></li>
 		</ul>
-		<div id="form-tab"></div>		
 		<div id="results-tab">${_assetSVG}</div>
 		<div id="data-tab">
 			<c:if test="${not empty _assetSVG}">
@@ -42,7 +40,7 @@
 				<table>
 					<tr>
 						<th></th>
-						<c:forTokens items="Income,Expense,Balance" delims="," var="_label">
+						<c:forTokens items="Income,Expense,Net,Balance" delims="," var="_label">
 							<th>${_label}</th>
 						</c:forTokens>
 					</tr>
@@ -53,11 +51,19 @@
 							<th>${_assetData.year}</th>
 							<td>${mon:formatPounds(_assetData.income)}</td>
 							<td>${mon:formatPounds(_assetData.expense)}</td>
+							<td <c:if test="${(_assetData.income - _assetData.expense) lt 0}">class="debit"</c:if>>${mon:formatPounds(_assetData.income - _assetData.expense)}</td>
 							<td>${mon:formatPounds(_balance)}</td>
 						</tr>
 					</c:forEach>
 										
-				</table>
+					<tr class="totals">
+						<td>Totals</td>
+						<td><strong>${mon:formatPounds(_totals.income)}</strong></td>
+						<td><strong>${mon:formatPounds(_totals.expense)}</strong></td>
+						<td><strong>${mon:formatPounds(_totals.income - _totals.expense)}</strong></td>
+						<td></td>
+					</tr>
+			</table>
 			</c:if>
 		</div>
 	</div>

@@ -9,6 +9,11 @@ public class YearlyAssetStatus {
 		this.year = y;
 	}
 	
+	public void add(YearlyAssetStatus other) {
+		setIncome(getIncome() + other.getIncome());
+		setExpense(getExpense() + other.getExpense());
+	}
+	
 	public int getYear() {
 		return year;
 	}

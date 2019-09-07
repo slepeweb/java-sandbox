@@ -300,7 +300,7 @@ public class Util {
 			
 			inner = inner.
 					replace("__splitOptionsTemplate__", splitOptions.toString()).
-					replace("[memo]", comp.getMemo()).
+					replace("[memo]", comp.getMemo() == null ? "" : comp.getMemo()).
 					replace("[amount]", formatPounds(comp.getAmount()));
 			
 			innerBuilder.append(inner);
