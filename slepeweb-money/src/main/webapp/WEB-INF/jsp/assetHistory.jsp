@@ -18,13 +18,14 @@
 	}
 
 	.totals {
-		font-size: 1.5em;
+		font-weight: bold;
+		font-size: 1.2em;
 	}
 </c:set>
 
 <mny:standardLayout>
 
-	<h2 class="inline-block">Chart results <c:if test="${not empty param.flash}"><span 
+	<h2 class="inline-block">Asset History <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
 			
 	<div id="tabs">
@@ -39,8 +40,7 @@
 				
 				<table>
 					<tr>
-						<th></th>
-						<c:forTokens items="Income,Expense,Net,Balance" delims="," var="_label">
+						<c:forTokens items="Year End,Income,Expense,Net,Balance" delims="," var="_label">
 							<th>${_label}</th>
 						</c:forTokens>
 					</tr>
@@ -58,9 +58,9 @@
 										
 					<tr class="totals">
 						<td>Totals</td>
-						<td><strong>${mon:formatPounds(_totals.income)}</strong></td>
-						<td><strong>${mon:formatPounds(_totals.expense)}</strong></td>
-						<td><strong>${mon:formatPounds(_totals.income - _totals.expense)}</strong></td>
+						<td>${mon:formatPounds(_totals.income)}</td>
+						<td>${mon:formatPounds(_totals.expense)}</td>
+						<td>${mon:formatPounds(_totals.income - _totals.expense)}</td>
 						<td></td>
 					</tr>
 			</table>
@@ -71,7 +71,7 @@
 	<script>
 		$(function() {
 			$("#tabs").tabs({
-				active: ${mon:tertiaryOp(not empty _assetSVG, 1, 0)}
+				active: 0;
 			});
 		});
 	</script>

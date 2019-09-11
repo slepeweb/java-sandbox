@@ -17,6 +17,11 @@
 	#form-tab, #results-tab {
 		padding: 0.5em;
 	}
+	
+	.table-summary {
+		font-weight: bold;
+		font-size: 1.2em;
+	}
 </c:set>
 
 <c:set var="_formActionUrl" scope="request">/search/post/${_ss.id}</c:set>

@@ -4,7 +4,8 @@
 	
 <mny:standardLayout>
 	<div class="right">
-		<a href="/money/index/by/dates">Re-index</a><br />
+		<a href="${_ctxPath}/index/by/dates">Re-index</a><br />
+		<a href="${_ctxPath}/asset/history">Asset history</a><br />
 	</div>
 	
 	<h2>Dashboard</h2>

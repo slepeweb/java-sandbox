@@ -20,10 +20,12 @@ import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.CategoryGroup;
 import com.slepeweb.money.bean.CategoryInput;
+import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.MultiCategoryCounter;
 import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
+import com.slepeweb.money.bean.solr.SolrResponse;
 
 @Controller
 @RequestMapping(value="/search")
@@ -87,11 +89,13 @@ public class SearchController extends BaseController {
 				setSaved(new Timestamp(new Date().getTime()));
 		
 		saveSearch(ss);
-		setCommonModelAttributes(ss, params, EXECUTE_MODE, model);		
+		setCommonModelAttributesAndSearchIfExecuteMode(ss, params, EXECUTE_MODE, model);		
 		return RESULTS_VIEW;
 	}	
 	
-	private void setCommonModelAttributes(SavedSearch ss, SolrParams params, String formMode, ModelMap model) {
+	private void setCommonModelAttributesAndSearchIfExecuteMode(
+			SavedSearch ss, SolrParams params, String formMode, ModelMap model) {
+		
 		model.addAttribute(SAVED_SEARCH_ATTR, ss);		
 		model.addAttribute(PARAMS_ATTR, params);		
 		model.addAttribute(CATEGORY_GROUP_ATTR, getCategoryGroup(params.getCategories()));				
@@ -101,7 +105,14 @@ public class SearchController extends BaseController {
 		model.addAttribute(FORM_MODE_ATTR, formMode);
 
 		if (formMode.equals(EXECUTE_MODE)) {
-			model.addAttribute(SEARCH_RESPONSE_ATTR, this.solrService.query(params));				
+			SolrResponse<FlatTransaction> resp = this.solrService.query(params);
+			model.addAttribute(SEARCH_RESPONSE_ATTR, resp);		
+			long credit = 0;
+			for (FlatTransaction ft : resp.getResults()) {
+				credit += ft.getAmount();
+			}
+			
+			model.addAttribute("_totalCredit", credit);		
 		}
 	}
 	
@@ -155,7 +166,7 @@ public class SearchController extends BaseController {
 		
 		model.addAttribute("_numDeletableTransactions", 0);
 		model.addAttribute(CategoryController.ALL_MAJOR_CATEGORIES_ATTR, this.categoryService.getAllMajorValues());
-		setCommonModelAttributes(ss, params, UPDATE_MODE, model);		
+		setCommonModelAttributesAndSearchIfExecuteMode(ss, params, UPDATE_MODE, model);		
 		return FORM_VIEW;
 	}
 	
@@ -208,7 +219,7 @@ public class SearchController extends BaseController {
 		SolrParams params = toSolrParams(ss.getJson()).setPageNum(page);
 		
 		model.addAttribute(SAVED_SEARCH_ATTR, ss);		
-		setCommonModelAttributes(ss, params, EXECUTE_MODE, model);		
+		setCommonModelAttributesAndSearchIfExecuteMode(ss, params, EXECUTE_MODE, model);		
 		return RESULTS_VIEW;
 	}	
 	
