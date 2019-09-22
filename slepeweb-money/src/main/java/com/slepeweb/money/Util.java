@@ -180,11 +180,27 @@ public class Util {
 	}
 	
 	public static Long toLong(String s) {
+		return toLong(s, 0L);
+	}
+	
+	public static Long toLong(String s, Long dflt) {
 		if (StringUtils.isNumeric(s)) {
 			return Long.valueOf(s);
 		}
 		
-		return 0L;
+		return dflt;
+	}
+	
+	public static Integer toInteger(String s) {
+		return toInteger(s, 0);
+	}
+	
+	public static Integer toInteger(String s, Integer dflt) {
+		if (StringUtils.isNumeric(s)) {
+			return Integer.valueOf(s);
+		}
+		
+		return 0;
 	}
 	
 	public static float toPounds(long pence) {

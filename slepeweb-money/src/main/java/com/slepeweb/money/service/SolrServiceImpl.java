@@ -312,7 +312,7 @@ public class SolrServiceImpl implements SolrService {
 							qr.getHeader().toString()));
 
 					response.setPager(new SolrPager<FlatTransaction>(response.getTotalHits(), response.getResults(),
-							params.getConfig().getPageSize(), params.getPageNum()));
+							params.getPageSize(), params.getPageNum()));
 
 					return response;
 

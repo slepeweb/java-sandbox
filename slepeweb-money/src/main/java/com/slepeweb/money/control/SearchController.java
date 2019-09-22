@@ -64,6 +64,7 @@ public class SearchController extends BaseController {
 		// Create a single, default category group
 		model.addAttribute(CATEGORY_GROUP_ATTR, emptyCategoryGroup());		
 		model.addAttribute(FORM_MODE_ATTR, CREATE_MODE);
+		model.addAttribute(PARAMS_ATTR, new SolrParams(new SolrConfig()));
 		return FORM_VIEW;
 	}
 	
@@ -126,6 +127,7 @@ public class SearchController extends BaseController {
 			setMemo(req.getParameter("memo")).
 			setFrom(req.getParameter("from")).
 			setTo(req.getParameter("to")).
+			setPageSize(req.getParameter("pageSize")).
 			setPageNum(1);
 	}
 	

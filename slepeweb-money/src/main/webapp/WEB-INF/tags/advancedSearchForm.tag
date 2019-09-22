@@ -1,15 +1,16 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
-<c:if test="${not empty _params}">
+<%-- <c:if test="${not empty _params}"> --%>
 	<c:set var="_selectedAccountId" value="${_params.accountIdStr}" />
 	<c:set var="_selectedPayeeId" value="${_params.payeeIdStr}" />
 	<c:set var="_selectedPayeeName" value="${_params.payeeName}" />
 	<c:set var="_selectedMajorCategory" value="${_params.majorCategory}" />
 	<c:set var="_selectedMemoTerms" value="${_params.memo}" />
+	<c:set var="_selectedPageSize" value="${_params.pageSize}" />
 	<c:set var="_selectedFrom" value="${mon:formatTimestamp(_params.from)}" />
 	<c:set var="_selectedTo" value="${mon:formatTimestamp(_params.to)}" />
-</c:if>
+<%-- </c:if> --%>
 
 <mny:multiCategoryInputSupport />
 <mny:multiCategoryJavascript />
@@ -22,8 +23,14 @@
 	        <td class="heading width25"><label for="name">Title</label></td>
 	        <td>
 	        	<input type="text" id="name" name="name"
-    				placeholder="Provide a title for this search" value="${_ss.name}" />
-	        	
+    					placeholder="Provide a title for this search" value="${_ss.name}" />	        	
+	        </td>
+	    </tr>
+	    <tr>
+	        <td class="heading"><label for="pageSize">Page size</label></td>
+	        <td>
+	        	<input type="text" id="pageSize" name="pageSize"
+    					placeholder="Specify the page size" value="${_selectedPageSize}" />	        	
 	        </td>
 	    </tr>
 	    <tr>
@@ -76,14 +83,14 @@
 		
 		<c:choose><c:when test="${_formMode eq 'create'}">
 			<input type="submit" value="Save" />
-			<input id="cancel-button" type="button" value="Cancel" />
 		</c:when><c:when test="${_formMode eq 'update'}">
 			<input type="submit" value="Update" />
-			<input id="cancel-button" type="button" value="Cancel" />
 			<input type="button" value="Delete search" id="delete-button" />
 		</c:when><c:when test="${_formMode eq 'execute'}">
 			<input type="submit" value="Update and re-execute" /> 
 		</c:when></c:choose>
+			
+		<input id="cancel-button" type="button" value="Cancel" />
 
 </form>		  	
 

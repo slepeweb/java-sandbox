@@ -169,13 +169,7 @@ public class SolrParams {
 	}
 
 	public SolrParams setPayeeId(String payeeId) {
-		if (StringUtils.isNumeric(payeeId)) {
-			this.payeeId = Long.valueOf(payeeId);
-		}
-		else {
-			this.payeeId = null;
-		}
-		
+		this.payeeId = Util.toLong(payeeId, null);
 		return this;
 	}
 
@@ -194,13 +188,7 @@ public class SolrParams {
 	}
 
 	public SolrParams setCategoryId(String categoryId) {
-		if (StringUtils.isNumeric(categoryId)) {
-			this.categoryId = Long.valueOf(categoryId);
-		}
-		else {
-			this.categoryId = null;
-		}
-		
+		this.categoryId = Util.toLong(categoryId, null);
 		return this;
 	}
 
@@ -219,13 +207,7 @@ public class SolrParams {
 	}
 
 	public SolrParams setAccountId(String accountId) {
-		if (StringUtils.isNumeric(accountId)) {
-			this.accountId = Long.valueOf(accountId);
-		}
-		else {
-			this.accountId = null;
-		}
-		
+		this.accountId = Util.toLong(accountId, null);		
 		return this;
 	}
 
@@ -236,8 +218,14 @@ public class SolrParams {
 		return this.pageSize;
 	}
 
+	@JsonSetter("pageSize")
 	public SolrParams setPageSize(int pageSize) {
 		this.pageSize = pageSize;
+		return this;
+	}
+
+	public SolrParams setPageSize(String s) {
+		this.pageSize = Util.toInteger(s, this.config.getPageSize());
 		return this;
 	}
 
@@ -259,12 +247,7 @@ public class SolrParams {
 	}
 
 	public SolrParams setPageNum(String s) {
-		if (StringUtils.isNumeric(s)) {
-			this.pageNum = Integer.parseInt(s);
-		}
-		else {
-			this.pageNum = 1;
-		}
+		this.pageNum = Util.toInteger(s, 1);
 		return this;
 	}
 

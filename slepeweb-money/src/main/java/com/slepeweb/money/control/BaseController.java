@@ -76,7 +76,8 @@ public class BaseController {
 	protected String saveSearch(SavedSearch ss) {
 		String flash;
 		try {
-			this.savedSearchService.save(ss);
+			SavedSearch saved = this.savedSearchService.save(ss);
+			ss.setId(saved.getId());
 			flash = "success|Search successfully updated";
 		}
 		catch (Exception e) {
