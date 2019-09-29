@@ -19,7 +19,7 @@
 			</tr>
 			<c:forEach items="${_searches}" var="_ss">
 				<tr>
-					<td><a href="${_ctxPath}/search/edit/${_ss.id}">${_ss.saved}</a></td>
+					<td><a href="${_ctxPath}/search/edit/${_ss.id}">${_ss.savedWithMinutes}</a></td>
 					<td>${_ss.name}</td>
 					<td><i class="far fa-caret-square-right" title="Execute this search" data-id="${_ss.id}"></i></td>
 				</tr>

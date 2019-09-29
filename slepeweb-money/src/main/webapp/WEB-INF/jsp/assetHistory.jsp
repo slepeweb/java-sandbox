@@ -71,7 +71,7 @@
 	<script>
 		$(function() {
 			$("#tabs").tabs({
-				active: 0;
+				active: 0
 			});
 		});
 	</script>

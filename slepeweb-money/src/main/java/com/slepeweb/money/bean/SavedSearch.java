@@ -1,10 +1,13 @@
 package com.slepeweb.money.bean;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang3.StringUtils;
 
 public class SavedSearch extends DbEntity {
+	
+	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd @ HH:mm");
 	
 	private String name, type, json;
 	private Timestamp saved;
@@ -114,6 +117,10 @@ public class SavedSearch extends DbEntity {
 
 	public Timestamp getSaved() {
 		return saved;
+	}
+	
+	public String getSavedWithMinutes() {
+		return SDF.format(this.saved);
 	}
 
 	public SavedSearch setSaved(Timestamp saved) {
