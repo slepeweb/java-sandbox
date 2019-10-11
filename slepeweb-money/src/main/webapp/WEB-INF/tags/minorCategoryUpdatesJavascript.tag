@@ -33,8 +33,8 @@
 		return deferred.promise();
 	}
 	
-	$(function(){
-		$("input[name^='major']").change(function(e) {	
+	var _resetMajorCategoryChangeBehaviours = function() {
+		$("input[name^='major']").off().change(function(e) {	
 			var promet = _updateMinorCategories($(this));
 			promet.done(function(res){
 				//window.alert(res);
@@ -44,5 +44,9 @@
 				//window.alert(res);
 			});
 		});
+	}
+		
+	$(function(){
+		_resetMajorCategoryChangeBehaviours();
 	});
 </script>

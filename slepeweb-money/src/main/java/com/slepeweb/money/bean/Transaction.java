@@ -45,12 +45,19 @@ public class Transaction extends DbEntity {
 		setSource(source.getSource());
 		setSplit(source.isSplit());
 		
-		assimilateSplits(source);
+		assimilateSplits(source.getSplits());
 	}
 	
-	public void assimilateSplits(Transaction source) {
+//	public void assimilateSplits(Transaction source) {
+//		getSplits().clear();
+//		for (SplitTransaction st : source.getSplits()) {
+//			getSplits().add(st.setTransactionId(getId()));
+//		}
+//	}
+	
+	public void assimilateSplits(List<SplitTransaction> source) {
 		getSplits().clear();
-		for (SplitTransaction st : source.getSplits()) {
+		for (SplitTransaction st : source) {
 			getSplits().add(st.setTransactionId(getId()));
 		}
 	}

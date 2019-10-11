@@ -48,12 +48,13 @@
 		  var debitOrCredit = $("input[name='debitorcredit']:checked").val();
 		  if (debitOrCredit == 'debit') {
 			  total = -total;
+			  sum = -sum;
 		  }
 		  
 		  if (Math.abs(total - sum) > 0.001) {
 				var d = $("#splits-error-dialog");
 				var s = d.html();
-				d.html(s.replace("__totalamount__", total.toString()).replace("__splitamounts__", sum.toFixed(2)));
+				d.html(s.replace("__totalamount__", total.toFixed(2)).replace("__splitamounts__", sum.toFixed(2)));
 				d.dialog("open");
 				
 				if (e) {

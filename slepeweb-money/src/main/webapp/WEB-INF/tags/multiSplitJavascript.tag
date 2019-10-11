@@ -23,6 +23,7 @@
 		
 		$(inner).insertBefore(button);
 		_resetSplitButtonClickBehaviours();
+		_resetMajorCategoryChangeBehaviours();
 	}
 	
 	var _resetSplitButtonClickBehaviours = function() {

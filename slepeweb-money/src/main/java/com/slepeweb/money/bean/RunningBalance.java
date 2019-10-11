@@ -2,18 +2,18 @@ package com.slepeweb.money.bean;
 
 public class RunningBalance extends Transaction {
 
-	private String balance;
+	private long balance;
 	
 	public RunningBalance(Transaction t) {
 		assimilate(t);
 		setId(t.getId());
 	}
 
-	public String getBalance() {
+	public long getBalance() {
 		return balance;
 	}
 
-	public RunningBalance setBalance(String balance) {
+	public RunningBalance setBalance(long balance) {
 		this.balance = balance;
 		return this;
 	}

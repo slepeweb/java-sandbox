@@ -77,4 +77,16 @@
 		<function-signature>java.lang.String encodeUrl(java.lang.String)</function-signature>
 	</function>
 	
+	<function>
+		<name>displayAmountNS</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.String displayAmountNS(long)</function-signature>
+	</function>
+	
+	<function>
+		<name>displayAmountWS</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.String displayAmountWS(long)</function-signature>
+	</function>
+	
 </taglib>

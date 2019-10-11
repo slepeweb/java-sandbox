@@ -776,4 +776,9 @@ span.flash {
 input[type="submit"] {
 	margin-top: 1.0em;
 }
-
+	
+span {
+	&.debit-amount {
+		color: red;
+	}
+}

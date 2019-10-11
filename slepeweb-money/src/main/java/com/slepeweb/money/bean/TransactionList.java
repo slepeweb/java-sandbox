@@ -2,8 +2,6 @@ package com.slepeweb.money.bean;
 
 import java.sql.Timestamp;
 
-import com.slepeweb.money.Util;
-
 public class TransactionList {
 	private Account account;
 	private RunningBalance[] runningBalances;
@@ -68,9 +66,4 @@ public class TransactionList {
 	public void setBalance(long balance) {
 		this.balance = balance;
 	}	
-	
-	public String getBalanceStr() {
-		return Util.formatPounds(getBalance());
-	}
-
 }

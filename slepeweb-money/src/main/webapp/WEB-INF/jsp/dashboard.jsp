@@ -16,7 +16,7 @@
 				<tr>
 					<td class="name"><a href="${_ctxPath}/transaction/list/${_a.id}">${_a.name}</a></td>
 					<td class="type">${_a.type}</td>
-					<td class="currency amount">&pound;${_a.balanceStr}</td>
+					<td class="currency amount">${mon:displayAmountWS(_a.balance)}</td>
 				</tr>
 			</c:forEach>
 		
@@ -25,7 +25,7 @@
 				<tr>
 					<td><c:if test="${_status.first}"><strong>Summary</strong></c:if></td>
 					<td class="type">${_pair.left}</td>
-					<td class="currency amount">&pound;${mon:formatPounds(_pair.right)}</td>
+					<td class="currency amount">${mon:displayAmountWS(_pair.right)}</td>
 				</tr>
 			</c:forEach>
 			
@@ -33,7 +33,7 @@
 			<tr>
 				<td></td>
 				<td><h3>Total</h3></td>
-				<td class="currency amount">&pound;${mon:formatPounds(_grandTotal)}</td>
+				<td class="currency amount">${mon:displayAmountWS(_grandTotal)}</td>
 			</tr>
 		</table>
 		

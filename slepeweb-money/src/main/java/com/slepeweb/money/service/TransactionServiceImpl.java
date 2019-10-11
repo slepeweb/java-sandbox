@@ -1,6 +1,7 @@
 package com.slepeweb.money.service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.Transfer;
 import com.slepeweb.money.except.DataInconsistencyException;
@@ -66,6 +68,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		if (pt.isDefined4Insert()) {
 			Transaction t;
+			List<SplitTransaction> revisedSplits = new ArrayList<SplitTransaction>(pt.getSplits());
 			
 			if (pt.isInDatabase()) {
 				Transaction dbRecord = get(pt.getId());	
@@ -81,7 +84,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			}
 			
 			// Also save the new transaction's splits, if any
-			t.assimilateSplits(pt);
+			t.assimilateSplits(revisedSplits);
 			t = this.splitTransactionService.save(t);
 			
 			// Keep a reference to the previous revision of this transaction, for

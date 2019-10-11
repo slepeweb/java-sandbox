@@ -3,6 +3,13 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <c:set var="_urlPrefix">${_ctxPath}/transaction/list/${_accountId}</c:set>
+
+<c:set var="_extraCss" scope="request">
+	.total-amount {
+		border-top: 1px solid black;
+	}
+</c:set>
+
 	
 <mny:standardLayout>
 	<div class="right">
@@ -22,7 +29,7 @@
 	</div>
 	
 	<div class="inline-block">
-		<p><strong>Today's balance: <span class="scale_3-2">&pound;${_tl.balanceStr}</span></strong></p>
+		<p><strong>Today's balance: <span class="scale_3-2">${mon:displayAmountWS(_tl.balance)}</span></strong></p>
 	</div>
 	
 	<c:if test="${fn:length(_yearSelector) gt 1}">
@@ -71,32 +78,33 @@
 				
 				<c:choose><c:when test="${not _trn.split and not _trn.transfer}">
 					<td class="category">${_trn.category}</td>
-					<td class="currency amount">${_trn.amountInPounds}</td>
+					<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 					<td class="memo">${_trn.memo}</td>
 				</c:when><c:when test="${_trn.transfer}">
 					<td class="category">Transfer</td>
-					<td class="currency amount">${_trn.amountInPounds}</td>
+					<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 					<td class="memo">${_trn.memo}</td>
 				</c:when><c:when test="${_trn.split}">
-					<td>(Split transaction) Total:<br />
+					<td>
 						<c:forEach items="${_trn.splits}" var="_split">
 								${_split.category}<br />
-						</c:forEach>						
+						</c:forEach>
 					</td>
-					<td class="currency amount">${_trn.amountInPounds}<br />
+					<td class="currency amount">
 						<c:forEach items="${_trn.splits}" var="_split">
-								${_split.amountInPounds}<br />
-						</c:forEach>						
+								${mon:displayAmountNS(_split.amount)}<br />
+						</c:forEach>	
+						<span class="total-amount">${mon:displayAmountNS(_trn.amount)}</span><br />					
 					</td>
 					<td> 
-						${_trn.memo}<br />
 						<c:forEach items="${_trn.splits}" var="_split">
 								${_split.memo}<br />
 						</c:forEach>						
+						Total<br />
 					</td>
 				</c:when></c:choose>
 				
-				<td class="currency amount">${_trn.balance}</td>
+				<td class="currency amount">${mon:displayAmountNS(_trn.balance)}</td>
 			</tr>
 		</c:forEach>
 	</table>

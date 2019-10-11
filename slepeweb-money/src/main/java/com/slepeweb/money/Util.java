@@ -25,6 +25,10 @@ public class Util {
 		return  d != null ? d.multiply(ONE_HUNDRED).longValue() : -1L;
 	}
 	
+	public static String formatPositivePounds(long pence) {
+		return formatPounds(pence < 0 ? -pence : pence);
+	}
+	
 	public static String formatPounds(long pence) {
 		return String.format("%,.2f", pence / 100.0F);
 	}
@@ -39,6 +43,13 @@ public class Util {
 				return Long.valueOf(cleanAmount(parts[0]));
 			}
 			else if (parts.length == 2){
+				if (parts[1].length() == 1) {
+					parts[1] = parts[1] + "0";
+				}
+				else if (parts[1].length() > 2) {
+					parts[1] = parts[1].substring(0, 2);
+				}
+				
 				return ((Long.valueOf(cleanAmount(parts[0])).longValue() * 100) + 
 						(multiplier * (Long.valueOf(parts[1])).longValue()));
 			}
@@ -317,11 +328,37 @@ public class Util {
 			inner = inner.
 					replace("__splitOptionsTemplate__", splitOptions.toString()).
 					replace("[memo]", comp.getMemo() == null ? "" : comp.getMemo()).
-					replace("[amount]", formatPounds(comp.getAmount()));
+					
+					/* Split amounts are always displayed as positive values, but are evaluated
+					 * according to whether the parent transaction is a debit or credit. */
+					replace("[amount]", formatPositivePounds(comp.getAmount()));
 			
 			innerBuilder.append(inner);
 		}
 		
 		return innerBuilder.toString();		
+	}
+	
+	public static String displayAmountNS(long amount) {
+		return displayAmount(amount, false);
+	}
+	
+	public static String displayAmountWS(long amount) {
+		return displayAmount(amount, true);
+	}
+	
+	private static String displayAmount(long amount, boolean prependSymbol) {
+		if (amount < 0) {
+			return String.format(
+					"<span class=\"debit-amount\">%s%s</span>", 
+					prependSymbol ? "&pound;" : "", 
+					formatPounds(amount));
+		}
+		else {
+			return String.format(
+					"%s%s", 
+					prependSymbol ? "&pound;" : "", 
+					formatPounds(amount));
+		}
 	}
 }
