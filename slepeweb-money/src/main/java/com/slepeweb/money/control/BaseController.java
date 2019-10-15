@@ -73,15 +73,15 @@ public class BaseController {
 		return searches;
 	}
 	
-	protected String saveSearch(SavedSearch ss) {
+	protected String storeSavedSearch(SavedSearch ss) {
 		String flash;
 		try {
 			SavedSearch saved = this.savedSearchService.save(ss);
 			ss.setId(saved.getId());
-			flash = "success|Search successfully updated";
+			flash = "success|Search successfully saved";
 		}
 		catch (Exception e) {
-			flash = "failure|Failed to update search";
+			flash = "failure|Failed to save search";
 		}
 		
 		return flash;

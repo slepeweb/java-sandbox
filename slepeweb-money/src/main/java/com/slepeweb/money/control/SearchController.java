@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -23,6 +24,7 @@ import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.MultiCategoryCounter;
 import com.slepeweb.money.bean.SavedSearch;
+import com.slepeweb.money.bean.SavedSearchSupport;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
@@ -47,54 +49,21 @@ public class SearchController extends BaseController {
 	private static final String RESULTS_VIEW = "searchResults";
 	
 	
-	@RequestMapping(value="/list", method=RequestMethod.GET)
-	public String list(ModelMap model) {
-		model.addAttribute(SEARCH_LIST_ATTR, filterSavedSearches(ADVANCED_TYPE));
-		return LIST_VIEW;
+	private SavedSearch setSavedSearch(SavedSearch ss, String name, SolrParams params) {
+		return ss.
+			setType(ADVANCED_TYPE).
+			setName(name).
+			setJson(toJson(params)).
+			setSaved(new Timestamp(new Date().getTime()));
 	}
-	
-	// Empty search definition form, for adding a new search
-	@RequestMapping(value="/create", method=RequestMethod.GET)
-	public String create(ModelMap model) {
-		
-		model.addAttribute(ALL_ACCOUNTS_ATTR, this.accountService.getAll(true));
-		model.addAttribute(ALL_PAYEES_ATTR, getAllPayees());
-		model.addAttribute(CategoryController.ALL_MAJOR_CATEGORIES_ATTR, this.categoryService.getAllMajorValues());
-		
-		// Create a single, default category group
-		model.addAttribute(CATEGORY_GROUP_ATTR, emptyCategoryGroup());		
-		model.addAttribute(FORM_MODE_ATTR, CREATE_MODE);
-		model.addAttribute(PARAMS_ATTR, new SolrParams(new SolrConfig()));
-		return FORM_VIEW;
-	}
-	
+
 	private CategoryGroup emptyCategoryGroup() {
 		CategoryGroup grp = new CategoryGroup().setId(1).setLabel("unset");
 		grp.getCategories().add(new CategoryInput().setId(1));
 		return grp;
 	}
-	
-	// Execute the search using form data, for a specific page.
-	// Also save the search.
-	@RequestMapping(value="/post/{id}", method=RequestMethod.POST)
-	public String post(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-		
-		SolrParams params = getSearchCriteriaFromRequest(req).setPageNum(1);
-		SavedSearch ss = this.savedSearchService.get(id);
-		params.setCategories(getCategoriesFromRequest(req));
-				
-		ss.
-				setType(ADVANCED_TYPE).
-				setName(req.getParameter("name")).
-				setJson(toJson(params)).
-				setSaved(new Timestamp(new Date().getTime()));
-		
-		saveSearch(ss);
-		setCommonModelAttributesAndSearchIfExecuteMode(ss, params, EXECUTE_MODE, model);		
-		return RESULTS_VIEW;
-	}	
-	
-	private void setCommonModelAttributesAndSearchIfExecuteMode(
+
+	private void setCommonModelAttributes(
 			SavedSearch ss, SolrParams params, String formMode, ModelMap model) {
 		
 		model.addAttribute(SAVED_SEARCH_ATTR, ss);		
@@ -104,17 +73,19 @@ public class SearchController extends BaseController {
 		model.addAttribute(ALL_PAYEES_ATTR, getAllPayees());
 		model.addAttribute(JSON_ATTR, Util.encodeUrl(toJson(params)));		
 		model.addAttribute(FORM_MODE_ATTR, formMode);
-
-		if (formMode.equals(EXECUTE_MODE)) {
-			SolrResponse<FlatTransaction> resp = this.solrService.query(params);
-			model.addAttribute(SEARCH_RESPONSE_ATTR, resp);		
-			long credit = 0;
-			for (FlatTransaction ft : resp.getResults()) {
-				credit += ft.getAmount();
-			}
-			
-			model.addAttribute("_totalCredit", credit);		
+		model.addAttribute(CategoryController.ALL_MAJOR_CATEGORIES_ATTR, 
+				this.categoryService.getAllMajorValues());
+	}
+	
+	private void executeSearch(SolrParams params, ModelMap model) {
+		SolrResponse<FlatTransaction> resp = this.solrService.query(params);
+		model.addAttribute(SEARCH_RESPONSE_ATTR, resp);		
+		long credit = 0;
+		for (FlatTransaction ft : resp.getResults()) {
+			credit += ft.getAmount();
 		}
+		
+		model.addAttribute("_totalCredit", credit);		
 	}
 	
 	private SolrParams getSearchCriteriaFromRequest(HttpServletRequest req) {
@@ -131,6 +102,37 @@ public class SearchController extends BaseController {
 			setPageNum(1);
 	}
 	
+	private CategoryGroup getCategoryGroup(List<Category> categories) {
+		CategoryGroup grp = new CategoryGroup().setId(1);
+		CategoryInput ci;
+		
+		if (categories != null && categories.size() > 0) {
+			for (Category c : categories) {
+				ci = new CategoryInput().
+						setMajor(c.getMajor()).
+						setMinor(c.getMinor()).
+						setOptions(this.categoryService.getAllMinorValues(c.getMajor()));
+				ci.setExclude(c.isExclude());
+				grp.getCategories().add(ci);
+						
+			}
+			
+			return grp;
+		}
+		
+		return emptyCategoryGroup();
+	}
+
+	private static SolrParams toSolrParams(String jsonPacket) {
+	
+		try {
+			return new ObjectMapper().readValue(jsonPacket, SolrParams.class);
+		} catch (Exception e) {
+			LOG.error("Jackson marshalling error", e);
+		}
+		return null;
+	}
+
 	private List<Category> getCategoriesFromRequest(HttpServletRequest req) {
 		String countersJson = req.getParameter("counterStore");
 		List<MultiCategoryCounter> counters = fromJson(new TypeReference<List<MultiCategoryCounter>>() {}, countersJson);
@@ -140,26 +142,79 @@ public class SearchController extends BaseController {
 		return grp.toCategoryList();
 	}
 	
+	private SavedSearchSupport processFormSubmission(HttpServletRequest req, SavedSearch ss) {
+		SolrParams params = getSearchCriteriaFromRequest(req);
+		params.setCategories(getCategoriesFromRequest(req));
+				
+		ss = setSavedSearch(
+				ss,
+				req.getParameter("name"),
+				params);
+		
+		String flash = storeSavedSearch(ss);
+		
+		return new SavedSearchSupport().setSavedSearch(ss).setSolrParams(params).setFlash(flash);
+	}
+	
+	private RedirectView redirect(String webContext, String path, String flash) {
+		return new RedirectView(String.format("%s%s?flash=%s", 
+				webContext, path, Util.encodeUrl(flash)));
+	}
+	
+	private boolean isExecuteOption(HttpServletRequest req) {
+		String p = req.getParameter("submit-option");
+		return p != null && StringUtils.containsIgnoreCase(p, "execute");
+	}
+	
+	@RequestMapping(value="/list", method=RequestMethod.GET)
+	public String list(ModelMap model) {
+		model.addAttribute(SEARCH_LIST_ATTR, filterSavedSearches(ADVANCED_TYPE));
+		return LIST_VIEW;
+	}
+
+	// Empty search definition form, for adding a new search
+	@RequestMapping(value="/create", method=RequestMethod.GET)
+	public String create(ModelMap model) {
+		
+		setCommonModelAttributes(null, new SolrParams(new SolrConfig()), CREATE_MODE, model);		
+		// Override previous setting ...
+		model.addAttribute(CATEGORY_GROUP_ATTR, emptyCategoryGroup());				
+		return FORM_VIEW;
+	}
+
 	// Save a newly created search
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	public RedirectView save(HttpServletRequest req, ModelMap model) {
 		
-		SolrParams params = getSearchCriteriaFromRequest(req);
-		params.setCategories(getCategoriesFromRequest(req));
-				
-		SavedSearch ss = new SavedSearch().
-				setType(ADVANCED_TYPE).
-				setName(req.getParameter("name")).
-				setJson(toJson(params)).
-				setSaved(new Timestamp(new Date().getTime()));
+		SavedSearchSupport supp = processFormSubmission(req, new SavedSearch());
 		
-		String flash = saveSearch(ss);
-
-		return new RedirectView(String.format("%s/search/list?flash=%s", 
-				req.getContextPath(), Util.encodeUrl(flash)));
+		if (isExecuteOption(req)) {
+			return redirect(req.getContextPath(), 
+					String.format("/search/post/%d", supp.getSavedSearch().getId()), 
+					supp.getFlash());
+		}
+		
+		return redirect(req.getContextPath(), "/search/list", supp.getFlash());
 	}	
 	
-	// Form to edit an exisiting search
+	// Update the existing search criteria from the form data, then execute the search.
+	@RequestMapping(value="/post/{id}", method=RequestMethod.POST)
+	public String post(@PathVariable int id, HttpServletRequest req, ModelMap model) {
+		
+		SavedSearchSupport supp = processFormSubmission(req, this.savedSearchService.get(id));
+		
+		setCommonModelAttributes(supp.getSavedSearch(), supp.getSolrParams(), EXECUTE_MODE, model);		
+		executeSearch(supp.getSolrParams(), model);
+		return RESULTS_VIEW;
+	}
+
+	@RequestMapping(value="/execute/{id}", method=RequestMethod.GET)
+	public String execute(@PathVariable int id, HttpServletRequest req, ModelMap model) {
+		
+		return post(id, req, model);
+	}
+
+	// Form to edit an existing search
 	@RequestMapping(value="/edit/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable int id, HttpServletRequest req, ModelMap model) {
 		
@@ -167,26 +222,23 @@ public class SearchController extends BaseController {
 		SolrParams params = toSolrParams(ss.getJson());
 		
 		model.addAttribute("_numDeletableTransactions", 0);
-		model.addAttribute(CategoryController.ALL_MAJOR_CATEGORIES_ATTR, this.categoryService.getAllMajorValues());
-		setCommonModelAttributesAndSearchIfExecuteMode(ss, params, UPDATE_MODE, model);		
+		setCommonModelAttributes(ss, params, UPDATE_MODE, model);	
 		return FORM_VIEW;
 	}
 	
 	// Update an existing search on form submission
 	@RequestMapping(value="/update/{id}", method=RequestMethod.POST)
 	public RedirectView update(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-		SolrParams params = getSearchCriteriaFromRequest(req);
-		params.setCategories(getCategoriesFromRequest(req));
-
-		SavedSearch ss = 
-				this.savedSearchService.get(id).
-				setName(req.getParameter("name")).
-				setJson(toJson(params));
 		
-		String flash = saveSearch(ss);	
+		SavedSearchSupport supp = processFormSubmission(req, this.savedSearchService.get(id));		
 		
-		return new RedirectView(String.format("%s/search/list?flash=%s", 
-				req.getContextPath(), Util.encodeUrl(flash)));
+		if (isExecuteOption(req)) {
+			return redirect(req.getContextPath(), 
+					String.format("/search/post/%d", supp.getSavedSearch().getId()), 
+					supp.getFlash());
+		}
+		
+		return redirect(req.getContextPath(), "/search/list", supp.getFlash());
 	}
 	
 	// Delete an existing search
@@ -220,40 +272,11 @@ public class SearchController extends BaseController {
 		SavedSearch ss = this.savedSearchService.get(id);
 		SolrParams params = toSolrParams(ss.getJson()).setPageNum(page);
 		
-		model.addAttribute(SAVED_SEARCH_ATTR, ss);		
-		setCommonModelAttributesAndSearchIfExecuteMode(ss, params, EXECUTE_MODE, model);		
+		model.addAttribute(SAVED_SEARCH_ATTR, ss);	
+		
+		setCommonModelAttributes(ss, params, EXECUTE_MODE, model);		
+		executeSearch(params, model);
 		return RESULTS_VIEW;
-	}	
-	
-	private CategoryGroup getCategoryGroup(List<Category> categories) {
-		CategoryGroup grp = new CategoryGroup().setId(1);
-		CategoryInput ci;
-		
-		if (categories.size() > 0) {
-			for (Category c : categories) {
-				ci = new CategoryInput().
-						setMajor(c.getMajor()).
-						setMinor(c.getMinor()).
-						setOptions(this.categoryService.getAllMinorValues(c.getMajor()));
-				ci.setExclude(c.isExclude());
-				grp.getCategories().add(ci);
-						
-			}
-			
-			return grp;
-		}
-		
-		return emptyCategoryGroup();
-	}
-	
-	private static SolrParams toSolrParams(String jsonPacket) {
-
-		try {
-			return new ObjectMapper().readValue(jsonPacket, SolrParams.class);
-		} catch (Exception e) {
-			LOG.error("Jackson marshalling error", e);
-		}
-		return null;
 	}
 	
 }

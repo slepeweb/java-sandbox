@@ -82,12 +82,15 @@
 		
 		
 		<c:choose><c:when test="${_formMode eq 'create'}">
+			<input type="submit" name="submit-option" value="Execute" />
 			<input type="submit" value="Save" />
 		</c:when><c:when test="${_formMode eq 'update'}">
+			<input type="submit" name="submit-option" value="Execute" />
 			<input type="submit" value="Update" />
 			<input type="button" value="Delete search" id="delete-button" />
 		</c:when><c:when test="${_formMode eq 'execute'}">
-			<input type="submit" value="Update and re-execute" /> 
+			<input type="submit" name="submit-option" value="Re-execute" />
+			<input type="submit" value="Update" /> 
 		</c:when></c:choose>
 			
 		<input id="cancel-button" type="button" value="Cancel" />

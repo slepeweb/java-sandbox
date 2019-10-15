@@ -22,6 +22,11 @@
 		font-weight: bold;
 		font-size: 1.2em;
 	}
+	
+	input[name="submit-option"] {
+		border: 2px solid red;
+		background-color: #d99;
+	}
 </c:set>
 
 <c:set var="_formActionUrl" scope="request">/search/post/${_ss.id}</c:set>

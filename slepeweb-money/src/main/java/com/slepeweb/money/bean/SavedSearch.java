@@ -27,9 +27,9 @@ public class SavedSearch extends DbEntity {
 	public boolean isDefined4Insert() {
 		return 
 				this.saved != null && 
-				StringUtils.isNotBlank(this.type) &&
-				StringUtils.isNotBlank(this.name) &&
-				StringUtils.isNotBlank(this.json);
+				StringUtils.isNotBlank(getType()) &&
+				StringUtils.isNotBlank(getName()) &&
+				StringUtils.isNotBlank(getJson());
 	}
 	
 	@Override
@@ -53,7 +53,7 @@ public class SavedSearch extends DbEntity {
 	}
 	
 	public String getName() {
-		return this.name != null ? this.name : "";
+		return StringUtils.isNotBlank(this.name) ? this.name : "Not set";
 	}
 
 	public SavedSearch setName(String s) {

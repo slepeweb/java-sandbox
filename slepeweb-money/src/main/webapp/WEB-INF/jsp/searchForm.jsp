@@ -14,13 +14,17 @@
 	.ui-autocomplete {
 		font-size: 1.0em;
 	}
+	
+	input[name="submit-option"] {
+		border: 2px solid red;
+		background-color: #d99;
+	}
 </c:set>
 
 <mny:standardLayout>
 
 	<h2>${_pageHeading}</h2>
 	<mny:advancedSearchForm />		
-
 	<mny:entityDeletionDialog entity="search" mode="${_formMode}" id="${_ss.id}"/>
 
 </mny:standardLayout>
