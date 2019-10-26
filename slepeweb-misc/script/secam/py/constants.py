@@ -6,7 +6,7 @@ class Constants:
         
         self.webroot = "/var/www/html/"
         self.video_folder = self.webroot + "video/"
-        self.app_folder_web = "/secam/app/"
+        self.app_folder_web = "/"
         self.video_folder_web = self.app_folder_web + "video/"
         self.backup_register = "resource/backup-register"
         

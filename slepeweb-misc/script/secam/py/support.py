@@ -1,4 +1,4 @@
-import constants, document, subprocess, os, time
+import constants, document, subprocess, os, time, logging
 import re, smtplib
 from email.mime.text import MIMEText
 import dropbox
@@ -10,6 +10,7 @@ class Support:
     def __init__(self):
         self.const = constants.Constants();
         self.null_device = open(os.devnull, 'w')
+        self.logger = logging.getLogger("secam")
     
     def get_videos(self):
         a = []  
@@ -36,6 +37,8 @@ class Support:
 
     # Copy source_file to dropbox folder
     def backup_file(self, task, source_file):
+        self.logger.info("In backup-file")
+        msg = ""
         file_exists = False
         for d in self.get_videos_as_documents():
             if d.filename == source_file:
@@ -43,9 +46,11 @@ class Support:
                 break
                 
         if not file_exists:
-            task.add_event("File not found [%s]" % source_file)
-            return 
+            msg = "File not found [%s]" % source_file
+            task.add_event(msg)
+            return msg, False
     
+        self.logger.info("File exists [%s]" % source_file)
         access_token = '4wPGw33d4lcAAAAAAAAE2yEVxIuEqa8tJugyLWewvArmg79Hhd-9e9DUrDU4hKXj'
         dbx = dropbox.Dropbox(access_token)
     
@@ -53,8 +58,9 @@ class Support:
         try:
             dbx.users_get_current_account()
         except AuthError as err:
-            task.add_event("ERROR: Invalid access token")
-            return
+            msg = "ERROR: Invalid access token"
+            task.add_event(msg)
+            return msg, False
             
         source_file_path = self.const.video_folder + source_file
         dest_file_path = '/' + source_file
@@ -72,10 +78,12 @@ class Support:
                 else:
                     task.add_event(tmplt % (source_file_path, err)) 
                     
-                return
+                return "Error uploading file to Dropbox", False
                    
             self.update_backup_register(source_file)
-            task.add_event("Uploaded %s to dropbox path %s" % (source_file_path, dest_file_path))
+            msg = "Uploaded %s to dropbox path %s" % (source_file_path, dest_file_path)
+            task.add_event(msg)
+            return msg, True
     
     def update_backup_register(self, backup_filename):
         # Identify videos stored locally on webserver; store in a dictionary
@@ -179,7 +187,7 @@ class Support:
     def send_mail(self, task):
         mail_from = "donna@buttigieg.org.uk"
         mail_to = "george@buttigieg.org.uk"
-        web_page = "http://secam.slepeweb.com/py/index.py"
+        web_page = "http://www.slepeweb.com/secam/app/py/index.py"
         mail_body = """
         A security alarm (#%d) has been raised @ %s.
         

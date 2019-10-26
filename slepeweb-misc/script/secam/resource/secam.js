@@ -1,5 +1,5 @@
 var status = null;
-var rootPath = "/secam/app/";
+var rootPath = "/";
 var indexPath = rootPath + "py/index.py";
 var securePath = rootPath + "secure/index.py";
 
@@ -113,11 +113,11 @@ function manageLiveVideoPlayer(playing_live_video) {
 	if (playing_live_video) {
 		$("#video-table-wrapper").css("display", "none")
 		$("#controls").css("display", "none")
-		$("#live-video img").attr("src", "http://www.buttigieg.org.uk:8083/?action=stream")
+		$("#live-video img").attr("src", "http://secam.buttigieg.org.uk:8083/?action=stream")
 	} else {
 		$("#video-table-wrapper").css("display", "")
 		$("#controls").css("display", "")
-		$("#live-video img").attr("src", "/secam/app/resource/images/video-play.png")
+		$("#live-video img").attr("src", "/resource/images/video-play.png")
 	}
 }
 

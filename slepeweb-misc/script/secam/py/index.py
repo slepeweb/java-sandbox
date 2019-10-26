@@ -82,12 +82,12 @@ def head(req):
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Security camera application</title>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
-    <link rel="stylesheet" href="/secam/app/resource/style.css" />
-    <link rel="stylesheet" href="/secam/app/resource/colorbox.css" />
+    <link rel="stylesheet" href="/resource/style.css" />
+    <link rel="stylesheet" href="/resource/colorbox.css" />
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
-    <script src="/secam/app/resource/jquery.colorbox-min.js"></script>
-    <script src="/secam/app/resource/secam.js"></script>
+    <script src="/resource/jquery.colorbox-min.js"></script>
+    <script src="/resource/secam.js"></script>
   </head> 
   <body>
       <div id="main">

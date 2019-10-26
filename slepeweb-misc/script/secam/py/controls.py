@@ -4,7 +4,7 @@ def controls(req):
     if "Authorization" in req.headers_in:    
         s = """
             <table><tr>
-                <td><a href="/secam/app/log/secam.log">Show log</a></td>
+                <td><a href="/log/secam.log">Show log</a></td>
                 <td><button id="button-photo" value="photo">Take photo</button></td>
                 <td><button id="button-stopgo" value="stop">Pause surveillance</button></td></td>
                 <td><button id="button-refresh">Refresh</button></td>
@@ -20,7 +20,7 @@ def controls(req):
             
             <div id="live-video">
                 <h3>Play live video</h3>
-                <img src="/secam/app/resource/images/video-play.png" />                
+                <img src="/resource/images/video-play.png" />                
             </div>
             
             <p></p>

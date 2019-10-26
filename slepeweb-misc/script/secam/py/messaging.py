@@ -141,7 +141,7 @@ class SecamController:
             util.send(json.dumps(response))
             
         elif task.action == "backup":
-            reply, ok = self.support.backup_file(task.args["plik"])
+            reply, ok = self.support.backup_file(task, task.args["plik"])
             self.logger.info(reply)
             response = {"status": ok, "msg": reply}
             util.send(json.dumps(response))
