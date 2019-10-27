@@ -1,4 +1,4 @@
-import constants, document, subprocess, os, time, logging
+import constants, document, subprocess, os, time
 import re, smtplib
 from email.mime.text import MIMEText
 import dropbox
@@ -10,7 +10,6 @@ class Support:
     def __init__(self):
         self.const = constants.Constants();
         self.null_device = open(os.devnull, 'w')
-        self.logger = logging.getLogger("secam")
     
     def get_videos(self):
         a = []  
@@ -37,7 +36,6 @@ class Support:
 
     # Copy source_file to dropbox folder
     def backup_file(self, task, source_file):
-        self.logger.info("In backup-file")
         msg = ""
         file_exists = False
         for d in self.get_videos_as_documents():
@@ -50,7 +48,6 @@ class Support:
             task.add_event(msg)
             return msg, False
     
-        self.logger.info("File exists [%s]" % source_file)
         access_token = '4wPGw33d4lcAAAAAAAAE2yEVxIuEqa8tJugyLWewvArmg79Hhd-9e9DUrDU4hKXj'
         dbx = dropbox.Dropbox(access_token)
     
@@ -187,7 +184,7 @@ class Support:
     def send_mail(self, task):
         mail_from = "donna@buttigieg.org.uk"
         mail_to = "george@buttigieg.org.uk"
-        web_page = "http://www.slepeweb.com/secam/app/py/index.py"
+        web_page = "http://secam.buttigieg.org.uk/py/index.py"
         mail_body = """
         A security alarm (#%d) has been raised @ %s.
         
