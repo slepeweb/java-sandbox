@@ -17,7 +17,7 @@
 			<td class="account">${_trn.account}</td>			
 			<td class="payee">${_trn.payee}</td>
 			<td class="category"><c:choose><c:when test="${_trn.type eq '1'}">[Split transaction]</c:when><c:otherwise>${_trn.category}</c:otherwise></c:choose></td>			
-			<td class="currency amount">${mon:formatPounds(_trn.amount)}</td>
+			<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 			<td class="memo">${_trn.memo}</td>				
 		</tr>
 	</c:forEach>
@@ -27,7 +27,7 @@
 		<td></td>
 		<td></td>
 		<td>Total</td>
-		<td class="currency amount">${mon:formatPounds(_totalCredit)}</td>
+		<td class="currency amount">${mon:displayAmountNS(_totalCredit)}</td>
 		<td></td>
 	</tr>
 </table>

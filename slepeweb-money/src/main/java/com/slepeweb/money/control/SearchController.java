@@ -48,6 +48,7 @@ public class SearchController extends BaseController {
 	private static final String LIST_VIEW = "searchList";
 	private static final String RESULTS_VIEW = "searchResults";
 	
+	private static final int ADHOC_ID = -1;
 	
 	private SavedSearch setSavedSearch(SavedSearch ss, String name, SolrParams params) {
 		return ss.
@@ -151,19 +152,54 @@ public class SearchController extends BaseController {
 				req.getParameter("name"),
 				params);
 		
-		String flash = storeSavedSearch(ss);
+		SavedSearchSupport sss = new SavedSearchSupport().
+				setRequest(req).
+				setSavedSearch(ss).
+				setSolrParams(params).
+				setMode(req.getParameter("formMode"));
 		
-		return new SavedSearchSupport().setSavedSearch(ss).setSolrParams(params).setFlash(flash);
+		if (sss.getMode().equals(ADHOC_MODE) ||
+				sss.getMode().equals(CREATE_MODE) && isOption("execute", req)) {
+			
+			sss.setAdhoc(true);
+		}
+		else {
+			sss.
+				setSave(isOption("save", req)).
+				setExecute(isOption("execute", req));
+		}
+		
+		return sss;
 	}
 	
-	private RedirectView redirect(String webContext, String path, String flash) {
-		return new RedirectView(String.format("%s%s?flash=%s", 
-				webContext, path, Util.encodeUrl(flash)));
+	private RedirectView redirect2Execute(SavedSearchSupport supp) {
+		return redirect(
+				String.format(
+						"/search/get/%d?flash=%s", 
+						supp.getSavedSearch().getId(),
+						Util.encodeUrl(supp.getFlash())));
 	}
 	
-	private boolean isExecuteOption(HttpServletRequest req) {
+	private RedirectView redirect2Adhoc(SavedSearchSupport supp) {
+		return redirect(
+				String.format(
+						"/search/get/adhoc?flash=%s", 
+						Util.encodeUrl(supp.getFlash())));
+	}
+	
+	private RedirectView redirect2List(SavedSearchSupport supp) {
+		return redirect(
+				String.format("/search/list?flash=%s", 
+						Util.encodeUrl(supp.getFlash())));
+	}
+	
+	private RedirectView redirect(String url) {
+		return new RedirectView(url, true, true, false);
+	}
+	
+	private boolean isOption(String option, HttpServletRequest req) {
 		String p = req.getParameter("submit-option");
-		return p != null && StringUtils.containsIgnoreCase(p, "execute");
+		return p != null && StringUtils.containsIgnoreCase(p, option);
 	}
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)
@@ -175,9 +211,17 @@ public class SearchController extends BaseController {
 	// Empty search definition form, for adding a new search
 	@RequestMapping(value="/create", method=RequestMethod.GET)
 	public String create(ModelMap model) {
-		
-		setCommonModelAttributes(null, new SolrParams(new SolrConfig()), CREATE_MODE, model);		
-		// Override previous setting ...
+		return emptyForm(CREATE_MODE, model);		
+	}
+
+	// Empty search definition form, for adding a new search
+	@RequestMapping(value="/adhoc", method=RequestMethod.GET)
+	public String adhoc(ModelMap model) {
+		return emptyForm(ADHOC_MODE, model);		
+	}
+	
+	private String emptyForm(String mode, ModelMap model) {
+		setCommonModelAttributes(null, new SolrParams(new SolrConfig()), mode, model);		
 		model.addAttribute(CATEGORY_GROUP_ATTR, emptyCategoryGroup());				
 		return FORM_VIEW;
 	}
@@ -185,35 +229,42 @@ public class SearchController extends BaseController {
 	// Save a newly created search
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	public RedirectView save(HttpServletRequest req, ModelMap model) {
+		return save(req, new SavedSearch());
+	}
+	
+	// Update an existing search on form submission
+	@RequestMapping(value="/save/{id}", method=RequestMethod.POST)
+	public RedirectView save(@PathVariable int id, HttpServletRequest req, ModelMap model) {
+		return save(req, this.savedSearchService.get(id));
+	}
+
+	private RedirectView save(HttpServletRequest req, SavedSearch ss) {
+		SavedSearchSupport supp = processFormSubmission(req, ss);
 		
-		SavedSearchSupport supp = processFormSubmission(req, new SavedSearch());
-		
-		if (isExecuteOption(req)) {
-			return redirect(req.getContextPath(), 
-					String.format("/search/post/%d", supp.getSavedSearch().getId()), 
-					supp.getFlash());
+		if (supp.isAdhoc()) {
+			ss.setId(ADHOC_ID);
+			storeSavedSearch(ss);
+			return redirect2Adhoc(supp.setFlash(""));
+		}
+		else {
+			if (supp.isSave()) {
+				supp.setFlash(storeSavedSearch(ss));
+			}
+			else {
+				supp.setFlash("success|Search NOT saved");
+			}
+			
+			if (supp.isExecute()) {
+				if (! supp.isSave()) {
+					supp.setFlash("");
+				}
+				return redirect2Execute(supp);
+			}
 		}
 		
-		return redirect(req.getContextPath(), "/search/list", supp.getFlash());
-	}	
+		return redirect2List(supp);
+	}
 	
-	// Update the existing search criteria from the form data, then execute the search.
-	@RequestMapping(value="/post/{id}", method=RequestMethod.POST)
-	public String post(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-		
-		SavedSearchSupport supp = processFormSubmission(req, this.savedSearchService.get(id));
-		
-		setCommonModelAttributes(supp.getSavedSearch(), supp.getSolrParams(), EXECUTE_MODE, model);		
-		executeSearch(supp.getSolrParams(), model);
-		return RESULTS_VIEW;
-	}
-
-	@RequestMapping(value="/execute/{id}", method=RequestMethod.GET)
-	public String execute(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-		
-		return post(id, req, model);
-	}
-
 	// Form to edit an existing search
 	@RequestMapping(value="/edit/{id}", method=RequestMethod.GET)
 	public String edit(@PathVariable int id, HttpServletRequest req, ModelMap model) {
@@ -224,21 +275,6 @@ public class SearchController extends BaseController {
 		model.addAttribute("_numDeletableTransactions", 0);
 		setCommonModelAttributes(ss, params, UPDATE_MODE, model);	
 		return FORM_VIEW;
-	}
-	
-	// Update an existing search on form submission
-	@RequestMapping(value="/update/{id}", method=RequestMethod.POST)
-	public RedirectView update(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-		
-		SavedSearchSupport supp = processFormSubmission(req, this.savedSearchService.get(id));		
-		
-		if (isExecuteOption(req)) {
-			return redirect(req.getContextPath(), 
-					String.format("/search/post/%d", supp.getSavedSearch().getId()), 
-					supp.getFlash());
-		}
-		
-		return redirect(req.getContextPath(), "/search/list", supp.getFlash());
 	}
 	
 	// Delete an existing search
@@ -261,22 +297,24 @@ public class SearchController extends BaseController {
 	
 	// Execute a saved search
 	@RequestMapping(value="/get/{id}", method=RequestMethod.GET)
-	public String get(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-		return get(id, 1, req, model);
+	public String get(@PathVariable int id, ModelMap model) {
+		return get(id, 1, model);
+	}
+	
+	// Execute an ad-hoc search
+	@RequestMapping(value="/get/adhoc", method=RequestMethod.GET)
+	public String getAdhoc(ModelMap model) {
+		return get(ADHOC_ID, 1, model);
 	}
 	
 	// Execute the search
 	@RequestMapping(value="/get/{id}/{page}", method=RequestMethod.GET)
-	public String get(@PathVariable int id, @PathVariable int page, HttpServletRequest req, ModelMap model) {
-		
+	public String get(@PathVariable int id, @PathVariable int page, ModelMap model) {
 		SavedSearch ss = this.savedSearchService.get(id);
-		SolrParams params = toSolrParams(ss.getJson()).setPageNum(page);
-		
-		model.addAttribute(SAVED_SEARCH_ATTR, ss);	
-		
-		setCommonModelAttributes(ss, params, EXECUTE_MODE, model);		
+		SolrParams params = toSolrParams(ss.getJson()).setPageNum(page);		
+		model.addAttribute(SAVED_SEARCH_ATTR, ss);			
+		setCommonModelAttributes(ss, params, id == -1 ? ADHOC_MODE : UPDATE_MODE, model);		
 		executeSearch(params, model);
 		return RESULTS_VIEW;
-	}
-	
+	}	
 }

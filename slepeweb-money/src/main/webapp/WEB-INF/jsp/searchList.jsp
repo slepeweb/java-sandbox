@@ -5,7 +5,10 @@
 <mny:flash />
 		
 <mny:standardLayout>
-	<div class="right"><a href="${_ctxPath}/search/create">New search</a></div>
+	<div class="right">
+		<a href="${_ctxPath}/search/create">New search</a><br />
+		<a href="${_ctxPath}/search/adhoc">Ad-hoc</a>
+	</div>
 	
 	<h2>Saved searches <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
@@ -13,14 +16,14 @@
 	<c:choose><c:when test="${not empty _searches}">
 		<table>
 			<tr>
-				<th>Date created</th>
 				<th>Name</th>
+				<th>Date created</th>
 				<th>Execute</th>
 			</tr>
 			<c:forEach items="${_searches}" var="_ss">
 				<tr>
-					<td><a href="${_ctxPath}/search/edit/${_ss.id}">${_ss.savedWithMinutes}</a></td>
-					<td>${_ss.name}</td>
+					<td><a href="${_ctxPath}/search/edit/${_ss.id}">${_ss.name}</a></td>
+					<td>${_ss.savedWithMinutes}</td>
 					<td><i class="far fa-caret-square-right" title="Execute this search" data-id="${_ss.id}"></i></td>
 				</tr>
 			</c:forEach>			

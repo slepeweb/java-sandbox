@@ -27,7 +27,9 @@ public abstract class DbEntity {
 	}
 	
 	public boolean isInDatabase() {
-		return getId() > 0; 
+		// id = -1 is only relevant to the ad-hoc saved-search, so it's
+		// a bit of a hack to put this in the base controller ... sorry!
+		return getId() == -1 || getId() > 0; 
 	}
 	
 	/*

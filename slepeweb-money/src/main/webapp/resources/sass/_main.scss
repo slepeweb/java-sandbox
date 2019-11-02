@@ -135,7 +135,7 @@
 	}
 
 	header {
-		background-color: #dd9;
+		background-color: #ffddb3;
 		line-height: 1.0em;
 		
 		p {
@@ -580,6 +580,11 @@
 
 /* Footer */
 
+#header-wrapper {
+	padding-left: 0em;
+	padding-right: 0em;
+}
+
 #footer-wrapper {
 	padding: 1em 0;
 	box-shadow: inset 0px 10px 60px 0px rgba(0,0,0,0.15);
@@ -688,7 +693,7 @@
 
 #user-welcome {
 	cursor: pointer;
-	margin-right: 2em;
+	margin-right: 0.5em;
 	margin-top: 1.0em;
 }
 
@@ -696,6 +701,7 @@
 	text-decoration: none;
 	list-style: none;
 	display: inline-block;
+	padding-left: 0.5em;
 	
 	li {
 		display: inline-block;

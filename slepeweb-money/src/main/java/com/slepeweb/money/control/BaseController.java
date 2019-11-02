@@ -41,6 +41,7 @@ public class BaseController {
 	protected static final String CREATE_MODE = "create";
 	protected static final String UPDATE_MODE = "update";
 	protected static final String EXECUTE_MODE = "execute";
+	protected static final String ADHOC_MODE = "adhoc";
 
 	private static Logger LOG = Logger.getLogger(BaseController.class);
 	public static final String USER = "_user";

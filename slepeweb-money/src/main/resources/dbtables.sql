@@ -166,4 +166,5 @@ create table search
 	index idx_search (saved desc, name)
 ) ENGINE=InnoDB;
 
-
+insert into search(saved,name,type,json) values('2019-10-01 00:00:01','my search #9','advanced','{}');
+update search set id=-1 where id=1;

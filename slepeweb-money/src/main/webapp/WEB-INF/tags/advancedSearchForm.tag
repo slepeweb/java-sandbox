@@ -19,13 +19,16 @@
 
 <form id="advanced-search-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">	  
     <table id="multi-category-groupings">
-	    <tr>
-	        <td class="heading width25"><label for="name">Title</label></td>
-	        <td>
-	        	<input type="text" id="name" name="name"
-    					placeholder="Provide a title for this search" value="${_ss.name}" />	        	
-	        </td>
-	    </tr>
+	    <c:if test="${_formMode ne 'adhoc'}">
+		    <tr>
+		        <td class="heading width25"><label for="name">Title</label></td>
+		        <td>
+		        	<input type="text" id="name" name="name"
+	    					placeholder="Provide a title for this search" value="${_ss.name}" />	        	
+		        </td>
+		    </tr>
+	    </c:if>
+	    
 	    <tr>
 	        <td class="heading"><label for="pageSize">Page size</label></td>
 	        <td>
@@ -75,25 +78,31 @@
 	        	placeholder="Optional search window end date" /></td>
 	    </tr>
 	    
+	    <c:if test="${_formMode ne 'adhoc'}">
+		    <tr>
+		        <td class="heading"><label>Form submission option</label></td>
+		        <td>		
+						  <div>
+								<span id="save-option" class="radio-option"><input type="radio" name="submit-option" value="save" checked="checked" /> Save</span>
+								<span id="save-execute-option" class="radio-option"><input type="radio" name="submit-option" value="save-execute" /> Save then execute</span>
+								<span id="execute-option" class="radio-option"><input type="radio" name="submit-option" value="execute" /> Execute</span>
+							</div>
+		        </td>
+		    </tr>
+	    </c:if>
+	    
 		</table> 
 		
-		<br />
-		<input id="counter-store" type="hidden" name="counterStore" value="" />
+		<input id="counter-store" type="hidden" name="counterStore" value="" />		
+		<input type="hidden" name="formMode" value="${_formMode}" />		
+
+		<input type="submit" id="submit-button" value="Submit" title="Submit this form" />		
 		
-		
-		<c:choose><c:when test="${_formMode eq 'create'}">
-			<input type="submit" name="submit-option" value="Execute" />
-			<input type="submit" value="Save" />
-		</c:when><c:when test="${_formMode eq 'update'}">
-			<input type="submit" name="submit-option" value="Execute" />
-			<input type="submit" value="Update" />
-			<input type="button" value="Delete search" id="delete-button" />
-		</c:when><c:when test="${_formMode eq 'execute'}">
-			<input type="submit" name="submit-option" value="Re-execute" />
-			<input type="submit" value="Update" /> 
-		</c:when></c:choose>
+		<c:if test="${_formMode eq 'update'}">
+			<input type="button" value="Delete search" id="delete-button" title="Delete this search" />
+		</c:if>
 			
-		<input id="cancel-button" type="button" value="Cancel" />
+		<input id="cancel-button" type="button" value="Cancel" title="Return to list" />
 
 </form>		  	
 

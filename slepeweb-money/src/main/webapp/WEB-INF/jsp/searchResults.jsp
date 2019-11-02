@@ -27,13 +27,23 @@
 		border: 2px solid red;
 		background-color: #d99;
 	}
+	
+	.radio-option {
+		margin-right: 3em;
+	}
 </c:set>
 
-<c:set var="_formActionUrl" scope="request">/search/post/${_ss.id}</c:set>
+<c:choose><c:when test="${_formMode eq 'adhoc'}">
+	<c:set var="_pageHeading" value="Ad-hoc search" scope="request" />
+	<c:set var="_formActionUrl" scope="request">/search/save</c:set>
+</c:when><c:when test="${_formMode eq 'update'}">
+	<c:set var="_pageHeading" value="Search results" scope="request" />
+	<c:set var="_formActionUrl" scope="request">/search/save/${_ss.id }</c:set>
+</c:when></c:choose>
 
 <mny:standardLayout>
 
-	<h2 class="inline-block">Advanced search <c:if test="${not empty param.flash}"><span 
+	<h2 class="inline-block">${_pageHeading} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
 			
 	<div id="tabs">
@@ -52,5 +62,7 @@
 			});
 		});
 	</script>
+	
+	<mny:searchOptionJavascript />
 	
 </mny:standardLayout>
