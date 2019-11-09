@@ -1,3 +1,4 @@
+drop table if exists property;
 drop table if exists splittransaction;
 drop table if exists transaction;
 drop table if exists scheduledtransaction;
@@ -168,3 +169,12 @@ create table search
 
 insert into search(saved,name,type,json) values('2019-10-01 00:00:01','my search #9','advanced','{}');
 update search set id=-1 where id=1;
+
+create table property
+(
+	name varchar(255) NOT NULL,
+	value varchar(255) NOT NULL,
+	primary key (name)
+) ENGINE=InnoDB;
+
+

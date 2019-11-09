@@ -11,6 +11,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Property;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.Transfer;
@@ -25,6 +26,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	@Autowired private AccountService accountService;
 	@Autowired private SplitTransactionService splitTransactionService;
 	@Autowired private SolrService solrService;
+	@Autowired private PropertyService propertyService;
 	
 	private static final String FROM = 
 			"from transaction t " +
@@ -81,6 +83,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			}
 			else {
 				t = insert(pt);
+				this.propertyService.save(new Property(Property.LAST_INSERT_DATE, t.getEnteredStr()));
 			}
 			
 			// Also save the new transaction's splits, if any

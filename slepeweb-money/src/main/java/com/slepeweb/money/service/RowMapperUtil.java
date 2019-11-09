@@ -11,6 +11,7 @@ import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.Property;
 import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.bean.SplitTransaction;
@@ -219,4 +220,9 @@ public class RowMapperUtil {
 		}
 	}
 	
+	public static final class PropertyMapper implements RowMapper<Property> {
+		public Property mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new Property(rs.getString("name"), rs.getString("value"));
+		}
+	}
 }
