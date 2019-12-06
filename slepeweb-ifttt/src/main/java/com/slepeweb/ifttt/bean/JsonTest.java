@@ -1,5 +1,8 @@
 package com.slepeweb.ifttt.bean;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class JsonTest {
 
 	public static void main(String[] args) {
@@ -23,6 +26,22 @@ public class JsonTest {
 		else {
 			pr("Failed to find property");
 		}
+		
+		JsonObj data = JsonObj.createList();
+		top = JsonObj.createStruc().put("data", data);
+		Date created = new Date();
+		String id = String.valueOf(created.getTime());
+		SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+
+		data.add(JsonObj.createStruc().
+				put("party", JsonObj.create("Halifax")).
+				put("password", JsonObj.create("dummyPassword")).
+				put("created_at", JsonObj.create(SDF.format(created))).
+				put("meta", JsonObj.createStruc().
+					put("id", JsonObj.create(created.getTime())).
+					put("timestamp", JsonObj.create(id))));	
+		
+		pr(top.stringify());
 	}
 	
 	public static void pr(String s) {

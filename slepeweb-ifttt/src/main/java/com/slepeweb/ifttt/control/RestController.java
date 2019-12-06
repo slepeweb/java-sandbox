@@ -1,5 +1,12 @@
 package com.slepeweb.ifttt.control;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.slepeweb.ifttt.bean.HelloWorldTrigger;
 import com.slepeweb.ifttt.bean.JsonObj;
 import com.slepeweb.ifttt.bean.PasswordAction;
+import com.slepeweb.ifttt.bean.PasswordActionFields;
+import com.slepeweb.ifttt.bean.PasswordTrigger;
+import com.slepeweb.ifttt.bean.QueueManager;
 import com.slepeweb.ifttt.bean.Request;
 import com.slepeweb.ifttt.bean.Status;
 
@@ -24,11 +33,27 @@ import com.slepeweb.ifttt.bean.Status;
 public class RestController extends BaseController {
 	
 	private static Logger LOG = Logger.getLogger(RestController.class);
-	public static final String SERVICE_KEY = "vQAqaeOMiU0p9vO-mlNv9SESl7KacisWVTV3Wf7iduKhbvZrVdCrAgH0_oEJX1XE";
+	private Map<String, QueueManager<PasswordAction>> passwordRequestQueues = new HashMap<String, QueueManager<PasswordAction>>();
+	
+	public static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+	private static final String STATUS_PATH = "/status";
+	private static final String TEST_SETUP_PATH = "/test/setup";
+	private static final String PASSWORD_INPUT_PATH = "/actions/password_in";
+	private static final String PASSWORD_OUTPUT_PATH = "/triggers/password_out";
+	private static final String USER_INFO_PATH = "/user/info";
 	
 	private boolean isValidService(HttpServletResponse response, ModelMap model) {
 		String key = (String) model.get("_serviceKey");
 		if (key == null || ! key.equals(Request.SERVICE_KEY)) {
+			response.setStatus(Response.SC_UNAUTHORIZED);
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean isValidUser(HttpServletResponse response, ModelMap model) {
+		String bearerCode = getBearerCode(model);
+		if (bearerCode == null || ! bearerCode.equals(OauthController.USER_ID_CODE)) {
 			response.setStatus(Response.SC_UNAUTHORIZED);
 			return false;
 		}
@@ -50,31 +75,37 @@ public class RestController extends BaseController {
 		return request.getHeader("IFTTT-Test-Mode");
 	}
 	
-	@RequestMapping(value="/test/setup", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value=TEST_SETUP_PATH, method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public String testSetup(HttpServletRequest request, HttpServletResponse response, ModelMap model) {	
-		LOG.info(String.format("Request for [%s]", "/test/setup"));
+		
+		LOG.info(String.format("Request for [%s]", TEST_SETUP_PATH));
+		
 		if (! isValidService(response, model)) {
 			return null;
 		}
 		
 		JsonObj top = JsonObj.createStruc().
 			put("data", JsonObj.createStruc().
+				put("accessToken", JsonObj.create(OauthController.USER_ID_CODE)).
 				put("samples", JsonObj.createStruc().
 					put("triggers", JsonObj.createStruc().
-						put("hello_world", JsonObj.createStruc().
-							put("greeting", JsonObj.create("Hello Wolrd")))).
+						put("password_out", JsonObj.createStruc().
+							put("party", JsonObj.create("Halifax")).
+							put("password", JsonObj.create("abcdefg")))).
 					put("actions", JsonObj.createStruc().
-						put("get_password", JsonObj.createStruc().
+						put("password_in", JsonObj.createStruc().
 							put("party", JsonObj.create("Halifax"))))));
 		
 		return top.stringify();
 	}
 
-	@RequestMapping(value="/status", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value=STATUS_PATH, method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public Status status(HttpServletResponse response, ModelMap model) {
-		LOG.info(String.format("Request for [%s]", "/status"));
+		
+		LOG.info(String.format("Request for [%s]", STATUS_PATH));
+		
 		if (! isValidService(response, model)) {
 			return new Status(false);
 		}
@@ -82,43 +113,48 @@ public class RestController extends BaseController {
 		return new Status(true);
 	}
 
-	@RequestMapping(value="/triggers/hello_world", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value=PASSWORD_OUTPUT_PATH, method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public String helloWorldTrigger(@RequestBody HelloWorldTrigger trigger, HttpServletResponse response, ModelMap model) {	
-		LOG.info(String.format("Request for [%s]", "/triggers/hello_world"));
+	public String sendPassword(@RequestBody PasswordTrigger trigger, HttpServletResponse response, ModelMap model) {	
+		LOG.info(String.format("Request for [%s]", PASSWORD_OUTPUT_PATH));
 		
-		if (! isValidService(response, model)) {
-			return error("Wrong service ID");
+		if (! isValidUser(response, model)) {
+			return error("Unauthorized access");
 		}
 		
+		/*
+		 * See comment below regarding this trigger.
+		 * 
 		if (trigger.isMissingFields()) {
 			response.setStatus(Response.SC_BAD_REQUEST);
 			return error("Missing 'greeting' trigger field");
 		}
+		*/
 		
 		if (isTestMode(model)) {
-			return helloWorldTriggerTest(trigger.getLimit());
+			return sendPasswordTest(trigger.getLimit());
 		}
 		
-		JsonObj top = JsonObj.createStruc().
-			put("data", JsonObj.createList().
-				add(JsonObj.createStruc().
-					put("greeting", JsonObj.create("Hello Joey")).
-					put("created_at", JsonObj.create("2019-08-28T12:52:59-07:00")).
-					put("meta", JsonObj.createStruc().
-						put("id", JsonObj.create("423456799")).
-						put("timestamp", JsonObj.create(423456789)))));		
-		
-		return top.stringify();
+		/*
+		 * We have 2 applets effectively chained together:
+		 *   1) Google assistant -> Password Manager Action
+		 *   2) Password Manager Trigger -> Android SMS
+		 * 
+		 * The ingredients used in 1) are stored in a FIFO queue by this service - IFTTT does NOT need
+		 * to provide them, so the RequestBody is currently ignored, and the ingredients for 2) are
+		 * drawn from the queued data.
+		 */
+		QueueManager<PasswordAction> queue = getQueue(getBearerCode(model));
+		return buildPasswordJson(queue.getBufferReversed(), trigger.getLimit());
 	}
 
-	@RequestMapping(value="/actions/get_password", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value=PASSWORD_INPUT_PATH, method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public String getPasswordAction(@RequestBody PasswordAction action, HttpServletResponse response, ModelMap model) {	
-		LOG.info(String.format("Request for [%s]", "/actions/get_password"));
+	public String requestPassword(@RequestBody PasswordAction action, HttpServletResponse response, ModelMap model) {	
+		LOG.info(String.format("Request for [%s]", PASSWORD_INPUT_PATH));
 		
-		if (! isValidService(response, model)) {
-			return error("Wrong service ID");
+		if (! isValidUser(response, model)) {
+			return error("Unauthorized access");
 		}
 		
 		if (action.isMissingFields()) {
@@ -127,47 +163,92 @@ public class RestController extends BaseController {
 		}
 		
 		if (isTestMode(model)) {
-			return passwordActionTest();
+			return requestPasswordTest();
 		}
+				
+		LOG.info(String.format("Password request queued [%s]", action.getFields().getParty()));
+		action.setCreated(new Date());
 		
-		return null;
+		QueueManager<PasswordAction> queue = getQueue(getBearerCode(model));
+		queue.add(action);
+		
+		// TODO: For the moment, return dummy data - doesn't seem to affect the result at this stage
+		return requestPasswordTest();
 	}
 	
-	private String helloWorldTriggerTest(int limit) {
+	@RequestMapping(value=USER_INFO_PATH, method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public String userInfo(HttpServletRequest req, HttpServletResponse response, ModelMap model) {
+		
+		LOG.info("User info request in progress ...");
+		
+		if (! isValidUser(response, model)) {
+			return error("Unauthorized access");
+		}
+
+		return JsonObj.createStruc().
+			put("data", JsonObj.createStruc().
+				put("name", JsonObj.create("Butty Bear")).
+				put("id", JsonObj.create("buttybear")).
+				put("url", JsonObj.create("https//ifttt.buttigieg.org.uk"))
+			).stringify();
+	}
+	
+	private String sendPasswordTest(int max) {
+		List<PasswordAction> actions = new ArrayList<PasswordAction>();
+		long id = new Date().getTime();
+		PasswordAction pa;
+		
+		pa = new PasswordAction();
+		pa.setCreated(new Date(id));
+		pa.setFields(new PasswordActionFields().setParty("Hello Joe"));
+		actions.add(pa);
+		
+		pa = new PasswordAction();
+		pa.setCreated(new Date(id - 1000));
+		pa.setFields(new PasswordActionFields().setParty("Hello Georgie"));
+		actions.add(pa);
+		
+		pa = new PasswordAction();
+		pa.setCreated(new Date(id - 2000));
+		pa.setFields(new PasswordActionFields().setParty("Hello GB"));
+		actions.add(pa);
+		
+		return buildPasswordJson(actions, max);
+	}
+	
+	private String buildPasswordJson(List<PasswordAction> list, int max) {
+		int count = 0;
+		String timestamp;
 		JsonObj data = JsonObj.createList();
 		JsonObj top = JsonObj.createStruc().put("data", data);
 		
-		if (limit > 0) {
-			data.add(JsonObj.createStruc().
-				put("greeting", JsonObj.create("Hello Joe")).
-				put("created_at", JsonObj.create("2017-08-27T12:52:59-07:00")).
-				put("meta", JsonObj.createStruc().
-					put("id", JsonObj.create("323456789")).
-					put("timestamp", JsonObj.create(323456789))));
-		}
+		LOG.info(String.format("Queue has %d entries", list.size()));
 		
-		if (limit > 1) {
-			data.add(JsonObj.createStruc().
-				put("greeting", JsonObj.create("Hello Georgie")).
-				put("created_at", JsonObj.create("2017-07-27T12:52:59-07:00")).
-				put("meta", JsonObj.createStruc().
-					put("id", JsonObj.create("223456789")).
-					put("timestamp", JsonObj.create(223456789))));
-		}
+		for (PasswordAction action : list) {
+			if (count >= max) {
+				break;
+			}
 			
-		if (limit > 2) {
+			// This needs to be in seconds
+			timestamp = String.valueOf((long) (action.getCreated().getTime() / 1000));	
+			
 			data.add(JsonObj.createStruc().
-				put("greeting", JsonObj.create("Hello GB")).
-				put("created_at", JsonObj.create("2017-06-27T12:52:59-07:00")).
-				put("meta", JsonObj.createStruc().
-					put("id", JsonObj.create("123456789")).
-					put("timestamp", JsonObj.create(123456789))));
+					put("party", JsonObj.create(action.getFields().getParty())).
+					put("password", JsonObj.create("dummyPassword")).
+					put("created_at", JsonObj.create(SDF.format(action.getCreated()))).
+					put("meta", JsonObj.createStruc().
+						put("id", JsonObj.create(action.getCreated().getTime())).
+						put("timestamp", JsonObj.create(timestamp))));	
+			
+			LOG.info(String.format("Trigger actioned [%s]", action.getFields().getParty()));
+			count++;
 		}
 		
 		return top.stringify();
 	}
 	
-	private String passwordActionTest() {
+	private String requestPasswordTest() {
 		JsonObj top = JsonObj.createStruc().
 			put("data", JsonObj.createList().
 				add(JsonObj.createStruc().
@@ -183,4 +264,13 @@ public class RestController extends BaseController {
 					add(JsonObj.createStruc().put("message", JsonObj.create(msg)))).stringify();
 	}
 	
+	private QueueManager<PasswordAction> getQueue(String bearer) {
+		QueueManager<PasswordAction> queue = this.passwordRequestQueues.get(bearer);
+		if (queue == null) {
+			queue = new QueueManager<PasswordAction>(50);
+			this.passwordRequestQueues.put(bearer, queue);
+		}
+		
+		return queue;
+	}
 }

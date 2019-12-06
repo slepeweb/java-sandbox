@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class PasswordActionFields extends RequestBodyFields {
 
-	private String party = "", key = "";
+	private String party = "";
 
 	@Override
 	public boolean isBlank() {
@@ -17,15 +17,6 @@ public class PasswordActionFields extends RequestBodyFields {
 
 	public PasswordActionFields setParty(String party) {
 		this.party = party;
-		return this;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public PasswordActionFields setKey(String key) {
-		this.key = key;
 		return this;
 	}
 }

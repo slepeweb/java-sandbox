@@ -2,21 +2,21 @@ package com.slepeweb.ifttt.bean;
 
 import org.codehaus.jackson.annotate.JsonSetter;
 
-public class HelloWorldTrigger extends Request {
+public class PasswordTrigger extends Request {
 
-	private HelloWorldTriggerFields fields;
+	private PasswordTriggerFields fields;
 	
 	@Override
 	public boolean isMissingFields() {
 		return this.fields == null || this.fields.isBlank();
 	}
 	
-	public HelloWorldTriggerFields getFields() {
+	public PasswordTriggerFields getFields() {
 		return fields;
 	}
 	
 	@JsonSetter("triggerFields") 
-	public HelloWorldTrigger setFields(HelloWorldTriggerFields fields) {
+	public PasswordTrigger setFields(PasswordTriggerFields fields) {
 		this.fields = fields;
 		return this;
 	}

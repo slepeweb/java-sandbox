@@ -11,7 +11,7 @@ public class JsonObj {
 	private Object value;
 	private List<JsonObj> list;
 	private Type type;
-	public enum Type {STRING, INTEGER, LIST, STRUC};
+	public enum Type {STRING, INTEGER, LONG, LIST, STRUC};
 	
 	public static JsonObj createStruc() {
 		return new JsonObj(new HashMap<String, JsonObj>());
@@ -28,12 +28,20 @@ public class JsonObj {
 		else if (o instanceof Integer) {
 			return new JsonObj((Integer) o);
 		}
+		else if (o instanceof Long) {
+			return new JsonObj((Long) o);
+		}
 		return new JsonObj("null_string");
 	}
 	
 	public JsonObj(String s) {
 		this.value = s;
 		this.type = Type.STRING;
+	}
+	
+	public JsonObj(Long i) {
+		this.value = i;
+		this.type = Type.LONG;
 	}
 	
 	public JsonObj(Integer i) {
@@ -203,8 +211,8 @@ public class JsonObj {
 			
 			return String.format("[%s]", sb.toString());
 		}
-		else if (this.type == Type.INTEGER) {
-			return String.format("%s", this.value.toString());
+		else if (this.type == Type.INTEGER || this.type == Type.LONG) {
+			return String.valueOf(this.value);
 		}
 		
 		return null;
