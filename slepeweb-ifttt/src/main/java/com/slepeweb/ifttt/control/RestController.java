@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Response;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -27,6 +28,7 @@ import com.slepeweb.ifttt.bean.PasswordTrigger;
 import com.slepeweb.ifttt.bean.QueueManager;
 import com.slepeweb.ifttt.bean.Request;
 import com.slepeweb.ifttt.bean.Status;
+import com.slepeweb.ifttt.service.HttpService;
 
 @Controller
 @RequestMapping("/ifttt/v1")
@@ -41,6 +43,9 @@ public class RestController extends BaseController {
 	private static final String PASSWORD_INPUT_PATH = "/actions/password_in";
 	private static final String PASSWORD_OUTPUT_PATH = "/triggers/password_out";
 	private static final String USER_INFO_PATH = "/user/info";
+	
+	@Autowired HttpService httpService;
+	private Map<String, String> passwordTrigger4User = new HashMap<String, String>();
 	
 	private boolean isValidService(HttpServletResponse response, ModelMap model) {
 		String key = (String) model.get("_serviceKey");
@@ -135,6 +140,12 @@ public class RestController extends BaseController {
 			return sendPasswordTest(trigger.getLimit());
 		}
 		
+		String savedTrigger = this.passwordTrigger4User.get(getBearerCode(model));
+		if (savedTrigger == null) {
+			this.passwordTrigger4User.put(getBearerCode(model), trigger.getIdentity());
+			LOG.info(String.format("Saving trigger identity [%s]", trigger.getIdentity()));
+		}
+		
 		/*
 		 * We have 2 applets effectively chained together:
 		 *   1) Google assistant -> Password Manager Action
@@ -171,6 +182,11 @@ public class RestController extends BaseController {
 		
 		QueueManager<PasswordAction> queue = getQueue(getBearerCode(model));
 		queue.add(action);
+		
+		String triggerId = this.passwordTrigger4User.get(getBearerCode(model));
+		if (triggerId != null) {
+			notify(triggerId);
+		}
 		
 		// TODO: For the moment, return dummy data - doesn't seem to affect the result at this stage
 		return requestPasswordTest();
@@ -241,10 +257,11 @@ public class RestController extends BaseController {
 						put("id", JsonObj.create(action.getCreated().getTime())).
 						put("timestamp", JsonObj.create(timestamp))));	
 			
-			LOG.info(String.format("Trigger actioned [%s]", action.getFields().getParty()));
+			LOG.info(String.format("Event actioned [%s]", action.getFields().getParty()));
 			count++;
 		}
-		
+		LOG.info(String.format("Queue has %d entries", list.size()));
+
 		return top.stringify();
 	}
 	
@@ -272,5 +289,16 @@ public class RestController extends BaseController {
 		}
 		
 		return queue;
+	}
+	
+	@SuppressWarnings("unused")
+	private void notify(String triggerId) {
+		String json = JsonObj.createStruc().
+			put("data", JsonObj.createList().
+				add(JsonObj.createStruc().
+					put("trigger_identity", JsonObj.create(triggerId)))).stringify();
+		
+		LOG.info(String.format("Notifying ifttt: %s", json));
+		this.httpService.postJsonBody("https://realtime.ifttt.com/v1/notifications", json);
 	}
 }
