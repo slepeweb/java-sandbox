@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.site.anc.bean.MenuItem;
 import com.slepeweb.site.anc.bean.Person;
 import com.slepeweb.site.anc.bean.svg.SvgSupport;
@@ -20,6 +24,12 @@ import com.slepeweb.site.model.Page;
 @Controller
 @RequestMapping("/spring/anc")
 public class AncestryPageController extends BaseController {
+	
+	public static final String HISTORY_VIEW = "history";
+	public static final String GALLERY_VIEW = "gallery";
+	public static final String RECORD_VIEW = "record";
+	
+	@Autowired private ItemService itemService;
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
@@ -44,60 +54,10 @@ public class AncestryPageController extends BaseController {
 		Person subject = new Person(i);
 		model.addAttribute("_person", subject);
 		model.addAttribute("_support", new SvgSupport(subject));
-		model.addAttribute("_menu", createPersonMenu(i, subject));
+		model.addAttribute("_menu", createPersonMenu(i, subject, null));
 		
 		filterBreadcrumbs(page);		
 		return page.getView();
-	}
-	
-	private List<MenuItem> createPersonMenu(Item requestItem, Person p) {
-		List<MenuItem> menu = new ArrayList<MenuItem>();
-
-		MenuItem m = new MenuItem().setEnabled(true);
-		m.setHref(p.getItem().getPath()).setTitle("Overview").setSelected(requestItem.getPath().equals(p.getItem().getPath()));
-		menu.add(m);
-		
-		menu.add(createPersonMenuItem("History", p.getDocuments(), requestItem));
-		menu.add(createPersonMenuItem("Gallery", p.getGallery(), requestItem));
-		menu.add(createPersonMenuItem("Records", p.getRecords(), requestItem));
-		
-		return menu;
-	}
-	
-	private List<MenuItem> createPersonSubMenu(Item requestItem, List<Item> members) {
-		List<MenuItem> menu = new ArrayList<MenuItem>();
-		MenuItem m;
-		
-		for (Item i : members) {
-			m = new MenuItem().setEnabled(true);
-			m.setHref(i.getPath()).setTitle(i.getFieldValue("heading")).setSelected(i.getPath().equals(requestItem.getPath()));
-			menu.add(m);
-		}
-
-		return menu;
-	}
-	
-	private MenuItem createPersonMenuItem(String label, List<Item> list, Item requestItem) {
-		MenuItem m = new MenuItem().setEnabled(list.size() > 0);
-		
-		if (m.isEnabled()) {
-			Item first = list.get(0);
-			m.setHref(first.getPath()).setSelected(first.getPath().equals(requestItem.getPath()));
-		}
-		
-		m.setTitle(label);
-		return m;
-	}
-	
-	private void filterBreadcrumbs(Page p) {
-		Iterator<Item> iter = p.getHeader().getBreadcrumbItems().iterator();
-		Item i;
-		while (iter.hasNext()) {
-			i = iter.next();
-			if (! (i.getType().getName().equals("Male") || i.getType().getName().equals("Female"))) {
-				iter.remove();
-			}
-		}
 	}
 	
 	@RequestMapping(value="/female")	
@@ -116,14 +76,153 @@ public class AncestryPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "personHistory", model);
-		page.setTitle(i.getName());
+		page.setTitle(i.getFieldValue("heading"));
 		
 		Person subject = new Person(i.getParent());
 		model.addAttribute("_person", subject);
-		model.addAttribute("_menu", createPersonMenu(i, subject));
-		model.addAttribute("_subMenu", createPersonSubMenu(i, subject.getDocuments()));
+		model.addAttribute("_menu", createPersonMenu(i, subject, null));
+		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, subject.getDocuments(), null, null));
 		
 		filterBreadcrumbs(page);
 		return page.getView();
 	}	
+
+	@RequestMapping(value="/male/gallery/{itemId}")	
+	public String gallery(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@PathVariable long itemId,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, GALLERY_VIEW, model);
+		
+		Person subject = new Person(i.getParent());
+		model.addAttribute("_person", subject);
+		model.addAttribute("_menu", createPersonMenu(i, subject, GALLERY_VIEW));
+		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, subject.getGallery(), GALLERY_VIEW, itemId));
+		
+		filterBreadcrumbs(page);
+		return page.getView();
+	}	
+
+	@RequestMapping(value="/male/record/{itemId}")	
+	public String record(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@PathVariable long itemId,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, RECORD_VIEW, model);
+		
+		Person subject = new Person(i);
+		model.addAttribute("_person", subject);
+		model.addAttribute("_menu", createPersonMenu(i, subject, RECORD_VIEW));
+		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, subject.getRecords(), RECORD_VIEW, itemId));
+		model.addAttribute("_target", this.itemService.getItem(itemId));
+		
+		filterBreadcrumbs(page);
+		return page.getView();
+	}	
+
+	private List<MenuItem> createPersonMenu(Item requestItem, Person p, String requestView) {
+		List<MenuItem> menu = new ArrayList<MenuItem>();
+		MenuItem m;
+		Item target;
+
+		// Overview
+		m = new MenuItem();
+		m.setHref(p.getItem().getPath()).setTitle("Overview");
+		m.setSelected(requestView == null && requestItem.getPath().equals(p.getItem().getPath()));
+		menu.add(m);
+		
+		// History
+		m = new MenuItem();
+		m.setTitle("History");
+		if (p.getDocuments().size() > 0) {
+			target = p.getDocuments().get(0);
+			m.setHref(target.getPath());
+		}
+		else {
+			m.setEnabled(false);
+			m.setHref("");
+		}
+		m.setSelected(requestItem.getType().getName().equals("Document"));
+		menu.add(m);
+		
+		// Gallery
+		m = new MenuItem();
+		m.setTitle("Gallery");
+		if (p.getGallery().size() > 0) {
+			target = p.getGallery().get(0);
+			m.setHref(String.format("%s?view=%s/%d", p.getItem().getPath(), GALLERY_VIEW, target.getId()));
+		}
+		else {
+			m.setEnabled(false);
+			m.setHref("");
+		}
+		m.setSelected(requestView != null && requestView.equals(GALLERY_VIEW));
+		menu.add(m);
+		
+		// Records
+		m = new MenuItem();
+		m.setTitle("Records");
+		if (p.getRecords().size() > 0) {
+			target = p.getRecords().get(0);
+			m.setHref(String.format("%s?view=%s/%d", p.getItem().getPath(), RECORD_VIEW, target.getId()));
+		}
+		else {
+			m.setEnabled(false);
+			m.setHref("");
+		}
+		m.setSelected(requestView != null && requestView.equals(RECORD_VIEW));
+		menu.add(m);
+		
+		return menu;
+	}
+	
+	private List<MenuItem> createPersonSubMenu(Item requestItem, Person p, List<Item> members, String requestView, Long requestId) {
+		List<MenuItem> menu = new ArrayList<MenuItem>();
+		MenuItem m;
+		String path, title;
+		
+		for (Item i : members) {
+			m = new MenuItem();
+			
+			if (StringUtils.isBlank(requestView)) {
+				// True for history
+				path = i.getPath();
+				m.setSelected(i.getPath().equals(requestItem.getPath()));
+			}
+			else {
+				path = String.format("%s?view=%s/%d", p.getItem().getPath(), requestView, i.getId());
+				m.setSelected(i.getId() == requestId.longValue());
+			}
+			m.setHref(path);
+			
+			title = i.getFieldValue("heading");
+			if (StringUtils.isBlank(title)) {
+				title = i.getFieldValue("heading");
+				if (StringUtils.isBlank(title)) {
+					title = i.getName();
+				}
+			}
+			
+			m.setTitle(title);
+			menu.add(m);
+		}
+
+		return menu;
+	}
+		
+	private void filterBreadcrumbs(Page p) {
+		Iterator<Item> iter = p.getHeader().getBreadcrumbItems().iterator();
+		Item i;
+		while (iter.hasNext()) {
+			i = iter.next();
+			if (! (i.getType().getName().equals("Male") || i.getType().getName().equals("Female"))) {
+				iter.remove();
+			}
+		}
+	}
+	
 }

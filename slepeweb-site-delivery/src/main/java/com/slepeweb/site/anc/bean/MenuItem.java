@@ -5,7 +5,7 @@ import com.slepeweb.site.model.LinkTarget;
 public class MenuItem extends LinkTarget {
 
 	private static final long serialVersionUID = 1L;
-	private boolean enabled;
+	private boolean enabled = true;
 
 	public String getTag() {
 		if (! isSelected()) {

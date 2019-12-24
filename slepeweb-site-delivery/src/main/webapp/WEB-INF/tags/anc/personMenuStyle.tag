@@ -14,10 +14,10 @@
 }
 
 #menu .selected {
-	opacity: 0.7;
+	font-weight: bold;
 } 
 
 #menu .disabled {
-	opacity: 0.3;
+	opacity: 0.5;
 } 
 		

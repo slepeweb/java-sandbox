@@ -9,11 +9,11 @@
 }
 
 #sub-menu .selected {
-	opacity: 0.7;
+	font-weight: bold;
 } 
 
 #sub-menu .disabled {
-	opacity: 0.3;
+	opacity: 0.5;
 } 
 
 @media (min-width: 48em) {
