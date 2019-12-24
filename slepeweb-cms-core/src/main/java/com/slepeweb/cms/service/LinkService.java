@@ -20,4 +20,5 @@ public interface LinkService {
 	int getCount();
 	int getCount(Long parentId);
 	Link getParent(Long childId);
+	List<Link> getRelatedParents(Long childId);
 }

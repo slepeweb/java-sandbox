@@ -107,10 +107,12 @@ public class CmsDeliveryServlet {
 						else {
 							res.setContentType("text/html;charset=utf-8");
 							Template tmplt = item.getTemplate();
+							String view = req.getParameter("view");
 							
 							if (tmplt != null) {
-								LOG.debug(LogUtil.compose("Forwarding request to template", tmplt.getForward()));
-								req.getRequestDispatcher(tmplt.getForward()).forward(req, res);
+								String springMapping = StringUtils.isBlank(view) ? tmplt.getForward() : tmplt.getForward() + "/" + view;
+								LOG.debug(LogUtil.compose("Forwarding request to template", springMapping));
+								req.getRequestDispatcher(springMapping).forward(req, res);
 								this.lastDeliveryTable.put(item.getId(), zeroMillis(requestTime));
 							}
 							else {

@@ -112,6 +112,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		i.setDateCreated(now);
 		i.setDateUpdated(now);
 		
+		if (StringUtils.isBlank(i.getSimpleName())) {
+			i.setSimpleName(String.valueOf(now.getTime()));
+		}
+		
 		// Item table
 		try {
 			this.jdbcTemplate.update(
@@ -180,6 +184,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				else if (dbRecord.isContentRoot()) {
 					i.setSimpleName(Item.CONTENT_ROOT_PATH.substring(1));
 				}
+			}
+			
+			// simplename cannot be blank
+			if (StringUtils.isBlank(i.getSimpleName())) {
+				i.setSimpleName(String.valueOf(System.currentTimeMillis()));
 			}
 			
 			boolean simplenameHasChanged = ! i.isSiteRoot() && ! dbRecord.getSimpleName().equals(i.getSimpleName());

@@ -15,11 +15,14 @@ public class Image implements Serializable {
 	public Image() {}
 	
 	public Image(Link l) {
-		Item i = l.getChild();
+		this(l.getChild(), l.getName());
+	}
+	
+	public Image(Item i, String type) {
 		setTitle(i.getFieldValue("title", ""));
 		setSrc(i.getPath());
 		setAlt(getTitle());
-		setType(l.getName());
+		setType(type);
 	}
 	
 	public String getTitle() {

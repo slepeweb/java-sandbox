@@ -38,6 +38,7 @@ public class Item extends CmsBean {
 	private List<Link> links;
 	private List<String> tags;
 	private Item parent;
+	private List<Item> relatedParents;
 	private int version = 1;
 
 	public boolean isProduct() {
@@ -120,6 +121,32 @@ public class Item extends CmsBean {
 		return this.parent;
 	}
 	
+	public List<Item> getRelatedParents() {
+		return getRelatedItems(null);
+	}
+	
+	public List<Item> getRelatedParents(ItemFilter filter) {
+		if (this.relatedParents == null) {
+			if (getId() != null) {
+				this.relatedParents = new ArrayList<Item>();
+				List<Link> list = this.cmsService.getLinkService().getRelatedParents(getId());
+				
+				if (list != null) {
+					if (filter != null) {
+						this.relatedParents = filter.filterLinks(list);
+					}
+					else {				
+						for (Link l : list) {
+							this.relatedParents.add(l.getChild());
+						}
+					}
+				}
+			}
+		}
+		
+		return this.relatedParents;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("(%s) %s: %s", getTemplate() != null ? getTemplate().getName() : "No template", 
@@ -135,7 +162,7 @@ public class Item extends CmsBean {
 		return getImage("thumb");
 	}
 		
-	private Item getImage(String classification) {
+	public Item getImage(String classification) {
 		ItemFilter f = new ItemFilter().setLinkName(classification);
 		List<Item> images = getInlineItems(f);
 		if (images.size() > 0) {
@@ -191,6 +218,7 @@ public class Item extends CmsBean {
 		return getItemService().save(child);
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	public Item addInline(Item inline) {
 		if (! getLinks().contains(inline)) {
 			getLinks().add(toChildLink(inline, LinkType.inline));
@@ -199,6 +227,7 @@ public class Item extends CmsBean {
 		return this;
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	public Item addRelation(Item relation) {
 		if (! getLinks().contains(relation)) {
 			getLinks().add(toChildLink(relation, LinkType.relation));

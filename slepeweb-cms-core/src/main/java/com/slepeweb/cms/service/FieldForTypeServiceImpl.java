@@ -15,7 +15,7 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 	private static Logger LOG = Logger.getLogger(FieldForTypeServiceImpl.class);
 	private static final String SELECTOR_TEMPLATE = 
 			"select fft.*, f.* from fieldfortype fft, field f where " +
-			"fft.fieldid = f.id and %s";
+			"fft.fieldid = f.id and %s order by fft.itemtypeid, fft.fieldorder";
 	
 	public FieldForType save(FieldForType fft) {
 		if (fft.isDefined4Insert()) {

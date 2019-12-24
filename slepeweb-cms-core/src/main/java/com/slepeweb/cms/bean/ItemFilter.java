@@ -61,6 +61,16 @@ public class ItemFilter {
 		return result;
 	}
 
+	public List<Link> filterLinksAsLinks(List<Link> list) {
+		List<Link> result = new ArrayList<Link>(list.size());
+		for (Link l : list) {
+			if (test(l)) {
+				result.add(l);
+			}
+		}
+		return result;
+	}
+
 	private <T> boolean matches(T[] arr, T target) {
 		// Must match ANY element in the array
 		for (T ele : arr) {

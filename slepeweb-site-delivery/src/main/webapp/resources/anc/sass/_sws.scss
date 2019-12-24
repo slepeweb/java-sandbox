@@ -1,0 +1,328 @@
+/* For IE10 snap mode ??? */
+@media screen and (max-width:400px) {
+  @-ms-viewport{
+    width: device-width;
+  }
+}
+
+.align-left {
+	text-align: left;
+}
+
+.align-center {
+	text-align: center;
+}
+
+.align-right {
+	text-align: right;
+}
+
+.fr {
+	float: right;
+}
+
+.smaller {
+	font-size: 0.9em;
+}
+
+.caption {
+	font-size: 0.9em;
+	line-height: 1.2em;
+	font-style: italic;
+	margin-left: 0.2em;
+}
+
+/* Section/Article */
+
+section, article {
+	&.special {
+		text-align: center;
+	}
+}
+
+#weather-report {
+	font-size: 0.8em;
+	line-height: 1.2em;
+	
+	td {
+		padding: 3px;
+		
+		&:first-child {
+			font-weight: bold;
+		}
+	}
+}
+
+#left-nav {
+	ul {
+		list-style: none;
+		
+		&.level-1 {
+			margin-left: -1em;
+			font-size: 0.9em;
+		}
+	
+		&.level-2 {
+			margin-left: 1em;
+			font-size: 0.9em;
+		}
+	
+		li {
+			/*border-bottom: thin solid $color-fg-light;*/
+			
+			&.selected {
+				font-weight: bold;
+			}
+			
+			&.unselected {
+				font-weight: normal;
+			}		
+			
+			/*&:last-child {
+				border-bottom: none;
+			}	*/
+		}
+	}
+	
+	h3:first-child {
+		margin-top: 3em;
+	}
+}
+
+.dilbert img {
+	width: 100%;
+	max-width: 600px;
+}
+
+.project-list {
+	font-weight: bold;
+	margin-left: 2em;
+}
+
+#tabs {
+	font-family: inherit;
+	font-size: inherit;
+}
+
+#lotterynumbers {
+	tr {
+		border: none;
+	}
+}
+
+.user-table td {
+	border: 2px solid #cccccc;
+}
+
+.user-table img {
+	vertical-align: text-bottom;
+}
+
+.form-error {
+	color: red;
+	border-style: solid;
+	border-width: 2px;
+	margin-bottom: 12px;
+	padding: 5px;
+}
+
+.form-field-error {
+	color: red;
+	/*border-style: solid;
+	border-width: 1px;*/
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.flash-msg {
+	border-style: solid;
+	border-width: 2px;
+	margin-left: 20px;
+	margin-bottom: 12px;
+	padding: 2px;
+	line-height: 1.4em;
+}
+
+.underline {
+	text-decoration: underline;
+}
+
+.red {
+	color: red;
+}
+
+.green {
+	color: green;
+}
+
+.orange {
+	color: orange;
+}
+
+.jaxws-table {
+	width: 50%;
+	min-width: 300px;
+}
+
+.twitter-feed {
+	line-height: 1.2em;
+	margin-bottom: 1em;
+	
+	> .left {
+		width: 42px;
+	}
+	
+	> .right {
+		width: (300%/4);
+		margin-left: 5px;
+	}
+	
+	> div {
+		float: left;
+		margin-bottom: 1em;
+	}
+	
+	img {
+		width: 40px;
+	}
+	
+	span {
+		font-weight: bold;
+		color: $color-accent-bg;
+		
+		&.hashtag {
+			font-weight: normal;
+		}
+		
+		&.link {
+			font-weight: normal;
+		}
+	}
+	
+	&::after {
+	  content: "";
+	  display: table;
+	  clear: both;
+	}
+}
+
+.logozer {
+	display: inline-block;
+	vertical-align: top;
+	width: 150px;
+	height: 120px;
+	
+	img {
+		display: none;
+		margin-left: $std-container-padding;
+	}
+}
+
+img.markup {
+		top: 0.25em;
+		max-width: 50%;
+		
+		&.left {
+			float: left;
+			padding: 0.25em 1em 1em 0em;
+		}
+
+		&.right {
+			float: right;
+			padding: 0.25em 0em 1em 1em;
+		}
+		
+		@include extra-small-only {
+			max-width: 100%;
+			display: block;
+		}
+}
+
+.grey-gradient {
+	background: rgba(204,204,204,1);
+	min-height: 20em;	
+	margin-bottom: 1em;
+	line-height: 1.2em;
+	
+	li {
+		margin-bottom: 0.7em;
+	}
+	
+	&.left2right {
+		background: -webkit-linear-gradient(left,$left2right-gradient);
+		background: -o-linear-gradient(right,$left2right-gradient);
+		background: -moz-linear-gradient(right,$left2right-gradient);
+		background: linear-gradient(to right,$left2right-gradient);
+	}
+	
+	&.right2left {
+		background: -webkit-linear-gradient(left,$right2left-gradient);
+		background: -o-linear-gradient(right,$right2left-gradient);
+		background: -moz-linear-gradient(right,$right2left-gradient);
+		background: linear-gradient(to right,$right2left-gradient);
+	}
+}
+
+.hide {
+	display: none;
+}	
+
+#password-update, #password-reset {
+	margin-bottom: 1em;
+}
+
+.search-results-div {
+	h3, p {
+		line-height: 1.2em;
+	}
+	
+	h3 {
+		margin-top: -20px;
+	}
+	
+	p {
+		margin-top: -10px;
+		margin-bottom: -10px;
+		margin-left: 2.5em;
+	}
+}
+
+.solr-page {
+	display: inline;
+	margin-right: 1em;
+	
+	&.selected {
+		opacity: 0.5;
+		text-decoration: underline;
+	}
+	
+	&.heading {
+		font-weight: bold;
+	}
+}
+
+.thumbnail {
+	&.border {
+		border-style: solid;
+		border-width: 1px;
+		border-color: lightblue;
+	}
+}
+
+#add2basket {
+	margin-top: 1em;
+	
+	span {
+		display: block;
+		color: green;
+	}
+}
+
+td.horiz-rule {
+	border-top: 2px solid lightblue;
+}
+
+.fa-angle-double-right {
+	color: $color-accent-bg;
+	/*font-weight: normal;*/
+}
