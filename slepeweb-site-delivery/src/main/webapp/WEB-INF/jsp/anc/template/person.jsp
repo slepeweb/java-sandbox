@@ -15,21 +15,12 @@
 <anc:standardLayout>
 	<gen:debug><!-- jsp/anc/person.jsp --></gen:debug>
 	
-	<!-- Left side -->	
-	<div class="col-1-2 primary-col">
-		<anc:standardPerson />	
-	</div>
-	
-	<!-- Right side -->
-	<div class="col-1-2 primary-col">	
+	<div class="col-1-3 primary-col">	
 		<anc:hierarchySvg />
 	</div>
 		
-	<%--
-	<script>
-		$(function(){
-			$("#person-tabs").tabs({active: 0});
-		});
-	</script>
-	 --%>
+	<div class="col-2-3 primary-col">
+		<anc:standardPerson />	
+	</div>
+	
 </anc:standardLayout>

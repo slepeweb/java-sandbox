@@ -3,7 +3,6 @@
 /* tags/anc/personSubMenuStyle.tag */
 
 #sub-menu {
-	list-style-type: none;
 	text-align: left;
 	margin-top: 0em;
 }
@@ -23,7 +22,6 @@
   
   #sub-menu {
 		margin-top: 7em;
-		text-align: center;
   }
 }
 

@@ -11,6 +11,7 @@
 #menu li {
 	display: inline;
 	padding-right: 2em;
+	padding-left: 0em;
 }
 
 #menu .selected {

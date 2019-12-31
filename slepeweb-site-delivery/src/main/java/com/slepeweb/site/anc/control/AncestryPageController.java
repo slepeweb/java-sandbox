@@ -88,41 +88,63 @@ public class AncestryPageController extends BaseController {
 	}	
 
 	@RequestMapping(value="/male/gallery/{itemId}")	
-	public String gallery(
+	public String maleGallery(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long itemId,
 			ModelMap model) {	
 		
-		Page page = getStandardPage(i, shortSitename, GALLERY_VIEW, model);
-		
-		Person subject = new Person(i.getParent());
-		model.addAttribute("_person", subject);
-		model.addAttribute("_menu", createPersonMenu(i, subject, GALLERY_VIEW));
-		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, subject.getGallery(), GALLERY_VIEW, itemId));
-		
-		filterBreadcrumbs(page);
-		return page.getView();
+		// Use the same jsp as for records
+		Person subject = new Person(i);
+		return galleryAndRecordController(i, shortSitename, itemId, model, 
+				subject, subject.getGallery(), RECORD_VIEW, GALLERY_VIEW);
 	}	
 
 	@RequestMapping(value="/male/record/{itemId}")	
-	public String record(
+	public String maleRecord(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long itemId,
 			ModelMap model) {	
 		
-		Page page = getStandardPage(i, shortSitename, RECORD_VIEW, model);
-		
 		Person subject = new Person(i);
+		return galleryAndRecordController(i, shortSitename, itemId, model, 
+				subject, subject.getRecords(), RECORD_VIEW, RECORD_VIEW);
+	}	
+	
+	@RequestMapping(value="/female/gallery/{itemId}")	
+	public String femaleGallery(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@PathVariable long itemId,
+			ModelMap model) {	
+		
+		return maleGallery(i, shortSitename, itemId, model);
+	}	
+
+	@RequestMapping(value="/female/record/{itemId}")	
+	public String femaleRecord(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@PathVariable long itemId,
+			ModelMap model) {	
+		
+		return maleRecord(i, shortSitename, itemId, model);
+	}	
+	
+	private String galleryAndRecordController(Item i, String shortSitename, long itemId, ModelMap model,
+			Person subject, List<Item> items, String jspName, String menuName) {
+		
+		Page page = getStandardPage(i, shortSitename, jspName, model);
+		
 		model.addAttribute("_person", subject);
-		model.addAttribute("_menu", createPersonMenu(i, subject, RECORD_VIEW));
-		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, subject.getRecords(), RECORD_VIEW, itemId));
+		model.addAttribute("_menu", createPersonMenu(i, subject, menuName));
+		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, items, menuName, itemId));
 		model.addAttribute("_target", this.itemService.getItem(itemId));
 		
 		filterBreadcrumbs(page);
 		return page.getView();
-	}	
+	}
 
 	private List<MenuItem> createPersonMenu(Item requestItem, Person p, String requestView) {
 		List<MenuItem> menu = new ArrayList<MenuItem>();

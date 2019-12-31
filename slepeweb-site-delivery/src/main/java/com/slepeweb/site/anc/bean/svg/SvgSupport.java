@@ -11,6 +11,7 @@ public class SvgSupport {
 	private List<Link> children;
 	private List<LineSegment> lineA, lineB, lineC;
 	private Coord grandparentsIcon, parentsIcon, childrenIcon;
+	private int frameHeight;
 	
 	public SvgSupport(Person pers) {
 		this.children = new ArrayList<Link>();
@@ -24,6 +25,7 @@ public class SvgSupport {
 		int u = 15;
 		int w = 45, t = 60;
 		
+		this.frameHeight = r + t + a + (pers.getChildren().size() - 1) * w;
 		this.subject = new Link(c, q, pers);
 		
 		if (pers.getFather() != null) {
@@ -55,11 +57,11 @@ public class SvgSupport {
 		this.childrenIcon = new Coord(300, r + pers.getChildren().size() * w / 2);
 	}
 	
-	private List<LineSegment> treeStyleA(int a, int b, int c, Person left, Person right, boolean isSubject) {
+	private List<LineSegment> treeStyleA(int a, int b, int c, Person left, Person right, boolean forSubject) {
 		
 		List<LineSegment> polyline = new ArrayList<LineSegment>();
 		
-		if ((left == null && right == null) || (isSubject && right == null && left.getChildren().size() == 0)) {
+		if ((left == null && right == null) || (forSubject && right == null && left.getChildren().size() == 0)) {
 			return polyline;
 		}
 		
@@ -81,7 +83,7 @@ public class SvgSupport {
 			horizontal.copyEnd(verticalShortRight.getStart());
 		}
 		
-		if (left != null || right != null) {
+		if ((left != null || right != null) && ! forSubject) {
 			polyline.add(verticalShortMiddle);
 		}
 		
@@ -169,6 +171,10 @@ public class SvgSupport {
 
 	public Coord getChildrenIcon() {
 		return childrenIcon;
+	}
+
+	public int getFrameHeight() {
+		return frameHeight;
 	}
 
 }
