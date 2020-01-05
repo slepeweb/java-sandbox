@@ -10,6 +10,7 @@ import com.slepeweb.cms.test.CacheTest;
 import com.slepeweb.cms.test.FieldTest;
 import com.slepeweb.cms.test.ItemTest;
 import com.slepeweb.cms.test.MediaTest;
+import com.slepeweb.cms.test.MultilingualFieldTest;
 import com.slepeweb.cms.test.ProductTest;
 import com.slepeweb.cms.test.PurgeTest;
 import com.slepeweb.cms.test.SolrTest;
@@ -30,6 +31,7 @@ public class TestController extends BaseController {
 	@Autowired private VersionTest versionTest;
 	@Autowired private SolrTest solrTest;
 	@Autowired private ProductTest productTest;
+	@Autowired private MultilingualFieldTest multilingualFieldTest;
 	
 	@RequestMapping("/build")
 	public String doBuild(ModelMap model) {
@@ -40,6 +42,12 @@ public class TestController extends BaseController {
 	@RequestMapping("/fields")
 	public String doFields(ModelMap model) {
 		model.addAttribute("testResults", this.fieldTest.execute());
+		return TEST_VIEW;
+	}
+	
+	@RequestMapping("/multilingual")
+	public String doMultiLingual(ModelMap model) {
+		model.addAttribute("testResults", this.multilingualFieldTest.execute());
 		return TEST_VIEW;
 	}
 	

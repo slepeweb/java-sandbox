@@ -133,6 +133,7 @@ create table field
    id int not null auto_increment,
    name varchar(64) not null,
    variable varchar(32) not null,
+   multilingual boolean default false,
    fieldtype enum ('text', 'markup', 'integer', 'date', 'url', 'radio', 'checkbox', 'select', 'datetime'),
    size int not null,
    helptext varchar(512),
@@ -157,10 +158,11 @@ create table fieldvalue
 (
    fieldid int,
    itemid int,
+   language varchar(2),
    stringvalue text,
    integervalue int,
    datevalue timestamp,
-   primary key (itemid, fieldid),
+   primary key (itemid, fieldid, language),
 	 constraint foreign key (fieldid) references field(id) on delete cascade,
 	 constraint foreign key (itemid) references item(id) on delete cascade
 ) ENGINE=InnoDB;

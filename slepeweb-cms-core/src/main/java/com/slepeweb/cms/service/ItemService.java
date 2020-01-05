@@ -2,7 +2,7 @@ package com.slepeweb.cms.service;
 
 import java.util.List;
 
-import com.slepeweb.cms.bean.FieldValue;
+import com.slepeweb.cms.bean.FieldValueSet;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.ResourceException;
 
@@ -16,7 +16,7 @@ public interface ItemService {
 	Item getItem(Long id, int version);
 	Item save(Item i) throws ResourceException;
 	Item save(Item i, boolean extended) throws ResourceException;
-	void saveFieldValues(List<FieldValue> fvs) throws ResourceException;
+	void saveFieldValues(FieldValueSet fvs) throws ResourceException;
 	void saveLinks(Item i) throws ResourceException;
 	int getCount();
 	int getCount(String path);

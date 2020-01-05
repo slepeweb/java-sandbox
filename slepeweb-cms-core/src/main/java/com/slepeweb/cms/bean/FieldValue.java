@@ -12,6 +12,7 @@ import com.slepeweb.cms.utils.StringUtil;
 
 public class FieldValue extends CmsBean {
 	private static final long serialVersionUID = 1L;
+	
 	private static String LINK_PATTERN_STR = "\\$_(\\d+)";
 	private static Pattern ANCHOR_PATTERN = 
 			Pattern.compile(String.format("(<a href=\")%s(\".*?>)(.*?)(</a>)", LINK_PATTERN_STR), 
@@ -25,6 +26,14 @@ public class FieldValue extends CmsBean {
 	private String stringValue, stringValueResolved;
 	private Integer integerValue;
 	private Timestamp dateValue;
+	private String language = "en";
+	
+	public FieldValue shallowClone() {
+		FieldValue fv = new FieldValue();
+		fv.assimilate(this);
+		fv.setCmsService(getCmsService());
+		return fv;
+	}
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof FieldValue) {
@@ -34,13 +43,16 @@ public class FieldValue extends CmsBean {
 			setStringValue(fv.getStringValue());
 			setIntegerValue(fv.getIntegerValue());
 			setDateValue(fv.getDateValue());
+			setLanguage(fv.getLanguage());
 		}
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
 			getItemId() != null &&
-			getField() != null && getField().getId() != null;
+			getField() != null && 
+			getField().getId() != null &&
+			StringUtils.isNotBlank(getLanguage());
 	}
 	
 	public Long getId() {
@@ -49,7 +61,8 @@ public class FieldValue extends CmsBean {
 	
 	@Override
 	public String toString() {
-		return String.format("itemId=%d: %s {%s}", getItemId(), getField(), StringUtils.abbreviate(getStringValue(), 64));
+		return String.format("itemId=%d: %s (%s) {%s}", getItemId(), getField(), getLanguage(), 
+				StringUtils.abbreviate(getStringValue(), 64));
 	}
 	
 	public FieldValue save() throws ResourceException {
@@ -57,7 +70,7 @@ public class FieldValue extends CmsBean {
 	}
 	
 	public void delete() {
-		getFieldValueService().deleteFieldValue(getField().getId(), getItemId());
+		getFieldValueService().deleteFieldValue(getField().getId(), getItemId(), getLanguage());
 	}
 	
 	public String getInputTag() {
@@ -132,6 +145,15 @@ public class FieldValue extends CmsBean {
 
 	public FieldValue setItemId(Long itemId) {
 		this.itemId = itemId;
+		return this;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public FieldValue setLanguage(String language) {
+		this.language = language;
 		return this;
 	}
 
@@ -210,6 +232,7 @@ public class FieldValue extends CmsBean {
 		result = prime * result + ((integerValue == null) ? 0 : integerValue.hashCode());
 		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
 		result = prime * result + ((stringValue == null) ? 0 : stringValue.hashCode());
+		result = prime * result + ((language == null) ? 0 : language.hashCode());
 		return result;
 	}
 
@@ -221,6 +244,7 @@ public class FieldValue extends CmsBean {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
+		
 		FieldValue other = (FieldValue) obj;
 		if (dateValue == null) {
 			if (other.dateValue != null)
@@ -247,6 +271,13 @@ public class FieldValue extends CmsBean {
 				return false;
 		} else if (!stringValue.equals(other.stringValue))
 			return false;
+		
+		if (language == null) {
+			if (other.language != null)
+				return false;
+		} else if (!language.equals(other.language))
+			return false;
+		
 		return true;
 	}
 

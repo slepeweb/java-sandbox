@@ -34,6 +34,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.component.SiteConfiguration;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.utils.LogUtil;
@@ -50,6 +51,7 @@ public class CmsDeliveryServlet {
 	private Map<Long, Long> lastDeliveryTable = new HashMap<Long, Long>(127);
 
 	@Autowired private CmsService cmsService;
+	@Autowired private SiteConfiguration siteConfiguration;
 
 	public void setBypass2Default(String s) {
 		// This method should be called when Spring does its injection stuff, 
@@ -78,6 +80,7 @@ public class CmsDeliveryServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
 		String path = getItemPath(req);
+		String trimmedPath = path;
 		boolean isBypass2Default = bypass2Default(path);
 		long requestTime = System.currentTimeMillis();
 		
@@ -86,10 +89,22 @@ public class CmsDeliveryServlet {
 			if (site != null) {
 				req.setAttribute("_site", site);
 				LOG.trace(LogUtil.compose("Site ...", site));
-				Item item = site.getItem(path);
+
+				boolean isMultilingual = this.siteConfiguration.getBooleanProperty(site.getId(), "multilingual");
+				
+				// Default language for site is English
+				String language = "en";
+				
+				if (isMultilingual && path.length() > 2) {
+					trimmedPath = path.substring(3);
+					language = path.substring(1, 3);
+				}
+				
+				Item item = site.getItem(trimmedPath);
 				
 				if (item != null) {
 					LOG.info(LogUtil.compose("Requesting", item));
+					item.setLanguage(language);
 					logRequestHeaders(req, path);					
 					long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
 

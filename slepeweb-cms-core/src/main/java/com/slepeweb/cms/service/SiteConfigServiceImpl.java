@@ -77,7 +77,7 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 	@Cacheable(value="serviceCache")
 	public List<SiteConfig> getSiteConfigs(Long siteId) {
 		return this.jdbcTemplate.query("select * from config where siteid = ? order by name", 
-				new Object[]{}, new RowMapperUtil.SiteConfigMapper());
+				new Object[]{siteId}, new RowMapperUtil.SiteConfigMapper());
 	}
 	
 	@SuppressWarnings("deprecation")

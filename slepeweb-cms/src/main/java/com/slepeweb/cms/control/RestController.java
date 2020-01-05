@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,6 +29,7 @@ import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
+import com.slepeweb.cms.bean.FieldValueSet;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
@@ -216,9 +216,11 @@ public class RestController extends BaseController {
 		Timestamp stamp;
 		Calendar cal;
 		int c = 0;
+		String language = request.getParameter("lang");
+
 		
 		// Identify FieldValue objects for this item
-		Map<String, FieldValue> fieldValuesMap = i.getFieldValuesMap();
+		FieldValueSet fvs = i.getFieldValueSet();
 		
 		// Build a list of FieldValue objects that need to be saved
 		List<FieldValue> fvList2Save = new ArrayList<FieldValue>();
@@ -232,7 +234,7 @@ public class RestController extends BaseController {
 			// For this field, see if there is a matching query parameter
 			param = fft.getField().getVariable();
 			ft = fft.getField().getType();
-			fv = fieldValuesMap.get(param);
+			fv = fvs.getFieldValueObj(param, language);
 			stringValue = request.getParameter(param);
 			
 			if (ft == FieldType.date || ft == FieldType.datetime) {
@@ -266,7 +268,8 @@ public class RestController extends BaseController {
 					fv = CmsBeanFactory.makeFieldValue().
 							setField(fft.getField()).
 							setItemId(i.getId()).
-							setValue(fft.getField().getDefaultValueObject());
+							setValue(fft.getField().getDefaultValueObject()).
+							setLanguage(language);
 				}
 				
 				if (ft == FieldType.integer) {

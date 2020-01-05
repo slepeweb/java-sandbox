@@ -3,7 +3,6 @@ package com.slepeweb.cms.bean;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -12,7 +11,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.CmsUtil;
 
@@ -25,12 +23,12 @@ public class Item extends CmsBean {
 	public static String SIMPLENAME_COPY_EXT = "-copy-";
 	public static Pattern SIMPLENAME_COPY_PATTERN = 
 			Pattern.compile("(^.*?" + SIMPLENAME_COPY_EXT + ")(\\d{1,})$");
-	public static final String CONTENT_ROOT_PATH = "/content";
+	public static final String CONTENT_ROOT_PATH = "/content";	
 	
 	private Site site;
 	private ItemType type;
 	private Template template;
-	private List<FieldValue> fieldValues;
+	private FieldValueSet fieldValues;
 	private String name, simpleName, path;
 	private Timestamp dateCreated, dateUpdated;
 	private boolean deleted, editable = true, published, searchable;
@@ -40,6 +38,9 @@ public class Item extends CmsBean {
 	private Item parent;
 	private List<Item> relatedParents;
 	private int version = 1;
+	
+	// NOTE: language is not saved in the database; it is assigned on item creation
+	private String language = "en";
 
 	public boolean isProduct() {
 		return false;
@@ -61,6 +62,7 @@ public class Item extends CmsBean {
 			setPublished(i.isPublished());
 			setSearchable(i.isSearchable());
 			setVersion(i.getVersion());
+			setLanguage(i.getLanguage());
 			
 			// Must assimilate fields and links too? 
 			// NO - fields and links are loaded when needed.
@@ -189,7 +191,7 @@ public class Item extends CmsBean {
 	}
 	
 	public void saveFieldValues() throws ResourceException {
-		getItemService().saveFieldValues(getFieldValues());
+		getItemService().saveFieldValues(getFieldValueSet());
 	}
 	
 	public void saveLinks() throws ResourceException {
@@ -201,7 +203,22 @@ public class Item extends CmsBean {
 	}
 	
 	public Item setFieldValue(String variable, Object value) {
-		FieldValue fv = getFieldValueObj(variable);
+		return setFieldValue(variable, value, DEFAULT_LANGUAGE);
+	}
+	
+	public Item setFieldValue(String variable, Object value, String language) {
+		FieldValue fv = getFieldValueSet().getFieldValueObj(variable, language);
+		
+		if (fv == null) {
+			Field f = getCmsService().getFieldService().getField(variable);
+			fv = CmsBeanFactory.makeFieldValue().
+					setItemId(getId()).
+					setField(f).
+					setValue(value).
+					setLanguage(language);
+			
+			getFieldValueSet().addFieldValue(fv);
+		}
 		
 		// Field value already exists
 		if (fv != null) {
@@ -350,49 +367,27 @@ public class Item extends CmsBean {
 		this.type = type;
 		return this;
 	}
-	
-	public Map<String, FieldValue> getFieldValuesMap() {
-		Map<String, FieldValue> map = new HashMap<String, FieldValue>();
-		for (FieldValue fv : getFieldValues()) {
-			map.put(fv.getField().getVariable(), fv);
-		}
-		return map;
-	}
-	
+		
 	/*
 	 * It's too verbose to work with FieldValue objects in JSPs, so this
 	 * Map should make it simpler.
 	 */
 	public Map<String, Object> getFields() {
-		Map<String, Object> map = new HashMap<String, Object>();
-		Object o;
-		
-		for (FieldValue fv : getFieldValues()) {
-			if (fv.getField().getType() == FieldType.integer) {
-				o = fv.getIntegerValue();
-			}
-			else if (fv.getField().getType() == FieldType.date) {
-				o = fv.getDateValue();
-			}
-			else {
-				o = fv.getValue();
-			}
-			
-			map.put(fv.getField().getVariable(), o);
-		}
-
-		return map;
+		return getFieldValueSet().getFields(getLanguage());
 	}
 	
-	public List<FieldValue> getFieldValues() {
+	public FieldValueSet getFieldValueSet() {
 		// If this item is not loaded with field values, get them from the database
 		if (this.fieldValues == null) {
 			/* If there are no field values defined in the db, this returns an empty list
 			 * so that the next time getFieldValues() is called, this method does not repeat
 			 * the db lookup.
+			 * 
+			 * This next call returns field values for all languages on a given item
 			 */
-			setFieldValues(getCmsService().getFieldValueService().getFieldValues(getId()));
+			this.fieldValues = getCmsService().getFieldValueService().getFieldValues(getId());
 		}
+		
 		return this.fieldValues;
 	}
 	
@@ -451,18 +446,14 @@ public class Item extends CmsBean {
 	}
 	
 	public FieldValue getFieldValueObj(String variable) {
-		if (getFieldValues() != null) {
-			for (FieldValue fv : getFieldValues()) {
-				if (fv.getField().getVariable().equals(variable)) {
-					return fv;
-				}
-			}
-		}
-		
-		return null;
+		return getFieldValueObj(variable, getLanguage());
 	}
 	
-	public Item setFieldValues(List<FieldValue> fields) {
+	public FieldValue getFieldValueObj(String variable, String language) {
+		return getFieldValueSet().getFallbackFieldValueObj(variable, language);
+	}
+	
+	public Item setFieldValues(FieldValueSet fields) {
 		this.fieldValues = fields;
 		return this;
 	}
@@ -490,6 +481,18 @@ public class Item extends CmsBean {
 	
 	public String getPath() {
 		return this.path;
+	}
+	
+	public String getBrowserPath() {
+		if (getCmsService().getSiteConfiguration().getBooleanProperty(getSite().getId(), "multilingual")) {
+			return String.format("/%s%s", getLanguage(), getPath());
+		}
+		
+		return getPath();
+	}
+	
+	public String getLanguagePath() {
+		return String.format("/%s%s", this.language, this.path);
 	}
 	
 	public String refreshPath() {
@@ -798,6 +801,15 @@ public class Item extends CmsBean {
 
 	public Item setSearchable(boolean searchable) {
 		this.searchable = searchable;
+		return this;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public Item setLanguage(String language) {
+		this.language = language;
 		return this;
 	}
 }

@@ -1,11 +1,10 @@
 package com.slepeweb.cms.service;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FieldValue;
+import com.slepeweb.cms.bean.FieldValueSet;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
@@ -19,7 +18,7 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 	
 	public FieldValue save(FieldValue fv) throws ResourceException {
 		if (fv.isDefined4Insert()) {
-			FieldValue dbRecord = getFieldValue(fv.getField().getId(), fv.getItemId());		
+			FieldValue dbRecord = getFieldValue(fv.getField().getId(), fv.getItemId(), fv.getLanguage());		
 			if (dbRecord != null) {
 				updateFieldValue(dbRecord, fv);
 				return dbRecord;
@@ -39,8 +38,8 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 	
 	private void insertFieldValue(FieldValue fv) {
 		this.jdbcTemplate.update(
-				"insert into fieldvalue (fieldid, itemid, stringvalue, integervalue, datevalue) values (?, ?, ?, ?, ?)", 
-				fv.getField().getId(), fv.getItemId(), fv.getStringValue(), fv.getIntegerValue(), fv.getDateValue());
+				"insert into fieldvalue (fieldid, itemid, language, stringvalue, integervalue, datevalue) values (?, ?, ?, ?, ?, ?)", 
+				fv.getField().getId(), fv.getItemId(), fv.getLanguage(), fv.getStringValue(), fv.getIntegerValue(), fv.getDateValue());
 		
 		// Note: No new id generated for this insert
 		LOG.info(compose("Inserted new field value", fv));
@@ -51,8 +50,8 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 			dbRecord.assimilate(fv);
 			
 			this.jdbcTemplate.update(
-					"update fieldvalue set stringvalue = ?, integervalue = ?, datevalue = ? where fieldid = ? and itemid = ?", 
-					fv.getStringValue(), fv.getIntegerValue(), fv.getDateValue(), fv.getField().getId(), fv.getItemId());
+					"update fieldvalue set stringvalue = ?, integervalue = ?, datevalue = ? where fieldid = ? and itemid = ? and language = ?", 
+					fv.getStringValue(), fv.getIntegerValue(), fv.getDateValue(), fv.getField().getId(), fv.getItemId(), fv.getLanguage());
 			
 			LOG.info(compose("Updated field value", fv));
 		}
@@ -61,25 +60,36 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 		}
 	}
 
-	public void deleteFieldValue(Long fieldId, Long itemId) {
-		if (this.jdbcTemplate.update("delete from fieldvalue where fieldid = ? and itemid = ?", fieldId, itemId) > 0) {
+	public void deleteFieldValue(Long fieldId, Long itemId, String language) {
+		if (this.jdbcTemplate.update("delete from fieldvalue where fieldid = ? and itemid = ? and language = ? ", fieldId, itemId, language) > 0) {
 			LOG.warn(compose("Deleted field value", "-"));
 		}
 	}
 
-	public FieldValue getFieldValue(Long fieldId, Long itemId) {
-		String sql = String.format(SELECTOR_TEMPLATE, "f.id = ? and fv.itemid = ?");		
-		return (FieldValue) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {fieldId, itemId}, 
-				new RowMapperUtil.FieldValueMapper()));
+	public int deleteFieldValues(Long fieldId, Long itemId) {
+		return this.jdbcTemplate.update("delete from fieldvalue where fieldid = ? and itemid = ?", fieldId, itemId);
 	}
 
 	public int deleteFieldValues(Long itemId) {
 		return this.jdbcTemplate.update("delete from fieldvalue where itemid = ?", itemId);
 	}
 
-	public List<FieldValue> getFieldValues(Long itemId) {
-		String sql = String.format(SELECTOR_TEMPLATE, "fv.itemid = ?");		
-		return this.jdbcTemplate.query(sql, new Object[] {itemId}, new RowMapperUtil.FieldValueMapper());
+	public FieldValue getFieldValue(Long fieldId, Long itemId, String language) {
+		String sql = String.format(SELECTOR_TEMPLATE, "f.id = ? and fv.itemid = ? and fv.language = ?");		
+		return (FieldValue) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {fieldId, itemId, language}, 
+				new RowMapperUtil.FieldValueMapper()));
+	}
+
+	public FieldValueSet getFieldValues(Long fieldId, Long itemId) {
+		String sql = String.format(SELECTOR_TEMPLATE, "f.id = ? and fv.itemid = ?");		
+		return new FieldValueSet(this.jdbcTemplate.query(sql, new Object[] {fieldId, itemId}, 
+				new RowMapperUtil.FieldValueMapper()));
+	}
+
+	public FieldValueSet getFieldValues(Long itemId) {
+		String sql = String.format(SELECTOR_TEMPLATE, "fv.itemid = ?");	
+		return new FieldValueSet(this.jdbcTemplate.query(sql, new Object[] {itemId}, 
+				new RowMapperUtil.FieldValueMapper()));
 	}
 
 	public int getCount() {

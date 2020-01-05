@@ -46,7 +46,7 @@ public class CmsBeanFactory {
 		return f;
 	}
 	
-	public static Item makeItem(String itemTypeName) {
+	public static Item makeItem(String itemTypeName, String language) {
 		if (
 				CMS.getServerConfig().isCommerceEnabled() && 
 				itemTypeName != null && 
@@ -57,7 +57,12 @@ public class CmsBeanFactory {
 		
 		Item i = new Item();
 		i.setCmsService(CMS);
+		i.setLanguage(language);
 		return i;
+	}
+	
+	public static Item makeItem(String itemTypeName) {
+		return makeItem(itemTypeName, "en");
 	}
 	
 	public static Template makeTemplate() {

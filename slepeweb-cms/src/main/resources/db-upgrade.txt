@@ -28,3 +28,18 @@ alter table field modify column fieldtype enum ('text', 'markup', 'integer', 'da
 
 alter table item add searchable boolean after published;
 update item set searchable=1;
+
+Multilingual work
+-----------------
+insert into config values (109, 'multilingual', 'true')
+alter table fieldvalue add column language varchar(2)
+update fieldvalue set language='en'
+
+I had to dump the database and edit the sql to alter the primary key for the fieldvalue table:
+
+primary key ('itemid', 'fieldid', 'language')
+
+Then I imported the db. Then:
+
+alter table field add column multilingual boolean default false after variable
+

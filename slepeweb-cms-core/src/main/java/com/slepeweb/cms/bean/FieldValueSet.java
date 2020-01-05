@@ -1,0 +1,151 @@
+package com.slepeweb.cms.bean;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.slepeweb.cms.bean.Field.FieldType;
+
+public class FieldValueSet {
+	private List<FieldValue> allValues;
+	private Map<String, Map<String, FieldValue>> languageMap;
+	
+	public FieldValueSet() {
+		this(new ArrayList<FieldValue>());
+	}
+	
+	public FieldValueSet(List<FieldValue> all) {
+		this.allValues = all;
+		this.languageMap = new HashMap<String, Map<String, FieldValue>>();
+		
+		// Place all field values into mapped structures
+		for (FieldValue fv : getAllValues()) {
+			getFieldValues(fv.getLanguage()).put(fv.getField().getVariable(), fv);
+		}
+	}
+
+	public List<FieldValue> getAllValues() {
+		return allValues;
+	}
+
+	public FieldValue getFieldValueObj(String variable, String language) {
+		return getFieldValues(language).get(variable);
+	}
+	
+	public String getFieldValue(String variable, String language) {
+		return getStringValue(variable, language);
+	}
+	
+	public String getStringValue(String variable, String language) {
+		return getFieldValueObj(variable, language).getStringValue();
+	}
+	
+	public Timestamp getDateFieldValue(String variable) {
+		return getFieldValueObj(variable, Item.DEFAULT_LANGUAGE).getDateValue();
+	}
+	
+	public Integer getIntegerValue(String variable) {
+		return getFieldValueObj(variable, Item.DEFAULT_LANGUAGE).getIntegerValue();
+	}
+	
+	public FieldValue getFallbackFieldValueObj(String variable, String language) {
+		FieldValue fv = getFieldValueObj(variable, language);
+		if ((fv == null || fv.getValue() == null) && ! language.equals(Item.DEFAULT_LANGUAGE)) {
+			return getFieldValueObj(variable, Item.DEFAULT_LANGUAGE);
+		}
+		return fv;
+	}
+	
+	public String getFallbackFieldValue(String variable, String language) {
+		FieldValue fv = getFallbackFieldValueObj(variable, language);
+		if (fv != null) {
+			return fv.getStringValue();
+		}
+		return "";
+	}
+	
+	public Timestamp getFallbackDateValue(String variable, String language) {
+		FieldValue fv = getFallbackFieldValueObj(variable, language);
+		if (fv != null) {
+			return fv.getDateValue();
+		}
+		return new Timestamp(0);
+	}
+	
+	public Integer getFallbackIntegerValue(String variable, String language) {
+		FieldValue fv = getFallbackFieldValueObj(variable, language);
+		if (fv != null) {
+			return fv.getIntegerValue();
+		}
+		return new Integer(0);
+	}
+	
+	/*
+	 * This returns a map of merged field values that can easily be used by jsp's
+	 */
+	public Map<String, Object> getFields(String language) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		/* 
+		 * First, get all values for the default language - the multilingual
+		 * fields will be a subset of these.
+		 */
+		merge(getFieldValues(Item.DEFAULT_LANGUAGE).values(), map);
+		if (! language.equals(Item.DEFAULT_LANGUAGE)) {
+			merge(getFieldValues(language).values(), map);
+		}
+
+		return map;
+	}
+	
+	private void merge(Collection<FieldValue> values, Map<String, Object> map) {
+		Object o, existing;
+		String var;
+		boolean doMerge;
+		
+		for (FieldValue fv : values) {
+			doMerge = false;
+			var = fv.getField().getVariable();
+			existing = map.get(var);
+			
+			if (fv.getField().getType() == FieldType.integer) {
+				o = fv.getIntegerValue();
+				doMerge = existing == null || fv.getIntegerValue() != null;
+			}
+			else if (fv.getField().getType() == FieldType.date) {
+				o = fv.getDateValue();
+				doMerge = true;
+			}
+			else {
+				o = fv.getValue();
+				doMerge = existing == null || ! StringUtils.isBlank(fv.getStringValue());
+			}
+			
+			if (doMerge) {
+				map.put(var, o);
+			}
+		}
+	}
+	
+	public void addFieldValue(FieldValue fv) {
+		if (! this.allValues.contains(fv)) {
+			this.allValues.add(fv);
+			getFieldValues(fv.getLanguage()).put(fv.getField().getVariable(), fv);
+		}
+	}
+	
+	public Map<String, FieldValue> getFieldValues(String language) {
+		Map<String, FieldValue> variableMap = this.languageMap.get(language);
+		if (variableMap == null) {
+			variableMap = new HashMap<String, FieldValue>();
+			this.languageMap.put(language, variableMap);
+		}
+		
+		return variableMap;
+	}
+}

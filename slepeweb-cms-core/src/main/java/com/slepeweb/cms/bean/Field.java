@@ -27,6 +27,7 @@ public class Field extends CmsBean {
 	private int size;
 	private String defaultValue;
 	private String validValues; 
+	private boolean multilingual;
 	
 	public enum FieldType {
 		text, markup, integer, date, datetime, url, radio, checkbox, select;
@@ -42,6 +43,7 @@ public class Field extends CmsBean {
 			setSize(f.getSize());
 			setDefaultValue(f.getDefaultValue());
 			setValidValues(f.getValidValues());
+			setMultilingual(f.isMultilingual());
 		}
 	}
 
@@ -290,6 +292,7 @@ public class Field extends CmsBean {
 		result = prime * result + size;
 		result = prime * result + ((type == null) ? 0 : type.name().hashCode());
 		result = prime * result + ((variable == null) ? 0 : variable.hashCode());
+		result = prime * result + (multilingual ? 1231 : 1237);
 		return result;
 	}
 
@@ -331,6 +334,8 @@ public class Field extends CmsBean {
 				return false;
 		} else if (!variable.equals(other.variable))
 			return false;
+		if (multilingual != other.multilingual)
+			return false;
 		return true;
 	}
 
@@ -362,5 +367,14 @@ public class Field extends CmsBean {
 			return vvl;
 		}
 		return null;
+	}
+
+	public boolean isMultilingual() {
+		return multilingual;
+	}
+
+	public Field setMultilingual(boolean multilingual) {
+		this.multilingual = multilingual;
+		return this;
 	}
 }

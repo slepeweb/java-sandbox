@@ -182,15 +182,16 @@ public class SiteSetup {
 					LOG.info(String.format("Creating new field [%s]", variable));
 				}
 				
-				if (! exists || updateable) {
+				if (! exists || updateable) {					
 					f.
 						setName(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1))).
 						setVariable(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))).
-						setType(FieldType.valueOf(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3)))).
-						setSize(SiteSetupUtils.getInteger(row.getCell(4))).
-						setHelp(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(5))).
-						setValidValues(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(6))).
-						setDefaultValue(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(7))).
+						setMultilingual(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3)).equals("1")).
+						setType(FieldType.valueOf(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(4)))).
+						setSize(SiteSetupUtils.getInteger(row.getCell(5))).
+						setHelp(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(6))).
+						setValidValues(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(7))).
+						setDefaultValue(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(8))).
 						save();
 					
 					LOG.info(String.format("Field saved [%s]", variable));

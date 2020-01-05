@@ -169,6 +169,7 @@ public class RowMapperUtil {
 				setId(rs.getLong("id")).
 				setName(rs.getString("name")).
 				setVariable(rs.getString("variable")).
+				setMultilingual(rs.getBoolean("multilingual")).
 				setHelp(rs.getString("helptext")).
 				setType(FieldType.valueOf(rs.getString("fieldtype"))).
 				setSize(rs.getInt("size")).
@@ -203,7 +204,8 @@ public class RowMapperUtil {
 					setItemId(rs.getLong("itemid")).
 					setStringValue(rs.getString("stringvalue")).
 					setIntegerValue(rs.getInt("integervalue")).
-					setDateValue(rs.getTimestamp("datevalue"));
+					setDateValue(rs.getTimestamp("datevalue")).
+					setLanguage(rs.getString("language"));
 		}
 	}
 	

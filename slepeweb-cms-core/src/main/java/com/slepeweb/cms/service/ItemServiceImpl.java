@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
+import com.slepeweb.cms.bean.FieldValueSet;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
@@ -76,7 +77,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 		
 		if (extendedSave) {
-			saveFieldValues(i.getFieldValues());
+			saveFieldValues(i.getFieldValueSet());
 			saveLinks(i, dbRecord);
 		}
 		
@@ -266,28 +267,31 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		LOG.info(compose("Older versions deleted", i));
 	}
 	
-	public void saveFieldValues(List<FieldValue> fieldValues) throws ResourceException {
+	public void saveFieldValues(FieldValueSet fieldValues) throws ResourceException {
 		if (fieldValues != null) {
-			for (FieldValue fv : fieldValues) {
+			for (FieldValue fv : fieldValues.getAllValues()) {
 				fv.save();
 			}
 		}
 	}
 	
+	// If item has no field values, create them, with default values
 	private void saveDefaultFieldValues(Item i) throws ResourceException {
-		// If item has no field values, create them, with default values
-		if (i.getFieldValues() == null || i.getFieldValues().size() == 0) {
-			i.setFieldValues(new ArrayList<FieldValue>());
+		FieldValueSet fvs = i.getFieldValueSet();
+		
+		if (fvs == null || fvs.getAllValues().size() == 0) {
+			fvs = new FieldValueSet(new ArrayList<FieldValue>());
+			i.setFieldValues(fvs);
 			FieldValue fv;
 
 			for (FieldForType fft : this.fieldForTypeService.getFieldsForType(i.getType().getId())) {
 				fv = CmsBeanFactory.makeFieldValue().
 					setField(fft.getField()).
 					setItemId(i.getId()).
-					setValue(fft.getField().getDefaultValueObject());
+					setValue(fft.getField().getDefaultValueObject()).
+					setLanguage(Item.DEFAULT_LANGUAGE);
 				
 				fv.save();
-				i.getFieldValues().add(fv);
 			}
 		}
 	}
@@ -510,6 +514,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 
 	public Item getItemFromBin(Long origId) {
+		// This operation isn't really interested in the language property
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.origid=? and i.editable=1 and i.deleted=1"), 
 			new Object[]{origId});
@@ -647,7 +652,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		int origOrdering = this.linkService.getLink(parent.getId(), source.getId()).getOrdering();
 		long sourceId = source.getId();
 		long sourceOrigId = source.getOrigId();
-		List <FieldValue> origFieldValues = source.getFieldValues();
+		FieldValueSet origFieldValues = source.getFieldValueSet();
 		List<Link> origLinks = source.getLinks();
 		
 		// Core data
@@ -694,15 +699,16 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		parentLink2NewVersion.save();
 		
 		// Field data
-		List <FieldValue> nfvl = new ArrayList<FieldValue>(origFieldValues.size());
+		FieldValueSet fvs = new FieldValueSet();
 		FieldValue nfv;
-		for (FieldValue fv : origFieldValues) {
+		
+		for (FieldValue fv : origFieldValues.getAllValues()) {
 			nfv = CmsBeanFactory.makeFieldValue();
 			nfv.assimilate(fv);
 			nfv.setItemId(ni.getId());
-			nfvl.add(nfv);
+			fvs.addFieldValue(nfv);
 		}
-		ni.setFieldValues(nfvl);
+		ni.setFieldValues(fvs);
 		
 		// Links
 		List<Link> nll = new ArrayList<Link>(origLinks.size());
