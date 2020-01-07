@@ -1,10 +1,12 @@
 package com.slepeweb.cms.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.FieldValueSet;
+import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
@@ -15,6 +17,8 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 	private static Logger LOG = Logger.getLogger(FieldValueServiceImpl.class);
 	private static final String SELECTOR_TEMPLATE = "select f.*, fv.* from field f, fieldvalue fv where " +
 			"fv.fieldid = f.id and %s";
+	
+	@Autowired private ItemService itemService;
 	
 	public FieldValue save(FieldValue fv) throws ResourceException {
 		if (fv.isDefined4Insert()) {
@@ -81,17 +85,19 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 	}
 
 	public FieldValueSet getFieldValues(Long fieldId, Long itemId) {
+		Item i = this.itemService.getItem(itemId);
 		String sql = String.format(SELECTOR_TEMPLATE, "f.id = ? and fv.itemid = ?");		
-		return new FieldValueSet(this.jdbcTemplate.query(sql, new Object[] {fieldId, itemId}, 
+		return new FieldValueSet(i.getSite(), this.jdbcTemplate.query(sql, new Object[] {fieldId, itemId}, 
 				new RowMapperUtil.FieldValueMapper()));
 	}
 
 	public FieldValueSet getFieldValues(Long itemId) {
+		Item i = this.itemService.getItem(itemId);
 		String sql = String.format(SELECTOR_TEMPLATE, "fv.itemid = ?");	
-		return new FieldValueSet(this.jdbcTemplate.query(sql, new Object[] {itemId}, 
+		return new FieldValueSet(i.getSite(), this.jdbcTemplate.query(sql, new Object[] {itemId}, 
 				new RowMapperUtil.FieldValueMapper()));
 	}
-
+	
 	public int getCount() {
 		return getCount(null);
 	}

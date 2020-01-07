@@ -203,7 +203,7 @@ public class Item extends CmsBean {
 	}
 	
 	public Item setFieldValue(String variable, Object value) {
-		return setFieldValue(variable, value, DEFAULT_LANGUAGE);
+		return setFieldValue(variable, value, getSite().getLanguage());
 	}
 	
 	public Item setFieldValue(String variable, Object value, String language) {
@@ -367,6 +367,10 @@ public class Item extends CmsBean {
 		this.type = type;
 		return this;
 	}
+	
+	public Map<String, FieldValue> getFieldValues() {
+		return getFieldValueSet().getFieldValues(getLanguage());
+	}
 		
 	/*
 	 * It's too verbose to work with FieldValue objects in JSPs, so this
@@ -484,7 +488,7 @@ public class Item extends CmsBean {
 	}
 	
 	public String getBrowserPath() {
-		if (getCmsService().getSiteConfiguration().getBooleanProperty(getSite().getId(), "multilingual")) {
+		if (getSite().isMultilingual()) {
 			return String.format("/%s%s", getLanguage(), getPath());
 		}
 		

@@ -31,10 +31,7 @@ public class RowMapperUtil {
 					setId(rs.getLong("id")).
 					setName(rs.getString("name"));
 			
-			Site s = CmsBeanFactory.makeSite().
-					setId(rs.getLong("siteid")).
-					setName(rs.getString("sitename")).
-					setShortname(rs.getString("shortname"));
+			Site s = mapSite(rs, "siteid", "sitename", "shortname");
 			
 			return h.setSite(s);			
 		}
@@ -42,11 +39,17 @@ public class RowMapperUtil {
 	
 	public static final class SiteMapper implements RowMapper<Site> {
 		public Site mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return CmsBeanFactory.makeSite().
-					setId(rs.getLong("id")).
-					setName(rs.getString("name")).
-					setShortname(rs.getString("shortname"));
+			return mapSite(rs, "id", "name", "shortname");
 		}
+	}
+	
+	private static Site mapSite(ResultSet rs, String id, String name, String shortname) throws SQLException {
+		return CmsBeanFactory.makeSite().
+				setId(rs.getLong(id)).
+				setName(rs.getString(name)).
+				setShortname(rs.getString(shortname)).
+				setLanguage(rs.getString("language")).
+				setExtraLanguages(rs.getString("xlanguages"));
 	}
 	
 	public static final class ItemTypeMapper implements RowMapper<ItemType> {
@@ -87,6 +90,8 @@ public class RowMapperUtil {
 				setSearchable(rs.getBoolean("searchable")).
 				setVersion(rs.getInt("version"));
 		
+		// TODO: refactor: there are several places here where item types are created, but with different sql
+		// TODO: check also for similar instances on other bean makers
 		ItemType type = CmsBeanFactory.makeItemType().
 				setId(rs.getLong("typeid")).
 				setName(itemTypeName).
@@ -96,11 +101,7 @@ public class RowMapperUtil {
 		
 		item.setType(type);
 		
-		Site site = CmsBeanFactory.makeSite().
-				setId(rs.getLong("siteid")).
-				setName(rs.getString("sitename")).
-				setShortname(rs.getString("site_shortname"));
-		
+		Site site = mapSite(rs, "siteid", "sitename", "site_shortname");		
 		item.setSite(site);
 		
 		Template t = null;

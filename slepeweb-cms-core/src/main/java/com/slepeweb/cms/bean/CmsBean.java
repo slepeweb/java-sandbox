@@ -26,7 +26,6 @@ import com.slepeweb.commerce.service.VariantService;
 public abstract class CmsBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	protected static final Long NO_ID = -1L;
-	public static final String DEFAULT_LANGUAGE = "en";
 	protected transient CmsService cmsService;
 	
 	protected abstract CmsBean save() throws ResourceException;	

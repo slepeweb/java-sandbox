@@ -25,6 +25,8 @@ create table site
 	id int not null auto_increment,
 	name varchar(255),
 	shortname varchar(8),
+	language varchar(2),
+	xlanguages varchar(16),
 	primary key (id),
 	unique key idx_site_name (name),
 	unique key idx_site_shortname (shortname),

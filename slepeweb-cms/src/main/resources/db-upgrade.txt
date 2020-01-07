@@ -31,7 +31,6 @@ update item set searchable=1;
 
 Multilingual work
 -----------------
-insert into config values (109, 'multilingual', 'true')
 alter table fieldvalue add column language varchar(2)
 update fieldvalue set language='en'
 
@@ -42,4 +41,6 @@ primary key ('itemid', 'fieldid', 'language')
 Then I imported the db. Then:
 
 alter table field add column multilingual boolean default false after variable
+alter table site add language varchar(2) after shortname
+alter table site add xlanguages varchar(16) after language
 

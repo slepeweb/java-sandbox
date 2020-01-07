@@ -38,7 +38,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private static final String MOVE_OVER = "over";
 
 	private final static String SELECT_TEMPLATE = 
-			"select i.*, s.name as sitename, s.shortname as site_shortname, " +
+			"select i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, " +
 			"it.id as typeid, it.name as typename, it.mimetype, it.privatecache, it.publiccache, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
 			"from item i " +
@@ -278,22 +278,31 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	// If item has no field values, create them, with default values
 	private void saveDefaultFieldValues(Item i) throws ResourceException {
 		FieldValueSet fvs = i.getFieldValueSet();
+		String defaultLanguage = i.getSite().getLanguage();
+		String[] additionalLanguages = i.getSite().getExtraLanguagesArray();
 		
 		if (fvs == null || fvs.getAllValues().size() == 0) {
-			fvs = new FieldValueSet(new ArrayList<FieldValue>());
+			fvs = new FieldValueSet(i.getSite());
 			i.setFieldValues(fvs);
-			FieldValue fv;
-
+			
 			for (FieldForType fft : this.fieldForTypeService.getFieldsForType(i.getType().getId())) {
-				fv = CmsBeanFactory.makeFieldValue().
-					setField(fft.getField()).
-					setItemId(i.getId()).
-					setValue(fft.getField().getDefaultValueObject()).
-					setLanguage(Item.DEFAULT_LANGUAGE);
-				
-				fv.save();
+				saveDefaultFieldValue(i, fft, defaultLanguage, fvs);
+				for (String lang : additionalLanguages) {
+					saveDefaultFieldValue(i, fft, lang, fvs);
+				}
 			}
 		}
+	}
+	
+	private void saveDefaultFieldValue(Item i, FieldForType fft, String language, FieldValueSet fvs) throws ResourceException {
+		FieldValue fv = CmsBeanFactory.makeFieldValue().
+			setField(fft.getField()).
+			setItemId(i.getId()).
+			setValue(fft.getField().getDefaultValueObject()).
+			setLanguage(language);
+		
+		fv.save();
+		fvs.addFieldValue(fv);
 	}
 
 	public void saveLinks(Item i) throws ResourceException {
@@ -699,7 +708,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		parentLink2NewVersion.save();
 		
 		// Field data
-		FieldValueSet fvs = new FieldValueSet();
+		FieldValueSet fvs = new FieldValueSet(source.getSite());
 		FieldValue nfv;
 		
 		for (FieldValue fv : origFieldValues.getAllValues()) {

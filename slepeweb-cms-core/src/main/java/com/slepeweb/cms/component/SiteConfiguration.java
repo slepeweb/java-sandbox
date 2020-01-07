@@ -13,7 +13,7 @@ import com.slepeweb.cms.service.SiteConfigService;
 
 @Component
 public class SiteConfiguration {
-
+	
 	@Autowired private SiteConfigService siteConfigService;
 	
 	private Map<Long, Properties> sites = new HashMap<Long, Properties>();

@@ -135,32 +135,59 @@
 
 <div id="field-tab">
 	<form id="field-form">
-	<c:set var="fvm" value="${editingItem.fieldValuesMap}" />
-	<c:forEach items="${editingItem.type.fieldsForType}" var="fft">
-		<c:set var="fv" value="${fvm[fft.field.variable]}" />
-		<c:choose>
-			<c:when test="${empty fv}">
-				<c:set var="variable" value="${fft.field.variable}" />
-				<c:set var="label" value="${fft.field.name}" />
-				<c:set var="inputTag" value="${fft.field.inputTag}" />
-			</c:when>
-			<c:otherwise>
-				<c:set var="fv" value="${fvm[fft.field.variable]}" />
-				<c:set var="variable" value="${fv.field.variable}" />
-				<c:set var="label" value="${fv.field.name}" />
-				<c:set var="inputTag" value="${fv.inputTag}" />
-			</c:otherwise>
-		</c:choose>
-		<div>
-			<label for="${variable}">${label} : </label>
-			${inputTag}
-		</div>
-	</c:forEach>
+		<c:set var="fvm" value="${editingItem.fieldValues}" />
+		
+		<c:if test="${editingItem.site.multilingual}">
+			<label for="field-language-selector">Language : </label>
+			<select id="field-language-selector" name="language">
+				<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
+					<option value="${_lang}" <c:if 
+						test="${editingItem.language eq _lang}">selected</c:if>>${_lang}</option>
+				</c:forEach>
+			</select>
+		</c:if>
+	
+		<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
+			<div id="form-fields-${_lang}" class="hideable">
+				<c:forEach items="${_fieldSupport[_lang]}" var="fes">
+						<div>
+							<label for="${fes.field.variable}">${fes.label} : </label>
+							${fes.inputTag}
+						</div>
+				</c:forEach>
+			</div>
+		</c:forEach>
 		<div>
 			<label>&nbsp;</label><button id="field-button" type="button">Update</button>
 		</div>
 	</form>
 </div>
+
+<script>
+	var _requestedLanguage = "${_requestedLanguage}";
+	var _siteDefaultLanguage = "${editingItem.site.language}";
+
+	var _toggleFieldDivs = function(lang) {
+		$(".hideable").each(function() {
+			var ele = $(this);
+			if (ele.attr("id").endsWith(lang)) {
+				ele.show();
+			}
+			else {
+				ele.hide();
+			}
+		});
+	}
+	
+	$(function() {
+		_toggleFieldDivs(_requestedLanguage);
+		
+		$("#field-language-selector").change(function(){
+			var lang = $(this).val();
+			_toggleFieldDivs(lang);
+		});
+	});
+</script>
 
 <div id="links-tab">
 	<div>

@@ -8,7 +8,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.bean.FieldEditorSupport;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
@@ -65,18 +68,73 @@ public class RestController extends BaseController {
 	@Autowired private TagService tagService;
 	@Autowired private AxisService axisService;
 	
+	/* 
+	 * This mapping is used by the main left-hand navigation.
+	 * 
+	 */
 	@RequestMapping("/item/editor")
-	public String doItemEditor(ModelMap model, @RequestParam(value="key", required=true) Long id) {	
+	public String doItemEditor(ModelMap model, 
+			@RequestParam(value="key", required=true) Long id,
+			@RequestParam(value="language", required=false) String requestedLanguage) {	
+		
 		Item i = this.itemService.getItem(id);
 		if (i != null) {
+			String lang = chooseLanguage(i.getSite().isMultilingual(), 
+					requestedLanguage, i.getSite().getLanguage());
+			model.addAttribute("_requestedLanguage", lang);
+			
 			model.put("editingItem", i);
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
 			
 			if (i.isProduct()) {
 				model.addAttribute("availableAxes", this.axisService.get());
 			}
+			
+			Map<String, FieldValue> languageValuesMap;
+			Map<String, List<FieldEditorSupport>> fieldSupport = new HashMap<String, List<FieldEditorSupport>>();
+			List<FieldEditorSupport> list;
+			FieldValue fv;
+			FieldEditorSupport fes;
+			String variable;
+			
+			for (String language : i.getSite().getAllLanguages()) {
+				languageValuesMap = i.getFieldValueSet().getFieldValues(language);
+				list = new ArrayList<FieldEditorSupport>();
+				
+				for (FieldForType fft : i.getType().getFieldsForType()) {
+					if (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual()) {
+						variable = fft.getField().getVariable();
+						fv = languageValuesMap.get(variable);
+						fes = new FieldEditorSupport().
+								setField(fft.getField()).
+								setLabel(fft.getField().getName());
+						
+						if (fv == null) {
+							fes.setInputTag(fft.getField().getInputTag());
+						}
+						else {
+							fes.setFieldValue(fv);
+							fes.setInputTag(fv.getInputTag());
+						}
+						
+						list.add(fes);
+					}
+				}
+				
+				fieldSupport.put(language, list);
+			}
+			
+			model.addAttribute("_fieldSupport", fieldSupport);
 		}
+		
 		return "cms.item.editor";		
+	}
+	
+	private String chooseLanguage(boolean isMultilingualSite, String requested, String siteDefault) {
+		if (isMultilingualSite) {
+			return StringUtils.isBlank(requested) ? siteDefault : requested;
+		}
+		return siteDefault;
 	}
 	
 	/*
@@ -216,8 +274,9 @@ public class RestController extends BaseController {
 		Timestamp stamp;
 		Calendar cal;
 		int c = 0;
-		String language = request.getParameter("lang");
-
+		
+		String language = chooseLanguage(i.getSite().isMultilingual(), 
+				request.getParameter("language"), i.getSite().getLanguage());
 		
 		// Identify FieldValue objects for this item
 		FieldValueSet fvs = i.getFieldValueSet();
@@ -231,6 +290,13 @@ public class RestController extends BaseController {
 		
 		// Loop through fields for this item type
 		for (FieldForType fft : i.getType().getFieldsForType()) {
+			// Only interested in multilingual fields for additional languages
+			if (i.getSite().isMultilingual() && 
+					! (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual())) {
+				
+				continue;
+			}
+			
 			// For this field, see if there is a matching query parameter
 			param = fft.getField().getVariable();
 			ft = fft.getField().getType();

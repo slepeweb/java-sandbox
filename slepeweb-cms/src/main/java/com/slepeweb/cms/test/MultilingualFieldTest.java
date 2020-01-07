@@ -48,7 +48,7 @@ public class MultilingualFieldTest extends BaseTest {
 					r.setNotes(String.format("Wrong title field value [%s]", titleFieldValue)).fail();
 				}
 				
-				// 8020: Assert french teaser field value defaults to english
+				// 8020: Assert empty french teaser field value defaults to english
 				String teaserFieldValue = checkItem.getFieldValue(TEASER_FIELD_NAME);
 				r = trs.execute(8020);
 				if (teaserFieldValue == null || ! teaserFieldValue.equals(teaserEn)) {

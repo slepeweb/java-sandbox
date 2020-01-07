@@ -1,5 +1,6 @@
 package com.slepeweb.cms.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,26 +9,39 @@ import com.slepeweb.cms.except.ResourceException;
 
 public class Site extends CmsBean {
 	private static final long serialVersionUID = 1L;
-	private String name, shortname;
+	private String name, shortname, language, extraLanguages;
+	private String[] extraLanguagesArray;
 	private Long id;
 		
 	public void assimilate(Object obj) {
 		if (obj instanceof Site) {
 			Site s = (Site) obj;
 			setName(s.getName());
-			setShortname(s.getShortname());
+			setShortname(s.getShortname()).
+			setLanguage(s.getLanguage()).
+			setExtraLanguages(s.getExtraLanguages());
 		}
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
 			StringUtils.isNotBlank(getName()) &&
-			StringUtils.isNotBlank(getShortname());
+			StringUtils.isNotBlank(getShortname()) &&
+			StringUtils.isNotBlank(getLanguage());
 	}
 	
 	@Override
 	public String toString() {
 		return String.format("%s (%s)", getName(), getShortname());
+	}
+	
+	public List<String> getAllLanguages() {
+		List<String> all = new ArrayList<String>();
+		all.add(getLanguage());
+		for (int i = 0; i < getExtraLanguagesArray().length; i++) {
+			all.add(getExtraLanguagesArray()[i]);
+		}
+		return all;
 	}
 	
 	public Site save() throws ResourceException {
@@ -84,10 +98,54 @@ public class Site extends CmsBean {
 		return this;
 	}
 	
+	public String getLanguage() {
+		return language;
+	}
+
+	public Site setLanguage(String defaultLanguage) {
+		this.language = defaultLanguage;
+		return this;
+	}
+
+	public String getExtraLanguages() {
+		return extraLanguages;
+	}
+
+	public Site setExtraLanguages(String langStr) {
+		String trimmed = langStr.trim();
+		this.extraLanguages = trimmed;
+		this.extraLanguagesArray = StringUtils.isNotBlank(trimmed) ? trimmed.split("[, ]") : new String[0];
+		return this;
+	}
+	
+	public String[] getExtraLanguagesArray() {
+		return extraLanguagesArray;
+	}
+
+	public Site setExtraLanguagesArray(String[] extraLanguagesArray) {
+		this.extraLanguagesArray = extraLanguagesArray;
+		return this;
+	}
+
+	public boolean isMultilingual() {
+		return this.extraLanguagesArray != null && this.extraLanguagesArray.length > 0;
+	}
+
+	public String getShortname() {
+		return shortname;
+	}
+
+	public Site setShortname(String shortname) {
+		this.shortname = shortname;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((extraLanguages == null) ? 0 : extraLanguages.hashCode());
+		result = prime * result + ((language == null) ? 0 : language.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((shortname == null) ? 0 : shortname.hashCode());
 		return result;
@@ -102,6 +160,16 @@ public class Site extends CmsBean {
 		if (getClass() != obj.getClass())
 			return false;
 		Site other = (Site) obj;
+		if (extraLanguages == null) {
+			if (other.extraLanguages != null)
+				return false;
+		} else if (!extraLanguages.equals(other.extraLanguages))
+			return false;
+		if (language == null) {
+			if (other.language != null)
+				return false;
+		} else if (!language.equals(other.language))
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -113,15 +181,6 @@ public class Site extends CmsBean {
 		} else if (!shortname.equals(other.shortname))
 			return false;
 		return true;
-	}
-
-	public String getShortname() {
-		return shortname;
-	}
-
-	public Site setShortname(String shortname) {
-		this.shortname = shortname;
-		return this;
 	}
 
 }

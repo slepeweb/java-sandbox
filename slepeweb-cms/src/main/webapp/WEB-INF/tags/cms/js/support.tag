@@ -64,7 +64,16 @@ var fetchItemEditor = function(nodeKey, status) {
 // Get form field names and values for forms on item-editor 
 var getFieldsFormInputData = function() {
 	var result = {};
-	$("#field-form input, #field-form textarea, #field-form select").each(function(i, obj) {
+	var language = $("#field-language-selector").val();
+	if (! language) {
+		language = _siteDefaultLanguage;
+	}
+	
+	result["language"] = language;
+	var selector = "#form-fields-lang input, #form-fields-lang textarea, #form-fields-lang select";
+	selector = selector.replace(/lang/g, language);
+	
+	$(selector).each(function(i, obj) {
 		var ctrl = $(obj);
 		var type = ctrl.attr("type");
 		var param = ctrl.attr("name");

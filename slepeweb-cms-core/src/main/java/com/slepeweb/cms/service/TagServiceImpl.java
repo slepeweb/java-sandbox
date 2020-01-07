@@ -16,7 +16,7 @@ public class TagServiceImpl extends BaseServiceImpl implements TagService {
 	
 	private static Logger LOG = Logger.getLogger(TagServiceImpl.class);
 	private static String SELECT_TEMPLATE = 
-			"select tg.value as tagvalue, i.*, s.name as sitename, s.shortname as site_shortname, " +
+			"select tg.value as tagvalue, i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, " +
 			"it.id as typeid, it.name as typename, it.mimetype, it.privatecache, it.publiccache, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
 			"from item i " +

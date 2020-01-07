@@ -13,20 +13,27 @@ import com.slepeweb.cms.bean.Field.FieldType;
 
 public class FieldValueSet {
 	private List<FieldValue> allValues;
-	private Map<String, Map<String, FieldValue>> languageMap;
+	private Map<String, Map<String, FieldValue>> mappedFieldValues;
+
+	private Site site;
 	
-	public FieldValueSet() {
-		this(new ArrayList<FieldValue>());
+	public FieldValueSet(Site s) {
+		this(s, new ArrayList<FieldValue>());
 	}
 	
-	public FieldValueSet(List<FieldValue> all) {
+	public FieldValueSet(Site s, List<FieldValue> all) {
+		this.site = s;
 		this.allValues = all;
-		this.languageMap = new HashMap<String, Map<String, FieldValue>>();
+		this.mappedFieldValues = new HashMap<String, Map<String, FieldValue>>();
 		
 		// Place all field values into mapped structures
 		for (FieldValue fv : getAllValues()) {
 			getFieldValues(fv.getLanguage()).put(fv.getField().getVariable(), fv);
 		}
+	}
+
+	public Site getSite() {
+		return site;
 	}
 
 	public List<FieldValue> getAllValues() {
@@ -46,17 +53,17 @@ public class FieldValueSet {
 	}
 	
 	public Timestamp getDateFieldValue(String variable) {
-		return getFieldValueObj(variable, Item.DEFAULT_LANGUAGE).getDateValue();
+		return getFieldValueObj(variable, getSite().getLanguage()).getDateValue();
 	}
 	
 	public Integer getIntegerValue(String variable) {
-		return getFieldValueObj(variable, Item.DEFAULT_LANGUAGE).getIntegerValue();
+		return getFieldValueObj(variable, getSite().getLanguage()).getIntegerValue();
 	}
 	
 	public FieldValue getFallbackFieldValueObj(String variable, String language) {
 		FieldValue fv = getFieldValueObj(variable, language);
-		if ((fv == null || fv.getValue() == null) && ! language.equals(Item.DEFAULT_LANGUAGE)) {
-			return getFieldValueObj(variable, Item.DEFAULT_LANGUAGE);
+		if ((fv == null || fv.getValue() == null) && ! language.equals(getSite().getLanguage())) {
+			return getFieldValueObj(variable, getSite().getLanguage());
 		}
 		return fv;
 	}
@@ -95,8 +102,8 @@ public class FieldValueSet {
 		 * First, get all values for the default language - the multilingual
 		 * fields will be a subset of these.
 		 */
-		merge(getFieldValues(Item.DEFAULT_LANGUAGE).values(), map);
-		if (! language.equals(Item.DEFAULT_LANGUAGE)) {
+		merge(getFieldValues(getSite().getLanguage()).values(), map);
+		if (! language.equals(getSite().getLanguage())) {
 			merge(getFieldValues(language).values(), map);
 		}
 
@@ -140,12 +147,16 @@ public class FieldValueSet {
 	}
 	
 	public Map<String, FieldValue> getFieldValues(String language) {
-		Map<String, FieldValue> variableMap = this.languageMap.get(language);
+		Map<String, FieldValue> variableMap = this.mappedFieldValues.get(language);
 		if (variableMap == null) {
 			variableMap = new HashMap<String, FieldValue>();
-			this.languageMap.put(language, variableMap);
+			this.mappedFieldValues.put(language, variableMap);
 		}
 		
 		return variableMap;
+	}
+
+	public Map<String, Map<String, FieldValue>> getMappedFieldValues() {
+		return mappedFieldValues;
 	}
 }

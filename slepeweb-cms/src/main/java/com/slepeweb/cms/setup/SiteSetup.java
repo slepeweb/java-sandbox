@@ -141,6 +141,8 @@ public class SiteSetup {
 					s.
 						setName(name).
 						setShortname(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(2))).
+						setLanguage(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))).
+						setExtraLanguages(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(4))).
 						save();
 					
 					if (s.getId() != null) {

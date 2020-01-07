@@ -47,6 +47,8 @@ public abstract class BaseTest {
 		return CmsBeanFactory.makeSite().
 				setName(name).
 				setShortname(shortname).
+				setLanguage("en").
+				setExtraLanguages("fr").
 				save();	
 	}
 	

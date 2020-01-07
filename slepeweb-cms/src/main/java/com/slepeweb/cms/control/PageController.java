@@ -45,7 +45,7 @@ public class PageController extends BaseController {
 				model.addAttribute("availableAxes", this.axisService.get());
 			}
 		}
-		
+			
 		String flash = req.getParameter("status");
 		if (StringUtils.isNotBlank(flash)) {
 			RestResponse status = new RestResponse();
