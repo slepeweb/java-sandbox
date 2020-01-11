@@ -30,7 +30,7 @@ public class Field extends CmsBean {
 	private boolean multilingual;
 	
 	public enum FieldType {
-		text, markup, integer, date, datetime, url, radio, checkbox, select;
+		text, markup, integer, date, datetime, url, radio, checkbox, select, layout;
 	}
 
 	public void assimilate(Object obj) {

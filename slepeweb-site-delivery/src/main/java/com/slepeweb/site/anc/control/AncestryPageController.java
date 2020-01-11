@@ -87,60 +87,60 @@ public class AncestryPageController extends BaseController {
 		return page.getView();
 	}	
 
-	@RequestMapping(value="/male/gallery/{itemId}")	
+	@RequestMapping(value="/male/gallery/{targetId}")	
 	public String maleGallery(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
-			@PathVariable long itemId,
+			@PathVariable long targetId,
 			ModelMap model) {	
 		
 		// Use the same jsp as for records
 		Person subject = new Person(i);
-		return galleryAndRecordController(i, shortSitename, itemId, model, 
+		return galleryAndRecordController(i, shortSitename, targetId, model, 
 				subject, subject.getGallery(), RECORD_VIEW, GALLERY_VIEW);
 	}	
 
-	@RequestMapping(value="/male/record/{itemId}")	
+	@RequestMapping(value="/male/record/{targetId}")	
 	public String maleRecord(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
-			@PathVariable long itemId,
+			@PathVariable long targetId,
 			ModelMap model) {	
 		
 		Person subject = new Person(i);
-		return galleryAndRecordController(i, shortSitename, itemId, model, 
+		return galleryAndRecordController(i, shortSitename, targetId, model, 
 				subject, subject.getRecords(), RECORD_VIEW, RECORD_VIEW);
 	}	
 	
-	@RequestMapping(value="/female/gallery/{itemId}")	
+	@RequestMapping(value="/female/gallery/{targetId}")	
 	public String femaleGallery(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
-			@PathVariable long itemId,
+			@PathVariable long targetId,
 			ModelMap model) {	
 		
-		return maleGallery(i, shortSitename, itemId, model);
+		return maleGallery(i, shortSitename, targetId, model);
 	}	
 
-	@RequestMapping(value="/female/record/{itemId}")	
+	@RequestMapping(value="/female/record/{targetId}")	
 	public String femaleRecord(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
-			@PathVariable long itemId,
+			@PathVariable long targetId,
 			ModelMap model) {	
 		
-		return maleRecord(i, shortSitename, itemId, model);
+		return maleRecord(i, shortSitename, targetId, model);
 	}	
 	
-	private String galleryAndRecordController(Item i, String shortSitename, long itemId, ModelMap model,
+	private String galleryAndRecordController(Item i, String shortSitename, long targetId, ModelMap model,
 			Person subject, List<Item> items, String jspName, String menuName) {
 		
 		Page page = getStandardPage(i, shortSitename, jspName, model);
 		
 		model.addAttribute("_person", subject);
 		model.addAttribute("_menu", createPersonMenu(i, subject, menuName));
-		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, items, menuName, itemId));
-		model.addAttribute("_target", this.itemService.getItem(itemId));
+		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, items, menuName, targetId));
+		model.addAttribute("_target", this.itemService.getItem(targetId).setLanguage(i.getLanguage()));
 		
 		filterBreadcrumbs(page);
 		return page.getView();
@@ -153,7 +153,7 @@ public class AncestryPageController extends BaseController {
 
 		// Overview
 		m = new MenuItem();
-		m.setHref(p.getItem().getPath()).setTitle("Overview");
+		m.setHref(p.getItem().getUrl()).setTitle("Overview");
 		m.setSelected(requestView == null && requestItem.getPath().equals(p.getItem().getPath()));
 		menu.add(m);
 		
@@ -162,7 +162,7 @@ public class AncestryPageController extends BaseController {
 		m.setTitle("History");
 		if (p.getDocuments().size() > 0) {
 			target = p.getDocuments().get(0);
-			m.setHref(target.getPath());
+			m.setHref(target.getUrl());
 		}
 		else {
 			m.setEnabled(false);
@@ -176,7 +176,7 @@ public class AncestryPageController extends BaseController {
 		m.setTitle("Gallery");
 		if (p.getGallery().size() > 0) {
 			target = p.getGallery().get(0);
-			m.setHref(String.format("%s?view=%s/%d", p.getItem().getPath(), GALLERY_VIEW, target.getId()));
+			m.setHref(String.format("%s?view=%s/%d", p.getItem().getUrl(), GALLERY_VIEW, target.getId()));
 		}
 		else {
 			m.setEnabled(false);
@@ -190,7 +190,7 @@ public class AncestryPageController extends BaseController {
 		m.setTitle("Records");
 		if (p.getRecords().size() > 0) {
 			target = p.getRecords().get(0);
-			m.setHref(String.format("%s?view=%s/%d", p.getItem().getPath(), RECORD_VIEW, target.getId()));
+			m.setHref(String.format("%s?view=%s/%d", p.getItem().getUrl(), RECORD_VIEW, target.getId()));
 		}
 		else {
 			m.setEnabled(false);
@@ -205,21 +205,22 @@ public class AncestryPageController extends BaseController {
 	private List<MenuItem> createPersonSubMenu(Item requestItem, Person p, List<Item> members, String requestView, Long requestId) {
 		List<MenuItem> menu = new ArrayList<MenuItem>();
 		MenuItem m;
-		String path, title;
+		String url, title;
 		
 		for (Item i : members) {
 			m = new MenuItem();
 			
 			if (StringUtils.isBlank(requestView)) {
 				// True for history
-				path = i.getPath();
-				m.setSelected(i.getPath().equals(requestItem.getPath()));
+				url = i.getUrl();
+				m.setSelected(url.equals(requestItem.getUrl()));
 			}
 			else {
-				path = String.format("%s?view=%s/%d", p.getItem().getPath(), requestView, i.getId());
+				url = String.format("%s?view=%s/%d", p.getItem().getUrl(), requestView, i.getId());
 				m.setSelected(i.getId() == requestId.longValue());
 			}
-			m.setHref(path);
+			
+			m.setHref(url);
 			
 			title = i.getFieldValue("heading");
 			if (StringUtils.isBlank(title)) {

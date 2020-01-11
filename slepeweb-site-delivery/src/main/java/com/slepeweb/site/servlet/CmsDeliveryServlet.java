@@ -88,12 +88,29 @@ public class CmsDeliveryServlet {
 				req.setAttribute("_site", site);
 				LOG.trace(LogUtil.compose("Site ...", site));
 
-				// Default language for site is English
-				String language = "en";
+				String language = site.getLanguage();
+				boolean redirect = false;
 				
-				if (site.isMultilingual() && path.length() > 2) {
-					trimmedPath = path.substring(3);
-					language = path.substring(1, 3);
+				if (site.isMultilingual()) {
+					if (path.length() > 2) {
+						String[] slugs = path.split("/");
+						if (slugs.length > 2 && slugs[1].length() == 2) {
+							trimmedPath = path.substring(3);
+							language = path.substring(1, 3);
+						}
+						else {
+							redirect = true;
+						}
+					}
+					else {
+						redirect = true;
+					}
+				}
+				
+				if (redirect) {
+					// language is missing on a multilingual site - redirect to default language
+					res.sendRedirect(String.format("/%s%s", language, path));
+					return;
 				}
 				
 				Item item = site.getItem(trimmedPath);
@@ -117,6 +134,7 @@ public class CmsDeliveryServlet {
 						}
 						else {
 							res.setContentType("text/html;charset=utf-8");
+							res.setCharacterEncoding("utf-8");
 							Template tmplt = item.getTemplate();
 							String view = req.getParameter("view");
 							

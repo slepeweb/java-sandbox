@@ -150,6 +150,7 @@ public class NavigationController extends BaseController {
 			for (Link l : bindings) {
 				cNode = dive(l.getChild(), numLevels - 1);
 				cNode.setShortcut(l.getType().equals(LinkType.shortcut));
+				cNode.setExtraClasses(getCmsIconClass(l.getChild()));
 				pNode.addChild(cNode);
 			}
 		}
@@ -191,7 +192,19 @@ public class NavigationController extends BaseController {
 	}
 	
 	private Navigation.Node toNode(Item i) {
-		return new Navigation.Node().setTitle(i.getName()).setKey(i.getId().toString());
+		return new Navigation.Node().setTitle(i.getName()).setKey(i.getId().toString()).
+				setExtraClasses(getCmsIconClass(i));
 	}
 	
+	private String getCmsIconClass(Item i) {
+		String type = i.getType().getName().toLowerCase();
+		if (type.endsWith("homepage")) {
+			type = "homepage";
+		}
+		else if (type.startsWith("image")) {
+			type = "image";
+		}
+		
+		return String.format("cms-icon-%s", type);
+	}
 }

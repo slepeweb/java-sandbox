@@ -57,8 +57,8 @@ public class MultilingualFieldTest extends BaseTest {
 				
 				// 8030: Item path is prefixed by language
 				r = trs.execute(8030);
-				if (! checkItem.getBrowserPath().startsWith(String.format("/%s/", secondLanguage))) {
-					r.setNotes(String.format("Wrong path [%s]", checkItem.getBrowserPath())).fail();
+				if (! checkItem.getUrl().startsWith(String.format("/%s/", secondLanguage))) {
+					r.setNotes(String.format("Wrong path [%s]", checkItem.getUrl())).fail();
 				}	
 			}
 		}

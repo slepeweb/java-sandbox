@@ -15,12 +15,12 @@ public class Link extends Coord {
 	
 	public String getLinkTag() {
 		return String.format(ANCHOR_FORMAT_STR, 
-				this.person.getItem().getPath(), getText());
+				this.person.getItem().getUrl(), getText());
 	}
 
 	public String getSingleLineTextLinkTag() {
 		return String.format(ANCHOR_FORMAT_STR, 
-				this.person.getItem().getPath(), getSingleLineText());
+				this.person.getItem().getUrl(), getSingleLineText());
 	}
 
 	public String getText() {

@@ -367,3 +367,38 @@ p.main-heading {
 #core-commerce {
 	display: none;
 }
+
+hr {
+	opacity: 0.4;
+	margin-bottom: 1.0em;
+}
+
+span.fancytree-node.cms-icon-homepage > span.fancytree-icon {
+  background-position: -16px 0px;
+  background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-male > span.fancytree-icon {
+  background-position: -32px 0px;
+  background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-female > span.fancytree-icon {
+  background-position: -48px 0px;
+  background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-pdf > span.fancytree-icon {
+  background-position: -64px 0px;
+  background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-document > span.fancytree-icon {
+  background-position: -80px 0px;
+  background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-image > span.fancytree-icon {
+  background-position: -16px -16px;
+  background-image: url("fancytree-cms-icons.gif");
+}

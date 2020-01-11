@@ -7,6 +7,9 @@
 
 // Manage the left-hand navigation
 $("#leftnav").fancytree({
+	//icon: function(event, data) {
+	//	return "my-icon-class";
+	//},
 	extensions: ["dnd"],
 	source: {
 		url: _ctx + "/rest/leftnav/lazy/thread",
@@ -18,11 +21,15 @@ $("#leftnav").fancytree({
 			_tree = $("#leftnav").fancytree("getTree");
 			var key = "" + _editingItemId;
 			var node = _tree.getNodeByKey(key);
+			//node.extraClasses = "custom1";
+			//node.icon = "custom1.gif"; // Alternate method
 			_tree.activateKey(node.key);
 		}
 	},
 	lazyLoad: function(event, data) {
 		var node = data.node;
+		//node.extraClasses = "custom1";
+		//node.icon = "custom1.gif"; // Alternate method
 		data.result = {
 			url: _ctx + "/rest/leftnav/lazy/one",
 			data: {key: removeShortcutMarker(node.key)}

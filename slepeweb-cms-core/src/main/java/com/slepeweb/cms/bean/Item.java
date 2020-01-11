@@ -117,6 +117,7 @@ public class Item extends CmsBean {
 				if (l != null) {
 					// In this case, the 'child' IS the 'parent'
 					this.parent = l.getChild();
+					this.parent.setLanguage(getLanguage());
 				}
 			}
 		}
@@ -487,7 +488,7 @@ public class Item extends CmsBean {
 		return this.path;
 	}
 	
-	public String getBrowserPath() {
+	public String getUrl() {
 		if (getSite().isMultilingual()) {
 			return String.format("/%s%s", getLanguage(), getPath());
 		}
@@ -586,6 +587,11 @@ public class Item extends CmsBean {
 	public List<Link> getLinks() {
 		if (this.links == null) {
 			this.links = getLinkService().getLinks(getId());
+			
+			// Set the language on each linked item
+			for (Link l : this.links) {
+				l.getChild().setLanguage(getLanguage());
+			}
 		}
 		return this.links;
 	}

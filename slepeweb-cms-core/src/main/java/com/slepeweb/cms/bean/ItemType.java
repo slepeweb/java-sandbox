@@ -1,8 +1,11 @@
 package com.slepeweb.cms.bean;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.slepeweb.cms.bean.Field.FieldType;
 
 public class ItemType extends CmsBean {
 	private static final long serialVersionUID = 1L;
@@ -39,8 +42,23 @@ public class ItemType extends CmsBean {
 	}
 	
 	public List<FieldForType> getFieldsForType() {
+		return getFieldsForType(true);
+	}
+	
+	public List<FieldForType> getFieldsForType(boolean omitLayouts) {
 		if (this.fieldsForType == null) {
 			this.fieldsForType = getFieldForTypeService().getFieldsForType(getId());
+			
+			if (omitLayouts) {
+				Iterator<FieldForType> iter = this.fieldsForType.iterator();
+				FieldForType fft;
+				while (iter.hasNext()) {
+					fft = iter.next();
+					if (fft.getField().getType() == FieldType.layout) {
+						iter.remove();
+					}
+				}
+			}
 		}
 		return this.fieldsForType;
 	}

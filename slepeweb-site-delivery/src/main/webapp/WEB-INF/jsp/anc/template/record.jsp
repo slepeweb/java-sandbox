@@ -19,13 +19,13 @@
 			<h2>${_target.fields.title}</h2>
 			<p>${_target.fields.teaser}</p>
 			
-			<object data="${_target.path}" type="application/pdf" width="100%" height="800px">
+			<object data="${_target.url}" type="application/pdf" width="100%" height="800px">
 				This browser does not support PDFs.
 			</object> 
 		</c:when><c:when test="${fn:startsWith(_target.type, 'Image')}">
 			<h2>${_target.fields.alt}</h2>
 			<p>${_target.fields.caption}</p>
-			<img src="${_target.path}" width="100%" />
+			<img src="${_target.url}" width="100%" />
 		</c:when></c:choose>
 	</div>
 	

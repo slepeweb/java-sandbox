@@ -2,6 +2,7 @@ package com.slepeweb.cms.control;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -101,20 +102,24 @@ public class RestController extends BaseController {
 				languageValuesMap = i.getFieldValueSet().getFieldValues(language);
 				list = new ArrayList<FieldEditorSupport>();
 				
-				for (FieldForType fft : i.getType().getFieldsForType()) {
+				for (FieldForType fft : i.getType().getFieldsForType(false)) {
 					if (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual()) {
 						variable = fft.getField().getVariable();
-						fv = languageValuesMap.get(variable);
+						
 						fes = new FieldEditorSupport().
 								setField(fft.getField()).
 								setLabel(fft.getField().getName());
 						
-						if (fv == null) {
-							fes.setInputTag(fft.getField().getInputTag());
-						}
-						else {
-							fes.setFieldValue(fv);
-							fes.setInputTag(fv.getInputTag());
+						fv = languageValuesMap.get(variable);
+						
+						if (fft.getField().getType() != FieldType.layout) {
+							if (fv == null) {
+								fes.setInputTag(fft.getField().getInputTag());
+							}
+							else {
+								fes.setFieldValue(fv);
+								fes.setInputTag(fv.getInputTag());
+							}
 						}
 						
 						list.add(fes);
@@ -274,6 +279,12 @@ public class RestController extends BaseController {
 		Timestamp stamp;
 		Calendar cal;
 		int c = 0;
+		
+		try {
+			request.setCharacterEncoding("utf-8");
+		} 
+		catch (UnsupportedEncodingException e1) {
+		}
 		
 		String language = chooseLanguage(i.getSite().isMultilingual(), 
 				request.getParameter("language"), i.getSite().getLanguage());

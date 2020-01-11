@@ -134,7 +134,7 @@
 </script>
 
 <div id="field-tab">
-	<form id="field-form">
+	<form id="field-form" enctype="multipart/form-data" accept-charset="utf-8">
 		<c:set var="fvm" value="${editingItem.fieldValues}" />
 		
 		<c:if test="${editingItem.site.multilingual}">
@@ -150,10 +150,15 @@
 		<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
 			<div id="form-fields-${_lang}" class="hideable">
 				<c:forEach items="${_fieldSupport[_lang]}" var="fes">
+				<!-- fes.field.type == [${fes.field.type}] -->
+					<c:choose><c:when test="${fes.field.type == 'layout'}">
+						<hr />
+					</c:when><c:otherwise>
 						<div>
 							<label for="${fes.field.variable}">${fes.label} : </label>
 							${fes.inputTag}
 						</div>
+					</c:otherwise></c:choose>
 				</c:forEach>
 			</div>
 		</c:forEach>
@@ -164,7 +169,6 @@
 </div>
 
 <script>
-	var _requestedLanguage = "${_requestedLanguage}";
 	var _siteDefaultLanguage = "${editingItem.site.language}";
 
 	var _toggleFieldDivs = function(lang) {
@@ -180,10 +184,17 @@
 	}
 	
 	$(function() {
-		_toggleFieldDivs(_requestedLanguage);
+		var language = localStorage.getItem("language");
+		if (! language) {
+			language = _siteDefaultLanguage;
+		}
+		
+		$("#field-language-selector").val(language);
+		_toggleFieldDivs(language);
 		
 		$("#field-language-selector").change(function(){
 			var lang = $(this).val();
+			localStorage.setItem("language", lang);
 			_toggleFieldDivs(lang);
 		});
 	});

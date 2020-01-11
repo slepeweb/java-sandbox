@@ -136,7 +136,7 @@ create table field
    name varchar(64) not null,
    variable varchar(32) not null,
    multilingual boolean default false,
-   fieldtype enum ('text', 'markup', 'integer', 'date', 'url', 'radio', 'checkbox', 'select', 'datetime'),
+   fieldtype enum ('text', 'markup', 'integer', 'date', 'url', 'radio', 'checkbox', 'select', 'datetime', 'layout'),
    size int not null,
    helptext varchar(512),
    dflt varchar(64),

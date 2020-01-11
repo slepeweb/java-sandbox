@@ -23,4 +23,15 @@
 		<anc:standardPerson />	
 	</div>
 	
+	<!-- 
+	<span class="icon">
+		<i class="fas fa-home icon-large" style="color: teal;"></i> 
+		<i class="fas fa-male icon-large" style="color: #3399ff;"></i> 
+		<i class="fas fa-female icon-large" style="color: #ff9999;"></i>
+		<i class="fas fa-file-pdf icon-large" style="color: #ff3333;"></i> 
+		<i class="fas fa-file-alt icon-large"></i>
+		<i class="fas fa-image icon-large" style="color: #009900;"></i>
+	</span>
+	 -->
+
 </anc:standardLayout>
