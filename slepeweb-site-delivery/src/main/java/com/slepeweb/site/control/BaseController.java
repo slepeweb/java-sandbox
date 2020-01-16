@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.service.LoglevelUpdateService;
 import com.slepeweb.site.model.Page;
@@ -114,7 +115,7 @@ public class BaseController {
 		Page p = new Page(this.navigationService).
 				setTitle(i.getFieldValue("title")).
 				setHeading(i.getFieldValue("title")).
-				setBody(i.getFieldValueResolved("bodytext", "")).
+				setBody(i.getFieldValueResolved("bodytext", new StringWrapper(""))).
 				setItem(i).
 				setView(getFullyQualifiedViewName(shortSitename, viewNameSuffix));
 		

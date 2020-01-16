@@ -110,7 +110,7 @@ public class RestController extends BaseController {
 								setField(fft.getField()).
 								setLabel(fft.getField().getName());
 						
-						fv = languageValuesMap.get(variable);
+						fv = languageValuesMap == null ? null : languageValuesMap.get(variable);
 						
 						if (fft.getField().getType() != FieldType.layout) {
 							if (fv == null) {

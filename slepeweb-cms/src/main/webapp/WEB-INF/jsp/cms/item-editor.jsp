@@ -32,7 +32,9 @@
 		</div>
 		<div>
 			<label for="path">Path: </label><input disabled="disabled" value="${editingItem.path}" />
-			<a href="${editingItem.path}" target="_blank">View</a>
+			<c:set var="url" value="${editingItem.path}" />
+			<c:if test="${editingItem.site.multilingual}"><c:set var="url" value="/${editingItem.site.language}${url}" /></c:if>
+			<a href="${url}" target="_blank">View</a>
 		</div>
 		<div>
 			<label for="type">Type: </label><input disabled="disabled" value="${editingItem.type.name}" />
@@ -201,20 +203,26 @@
 </script>
 
 <div id="links-tab">
-	<div>
-		<ul id="sortable-links">
-			<c:forEach items="${editingItem.allLinksBarBindings}" var="link">
-				<li class="sortable-link ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
-					href="${applicationContextPath}/page/editor/${link.child.id}">${link}</a>
-						<button class="remove-link float-right">Remove</button><span 
-							class="hide">${link.parentId},${link.child.id},${link.type},${link.name}</span></li>
-			</c:forEach>
-		</ul>
-		<div class="spacer20">
-			<button id="addlink-button" type="button">Add link</button>
-			<button id="savelinks-button" type="button">Save changes</button>
+	<h2>Child links</h2>
+	
+	<c:choose><c:when test="${not empty editingItem.allLinksBarBindings}">	
+		<div>
+			<ul id="sortable-links">
+				<c:forEach items="${editingItem.allLinksBarBindings}" var="link">
+					<li class="sortable-link ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
+						href="${applicationContextPath}/page/editor/${link.child.id}">${link}</a>
+							<button class="remove-link float-right">Remove</button><span 
+								class="hide">${link.parentId},${link.child.id},${link.type},${link.name}</span></li>
+				</c:forEach>
+			</ul>
+			<div class="spacer20">
+				<button id="addlink-button" type="button">Add child link</button>
+				<button id="savelinks-button" type="button">Save changes</button>
+			</div>
 		</div>
-	</div>
+	</c:when><c:otherwise>
+		<p>None</p>
+	</c:otherwise></c:choose>
 	
 	<div class="spacer20"></div>
 	<div id="addlinkdiv">
@@ -246,6 +254,25 @@
 			<span class="hide">*</span>
 		</li>		
 	</ul>
+	
+	<div class="spacer20">&nbsp;</div>
+	<h2>Parent links</h2>
+	<c:choose><c:when test="${not empty editingItem.parentLinks}">
+		<table width="100%">
+			<tr>
+				<th align="left">Link type</th>
+				<th align="left">From</th>
+			</tr>
+			<c:forEach items="${editingItem.parentLinks}" var="_link">
+				<tr>
+					<td width="20%">${_link.type}</td>
+					<td><a href="${applicationContextPath}/page/editor/${_link.child.id}">${_link.child.name}</a></td>
+				</tr>
+			</c:forEach>
+		</table>
+	</c:when><c:otherwise>
+		<p>None</p>
+	</c:otherwise></c:choose>
 </div>
 
 <c:if test="${editingItem.type.media}">
@@ -344,7 +371,7 @@
 					value="${_copyDetails[1]}" />
 			</div>
 			<div>
-				<label>&nbsp;</label><button id="copy-button" type="button">Copy</button>
+				<label>(Deep copy is NOT available)</label><button id="copy-button" type="button">Copy</button>
 			</div>
 		</form>
 	</div>

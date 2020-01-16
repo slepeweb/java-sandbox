@@ -142,7 +142,7 @@ public class NavigationController extends BaseController {
 	}
 	
 	private Navigation.Node dive(Item parentItem, int numLevels) {
-		Navigation.Node pNode = toNode(parentItem), cNode;		
+		Navigation.Node pNode = toNode(parentItem, false), cNode;		
 		List<Link> bindings = parentItem.getBindings();
 		pNode.setFolder(bindings.size() > 0);
 		
@@ -150,7 +150,7 @@ public class NavigationController extends BaseController {
 			for (Link l : bindings) {
 				cNode = dive(l.getChild(), numLevels - 1);
 				cNode.setShortcut(l.getType().equals(LinkType.shortcut));
-				cNode.setExtraClasses(getCmsIconClass(l.getChild()));
+				cNode.setExtraClasses(getCmsIconClass(l.getChild(), cNode.isShortcut()));
 				pNode.addChild(cNode);
 			}
 		}
@@ -159,7 +159,7 @@ public class NavigationController extends BaseController {
 	}
 	
 	private Navigation.Node dive(Item parentItem, final Vector<String> pathComponents) {
-		Navigation.Node pNode = toNode(parentItem);		
+		Navigation.Node pNode = toNode(parentItem, false);		
 		Navigation.Node cNode;
 		List<Link> bindings = parentItem.getBindings();
 		pNode.setFolder(bindings.size() > 0);
@@ -180,7 +180,7 @@ public class NavigationController extends BaseController {
 				}
 			}
 			else {
-				cNode = toNode(child);
+				cNode = toNode(child, shortcut);
 				cNode.setFolder(child.getBoundItems().size() > 0);
 			}
 			
@@ -191,12 +191,12 @@ public class NavigationController extends BaseController {
 		return pNode;
 	}
 	
-	private Navigation.Node toNode(Item i) {
+	private Navigation.Node toNode(Item i, boolean isShortcut) {
 		return new Navigation.Node().setTitle(i.getName()).setKey(i.getId().toString()).
-				setExtraClasses(getCmsIconClass(i));
+				setExtraClasses(getCmsIconClass(i, isShortcut));
 	}
 	
-	private String getCmsIconClass(Item i) {
+	private String getCmsIconClass(Item i, boolean isShortcut) {
 		String type = i.getType().getName().toLowerCase();
 		if (type.endsWith("homepage")) {
 			type = "homepage";
@@ -205,6 +205,11 @@ public class NavigationController extends BaseController {
 			type = "image";
 		}
 		
-		return String.format("cms-icon-%s", type);
+		String prefix = "cms-icon-";
+		if (isShortcut) {
+			prefix = prefix + "shortcut-";
+		}
+		
+		return String.format(prefix + "%s", type);
 	}
 }

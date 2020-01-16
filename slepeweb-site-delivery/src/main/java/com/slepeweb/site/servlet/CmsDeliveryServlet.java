@@ -33,6 +33,7 @@ import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
@@ -93,8 +94,8 @@ public class CmsDeliveryServlet {
 				
 				if (site.isMultilingual()) {
 					if (path.length() > 2) {
-						String[] slugs = path.split("/");
-						if (slugs.length > 2 && slugs[1].length() == 2) {
+						String[] slugs = path.substring(1).split("/");
+						if (slugs.length > 1 && slugs[0].length() == 2) {
 							trimmedPath = path.substring(3);
 							language = path.substring(1, 3);
 						}
@@ -422,7 +423,7 @@ public class CmsDeliveryServlet {
 		return 
 				this.cmsService.isLiveServer() &&
 				i.isPublished() && 
-				! i.getFieldValue(FieldName.CACHEABLE, "yes").equalsIgnoreCase("no");
+				! i.getFieldValue(FieldName.CACHEABLE, new StringWrapper("yes")).equalsIgnoreCase("no");
 	}
 
 	private void setCacheHeaders(Item item, long requestTime, HttpServletResponse res) {

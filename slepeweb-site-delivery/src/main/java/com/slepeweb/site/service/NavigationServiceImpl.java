@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.site.model.LinkTarget;
 
@@ -20,7 +21,7 @@ public class NavigationServiceImpl implements NavigationService {
 			if (parentTarget != null && numLevels-- > 0) {
 				LinkTarget childTarget;
 				
-				if (! parent.getFieldValue(FieldName.HIDE_CHILDREN_FROM_NAV, "").equalsIgnoreCase("yes")) {
+				if (! parent.getFieldValue(FieldName.HIDE_CHILDREN_FROM_NAV, new StringWrapper("")).equalsIgnoreCase("yes")) {
 					
 					for (Link l : parent.getBindings()) {
 						childTarget = drillDown(l.getChild(), numLevels, currentItemPath);
@@ -38,7 +39,7 @@ public class NavigationServiceImpl implements NavigationService {
 	}
 	
 	private LinkTarget createLinkTarget(Item child, String currentItemPath) {		
-		if (! child.getFieldValue(FieldName.HIDE_FROM_NAV, "").equalsIgnoreCase("yes")) {
+		if (! child.getFieldValue(FieldName.HIDE_FROM_NAV, new StringWrapper("")).equalsIgnoreCase("yes")) {
 			LinkTarget lt = new LinkTarget(child);
 			if (currentItemPath != null) {
 				lt.setSelected(currentItemPath.startsWith(child.getPath()));

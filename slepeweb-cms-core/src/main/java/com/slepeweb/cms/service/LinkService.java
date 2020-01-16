@@ -17,8 +17,11 @@ public interface LinkService {
 	List<Link> getComponents(Long parentId);
 	Link getLink(Long parentId, Long childId);
 	Link save(Link l) throws ResourceException;
+	
 	int getCount();
 	int getCount(Long parentId);
+	
 	Link getParent(Long childId);
+	List<Link> getParentLinks(Long childId);
 	List<Link> getRelatedParents(Long childId);
 }

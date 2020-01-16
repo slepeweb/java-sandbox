@@ -137,7 +137,13 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		this.jdbcTemplate.update("update item set origid = ? where id = ?", i.getId(), i.getId());
 		i.setOrigId(i.getId());
 		
-		saveDefaultFieldValues(i);
+		/* If item has no field values, create them, with default values
+		 * 
+		 * Jan 2020: Different approach taken to avoid unnecessary filling up of fieldvalue table
+		 * with empty values.
+		 * 
+		 * saveDefaultFieldValues(i); woz here
+		*/ 
 		LOG.info(compose("Added new item", i));
 		
 		// Insert binding link to parent item UNLESS we are creating/versioning the root item
@@ -275,7 +281,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		}
 	}
 	
-	// If item has no field values, create them, with default values
+	@SuppressWarnings("unused")
 	private void saveDefaultFieldValues(Item i) throws ResourceException {
 		FieldValueSet fvs = i.getFieldValueSet();
 		String defaultLanguage = i.getSite().getLanguage();
@@ -723,11 +729,17 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		List<Link> nll = new ArrayList<Link>(origLinks.size());
 		Link nl;
 		for (Link l : origLinks) {
+			// DO NOT copy bindings, only relations, inlines and shortcuts
+			if (l.getType().equals(LinkType.binding)) {
+				continue;
+			}
+			
 			nl = CmsBeanFactory.makeLink();
 			nl.assimilate(l);
 			nl.
 				setParentId(ni.getId()).
 				setChild(l.getChild());
+			
 			nll.add(nl);
 		}
 		ni.setLinks(nll);

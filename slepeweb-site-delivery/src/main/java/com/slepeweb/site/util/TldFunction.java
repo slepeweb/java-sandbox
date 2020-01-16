@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.commerce.bean.Product;
 
 public class TldFunction {
@@ -19,7 +20,7 @@ public class TldFunction {
 	}
 	
 	public static String resolveMarkupFieldValue(Item i, String variable, String dflt) {
-		return i.getFieldValueResolved(variable, dflt);
+		return i.getFieldValueResolved(variable, new StringWrapper(dflt));
 	}
 	
 	public static Item resolveOrderItemThumbnail(Product p, String qualifier) {

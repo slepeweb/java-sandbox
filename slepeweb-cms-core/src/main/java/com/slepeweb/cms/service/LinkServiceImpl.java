@@ -156,6 +156,12 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		return this.jdbcTemplate.query(sql, new Object[] {parentId}, new RowMapperUtil.LinkMapper());		 
 	}
 
+	public List<Link> getParentLinks(Long childId) {
+		String sql = String.format(PARENT_SELECT_TEMPLATE, "l.childid = ? and i.deleted = 0");
+		return this.jdbcTemplate.query(sql, new Object[] {childId}, 
+				new RowMapperUtil.ParentLinkMapper());
+	}
+
 	public List<Link> getBindings(Long parentId) {
 		return getLinks(parentId, "binding");		 
 	}

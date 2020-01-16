@@ -29,8 +29,8 @@ public class BuildTest extends BaseTest {
 			register(2040, "Check test site has been created").
 			register(2045, "Check news template has been created").
 			register(2050, "Check root item has been created").
-			register(2060, "Check 3 section items created").
-			register(2070, "Check 3 field values created for news section page").
+			register(2060, "Check 4 section items created").
+			register(2070, "Check 0 field values created for news section page").
 			register(2080, "Check number of bindings for news section").
 			register(2090, "Check template applied to news item").
 			register(2100, "Check NO template applied to news section item");
@@ -179,10 +179,10 @@ public class BuildTest extends BaseTest {
 				}
 				
 				if (newsSection != null) {
-					// 2070: Assert N field values have been created for the news section
+					// 2070: Assert zero field values have been created for the news section
 					int fieldValueCount = this.cmsService.getFieldValueService().getCount(newsSection.getId());
 					r = trs.execute(2070).setNotes(fieldValueCount + " field values have been created");
-					if (fieldValueCount != 3) {
+					if (fieldValueCount != 0) {
 						r.fail();
 					}
 				

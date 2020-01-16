@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.site.util.StringUtil;
 
 public class SimpleComponent implements NestableComponent, Serializable {
@@ -23,7 +24,7 @@ public class SimpleComponent implements NestableComponent, Serializable {
 		setCssClass(l.getChild().getFieldValue("css"));	
 		setJs(l.getChild().getFieldValue("js"));
 		setHeading(l.getChild().getFieldValue("heading"));
-		setBlurb(l.getChild().getFieldValueResolved("blurb", ""));
+		setBlurb(l.getChild().getFieldValueResolved("blurb", new StringWrapper("")));
 		setName(l.getChild().getName());
 		return this;
 	}

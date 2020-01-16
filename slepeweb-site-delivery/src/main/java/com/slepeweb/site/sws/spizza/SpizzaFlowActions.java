@@ -20,6 +20,7 @@ import org.springframework.webflow.execution.RequestContext;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.site.model.Page;
@@ -64,7 +65,7 @@ public class SpizzaFlowActions extends MultiAction {
 			p = new Page(this.navigationService).
 					setTitle(i.getFieldValue("title")).
 					setHeading(i.getFieldValue("title")).
-					setBody(i.getFieldValue("bodytext", "")).
+					setBody(i.getFieldValue("bodytext", new StringWrapper(""))).
 					setItem(i);
 	    }
 	    
@@ -88,7 +89,7 @@ public class SpizzaFlowActions extends MultiAction {
 	public Map<String, String> parseContent(String fieldName, RequestContext ctx) {
 		Map<String, String> map = new HashMap<String, String>();
 		Page p = (Page) ctx.getConversationScope().get("page");
-		String fieldValue = p.getItem().getFieldValue(fieldName, "");
+		String fieldValue = p.getItem().getFieldValue(fieldName, new StringWrapper(""));
 		Matcher m;
 		
 		for (String part : fieldValue.split("\\|")) {

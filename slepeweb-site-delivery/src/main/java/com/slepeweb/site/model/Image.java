@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.StringWrapper;
 
 public class Image implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -19,7 +20,7 @@ public class Image implements Serializable {
 	}
 	
 	public Image(Item i, String type) {
-		setTitle(i.getFieldValue("title", ""));
+		setTitle(i.getFieldValue("title", new StringWrapper("")));
 		setSrc(i.getPath());
 		setAlt(getTitle());
 		setType(type);

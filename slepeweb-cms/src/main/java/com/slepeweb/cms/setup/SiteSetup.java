@@ -111,6 +111,9 @@ public class SiteSetup {
 		}
 	}
 
+	/*
+	 * TODO: NOTE: host column in spreadsheet is currently being ignored!
+	 */
 	private void createSites(Iterator<Row> rowIter, SiteSetupStatistics stats) throws ResourceException {
 		Row row;
 		Site s = null;

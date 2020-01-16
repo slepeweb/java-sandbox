@@ -6,6 +6,7 @@ import java.util.Calendar;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.FieldValue;
+import com.slepeweb.cms.bean.FieldValueSet;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.except.ResourceException;
@@ -18,7 +19,8 @@ public class FieldTest extends BaseTest {
 		TestResult r;
 		TestResultSet trs = new TestResultSet("Fields testbed").
 			register(3010, "Check title field value update").
-			register(3020, "Check embargo date field value update");
+			register(3020, "Check embargo date field value update").
+			register(3030, "Check there are no french field values");
 		
 		// Set field values for first news item
 		Site site = this.cmsService.getSiteService().getSite(TEST_SITE_NAME);
@@ -54,6 +56,14 @@ public class FieldTest extends BaseTest {
 				r = trs.execute(3020);
 				if (embargoFieldValue == null || ! embargoFieldValue.getDateValue().equals(ts)) {
 					r.setNotes("Date value update failed").fail();
+				}	
+				
+				// 3030: Check there are no french field values
+				FieldValueSet fvs = checkItem.getFieldValueSet();
+				FieldValue frenchTitleFieldValue = fvs.getFieldValueObj(TITLE_FIELD_NAME, "fr");
+				r = trs.execute(3030);
+				if (frenchTitleFieldValue != null) {
+					r.setNotes(String.format("French title set [%s]", frenchTitleFieldValue.getStringValue())).fail();
 				}	
 			}
 		}

@@ -62,9 +62,12 @@ public class FieldValueSet {
 	
 	public FieldValue getFallbackFieldValueObj(String variable, String language) {
 		FieldValue fv = getFieldValueObj(variable, language);
-		if ((fv == null || fv.getValue() == null) && ! language.equals(getSite().getLanguage())) {
+		
+		// Fallback to default site language if necessary
+		if ((fv == null || StringUtils.isBlank(fv.getValue())) && ! language.equals(getSite().getLanguage())) {
 			return getFieldValueObj(variable, getSite().getLanguage());
 		}
+		
 		return fv;
 	}
 	

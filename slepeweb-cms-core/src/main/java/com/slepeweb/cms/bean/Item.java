@@ -33,7 +33,7 @@ public class Item extends CmsBean {
 	private Timestamp dateCreated, dateUpdated;
 	private boolean deleted, editable = true, published, searchable;
 	private Long id = -1L, origId;
-	private List<Link> links;
+	private List<Link> links, parentLinks;
 	private List<String> tags;
 	private Item parent;
 	private List<Item> relatedParents;
@@ -397,31 +397,31 @@ public class Item extends CmsBean {
 	}
 	
 	public String getFieldValue(String variable) {
-		return getFieldValue(variable, "");
+		return getFieldValue(variable, new StringWrapper(""));
 	}
 	
 	public String getFieldValueResolved(String variable) {
-		return getFieldValueResolved(variable, "");
+		return getFieldValueResolved(variable, new StringWrapper(""));
 	}
 	
-	public String getFieldValue(String variable, String dflt) {
+	public String getFieldValue(String variable, StringWrapper dflt) {
 		FieldValue fv = getFieldValueObj(variable);
 		if (fv != null) {
 			return fv.getStringValue();
 		}
 		else if (dflt != null) {
-			return dflt;
+			return dflt.getValue();
 		}
 		return null;
 	}
 	
-	public String getFieldValueResolved(String variable, String dflt) {
+	public String getFieldValueResolved(String variable, StringWrapper dflt) {
 		FieldValue fv = getFieldValueObj(variable);
 		if (fv != null) {
 			return fv.getStringValueResolved();
 		}
 		else if (dflt != null) {
-			return dflt;
+			return dflt.getValue();
 		}
 		return null;
 	}
@@ -589,11 +589,41 @@ public class Item extends CmsBean {
 			this.links = getLinkService().getLinks(getId());
 			
 			// Set the language on each linked item
-			for (Link l : this.links) {
-				l.getChild().setLanguage(getLanguage());
-			}
+			setLinkLanguage(this.links, getLanguage());
 		}
 		return this.links;
+	}
+
+	public List<Link> getParentLinks() {
+		return getParentLinks(false);
+	}
+	
+	public List<Link> getParentLinks(boolean includeBinding) {
+		if (this.parentLinks == null) {
+			this.parentLinks = getLinkService().getParentLinks(getId());
+			
+			// Set the language on each linked item
+			setLinkLanguage(this.parentLinks, getLanguage());
+		}
+		
+		if (! includeBinding) {
+			List<Link> links = new ArrayList<Link>(this.parentLinks.size());
+			for (Link l : this.parentLinks) {
+				if (! l.getType().equals(LinkType.binding)) {
+					links.add(l);
+				}
+			}
+			
+			return links;
+		}
+		
+		return this.parentLinks;
+	}
+	
+	private void setLinkLanguage(List<Link> links, String language) {
+		for (Link l : links) {
+			l.getChild().setLanguage(getLanguage());
+		}
 	}
 
 	public List<Link> getBindings() {

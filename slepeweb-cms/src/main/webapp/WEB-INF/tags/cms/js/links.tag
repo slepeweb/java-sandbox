@@ -68,7 +68,7 @@ $("#addlinkdiv select[name='linktype']").change(function(e) {
 
 // Show link addition form when 'Add link' button is clicked
 $("#addlink-button").click(function(e) {
-	$("#addlinkdiv").css("visibility", "visible");
+	$("#addlinkdiv").css("display", "block");
 });
 
 // Add behaviour to 'Save links' button 

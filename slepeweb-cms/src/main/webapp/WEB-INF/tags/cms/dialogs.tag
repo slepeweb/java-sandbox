@@ -3,7 +3,7 @@
 <div id="dialog-trash-confirm" class="hide" title="Delete item?">
 	<p>
 		<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-		This will delete the current item PLUS ALL descendant items. Are you sure you want to do this?
+		This will delete the current item PLUS any shortcuts to it PLUS ALL child items. Are you sure you want to do this?
 	</p>
 </div>
 
