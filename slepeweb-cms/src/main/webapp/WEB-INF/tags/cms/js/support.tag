@@ -56,8 +56,12 @@ var displayCommerceElements = function(target) {
  */
 var fetchItemEditor = function(nodeKey, status) {
 	var url = pageEditorUrlPrefix + nodeKey;
-	var param = status.error ? "error" : "success";
-	url += ("?status=" + param + "&msg=" + status.messageEncoded);	
+	
+	if (status) {
+		var param = status.error ? "error" : "success";
+		url += ("?status=" + param + "&msg=" + status.messageEncoded);	
+	}
+	
 	window.location = url; 
 };
 	
@@ -130,4 +134,35 @@ var removeShortcutMarker = function(key) {
 		return key.substring(0, cursor);
 	}
 	return key;
+};
+
+var addHistoryBehaviour = function(selector) {
+	selector.unbind();
+	selector.change(function() {	
+		fetchItemEditor(selector.val());
+	});
+};
+
+var refreshHistory = function(siteId) {
+		$.ajax(_ctx + "/rest/item/history/" + siteId, {
+			type: "POST",
+			cache: false,
+			//data: {key: nodeKey}, 
+			dataType: "json",
+			mimeType: "application/json",
+			
+			// On successful loading of forms 
+			success: function(list, status, z) {
+					var selector = $("#history-selector");
+					selector.empty();
+					for (var i = 0; i < list.length; i++) {
+						selector.append("<option value='" + list[i].itemId + "'>" + list[i].name + "</option>");
+					}
+
+					addHistoryBehaviour(selector);					
+			},
+			error: function(list, status, z) {
+				console.log("Error: " + list);
+			}
+		});
 };

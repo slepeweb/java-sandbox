@@ -32,6 +32,8 @@
 				$( "#sortable-links" ).sortable();
 				$( "#sortable-links" ).disableSelection();
 				
+				// Refresh history selector
+				refreshHistory(_siteId);
 			}
 		});
 	};

@@ -19,6 +19,12 @@
 		
 		<!-- Main -->	
 		<div id="main-wrapper">
+			<!-- History -->
+			<div id="history-div">
+				<span>Recent history: </span>
+				<cms:navigation-history />
+			</div>
+			
 			<!-- Left navigation -->
 			<div id="leftnav">
 			</div>

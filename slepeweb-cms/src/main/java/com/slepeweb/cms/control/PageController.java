@@ -3,6 +3,7 @@ package com.slepeweb.cms.control;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.commerce.service.AxisService;
@@ -27,6 +29,7 @@ public class PageController extends BaseController {
 	@Autowired private SiteService siteService;
 	@Autowired private ItemService itemService;
 	@Autowired private AxisService axisService;
+	@Autowired private CookieService cookieService;
 	
 	@RequestMapping(value="/editor")	
 	public String doMain(ModelMap model) {		
@@ -34,7 +37,8 @@ public class PageController extends BaseController {
 	}
 	
 	@RequestMapping(value="/editor/{itemId}")	
-	public String doWithItem(@PathVariable long itemId, ModelMap model, HttpServletRequest req) {	
+	public String doWithItem(@PathVariable long itemId, HttpServletRequest req, ModelMap model) {	
+		
 		Item i = this.itemService.getItem(itemId);
 		if (i != null) {
 			model.addAttribute("editingItem", i);
@@ -54,16 +58,25 @@ public class PageController extends BaseController {
 			model.addAttribute("_flashMessage", status);
 		}
 		
+		// Get a history of visited items
+		model.addAttribute("_history", this.cookieService.getHistoryCookieValue(i.getSite().getId(), req));
+		
 		return "cms.editor";
 	}
 	
 	@RequestMapping(value="/site/select/{siteId}")	
-	public String chooseSite(@PathVariable long siteId, ModelMap model) {	
+	public String chooseSite(@PathVariable long siteId, 
+			HttpServletRequest req, HttpServletResponse res, ModelMap model) {	
+		
 		Site site = this.siteService.getSite(siteId);
 		if (site != null) {
 			model.addAttribute("site", site);
 			model.addAttribute("editingItem", site.getItem("/"));
 		}
+
+		// Get a history of visited items
+		model.addAttribute("_history", this.cookieService.getHistoryCookieValue(site.getId(), req));
+		
 		return "cms.editor";
 	}
 	

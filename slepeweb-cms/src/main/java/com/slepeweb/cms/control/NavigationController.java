@@ -102,6 +102,7 @@ public class NavigationController extends BaseController {
 		}
 		
 		level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH), pathComponents));
+		
 		return level0;		
 	}
 	
@@ -174,12 +175,15 @@ public class NavigationController extends BaseController {
 				@SuppressWarnings("unchecked")
 				Vector<String> workingPath = (Vector<String>) pathComponents.clone();
 				workingPath.remove(0);
+				
+				// There are more nodes below this one - continue diving
 				cNode = dive(child, workingPath);
 				if (pathComponents.size() == 1) {
 					//cNode.setSelected(true);
 				}
 			}
 			else {
+				// We've reached the end of this trail
 				cNode = toNode(child, shortcut);
 				cNode.setFolder(child.getBoundItems().size() > 0);
 			}

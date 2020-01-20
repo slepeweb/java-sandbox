@@ -377,6 +377,10 @@ hr {
 	margin-bottom: 1.0em;
 }
 
+#history-div {
+	padding-bottom: 1em;
+}
+
 span.fancytree-node.cms-icon-homepage > span.fancytree-icon {
   background-position: -16px 0px;
   background-image: url("fancytree-cms-icons.gif");

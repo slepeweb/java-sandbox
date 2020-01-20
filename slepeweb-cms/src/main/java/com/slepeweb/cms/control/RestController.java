@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -29,12 +30,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
-import com.slepeweb.cms.bean.FieldEditorSupport;
 import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.bean.FieldEditorSupport;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.FieldValueSet;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
@@ -45,6 +47,7 @@ import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
+import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemTypeService;
 import com.slepeweb.cms.service.LinkNameService;
@@ -68,6 +71,7 @@ public class RestController extends BaseController {
 	@Autowired private LinkNameService linkNameService;
 	@Autowired private TagService tagService;
 	@Autowired private AxisService axisService;
+	@Autowired private CookieService cookieService;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -76,7 +80,8 @@ public class RestController extends BaseController {
 	@RequestMapping("/item/editor")
 	public String doItemEditor(ModelMap model, 
 			@RequestParam(value="key", required=true) Long id,
-			@RequestParam(value="language", required=false) String requestedLanguage) {	
+			@RequestParam(value="language", required=false) String requestedLanguage,
+			HttpServletRequest req, HttpServletResponse res) {	
 		
 		Item i = this.itemService.getItem(id);
 		if (i != null) {
@@ -91,48 +96,56 @@ public class RestController extends BaseController {
 				model.addAttribute("availableAxes", this.axisService.get());
 			}
 			
-			Map<String, FieldValue> languageValuesMap;
-			Map<String, List<FieldEditorSupport>> fieldSupport = new HashMap<String, List<FieldEditorSupport>>();
-			List<FieldEditorSupport> list;
-			FieldValue fv;
-			FieldEditorSupport fes;
-			String variable;
+			// Work out form data to build the field editor page
+			model.addAttribute("_fieldSupport", fieldEditorSupport(i));
 			
-			for (String language : i.getSite().getAllLanguages()) {
-				languageValuesMap = i.getFieldValueSet().getFieldValues(language);
-				list = new ArrayList<FieldEditorSupport>();
-				
-				for (FieldForType fft : i.getType().getFieldsForType(false)) {
-					if (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual()) {
-						variable = fft.getField().getVariable();
-						
-						fes = new FieldEditorSupport().
-								setField(fft.getField()).
-								setLabel(fft.getField().getName());
-						
-						fv = languageValuesMap == null ? null : languageValuesMap.get(variable);
-						
-						if (fft.getField().getType() != FieldType.layout) {
-							if (fv == null) {
-								fes.setInputTag(fft.getField().getInputTag());
-							}
-							else {
-								fes.setFieldValue(fv);
-								fes.setInputTag(fv.getInputTag());
-							}
-						}
-						
-						list.add(fes);
-					}
-				}
-				
-				fieldSupport.put(language, list);
-			}
-			
-			model.addAttribute("_fieldSupport", fieldSupport);
+			// Store this item's id in a cookie			
+			this.cookieService.updateHistoryCookie(i, req, res);
 		}
 		
 		return "cms.item.editor";		
+	}
+	
+	private Map<String, List<FieldEditorSupport>> fieldEditorSupport(Item i) {
+		Map<String, FieldValue> languageValuesMap;
+		Map<String, List<FieldEditorSupport>> fieldSupport = new HashMap<String, List<FieldEditorSupport>>();
+		List<FieldEditorSupport> list;
+		FieldValue fv;
+		FieldEditorSupport fes;
+		String variable;
+		
+		for (String language : i.getSite().getAllLanguages()) {
+			languageValuesMap = i.getFieldValueSet().getFieldValues(language);
+			list = new ArrayList<FieldEditorSupport>();
+			
+			for (FieldForType fft : i.getType().getFieldsForType(false)) {
+				if (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual()) {
+					variable = fft.getField().getVariable();
+					
+					fes = new FieldEditorSupport().
+							setField(fft.getField()).
+							setLabel(fft.getField().getName());
+					
+					fv = languageValuesMap == null ? null : languageValuesMap.get(variable);
+					
+					if (fft.getField().getType() != FieldType.layout) {
+						if (fv == null) {
+							fes.setInputTag(fft.getField().getInputTag());
+						}
+						else {
+							fes.setFieldValue(fv);
+							fes.setInputTag(fv.getInputTag());
+						}
+					}
+					
+					list.add(fes);
+				}
+			}
+			
+			fieldSupport.put(language, list);
+		}
+		
+		return fieldSupport;
 	}
 	
 	private String chooseLanguage(boolean isMultilingualSite, String requested, String siteDefault) {
@@ -750,4 +763,11 @@ public class RestController extends BaseController {
 		return "n/a";
 	}
 	
+	@RequestMapping(value="/item/history/{siteId}", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public List<ItemIdentifier> history(@PathVariable long siteId, HttpServletRequest req) {	
+		
+		return this.cookieService.getHistoryCookieValue(siteId, req);
+	}
+
 }
