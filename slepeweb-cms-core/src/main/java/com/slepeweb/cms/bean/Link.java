@@ -1,5 +1,7 @@
 package com.slepeweb.cms.bean;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.cms.except.ResourceException;
 
 public class Link extends CmsBean {
@@ -25,7 +27,8 @@ public class Link extends CmsBean {
 			getParentId() != null &&
 			getChild() != null && 
 			getChild().getId() != null &&
-			getType() != null;
+			StringUtils.isNotBlank(getType()) &&
+			StringUtils.isNotBlank(getName());
 	}
 	
 	public Long getId() {

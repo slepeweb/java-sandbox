@@ -311,12 +311,16 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		fvs.addFieldValue(fv);
 	}
 
-	public void saveLinks(Item i) throws ResourceException {
+	public void saveLinks(Item i) throws ResourceException, DuplicateItemException {
 		saveLinks(i, null);
 	}
 	
-	private void saveLinks(Item i, Item dbRecord) throws ResourceException {
+	private void saveLinks(Item i, Item dbRecord) throws ResourceException, DuplicateItemException {
 		if (i.getLinks() != null) {
+			if (duplicateLinks(i.getLinks())) {
+				throw new DuplicateItemException("Items can only be linked once, regardless of link type or name");
+			}
+			
 			if (dbRecord == null) {
 				dbRecord = getItem(i.getId());
 			}
@@ -327,6 +331,22 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				l.save();
 			}
 		}
+	}
+	
+	private boolean duplicateLinks(List<Link> links) {
+		Link a, b;
+		
+		for (int i = 0; i < links.size(); i++) {
+			a = links.get(i);
+			for (int j = i + 1; j < links.size(); j++) {
+				b = links.get(j);
+				if (a.getChild().getId() == b.getChild().getId()) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 	
 	private void removeStaleLinks(List<Link> dbRecordLinks, List<Link> updatedLinks) {
