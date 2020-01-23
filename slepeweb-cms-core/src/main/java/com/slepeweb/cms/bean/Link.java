@@ -7,7 +7,7 @@ public class Link extends CmsBean {
 
 	private Long parentId;
 	private Item child;
-	private String name = "na", type;
+	private String name = "na", type, data;
 	private Integer ordering;
 	
 	public void assimilate(Object obj) {
@@ -16,6 +16,7 @@ public class Link extends CmsBean {
 			setName(l.getName());
 			setType(l.getType());
 			setOrdering(l.getOrdering());
+			setData(l.getData());
 		}
 	}
 	
@@ -86,6 +87,15 @@ public class Link extends CmsBean {
 
 	public Link setParentId(Long parentId) {
 		this.parentId = parentId;
+		return this;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public Link setData(String data) {
+		this.data = data;
 		return this;
 	}
 

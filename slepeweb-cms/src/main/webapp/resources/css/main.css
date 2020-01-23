@@ -156,12 +156,12 @@ ul.fancytree-container {
 	width: 100%;
 }
 
-#addlinkdiv input {
-	width: 60px;
+#addlinkdiv input, #addlinkdiv select {
+	width: 140px;
 }
 
 #addlinkdiv label {
-	width: 100px;
+	width: 50px;
 }
 
 #addlinkdiv td:first {

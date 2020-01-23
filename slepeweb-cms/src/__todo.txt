@@ -1,0 +1,20 @@
+HIGH
+- review primary key on link - think it should be (parentid, childid, linktypeid, linknameid)
+- language switcher (Ancestry)
+- store preferred language in cookie (Ancestry)
+- resource bundles (Ancestry)
+- support link data
+- links aren't editable in UI
+- stylise 'add child link' form components
+
+
+MEDIUM
+- search functionality (Ancestry)
+- password protection for site visitors (Ancestry)
+- documents need to be nest-able (Ancestry)
+- support multiple partners (Ancestry)
+- support homosexual partners (Ancestry)
+
+LOW
+- hover over lefthand nav in cms reveals wrong icon
+- get site working on internet

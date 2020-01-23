@@ -26,7 +26,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	private static String CHILD_SELECT_TEMPLATE = 
 			"select i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, " +
 			"it.id as typeid, it.name as typename, it.mimetype, it.privatecache, it.publiccache, " +
-			"l.parentid, lt.name as linktype, ln.name as linkname, l.ordering, " +
+			"l.parentid, lt.name as linktype, ln.name as linkname, l.ordering, l.data, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
 			"from item i " +
 			"join site s on i.siteid = s.id " +
@@ -76,8 +76,9 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		
 		if (pair != null) {
 			this.jdbcTemplate.update(
-					"insert into link (parentid, childid, linktypeid, linknameid, ordering) values (?, ?, ?, ?, ?)", 
-					l.getParentId(), l.getChild().getId(), pair.getLeft().getId(), pair.getRight().getId(), l.getOrdering());
+					"insert into link (parentid, childid, linktypeid, linknameid, ordering, data) values (?, ?, ?, ?, ?, ?)", 
+					l.getParentId(), l.getChild().getId(), pair.getLeft().getId(), pair.getRight().getId(), l.getOrdering(), 
+					l.getData());
 			
 			// Note: no new id generated for this bean
 			LOG.info(compose("Added new link", l));
@@ -91,8 +92,8 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 			
 			if (pair != null) {
 				this.jdbcTemplate.update(
-						"update link set linktypeid = ?, linknameid = ?, ordering = ? where parentid = ? and childid = ?", 
-						pair.getLeft().getId(), pair.getRight().getId(), dbRecord.getOrdering(), 
+						"update link set linktypeid = ?, linknameid = ?, ordering = ?, data = ? where parentid = ? and childid = ?", 
+						pair.getLeft().getId(), pair.getRight().getId(), dbRecord.getOrdering(), dbRecord.getData(),
 						dbRecord.getParentId(), dbRecord.getChild().getId());
 				
 				LOG.info(compose("Updated link", l));

@@ -212,7 +212,7 @@
 					<li class="sortable-link ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
 						href="${applicationContextPath}/page/editor/${link.child.id}">${link}</a>
 							<button class="remove-link float-right">Remove</button><span 
-								class="hide">${link.parentId},${link.child.id},${link.type},${link.name}</span></li>
+								class="hide">${link.parentId},${link.child.id},${link.type},${link.name},${link.data}</span></li>
 				</c:forEach>
 			</ul>
 			<div class="spacer20">
@@ -228,7 +228,7 @@
 	<div id="addlinkdiv">
 		<div class="float-left">
 			<div>
-				<label for="linktype">Link type: </label>
+				<label for="linktype">Type: </label>
 				<select name="linktype">
 					<option value="unknown">Choose ...</option>
 					<c:forTokens items="inline,relation,component,shortcut" delims="," var="type">
@@ -237,10 +237,14 @@
 				</select>	
 			</div>
 			<div>
-				<label for="linkname">Link name: </label>
+				<label for="linkname">Name: </label>
 				<select name="linkname">
 					<option value="unknown">Choose ...</option>
 				</select>	
+			</div>
+			<div>
+				<label>Data: </label>
+				<input name="linkdata" value="" />
 			</div>
 		</div>		
 		<div id="linknav" class="inline"></div>

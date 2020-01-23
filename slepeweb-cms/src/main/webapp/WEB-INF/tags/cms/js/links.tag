@@ -23,6 +23,7 @@ $("#linknav").fancytree({
 	activate: function(event, data) {
 		var linkType = $("#addlinkdiv select[name='linktype']").val();
 		var linkName = $("#addlinkdiv select[name='linkname']").val();
+		var linkData = encodeURIComponent($("#addlinkdiv input[name='linkdata']").val());
 		var parentId = nodeKey;
 		var childId = data.node.key;
   			
@@ -36,7 +37,7 @@ $("#linknav").fancytree({
 				dataType: "text",
 				success: function(itemName, status, z) {
 					copy.find("a").attr("href", pageEditorUrlPrefix + childId).html(linkType + " (" + linkName + "): " + itemName);
-					copy.find("span.hide").html(parentId + "," + childId + "," + linkType + "," + linkName);
+					copy.find("span.hide").html(parentId + "," + childId + "," + linkType + "," + linkName + "," + linkData);
 					copy.appendTo(selector);
 				}
 			});
@@ -83,6 +84,7 @@ $("#savelinks-button").click(function(e) {
 			childId: parts[1],
 			type: parts[2],
 			name: parts[3],
+			data: decodeURIComponent(parts[4]),
 			ordering: index
 		};
 		links.push(obj);

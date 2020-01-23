@@ -711,7 +711,8 @@ public class RestController extends BaseController {
 					setParentId(lp.getParentId()).
 					setName(lp.getName()).
 					setOrdering(lp.getOrdering()).
-					setType(lp.getType());
+					setType(lp.getType()).
+					setData(lp.getData());
 			
 			i = CmsBeanFactory.makeItem(null).
 					setId(lp.getChildId());

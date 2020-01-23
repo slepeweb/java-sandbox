@@ -121,6 +121,7 @@ create table link
 	childid int,
 	linktypeid int,
 	linknameid int,
+	data varchar(512),
 	ordering smallint,
 	primary key (parentid, childid),
 	index idx_link_child (childid),

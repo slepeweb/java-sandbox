@@ -126,7 +126,8 @@ public class RowMapperUtil {
 					setChild(mapItem(rs)).
 					setType(rs.getString("linktype")).
 					setName(rs.getString("linkname")).
-					setOrdering(rs.getInt("ordering"));
+					setOrdering(rs.getInt("ordering")).
+					setData(rs.getString("data"));
 		}
 	}
 	
@@ -137,7 +138,8 @@ public class RowMapperUtil {
 					setChild(mapItem(rs)).
 					setType(rs.getString("linktype")).
 					setName(rs.getString("linkname")).
-					setOrdering(rs.getInt("ordering"));
+					setOrdering(rs.getInt("ordering")).
+					setData(rs.getString("data"));
 		}
 	}
 	

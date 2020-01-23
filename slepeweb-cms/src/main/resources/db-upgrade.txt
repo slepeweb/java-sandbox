@@ -47,3 +47,7 @@ alter table site add xlanguages varchar(16) after language
 Grouping/separating fields
 --------------------------
 alter table field modify column fieldtype enum ('text', 'markup', 'integer', 'date', 'url', 'radio', 'checkbox', 'select', 'datetime', 'layout')
+
+Adding link data
+----------------
+alter table link add column data varchar(512) default null after ordering
