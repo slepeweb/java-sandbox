@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
@@ -28,7 +29,20 @@ public class QuickTest {
 	public static void main(String[] args) {
 		// http://t.co/uzH3Yw6kCc
 		// http://t.co/LN3PZcCnir
-		trace(getRedirectedHref("http://t.co/uzH3Yw6kCc"));
+		//trace(getRedirectedHref("http://t.co/uzH3Yw6kCc"));
+		parseLinkData();
+	}
+	
+	private static void parseLinkData() {
+		String data = "1915::Izmir, Turkey";
+		String[] parts = data.split("\\:\\:");
+		trace(String.format(" date=%s", parts[0]));
+		trace(String.format("place=%s", parts[1]));
+		
+		String tmplt = "01/01/1700";
+//		trace(String.format("date=%s", StringUtils.overlay(tmplt, 
+//				StringUtils.leftPad(parts[0].trim(), 0, tmplt.length() - 1)));
+
 	}
 	
 	private static void getTweets() {

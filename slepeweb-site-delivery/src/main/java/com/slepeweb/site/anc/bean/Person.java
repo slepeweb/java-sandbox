@@ -9,18 +9,21 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
+import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkFilter;
+import com.slepeweb.cms.bean.LinkType;
 
 public class Person {
 	
 	private static SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy");
 
-	private Date birthDate, deathDate, marriageDate;
+	private Date birthDate, deathDate;
 	private String firstName, lastName, middleNames;
-	private String birthPlace, deathPlace, marriagePlace;
-	private Person mother, father, partner;
-	private List<Person> children, siblings;
+	private String birthPlace, deathPlace;
+	private Person mother, father;
+	private List<Person> siblings;
+	private List<Relationship> relationships;
 	private boolean male;
-	private Boolean partnered;
 	private Item item, photo;
 	private List<Item> documents, records, gallery;
 	
@@ -30,14 +33,17 @@ public class Person {
 		
 		this.birthDate = setDate(i.getFieldValue("birthdate"));
 		this.deathDate =setDate(i.getFieldValue("deathdate"));
-		this.marriageDate = setDate(i.getFieldValue("marriagedate"));
 		this.birthPlace = i.getFieldValue("birthplace");
 		this.deathPlace = i.getFieldValue("deathplace");
-		this.marriagePlace = i.getFieldValue("marriageplace");
 		
 		this.lastName = i.getFieldValue("lastname");
 		this.firstName = i.getFieldValue("firstname");
 		this.middleNames = i.getFieldValue("middlenames");
+	}
+	
+	@Override
+	public String toString() {
+		return getName();
 	}
 	
 	public String getFullName() {
@@ -70,37 +76,12 @@ public class Person {
 		return sb.toString();
 	}
 	
-//	public String getFullName() {
-//		StringBuilder sb = new StringBuilder();
-//		if (! isBlank(this.lastName)) {
-//			sb.append(this.lastName);
-//		}
-//		
-//		if (! isBlank(this.firstName)) {
-//			if (sb.length() > 0) {
-//				sb.append(", ");
-//			}			
-//			sb.append(this.firstName);
-//			
-//			if (! isBlank(this.middleNames)) {
-//				sb.append(" ").append(this.middleNames);
-//			}
-//		}
-//		
-//		return sb.toString();
-//	}
-	
 	public boolean isBlankBirthDetails() {
 		return this.birthDate == null && isBlank(this.birthPlace);
 	}
 	
 	public boolean isBlankDeathDetails() {
 		return this.deathDate == null && isBlank(this.deathPlace);
-	}
-	
-	public boolean isBlankMarriageDetails() {
-		getPartner(); // Marriage details are stored against the male partner
-		return this.marriageDate == null && isBlank(this.marriagePlace);
 	}
 	
 	public String getBirthDetails() {
@@ -110,11 +91,7 @@ public class Person {
 	public String getDeathDetails() {
 		return getDateAndPlaceDetails(this.deathDate, this.deathPlace);
 	}
-	
-	public String getMarriageDetails() {
-		return getDateAndPlaceDetails(getMarriageDate(), getMarriagePlace());
-	}
-	
+
 	private String getDateAndPlaceDetails(Date date, String place) {
 		StringBuilder sb = new StringBuilder();
 		if (date != null) {
@@ -143,58 +120,40 @@ public class Person {
 	}
 	
 	private void setParentage() {
+		// This is the primary parent, linked by 'binding'
 		Item parentItem = this.item.getParent();
 		
 		if (parentItem != null && ! parentItem.getPath().equals("/")) {
 			Person parentPerson = new Person(parentItem);
-			Person spouse = parentPerson.getPartner();
+			this.father = parentPerson;
+			List<Relationship> relationships = parentPerson.getRelationships();
 			
-			if (parentPerson.isMale()) {
-				this.father = parentPerson;
-				this.mother = spouse;
+			if (relationships.size() == 1) {
+				this.mother = relationships.get(0).getPartner();
 			}
 			else {
-				this.mother = parentPerson;
-				this.father = spouse;
-			}
-		}
-	}
-	
-	private void setPartner() {
-		this.partnered = new Boolean(false);
-		
-		List<Item> partners = isMale() ? 
-				this.item.getRelatedItems(new ItemFilter().setLinkName("partner")) :
-					this.item.getRelatedParents(new ItemFilter().setLinkName("partner"));
-					
-		if (partners != null && partners.size() > 0) {
-			this.partner = new Person(partners.get(0));
-			this.partnered = new Boolean(true);
-			
-			// Use male partner's marriage details
-			if (! isMale()) {
-				this.marriageDate = this.partner.getMarriageDate();
-				this.marriagePlace = this.partner.getMarriagePlace();
-			}
-		}	
-	}
-	
-	private void setChildren() {
-		this.children = new ArrayList<Person>();
-		
-		if (isMale()) {
-			for (Item child : this.item.getBoundItems(new ItemFilter().setTypes(new String[] {"Male", "Female"}))) {
-				this.children.add(new Person(child));
-			}
-		}
-		else {
-			Person spouse = getPartner();
-			if (spouse != null) {
-				for (Item child : getPartner().getItem().getBoundItems(new ItemFilter().setTypes(new String[] {"Male", "Female"}))) {
-					this.children.add(new Person(child));
+				LinkFilter f = new LinkFilter().setLinkType(LinkType.shortcut).setItemType("Female");;
+				Link l = f.filterFirst(this.item.getParentLinks());
+				
+				if (l != null) {
+					this.mother = new Person(l.getChild());
 				}
 			}
 		}
+	}
+	
+	private void setRelationships() {
+		this.relationships = new ArrayList<Relationship>();
+		
+		LinkFilter f = new LinkFilter().setName("partner").setLinkType(LinkType.relation);
+		
+		List<Link> partners = isMale() ? 
+				f.filterLinks(this.item.getRelations()) :
+					f.filterLinks(this.item.getParentLinks());
+					
+		for (Link l : partners) {
+			this.relationships.add(new Relationship(this, l));
+		}	
 	}
 	
 	private void setSiblings() {
@@ -214,20 +173,12 @@ public class Person {
 		return this.deathDate != null;
 	}
 	
-	public boolean isMarried() {
-		return this.marriageDate != null;
-	}
-	
 	public Date getBirthDate() {
 		return birthDate;
 	}
 	
 	public Date getDeathDate() {
 		return deathDate;
-	}
-	
-	public Date getMarriageDate() {
-		return marriageDate;
 	}
 	
 	public String getFirstName() {
@@ -251,10 +202,6 @@ public class Person {
 		return deathPlace;
 	}
 	
-	public String getMarriagePlace() {
-		return marriagePlace;
-	}
-	
 	public Person getMother() {
 		if (this.mother == null && this.father == null) {
 			setParentage();
@@ -269,13 +216,6 @@ public class Person {
 		return this.father;
 	}
 	
-	public List<Person> getChildren() {
-		if (this.children == null) {
-			setChildren();
-		}
-		return this.children;
-	}
-	
 	public List<Person> getSiblings() {
 		if (this.siblings == null) {
 			setSiblings();
@@ -283,6 +223,11 @@ public class Person {
 		return this.siblings;
 	}
 	
+	public List<Person> getChildren(int relationshipId) {
+		Relationship r = getRelationship(relationshipId);
+		return r == null ? new ArrayList<Person>() : r.getChildren();
+	}
+
 	public boolean isMale() {
 		return male;
 	}
@@ -291,18 +236,30 @@ public class Person {
 		return item;
 	}
 
-	public Person getPartner() {
-		if (this.partnered == null) {
-			setPartner();
+	public List<Relationship> getRelationships() {
+		if (this.relationships == null) {
+			setRelationships();
 		}
 
-		return partner;
+		return this.relationships;
+	}
+
+	public Relationship getRelationship(int id) {
+		if (getRelationships().size() > id) {
+			return getRelationships().get(id);
+		}
+
+		return null;
 	}
 
 	public boolean isPartnered() {
-		return partnered != null && partnered.booleanValue();
+		return getRelationships() != null && getRelationships().size() > 0;
 	}
 
+	public boolean isMultiPartnered() {
+		return getRelationships() != null && getRelationships().size() > 1;
+	}
+	
 	public Item getPhoto() {
 		if (this.photo == null) {
 			this.photo = this.item.getImage("passport_photo");
@@ -333,5 +290,4 @@ public class Person {
 		
 		return this.records;
 	}
-
 }

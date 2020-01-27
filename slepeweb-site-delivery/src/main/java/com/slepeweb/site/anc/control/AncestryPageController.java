@@ -42,6 +42,17 @@ public class AncestryPageController extends BaseController {
 		return page.getView();
 	}
 
+	@RequestMapping(value="/notfound")	
+	public String notfound(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute("_site") Site site, 
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "error", model);
+		return page.getView();
+	}
+
 	@RequestMapping(value="/male")	
 	public String male(
 			@ModelAttribute("_item") Item i, 
@@ -53,7 +64,7 @@ public class AncestryPageController extends BaseController {
 		
 		Person subject = new Person(i);
 		model.addAttribute("_person", subject);
-		model.addAttribute("_support", new SvgSupport(subject));
+		model.addAttribute("_support", new SvgSupport(subject, 0));
 		model.addAttribute("_menu", createPersonMenu(i, subject, null));
 		
 		filterBreadcrumbs(page);		

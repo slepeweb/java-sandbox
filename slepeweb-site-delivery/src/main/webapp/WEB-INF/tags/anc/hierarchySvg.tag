@@ -37,11 +37,11 @@
 
 		${_support.subject.subjectText}
 
-		<c:if test="${not empty _person.partner}">
+		<c:if test="${not empty _support.partner}">
 			${_support.partner.linkTag}
 		</c:if>
 
-		<c:if test="${not empty _person.children}">
+		<c:if test="${not empty _support.children}">
 			<c:forEach items="${_support.children}" var="_child">
 				${_child.singleLineTextLinkTag}
 			</c:forEach>

@@ -44,7 +44,7 @@ import com.slepeweb.site.util.HttpUtil;
 public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
 	
-	//private String[] bypass2DefaultPatterns = new String[] {};	
+	//private String[] bypass2DefaultPatterns = new String[] {"/\\w\\w/notfound", "/\\w\\w/error"};	
 	private final Object buffPoolLock = new Object();
 	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
 	private long defaultPrivateCacheTime, defaultPublicCacheTime;
@@ -55,7 +55,7 @@ public class CmsDeliveryServlet {
 	public void setBypass2Default(String s) {
 		// This method should be called when Spring does its injection stuff, 
 		// but it has been disabled for the foreseeable future.
-		//this.bypass2DefaultPatterns = s != null ? s.split("\\|") : new String[] {};
+//		this.bypass2DefaultPatterns = s != null ? s.split("\\|") : new String[] {};
 	}
 	
 	private boolean bypass2Default(String path) {
@@ -63,12 +63,12 @@ public class CmsDeliveryServlet {
 		 * Forwarding the request to the default servlet is not working in this Spring
 		 * environment, thereby breaking this bypass functionality.
 		 * 
-		for (String regex : this.bypass2DefaultPatterns) {
-			if (path.matches(regex)) {
-				return true;
-			}
-		}
 		*/
+//		for (String regex : this.bypass2DefaultPatterns) {
+//			if (path.matches(regex)) {
+//				return true;
+//			}
+//		}
 		return false;
 	}
 	
@@ -92,7 +92,7 @@ public class CmsDeliveryServlet {
 				String language = site.getLanguage();
 				boolean redirect = false;
 				
-				if (site.isMultilingual()) {
+				if (site.isMultilingual() && ! path.equals("/favicon.ico")) {
 					if (path.length() > 2) {
 						String[] slugs = path.substring(1).split("/");
 						if (slugs.length > 1 && slugs[0].length() == 2) {
@@ -146,13 +146,13 @@ public class CmsDeliveryServlet {
 								this.lastDeliveryTable.put(item.getId(), zeroMillis(requestTime));
 							}
 							else {
-								notFound(req, res, "Item has no template", item);
+								notFound(res, "Item has no template", item);
 							}
 						}
 					}
 				}
 				else {
-					notFound(req, res, "Item not found", path);
+					notFound(res, "Item not found", path);
 				}
 			}
 			else {
@@ -272,7 +272,7 @@ public class CmsDeliveryServlet {
 		return -1L;
 	}
 	
-	private void notFound(HttpServletRequest req, HttpServletResponse res, String msg, Object arg) throws Exception
+	private void notFound(HttpServletResponse res, String msg, Object arg) throws Exception
     {
 		LOG.error(LogUtil.compose(msg, arg));
 		res.sendError(HttpServletResponse.SC_NOT_FOUND);

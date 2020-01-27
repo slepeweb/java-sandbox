@@ -8,8 +8,8 @@
 	<c:if test="${not _person.blankBirthDetails}">
 		<li>b. ${_person.birthDetails}</li>
 	</c:if>
-	<c:if test="${not _person.blankMarriageDetails}">
-		<li>m. ${_person.marriageDetails}</li>
+	<c:if test="${not _person.relationships[0].blankMarriageDetails}">
+		<li>m. ${_person.relationships[0].marriageDetails}</li>
 	</c:if>
 	<c:if test="${not _person.blankDeathDetails}">
 		<li>d. ${_person.deathDetails}</li>

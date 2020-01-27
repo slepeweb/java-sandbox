@@ -203,26 +203,27 @@
 </script>
 
 <div id="links-tab">
-	<h2>Child links</h2>
+	<h2>Linked to</h2>
 	
-	<c:choose><c:when test="${not empty editingItem.allLinksBarBindings}">	
-		<div>
-			<ul id="sortable-links">
-				<c:forEach items="${editingItem.allLinksBarBindings}" var="link">
-					<li class="sortable-link ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
-						href="${applicationContextPath}/page/editor/${link.child.id}">${link}</a>
-							<button class="remove-link float-right">Remove</button><span 
-								class="hide">${link.parentId},${link.child.id},${link.type},${link.name},${link.data}</span></li>
-				</c:forEach>
-			</ul>
-			<div class="spacer20">
-				<button id="addlink-button" type="button">Add child link</button>
-				<button id="savelinks-button" type="button">Save changes</button>
-			</div>
-		</div>
-	</c:when><c:otherwise>
+	<div>
+		<ul id="sortable-links">
+			<c:forEach items="${editingItem.allLinksBarBindings}" var="link">
+				<li class="sortable-link ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span><a 
+					href="${applicationContextPath}/page/editor/${link.child.id}">${link}</a>
+						<button class="remove-link float-right">Remove</button><span 
+							class="hide">${link.parentId},${link.child.id},${link.type},${link.name},${link.data}</span></li>
+			</c:forEach>
+		</ul>
+	</div>
+	
+	<c:if test="${empty editingItem.allLinksBarBindings}">
 		<p>None</p>
-	</c:otherwise></c:choose>
+	</c:if>
+	
+	<div class="spacer20">
+		<button id="addlink-button" type="button">Add child link</button>
+		<button id="savelinks-button" type="button">Save changes</button>
+	</div>
 	
 	<div class="spacer20"></div>
 	<div id="addlinkdiv">
@@ -260,16 +261,18 @@
 	</ul>
 	
 	<div class="spacer20">&nbsp;</div>
-	<h2>Parent links</h2>
+	<h2>Linked from</h2>
 	<c:choose><c:when test="${not empty editingItem.parentLinks}">
 		<table width="100%">
 			<tr>
 				<th align="left">Link type</th>
+				<th align="left">Link name</th>
 				<th align="left">From</th>
 			</tr>
 			<c:forEach items="${editingItem.parentLinks}" var="_link">
 				<tr>
 					<td width="20%">${_link.type}</td>
+					<td width="20%">${_link.name}</td>
 					<td><a href="${applicationContextPath}/page/editor/${_link.child.id}">${_link.child.name}</a></td>
 				</tr>
 			</c:forEach>
