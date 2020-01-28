@@ -134,9 +134,17 @@ public class Relationship {
 		if (getSubject().isMultiPartnered()) {
 			/*
 			 * In this situation, where the subject has multiple partners, we examine
-			 * the children below the subject, who is NOT ALWAYS the primary person.
+			 * the children below the subject, AND the primary person, and draw out the
+			 * intersection of the two sets.
 			 */
-			p = this.subject.getItem();
+			for (Person childOfSubject : identifyChildren(this.subject.getItem())) {
+				for (Person childOfPartner : identifyChildren(this.partner.getItem())) {
+					if (childOfPartner.getItem().getId().equals(childOfSubject.getItem().getId())) {
+						this.children.add(childOfPartner);
+						break;
+					}
+				}
+			}
 		}
 		else {
 			/*
@@ -144,11 +152,18 @@ public class Relationship {
 			 * of the primary person (currently, the 'Male').
 			 */
 			p = this.subject.isMale() ? this.subject.getItem() : this.partner.getItem();
+			this.children.addAll(identifyChildren(p));
 		}
+	}
+	
+	private List<Person> identifyChildren(Item p) {
+		List<Person> children = new ArrayList<Person>();
 		
 		for (Item i : p.getBoundItems(new ItemFilter().setTypes(new String[] {"Male", "Female"}))) {
-			this.children.add(new Person(i));
+			children.add(new Person(i));
 		}
+		
+		return children;
 	}
 	
 	public Person getSubject() {

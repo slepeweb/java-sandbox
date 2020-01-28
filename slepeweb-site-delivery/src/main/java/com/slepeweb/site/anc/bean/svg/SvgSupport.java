@@ -46,7 +46,8 @@ public class SvgSupport {
 		}
 		
 		if (subjectRel != null) {
-		int num = 0, X = 2 * (u + c) + 5, Y;
+			int num = 0, X = 2 * (u + c) + 5, Y;
+			
 			for (Person child : subjectRel.getChildren()) {
 				num++;
 				Y = num == 1 ? r + t : r + t + (num - 1) * w;
@@ -83,17 +84,17 @@ public class SvgSupport {
 		
 		polyline.add(horizontal);
 		
-		if (subject != null) {
+		if (rel.getSubject() != null) {
 			polyline.add(verticalShortLeft);
 			horizontal.copyStart(verticalShortLeft.getStart());
 		}
 			
-		if (partner != null) {
+		if (rel.getPartner() != null) {
 			polyline.add(verticalShortRight);
 			horizontal.copyEnd(verticalShortRight.getStart());
 		}
 		
-		if ((subject != null || partner != null) && ! forSubject) {
+		if ((rel.getSubject() != null || rel.getPartner() != null) && ! forSubject) {
 			polyline.add(verticalShortMiddle);
 		}
 		
@@ -103,6 +104,11 @@ public class SvgSupport {
 	private List<LineSegment> treeStyleB(int a, int w, int y, int z, Relationship rel) {
 		
 		List<LineSegment> polyline = new ArrayList<LineSegment>();
+		
+		if (rel == null) {
+			return polyline;
+		}
+		
 		int numChildren = rel.getChildren().size();
 		
 		if (numChildren == 0) {

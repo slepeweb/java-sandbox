@@ -2,6 +2,8 @@ package com.slepeweb.site.anc.bean;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -153,7 +155,18 @@ public class Person {
 					
 		for (Link l : partners) {
 			this.relationships.add(new Relationship(this, l));
-		}	
+		}
+		
+		// Order relationships by date
+		Collections.sort(this.relationships, new Comparator<Relationship>() {
+			public int compare(Relationship a, Relationship b) {
+				if (a == null || b == null || a.getMarriageDate() == null || b.getMarriageDate() == null) {
+					return 0;
+				}
+				
+				return a.getMarriageDate().compareTo(b.getMarriageDate());
+			}
+		});
 	}
 	
 	private void setSiblings() {

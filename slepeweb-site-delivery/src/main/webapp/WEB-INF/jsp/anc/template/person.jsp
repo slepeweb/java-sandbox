@@ -30,29 +30,46 @@
 	<gen:debug><!-- jsp/anc/person.jsp --></gen:debug>
 	
 	<div class="col-1-3 primary-col">	
-		<anc:hierarchySvg />
-		
+		<c:forEach items="${_svgList}" var="_support" varStatus="_stat">
+			<anc:hierarchySvg svgdata="${_support}" index="${_stat.index}" />
+		</c:forEach>
+			
 		<c:if test="${_person.multiPartnered}">
 			<div id="partner-options">
-				${_person.firstName}'s partners: 
-				<c:forEach items="${_person.relationships}" var="_rel">
-					<span><input type="radio" name="x" value="${_rel.partner.item.id}" /> ${_rel.partner.name} </span>
+				${_person.firstName}'s partners: <br />
+				<c:forEach items="${_person.relationships}" var="_rel" varStatus="_stat">
+					<span><input type="radio" name="svgindex" value="${_stat.index}" 
+						<c:if test="${_stat.index eq 0}">checked</c:if>/> ${_rel.partner.name} </span>
 				</c:forEach>
 			</div>
-			
-			<script>
-				$(function(){
-					$("#partner-options input").change(function(ele){
-						console.log("Switching diagram to #" + $(this).val());
-					});
-				});
-			</script>
 		</c:if>
 	</div>
 		
 	<div class="col-2-3 primary-col">
 		<anc:standardPerson />	
 	</div>
+	
+	<script>
+		var switchHierarchy = function(target) {
+			$(".hierarchy-diagram").each(function(idx){
+				if (idx != target) {
+					$(this).hide();
+				}
+				else {
+					$(this).show();
+				}
+			});
+		};
+		
+		$(function(){
+			switchHierarchy(0);
+			
+			$("#partner-options input").change(function(){
+				var index = $("#partner-options input:checked").val();
+				switchHierarchy(index);
+			});
+		});
+	</script>
 	
 	<!-- 
 	<span class="icon">
