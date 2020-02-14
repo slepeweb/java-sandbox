@@ -705,12 +705,13 @@ public class RestController extends BaseController {
 		List<Link> links = new ArrayList<Link>();
 		Link l;
 		Item i;
+		int count = 0;
 		
 		for (LinkParams lp : linkParams) {
 			l = CmsBeanFactory.makeLink().
-					setParentId(lp.getParentId()).
+					setParentId(parentId).
 					setName(lp.getName()).
-					setOrdering(lp.getOrdering()).
+					setOrdering(count++).
 					setType(lp.getType()).
 					setData(lp.getData());
 			
@@ -725,17 +726,19 @@ public class RestController extends BaseController {
 		
 		try {
 			parent.saveLinks();		
-			return resp.setError(false).addMessage(String.format("%d links saved", links.size()));
+			resp.addMessage(String.format("%d links saved", links.size()));
 		}
 		catch (ResourceException e) {
-			return resp.setError(true).addMessage(e.getMessage());
+			resp.setError(true).addMessage(e.getMessage());
 		}
+		
+		return resp;
 	}
 	
-	@RequestMapping(value="/linknames/{parentId}/{linkType}", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/linknames/{siteId}/{linkType}", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public List<String> getLinkNameOptions(
-			@PathVariable long parentId, @PathVariable String linkType, ModelMap model) {	
+			@PathVariable long siteId, @PathVariable String linkType, ModelMap model) {	
 		
 		List<String> names = new ArrayList<String>();
 		
@@ -743,9 +746,7 @@ public class RestController extends BaseController {
 			LinkType lt = this.linkTypeService.getLinkType(linkType);
 			
 			if (lt != null) {
-				Item parent = this.itemService.getItem(parentId);		
-			
-				for (LinkName ln : this.linkNameService.getLinkNames(parent.getSite().getId(), lt.getId())) {
+				for (LinkName ln : this.linkNameService.getLinkNames(siteId, lt.getId())) {
 					names.add(ln.getName());
 				}
 			}

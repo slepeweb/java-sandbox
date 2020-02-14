@@ -165,15 +165,6 @@
 	}
 }
 	
-/* To avoid changing the size of the company logo, shorten it for small devices */
-@include extra-small-and-above {
-	h1 > a {		
-		&:after {
-				content: "solutions";
-		}
-	}
-}
-
 #tiny-nav {
 	display: none;
 	

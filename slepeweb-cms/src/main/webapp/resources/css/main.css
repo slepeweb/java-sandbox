@@ -142,8 +142,7 @@ form div {
 /* Link tab: to identify link targets  */
 
 #linknav {
-		margin-left: 4em;
-		width: 55%;
+		display: inline;
 }
 
 ul.fancytree-container {
@@ -156,8 +155,12 @@ ul.fancytree-container {
 	width: 100%;
 }
 
-#addlinkdiv input, #addlinkdiv select {
+#addlinkdiv select {
 	width: 140px;
+}
+
+#addlinkdiv input {
+	width: 85%;
 }
 
 #addlinkdiv label {
@@ -178,11 +181,13 @@ ul.fancytree-container {
 	visibility: hidden;
 }
 
+/*
 .remove-link {
 	position: relative;
 	bottom: 5px;
 	color: red;
 }
+*/
 
 #sortable-links { 
 	list-style-type: none; 
@@ -205,9 +210,17 @@ ul.fancytree-container {
 	margin-left: -1.3em; 
 }
 
-#sortable-links button {
+#sortable-links button.remove-link {
 	position: absolute;
 	right: -80px;
+	bottom: -2px;
+	background-color: red;
+	border-color: #c90000;
+}
+
+#sortable-links button.edit-link {
+	position: absolute;
+	right: -50px;
 	bottom: -2px;
 }
 
@@ -386,12 +399,12 @@ span.fancytree-node.cms-icon-homepage > span.fancytree-icon {
   background-image: url("fancytree-cms-icons.gif");
 }
 
-span.fancytree-node.cms-icon-male > span.fancytree-icon {
+span.fancytree-node.cms-icon-primary > span.fancytree-icon {
   background-position: -32px 0px;
   background-image: url("fancytree-cms-icons.gif");
 }
 
-span.fancytree-node.cms-icon-female > span.fancytree-icon {
+span.fancytree-node.cms-icon-partner > span.fancytree-icon {
   background-position: -48px 0px;
   background-image: url("fancytree-cms-icons.gif");
 }
@@ -423,5 +436,10 @@ span.fancytree-node.cms-icon-shortcut-document > span.fancytree-icon {
 
 span.fancytree-node.cms-icon-shortcut-image > span.fancytree-icon {
   background-position: -96px -16px;
+  background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-shortcut-error > span.fancytree-icon {
+  background-position: -16px -32px;
   background-image: url("fancytree-cms-icons.gif");
 }

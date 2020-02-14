@@ -1,7 +1,6 @@
 package com.slepeweb.site.anc.control;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.site.anc.bean.MenuItem;
@@ -39,6 +39,14 @@ public class AncestryPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "homepage", model);
+		
+		List<Person> tops = new ArrayList<Person>();
+		for (Item c : i.getBoundItems(new ItemFilter().setTypes(new String[] {Person.PRIMARY, Person.PARTNER}))) {
+			tops.add(new Person(c));
+		}
+		
+		model.addAttribute("_rootEntries", tops);
+		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));		
 		return page.getView();
 	}
 
@@ -63,8 +71,8 @@ public class AncestryPageController extends BaseController {
 		return page.getView();
 	}
 
-	@RequestMapping(value="/male")	
-	public String male(
+	@RequestMapping(value="/primary")	
+	public String primary(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			ModelMap model) {	
@@ -87,17 +95,17 @@ public class AncestryPageController extends BaseController {
 		
 		model.addAttribute("_menu", createPersonMenu(i, subject, null));
 		
-		filterBreadcrumbs(page);		
+		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));		
 		return page.getView();
 	}
 	
-	@RequestMapping(value="/female")	
-	public String female(
+	@RequestMapping(value="/partner")	
+	public String partner(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			ModelMap model) {	
 		
-		return male(i, shortSitename, model);
+		return primary(i, shortSitename, model);
 	}
 	
 	@RequestMapping(value="/document")	
@@ -114,12 +122,12 @@ public class AncestryPageController extends BaseController {
 		model.addAttribute("_menu", createPersonMenu(i, subject, null));
 		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, subject.getDocuments(), null, null));
 		
-		filterBreadcrumbs(page);
+		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));
 		return page.getView();
 	}	
 
-	@RequestMapping(value="/male/gallery/{targetId}")	
-	public String maleGallery(
+	@RequestMapping(value="/primary/gallery/{targetId}")	
+	public String primaryGallery(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long targetId,
@@ -131,8 +139,8 @@ public class AncestryPageController extends BaseController {
 				subject, subject.getGallery(), RECORD_VIEW, GALLERY_VIEW);
 	}	
 
-	@RequestMapping(value="/male/record/{targetId}")	
-	public String maleRecord(
+	@RequestMapping(value="/primary/record/{targetId}")	
+	public String primaryRecord(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long targetId,
@@ -143,24 +151,24 @@ public class AncestryPageController extends BaseController {
 				subject, subject.getRecords(), RECORD_VIEW, RECORD_VIEW);
 	}	
 	
-	@RequestMapping(value="/female/gallery/{targetId}")	
-	public String femaleGallery(
+	@RequestMapping(value="/partner/gallery/{targetId}")	
+	public String partnerGallery(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
 		
-		return maleGallery(i, shortSitename, targetId, model);
+		return primaryGallery(i, shortSitename, targetId, model);
 	}	
 
-	@RequestMapping(value="/female/record/{targetId}")	
-	public String femaleRecord(
+	@RequestMapping(value="/partner/record/{targetId}")	
+	public String partnerRecord(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
 		
-		return maleRecord(i, shortSitename, targetId, model);
+		return primaryRecord(i, shortSitename, targetId, model);
 	}	
 	
 	private String galleryAndRecordController(Item i, String shortSitename, long targetId, ModelMap model,
@@ -173,7 +181,7 @@ public class AncestryPageController extends BaseController {
 		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, items, menuName, targetId));
 		model.addAttribute("_target", this.itemService.getItem(targetId).setLanguage(i.getLanguage()));
 		
-		filterBreadcrumbs(page);
+		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));
 		return page.getView();
 	}
 
@@ -268,15 +276,16 @@ public class AncestryPageController extends BaseController {
 		return menu;
 	}
 		
-	private void filterBreadcrumbs(Page p) {
-		Iterator<Item> iter = p.getHeader().getBreadcrumbItems().iterator();
-		Item i;
-		while (iter.hasNext()) {
-			i = iter.next();
-			if (! (i.getType().getName().equals("Male") || i.getType().getName().equals("Female"))) {
-				iter.remove();
+	private List<Person> personBreadcrumbs(Page p) {
+		List<Person> trail = new ArrayList<Person>();
+
+		for (Item i : p.getHeader().getBreadcrumbItems()) {
+			if (i.getType().getName().equals(Person.PRIMARY) || i.getType().getName().equals(Person.PARTNER)) {
+				trail.add(new Person(i));
 			}
 		}
+		
+		return trail;
 	}
 	
 }

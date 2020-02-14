@@ -48,12 +48,20 @@ public class LineSegment {
 		return end;
 	}
 
-	public void setStart(Coord start) {
+	public LineSegment setStart(Coord start) {
 		this.start = start;
+		return this;
 	}
 
-	public void setEnd(Coord end) {
+	public LineSegment setEnd(Coord end) {
 		this.end = end;
+		return this;
 	}
-	
+
+	public Coord getTextDatum(int textPosPercent) {
+		int dx = (getEnd().getX() - getStart().getX()) * textPosPercent / 100;
+		int dy = (getEnd().getY() - getStart().getY()) * textPosPercent / 100;
+		return new Coord(getStart().copy().move(new Coord(dx, dy)));
+	}
+
 }

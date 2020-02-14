@@ -5,6 +5,9 @@
         
 <cms:debug>/* tags/cms/js/init.tag */</cms:debug>
 
+// nodeKey is an argument in renderItemForms function call
+_editingItemId = nodeKey;
+
 var tabsdiv = $("#item-editor");
 tabsdiv.empty().append(html);
 

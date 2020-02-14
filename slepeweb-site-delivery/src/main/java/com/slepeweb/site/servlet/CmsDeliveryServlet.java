@@ -95,22 +95,29 @@ public class CmsDeliveryServlet {
 				if (site.isMultilingual() && ! path.equals("/favicon.ico")) {
 					if (path.length() > 2) {
 						String[] slugs = path.substring(1).split("/");
-						if (slugs.length > 1 && slugs[0].length() == 2) {
-							trimmedPath = path.substring(3);
+						if (slugs.length > 0 && slugs[0].length() == 2) {
 							language = path.substring(1, 3);
+							trimmedPath = path.substring(3);
+							
+							// Special treatment for homepage
+							if (StringUtils.isBlank(trimmedPath)) {
+								trimmedPath = "/";
+							}
 						}
 						else {
 							redirect = true;
 						}
 					}
 					else {
+						// Special treatment for homepage
+						trimmedPath = "";
 						redirect = true;
 					}
 				}
 				
 				if (redirect) {
 					// language is missing on a multilingual site - redirect to default language
-					res.sendRedirect(String.format("/%s%s", language, path));
+					res.sendRedirect(String.format("/%s%s", language, trimmedPath));
 					return;
 				}
 				

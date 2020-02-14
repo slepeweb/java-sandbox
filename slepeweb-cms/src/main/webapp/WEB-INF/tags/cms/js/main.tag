@@ -49,7 +49,7 @@
 		
 	// All the things that can only be executed once the page has been fully loaded ...
 	// For development purposes, expose a handle to the main FancyTree
-	var _tree;
+	var _tree, _linkerTree;
 	
 	$(function() {
 		$("body").click(function() {
@@ -64,7 +64,9 @@
 	
 		// Render item management forms when page is first loaded
 		if (_editingItemId) {
-			renderItemForms(_editingItemId);
+			// On first call to renderItemForms, we use _editingItemId.
+			// On subsequent ajax calls driven by selecting items on the left nav, we use nodeKey.
+			renderItemForms(_editingItemId, _activeTab);
 		}
 		
 		// Render flash message when page is first loaded

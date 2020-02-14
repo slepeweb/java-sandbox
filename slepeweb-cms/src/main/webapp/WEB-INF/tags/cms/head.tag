@@ -24,6 +24,7 @@
 	var _ctx = "${applicationContextPath}";
 	var _siteId = <c:choose><c:when test="${not empty site}">${site.id}</c:when><c:otherwise>0</c:otherwise></c:choose>;
 	var _editingItemId = null;
+	
 	<c:if test="${not empty editingItem}">
 		_editingItemId = ${editingItem.id};
 		_siteId = ${editingItem.site.id};
@@ -38,8 +39,13 @@
 	</c:if>
 	
 	var _productTypeId = "${_productTypeId}";
+	var _activeTab = "${param.tab}";
 </script>
 
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" 
+	integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" 
+	crossorigin="anonymous">
+	
 <link rel="stylesheet" href="${applicationContextPath}/resources/css/main.css" type="text/css">
 <cmsjs:main />
 

@@ -111,6 +111,7 @@ public class Link extends CmsBean {
 		result = prime * result + ((ordering == null) ? 0 : ordering.hashCode());
 		result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((data == null) ? 0 : data.hashCode());
 		return result;
 	}
 
@@ -147,6 +148,11 @@ public class Link extends CmsBean {
 			if (other.type != null)
 				return false;
 		} else if (!type.equals(other.type))
+			return false;
+		if (data == null) {
+			if (other.data != null)
+				return false;
+		} else if (!data.equals(other.data))
 			return false;
 		return true;
 	}

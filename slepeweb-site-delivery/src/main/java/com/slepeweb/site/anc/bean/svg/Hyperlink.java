@@ -2,13 +2,13 @@ package com.slepeweb.site.anc.bean.svg;
 
 import com.slepeweb.site.anc.bean.Person;
 
-public class Link extends Coord {
+public class Hyperlink extends Coord {
 	
 	private static String ANCHOR_FORMAT_STR = "<a xlink:href=\"%s\">%s</a>";
 	private static String TSPAN_FORMAT_STR = "<tspan x=\"%d\" dy=\"1.2em\">%s</tspan>";
 	private Person person;
 
-	public Link(int a, int b, Person p) {
+	public Hyperlink(int a, int b, Person p) {
 		super(a, b);
 		this.person = p;
 	}
@@ -53,7 +53,7 @@ public class Link extends Coord {
 			sb.append(String.format(TSPAN_FORMAT_STR, getX(), getPerson().getLastName()));
 		}
 		else {
-			sb.append(getPerson().getName());
+			sb.append(getPerson().getFirstName());
 		}
 		
 		return sb.append("</text>").toString();

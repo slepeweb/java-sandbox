@@ -5,14 +5,18 @@
 <h2>${_person.fullName}</h2>
 
 <ul>
-	<c:if test="${not _person.blankBirthDetails}">
-		<li>b. ${_person.birthDetails}</li>
+	<c:if test="${not empty _person.birthSummary}">
+		<li>${_person.birthSummary}</li>
 	</c:if>
-	<c:if test="${not _person.relationships[0].blankMarriageDetails}">
-		<li>m. ${_person.relationships[0].marriageDetails}</li>
-	</c:if>
-	<c:if test="${not _person.blankDeathDetails}">
-		<li>d. ${_person.deathDetails}</li>
+	
+	<c:forEach items="${_person.relationships}" var="rel">
+		<c:if test="${not empty rel.summary}">
+			<li>${rel.summary}</li>
+		</c:if>
+	</c:forEach>
+	
+	<c:if test="${not empty _person.deathSummary}">
+		<li>${_person.deathSummary}</li>
 	</c:if>
 </ul>
 

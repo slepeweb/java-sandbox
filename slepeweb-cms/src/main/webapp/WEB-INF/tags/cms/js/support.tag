@@ -54,12 +54,16 @@ var displayCommerceElements = function(target) {
 /*
  * Tells the browser to get the item editor page for a given item.
  */
-var fetchItemEditor = function(nodeKey, status) {
+var fetchItemEditor = function(nodeKey, status, tabName) {
 	var url = pageEditorUrlPrefix + nodeKey;
 	
 	if (status) {
 		var param = status.error ? "error" : "success";
 		url += ("?status=" + param + "&msg=" + status.messageEncoded);	
+	}
+	
+	if (tabName) {
+		url += "&tab=" + tabName;
 	}
 	
 	window.location = url; 
@@ -165,4 +169,149 @@ var refreshHistory = function(siteId) {
 				console.log("Error: " + list);
 			}
 		});
+};
+
+var _identifyHiddenLinkDataList = function(ulSelector) {
+	var links = [];
+	var parts, obj, span;
+	
+	ulSelector.find("li").each(function(index, li) {
+		span = $(li).find("span.hide");
+		links.push(_identifyHiddenLinkData4Span(span));
+	});
+	
+	return links;
+};
+
+var _identifyHiddenLinkData4Span = function(span) {
+	var	parts = span.html().split("\|");
+	var	obj = {
+		span: span,
+		childId: parts[0],
+		type: parts[1],
+		name: parts[2],
+		data: decodeURIComponent(parts[3]),
+		ordering: parseInt(parts[4], 10),
+		state: parts[5]
+	};
+	
+	return obj;
+};
+
+var _formatHiddenLinkData = function(d) {
+	var dl = "|";
+	return d.childId + dl + d.type + dl + d.name + dl + d.data + dl + d.ordering + dl + d.state;
+};
+
+// Use the link form data to add a new link for saving, or edit an existing link
+var _useLink = function() {
+	// Collect form data
+	var div = $("#addlinkdiv");
+	var formData = {};
+	formData.type = div.find("select[name='linktype']").val();
+	formData.name = div.find("select[name='linkname']").val();
+	formData.data = encodeURIComponent(div.find("input[name='linkdata']").val());
+	formData.state = div.find("input[name='state']").val();
+	var linkIdStr = div.find("input[name='linkId']").val();
+	formData.ordering = parseInt(linkIdStr, 10);
+	
+	if (formData.type != 'unknown' && formData.name != 'unknown') {
+		if (formData.state == "1") {
+			// We need to replace an existing link
+			var linkHtml = null;
+			var target = null;
+			
+			var links = _identifyHiddenLinkDataList($("#sortable-links"));
+			for (var i = 0; i < links.length; i++) {
+				if (links[i].ordering == formData.ordering) {
+					target = links[i];
+					break;
+				}
+			}
+			
+			if (target) {
+				var span = target.span;
+				formData.childId = target.childId;
+				span.html(_formatHiddenLinkData(formData));
+			}
+		}
+		else {
+			// This is a new link - append it to the end of any existing links
+			linkHtml = $("#link-template li").clone(true);
+			var ul = $("#sortable-links");
+			var links = _identifyHiddenLinkDataList(ul);
+			var nextId = -1;
+			
+			if (links) {
+				for (var i = 0; i < links.length; i++) {
+					if (links[i].ordering > nextId) {
+						nextId = links[i].ordering;
+					}
+				};
+				
+				nextId += 1;
+			}
+			else {
+				// This is the first link
+				nextId = 0;				
+			}
+			
+			if (_linkerTree) {
+				formData.childId = _linkerTree.activeNode.key;
+				
+				if (formData.childId) {
+					 
+					$.ajax(_ctx + "/rest/item/" + formData.childId + "/name", {
+						type: "POST",
+						cache: false,
+						dataType: "text",
+						success: function(itemName, status, z) {
+							linkHtml.find("a").attr("href", pageEditorUrlPrefix + formData.childId).html(formData.type + " (" + formData.name + "): " + itemName);
+							linkHtml.find("span.hide").html(_formatHiddenLinkData(formData));				
+							linkHtml.appendTo(ul);					
+						}
+					});
+				}
+			}
+		}	   	  	
+	}
+	else {
+		showDialog("dialog-choose-linktype");
+	}
+};
+
+var _closeLinkForm = function() {
+	linkDialog.dialog("close");
+	$("#linknav").css("display", "inline");
+	_setLinkForm(["unknown","unknown","","-1"], "0");
+};
+
+var _setLinkForm = function(data, state) {
+	var form = $("#addlinkdiv");	
+	form.find("select[name='linktype']").val(data[0]);
+	form.find("select[name='linkname']").val(data[1]);
+	form.find("input[name='linkdata']").val(data[2]);
+	form.find("input[name='linkId']").val(data[3]);
+	form.find("input[name='state']").val(state);	
+};
+
+var _repopulateLinkNameDropdown = function(linkType, value) {
+	var selector = $("#addlinkdiv select[name='linkname']");
+	selector.empty();
+	
+	$.ajax(_ctx + "/rest/linknames/" + _siteId + "/" + linkType, {
+		type: "POST",
+		cache: false,
+		dataType: "json",
+		success: function(result, status, z) {
+			selector.append("<option value='unknown'>Choose ...</option>");
+			for (var i = 0; i < result.length; i++) {
+				selector.append("<option value='" + result[i] + "'>" + result[i] + "</option>");
+			}
+			
+			if (value) {
+				selector.val(value);
+			}
+		}
+	});
 };

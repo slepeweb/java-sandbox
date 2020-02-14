@@ -18,7 +18,10 @@ $("#leftnav").fancytree({
 			_tree = $("#leftnav").fancytree("getTree");
 			var key = "" + _editingItemId;
 			var node = _tree.getNodeByKey(key);
-			_tree.activateKey(node.key);
+			
+			if (node) {
+				_tree.activateKey(node.key);
+			}
 		}
 	},
 	lazyLoad: function(event, data) {

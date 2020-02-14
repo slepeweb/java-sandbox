@@ -846,12 +846,6 @@ html {
   }
 }
 
-/* To avoid changing the size of the company logo, shorten it for small devices */
-@media only screen and (min-width: 26em) {
-  h1 > a:after {
-    content: "solutions";
-  }
-}
 #tiny-nav {
   display: none;
 }

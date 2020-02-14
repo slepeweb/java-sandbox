@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.CookieService;
@@ -71,11 +72,20 @@ public class PageController extends BaseController {
 		Site site = this.siteService.getSite(siteId);
 		if (site != null) {
 			model.addAttribute("site", site);
-			model.addAttribute("editingItem", site.getItem("/"));
+		}
+
+		Item i = null;
+		List<ItemIdentifier> history = this.cookieService.getHistoryCookieValue(site.getId(), req);
+		if (history.size() > 0) {
+			i = this.itemService.getItem(history.get(0).getItemId());
+		}
+		else {
+			i = site.getItem("/");
 		}
 
 		// Get a history of visited items
-		model.addAttribute("_history", this.cookieService.getHistoryCookieValue(site.getId(), req));
+		model.addAttribute("_history", history);
+		model.addAttribute("editingItem", i);
 		
 		return "cms.editor";
 	}

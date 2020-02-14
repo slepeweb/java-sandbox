@@ -3,21 +3,24 @@ package com.slepeweb.site.anc.bean.svg;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.site.anc.bean.Person;
 import com.slepeweb.site.anc.bean.Relationship;
 
 public class SvgSupport {
 	
-	private Link father, mother, subject, partner;
-	private List<Link> children;
-	private List<LineSegment> lineA, lineB, lineC;
+	private Hyperlink father, mother, subject, partner;
+	private List<Hyperlink> children;
+	private RelationshipBranch lineA, lineB;
+	private List<LineSegment> lineC;
 	private Coord grandparentsIcon, parentsIcon, childrenIcon;
 	private int frameHeight;
 	
 	public SvgSupport(Person pers, int relationshipId) {
-		this.children = new ArrayList<Link>();
-		this.lineA = new ArrayList<LineSegment>();
-		this.lineB = new ArrayList<LineSegment>();
+		this.children = new ArrayList<Hyperlink>();
+		this.lineA = new RelationshipBranch();
+		this.lineB = new RelationshipBranch();
 		this.lineC = new ArrayList<LineSegment>();
 		
 		// See hand-written notes for legend
@@ -31,18 +34,18 @@ public class SvgSupport {
 		
 		int numChildren = subjectRel != null ? subjectRel.getChildren().size() - 1 : 0;
 		this.frameHeight = r + t + a + (numChildren * w);
-		this.subject = new Link(c, q, pers);
+		this.subject = new Hyperlink(c, q, pers);
 		
 		if (pers.getFather() != null) {
-			this.father = new Link(0, p, pers.getFather());
+			this.father = new Hyperlink(0, p, pers.getFather());
 		}
 		
 		if (pers.getMother() != null) {
-			this.mother = new Link(b, p, pers.getMother());
+			this.mother = new Hyperlink(b, p, pers.getMother());
 		}
 		
 		if (subjectRel != null) {
-			this.partner = new Link(c + b, q, subjectRel.getPartner());
+			this.partner = new Hyperlink(c + b, q, subjectRel.getPartner());
 		}
 		
 		if (subjectRel != null) {
@@ -51,7 +54,7 @@ public class SvgSupport {
 			for (Person child : subjectRel.getChildren()) {
 				num++;
 				Y = num == 1 ? r + t : r + t + (num - 1) * w;
-				children.add(new Link(X, Y, child));
+				children.add(new Hyperlink(X, Y, child));
 			}
 		}
 		
@@ -65,9 +68,9 @@ public class SvgSupport {
 		this.childrenIcon = new Coord(300, r + (numChildren * w / 2));
 	}
 	
-	private List<LineSegment> treeStyleA(int a, int b, int c, Relationship rel, boolean forSubject) {
+	private RelationshipBranch treeStyleA(int a, int b, int c, Relationship rel, boolean forSubject) {
 		
-		List<LineSegment> polyline = new ArrayList<LineSegment>();
+		RelationshipBranch polyline = new RelationshipBranch();
 		
 		if (rel == null ||
 				(rel.getSubject() == null && rel.getPartner() == null) || 
@@ -77,6 +80,7 @@ public class SvgSupport {
 		}
 		
 		LineSegment horizontal = new LineSegment(new Coord(c, 0), new Coord(c, 0)).move(new Coord(0, a));
+		
 		LineSegment verticalShortLeft = new LineSegment(new Coord(0, a), new Coord(0, 0, true));
 		LineSegment verticalShortRight = verticalShortLeft.copy().move(new Coord(b, 0));
 		LineSegment verticalShortMiddle = verticalShortLeft.copy().move(new Coord(c, 0)).mirrorX(a);
@@ -96,6 +100,11 @@ public class SvgSupport {
 		
 		if ((rel.getSubject() != null || rel.getPartner() != null) && ! forSubject) {
 			polyline.add(verticalShortMiddle);
+		}
+		
+		if (rel.getSubject() != null && rel.getPartner() != null && StringUtils.isNotBlank(rel.getSummary())) {
+			polyline.setSummary(rel.getSummary());
+			polyline.setTooltipSegment(horizontal);
 		}
 		
 		return polyline;
@@ -146,31 +155,39 @@ public class SvgSupport {
 		return polyline;
 	}
 	
-	public Link getFather() {
+	public RelationshipBranch move(RelationshipBranch polyline, Coord shift) {
+		for (LineSegment seg : polyline.getSegments()) {
+			seg.move(shift);
+		}
+		
+		return polyline;
+	}
+	
+	public Hyperlink getFather() {
 		return father;
 	}
 	
-	public Link getMother() {
+	public Hyperlink getMother() {
 		return mother;
 	}
 	
-	public Link getSubject() {
+	public Hyperlink getSubject() {
 		return subject;
 	}
 	
-	public Link getPartner() {
+	public Hyperlink getPartner() {
 		return partner;
 	}
 	
-	public List<Link> getChildren() {
+	public List<Hyperlink> getChildren() {
 		return children;
 	}
 	
-	public List<LineSegment> getLineA() {
+	public RelationshipBranch getLineA() {
 		return lineA;
 	}
 	
-	public List<LineSegment> getLineB() {
+	public RelationshipBranch getLineB() {
 		return lineB;
 	}
 	

@@ -22,9 +22,12 @@
 		  		font-weight: bold;
 		  		fill: #16688a;
 		  	}
+		  	
+		  	text.data {
+		  		font-size: 0.7em;
+		  	}
 		  </style>
 		   
-	<!-- 	<g> -->
 			<c:if test="${not empty _person.father}">
 				${svgdata.father.linkTag}
 			</c:if>
@@ -45,16 +48,26 @@
 				</c:forEach>
 			</c:if>
 	
-			<c:forEach items="${svgdata.lineA}" var="_segment">
+			<c:forEach items="${svgdata.lineA.segments}" var="_segment">
 				<line x1="${_segment.start.x}" y1="${_segment.start.y}" x2="${_segment.end.x}" y2="${_segment.end.y}" 
 					stroke="black" <c:if test="${_segment.end.marker}">marker-end="url(#arrow-${index})"</c:if> />
 			</c:forEach>
-	
-			<c:forEach items="${svgdata.lineB}" var="_segment">
+			
+			<c:if test="${not empty svgdata.lineA.tooltipPos}">
+				<image class="info-icon" x="${svgdata.lineA.tooltipPos.x}" y="${svgdata.lineA.tooltipPos.y - 20}" 
+					width="16" height="16" href="/resources/anc/info2.png" title="${svgdata.lineA.tooltip}" />
+			</c:if>
+			
+			<c:forEach items="${svgdata.lineB.segments}" var="_segment">
 				<line x1="${_segment.start.x}" y1="${_segment.start.y}" x2="${_segment.end.x}" y2="${_segment.end.y}" 
 					stroke="black" <c:if test="${_segment.end.marker}">marker-end="url(#arrow-${index})"</c:if> />
 			</c:forEach>
-	
+											
+			<c:if test="${not empty svgdata.lineB.tooltipPos}">
+				<image class="info-icon" x="${svgdata.lineB.tooltipPos.x}" y="${svgdata.lineB.tooltipPos.y - 20}" 
+					width="16" height="16" href="/resources/anc/info2.png" title="${svgdata.lineB.tooltip}" />
+			</c:if>
+			
 			<c:forEach items="${svgdata.lineC}" var="_segment">
 				<line x1="${_segment.start.x}" y1="${_segment.start.y}" x2="${_segment.end.x}" y2="${_segment.end.y}" 
 					stroke="black" />
@@ -65,6 +78,11 @@
 			<image x="300" y="${svgdata.parentsIcon.y}" width="70" height="70" href="/content/images/icons/parents" />
 			<image x="300" y="${svgdata.childrenIcon.y}" width="70" height="70" href="/content/images/icons/children" />
 			 --%>
-	<!-- 	</g> -->
 	</svg>
 </div>
+
+<script>
+	$(function() {
+		$("image.info-icon").tooltip();
+	});
+</script>

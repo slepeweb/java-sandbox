@@ -30,8 +30,9 @@
 			</div>
 
 			<!-- Main content -->	
+			<!-- The body of the next div is populated by an ajax call, so should be empty initially. -->
 			<div id="item-editor">
-				<tiles:insertAttribute name="body" />	
+				<%--	<tiles:insertAttribute name="body" />	--%>
 			</div>
 		</div>
 	
