@@ -23,7 +23,13 @@ $("#add-button").click(function () {
 		}, 
 		dataType: "json",
 		success: function(obj, status, z) {
-			fetchItemEditor(obj.data, obj);
+			flashMessage(obj);
+			
+			if (! obj.error) {
+				var childNode = obj.data;
+				var parentNode = _tree.getNodeByKey(nodeKey);
+				parentNode.addNode(childNode);
+			}
 		},
 		error: function(json, status, z) {
 			serverError();

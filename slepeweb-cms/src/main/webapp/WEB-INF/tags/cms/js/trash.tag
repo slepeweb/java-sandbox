@@ -105,7 +105,16 @@ $("#trash-button").click(function () {
 					dataType: "json",
 					success: function(obj, status, z) {
 						theDialog.dialog("close");
-						fetchItemEditor(obj.data, obj);
+						flashMessage(obj);
+						
+						if (! obj.error) {
+							var node = _tree.getNodeByKey(nodeKey);
+							if (node) {
+								var parent = node.getParent();
+								node.remove();
+								_tree.activateKey(parent.key);
+							}
+						}
 					},
 					error: function(json, status, z) {
 						theDialog.dialog("close");

@@ -18,6 +18,7 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.component.Navigation;
+import com.slepeweb.cms.component.Navigation.Node;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteService;
 
@@ -143,7 +144,7 @@ public class NavigationController extends BaseController {
 	}
 	
 	private Navigation.Node dive(Item parentItem, int numLevels) {
-		Navigation.Node pNode = toNode(parentItem, false), cNode;		
+		Navigation.Node pNode = Node.toNode(parentItem, false), cNode;		
 		List<Link> bindings = parentItem.getBindings();
 		pNode.setFolder(bindings.size() > 0);
 		
@@ -151,7 +152,7 @@ public class NavigationController extends BaseController {
 			for (Link l : bindings) {
 				cNode = dive(l.getChild(), numLevels - 1);
 				cNode.setShortcut(l.getType().equals(LinkType.shortcut));
-				cNode.setExtraClasses(getCmsIconClass(l.getChild(), cNode.isShortcut()));
+				cNode.setExtraClasses(Node.getCmsIconClass(l.getChild(), cNode.isShortcut()));
 				pNode.addChild(cNode);
 			}
 		}
@@ -160,7 +161,7 @@ public class NavigationController extends BaseController {
 	}
 	
 	private Navigation.Node dive(Item parentItem, final Vector<String> pathComponents) {
-		Navigation.Node pNode = toNode(parentItem, false);		
+		Navigation.Node pNode = Node.toNode(parentItem, false);		
 		Navigation.Node cNode;
 		List<Link> bindings = parentItem.getBindings();
 		pNode.setFolder(bindings.size() > 0);
@@ -184,7 +185,7 @@ public class NavigationController extends BaseController {
 			}
 			else {
 				// We've reached the end of this trail
-				cNode = toNode(child, shortcut);
+				cNode = Node.toNode(child, shortcut);
 				cNode.setFolder(child.getBoundItems().size() > 0);
 			}
 			
@@ -193,27 +194,5 @@ public class NavigationController extends BaseController {
 		}
 		
 		return pNode;
-	}
-	
-	private Navigation.Node toNode(Item i, boolean isShortcut) {
-		return new Navigation.Node().setTitle(i.getName()).setKey(i.getId().toString()).
-				setExtraClasses(getCmsIconClass(i, isShortcut));
-	}
-	
-	private String getCmsIconClass(Item i, boolean isShortcut) {
-		String type = i.getType().getName().toLowerCase();
-		if (type.endsWith("homepage")) {
-			type = "homepage";
-		}
-		else if (type.startsWith("image")) {
-			type = "image";
-		}
-		
-		String prefix = "cms-icon-";
-		if (isShortcut) {
-			prefix = prefix + "shortcut-";
-		}
-		
-		return String.format(prefix + "%s", type);
-	}
+	}	
 }

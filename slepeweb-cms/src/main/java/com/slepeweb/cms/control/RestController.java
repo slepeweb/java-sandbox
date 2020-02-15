@@ -39,11 +39,14 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.component.Navigation;
+import com.slepeweb.cms.component.Navigation.Node;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
@@ -196,6 +199,8 @@ public class RestController extends BaseController {
 					i.save();
 					resp.addMessage("Core item data successfully updated");
 				}
+				
+				resp.setData(new Navigation.Node().setTitle(i.getName()));
 			}
 			catch (Exception e) {
 				return resp.setError(true).addMessage(e.getMessage());		
@@ -209,7 +214,7 @@ public class RestController extends BaseController {
 				resp.addMessage("Tags updated");
 			}
 			
-			return resp.setError(false);
+			return resp;
 		}
 				
 		return resp.setError(true).addMessage(String.format("No item found with id %d", itemId));		
@@ -501,12 +506,13 @@ public class RestController extends BaseController {
 			else {
 				i.save();
 			}
+			
+			Node n = Node.toNode(i, false);		
+			return resp.addMessage("Item added").setData(n);
 		}
 		catch (Exception e) {
 			return resp.setError(true).addMessage(e.getMessage()).setData(itemId);
 		}
-		
-		return resp.setError(false).addMessage("Item added").setData(i.getId());
 	}
 	
 	@RequestMapping(value="/item/{itemId}/copy", method=RequestMethod.POST, produces="application/json")
@@ -522,11 +528,19 @@ public class RestController extends BaseController {
 		
 		try {
 			Item c = this.itemService.copy(i, name, simplename);	
-			return resp.setError(c == null).addMessage("Item copied").setData(c.getId());
+			if (c != null) {
+				Node n = Node.toNode(c, false);
+				resp.addMessage("Item copied").setData(n);
+			}
+			else {
+				resp.setError(true).addMessage("Failed to copy item");
+			}
 		}
 		catch (Exception e) {
-			return resp.setError(true).addMessage(e.getMessage()).setData(itemId);
-		}		
+			resp.setError(true).addMessage(e.getMessage()).setData(itemId);
+		}
+		
+		return resp;
 	}
 	
 	@RequestMapping(value="/item/{itemId}/version", method=RequestMethod.POST, produces="application/json")
@@ -578,7 +592,7 @@ public class RestController extends BaseController {
 		Item parent = i.getParent();
 		i.trash();
 			
-		return resp.setError(false).addMessage("Item trashed").setData(parent.getId());
+		return resp.addMessage("Item trashed").setData(parent.getId());
 	}
 	
 	@RequestMapping(value="/trash/get")
@@ -707,6 +721,10 @@ public class RestController extends BaseController {
 		Item i;
 		int count = 0;
 		
+		LinkFilter f = new LinkFilter().setLinkType(LinkType.shortcut);
+		List<Link> shortcuts = f.filterLinks(parent.getLinks());
+		boolean existShortcuts = shortcuts.size() > 0;
+		
 		for (LinkParams lp : linkParams) {
 			l = CmsBeanFactory.makeLink().
 					setParentId(parentId).
@@ -720,6 +738,8 @@ public class RestController extends BaseController {
 			
 			l.setChild(i);			
 			links.add(l);
+			
+			existShortcuts = existShortcuts || lp.getType().equals(LinkType.shortcut);
 		}
 		
 		parent.setLinks(links);
@@ -727,6 +747,10 @@ public class RestController extends BaseController {
 		try {
 			parent.saveLinks();		
 			resp.addMessage(String.format("%d links saved", links.size()));
+			
+			if (existShortcuts) {
+				resp.setData("shortcuts");
+			}
 		}
 		catch (ResourceException e) {
 			resp.setError(true).addMessage(e.getMessage());

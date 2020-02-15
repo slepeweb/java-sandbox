@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import com.slepeweb.cms.bean.Item;
+
 public class Navigation {
 	
 	/*
@@ -31,6 +33,28 @@ public class Navigation {
 		private String title, key, extraClasses;
 		private boolean folder, lazy = true, expanded, selected, shortcut;
 		private List<Node> children = new ArrayList<Node>();
+		
+		public static Node toNode(Item i, boolean isShortcut) {
+			return new Navigation.Node().setTitle(i.getName()).setKey(i.getId().toString()).
+					setExtraClasses(getCmsIconClass(i, isShortcut));
+		}
+		
+		public static String getCmsIconClass(Item i, boolean isShortcut) {
+			String type = i.getType().getName().toLowerCase();
+			if (type.endsWith("homepage")) {
+				type = "homepage";
+			}
+			else if (type.startsWith("image")) {
+				type = "image";
+			}
+			
+			String prefix = "cms-icon-";
+			if (isShortcut) {
+				prefix = prefix + "shortcut-";
+			}
+			
+			return String.format(prefix + "%s", type);
+		}
 		
 		public Node addChild(Node n) {
 			getChildren().add(n);

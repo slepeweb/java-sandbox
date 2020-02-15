@@ -58,9 +58,14 @@ $("#savelinks-button").click(function(e) {
 		dataType: "json",
 		processData: false,
 		success: function(obj, status, z) {
-			// Need to refresh the page, to update the FancyTree,
-			// in case a shortcut link was added/removed
-			fetchItemEditor(_editingItemId, obj, "links-tab");
+			if (! obj.error && obj.data) {
+				// Need to refresh the page, to update the FancyTree,
+				// since one or more shortcuts have been added/removed
+				fetchItemEditor(_editingItemId, obj, "links-tab");
+			}
+			else {
+				flashMessage(obj);
+			}
 		},
 		error: function(obj, status, z) {
 			serverError();

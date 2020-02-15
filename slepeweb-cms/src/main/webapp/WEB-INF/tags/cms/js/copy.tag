@@ -16,7 +16,12 @@ $("#copy-button").click(function () {
 		}, 
 		dataType: "json",
 		success: function(obj, status, z) {
-			fetchItemEditor(obj.data, obj);
+			flashMessage(obj);
+			
+			if (! obj.error) {
+				var sourceNode = _tree.getNodeByKey(nodeKey);
+				sourceNode.getParent().addNode(obj.data);
+			}
 		},
 		error: function(json, status, z) {
 			serverError();

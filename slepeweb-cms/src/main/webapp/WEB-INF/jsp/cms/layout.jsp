@@ -26,6 +26,7 @@
 			</div>
 			
 			<!-- Left navigation -->
+			<!-- The body of the next div is populated by an ajax call, so should be empty initially. -->
 			<div id="leftnav">
 			</div>
 

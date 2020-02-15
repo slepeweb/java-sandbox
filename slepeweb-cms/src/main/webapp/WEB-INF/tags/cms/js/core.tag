@@ -29,6 +29,14 @@ $("#core-button").click(function () {
 		data: args, 
 		dataType: "json",
 		success: function(obj, status, z) {
+			if (! obj.error) {
+				// Name may have changed, so navigation tree will need updating
+				var node = _tree.getNodeByKey(nodeKey);
+				if (node) {
+					node.setTitle(obj.data.title);
+				}
+			}
+			
 			flashMessage(obj);
 		},
 		error: function(json, status, z) {
