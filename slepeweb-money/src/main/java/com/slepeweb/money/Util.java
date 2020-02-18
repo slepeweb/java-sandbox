@@ -25,12 +25,12 @@ public class Util {
 		return  d != null ? d.multiply(ONE_HUNDRED).longValue() : -1L;
 	}
 	
-	public static String formatPositivePounds(long pence) {
-		return formatPounds(pence < 0 ? -pence : pence);
+	public static String formatPositivePounds(Long pence) {
+		return pence != null ? formatPounds(pence < 0 ? -pence : pence) : "";
 	}
 	
-	public static String formatPounds(long pence) {
-		return String.format("%,.2f", pence / 100.0F);
+	public static String formatPounds(Long pence) {
+		return pence != null ? String.format("%,.2f", pence / 100.0F) : "";
 	}
 	
 	public static long parsePounds(String value) {
@@ -40,7 +40,7 @@ public class Util {
 
 			String[] parts = val.split("\\.");
 			if (parts.length == 1) {
-				return Long.valueOf(cleanAmount(parts[0]));
+				return Long.valueOf(cleanAmount(parts[0])).longValue() * 100;
 			}
 			else if (parts.length == 2){
 				if (parts[1].length() == 1) {

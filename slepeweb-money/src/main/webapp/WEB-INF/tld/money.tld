@@ -29,7 +29,7 @@
 	<function>
 		<name>formatPounds</name>
 		<function-class>com.slepeweb.money.Util</function-class>
-		<function-signature>java.lang.String formatPounds(long)</function-signature>
+		<function-signature>java.lang.String formatPounds(java.lang.Long)</function-signature>
 	</function>
 	
 	<function>

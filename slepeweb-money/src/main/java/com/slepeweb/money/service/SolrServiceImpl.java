@@ -291,6 +291,15 @@ public class SolrServiceImpl implements SolrService {
 				isCriteriaSet = true;
 			}
 			
+			if (params.getFromAmount() != null || params.getToAmount() != null) {
+				String smaller = params.getFromAmount() == null ? "*" : String.valueOf(params.getFromAmount());
+				String larger = params.getToAmount() == null ? "*" : String.valueOf(params.getToAmount());
+				q.addFilterQuery(String.format("amount:[%s TO %s]", 
+						params.isDebit() ? larger : smaller, 
+						params.isDebit() ? smaller : larger));
+				isCriteriaSet = true;
+			}
+			
 			if (isCriteriaSet) {
 				if (isCategorySearch) {
 					q.addFilterQuery(String.format("type:%d OR type:%d", 0, 2));

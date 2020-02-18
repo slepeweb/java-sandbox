@@ -1,7 +1,5 @@
 package com.slepeweb.money.bean.solr;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 
@@ -12,7 +10,7 @@ import org.codehaus.jackson.annotate.JsonSetter;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
 
-@JsonIgnoreProperties({"start", "urlParameters", "hrefBase", "accountIdStr", "payeeIdStr", "categoryIdStr"})
+@JsonIgnoreProperties({"start", "hrefBase", "accountIdStr", "payeeIdStr", "categoryIdStr"})
 public class SolrParams {
 
 	public static final String START_OF_DAY = "T00:00:00Z";
@@ -24,48 +22,14 @@ public class SolrParams {
 	private Long accountId, payeeId, categoryId;
 	private int pageNum, pageSize;
 	private Date from, to;
+	private Long fromAmount, toAmount;
+	private boolean debit;
 
 	// For Jackson
 	public SolrParams() {}
 	
 	public SolrParams(SolrConfig config) {
 		this.config = config;
-	}
-	
-	public String getUrlParameters() {
-		StringBuilder sb = new StringBuilder();
-		if (getAccountId() != null) {
-			appendParam(sb, "accountId", getAccountId());
-		}
-		
-		if (getPayeeId() != null) {
-			appendParam(sb, "payeeId", getPayeeId());
-		}
-		
-		if (getCategoryId() != null) {
-			appendParam(sb, "categoryId", getCategoryId());
-		}
-		
-		if (StringUtils.isNotBlank(getMajorCategory())) {
-			appendParam(sb, "category", getMajorCategory());
-		}
-		
-		if (StringUtils.isNotBlank(getMemo())) {
-			appendParam(sb, "memo", getMemo());
-		}
-		
-		return sb.toString();
-	}
-	
-	private void appendParam(StringBuilder sb, String fieldName, Long fieldValue) {
-		appendParam(sb, fieldName, String.valueOf(fieldValue));
-	}
-	
-	private void appendParam(StringBuilder sb, String fieldName, String fieldValue) {
-		if (sb.length() > 0) {
-			sb.append("&");
-		}
-		sb.append(fieldName).append("=").append(clean(fieldValue));
 	}
 	
 	public Date getFrom() {
@@ -257,6 +221,7 @@ public class SolrParams {
 		return sb.toString();
 	}
 	
+	/*
 	private String clean(String s) {
 		String cleaned = s.replaceAll("[<>]", " ");
 		try {
@@ -265,6 +230,7 @@ public class SolrParams {
 		catch (UnsupportedEncodingException e) {}
 		return cleaned;
 	}
+	*/
 
 	public SolrConfig getConfig() {
 		return config;
@@ -276,6 +242,67 @@ public class SolrParams {
 
 	public SolrParams setCategories(List<Category> categories) {
 		this.categories = categories;
+		return this;
+	}
+
+	public Long getFromAmount() {
+		return fromAmount;
+	}
+
+	@JsonSetter("fromAmount")
+	public SolrParams setFromAmount(Long fromAmount) {
+		this.fromAmount = fromAmount;
+		return this;
+	}
+
+	public SolrParams setFromAmount(String s) {
+		this.fromAmount = setAmount(s);
+		return this;
+	}
+
+	public Long getToAmount() {
+		return toAmount;
+	}
+
+	@JsonSetter("toAmount")
+	public SolrParams setToAmount(Long toAmount) {
+		this.toAmount = toAmount;
+		return this;
+	}
+
+	public SolrParams setToAmount(String s) {
+		this.toAmount = setAmount(s);
+		return this;
+	}
+	
+	private Long setAmount(String s) {
+		if (StringUtils.isNotBlank(s)) {
+			long pennies = Util.parsePounds(s);
+			if (isDebit()) {
+				pennies = -pennies;
+			}
+			return new Long(pennies);
+		}
+		return null;
+	}
+
+	public boolean isDebit() {
+		return debit;
+	}
+
+	@JsonSetter("debit")
+	public SolrParams setDebit(boolean debit) {
+		this.debit = debit;
+		return this;
+	}
+
+	public SolrParams setDebit(String s) {
+		if (StringUtils.isNotBlank(s)) {
+			this.debit = s.equals("-1");
+		}
+		else {
+			this.debit = false;
+		}
 		return this;
 	}
 }

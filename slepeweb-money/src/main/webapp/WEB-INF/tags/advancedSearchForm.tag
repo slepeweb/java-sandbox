@@ -1,16 +1,17 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
-<%-- <c:if test="${not empty _params}"> --%>
-	<c:set var="_selectedAccountId" value="${_params.accountIdStr}" />
-	<c:set var="_selectedPayeeId" value="${_params.payeeIdStr}" />
-	<c:set var="_selectedPayeeName" value="${_params.payeeName}" />
-	<c:set var="_selectedMajorCategory" value="${_params.majorCategory}" />
-	<c:set var="_selectedMemoTerms" value="${_params.memo}" />
-	<c:set var="_selectedPageSize" value="${_params.pageSize}" />
-	<c:set var="_selectedFrom" value="${mon:formatTimestamp(_params.from)}" />
-	<c:set var="_selectedTo" value="${mon:formatTimestamp(_params.to)}" />
-<%-- </c:if> --%>
+<c:set var="_selectedAccountId" value="${_params.accountIdStr}" />
+<c:set var="_selectedPayeeId" value="${_params.payeeIdStr}" />
+<c:set var="_selectedPayeeName" value="${_params.payeeName}" />
+<c:set var="_selectedMajorCategory" value="${_params.majorCategory}" />
+<c:set var="_selectedMemoTerms" value="${_params.memo}" />
+<c:set var="_selectedPageSize" value="${_params.pageSize}" />
+<c:set var="_selectedFrom" value="${mon:formatTimestamp(_params.from)}" />
+<c:set var="_selectedTo" value="${mon:formatTimestamp(_params.to)}" />
+<c:set var="_selectedFromAmount" value="${not empty _params.fromAmount ? mon:formatPounds(_params.fromAmount) : ''}" />
+<c:set var="_selectedToAmount" value="${not empty _params.toAmount ? mon:formatPounds(_params.toAmount) : ''}" />
+<c:set var="_selectedDebitOrCredit" value="${_params.debit ? '-1' : '1'}" />
 
 <mny:multiCategoryInputSupport />
 <mny:multiCategoryJavascript />
@@ -67,15 +68,28 @@
 	    </tr>
 	    
 	    <tr>
-	        <td class="heading"><label for="from">From date</label></td>
-	        <td><input class="datepicker" id="from" type="text" name="from" value="${_selectedFrom}"
-	        	placeholder="Optional search window start date" /></td>
+	        <td class="heading"><label for="from">Dates</label></td>
+	        <td>
+	        	From: <input class="datepicker" id="from" type="text" name="from" value="${_selectedFrom}"
+	        		placeholder="Optional search window start date" />
+	        	To: <input class="datepicker" id="to" type="text" name="to" value="${_selectedTo}"
+	        		placeholder="Optional search window end date" />
+	        </td>
 	    </tr>
 	    
 	    <tr>
-	        <td class="heading"><label for="to">To date</label></td>
-	        <td><input class="datepicker" id="to" type="text" name="to" value="${_selectedTo}"
-	        	placeholder="Optional search window end date" /></td>
+	        <td class="heading"><label for="from">Amounts</label></td>
+	        <td>
+	        	From: <input class="amount" id="from-amount" type="text" name="from-amount" value="${_selectedFromAmount}"
+	        		placeholder="Optional minimum amount" />
+	        	To: <input class="amount" id="to-amount" type="text" name="to-amount" value="${_selectedToAmount}"
+	        		placeholder="Optional maximum amount" />
+	        	
+	        	<select name="debitorcredit" class="amount">
+	        		<option value="-1" <c:if test="${_selectedDebitOrCredit eq '-1'}">selected</c:if>>Debit</option>
+	        		<option value="1" <c:if test="${_selectedDebitOrCredit eq '1'}">selected</c:if>>Credit</option>
+	        	</select>
+	        </td>
 	    </tr>
 	    
 	    <c:if test="${_formMode ne 'adhoc'}">

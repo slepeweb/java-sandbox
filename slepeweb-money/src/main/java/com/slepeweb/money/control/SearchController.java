@@ -99,6 +99,9 @@ public class SearchController extends BaseController {
 			setMemo(req.getParameter("memo")).
 			setFrom(req.getParameter("from")).
 			setTo(req.getParameter("to")).
+			setDebit(req.getParameter("debitorcredit")).
+			setFromAmount(req.getParameter("from-amount")).
+			setToAmount(req.getParameter("to-amount")).
 			setPageSize(req.getParameter("pageSize")).
 			setPageNum(1);
 	}

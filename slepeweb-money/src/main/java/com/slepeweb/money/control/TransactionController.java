@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -26,7 +27,6 @@ import com.slepeweb.money.bean.MultiSplitCounter;
 import com.slepeweb.money.bean.NormalisedMonth;
 import com.slepeweb.money.bean.Option;
 import com.slepeweb.money.bean.Payee;
-import com.slepeweb.money.bean.Property;
 import com.slepeweb.money.bean.RunningBalance;
 import com.slepeweb.money.bean.SplitInput;
 import com.slepeweb.money.bean.SplitTransaction;
@@ -34,8 +34,7 @@ import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.bean.Transfer;
-import com.slepeweb.money.except.DuplicateItemException;
-import com.slepeweb.money.service.PropertyService;
+import com.slepeweb.money.service.CookieService;
 
 
 /*
@@ -55,30 +54,27 @@ public class TransactionController extends BaseController {
 	
 	private static Logger LOG = Logger.getLogger(TransactionController.class);
 	
-	@Autowired private PropertyService propertyService;
+	@Autowired private CookieService cookieService;
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)	
-	public String listNoAccount(ModelMap model) { 
-		Property p = this.propertyService.get(Property.LAST_ACCOUNT_ID);
-		if (p != null && p.getLongValue() > -1) {
-			return listNoMonth(p.getLongValue(), model);
+	public String listNoAccount(HttpServletRequest req, HttpServletResponse res, ModelMap model) { 
+		Long accountId = this.cookieService.getAccountId(req);
+		if (accountId != null) {
+			return listNoMonth(accountId.longValue(), req, res, model);
 		}
 		
 		List<Account> allAccounts = this.accountService.getAll(false);
 		if (allAccounts.size() > 0) {
-			return listNoMonth(allAccounts.get(0).getId(), model);
+			return listNoMonth(allAccounts.get(0).getId(), req, res, model);
 		}
 		
 		return null;
 	}
 	
 	@RequestMapping(value="/list/{accountId}")	
-	public String listNoMonth(@PathVariable long accountId, ModelMap model) { 
-		try {
-			this.propertyService.save(new Property(Property.LAST_ACCOUNT_ID, String.valueOf(accountId)));
-		} catch (DuplicateItemException e) {
-			LOG.error(String.format("Failed to save property [%s]", Property.LAST_ACCOUNT_ID));
-		}
+	public String listNoMonth(@PathVariable long accountId, HttpServletRequest req, HttpServletResponse res, ModelMap model) { 
+		
+		this.cookieService.updateAccountCookie(accountId, req, res);
 		
 		Timestamp end = this.transactionService.getTransactionDateForAccount(accountId, false);		
 		NormalisedMonth endMonth = new NormalisedMonth(end);
@@ -192,16 +188,15 @@ public class TransactionController extends BaseController {
 	}
 	
 	@RequestMapping(value="/add/{accountId}", method=RequestMethod.GET)
-	public String addFormForAccount(@PathVariable long accountId, ModelMap model) {
-		Property p = this.propertyService.get(Property.LAST_INSERT_DATE);
-		if (p == null) {
-			p = new Property(null, null);
-		}
+	public String addFormForAccount(@PathVariable long accountId, HttpServletRequest req, ModelMap model) {
+		
+		Timestamp lastEntered = this.cookieService.getLastEntered(req);
 		
 		populateForm(model, 
 				new Transaction().
-				setAccount(this.accountService.get(accountId)).
-				setEntered(p.getTimestampValue()), "add");
+					setAccount(this.accountService.get(accountId)).
+					setEntered(lastEntered != null ? lastEntered : Util.now()), 
+				"add");
 		
 		return "transactionForm";
 	}
@@ -255,7 +250,7 @@ public class TransactionController extends BaseController {
 	}
 	
 	@RequestMapping(value="/update", method=RequestMethod.POST)
-	public RedirectView update(HttpServletRequest req, ModelMap model) {
+	public RedirectView update(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		
 		String flash;	
 		boolean isUpdateMode = req.getParameter("formMode").equals("update");
@@ -324,6 +319,7 @@ public class TransactionController extends BaseController {
 		
 		if (save(t) != null) {
 			flash = String.format("success|Transaction successfully %s", isUpdateMode ? "updated" : "added");
+			this.cookieService.updateLastEnteredCookie(t.getEntered(), req, res);
 		
 			return new RedirectView(String.format("%s/transaction/form/%d?flash=%s", 
 				req.getContextPath(), t.getId(), Util.encodeUrl(flash)));

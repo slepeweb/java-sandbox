@@ -7,8 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.slepeweb.money.Util;
 
 public class Property {
-	public static final String LAST_ACCOUNT_ID = "last-account-id";
-	public static final String LAST_INSERT_DATE = "last-insert-date";
 	
 	private String key, value;
 	
