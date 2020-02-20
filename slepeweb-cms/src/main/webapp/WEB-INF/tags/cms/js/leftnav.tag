@@ -33,9 +33,14 @@ $("#leftnav").fancytree({
 	},
 	dnd: {
 		autoExpandMS: 400,
-		focusOnClick: true,
+		focusOnClick: false,
 		preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
 		preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+		
+		dragExpand: function(node, data) {
+			return false;
+		},
+		
 		dragStart: function(node, data) {
 			return true;
 		},
@@ -69,7 +74,8 @@ $("#leftnav").fancytree({
 								dataType: "json",
 								success: function(obj, status, z) {
 									theDialog.dialog("close");
-									fetchItemEditor(obj.data, obj);
+									data.otherNode.moveTo(node, data.hitMode);
+									flashMessage(obj);
 								},
 								error: function(json, status, z) {
 									theDialog.dialog("close");
