@@ -24,7 +24,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	private static Logger LOG = Logger.getLogger(TransactionServiceImpl.class);
 	@Autowired private AccountService accountService;
 	@Autowired private SplitTransactionService splitTransactionService;
-	@Autowired private SolrService solrService;
+	@Autowired private SolrService4Money solrService4Money;
 	
 	private static final String FROM = 
 			"from transaction t " +
@@ -107,7 +107,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			}
 			
 			// Update solr regarding the transaction AND its splits, if any
-			this.solrService.save(t);
+			this.solrService4Money.save(t);
 			
 			return t;
 		}
@@ -139,7 +139,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		if (previousTransferId > 0 && mirrorAccount == null) {
 			// Case 3) delete the original mirror transaction
 			LOG.info(String.format("Deleted %d transaction(s)", delete(previousTransferId, true)));
-			this.solrService.removeTransactionsById(previousTransferId);
+			this.solrService4Money.removeTransactionsById(previousTransferId);
 		}
 		else if (previousTransferId == 0 && mirrorAccount != null) {
 			// Case 1) create a new mirror transaction
@@ -383,11 +383,11 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		if (! ignoreMirror && t.isTransfer()) {
 			num += delete(t.getTransferId(), true);
-			this.solrService.removeTransactionsById(t.getTransferId());
+			this.solrService4Money.removeTransactionsById(t.getTransferId());
 		}
 		
 		num += this.jdbcTemplate.update("delete from transaction where id = ?", id);		
-		this.solrService.removeTransactionsById(id);
+		this.solrService4Money.removeTransactionsById(id);
 		return num;
 	}	
 }

@@ -2,7 +2,7 @@ package com.slepeweb.commerce.xls;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.cms.utils.StringUtil;
+import com.slepeweb.common.util.StringUtil;
 
 public class VariantXlsRow {
 	private String update, partNum, stock, price, alpha, beta;

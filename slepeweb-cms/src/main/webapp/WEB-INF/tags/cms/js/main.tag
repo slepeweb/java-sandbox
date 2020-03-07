@@ -27,6 +27,7 @@
 				<cmsjs:trash />
 				<cmsjs:links />
 				<cmsjs:media />
+				<cmsjs:reindex />
 					
 				// Initialise sortable links 
 				$( "#sortable-links" ).sortable();

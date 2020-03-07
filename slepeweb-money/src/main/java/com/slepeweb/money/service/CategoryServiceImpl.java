@@ -17,7 +17,7 @@ import com.slepeweb.money.except.MissingDataException;
 public class CategoryServiceImpl extends BaseServiceImpl implements CategoryService {
 	
 	private static Logger LOG = Logger.getLogger(CategoryServiceImpl.class);
-	@Autowired private SolrService solrService;
+	@Autowired private SolrService4Money solrService4Money;
 	
 	public Category save(Category c) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (c.isDefined4Insert()) {
@@ -131,7 +131,7 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 	public int delete(long id) {
 		Category c = get(id);
 		int num = this.jdbcTemplate.update("delete from category where id = ?", id);
-		this.solrService.removeTransactionsByCategory(c.getMajor(), c.getMinor());
+		this.solrService4Money.removeTransactionsByCategory(c.getMajor(), c.getMinor());
 		return num;
 	}	
 }

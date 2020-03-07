@@ -26,7 +26,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	@Autowired private TransactionService transactionService;
 	@Autowired private SplitTransactionService splitTransactionService;
 	@Autowired private MSAccessService msAccessService;
-	@Autowired private SolrService solrService;
+	@Autowired private SolrService4Money solrService4Money;
 	
 	public void init(TimeWindow twin) throws IOException {
 		// Create null entries for Payee and Category, if not already created
@@ -96,7 +96,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		}
 		
 		// Wipe out any existing transactions in solr
-		this.solrService.removeTransactionsByDate(twin.getFrom(), twin.getTo());
+		this.solrService4Money.removeTransactionsByDate(twin.getFrom(), twin.getTo());
 	}
 		
 	private Payee getNoPayee() {
@@ -149,7 +149,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	public Transaction updateTransaction(Transaction dbRecord, Transaction t) {
 		try {
 			t = this.transactionService.update(dbRecord, t);
-			this.solrService.save(t);
+			this.solrService4Money.save(t);
 			return t;
 		}
 		catch (Exception e) {
@@ -171,7 +171,7 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 		try {
 			this.transactionService.updateSplit(t);
 			t = this.splitTransactionService.save(t);
-			this.solrService.save(t);
+			this.solrService4Money.save(t);
 			return t;
 		}
 		catch (Exception e) {

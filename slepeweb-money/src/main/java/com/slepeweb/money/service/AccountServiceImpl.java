@@ -18,7 +18,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	private static Logger LOG = Logger.getLogger(AccountServiceImpl.class);
 
 	@Autowired private TransactionService transactionService;
-	@Autowired private SolrService solrService;
+	@Autowired private SolrService4Money solrService4Money;
 	
 	public Account save(Account a) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (a.isDefined4Insert()) {
@@ -120,7 +120,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	public int delete(long id) {
 		Account a = get(id);
 		int num = this.jdbcTemplate.update("delete from account where id = ?", id);
-		this.solrService.removeTransactionsByAccount(a.getName());
+		this.solrService4Money.removeTransactionsByAccount(a.getName());
 		return num;
 	}
 }

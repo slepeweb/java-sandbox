@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.bean.solr.SolrConfig;
-import com.slepeweb.cms.bean.solr.SolrParams;
 import com.slepeweb.cms.service.SiteConfigService;
-import com.slepeweb.cms.service.SolrService;
 import com.slepeweb.commerce.bean.Basket;
+import com.slepeweb.common.solr.bean.SolrConfig;
+import com.slepeweb.site.bean.SolrParams4Site;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.model.SiblingItemPager;
+import com.slepeweb.site.service.SolrService4Site;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
 import com.slepeweb.site.util.SiteUtil;
 
@@ -31,7 +31,7 @@ public class PageController extends BaseController {
 	
 	@Autowired private CmsDeliveryServlet cmsDeliveryServlet;
 	@Autowired private SiteConfigService siteConfigService;
-	@Autowired private SolrService solrService;
+	@Autowired private SolrService4Site solrService4Site;
 	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
@@ -96,11 +96,11 @@ public class PageController extends BaseController {
 				setPageSize(this.siteConfigService.getIntegerProperty(siteId, SolrConfig.PAGE_SIZE_KEY, 5)).
 				setMaxPages(this.siteConfigService.getIntegerProperty(siteId, SolrConfig.MAX_PAGES_KEY, 5));
 		
-		SolrParams params = new SolrParams(i, config).
-				setSearchText(req.getParameter("searchText")).
-				setPageNum(req.getParameter("page"));
+		SolrParams4Site params = new SolrParams4Site(i, config);
+		params.setSearchText(req.getParameter("searchText")).setPageNum(req.getParameter("page"));
 		
-		model.addAttribute("_searchResults", this.solrService.query(params));		
+		model.addAttribute("_params", params);		
+		model.addAttribute("_searchResults", this.solrService4Site.query(params));		
 		return page.getView();
 	}
 	

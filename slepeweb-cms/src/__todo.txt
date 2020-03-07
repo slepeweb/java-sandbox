@@ -1,6 +1,13 @@
+TODO: This is the main todo file:
+
 HIGH
-- support multiple partners (Ancestry)
-- support same sex partners (Ancestry)
+- ancestry search results pagination
+- need to protect against injection attacks
+- check sws search still working
+- cms: nav did not refresh after item added below root
+- also, new item should have had focus
+- solr index must contain content for each language
+- solr queries need to search by language
 
 MEDIUM
 - language switcher (Ancestry)
@@ -13,4 +20,4 @@ MEDIUM
 LOW
 - hover over lefthand nav in cms reveals wrong icon
 - get site working on internet
-- links aren't editable in UI
+- 

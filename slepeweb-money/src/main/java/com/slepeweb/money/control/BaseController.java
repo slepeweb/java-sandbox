@@ -28,7 +28,7 @@ import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
 import com.slepeweb.money.service.SavedSearchService;
 import com.slepeweb.money.service.ScheduledTransactionService;
-import com.slepeweb.money.service.SolrService;
+import com.slepeweb.money.service.SolrService4Money;
 import com.slepeweb.money.service.TransactionService;
 
 @Controller
@@ -51,7 +51,7 @@ public class BaseController {
 	@Autowired protected CategoryService categoryService;
 	@Autowired protected TransactionService transactionService;
 	@Autowired protected ScheduledTransactionService scheduledTransactionService;
-	@Autowired protected SolrService solrService;
+	@Autowired protected SolrService4Money solrService;
 	@Autowired protected SavedSearchService savedSearchService;
 	
 	protected List<Payee> getAllPayees() {

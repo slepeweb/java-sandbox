@@ -13,7 +13,7 @@ import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.HostService;
-import com.slepeweb.cms.service.SolrService;
+import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.cms.setup.CommerceSetup;
 import com.slepeweb.cms.setup.SiteSetup;
 
@@ -24,7 +24,7 @@ public class SetupController extends BaseController {
 	@Autowired private SiteSetup siteSetup;
 	@Autowired private CommerceSetup commerceSetup;
 	@Autowired private HostService hostService;
-	@Autowired private SolrService solrService;
+	@Autowired private SolrService4Cms solrService4Cms;
 	
 	@RequestMapping(value="/setup", produces="text/text")	
 	@ResponseBody
@@ -87,10 +87,10 @@ public class SetupController extends BaseController {
 		}
 		
 		// Empty the index for this site
-		this.solrService.remove(h.getSite());
+		this.solrService4Cms.remove(h.getSite());
 		
 		// Index the site
-		this.solrService.indexSection(i);
+		this.solrService4Cms.indexSection(i);
 		return "Indexing complete";
 	}	
 	

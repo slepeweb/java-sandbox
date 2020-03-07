@@ -40,19 +40,6 @@ section, article {
 	}
 }
 
-#weather-report {
-	font-size: 0.8em;
-	line-height: 1.2em;
-	
-	td {
-		padding: 3px;
-		
-		&:first-child {
-			font-weight: bold;
-		}
-	}
-}
-
 #left-nav {
 	ul {
 		list-style: none;
@@ -89,33 +76,9 @@ section, article {
 	}
 }
 
-.dilbert img {
-	width: 100%;
-	max-width: 600px;
-}
-
-.project-list {
-	font-weight: bold;
-	margin-left: 2em;
-}
-
 #tabs {
 	font-family: inherit;
 	font-size: inherit;
-}
-
-#lotterynumbers {
-	tr {
-		border: none;
-	}
-}
-
-.user-table td {
-	border: 2px solid #cccccc;
-}
-
-.user-table img {
-	vertical-align: text-bottom;
 }
 
 .form-error {
@@ -157,65 +120,6 @@ section, article {
 
 .orange {
 	color: orange;
-}
-
-.jaxws-table {
-	width: 50%;
-	min-width: 300px;
-}
-
-.twitter-feed {
-	line-height: 1.2em;
-	margin-bottom: 1em;
-	
-	> .left {
-		width: 42px;
-	}
-	
-	> .right {
-		width: (300%/4);
-		margin-left: 5px;
-	}
-	
-	> div {
-		float: left;
-		margin-bottom: 1em;
-	}
-	
-	img {
-		width: 40px;
-	}
-	
-	span {
-		font-weight: bold;
-		color: $color-accent-bg;
-		
-		&.hashtag {
-			font-weight: normal;
-		}
-		
-		&.link {
-			font-weight: normal;
-		}
-	}
-	
-	&::after {
-	  content: "";
-	  display: table;
-	  clear: both;
-	}
-}
-
-.logozer {
-	display: inline-block;
-	vertical-align: top;
-	width: 150px;
-	height: 120px;
-	
-	img {
-		display: none;
-		margin-left: $std-container-padding;
-	}
 }
 
 img.markup {
@@ -267,26 +171,6 @@ img.markup {
 	display: none;
 }	
 
-#password-update, #password-reset {
-	margin-bottom: 1em;
-}
-
-.search-results-div {
-	h3, p {
-		line-height: 1.2em;
-	}
-	
-	h3 {
-		margin-top: -20px;
-	}
-	
-	p {
-		margin-top: -10px;
-		margin-bottom: -10px;
-		margin-left: 2.5em;
-	}
-}
-
 .solr-page {
 	display: inline;
 	margin-right: 1em;
@@ -309,15 +193,6 @@ img.markup {
 	}
 }
 
-#add2basket {
-	margin-top: 1em;
-	
-	span {
-		display: block;
-		color: green;
-	}
-}
-
 td.horiz-rule {
 	border-top: 2px solid lightblue;
 }
@@ -326,3 +201,4 @@ td.horiz-rule {
 	color: $color-accent-bg;
 	/*font-weight: normal;*/
 }
+

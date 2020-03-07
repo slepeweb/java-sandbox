@@ -61,6 +61,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 
 h1 {
   margin-bottom: 0.5em;
+  display: inline-block;
 }
 
 h2 {
@@ -802,23 +803,13 @@ html {
 }
 
 #search-bar {
-  visibility: hidden;
-  position: absolute;
-  right: 0px;
-  top: 67px;
-  width: 258px;
-}
-#search-bar input[type='text'] {
-  color: #000;
-  background: #fff;
+  display: inline-block;
   float: right;
-  width: 80%;
+  margin-top: 10px;
 }
-#search-bar input[type='submit'] {
-  color: #000 !important;
-  background: #9bd7de;
-  float: right;
-  padding: 0 10px;
+#search-bar input {
+  display: inline;
+  width: 90%;
 }
 
 /* Banner */
@@ -1057,17 +1048,6 @@ section.special, article.special {
   text-align: center;
 }
 
-#weather-report {
-  font-size: 0.8em;
-  line-height: 1.2em;
-}
-#weather-report td {
-  padding: 3px;
-}
-#weather-report td:first-child {
-  font-weight: bold;
-}
-
 #left-nav ul {
   list-style: none;
 }
@@ -1095,31 +1075,9 @@ section.special, article.special {
   margin-top: 3em;
 }
 
-.dilbert img {
-  width: 100%;
-  max-width: 600px;
-}
-
-.project-list {
-  font-weight: bold;
-  margin-left: 2em;
-}
-
 #tabs {
   font-family: inherit;
   font-size: inherit;
-}
-
-#lotterynumbers tr {
-  border: none;
-}
-
-.user-table td {
-  border: 2px solid #cccccc;
-}
-
-.user-table img {
-  vertical-align: text-bottom;
 }
 
 .form-error {
@@ -1161,56 +1119,6 @@ section.special, article.special {
 
 .orange {
   color: orange;
-}
-
-.jaxws-table {
-  width: 50%;
-  min-width: 300px;
-}
-
-.twitter-feed {
-  line-height: 1.2em;
-  margin-bottom: 1em;
-}
-.twitter-feed > .left {
-  width: 42px;
-}
-.twitter-feed > .right {
-  width: 75%;
-  margin-left: 5px;
-}
-.twitter-feed > div {
-  float: left;
-  margin-bottom: 1em;
-}
-.twitter-feed img {
-  width: 40px;
-}
-.twitter-feed span {
-  font-weight: bold;
-  color: #24604e;
-}
-.twitter-feed span.hashtag {
-  font-weight: normal;
-}
-.twitter-feed span.link {
-  font-weight: normal;
-}
-.twitter-feed::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-.logozer {
-  display: inline-block;
-  vertical-align: top;
-  width: 150px;
-  height: 120px;
-}
-.logozer img {
-  display: none;
-  margin-left: 15px;
 }
 
 img.markup {
@@ -1258,22 +1166,6 @@ img.markup.right {
   display: none;
 }
 
-#password-update, #password-reset {
-  margin-bottom: 1em;
-}
-
-.search-results-div h3, .search-results-div p {
-  line-height: 1.2em;
-}
-.search-results-div h3 {
-  margin-top: -20px;
-}
-.search-results-div p {
-  margin-top: -10px;
-  margin-bottom: -10px;
-  margin-left: 2.5em;
-}
-
 .solr-page {
   display: inline;
   margin-right: 1em;
@@ -1290,14 +1182,6 @@ img.markup.right {
   border-style: solid;
   border-width: 1px;
   border-color: lightblue;
-}
-
-#add2basket {
-  margin-top: 1em;
-}
-#add2basket span {
-  display: block;
-  color: green;
 }
 
 td.horiz-rule {

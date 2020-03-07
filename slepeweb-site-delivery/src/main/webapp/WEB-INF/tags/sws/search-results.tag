@@ -3,13 +3,13 @@
 <gen:debug><!-- tags/sws/search-results.tag --></gen:debug>
 
 <c:choose><c:when test="${not _searchResults.error}">
-	<p>Your search for '${_searchResults.params.searchText}' found ${_searchResults.totalHits} results.<br /> 
-			Showing page ${_searchResults.params.pageNum} of ${_searchResults.pager.numPages}:</p>
+	<p>Your search for '${_params.searchText}' found ${_searchResults.totalHits} results.<br /> 
+			Showing page ${_params.pageNum} of ${_searchResults.pager.maxPages}:</p>
 	<hr />
 	
 	<c:forEach items="${_searchResults.results}" var="_result" varStatus="_stat">
 	    <div class="search-results-div">
-	    		<h3>${_searchResults.params.start + _stat.count}. 
+	    		<h3>${_params.start + _stat.count}. 
 	    				<a href="${_result.path}">${_result.title}</a></h3>
         	<p>${_result.teaser}</p>
         	<hr />
@@ -17,7 +17,7 @@
 	</c:forEach>
 	
 	<%-- Paging controls --%>
-	<c:if test="${_searchResults.pager.numPages gt 1}">
+	<c:if test="${_searchResults.pager.maxPages gt 1}">
 		<div class="search-results-pager">			
 			<div class="solr-page heading">Select another page:</div>			
 			<sw:solr-page-link link="${_searchResults.pager.previous}" />
@@ -30,7 +30,7 @@
 		</div>
 	</c:if>
 	
-</c:when><c:when test="${_searchResults.error and not empty _searchResults.params.searchText}">
+</c:when><c:when test="${_searchResults.error and not empty _params.searchText}">
 	<h3>No items matching your search criteria.</h3>
 	<p>${_searchResults.message}</p>
 </c:when><c:otherwise>

@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.bean.solr.SolrDocument;
+import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.cms.service.SolrService;
+import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.cms.service.TemplateService;
 
 @Service
@@ -20,7 +20,7 @@ public class SolrTest extends BaseTest {
 	private static String AFTER_TEXT = "After";
 
 	@Autowired private ItemService itemService;
-	@Autowired private SolrService solrService;
+	@Autowired private SolrService4Cms solrService;
 	@Autowired private TemplateService templateService;
 
 	public TestResultSet execute() {
@@ -55,7 +55,7 @@ public class SolrTest extends BaseTest {
 			
 			// Check item not already indexed
 			r = trs.execute(8010);
-			SolrDocument doc = getDocument(testItem);
+			SolrDocument4Cms doc = getDocument(testItem);
 			r.test(doc == null);
 			
 			// Apply template if necessary
@@ -130,8 +130,12 @@ public class SolrTest extends BaseTest {
 		return trs;
 	}
 	
-	private SolrDocument getDocument(Item testItem) throws InterruptedException {
+	private SolrDocument4Cms getDocument(Item testItem) throws InterruptedException {
 		Thread.sleep(1000);
-		return this.solrService.getDocument(testItem);
+		Object o = this.solrService.getDocument(testItem);
+		if (o instanceof SolrDocument4Cms) {
+			return (SolrDocument4Cms) o;
+		}
+		return null;
 	}
 }

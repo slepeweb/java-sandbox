@@ -116,24 +116,13 @@
 }
 
 #search-bar {
-	visibility: hidden;
-	position: absolute;
-	right: 0px;
-	top: 67px;
-	width: 258px;
+	display: inline-block;
+	float: right;
+	margin-top: 10px;
 	
-	input[type='text'] {
-		color: #000;
-		background: #fff;
-		float: right;
-		width: 80%;
-	}
-	
-	input[type='submit'] {
-		color: #000 !important;
-		background: #9bd7de;
-		float: right;
-		padding: 0 10px;
+	input {
+		display: inline;
+		width: 90%;
 	}
 }
 

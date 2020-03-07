@@ -21,7 +21,7 @@
 						<input type="submit" value="Go" />
 						<input type="text" name="searchText" 
 							placeholder="Enter search terms here" 
-							value="${_searchResults.params.searchText}" />
+							value="${_params.searchText}" />
 					</form>
 				</div>
 			</div>

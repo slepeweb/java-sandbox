@@ -1,5 +1,8 @@
 package com.slepeweb.site.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import javax.servlet.http.HttpServletResponse;
 
 public class HttpUtil {
@@ -26,5 +29,22 @@ public class HttpUtil {
 		if (lastModified > -1L) {
 			res.setDateHeader("Last-Modified", lastModified);
 		}
+	}
+	
+	public static String encodeUrl(String s) {
+		try {
+			return URLEncoder.encode(s, "utf-8");
+		}
+		catch (UnsupportedEncodingException e) {}
+		return s;
+	}
+	
+	public static String clean(String s) {
+		String cleaned = s.replaceAll("[<>]", " ");
+		try {
+			return URLEncoder.encode(cleaned, "utf-8");
+		}
+		catch (UnsupportedEncodingException e) {}
+		return cleaned;
 	}
 }

@@ -10,14 +10,19 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.ItemService;
+import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.site.anc.bean.MenuItem;
 import com.slepeweb.site.anc.bean.Person;
 import com.slepeweb.site.anc.bean.svg.SvgSupport;
+import com.slepeweb.site.anc.service.SolrService4Ancestry;
+import com.slepeweb.site.bean.SolrParams4Site;
 import com.slepeweb.site.control.BaseController;
 import com.slepeweb.site.model.Page;
 
@@ -30,6 +35,7 @@ public class AncestryPageController extends BaseController {
 	public static final String RECORD_VIEW = "record";
 	
 	@Autowired private ItemService itemService;
+	@Autowired private SolrService4Ancestry solrService4Ancestry;
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
@@ -170,6 +176,25 @@ public class AncestryPageController extends BaseController {
 		
 		return primaryRecord(i, shortSitename, targetId, model);
 	}	
+	
+	@RequestMapping(value="/search", method=RequestMethod.POST)	
+	public String search(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@RequestParam(value="searchtext", required=true) String searchText,
+			@RequestParam(value="page", required=true) String pageNum,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "search", model);
+		page.setTitle(i.getName());
+		
+		SolrParams4Site params = new SolrParams4Site(i, new SolrConfig());
+		params./*setPageSize(2).*/setPageNum(pageNum);
+		params.setSearchText(searchText);
+		model.addAttribute("_params", params);
+		model.addAttribute("_search", this.solrService4Ancestry.query(params));
+		return page.getView();
+	}
 	
 	private String galleryAndRecordController(Item i, String shortSitename, long targetId, ModelMap model,
 			Person subject, List<Item> items, String jspName, String menuName) {

@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.except.ResourceException;
-import com.slepeweb.cms.utils.StringUtil;
+import com.slepeweb.common.util.StringUtil;
 
 public class FieldValue extends CmsBean {
 	private static final long serialVersionUID = 1L;

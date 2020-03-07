@@ -34,6 +34,12 @@
 <edit:version />
 
 <div id="misc-tab">
-	<button id="trash-show-button" type="button">Show bin</button>
-	<div id="trash-container"></div>
+	<div>
+		<button id="reindex-button" type="button">Re-index</button>
+	</div>
+
+	<div>
+		<button id="trash-show-button" type="button">Show bin</button>
+		<div id="trash-container"></div>
+	</div>
 </div>

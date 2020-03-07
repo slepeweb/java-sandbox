@@ -17,7 +17,7 @@ import com.slepeweb.money.except.MissingDataException;
 public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 	
 	private static Logger LOG = Logger.getLogger(PayeeServiceImpl.class);
-	@Autowired private SolrService solrService;
+	@Autowired private SolrService4Money solrService4Money;
 	
 	public Payee save(Payee pe) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (pe.isDefined4Insert()) {
@@ -111,7 +111,7 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 	public int delete(long id) {
 		Payee p = get(id);
 		int num = this.jdbcTemplate.update("delete from payee where id = ?", id);
-		this.solrService.removeTransactionsByPayee(p.getName());
+		this.solrService4Money.removeTransactionsByPayee(p.getName());
 		return num;
 	}	
 }

@@ -23,16 +23,19 @@ public class PageController extends BaseController {
 		long total = 0L, grandTotal = 0L;
 		
 		for (Account a : all) {
-			if (lastType == null || ! lastType.equals(a.getType())) {
-				index++;
-				grandTotal += total;
-				total = 0;
-				lastType = a.getType();
-				summary.add(Pair.of("dummy", 0L));
+			// Not interested in 'other' accounts, ie not to be included in the summary or asset history
+			if (! a.getType().equals("other")) {
+				if (lastType == null || ! lastType.equals(a.getType())) {
+					index++;
+					grandTotal += total;
+					total = 0;
+					lastType = a.getType();
+					summary.add(Pair.of("dummy", 0L));
+				}
+				
+				total += a.getBalance();
+				summary.set(index, Pair.of(a.getType(), total));
 			}
-			
-			total += a.getBalance();
-			summary.set(index, Pair.of(a.getType(), total));
 		}
 		
 		grandTotal += total;

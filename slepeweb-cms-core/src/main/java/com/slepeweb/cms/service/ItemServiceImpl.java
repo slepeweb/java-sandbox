@@ -51,7 +51,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected FieldValueService fieldValueService;
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected MediaService mediaService;
-	@Autowired protected SolrService solrService;
+	@Autowired protected SolrService4Cms solrService4Cms;
 	@Autowired protected CmsService cmsService;
 	@Autowired protected ServerConfig config;
 	
@@ -85,7 +85,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		boolean isIndexable = i.isSearchable() && i.isPage() && i.isPublished();
 		
 		if (isIndexable) {
-			this.solrService.save(i);
+			this.solrService4Cms.save(i);
 		}
 		/* 
 		 * We might have created a new item as a result of versioning,
@@ -93,7 +93,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		 * published versions.
 		 */
 		else if (i.getVersion() == 1){
-			this.solrService.remove(i);
+			this.solrService4Cms.remove(i);
 		}
 		
 		if (updated) {
@@ -450,7 +450,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			LOG.info(compose("Trashed item", String.valueOf(i)));
 			
 			// Remove item from Solr index
-			this.solrService.remove(i);
+			this.solrService4Cms.remove(i);
 			
 			// Now attend to any child items
 			List<Link> list = this.linkService.getBindings(i.getId());
@@ -475,7 +475,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			if (r != null) {
 				r.setEditable(true);
 				updateEditable(r);
-				this.solrService.save(r);
+				this.solrService4Cms.save(r);
 				return r;
 			}
 			else {
