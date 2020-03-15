@@ -16,7 +16,8 @@
 <%-- Table of search results --%>
 <c:forEach items="${_search.results}" var="_result" varStatus="stat">
 	<div class="search-result">
-		${_search.pager.startResultId + stat.count - 1}) <a href="${_result.path}">${_result.title}</a>
+		${_search.pager.startResultId + stat.count - 1}) <a href="${_result.path}">${_result.title}</a> <br />
+		<p class="teaser">${_result.teaser}</p>
 	</div>
 </c:forEach>
 

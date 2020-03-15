@@ -189,7 +189,7 @@ public class AncestryPageController extends BaseController {
 		page.setTitle(i.getName());
 		
 		SolrParams4Site params = new SolrParams4Site(i, new SolrConfig());
-		params./*setPageSize(2).*/setPageNum(pageNum);
+		params.setPageSize(4).setPageNum(pageNum);
 		params.setSearchText(searchText);
 		model.addAttribute("_params", params);
 		model.addAttribute("_search", this.solrService4Ancestry.query(params));

@@ -10,4 +10,5 @@ public interface SolrService4Cms {
 	boolean remove(Item i);
 	boolean remove(Site s);
 	Object getDocument(Item i);
+	Object getDocument(Item i, String language);
 }

@@ -26,21 +26,22 @@
 		margin-top: 1.5em;
 	}
 	
-	.choose-page {
+	.choose-page, .teaser {
 		font-size: 0.9em;
 	}
+	
 </c:set>
 
 <anc:standardLayout>
 	<gen:debug><!-- jsp/anc/template/search.jsp --></gen:debug>
 	
-	<div class="col-1-3 primary-col">	
+	<div class="col-2-3 primary-col">	
 		<h2>${_item.fields.heading}</h2>
 	
 		<c:choose><c:when test="${fn:length(_search.results) > 0}">
 			<anc:searchResults urlPrefix="${_item.url}" />			
 		</c:when><c:otherwise>
-			<p>No results for these search terms - please try again.</p>
+			<p>No results found for your search terms [${_params.searchText}]. <br /> Please try again.</p>
 		</c:otherwise></c:choose>
 	</div>
 			

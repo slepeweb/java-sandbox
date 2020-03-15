@@ -20,4 +20,5 @@ public class FieldName {
 	public static final String URL = "url";
 	public static final String BLURB = "blurb";
 	public static final String HEADING = "heading";
+	public static final String OVERVIEW = "overview";
 }

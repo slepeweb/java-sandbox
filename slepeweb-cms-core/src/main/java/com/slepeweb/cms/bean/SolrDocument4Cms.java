@@ -4,7 +4,9 @@ import org.apache.solr.client.solrj.beans.Field;
 
 public class SolrDocument4Cms {
 
+	@Field("key") private String key;
 	@Field("id") private String id;
+	@Field("language") private String language = "en";
 	@Field("siteid") private String siteId;
 	@Field("type") private String type;
 	@Field("title") private String title;
@@ -89,6 +91,36 @@ public class SolrDocument4Cms {
 
 	public SolrDocument4Cms setType(String type) {
 		this.type = type;
+		return this;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public SolrDocument4Cms setLanguage(String language) {
+		this.language = language;
+		return this;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public SolrDocument4Cms setKey(String key) {
+		this.key = key;
+		String[] parts = key.split("-");
+		if (parts.length == 2) {
+			this.id = parts[0];
+			this.language = parts[1];
+		}
+		return this;
+	}
+	
+	public SolrDocument4Cms setKey(String id, String language) {
+		this.key = String.format("%s-%s", id, language);
+		this.id = id;
+		this.language = language;
 		return this;
 	}
 }
