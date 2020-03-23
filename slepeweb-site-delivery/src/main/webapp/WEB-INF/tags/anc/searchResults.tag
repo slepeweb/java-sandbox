@@ -5,7 +5,7 @@
 <gen:debug><!-- tags/anc/searchResults.tag --></gen:debug>
 
 <p>
-	<strong>Found ${_search.totalHits} results for your search [${_params.searchText}].</strong>
+	<strong>Found ${_search.totalHits} results for your search terms: [${_params.searchText}].</strong>
 	
 	<c:if test="${_search.pager.maxPages gt 1}">
 		<br />
@@ -16,8 +16,8 @@
 <%-- Table of search results --%>
 <c:forEach items="${_search.results}" var="_result" varStatus="stat">
 	<div class="search-result">
-		${_search.pager.startResultId + stat.count - 1}) <a href="${_result.path}">${_result.title}</a> <br />
-		<p class="teaser">${_result.teaser}</p>
+		<p class="sr-header">${_search.pager.startResultId + stat.count - 1}) <a href="${_result.path}">${_result.title}</a></p>
+		<p class="sr-teaser">${_result.teaser}</p>
 	</div>
 </c:forEach>
 

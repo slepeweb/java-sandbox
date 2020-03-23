@@ -26,8 +26,12 @@
 		margin-top: 1.5em;
 	}
 	
-	.choose-page, .teaser {
+	.choose-page, .sr-teaser {
 		font-size: 0.9em;
+	}
+	
+	.sr-header {
+		margin: 0 0 0.5em 0;
 	}
 	
 </c:set>
@@ -41,7 +45,7 @@
 		<c:choose><c:when test="${fn:length(_search.results) > 0}">
 			<anc:searchResults urlPrefix="${_item.url}" />			
 		</c:when><c:otherwise>
-			<p>No results found for your search terms [${_params.searchText}]. <br /> Please try again.</p>
+			<p>No results found for your search terms: [${_params.searchText}]. <br /> Please try again.</p>
 		</c:otherwise></c:choose>
 	</div>
 			

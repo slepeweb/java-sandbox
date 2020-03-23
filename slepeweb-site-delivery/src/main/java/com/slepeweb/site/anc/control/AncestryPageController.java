@@ -3,6 +3,8 @@ package com.slepeweb.site.anc.control;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
@@ -181,10 +182,12 @@ public class AncestryPageController extends BaseController {
 	public String search(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
-			@RequestParam(value="searchtext", required=true) String searchText,
-			@RequestParam(value="page", required=true) String pageNum,
+			HttpServletRequest request,
 			ModelMap model) {	
-		
+				
+		String searchText = iso2utf8(request.getParameter("searchtext"));
+		String pageNum = request.getParameter("page");
+
 		Page page = getStandardPage(i, shortSitename, "search", model);
 		page.setTitle(i.getName());
 		
@@ -311,6 +314,21 @@ public class AncestryPageController extends BaseController {
 		}
 		
 		return trail;
+	}
+	
+	/*
+	 * I can't see a way to make the server process the form data as utf-8. All attempts to set the
+	 * character encoding for dealing with non-english search terms as utf-8 have failed.
+	 */
+	private String iso2utf8(String s) {
+		if (StringUtils.isNotBlank(s)) {
+			try {
+				return new String(s.getBytes("ISO-8859-1"));
+			}
+			catch (Exception e) {
+			}
+		}
+		return s;
 	}
 	
 }

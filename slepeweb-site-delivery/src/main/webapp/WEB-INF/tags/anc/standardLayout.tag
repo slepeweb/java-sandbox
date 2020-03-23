@@ -1,6 +1,6 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %><!DOCTYPE html>
 
-<html>
+<html lang="${_item.language}">
 	<head>
 		<anc:head />
 	</head>

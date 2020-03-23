@@ -122,11 +122,11 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 							fullName = "(Un-named)";
 						}
 						doc.setTitle(fullName);
-						doc.setTeaser(StringUtils.abbreviate(doc.getBodytext(), MAX_WIDTH));
+						doc.setTeaser(StringUtils.abbreviate(getFieldValue(i, FieldName.OVERVIEW, language, false, null), MAX_WIDTH));
 					}
 					else if (i.getType().getName().equals("Document")) {
 						doc.setTitle(getFieldValue(i, FieldName.HEADING, language, false, null));
-						doc.setTeaser(StringUtils.abbreviate(doc.getBodytext(), MAX_WIDTH));
+						doc.setTeaser(StringUtils.abbreviate(getFieldValue(i, FieldName.OVERVIEW, language, false, null), MAX_WIDTH));
 					}
 				}
 				// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

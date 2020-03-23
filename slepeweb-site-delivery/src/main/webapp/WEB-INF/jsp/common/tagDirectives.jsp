@@ -5,4 +5,4 @@
 	taglib uri="siteTags" prefix="site" %><%@ 
 	taglib prefix="sw" tagdir="/WEB-INF/tags/sws" %><%@ 
 	taglib prefix="anc" tagdir="/WEB-INF/tags/anc" %><%@ 
-	taglib prefix="gen" tagdir="/WEB-INF/tags" %>
+	taglib prefix="gen" tagdir="/WEB-INF/tags" %><fmt:requestEncoding value="utf-8" />
