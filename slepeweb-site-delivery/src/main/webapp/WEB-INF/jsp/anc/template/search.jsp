@@ -36,10 +36,10 @@
 	
 </c:set>
 
-<anc:standardLayout>
+<anc:pageLayout type="std">
 	<gen:debug><!-- jsp/anc/template/search.jsp --></gen:debug>
 	
-	<div class="col-2-3 primary-col">	
+	<div class="main-wrapper">	
 		<h2>${_item.fields.heading}</h2>
 	
 		<c:choose><c:when test="${fn:length(_search.results) > 0}">
@@ -49,4 +49,4 @@
 		</c:otherwise></c:choose>
 	</div>
 			
-</anc:standardLayout>
+</anc:pageLayout>

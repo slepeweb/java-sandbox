@@ -86,7 +86,11 @@ public class Person {
 		// This is the primary parent, linked by 'binding'
 		Item parentItem = this.item.getParent();
 		
-		if (parentItem != null && ! parentItem.getPath().equals("/")) {
+		if (
+				parentItem != null && 
+				! parentItem.getPath().equals("/") && 
+				(parentItem.getType().getName().equals(Person.PRIMARY) || parentItem.getType().getName().equals(Person.PARTNER))) {
+			
 			Person parentPerson = new Person(parentItem);
 			this.father = parentPerson;
 			List<Relationship> relationships = parentPerson.getRelationships();

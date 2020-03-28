@@ -9,10 +9,10 @@
 	<anc:personSubMenuStyle/>
 </c:set>
 
-<anc:standardLayout>
+<anc:pageLayout type="leftmenu">
 	<gen:debug><!-- jsp/anc/record.jsp --></gen:debug>
 	
-	<div class="col-3-4 primary-col pull-right-sm">
+	<div class="main-wrapper">
 		<anc:personMenu />
 		
 		<c:choose><c:when test="${_target.type == 'PDF'}">
@@ -29,8 +29,8 @@
 		</c:when></c:choose>
 	</div>
 	
-	<div class="col-1-4 primary-col">
+	<div class="side-wrapper">
 		<anc:personSubMenu />
 	</div>
 	
-</anc:standardLayout>
+</anc:pageLayout>

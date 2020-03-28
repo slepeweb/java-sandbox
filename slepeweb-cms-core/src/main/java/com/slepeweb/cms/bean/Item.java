@@ -496,6 +496,10 @@ public class Item extends CmsBean {
 		return getPath();
 	}
 	
+	public String getUrl(String lang) {
+		return String.format("/%s%s", lang, getPath());
+	}
+	
 	public String getLanguagePath() {
 		return String.format("/%s%s", this.language, this.path);
 	}

@@ -26,26 +26,28 @@
 	<anc:personMenuStyle/>
 </c:set>
 
-<anc:standardLayout>
+<anc:pageLayout type="person">
 	<gen:debug><!-- jsp/anc/person.jsp --></gen:debug>
 	
-	<div class="col-1-3 primary-col">	
-		<c:forEach items="${_svgList}" var="_support" varStatus="_stat">
-			<anc:hierarchySvg svgdata="${_support}" index="${_stat.index}" />
-		</c:forEach>
-			
-		<c:if test="${_person.multiPartnered}">
-			<div id="partner-options">
-				${_person.firstName}'s partners: <br />
-				<c:forEach items="${_person.relationships}" var="_rel" varStatus="_stat">
-					<span><input type="radio" name="svgindex" value="${_stat.index}" 
-						<c:if test="${_stat.index eq 0}">checked</c:if>/> ${_rel.partner.name} </span>
-				</c:forEach>
-			</div>
-		</c:if>
+	<div class="side-wrapper">
+		<div id="person-svg">
+			<c:forEach items="${_svgList}" var="_support" varStatus="_stat">
+				<anc:hierarchySvg svgdata="${_support}" index="${_stat.index}" />
+			</c:forEach>
+				
+			<c:if test="${_person.multiPartnered}">
+				<div id="partner-options">
+					${_person.firstName}'s partners: <br />
+					<c:forEach items="${_person.relationships}" var="_rel" varStatus="_stat">
+						<span><input type="radio" name="svgindex" value="${_stat.index}" 
+							<c:if test="${_stat.index eq 0}">checked</c:if>/> ${_rel.partner.name} </span>
+					</c:forEach>
+				</div>
+			</c:if>
+		</div>
 	</div>
 		
-	<div class="col-2-3 primary-col">
+	<div class="main-wrapper">
 		<anc:standardPerson />	
 	</div>
 	
@@ -82,4 +84,4 @@
 	</span>
 	 -->
 
-</anc:standardLayout>
+</anc:pageLayout>

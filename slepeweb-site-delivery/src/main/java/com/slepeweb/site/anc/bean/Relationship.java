@@ -1,8 +1,8 @@
 package com.slepeweb.site.anc.bean;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.common.util.DateUtil;
 
 /*
  * The subject can be either person in a relationship. It can be either the 'man' in a
@@ -19,7 +20,7 @@ import com.slepeweb.cms.bean.Link;
 public class Relationship {
 	
 	private static SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy");
-	private static Pattern DATE_PATTERN = Pattern.compile("^.*?(\\d{2}/\\d{2}/\\d{4}).*$");
+	private static Pattern DATE_PATTERN = Pattern.compile("^.*?(\\d{1,2}/)?(\\d{1,2}/)?(\\d{4}).*$");
 
 	private String summary;
 	private Person subject, partner;
@@ -48,15 +49,27 @@ public class Relationship {
 		if (str == null) {
 			return;
 		}
-		
+	
 		Matcher m = DATE_PATTERN.matcher(str);
 		if (m.matches()) {
-			try {
-				this.date = SDF.parse(m.group(1));
-			} catch (ParseException e) {
-				//e.printStackTrace();
-			}
+			Calendar cal = DateUtil.today();
+			cal.set(Calendar.DATE, getDatePart(m.group(1), 1));
+			cal.set(Calendar.MONTH, getDatePart(m.group(2), 1) - 1);
+			cal.set(Calendar.YEAR, getDatePart(m.group(3), 1970));
+			this.date = cal.getTime();
 		}
+	}
+	
+	private int getDatePart(String s, int dflt) {
+		if (s == null) {
+			return dflt;
+		}
+		
+		if (s.endsWith("/")) {
+			s = s.substring(0, s.length() - 1);
+		}
+		
+		return Integer.parseInt(s);
 	}
 
 	public Date getDate() {

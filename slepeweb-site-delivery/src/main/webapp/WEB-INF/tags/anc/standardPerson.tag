@@ -6,7 +6,7 @@
 
 <ul>
 	<c:if test="${not empty _person.birthSummary}">
-		<li>${_person.birthSummary}</li>
+		<li>b. ${_person.birthSummary}</li>
 	</c:if>
 	
 	<c:forEach items="${_person.relationships}" var="rel">
@@ -16,7 +16,7 @@
 	</c:forEach>
 	
 	<c:if test="${not empty _person.deathSummary}">
-		<li>${_person.deathSummary}</li>
+		<li>d. ${_person.deathSummary}</li>
 	</c:if>
 </ul>
 

@@ -7,17 +7,17 @@
 	<anc:personSubMenuStyle/>
 </c:set>
 
-<anc:standardLayout>
+<anc:pageLayout type="leftmenu">
 	<gen:debug><!-- jsp/anc/personHistory.jsp --></gen:debug>
 	
-	<div class="col-3-4 primary-col pull-right-sm">
+	<div class="side-wrapper">
+		<anc:personSubMenu />
+	</div>
+	
+	<div class="main-wrapper">
 		<anc:personMenu />
 		<h2>${_item.fields.heading}</h2>
 		${site:resolveMarkupFieldValue(_item, 'bodytext', '')}
 	</div>
 	
-	<div class="col-1-4 primary-col">
-		<anc:personSubMenu />
-	</div>
-	
-</anc:standardLayout>
+</anc:pageLayout>

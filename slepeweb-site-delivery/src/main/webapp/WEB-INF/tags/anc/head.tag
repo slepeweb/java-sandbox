@@ -8,7 +8,7 @@
 
 <link rel="stylesheet" href="/resources/css/normalize.css" />
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/start/jquery-ui.css" type="text/css">
-<link rel="stylesheet" href="/resources/anc/css/style-new.css" />
+<link rel="stylesheet" href="/resources/anc/css/style-anc.css" />
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js" type="text/javascript"></script>
