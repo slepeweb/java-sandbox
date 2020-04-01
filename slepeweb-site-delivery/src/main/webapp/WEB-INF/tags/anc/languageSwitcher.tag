@@ -2,19 +2,12 @@
 
 <gen:debug><!-- tags/anc/languageSwitcher.tag --></gen:debug>
 
-<div id="language-selector">
-	<span>Switch language: </span>		
-	<select>
+<c:if test="${_item.site.multilingual}">
+	<div id="language-selector">
+		<div>
 		<c:forEach items="${_site.allLanguages}" var="lang">
-			<option value="${lang}" <c:if test="${lang eq _item.language}">selected</c:if>>${lang}</option>
+			<a href="/${lang}${_item.path}"><img data-lang="${lang}" <c:if test="${lang eq _item.language}">class="selected"</c:if> src="/resources/anc/flag/${lang}.png" /></a>
 		</c:forEach>
-	</select>
-</div>
-
-<script>
-	$(function(){
-		$("#language-selector select").change(function(){
-			window.location = "/" + $(this).val() + "${_item.path}";
-		});
-	});
-</script>
+		</div>
+	</div>	
+</c:if>

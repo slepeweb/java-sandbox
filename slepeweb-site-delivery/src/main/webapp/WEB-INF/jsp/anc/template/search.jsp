@@ -39,7 +39,7 @@
 <anc:pageLayout type="std">
 	<gen:debug><!-- jsp/anc/template/search.jsp --></gen:debug>
 	
-	<div class="main-wrapper">	
+	<div class="main">	
 		<h2>${_item.fields.heading}</h2>
 	
 		<c:choose><c:when test="${fn:length(_search.results) > 0}">

@@ -43,6 +43,18 @@ public class Coord {
 		return this;
 	}
 
+	public Coord move(int x, int y) {
+		this.x += x;
+		this.y += y;
+		return this;
+	}
+
+	public Coord back(Coord shift) {
+		this.x -= shift.getX();
+		this.y -= shift.getY();
+		return this;
+	}
+
 	public int getX() {
 		return x;
 	}

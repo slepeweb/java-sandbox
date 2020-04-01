@@ -22,7 +22,8 @@ public class SvgSupport {
 		this.lineA = new RelationshipBranch();
 		this.lineB = new RelationshipBranch();
 		this.lineC = new ArrayList<LineSegment>();
-		
+		this.frameHeight = 200; // default value
+				
 		// See hand-written notes for legend
 		int p = 10, q = p + 100, r = q + 70;
 		int a = 15, b = 160, c = 50;
@@ -31,36 +32,50 @@ public class SvgSupport {
 		
 		Relationship subjectRel = pers.getRelationship(relationshipId);
 		Relationship parentRel = new Relationship(pers.getFather(), pers.getMother());
+		boolean isParentDefined = parentRel.getSubject() != null || parentRel.getPartner() != null;
+		
+		// parentOffset is a vector pointing right and down when one of the parents exists.
+		Coord parentsOffset = new Coord(0, 0);
+		if (isParentDefined) {
+			parentsOffset.move(c, q - p);
+		}
+		
+		Coord fatherLinkDatum = new Coord(0, p);
+		Coord motherLinkDatum = fatherLinkDatum.copy().move(b, 0);
+		Coord subjectLinkDatum = fatherLinkDatum.copy().move(parentsOffset);
+		Coord partnerLinkDatum = subjectLinkDatum.copy().move(b, 0);
+		
+		Coord lineAdatum = new Coord(u, p + t);
+		Coord lineBdatum = lineAdatum.copy().move(parentsOffset);
+		Coord lineCdatum = lineBdatum.copy().move(c, a);
 		
 		int numChildren = subjectRel != null ? subjectRel.getChildren().size() - 1 : 0;
-		this.frameHeight = r + t + a + (numChildren * w);
-		this.subject = new Hyperlink(c, q, pers);
+		
+		this.subject = new Hyperlink(subjectLinkDatum, pers);
 		
 		if (pers.getFather() != null) {
-			this.father = new Hyperlink(0, p, pers.getFather());
+			this.father = new Hyperlink(fatherLinkDatum, pers.getFather());
 		}
 		
 		if (pers.getMother() != null) {
-			this.mother = new Hyperlink(b, p, pers.getMother());
+			this.mother = new Hyperlink(motherLinkDatum, pers.getMother());
 		}
 		
 		if (subjectRel != null) {
-			this.partner = new Hyperlink(c + b, q, subjectRel.getPartner());
-		}
-		
-		if (subjectRel != null) {
-			int num = 0, X = 2 * (u + c) + 5, Y;
-			
+			this.partner = new Hyperlink(partnerLinkDatum, subjectRel.getPartner());
+			Coord childLinkDatum = subjectLinkDatum.copy().move(90, 134);
+
 			for (Person child : subjectRel.getChildren()) {
-				num++;
-				Y = num == 1 ? r + t : r + t + (num - 1) * w;
-				children.add(new Hyperlink(X, Y, child));
+				children.add(new Hyperlink(childLinkDatum, child));
+				childLinkDatum.move(0, w);
 			}
+			
+			this.frameHeight = childLinkDatum.getY() - w + 10;
 		}
 		
-		this.lineA = move(treeStyleA(a, b, c, parentRel, false), new Coord(u, p + t));
-		this.lineB = move(treeStyleA(a, b, c, subjectRel, true), new Coord(u + c, q + t));
-		this.lineC = move(treeStyleB(a, w, q + t, r + t, subjectRel), new Coord(2 * c + u, q + t + a));
+		this.lineA = move(treeStyleA(a, b, c, parentRel, false), lineAdatum);
+		this.lineB = move(treeStyleA(a, b, c, subjectRel, true), lineBdatum);
+		this.lineC = move(treeStyleB(a, w, q + t, r + t, subjectRel), lineCdatum);
 		
 		int dy = -10;
 		this.grandparentsIcon = new Coord(300, p + dy);

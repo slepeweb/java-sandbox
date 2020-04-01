@@ -13,6 +13,11 @@ public class Hyperlink extends Coord {
 		this.person = p;
 	}
 	
+	public Hyperlink(Coord c, Person p) {
+		super(c.getX(), c.getY());
+		this.person = p;
+	}
+	
 	public String getLinkTag() {
 		return String.format(ANCHOR_FORMAT_STR, 
 				this.person.getItem().getUrl(), getText());

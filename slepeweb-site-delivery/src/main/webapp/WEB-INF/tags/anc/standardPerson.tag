@@ -20,8 +20,6 @@
 	</c:if>
 </ul>
 
-<anc:personMenu />
-
 <c:if test="${not empty _person.photo}">
 	<div>
 		<img class="passport-photo" src="${_person.photo.url}" align="left" />

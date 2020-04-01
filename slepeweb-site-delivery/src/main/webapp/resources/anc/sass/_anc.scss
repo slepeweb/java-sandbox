@@ -12,17 +12,15 @@ body {
 }
 
 header {
-	grid-area: hd;
+	grid-area: hdr;
 	display: grid;
-	grid-template-columns: 1fr;
-	grid-gap: 5px;
+	grid-template-columns: repeat(4, 1fr);
 	grid-template-areas: 
-		"ha"
-		"hb"
-		"hc"
-		"br";
-  @include std-container-padding{}
-  padding-bottom: 1em;
+		"ha ha ha hb"
+		"hc hc hc hc"
+		"br br br br";
+		
+	@include std-container-padding{}
   background-color: #e4ddd0;
   
   /*
@@ -37,59 +35,69 @@ header {
 }
 
 footer {
-	grid-area: ft;
+	grid-area: ftr;
 	text-align: center;
 	font-size: 0.85em;
 	opacity: 0.6;
 	line-height: 1.3em;
-  @include std-container-padding{}
+	@include std-container-padding{}
 }
 
-.main-wrapper {
-	grid-area: mn;
-  @include std-container-padding{}
+.main {
+	grid-area: main;
+	@include std-container-padding{}
 }
 
-.side-wrapper {
-	grid-area: sd;
-  @include std-container-padding{}
+.leftside {
+	grid-area: side;
+	@include std-container-padding{}
 }
 
 #breadcrumbs {
 	grid-area: br;
-	padding-top: 1em;
+}
+
+.menu {
+	font-size: 1.1em;
+	grid-area: menu;
+	padding: $std-container-padding;
+	padding-bottom: 0;
+}
+
+.submenu {
+	margin: 0 0 1em 0;
+	list-style-type: none;
 }
 
 .layout-std {
 	display: grid;
-	grid-gap: 5px;
   grid-template-columns: 1fr;
 	grid-template-areas: 
-		"hd"
-		"mn"
-		"ft";
+		"hdr"
+		"main"
+		"ftr";
 }
 
 .layout-person {
 	display: grid;
-	grid-gap: 5px;
   grid-template-columns: 1fr;
 	grid-template-areas: 
-		"hd"
-		"sd"
-		"mn"
-		"ft";
+		"hdr"
+		"side"
+		"menu"
+		"main"
+		"ftr";
 }
 
 .layout-leftmenu {
 	display: grid;
-	grid-gap: 5px;
   grid-template-columns: 1fr;
 	grid-template-areas: 
-		"hd"
-		"sd"
-		"mn"
-		"ft";
+		"hdr"
+		"menu"
+		"side"
+		"main"
+		"ftr";
 }
 
 #site-identifier {
@@ -97,13 +105,18 @@ footer {
 }
 
 #language-selector {
+	padding-top: 1.0em;
 	grid-area: hb;
+	justify-self: end;
 	
-	select {
-		display: inline-block;
-		padding: 0;
-		width: 20%;
-		max-width: 40px;
+	img {
+		width: 30px;
+		padding-bottom: 5px;
+		vertical-align: top;
+		
+		&.selected {
+			border-bottom: solid 2px #666;
+		}
 	}
 }
 
@@ -113,13 +126,17 @@ footer {
 	
 	input {
 		display: inline-block;
-		width: 70%;
-		max-width: 250px;
+		width: 65%;
+		max-width: 160px;
 	}
 }
 
+#breadcrumbs {
+	padding-top: 0.5em;
+}
+	
 #person-svg {
-	grid-area: sv;
+	@include std-container-padding{}
 }
 
 @media (min-width: 700px) {
@@ -131,41 +148,49 @@ footer {
 	}
 	
 	#language-selector {
-		padding-top: 1.0em;
+		justify-self: center;	
 	}
 	
 	#search-bar {
 		padding-top: 1.0em;
-	}
-	
-	#breadcrumbs {
-		padding-top: 0;
+		justify-self: end;
 	}
 	
 	.layout-std {
 		grid-template-columns: repeat(9, 1fr);
 		grid-template-areas: 
-			"hd hd hd hd hd hd hd hd hd"
-			".  .  mn mn mn mn mn mn ."
-			"ft ft ft ft ft ft ft ft ft";
+			"hdr hdr hdr  hdr  hdr  hdr  hdr  hdr  hdr"
+			".   .   main main main main main main ."
+			"ftr ftr ftr  ftr  ftr  ftr  ftr  ftr  ftr";
 	}
 	
 	.layout-person {
 		grid-template-columns: repeat(9, 1fr);
 		grid-template-areas: 
-			"hd hd hd hd hd hd hd hd hd"
-			"sd sd sd mn mn mn mn mn mn"
-			"ft ft ft ft ft ft ft ft ft";
+			"hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr"
+			".    .    .    .    menu menu menu menu menu"
+			"side side side side main main main main main"
+			"ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
 	}
 	
 	.layout-leftmenu {
-		display: grid;
-		grid-gap: 5px;
 		grid-template-columns: repeat(9, 1fr);
 		grid-template-areas: 
-			"hd hd hd hd hd hd hd hd hd"
-			"sd sd mn mn mn mn mn mn mn"
-			"ft ft ft ft ft ft ft ft ft";
+			"hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr"
+			".    .    menu menu menu menu menu menu menu"
+			"side side main main main main main main main"
+			"ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
+	}
+}
+
+@media (min-width: 1000px) {
+	.layout-person {
+		grid-template-columns: repeat(9, 1fr);
+		grid-template-areas: 
+			"hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr"
+			".    .    .    menu menu menu menu menu menu"
+			"side side side main main main main main main"
+			"ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
 	}
 }
 
@@ -173,6 +198,7 @@ footer {
 	display: none;
 }	
 
+/*
 .solr-page {
 	display: inline;
 	margin-right: 1em;
@@ -198,6 +224,7 @@ footer {
 td.horiz-rule {
 	border-top: 2px solid lightblue;
 }
+*/
 
 .fa-angle-double-right {
 	color: $color-accent-bg;

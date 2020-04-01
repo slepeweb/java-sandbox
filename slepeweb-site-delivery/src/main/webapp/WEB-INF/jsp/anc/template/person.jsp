@@ -29,7 +29,7 @@
 <anc:pageLayout type="person">
 	<gen:debug><!-- jsp/anc/person.jsp --></gen:debug>
 	
-	<div class="side-wrapper">
+	<div class="leftside">
 		<div id="person-svg">
 			<c:forEach items="${_svgList}" var="_support" varStatus="_stat">
 				<anc:hierarchySvg svgdata="${_support}" index="${_stat.index}" />
@@ -47,7 +47,11 @@
 		</div>
 	</div>
 		
-	<div class="main-wrapper">
+	<div class="menu">
+		<anc:personMenu />
+	</div>
+	
+	<div class="main">
 		<anc:standardPerson />	
 	</div>
 	

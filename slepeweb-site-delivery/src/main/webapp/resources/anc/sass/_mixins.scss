@@ -30,6 +30,7 @@
 @mixin std-container-padding {
   padding-left: $std-container-padding;
   padding-right: $std-container-padding;
+  padding-bottom: $std-container-padding;  
 }
 
 

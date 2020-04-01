@@ -10,12 +10,15 @@
 <anc:pageLayout type="leftmenu">
 	<gen:debug><!-- jsp/anc/personHistory.jsp --></gen:debug>
 	
-	<div class="side-wrapper">
+	<div class="leftside">
 		<anc:personSubMenu />
 	</div>
 	
-	<div class="main-wrapper">
+	<div class="menu">
 		<anc:personMenu />
+	</div>
+	
+	<div class="main">
 		<h2>${_item.fields.heading}</h2>
 		${site:resolveMarkupFieldValue(_item, 'bodytext', '')}
 	</div>

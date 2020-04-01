@@ -9,6 +9,10 @@ public class RelationshipBranch {
 	private LineSegment tooltipSegment;
 	private String summary;
 	
+	public boolean isEmpty() {
+		return this.segments.size() == 0;
+	}
+	
 	public RelationshipBranch add(LineSegment seg) {
 		getSegments().add(seg);
 		return this;

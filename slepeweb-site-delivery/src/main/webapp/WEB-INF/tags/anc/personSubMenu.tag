@@ -2,7 +2,7 @@
 
 <gen:debug><!-- tags/anc/personSubMenu.tag --></gen:debug>
 
-<ul id="sub-menu">
+<ul class="submenu">
 	<c:forEach items="${_subMenu}" var="_link">
 		<li <c:if test="${_link.selected}">class="selected"</c:if>>
 				

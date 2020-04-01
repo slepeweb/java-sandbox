@@ -5,7 +5,7 @@
 <anc:pageLayout type="std">
 	<gen:debug><!-- jsp/anc/homepage.jsp --></gen:debug>
 	
-	<div class="main-wrapper">
+	<div class="main">
 		<h2>${_item.fields.title}</h2>
 		${site:resolveMarkupFieldValue(_item, 'bodytext', '')}
 		

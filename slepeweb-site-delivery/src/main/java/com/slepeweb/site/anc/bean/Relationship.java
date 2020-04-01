@@ -44,7 +44,6 @@ public class Relationship {
 		return String.format("%s ==> %s", this.subject.toString(), this.partner.toString());
 	}
 	
-	
 	private void parseDate(String str) {
 		if (str == null) {
 			return;

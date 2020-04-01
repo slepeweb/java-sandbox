@@ -12,9 +12,11 @@
 <anc:pageLayout type="leftmenu">
 	<gen:debug><!-- jsp/anc/record.jsp --></gen:debug>
 	
-	<div class="main-wrapper">
+	<div class="menu">
 		<anc:personMenu />
-		
+	</div>
+	
+	<div class="main">
 		<c:choose><c:when test="${_target.type == 'PDF'}">
 			<h2>${_target.fields.title}</h2>
 			<p>${_target.fields.teaser}</p>
@@ -29,7 +31,7 @@
 		</c:when></c:choose>
 	</div>
 	
-	<div class="side-wrapper">
+	<div class="leftside">
 		<anc:personSubMenu />
 	</div>
 	
