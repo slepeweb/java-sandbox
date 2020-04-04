@@ -20,7 +20,8 @@ $("#copy-button").click(function () {
 			
 			if (! obj.error) {
 				var sourceNode = _tree.getNodeByKey(nodeKey);
-				sourceNode.getParent().addNode(obj.data);
+				var newNode = sourceNode.getParent().addNode(obj.data);
+				newNode.setActive();
 			}
 		},
 		error: function(json, status, z) {

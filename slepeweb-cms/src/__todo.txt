@@ -3,11 +3,8 @@ TODO: This is the main todo file:
 HIGH
 - need to protect against injection attacks
 - check sws search still working
-- cms: nav did not refresh after item added below root
-- also, new item should have had focus
 
 MEDIUM
-- language switcher (Ancestry)
 - store preferred language in cookie (Ancestry)
 - resource bundles (Ancestry)
 - password protection for site visitors (Ancestry)

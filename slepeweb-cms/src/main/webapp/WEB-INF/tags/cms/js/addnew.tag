@@ -26,9 +26,10 @@ $("#add-button").click(function () {
 			flashMessage(obj);
 			
 			if (! obj.error) {
-				var childNode = obj.data;
+				var nodeData = obj.data;
 				var parentNode = _tree.getNodeByKey(nodeKey);
-				parentNode.addNode(childNode);
+				var childNode = parentNode.addNode(nodeData);
+				childNode.setActive();
 			}
 		},
 		error: function(json, status, z) {

@@ -3,6 +3,7 @@ package com.slepeweb.cms.bean;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -41,6 +42,10 @@ public class Item extends CmsBean {
 	
 	// NOTE: language is not saved in the database; it is assigned on item creation
 	private String language = "en";
+	
+	public String getDefaultSimplename() {
+		return String.valueOf(new Date().getTime());
+	}
 
 	public boolean isProduct() {
 		return false;
@@ -345,7 +350,7 @@ public class Item extends CmsBean {
 	}
 	
 	public String getParentPath() {
-		return CmsUtil.getParentPath(this);
+		return CmsUtil.getParentPathFromPath(this);
 	}
 
 	public boolean hasMedia() {
@@ -477,10 +482,12 @@ public class Item extends CmsBean {
 	}
 	
 	public Item setSimpleName(String simpleName) {
-		this.simpleName = simpleName;
+		this.simpleName = StringUtils.isBlank(simpleName) ? getDefaultSimplename() : simpleName;
+		
 		if (getPath() != null && ! isSiteRoot()) {
 			refreshPath();
 		}
+		
 		return this;
 	}
 	

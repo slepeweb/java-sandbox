@@ -12,7 +12,7 @@ $("#version-button").click(function () {
 		cache: false,
 		dataType: "json",
 		success: function(obj, status, z) {
-			fetchItemEditor(obj.data, obj);
+			flashMessage(obj);
 		},
 		error: function(json, status, z) {
 			serverError();
@@ -27,7 +27,7 @@ $("#revert-button").click(function () {
 		cache: false,
 		dataType: "json",
 		success: function(obj, status, z) {
-			fetchItemEditor(obj.data, obj);
+			flashMessage(obj);
 		},
 		error: function(json, status, z) {
 			serverError();

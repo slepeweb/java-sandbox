@@ -14,7 +14,7 @@
 			<c:forEach items="${editingItem.allLinksBarBindings}" var="link" varStatus="_stat">
 				<li class="sortable-link ui-state-default">
 					<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-					<a href="${applicationContextPath}/page/editor/${link.child.id}">${link}</a>
+					<span class="link-linker" data-id="${link.child.id}">${link}</span>
 					<button class="edit-link"><i class="far fa-edit"></i></button>
 					<button class="remove-link"><i class="far fa-trash-alt"></i></button>
 					<span class="hide">${link.child.id}|${link.type}|${link.name}|${link.data}|${_stat.index}|1</span>
@@ -91,7 +91,7 @@
 				<tr>
 					<td width="20%">${_link.type}</td>
 					<td width="20%">${_link.name}</td>
-					<td><a href="${applicationContextPath}/page/editor/${_link.child.id}">${_link.child.name}</a></td>
+					<td><span class="link-linker" data-id="${_link.child.id}">${_link.child.name}</span></td>
 				</tr>
 			</c:forEach>
 		</table>

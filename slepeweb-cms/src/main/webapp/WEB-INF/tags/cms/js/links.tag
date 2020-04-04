@@ -58,13 +58,12 @@ $("#savelinks-button").click(function(e) {
 		dataType: "json",
 		processData: false,
 		success: function(obj, status, z) {
+			flashMessage(obj);
+			
 			if (! obj.error && obj.data) {
 				// Need to refresh the page, to update the FancyTree,
 				// since one or more shortcuts have been added/removed
-				fetchItemEditor(_editingItemId, obj, "links-tab");
-			}
-			else {
-				flashMessage(obj);
+				_refreshShortcuts("" + _editingItemId, obj.data);
 			}
 		},
 		error: function(obj, status, z) {
@@ -118,5 +117,37 @@ $(".edit-link").click(function() {
 	
 	// Open the dialog
 	linkDialog.dialog("open");
+});
+
+// Add behaviour for when a link (in the links editor) is clicked 
+$(".link-linker").click(function(e) {
+	var key = $(this).attr("data-id");
+	var node = _tree.getNodeByKey(key);
+	
+	if (node) {
+		// This attribute setting changes the active tab for when node activation completes
+		$("li.ui-tabs-active").attr("aria-controls", "core-tab");
+		_tree.activateKey(node.key);
+	}
+	else {
+		// This node hasn't been loaded yet - ask the server for the breadcrumb trail
+		$.ajax(_ctx + "/rest/breadcrumbs/" + key, {
+			cache: false,
+			dataType: "json",
+			mimeType: "application/json",
+			success: function(json, status, z) {
+				// This attribute setting changes the active tab for when node activation completes
+				$("li.ui-tabs-active").attr("aria-controls", "core-tab");
+				_tree.loadKeyPath(json, function(node, stats) {
+					if (stats === "ok") {
+					    node.setActive();
+					}
+				});
+			},
+			error: function(json, status, z) {
+				flashMessage(toStatus(false, "Failed to retrieve breadcrumb trail"));
+			}
+		});
+	}
 });
 

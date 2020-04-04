@@ -113,10 +113,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		i.setDateCreated(now);
 		i.setDateUpdated(now);
 		
-		if (StringUtils.isBlank(i.getSimpleName())) {
-			i.setSimpleName(String.valueOf(now.getTime()));
-		}
-		
 		// Item table
 		try {
 			this.jdbcTemplate.update(

@@ -315,3 +315,24 @@ var _repopulateLinkNameDropdown = function(linkType, value) {
 		}
 	});
 };
+
+var _refreshShortcuts = function(parentKey, updatedChildData) {
+	var existingParentNode = _tree.getNodeByKey(parentKey);
+	if (existingParentNode) {
+		var children = existingParentNode.getChildren();
+	
+		// First, remove existing shortcuts to parent	
+		for (var i = 0; i < children.length; i++) {
+			if (children[i].data.shortcut) {
+				existingParentNode.removeChild(children[i]);
+			}
+		}
+		
+		// Now add current list
+		for (var i = 0; i < updatedChildData.length; i++) {
+			if (updatedChildData[i].shortcut) {
+				existingParentNode.addNode(updatedChildData[i]);
+			}
+		}
+	}
+};

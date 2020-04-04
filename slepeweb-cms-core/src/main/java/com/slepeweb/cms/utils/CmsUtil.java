@@ -6,16 +6,16 @@ import com.slepeweb.cms.bean.Item;
 
 public class CmsUtil {
 	
-	public static String getParentPath(Item i) {
+	public static String getParentPathFromPath(Item i) {
 		if (! i.isRoot()) {
-			return getParentPath(i.getPath());
+			return getParentPathFromPath(i.getPath());
 		}
 		
 		// A null parent means that this item is a root item
 		return null;
 	}
 
-	public static String getParentPath(String path) {
+	public static String getParentPathFromPath(String path) {
 		if (StringUtils.isNotBlank(path)) {
 			int c = path.lastIndexOf("/");
 			if (c > 0) {

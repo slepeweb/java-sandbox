@@ -56,6 +56,11 @@ public class Navigation {
 			return String.format(prefix + "%s", type);
 		}
 		
+		@Override
+		public String toString() {
+			return getTitle();
+		}
+		
 		public Node addChild(Node n) {
 			getChildren().add(n);
 			n.setParentNode(this);

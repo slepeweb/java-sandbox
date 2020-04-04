@@ -39,7 +39,6 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
@@ -75,6 +74,7 @@ public class RestController extends BaseController {
 	@Autowired private TagService tagService;
 	@Autowired private AxisService axisService;
 	@Autowired private CookieService cookieService;
+	@Autowired private NavigationController navigationController;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -448,10 +448,10 @@ public class RestController extends BaseController {
 		return resp;
 	}	
 	
-	@RequestMapping(value="/item/{itemId}/add", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{parentId}/add", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse addItem(
-			@PathVariable long itemId, 
+			@PathVariable long parentId, 
 			@RequestParam("template") long templateId, 
 			@RequestParam("itemtype") long itemTypeId, 
 			@RequestParam("name") String name, 
@@ -473,7 +473,7 @@ public class RestController extends BaseController {
 		}
 		
 		ItemType it = this.itemTypeService.getItemType(itemTypeId);
-		Item parent = this.itemService.getItem(itemId);
+		Item parent = this.itemService.getItem(parentId);
 		 
 		Item i = CmsBeanFactory.makeItem(it.getName()).
 				setSite(parent.getSite()).
@@ -511,7 +511,7 @@ public class RestController extends BaseController {
 			return resp.addMessage("Item added").setData(n);
 		}
 		catch (Exception e) {
-			return resp.setError(true).addMessage(e.getMessage()).setData(itemId);
+			return resp.setError(true).addMessage(e.getMessage()).setData(parentId);
 		}
 	}
 	
@@ -721,10 +721,6 @@ public class RestController extends BaseController {
 		Item i;
 		int count = 0;
 		
-		LinkFilter f = new LinkFilter().setLinkType(LinkType.shortcut);
-		List<Link> shortcuts = f.filterLinks(parent.getLinks());
-		boolean existShortcuts = shortcuts.size() > 0;
-		
 		for (LinkParams lp : linkParams) {
 			l = CmsBeanFactory.makeLink().
 					setParentId(parentId).
@@ -738,8 +734,6 @@ public class RestController extends BaseController {
 			
 			l.setChild(i);			
 			links.add(l);
-			
-			existShortcuts = existShortcuts || lp.getType().equals(LinkType.shortcut);
 		}
 		
 		parent.setLinks(links);
@@ -748,9 +742,8 @@ public class RestController extends BaseController {
 			parent.saveLinks();		
 			resp.addMessage(String.format("%d links saved", links.size()));
 			
-			if (existShortcuts) {
-				resp.setData("shortcuts");
-			}
+			// Return a list of shortcuts as response data, so that leftnav tree can be refreshed
+			resp.setData(this.navigationController.doLazyNavOneLevel(parent.getId(), parent.getSite().getId()));
 		}
 		catch (ResourceException e) {
 			resp.setError(true).addMessage(e.getMessage());
