@@ -33,22 +33,6 @@ if (activeTab) {
 
 $("#item-editor").tabs({active: activeTabId});
 
-// Identify tooltips
-$("input,select,textarea").tooltip({
-	position: {
-		my: "center bottom-20",
-		at: "center top",
-		using: function( position, feedback ) {
-			$( this ).css( position );
-			$( "<div>" )
-			.addClass( "arrow" )
-			.addClass( feedback.vertical )
-			.addClass( feedback.horizontal )
-			.appendTo( this );
-		}
-	}
-});
-
 // Add behaviour to template & itemtype selectors 
 $("#add-tab select[name='template']").change(function (e) {
 	var typeSelector = $("#add-tab select[name='itemtype']");

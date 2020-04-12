@@ -3,6 +3,7 @@ package com.slepeweb.cms.control;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,6 +54,7 @@ import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemTypeService;
 import com.slepeweb.cms.service.LinkNameService;
+import com.slepeweb.cms.service.LinkService;
 import com.slepeweb.cms.service.LinkTypeService;
 import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.TagService;
@@ -69,6 +71,7 @@ public class RestController extends BaseController {
 	@Autowired private ItemTypeService itemTypeService;
 	@Autowired private TemplateService templateService;
 	@Autowired private MediaService mediaService;
+	@Autowired private LinkService linkService;
 	@Autowired private LinkTypeService linkTypeService;
 	@Autowired private LinkNameService linkNameService;
 	@Autowired private TagService tagService;
@@ -717,7 +720,7 @@ public class RestController extends BaseController {
 		RestResponse resp = new RestResponse();
 		Item parent = this.itemService.getItem(parentId);
 		List<Link> links = new ArrayList<Link>();
-		Link l;
+		Link l, existing;
 		Item i;
 		int count = 0;
 		
@@ -726,8 +729,25 @@ public class RestController extends BaseController {
 					setParentId(parentId).
 					setName(lp.getName()).
 					setOrdering(count++).
-					setType(lp.getType()).
-					setData(lp.getData());
+					setType(lp.getType());
+			
+			if (StringUtils.isNotBlank(lp.getData())) {
+				try {
+					l.setData(URLDecoder.decode(lp.getData(), "utf-8"));
+				} 
+				catch (UnsupportedEncodingException e) {}
+			}
+			
+			// Do not modify ordering for existing shortcuts
+			if (l.getType().equals(LinkType.shortcut)) {
+				existing = this.linkService.getLink(l.getParentId(), lp.getChildId());
+				if (existing != null) {
+					l.setOrdering(existing.getOrdering());
+				}
+				else {
+					l.setOrdering(1000);
+				}
+			}
 			
 			i = CmsBeanFactory.makeItem(null).
 					setId(lp.getChildId());

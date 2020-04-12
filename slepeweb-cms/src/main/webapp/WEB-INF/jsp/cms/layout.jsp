@@ -19,22 +19,13 @@
 		
 		<!-- Main -->	
 		<div id="main-wrapper">
-			<!-- History -->
-			<div id="history-div">
-				<span>Recent history: </span>
-				<cms:navigation-history />
-			</div>
-			
 			<!-- Left navigation -->
 			<!-- The body of the next div is populated by an ajax call, so should be empty initially. -->
-			<div id="leftnav">
-			</div>
+			<div id="leftnav" class="hide"></div>
 
 			<!-- Main content -->	
 			<!-- The body of the next div is populated by an ajax call, so should be empty initially. -->
-			<div id="item-editor">
-				<%--	<tiles:insertAttribute name="body" />	--%>
-			</div>
+			<div id="item-editor"></div>
 		</div>
 	
 		<!-- Footer -->

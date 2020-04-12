@@ -18,8 +18,15 @@
 				<label for="simplename">Simple name: </label><input name="simplename" 
 					value="${_copyDetails[1]}" />
 			</div>
+			
+			<details>
+				<summary>NOTE</summary>
+				<p>Deep copy is NOT available.</p>
+			</details>
+			
 			<div>
-				<label>(Deep copy is NOT available)</label><button id="copy-button" type="button">Copy</button>
+				<button id="copy-button" type="button"
+					title="Produce an identical copy of this item, including it's links">Copy</button>
 			</div>
 		</form>
 	</div>

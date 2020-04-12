@@ -6,7 +6,7 @@
 	enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
 
 		<input type="text" name="searchtext" value="${_params.searchText}"
-			placeholder="Enter search terms here" /><button 
+			placeholder="Enter search terms" /><button 
 				type="submit"><span><i class="fa fa-search"></i></span></button>
 				
 		<input type="hidden" name="page" value="1" />

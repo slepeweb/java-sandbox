@@ -3,6 +3,7 @@ package com.slepeweb.cms.bean;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -671,6 +672,32 @@ public class Item extends CmsBean {
 				LinkType.relation, 
 				LinkType.component, 
 				LinkType.shortcut});
+	}
+
+	public List<Link> getAllLinksShortcutsLast() {
+		List<Link> list = getAllLinksBarBindings();
+		Collections.sort(list, new Comparator<Link>() {
+
+			@Override
+			public int compare(Link a, Link b) {
+				boolean aIsShortcut = a.getType().equals(LinkType.shortcut);
+				boolean bIsShortcut = b.getType().equals(LinkType.shortcut);
+				
+				if (!(aIsShortcut ^ bIsShortcut)) {
+					return a.getOrdering().compareTo(b.getOrdering());
+				}
+				else if (aIsShortcut) {
+					return 1;
+				}
+				else if (bIsShortcut) {
+					return -1;
+				}
+				return 0;
+			}
+			
+		});
+		
+		return list;
 	}
 
 	public Item setLinks(List<Link> links) {

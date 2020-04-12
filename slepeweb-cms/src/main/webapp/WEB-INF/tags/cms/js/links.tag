@@ -41,12 +41,12 @@ $("#addlink-button").click(function(e) {
 
 // Add behaviour to 'Save links' button 
 $("#savelinks-button").click(function(e) {
-	var selector = $("#sortable-links");
-	var links = _identifyHiddenLinkDataList(selector);
+	var links = _identifyHiddenLinkDataList($(_sortableLinksSelector));
 	
 	// Remove the 'span' property from each object
 	for (var i = 0; i < links.length; i++) {
 		delete links[i].span;
+		links[i].data = encodeURIComponent(links[i].data);
 	}
 	
 	// Ajax call to save links to db 
@@ -74,7 +74,7 @@ $("#savelinks-button").click(function(e) {
 
 // Add behaviour to 'Remove links' button 
 $(".remove-link").click(function(e) {
-	$(this).parent().remove();
+	$(this).parent().parent().remove();
 });
 
 // New dialog containing form to add/edit links
@@ -85,7 +85,7 @@ if (linkDialog) {
 linkDialog = $("#addlinkdiv").dialog({
   autoOpen: false,
   minHeight: 250,
-  minWidth: 400,
+  maxWidth: 350,
   modal: true,
   title: "Add/Edit a link",
   buttons: {
@@ -104,7 +104,7 @@ linkDialog = $("#addlinkdiv").dialog({
 // Open form to edit an existing link
 $(".edit-link").click(function() {
 	var span = $(this).parent().find("span.hide");
-	var dataparts = $(this).parent().find("span.hide").html().split("\|");
+	var dataparts = span.html().split("\|");
 	
 	// Ignore first element
 	dataparts.shift();
@@ -113,7 +113,7 @@ $(".edit-link").click(function() {
 	_setLinkForm(dataparts, "1");
 	
 	// Hide the tree for link editing (as opposed to link creation)
-	$("#linknav").css("display", "none");
+	$("#linknav-container").css("display", "none");
 	
 	// Open the dialog
 	linkDialog.dialog("open");

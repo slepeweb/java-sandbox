@@ -18,6 +18,7 @@
 			
 			// On successful loading of forms 
 			success: function(html, status, z) {
+				// The html produced here is inserted into the page by init.tag
 				<cmsjs:init />
 				<cmsjs:core />
 				<cmsjs:fields />
@@ -51,12 +52,28 @@
 	// All the things that can only be executed once the page has been fully loaded ...
 	// For development purposes, expose a handle to the main FancyTree
 	var _tree, _linkerTree;
+	var _leftnavStatus = false;
 	
 	$(function() {
 		$("body").click(function() {
 			$("#status-block").empty();
 		});
 	
+		$("#leftnav-hider").click(function(event) {
+			_leftnavStatus = ! _leftnavStatus;
+			if (_leftnavStatus) {
+				$("#leftnav").show();
+			}
+			else {
+				$("#leftnav").hide();
+			}
+		});
+		
+		$("#leftnav").mouseleave(function() {
+			$("#leftnav").hide();
+			_leftnavStatus = false;
+		});
+
 		<cmsjs:leftnav />
 	
 		$("#site-selector").change(function(e){

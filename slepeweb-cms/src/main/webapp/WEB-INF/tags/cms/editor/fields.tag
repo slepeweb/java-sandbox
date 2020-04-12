@@ -11,13 +11,15 @@
 		<c:set var="fvm" value="${editingItem.fieldValues}" />
 		
 		<c:if test="${editingItem.site.multilingual}">
-			<label for="field-language-selector">Language : </label>
-			<select id="field-language-selector" name="language">
-				<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
-					<option value="${_lang}" <c:if 
-						test="${editingItem.language eq _lang}">selected</c:if>>${_lang}</option>
-				</c:forEach>
-			</select>
+			<div id="field-language-selector">
+				<label>Language : </label>
+				<select name="language">
+					<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
+						<option value="${_lang}" <c:if 
+							test="${editingItem.language eq _lang}">selected</c:if>>${_lang}</option>
+					</c:forEach>
+				</select>
+			</div>
 		</c:if>
 	
 		<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
@@ -36,7 +38,7 @@
 			</div>
 		</c:forEach>
 		<div>
-			<label>&nbsp;</label><button id="field-button" type="button">Update</button>
+			<button id="field-button" type="button">Update</button>
 		</div>
 	</form>
 </div>
@@ -62,10 +64,10 @@
 			language = _siteDefaultLanguage;
 		}
 		
-		$("#field-language-selector").val(language);
+		$("#field-language-selector select").val(language);
 		_toggleFieldDivs(language);
 		
-		$("#field-language-selector").change(function(){
+		$("#field-language-selector select").change(function(){
 			var lang = $(this).val();
 			localStorage.setItem("language", lang);
 			_toggleFieldDivs(lang);

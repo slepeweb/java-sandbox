@@ -34,7 +34,10 @@ var flashMessage = function(status) {
 	}
 	
 	$("#status-block").removeClass("red").removeClass("green").addClass(clazz).append(msg);
-	$("#bell").get(0).play();
+	var audio = $("#bell");
+	if (audio && audio.get(0)) {
+		audio.get(0).play();
+	}
 };
 
 var pageEditorUrlPrefix = _ctx + "/page/editor/";
@@ -72,7 +75,7 @@ var fetchItemEditor = function(nodeKey, status, tabName) {
 // Get form field names and values for forms on item-editor 
 var getFieldsFormInputData = function() {
 	var result = {};
-	var language = $("#field-language-selector").val();
+	var language = $("#field-language-selector select").val();
 	if (! language) {
 		language = _siteDefaultLanguage;
 	}
@@ -171,12 +174,13 @@ var refreshHistory = function(siteId) {
 		});
 };
 
-var _identifyHiddenLinkDataList = function(ulSelector) {
+var _sortableLinksSelector = "#sortable-links div.sortable-link";
+
+var _identifyHiddenLinkDataList = function(sortableLinks) {
 	var links = [];
-	var parts, obj, span;
+	var span;
 	
-	ulSelector.find("li").each(function(index, li) {
-		span = $(li).find("span.hide");
+	sortableLinks.find("div.right span").each(function(index, span) {
 		links.push(_identifyHiddenLinkData4Span(span));
 	});
 	
@@ -184,7 +188,7 @@ var _identifyHiddenLinkDataList = function(ulSelector) {
 };
 
 var _identifyHiddenLinkData4Span = function(span) {
-	var	parts = span.html().split("\|");
+	var	parts = span.innerHTML.split("\|");
 	var	obj = {
 		span: span,
 		childId: parts[0],
@@ -210,18 +214,21 @@ var _useLink = function() {
 	var formData = {};
 	formData.type = div.find("select[name='linktype']").val();
 	formData.name = div.find("select[name='linkname']").val();
-	formData.data = encodeURIComponent(div.find("input[name='linkdata']").val());
+	formData.data = div.find("input[name='linkdata']").val();
 	formData.state = div.find("input[name='state']").val();
 	var linkIdStr = div.find("input[name='linkId']").val();
 	formData.ordering = parseInt(linkIdStr, 10);
 	
 	if (formData.type != 'unknown' && formData.name != 'unknown') {
+		var sortableLinksContainer = $("div#sortable-links");
+		var sortableLinks = $(_sortableLinksSelector);
+	
 		if (formData.state == "1") {
 			// We need to replace an existing link
 			var linkHtml = null;
 			var target = null;
 			
-			var links = _identifyHiddenLinkDataList($("#sortable-links"));
+			var links = _identifyHiddenLinkDataList(sortableLinks);
 			for (var i = 0; i < links.length; i++) {
 				if (links[i].ordering == formData.ordering) {
 					target = links[i];
@@ -232,14 +239,13 @@ var _useLink = function() {
 			if (target) {
 				var span = target.span;
 				formData.childId = target.childId;
-				span.html(_formatHiddenLinkData(formData));
+				span.innerHTML = _formatHiddenLinkData(formData);
 			}
 		}
 		else {
 			// This is a new link - append it to the end of any existing links
-			linkHtml = $("#link-template li").clone(true);
-			var ul = $("#sortable-links");
-			var links = _identifyHiddenLinkDataList(ul);
+			linkHtml = $("#link-template>div").clone(true);
+			var links = _identifyHiddenLinkDataList(sortableLinks);
 			var nextId = -1;
 			
 			if (links) {
@@ -266,9 +272,10 @@ var _useLink = function() {
 						cache: false,
 						dataType: "text",
 						success: function(itemName, status, z) {
-							linkHtml.find("a").attr("href", pageEditorUrlPrefix + formData.childId).html(formData.type + " (" + formData.name + "): " + itemName);
-							linkHtml.find("span.hide").html(_formatHiddenLinkData(formData));				
-							linkHtml.appendTo(ul);					
+							linkHtml.find("div.left span.link-identifier").html(formData.type + " (" + formData.name + "): " + itemName);
+							linkHtml.find("div.right button.link-linker").attr("data-id", formData.childId);
+							linkHtml.find("div.right span.hide").html(_formatHiddenLinkData(formData));				
+							linkHtml.appendTo(sortableLinksContainer);					
 						}
 					});
 				}
@@ -282,7 +289,7 @@ var _useLink = function() {
 
 var _closeLinkForm = function() {
 	linkDialog.dialog("close");
-	$("#linknav").css("display", "inline");
+	$("#linknav-container").css("display", "block");
 	_setLinkForm(["unknown","unknown","","-1"], "0");
 };
 
@@ -316,23 +323,50 @@ var _repopulateLinkNameDropdown = function(linkType, value) {
 	});
 };
 
-var _refreshShortcuts = function(parentKey, updatedChildData) {
-	var existingParentNode = _tree.getNodeByKey(parentKey);
-	if (existingParentNode) {
-		var children = existingParentNode.getChildren();
+/* We are filtering the left array, by comparing it's elements with the right array.
+ * All links that are NOT shortcuts will be filtered out. So will all MATCHING shortcuts.
+ * leftIsFancytreeNode = true indicates the left array contains fancytree nodes, and the right array contains form data.
+ * leftIsFancytreeNode = false indicates the left array contains form data, and the right array contains fancytree nodes.
+ */
+var _filterShortcuts = function(left, leftIsFancytreeNode, right) {
+	return left.filter(function(node, index, fullArray) {
 	
-		// First, remove existing shortcuts to parent	
-		for (var i = 0; i < children.length; i++) {
-			if (children[i].data.shortcut) {
-				existingParentNode.removeChild(children[i]);
+		var isShortcut = leftIsFancytreeNode ? node.data.shortcut : node.shortcut;	
+		if (! isShortcut) {
+			return false;
+		}
+		
+		for (var j = 0; j < right.length; j++) {
+			isShortcut = leftIsFancytreeNode ? right[j].shortcut : right[j].data.shortcut
+			if (isShortcut && right[j].key == node.key) {
+				return false;
 			}
 		}
 		
-		// Now add current list
-		for (var i = 0; i < updatedChildData.length; i++) {
-			if (updatedChildData[i].shortcut) {
-				existingParentNode.addNode(updatedChildData[i]);
-			}
+		return true;
+	});
+}
+
+var _refreshShortcuts = function(parentKey, updatedChildData) {
+	var existingParentNode = _tree.getNodeByKey(parentKey);
+	if (existingParentNode) {
+		var existingChildren = existingParentNode.getChildren();
+	
+		// Remove non-shortcuts, and matching shortcuts from each array
+		// First, existing shortcuts
+		var filteredExisting = _filterShortcuts(existingChildren, true, updatedChildData);
+		
+		// Next, the updated form data
+		var filteredUpdates = _filterShortcuts(updatedChildData, false, existingChildren);;
+		
+		// Remove any nodes remaining in the filteredExisting array
+		for (var j = 0; j < filteredExisting.length; j++) {
+			existingParentNode.removeChild(filteredExisting[j]);
 		}
+		
+		// Add any nodes remaining in the filteredUpdates array
+		for (var i = 0; i < filteredUpdates.length; i++) {
+			existingParentNode.addNode(filteredUpdates[i]);
+		}		
 	}
 };

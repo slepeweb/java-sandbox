@@ -69,7 +69,8 @@
 		</div>
 
 		<div>
-			<label>&nbsp;</label><button id="add-button" type="button">Add</button>
+			<button id="add-button" type="button"
+				title="Add a new item of the specified type below the current item">Add</button>
 		</div>
 	</form>
 </div>
