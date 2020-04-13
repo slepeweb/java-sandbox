@@ -8,7 +8,7 @@
 	
 <div id="add-tab">
 	<form>
-		<div>
+		<div class="ff">
 			<label for="type">Template: </label>
 			<select name="template">
 				<option value="0">Choose ...</option>
@@ -18,7 +18,7 @@
 				</c:forEach>
 			</select>
 		</div>
-		<div>
+		<div class="ff">
 			<label for="type">Type: </label>
 			<select name="itemtype">
 				<option value="0">Choose ...</option>
@@ -28,25 +28,25 @@
 				</c:forEach>
 			</select>			
 		</div>
-		<div>
+		<div class="ff">
 			<label for="name">Name: </label><input name="name" value="" />
 		</div>
-		<div>
+		<div class="ff">
 			<label for="simplename">Simple name: </label><input name="simplename" value="" />
 		</div>
 		
 		<%-- This div will only be visible if the selected item type is Product --%>
 		<div id="core-commerce">
-			<div>
+			<div class="ff">
 				<label for="partNum">Part number: </label><input type="text" name="partNum" value="" />
 			</div>
-			<div>
+			<div class="ff">
 				<label for="price">Price: </label><input type="text" name="price" value="0" />
 			</div>
-			<div>
+			<div class="ff">
 				<label for="stock">Stock: </label><input type="text" name="stock" value="0" />
 			</div>
-			<div>
+			<div class="ff">
 				<label for="alphaaxis">Axis A: </label>
 				<select id="alphaaxis" name="alphaaxis">
 					<option value="-1">Choose ...</option>
@@ -56,7 +56,7 @@
 					</c:forEach>
 				</select>
 			</div>
-			<div>
+			<div class="ff">
 				<label for="betaaxis">Axis B: </label>
 				<select id="betaaxis" name="betaaxis">
 					<option value="-1">Choose ...</option>
