@@ -121,7 +121,14 @@ public class CmsDeliveryServlet {
 					return;
 				}
 				
-				Item item = site.getItem(trimmedPath);
+				String versionParam = req.getParameter("version");
+				Item item = null;
+				if (StringUtils.isNumeric(versionParam)) {
+					item = site.getItem(trimmedPath, Integer.parseInt(versionParam));
+				}
+				else {
+					item = site.getItem(trimmedPath);
+				}
 				
 				if (item != null) {
 					LOG.info(LogUtil.compose("Requesting", item));
