@@ -11,10 +11,10 @@
 	<c:set var="_copyDetails" value="${editingItem.copyDetails}" />
 	<div id="copy-tab">
 		<form>
-			<div class="ff">
+			<div>
 				<label for="name">Name: </label><input name="name" value="${_copyDetails[2]}" />
 			</div>
-			<div class="ff">
+			<div>
 				<label for="simplename">Simple name: </label><input name="simplename" 
 					value="${_copyDetails[1]}" />
 			</div>

@@ -9,11 +9,11 @@
 <c:if test="${editingItem.type.media}">
 	<div id="media-tab">
 		<form id="media-form" enctype="multipart/form-data">
-			<div class="ff">
+			<div>
 				<label for="media">&nbsp;</label>
 				<input name="media" type="file" />
 			</div>
-			<div class="ff">
+			<div>
 				<label>&nbsp;</label><button id="media-button" type="button">Update media</button>
 			</div>
 			<label>&nbsp;</label><progress class="spacer10"></progress>		
