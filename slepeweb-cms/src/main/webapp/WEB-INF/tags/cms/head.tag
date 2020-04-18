@@ -6,6 +6,13 @@
 
 <title>slepe web solutions | </title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+<%-- 
+	Key requirement for responsive layout on mobile phone. My phone has 2280 x 1080 pixels wide,
+	and without this meta element, it would attempt to fit the desktop layout in both landscape and portrait mode.
+	#responsive.
+ --%>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 

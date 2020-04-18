@@ -39,7 +39,7 @@
 	<div class="spacer20"></div>
 	<div id="addlinkdiv">
 		<div>
-			<div>
+			<div class="ff">
 				<label>Type: </label>
 				<select name="linktype">
 					<option value="unknown">Choose ...</option>
@@ -49,14 +49,14 @@
 				</select>	
 			</div>
 			
-			<div>
+			<div class="ff">
 				<label>Subtype: </label>
 				<select name="linkname">
 					<option value="unknown">Choose ...</option>
 				</select>	
 			</div>
 			
-			<div>
+			<div class="ff">
 				<label>Data: </label>
 				<input name="linkdata" value="" />
 			</div>

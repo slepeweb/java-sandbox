@@ -171,7 +171,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			retireOlderEditableVersions(i);
 		}
 
-		int maxVersions = 10;
+		int maxVersions = 4;
 		if (i.getVersion() > maxVersions) {
 			deleteOlderVersions(i, maxVersions);
 		}
@@ -500,12 +500,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=? and i.deleted=0" + getVersionClause()),
 			new Object[]{siteId, path});
-	}
-
-	public Item getItem(Long siteId, String path, int version) {
-		return getItem(
-			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=? and version=? and i.deleted=0"),
-			new Object[]{siteId, path, version});
 	}
 
 	/*

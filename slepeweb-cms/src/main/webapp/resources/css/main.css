@@ -1,3 +1,9 @@
+@media screen and (max-width:400px) {
+  @-ms-viewport{
+    width: device-width;
+  }
+}
+
 body {
   max-width: 370px;
   margin: auto;
@@ -70,8 +76,8 @@ hr {
 	width: 100%;
 }
 
-form div {
-	padding-bottom: 0.5em;
+div.ff {
+	padding-bottom: 1em;
 }
 
 #field-language-selector select {
@@ -96,10 +102,6 @@ input, textarea {
 	width: 95%;
 }
 
-#addlinkdiv>div>div {
-	padding-bottom: 0.5em;
-}
-
 input[disabled="disabled"] {
 	background-color: #d8d8d8;
 	color: #909090;
@@ -117,15 +119,15 @@ details {
 	padding-bottom: 1em;
 }
 
-/* >>>>> Used by cms-test */
-	.pass {
-		color: green;
-	}
-	
-	.fail {
-		color: red;
-	}
-/* <<<<< Used by cms-test */
+					/* >>>>> Used by cms-test */
+						.pass {
+							color: green;
+						}
+						
+						.fail {
+							color: red;
+						}
+					/* <<<<< Used by cms-test */
 
 .inline {
 	display: inline-block;
@@ -147,26 +149,25 @@ details {
 	vertical-align: top;
 }
 
-/* >>>>> Used on login page */
-	.underline {
-		text-decoration: underline;
-	}
-	
-	.red {
-		color: red;
-	}
-	
-	.green {
-		color: green;
-	}
-	
-	#login .heading {
-		font-weight: bold;
-		text-align: left;
-	}	
-/* <<<<< Used on login page */
+					/* >>>>> Used on login page */
+						.underline {
+							text-decoration: underline;
+						}
+						
+						.red {
+							color: red;
+						}
+						
+						.green {
+							color: green;
+						}
+						
+						#login .heading {
+							font-weight: bold;
+							text-align: left;
+						}	
+					/* <<<<< Used on login page */
 
-/* Link tab: to identify link targets  */
 #linknav-container {
 	display: block;
 }
@@ -221,54 +222,54 @@ details {
 	background-color: #db9131;
 }
 
-/* >>>>> Left navigation */
-	#leftnav-wrapper {
-		position: relative;
-	}
-	
-	#leftnav {
-		position: absolute;
-		width: 90%;
-		max-width: 400px;
-		left: 1.8em;
-		top: -0.5em;
-		z-index: 10;
-		box-shadow: 6px 6px 6px 6px #666;
-	}
-/* <<<<< Left navigation */
+					/* >>>>> Left navigation */
+						#leftnav-wrapper {
+							position: relative;
+						}
+						
+						#leftnav {
+							position: absolute;
+							width: 90%;
+							max-width: 400px;
+							left: 1.8em;
+							top: -0.5em;
+							z-index: 10;
+							box-shadow: 6px 6px 6px 6px #666;
+						}
+					/* <<<<< Left navigation */
 
-/* >>>>> Buttons */
-	#item-editor button, #login button {
-		background: #6eac2c;
-		border: 1px solid #acdd4a;
-		border-radius: 6px;
-		color: #fff;
-		padding: 6px;
-		margin-top: 1.5em;
-		cursor: pointer;
-	}
-	
-	#item-editor button.disabled {
-		background: #ccc;
-	}
-	
-	#item-editor #trash-button {
-		background: red;
-		float: right;
-	}
-	
-	#version-tab button {
-		margin-bottom: 1.5em;
-	}
-	
-	button#savelinks-button {
-		color: #fff;
-		float: right;
-		padding: 8px;
-		font-size: 1.2em;
-	}
-
-/* <<<<< Buttons */
+										/* >>>>> Buttons */
+											#item-editor button, #login button {
+												background: #6eac2c;
+												border: 1px solid #acdd4a;
+												border-radius: 6px;
+												color: #fff;
+												padding: 6px;
+												margin-top: 1.5em;
+												cursor: pointer;
+											}
+											
+											#item-editor button.disabled {
+												background: #ccc;
+											}
+											
+											#item-editor #trash-button {
+												background: red;
+												float: right;
+											}
+											
+											#version-tab button {
+												margin-bottom: 1.5em;
+											}
+											
+											button#savelinks-button {
+												color: #fff;
+												float: right;
+												padding: 8px;
+												font-size: 1.2em;
+											}
+										
+										/* <<<<< Buttons */
 
 #trash-table {
 	margin-top: 1em;
@@ -299,69 +300,71 @@ details {
 	display: none;
 }
 
-/* >>>>> Fancytree styles */
-ul.fancytree-container {
-	background-color: #ccc;
-}
+					/* >>>>> Fancytree styles */
+					ul.fancytree-container {
+						background-color: #ccc;
+					}
+					
+					span.fancytree-node.shortcut>span.fancytree-icon {
+						background-position: -64px -160px;
+						margin-left: 19px;
+					}
+					
+					span.fancytree-node.shortcut>span.fancytree-expander {
+						display: none;
+					}
+					
+					span.fancytree-node.cms-icon-homepage>span.fancytree-icon {
+						background-position: -16px 0px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-primary>span.fancytree-icon {
+						background-position: -32px 0px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-partner>span.fancytree-icon {
+						background-position: -48px 0px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-pdf>span.fancytree-icon {
+						background-position: -64px 0px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-document>span.fancytree-icon {
+						background-position: -80px 0px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-image>span.fancytree-icon {
+						background-position: -96px 0px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-shortcut-pdf>span.fancytree-icon {
+						background-position: -64px -16px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-shortcut-document>span.fancytree-icon {
+						background-position: -80px -16px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-shortcut-image>span.fancytree-icon {
+						background-position: -96px -16px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-shortcut-error>span.fancytree-icon {
+						background-position: -16px -32px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					/* <<<<< Fancytree styles */
 
-span.fancytree-node.shortcut>span.fancytree-icon {
-	background-position: -64px -160px;
-	margin-left: 19px;
-}
-
-span.fancytree-node.shortcut>span.fancytree-expander {
-	display: none;
-}
-
-span.fancytree-node.cms-icon-homepage>span.fancytree-icon {
-	background-position: -16px 0px;
-	background-image: url("fancytree-cms-icons.gif");
-}
-
-span.fancytree-node.cms-icon-primary>span.fancytree-icon {
-	background-position: -32px 0px;
-	background-image: url("fancytree-cms-icons.gif");
-}
-
-span.fancytree-node.cms-icon-partner>span.fancytree-icon {
-	background-position: -48px 0px;
-	background-image: url("fancytree-cms-icons.gif");
-}
-
-span.fancytree-node.cms-icon-pdf>span.fancytree-icon {
-	background-position: -64px 0px;
-	background-image: url("fancytree-cms-icons.gif");
-}
-
-span.fancytree-node.cms-icon-document>span.fancytree-icon {
-	background-position: -80px 0px;
-	background-image: url("fancytree-cms-icons.gif");
-}
-
-span.fancytree-node.cms-icon-image>span.fancytree-icon {
-	background-position: -96px 0px;
-	background-image: url("fancytree-cms-icons.gif");
-}
-
-span.fancytree-node.cms-icon-shortcut-pdf>span.fancytree-icon {
-	background-position: -64px -16px;
-	background-image: url("fancytree-cms-icons.gif");
-}
-
-span.fancytree-node.cms-icon-shortcut-document>span.fancytree-icon {
-	background-position: -80px -16px;
-	background-image: url("fancytree-cms-icons.gif");
-}
-
-span.fancytree-node.cms-icon-shortcut-image>span.fancytree-icon {
-	background-position: -96px -16px;
-	background-image: url("fancytree-cms-icons.gif");
-}
-
-span.fancytree-node.cms-icon-shortcut-error>span.fancytree-icon {
-	background-position: -16px -32px;
-	background-image: url("fancytree-cms-icons.gif");
-}
 
 @media (min-width: 700px) {
 	header {

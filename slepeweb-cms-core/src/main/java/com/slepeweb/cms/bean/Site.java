@@ -56,10 +56,6 @@ public class Site extends CmsBean {
 		return getItemService().getItem(getId(), path);
 	}
 	
-	public Item getItem(String path, int version) {
-		return getItemService().getItem(getId(), path, version);
-	}
-	
 	public Item getContentItem(String relativePath) {
 		return getItemService().getItem(getId(), Item.CONTENT_ROOT_PATH + relativePath);
 	}

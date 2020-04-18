@@ -11,7 +11,7 @@
 		<c:set var="fvm" value="${editingItem.fieldValues}" />
 		
 		<c:if test="${editingItem.site.multilingual}">
-			<div id="field-language-selector">
+			<div id="field-language-selector" class="ff">
 				<label>Language : </label>
 				<select name="language">
 					<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
@@ -29,7 +29,7 @@
 					<c:choose><c:when test="${fes.field.type == 'layout'}">
 						<hr />
 					</c:when><c:otherwise>
-						<div>
+						<div class="ff">
 							<label for="${fes.field.variable}">${fes.label} : </label>
 							${fes.inputTag}
 						</div>
