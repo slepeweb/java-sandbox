@@ -27,7 +27,7 @@ public interface ItemService {
 			boolean moverIsShortcut) throws ResourceException;
 	boolean move(Item child, Item currentParent, Item targetParent, Item target, 
 			boolean moverIsShortcut, String mode) throws ResourceException;
-	Item trashItem(Long id);
+	int trashItemAndDirectChildren(Item i);
 	Item restoreItem(Long id);
 	List<Item> getTrashedItems();
 	int deleteTrashedItems(long[] idArr);

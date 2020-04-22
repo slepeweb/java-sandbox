@@ -13,7 +13,7 @@
 		<input id="itemIsProductFlag" type="hidden" value="${editingItem.product}" />
 		
 		<div class="ff">
-			<label for="id">Id: </label><input disabled="disabled" value="${editingItem.id}" />
+			<label for="id">Id: </label><input disabled="disabled" value="${editingItem.id} (Orig. ${editingItem.origId})" />
 		</div>
 		<div class="ff">
 			<label for="path">Path: </label><input disabled="disabled" value="${editingItem.path}" />

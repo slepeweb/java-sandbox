@@ -540,11 +540,7 @@ public class Item extends CmsBean {
 	}
 	
 	public void trash() {
-		this.cmsService.getItemService().trashItem(getId());
-	}
-	
-	public void restore() {
-		this.cmsService.getItemService().restoreItem(getId());
+		this.cmsService.getItemService().trashItemAndDirectChildren(this);
 	}
 	
 	public boolean isDeleted() {

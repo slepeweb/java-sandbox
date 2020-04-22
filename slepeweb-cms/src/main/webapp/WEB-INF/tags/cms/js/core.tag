@@ -38,6 +38,8 @@ $("#core-button").click(function () {
 			}
 			
 			flashMessage(obj);
+			_tree.activateKey(nodeKey);		
+			renderItemForms(nodeKey, "core-tab");
 		},
 		error: function(json, status, z) {
 			serverError();

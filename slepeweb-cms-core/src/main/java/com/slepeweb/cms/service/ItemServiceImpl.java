@@ -411,38 +411,32 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 * Restored items are set to 'not-published', and so shouldn't be re-indexed
 	 * by Solr, but they will be once they are published manually by the user.
 	 */
-	public int restoreSelectedItems(long[] idArr) {
+	public int restoreSelectedItems(long[] origIdArr) {
 		int num = 0;
 		String allItemsSql = "update item set deleted = 0, published = 0 where deleted = 1";
 		String  singleItemSql = "update item set deleted = 0, published = 0 where origid = ?";
 		
-		if (idArr == null) {
-			if ((num = this.jdbcTemplate.update(allItemsSql)) > 0) {
-				LOG.info("The entire trash bin has been restored");
-			}
+		if (origIdArr == null) {
+			num = this.jdbcTemplate.update(allItemsSql);
+			LOG.info("The entire trash bin has been restored");
 		}
 		else {
-			int c;
-			Item i;
-			for (Long id : idArr) {
-				i = getItemFromBin(id);
-				if (i != null && ((c = this.jdbcTemplate.update(singleItemSql, i.getOrigId()))) > 0) {
-					num += c;
-				}
+			for (Long origId : origIdArr) {
+				num += this.jdbcTemplate.update(singleItemSql, origId);
 			}
-			LOG.info(String.format("Restored %d items from the bin", num));
 		}
+		
+		LOG.info(String.format("Restored %d items from the bin", num));
 		return num;
 	}
 	
 	// The 'delete' methods permanently delete items from the db that have their 'deleted' flag set.
 	// The 'trash' methods perform soft-deletes, by setting/un-setting the 'deleted' flag.
 	
-	public Item trashItem(Long id) {
-		Item i = getItem(id);
-
+	public int trashItemAndDirectChildren(Item i) {
 		// Delete all versions of this item
-		if (this.jdbcTemplate.update("update item set deleted = 1 where origid = ?", i.getOrigId()) > 0) {
+		int count = this.jdbcTemplate.update("update item set deleted = 1 where origid = ?", i.getOrigId());
+		if (count > 0) {
 			LOG.info(compose("Trashed item", String.valueOf(i)));
 			
 			// Remove item from Solr index
@@ -452,16 +446,16 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			List<Link> list = this.linkService.getBindings(i.getId());
 				
 			for (Link l : list) {
-				trashItem(l.getChild().getId());
+				count += trashItemAndDirectChildren(l.getChild());
 			}
 		}
 		
-		return getItem(id);
+		return count;
 	}
 	
-	public Item restoreItem(Long id) {
-		restoreSelectedItems(new long[] {id});
-		return getItem(id);
+	public Item restoreItem(Long origId) {
+		restoreSelectedItems(new long[] {origId});
+		return getItemByOriginalId(origId);
 	}
 
 	public Item revert(Item i) throws ResourceException {
@@ -745,18 +739,17 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		List<Link> nll = new ArrayList<Link>(origLinks.size());
 		Link nl;
 		for (Link l : origLinks) {
-			// DO NOT copy bindings, only relations, inlines and shortcuts
-			if (l.getType().equals(LinkType.binding)) {
-				continue;
+			// DO NOT copy bindings, only relations, inlines and shortcuts UNLESS
+			// this is a new version of an existing item.
+			if (isNewVersion || ! l.getType().equals(LinkType.binding)) {
+				nl = CmsBeanFactory.makeLink();
+				nl.assimilate(l);
+				nl.
+					setParentId(ni.getId()).
+					setChild(l.getChild());
+				
+				nll.add(nl);
 			}
-			
-			nl = CmsBeanFactory.makeLink();
-			nl.assimilate(l);
-			nl.
-				setParentId(ni.getId()).
-				setChild(l.getChild());
-			
-			nll.add(nl);
 		}
 		ni.setLinks(nll);
 		

@@ -32,19 +32,19 @@ public class VersionTest extends BaseTest {
 				register(7035, "", "The new version should be editable").
 				register(7040, "Check the original item", "Its should still be published").
 				register(7045, "", "It should NOT be editable").
-				register(7050, "Check the parent of the new item", "It should be the same as before").
-				register(7060, "Check the children of the new item", "They should be the same as before").
-				register(7070, "Trash the new item", "There should be N more entries in the bin").
+				register(7050, "Check the parent of the new version", "It should be the same as before").
+				register(7060, "Check the children of the new version", "They should be the same as before").
+				register(7070, "Trash the new version", "There should be 4 more entries in the bin").
 				register(7080, "Restore the new item", "The bin size should be reduced by 2").
 				register(7090, "Revert the new item", "It's version no. should be 1 less").
 				register(7100, "", "It should be editable").
 				register(7110, "", "Its status should NOT be published").
 				register(7120, "", "The new version should no longer be in the db").
-				register(7130, "", "The original version should be editable and accessible").
-				register(7140, "Repeat creation of new version of the news section after emptying the bin", "There should"
-						+ " be one new row in the item table").
-				register(7150, "Remove this specific item from the bin", "The number of records in the item table "
-						+ "should be 2 fewer");
+				register(7130, "", "The original version should be editable and accessible");
+//				register(7140, "Repeat creation of new version of the news section after emptying the bin", "There should"
+//						+ " be one new row in the item table").
+//				register(7150, "Remove this specific item from the bin", "The number of records in the item table "
+//						+ "should be 2 fewer");
 		
 
 		try {
@@ -71,7 +71,7 @@ public class VersionTest extends BaseTest {
 				return trs;
 			}
 			
-			// No publish the item and try again
+			// Now publish the item and try again
 			newsSectionItem.setPublished(true).save();		
 			
 			// We now have an instance of the newsSectionItem BEFORE it is versioned
@@ -131,6 +131,7 @@ public class VersionTest extends BaseTest {
 				
 				r.test(ok);
 				
+				// Trash the new version; this includes the old version, and the 2 children - total = 4
 				int binCount = this.cmsService.getItemService().getBinCount();
 				newVersionOfNewsSection.trash();
 				
@@ -138,16 +139,17 @@ public class VersionTest extends BaseTest {
 				int binCount2 = this.cmsService.getItemService().getBinCount();
 				r = trs.execute(7070);
 				r.setNotes(String.format("Bin has grown from %d to %d entries", binCount, binCount2));
-				r.test((binCount2 - binCount) > 0);
+				r.test((binCount2 - binCount) == 4);
 						
-				// Restore the trashed section
-				newVersionOfNewsSection.restore();
+				// Restore the trashed section, and it's older version.
+				// NOTE: it will NOT restore the original children - these would have to be restored separately.
+				newVersionOfNewsSection = this.itemService.restoreItem(newVersionOfNewsSection.getOrigId());
 				
-				// 7080: Assert bin size back to original
+				// 7080: Assert bin size is 2 less
 				int finalBinCount = this.cmsService.getItemService().getBinCount();
 				r = trs.execute(7080);
 				r.setNotes(String.format("Bin has reduced from %d to %d entries", binCount2, finalBinCount));
-				r.test(finalBinCount == binCount2 - 2);
+				r.test(binCount2 - finalBinCount == 2);
 				
 				// 7090: Revert the new item
 				r = trs.execute(7090);

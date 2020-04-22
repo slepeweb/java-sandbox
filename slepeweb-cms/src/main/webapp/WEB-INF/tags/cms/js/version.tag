@@ -13,6 +13,12 @@ $("#version-button").click(function () {
 		dataType: "json",
 		success: function(obj, status, z) {
 			flashMessage(obj);
+			var neuNode = obj.data;
+			var origNode = _tree.getNodeByKey(nodeKey);
+			neuNode = origNode.appendSibling(neuNode);
+			origNode.remove();
+			neuNode.setActive();
+			renderItemForms(neuNode.key, "core-tab");
 		},
 		error: function(json, status, z) {
 			serverError();

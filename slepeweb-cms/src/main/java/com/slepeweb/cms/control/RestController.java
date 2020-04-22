@@ -557,7 +557,10 @@ public class RestController extends BaseController {
 		
 		try {
 			Item c = this.itemService.version(i);			
-			return resp.setError(false).setData(c.getId()).addMessage("New version created");
+			return resp.
+					setError(false).
+					setData(Node.toNode(c, false)).
+					addMessage("New version created");
 		}
 		catch (Exception e) {
 			return resp.setError(true).setData(i.getId()).addMessage(e.getMessage());
@@ -616,26 +619,26 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/trash/restore/selected", produces="application/json")
 	@ResponseBody
 	public RestResponse restoreSelectedTrashedItems(
-			@RequestParam(value="id", required=true) String idList,
+			@RequestParam(value="id", required=true) String origIdList,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
 
-		if (idList.endsWith(",")) {
-			idList = idList.substring(0, idList.length() - 1);
+		if (origIdList.endsWith(",")) {
+			origIdList = origIdList.substring(0, origIdList.length() - 1);
 		}
 		
-		if (StringUtils.isNotBlank(idList)) {
-			String[] idStr = idList.split(",");
-			int len = idStr.length;
+		if (StringUtils.isNotBlank(origIdList)) {
+			String[] origIdStr = origIdList.split(",");
+			int len = origIdStr.length;
 		
-			long[] ids = new long[len];
+			long[] origIds = new long[len];
 			for (int i = 0; i < len; i++) {
-				ids[i] = Integer.parseInt(idStr[i]);
+				origIds[i] = Integer.parseInt(origIdStr[i]);
 			}
 			
 			return resp.setError(false).addMessage(
-					String.format("Restored %d items from the trash", this.itemService.restoreSelectedItems(ids)));
+					String.format("Restored %d items from the trash", this.itemService.restoreSelectedItems(origIds)));
 		}
 		else {
 			return resp.setError(true).addMessage("No items selected by user");

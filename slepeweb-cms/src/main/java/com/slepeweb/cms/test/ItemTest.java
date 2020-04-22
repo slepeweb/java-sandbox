@@ -52,8 +52,8 @@ public class ItemTest extends BaseTest {
 			Item aboutSectionItem = site.getItem("/about");
 			Item newsSectionItem = site.getItem("/news");
 			Item rootItem = site.getItem("/");
-			Long newsItemId_101 = site.getItem("/news/101").getId();
-			Long newsItemId_102 = site.getItem("/news/102").getId();
+			Long newsItemOrigId_101 = site.getItem("/news/101").getOrigId();
+			Long newsItemOrigId_102 = site.getItem("/news/102").getOrigId();
 			
 			if (aboutSectionItem == null || newsSectionItem == null) {
 				LOG.warn("Failed to retrieve either 'about' section or 'news' section");
@@ -224,7 +224,7 @@ public class ItemTest extends BaseTest {
 					r.test(diff == 1);
 					
 					// Restore the trashed section
-					newsSectionItem.restore();
+					newsSectionItem = this.cmsService.getItemService().restoreItem(newsSectionItem.getOrigId());
 					
 					// 4110: Assert bin size back to original
 					int finalBinCount = this.cmsService.getItemService().getBinCount();
@@ -236,8 +236,8 @@ public class ItemTest extends BaseTest {
 			
 			// 4120
 			// Restore 2 news items trashed earlier when parent folder was trashed
-			Item newsItem = this.cmsService.getItemService().restoreItem(newsItemId_101);
-			this.cmsService.getItemService().restoreItem(newsItemId_102);
+			Item newsItem = this.cmsService.getItemService().restoreItem(newsItemOrigId_101);
+			this.cmsService.getItemService().restoreItem(newsItemOrigId_102);
 			
 			if (newsItem != null) {
 				r = trs.execute(4120);

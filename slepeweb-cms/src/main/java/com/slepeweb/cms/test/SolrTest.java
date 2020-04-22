@@ -76,7 +76,7 @@ public class SolrTest extends BaseTest {
 			
 			// Trash the item
 			r = trs.execute(8030);
-			this.itemService.trashItem(testItem.getId());
+			this.itemService.trashItemAndDirectChildren(testItem);
 			doc = getDocument(testItem);
 			r.test(doc == null);
 			
