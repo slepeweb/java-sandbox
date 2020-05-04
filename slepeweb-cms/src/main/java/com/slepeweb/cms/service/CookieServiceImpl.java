@@ -1,6 +1,7 @@
 package com.slepeweb.cms.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
@@ -25,7 +26,7 @@ public class CookieServiceImpl implements CookieService {
 	
 	public void updateHistoryCookie(Item i, HttpServletRequest req, HttpServletResponse res) {
 		
-		ItemIdentifier targetKey = new ItemIdentifier(i.getId());
+		ItemIdentifier targetKey = new ItemIdentifier(i.getOrigId());
 		List<ItemIdentifier> nodeList = getHistoryCookieValue(i.getSite().getId(), req);
 		
 		if (nodeList.contains(targetKey)) {
@@ -74,12 +75,18 @@ public class CookieServiceImpl implements CookieService {
 	}
 	
 	private void updateItemNames(List<ItemIdentifier> list) {
-		Item h;
+		Item h;		
+		Iterator<ItemIdentifier> iter = list.iterator();
+		ItemIdentifier ii;
 		
-		for (ItemIdentifier ii : list) {
-			h = this.itemService.getItem(ii.getItemId());
+		while (iter.hasNext()) {
+			ii = iter.next();
+			h = this.itemService.getEditableVersion(ii.getItemId());
 			if (h != null) {
 				ii.setName(StringUtils.abbreviate(h.getName(), 24));
+			}
+			else {
+				iter.remove();
 			}
 		}
 	}

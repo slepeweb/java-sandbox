@@ -38,7 +38,7 @@ import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.utils.LogUtil;
-import com.slepeweb.site.util.HttpUtil;
+import com.slepeweb.common.util.HttpUtil;
 
 @Component
 public class CmsDeliveryServlet {

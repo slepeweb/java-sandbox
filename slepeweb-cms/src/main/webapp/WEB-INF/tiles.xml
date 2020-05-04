@@ -26,4 +26,8 @@
 	<definition name="cms.item.editor" template="/WEB-INF/jsp/cms/item-editor.jsp" />
 	<definition name="cms.trash.contents" template="/WEB-INF/jsp/cms/trash-contents.jsp" />
 
+	<definition name="cms.refresh.core" template="/WEB-INF/jsp/cms/refresh/core.jsp" />
+	<definition name="cms.refresh.field" template="/WEB-INF/jsp/cms/refresh/field.jsp" />
+	<definition name="cms.refresh.links" template="/WEB-INF/jsp/cms/refresh/links.jsp" />
+	<definition name="cms.refresh.version" template="/WEB-INF/jsp/cms/refresh/version.jsp" />
 </tiles-definitions>

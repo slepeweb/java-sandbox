@@ -11,6 +11,7 @@ public class ItemType extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	public static final String CONTENT_FOLDER_TYPE_NAME = "Content Folder";
 	public static final String PAGE_MIMETYPE = "application/cms";
+	public static final String JS_MIMETYPE = "text/javascript";
 	
 	private Long id, privateCache = 0L, publicCache = 0L;
 	private String name, mimeType = PAGE_MIMETYPE;
@@ -149,8 +150,11 @@ public class ItemType extends CmsBean {
 		return true;
 	}
 
+	// TODO: This would be better handled by adding a media column to the itemtype table
 	public boolean isMedia() {
-		return ! getMimeType().equals(PAGE_MIMETYPE);
+		return 
+			! getMimeType().equals(PAGE_MIMETYPE) &&
+			! getMimeType().equals(JS_MIMETYPE);
 	}
 
 	public String getMimeType() {

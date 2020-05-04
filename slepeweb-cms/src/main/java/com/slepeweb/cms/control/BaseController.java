@@ -1,5 +1,10 @@
 package com.slepeweb.cms.control;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +15,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.slepeweb.cms.bean.FieldEditorSupport;
+import com.slepeweb.cms.bean.FieldForType;
+import com.slepeweb.cms.bean.FieldValue;
+import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.ItemTypeService;
@@ -76,6 +86,48 @@ public class BaseController {
 			}
 		}
 		return false;
+	}
+	
+	protected Map<String, List<FieldEditorSupport>> fieldEditorSupport(Item i) {
+		Map<String, FieldValue> languageValuesMap;
+		Map<String, List<FieldEditorSupport>> fieldSupport = new HashMap<String, List<FieldEditorSupport>>();
+		List<FieldEditorSupport> list;
+		FieldValue fv;
+		FieldEditorSupport fes;
+		String variable;
+		
+		for (String language : i.getSite().getAllLanguages()) {
+			languageValuesMap = i.getFieldValueSet().getFieldValues(language);
+			list = new ArrayList<FieldEditorSupport>();
+			
+			for (FieldForType fft : i.getType().getFieldsForType(false)) {
+				if (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual()) {
+					variable = fft.getField().getVariable();
+					
+					fes = new FieldEditorSupport().
+							setField(fft.getField()).
+							setLabel(fft.getField().getName());
+					
+					fv = languageValuesMap == null ? null : languageValuesMap.get(variable);
+					
+					if (fft.getField().getType() != FieldType.layout) {
+						if (fv == null) {
+							fes.setInputTag(fft.getField().getInputTag());
+						}
+						else {
+							fes.setFieldValue(fv);
+							fes.setInputTag(fv.getInputTag());
+						}
+					}
+					
+					list.add(fes);
+				}
+			}
+			
+			fieldSupport.put(language, list);
+		}
+		
+		return fieldSupport;
 	}
 	
 }

@@ -35,7 +35,7 @@ public class Navigation {
 		private List<Node> children = new ArrayList<Node>();
 		
 		public static Node toNode(Item i, boolean isShortcut) {
-			return new Navigation.Node().setTitle(i.getName()).setKey(i.getId().toString()).
+			return new Navigation.Node().setTitle(i.getName()).setKey(i.getOrigId().toString()).
 					setExtraClasses(getCmsIconClass(i, isShortcut));
 		}
 		

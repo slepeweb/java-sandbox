@@ -37,10 +37,10 @@ public class PageController extends BaseController {
 		return "cms.editor";
 	}
 	
-	@RequestMapping(value="/editor/{itemId}")	
-	public String doWithItem(@PathVariable long itemId, HttpServletRequest req, ModelMap model) {	
+	@RequestMapping(value="/editor/{origId}")	
+	public String doWithItem(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = this.itemService.getItem(itemId);
+		Item i = this.itemService.getEditableVersion(origId);
 		if (i != null) {
 			model.addAttribute("editingItem", i);
 			model.addAttribute("site", i.getSite());

@@ -23,14 +23,14 @@ public class SearchController extends BaseController {
 	@Autowired private ItemService itemService;
 	@Autowired private SolrService4Cms solrService4Cms;
 	
-	@RequestMapping(value="/reindex/{id}", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value="/reindex/{origId}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public RestResponse reindexSection( 
-			@PathVariable long id,
+			@PathVariable long origId,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getItem(id);
+		Item i = this.itemService.getEditableVersion(origId);
 		
 		if (i != null) {
 			this.solrService4Cms.indexSection(i);

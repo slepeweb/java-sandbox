@@ -1,12 +1,6 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
-    taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@ 
-    taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%><%@ 
-    taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%><%@ 
-    taglib prefix="edit" tagdir="/WEB-INF/tags/cms/editor"%>
-
-<c:set var="_showVersionTab" 
-	value="${editingItem.type.name ne 'ContentFolder' and (editingItem.published or editingItem.version > 1)}"
-	scope="request" />
+<%@ 
+	page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <ul id="editor-tabs">
 	<li><a href="#core-tab">Core</a></li>
@@ -16,32 +10,30 @@
 		<li><a href="#media-tab">Media</a></li>
 	</c:if>
 	<li><a href="#add-tab">Add new</a></li>
+	
 	<c:if test="${editingItem.path ne '/'}">
 		<li><a href="#copy-tab">Copy</a></li>
 	</c:if>
-	<c:if test="${_showVersionTab}">
-		<li><a href="#version-tab">Version</a></li>
-	</c:if>
-		<li><a href="#misc-tab">Misc</a></li>
+	
+	<li><a href="#version-tab">Version</a></li>
+	<li><a href="#misc-tab">Misc</a></li>
 </ul>
 
-<edit:core />
-<edit:fields />
-<edit:links />
-<edit:media />
-<edit:addnew />
-<edit:copy />
-<edit:version />
+<div id="core-tab"><edit:core /></div>
+<div id="field-tab"><edit:field /></div>
+<div id="links-tab"><edit:links /></div>
 
-<div id="misc-tab">
-	<div>
-		<button id="reindex-button" type="button"
-			title="Refresh the search index for this item and all its descendants">Re-index</button>
-	</div>
+<c:if test="${editingItem.type.media}">
+	<div id="media-tab"><edit:media /></div>
+</c:if>
 
-	<div>
-		<button id="trash-show-button" type="button"
-			title="Reveal the contents of the trash bin">Show bin</button>
-		<div id="trash-container"></div>
-	</div>
-</div>
+<div id="add-tab"><edit:addnew /></div>
+
+<c:if test="${editingItem.path ne '/'}">
+	<%-- Avoid calling the getCopyDetails() method more than once per request --%>
+	<c:set var="_copyDetails" value="${editingItem.copyDetails}" />
+	<div id="copy-tab"><edit:copy /></div>
+</c:if>
+
+<div id="version-tab"><edit:version /></div>
+<div id="misc-tab"><edit:misc /></div>

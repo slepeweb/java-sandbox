@@ -158,7 +158,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	}
 
 	public List<Link> getParentLinks(Long childId) {
-		String sql = String.format(PARENT_SELECT_TEMPLATE, "l.childid = ? and i.deleted = 0");
+		String sql = String.format(PARENT_SELECT_TEMPLATE, "l.childid = ? and i.deleted = 0" + getVersionClause());
 		return this.jdbcTemplate.query(sql, new Object[] {childId}, 
 				new RowMapperUtil.ParentLinkMapper());
 	}

@@ -1,5 +1,9 @@
 package com.slepeweb.cms.control;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -10,9 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,7 +36,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field.FieldType;
-import com.slepeweb.cms.bean.FieldEditorSupport;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.FieldValueSet;
@@ -61,6 +64,8 @@ import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.service.TemplateService;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.commerce.service.AxisService;
+import com.slepeweb.common.util.DateUtil;
+import com.slepeweb.common.util.HttpUtil;
 
 @Controller
 @RequestMapping("/rest")
@@ -85,17 +90,18 @@ public class RestController extends BaseController {
 	 */
 	@RequestMapping("/item/editor")
 	public String doItemEditor(ModelMap model, 
-			@RequestParam(value="key", required=true) Long id,
+			@RequestParam(value="key", required=true) Long origId,
 			@RequestParam(value="language", required=false) String requestedLanguage,
 			HttpServletRequest req, HttpServletResponse res) {	
 		
-		Item i = this.itemService.getItem(id);
+		Item i = this.itemService.getEditableVersion(origId);
+		
 		if (i != null) {
-			String lang = chooseLanguage(i.getSite().isMultilingual(), 
-					requestedLanguage, i.getSite().getLanguage());
+			String lang = chooseLanguage(i.getSite().isMultilingual(), requestedLanguage, i.getSite().getLanguage());
 			model.addAttribute("_requestedLanguage", lang);
 			
 			model.put("editingItem", i);
+			model.put("allVersions", i.getAllVersions());
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
 			
 			if (i.isProduct()) {
@@ -112,48 +118,6 @@ public class RestController extends BaseController {
 		return "cms.item.editor";		
 	}
 	
-	private Map<String, List<FieldEditorSupport>> fieldEditorSupport(Item i) {
-		Map<String, FieldValue> languageValuesMap;
-		Map<String, List<FieldEditorSupport>> fieldSupport = new HashMap<String, List<FieldEditorSupport>>();
-		List<FieldEditorSupport> list;
-		FieldValue fv;
-		FieldEditorSupport fes;
-		String variable;
-		
-		for (String language : i.getSite().getAllLanguages()) {
-			languageValuesMap = i.getFieldValueSet().getFieldValues(language);
-			list = new ArrayList<FieldEditorSupport>();
-			
-			for (FieldForType fft : i.getType().getFieldsForType(false)) {
-				if (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual()) {
-					variable = fft.getField().getVariable();
-					
-					fes = new FieldEditorSupport().
-							setField(fft.getField()).
-							setLabel(fft.getField().getName());
-					
-					fv = languageValuesMap == null ? null : languageValuesMap.get(variable);
-					
-					if (fft.getField().getType() != FieldType.layout) {
-						if (fv == null) {
-							fes.setInputTag(fft.getField().getInputTag());
-						}
-						else {
-							fes.setFieldValue(fv);
-							fes.setInputTag(fv.getInputTag());
-						}
-					}
-					
-					list.add(fes);
-				}
-			}
-			
-			fieldSupport.put(language, list);
-		}
-		
-		return fieldSupport;
-	}
-	
 	private String chooseLanguage(boolean isMultilingualSite, String requested, String siteDefault) {
 		if (isMultilingualSite) {
 			return StringUtils.isBlank(requested) ? siteDefault : requested;
@@ -166,13 +130,13 @@ public class RestController extends BaseController {
 	 * so instead used HttpServletRequest in the method signature, and that seemed to cure the problem.
 	 * (But it could have been something else!)
 	 */
-	@RequestMapping(value="/item/{itemId}/update/core", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{origId}/update/core", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse updateItemCore(
-			@PathVariable long itemId, HttpServletRequest req, ModelMap model) {	
+			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getItem(itemId);
+		Item i = this.itemService.getEditableVersion(origId);
 		Template t = this.templateService.getTemplate(getLongParam(req, "template"));
 		
 		if (i != null) {
@@ -220,7 +184,7 @@ public class RestController extends BaseController {
 			return resp;
 		}
 				
-		return resp.setError(true).addMessage(String.format("No item found with id %d", itemId));		
+		return resp.setError(true).addMessage(String.format("No item found with id %d", origId));		
 	}
 	
 	private String getParam(HttpServletRequest req, String name) {
@@ -235,10 +199,10 @@ public class RestController extends BaseController {
 		return getParam(req, name).equals("true");
 	}
 	
-	@RequestMapping(value="/item/{itemId}/update/media", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{origId}/update/media", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse updateItemMedia(
-			@PathVariable Long itemId, 
+			@PathVariable Long origId, 
 			@RequestParam("media") MultipartFile file, 
 			ModelMap model) {	
 		
@@ -247,10 +211,10 @@ public class RestController extends BaseController {
 		
 		try {
 			is = file.getInputStream();
-			Item i = this.itemService.getItem(itemId);
+			Item i = this.itemService.getEditableVersion(origId);
 			if (i != null) {
 				Media m = CmsBeanFactory.makeMedia().
-						setItemId(itemId).
+						setItemId(origId).
 						setInputStream(is).
 						setSize(file.getSize());
 					
@@ -278,7 +242,7 @@ public class RestController extends BaseController {
 				return resp.setError(false).addMessage("Media successfully uploaded");
 			}
 			
-			return resp.setError(true).addMessage(String.format("No item found with id %d", itemId));		
+			return resp.setError(true).addMessage(String.format("No item found with id %d", origId));		
 		}
 		catch (IOException e) {
 			String s = "Failed to get input stream for media upload";
@@ -287,12 +251,12 @@ public class RestController extends BaseController {
 		}		
 	}
 	
-	@RequestMapping(value="/item/{itemId}/update/fields", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{origId}/update/fields", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public RestResponse updateFields(@PathVariable long itemId, HttpServletRequest request, ModelMap model) {	
+	public RestResponse updateFields(@PathVariable long origId, HttpServletRequest request, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getItem(itemId);
+		Item i = this.itemService.getEditableVersion(origId);
 		String param, stringValue, dateValueStr = null, timeValueStr = null;
 		FieldType ft;
 		FieldValue fv;
@@ -451,10 +415,10 @@ public class RestController extends BaseController {
 		return resp;
 	}	
 	
-	@RequestMapping(value="/item/{parentId}/add", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{parentOrigId}/add", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse addItem(
-			@PathVariable long parentId, 
+			@PathVariable long parentOrigId, 
 			@RequestParam("template") long templateId, 
 			@RequestParam("itemtype") long itemTypeId, 
 			@RequestParam("name") String name, 
@@ -476,7 +440,7 @@ public class RestController extends BaseController {
 		}
 		
 		ItemType it = this.itemTypeService.getItemType(itemTypeId);
-		Item parent = this.itemService.getItem(parentId);
+		Item parent = this.itemService.getEditableVersion(parentOrigId);
 		 
 		Item i = CmsBeanFactory.makeItem(it.getName()).
 				setSite(parent.getSite()).
@@ -514,20 +478,20 @@ public class RestController extends BaseController {
 			return resp.addMessage("Item added").setData(n);
 		}
 		catch (Exception e) {
-			return resp.setError(true).addMessage(e.getMessage()).setData(parentId);
+			return resp.setError(true).addMessage(e.getMessage()).setData(parentOrigId);
 		}
 	}
 	
-	@RequestMapping(value="/item/{itemId}/copy", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{origId}/copy", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse copyItem(
-			@PathVariable long itemId, 
+			@PathVariable long origId, 
 			@RequestParam(value="name", required=true) String name, 
 			@RequestParam(value="simplename", required=true) String simplename, 
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getItem(itemId);
+		Item i = this.itemService.getEditableVersion(origId);
 		
 		try {
 			Item c = this.itemService.copy(i, name, simplename);	
@@ -540,20 +504,20 @@ public class RestController extends BaseController {
 			}
 		}
 		catch (Exception e) {
-			resp.setError(true).addMessage(e.getMessage()).setData(itemId);
+			resp.setError(true).addMessage(e.getMessage()).setData(origId);
 		}
 		
 		return resp;
 	}
 	
-	@RequestMapping(value="/item/{itemId}/version", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{origId}/version", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse versionItem(
-			@PathVariable long itemId, 
+			@PathVariable long origId, 
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getItem(itemId);
+		Item i = this.itemService.getEditableVersion(origId);
 		
 		try {
 			Item c = this.itemService.version(i);			
@@ -567,14 +531,14 @@ public class RestController extends BaseController {
 		}
 	}
 	
-	@RequestMapping(value="/item/{itemId}/revert", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{origId}/revert", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse revertItem(
-			@PathVariable long itemId, 
+			@PathVariable long origId,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getItem(itemId);
+		Item i = this.itemService.getEditableVersion(origId);
 		
 		if (i != null) {
 			try {
@@ -582,19 +546,19 @@ public class RestController extends BaseController {
 				return resp.setError(false).addMessage("Item reverted to previous version").setData(r.getId());
 			}
 			catch (ResourceException e) {
-				return resp.setError(true).addMessage(String.format("No item with this id", itemId));
+				return resp.setError(true).addMessage(String.format("No item with this id", origId));
 			}
 		}
 		
-		return resp.setError(true).addMessage(String.format("No item with this id", itemId));
+		return resp.setError(true).addMessage(String.format("No item with this id", origId));
 	}
 	
-	@RequestMapping(value="/item/{itemId}/trash", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{origId}/trash", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public RestResponse trashItem(@PathVariable long itemId, ModelMap model) {	
+	public RestResponse trashItem(@PathVariable long origId, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getItem(itemId);
+		Item i = this.itemService.getEditableVersion(origId);
 		Item parent = i.getParent();
 		i.trash();
 			
@@ -657,17 +621,17 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/trash/empty/selected", produces="application/json")
 	@ResponseBody
 	public RestResponse deleteSelectedTrashedItems(
-			@RequestParam(value="id", required=true) String idList,
+			@RequestParam(value="id", required=true) String origIdList,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
 
-		if (idList.endsWith(",")) {
-			idList = idList.substring(0, idList.length() - 1);
+		if (origIdList.endsWith(",")) {
+			origIdList = origIdList.substring(0, origIdList.length() - 1);
 		}
 		
-		if (StringUtils.isNotBlank(idList)) {
-			String[] idStr = idList.split(",");
+		if (StringUtils.isNotBlank(origIdList)) {
+			String[] idStr = origIdList.split(",");
 			int len = idStr.length;
 		
 			long[] ids = new long[len];
@@ -695,14 +659,14 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item mover = this.itemService.getItem(moverId);
+		Item mover = this.itemService.getEditableVersion(moverId);
 		if (mover.isRoot()) {
 			return resp.setError(true).setData(mover.getId()).addMessage("Cannot move the root item");
 		}
 		
-		Item target = this.itemService.getItem(targetId);
-		Item currentParent = this.itemService.getItem(moverParentId);
-		Item targetParent = this.itemService.getItem(targetParentId);
+		Item target = this.itemService.getEditableVersion(targetId);
+		Item currentParent = this.itemService.getEditableVersion(moverParentId);
+		Item targetParent = this.itemService.getEditableVersion(targetParentId);
 		
 		try {
 			mover.move(currentParent, targetParent, target, moverIsShortcut, mode);		
@@ -721,7 +685,8 @@ public class RestController extends BaseController {
 	public RestResponse saveLinks(@RequestBody LinkParams[] linkParams, @PathVariable long parentId, ModelMap model) {	
 
 		RestResponse resp = new RestResponse();
-		Item parent = this.itemService.getItem(parentId);
+		Item parent = this.itemService.getEditableVersion(parentId);
+		Item child;
 		List<Link> links = new ArrayList<Link>();
 		Link l, existing;
 		Item i;
@@ -729,7 +694,7 @@ public class RestController extends BaseController {
 		
 		for (LinkParams lp : linkParams) {
 			l = CmsBeanFactory.makeLink().
-					setParentId(parentId).
+					setParentId(parent.getId()).
 					setName(lp.getName()).
 					setOrdering(count++).
 					setType(lp.getType());
@@ -741,9 +706,11 @@ public class RestController extends BaseController {
 				catch (UnsupportedEncodingException e) {}
 			}
 			
+			child = this.itemService.getEditableVersion(lp.getChildId());
+			
 			// Do not modify ordering for existing shortcuts
 			if (l.getType().equals(LinkType.shortcut)) {
-				existing = this.linkService.getLink(l.getParentId(), lp.getChildId());
+				existing = this.linkService.getLink(l.getParentId(), child.getId());
 				if (existing != null) {
 					l.setOrdering(existing.getOrdering());
 				}
@@ -752,9 +719,7 @@ public class RestController extends BaseController {
 				}
 			}
 			
-			i = CmsBeanFactory.makeItem(null).
-					setId(lp.getChildId());
-			
+			i = CmsBeanFactory.makeItem(null).setId(child.getId());			
 			l.setChild(i);			
 			links.add(l);
 		}
@@ -766,7 +731,7 @@ public class RestController extends BaseController {
 			resp.addMessage(String.format("%d links saved", links.size()));
 			
 			// Return a list of shortcuts as response data, so that leftnav tree can be refreshed
-			resp.setData(this.navigationController.doLazyNavOneLevel(parent.getId(), parent.getSite().getId()));
+			resp.setData(this.navigationController.doLazyNavOneLevel(parent.getOrigId(), parent.getSite().getId()));
 		}
 		catch (ResourceException e) {
 			resp.setError(true).addMessage(e.getMessage());
@@ -795,10 +760,10 @@ public class RestController extends BaseController {
 		return names;
 	}
 	
-	@RequestMapping(value="/item/{itemId}/name", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{origId}/name", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public String getItemName(@PathVariable long itemId, ModelMap model) {	
-		Item i =  this.itemService.getItem(itemId);
+	public String getItemName(@PathVariable long origId, ModelMap model) {	
+		Item i =  this.itemService.getEditableVersion(origId);
 		if (i != null) {
 			return i.getName();
 		}
@@ -810,6 +775,64 @@ public class RestController extends BaseController {
 	public List<ItemIdentifier> history(@PathVariable long siteId, HttpServletRequest req) {	
 		
 		return this.cookieService.getHistoryCookieValue(siteId, req);
+	}
+
+	@RequestMapping(value="/js", method=RequestMethod.GET, produces="text/javascript")
+	//@ResponseBody
+	public void javascript(HttpServletRequest req, HttpServletResponse res, ModelMap model) {	
+		
+		LOG.info("assembling js files");
+		
+		StringBuilder sb = new StringBuilder();
+		File folder = new File(req.getServletContext().getRealPath("/WEB-INF/js"));
+		BufferedReader r;
+		int bufflen = 1000, len;
+		char[] buffer = new char[bufflen];
+		List<File> jsfiles = Arrays.asList(folder.listFiles());
+		
+		Collections.sort(jsfiles, new Comparator<File>() {
+
+			@Override
+			public int compare(File f1, File f2) {
+				return f1.getName().compareTo(f2.getName());
+			}});
+		
+		for (File f : jsfiles) {			
+			try {
+				r = new BufferedReader(new FileReader(f));
+				do {
+					len = r.read(buffer, 0, bufflen);					
+					sb.append(buffer, 0, len);
+				} 
+				while (len > -1);
+			}
+			catch (Exception e) {}
+			
+			sb.append("\n");
+		}
+		
+		long now = DateUtil.now().getTime();
+		HttpUtil.setCacheHeaders(now, now, 1200000L, 600000L, res);
+		res.setContentType("text/javascript;charset=utf-8");
+		res.setCharacterEncoding("utf-8");
+		res.setHeader("Content-Length", String.valueOf(sb.length()));	
+		ByteArrayInputStream is = null;
+		
+		try {
+			is = new ByteArrayInputStream(sb.toString().getBytes("utf-8"));
+			HttpUtil.stream(is, res.getOutputStream());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }

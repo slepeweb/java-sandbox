@@ -2,5 +2,4 @@
 	page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
-<div id="item-editor">
-</div>
+<edit:version />

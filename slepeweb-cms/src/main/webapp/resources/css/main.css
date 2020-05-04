@@ -300,6 +300,26 @@ details {
 	display: none;
 }
 
+#version-tab table th, #version-tab table td, #trash-table th, #trash-table td {
+	padding: 6px 12px 6px 6px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	vertical-align: top;
+}
+
+#version-buttons {
+	margin-top: 2em;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	width: 50%;
+	align-items: center;
+}
+
+#version-buttons button {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+	
 					/* >>>>> Fancytree styles */
 					ul.fancytree-container {
 						background-color: #ccc;

@@ -9,7 +9,10 @@ import com.slepeweb.cms.except.ResourceException;
 
 
 public interface ItemService {
+	List<Item> getAllVersions(Long origId);
 	void deleteAllVersions(Long origId);
+	Item getEditableVersion(Long origId);
+	Item getPublishedVersion(Long origId);
 	Item getItem(Long siteId, String path);
 	List<Item> getItemsByPathLike(Long siteId, String path);
 	Item getItem(Long id);

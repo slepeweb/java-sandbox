@@ -696,6 +696,10 @@ public class Item extends CmsBean {
 		return list;
 	}
 
+	public List<Item> getAllVersions() {
+		return getCmsService().getItemService().getAllVersions(getOrigId());
+	}
+	
 	public Item setLinks(List<Link> links) {
 		this.links = links;
 		return this;

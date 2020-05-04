@@ -1,7 +1,6 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
-    taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@ 
-    taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%><%@ 
-    taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%>
+<%@ 
+	page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <c:choose><c:when test="${fn:length(_trashContents) > 0}">
 	<table id="trash-table">

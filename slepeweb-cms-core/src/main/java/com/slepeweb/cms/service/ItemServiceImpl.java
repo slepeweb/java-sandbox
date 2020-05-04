@@ -519,10 +519,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			new Object[]{id});
 	}
 	
-	public Item getItemByOriginalId(Long id) {
+	public Item getItemByOriginalId(Long origId) {
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.origid=? and i.deleted=0" + getVersionClause()), 
-			new Object[]{id});
+			new Object[]{origId});
 	}
 	
 	public Item getItem(Long origId, int version) {
@@ -531,8 +531,19 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			new Object[]{origId, version});
 	}
 	
-	@SuppressWarnings("unused")
-	private List<Item> getAllVersions(Long origId) {
+	public Item getEditableVersion(Long origId) {
+		return getItem(
+			String.format(SELECT_TEMPLATE, "i.origid=? and i.deleted=0 and i.editable=1"), 
+			new Object[]{origId});
+	}
+	
+	public Item getPublishedVersion(Long origId) {
+		return getItem(
+			String.format(SELECT_TEMPLATE, "i.origid=? and i.deleted=0 and i.published=1"), 
+			new Object[]{origId});
+	}
+	
+	public List<Item> getAllVersions(Long origId) {
 		return this.jdbcTemplate.query(
 			String.format(SELECT_TEMPLATE, "i.origid=? and i.deleted=0 order by i.version"),
 			new Object[]{origId}, new RowMapperUtil.ItemMapper());		

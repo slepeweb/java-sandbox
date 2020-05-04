@@ -3,7 +3,7 @@ package com.slepeweb.site.bean;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.solr.bean.SolrParams;
-import com.slepeweb.site.util.HttpUtil;
+import com.slepeweb.common.util.HttpUtil;
 
 public class SolrParams4Site extends SolrParams {
 
