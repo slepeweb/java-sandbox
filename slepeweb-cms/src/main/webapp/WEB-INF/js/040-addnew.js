@@ -28,6 +28,8 @@ _cms.add.behaviour.add = function(nodeKey) {
 					var nodeData = obj.data;
 					var parentNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
 					var childNode = parentNode.addNode(nodeData);
+					
+					// This triggers a call to loads the editor with the newly created item
 					childNode.setActive();
 				}
 			},
@@ -38,9 +40,9 @@ _cms.add.behaviour.add = function(nodeKey) {
 	});
 }
 
-_cms.add.behaviour.changetype = function() {
+_cms.add.behaviour.changetemplate = function() {
 	//Add behaviour to template & itemtype selectors 
-	$("#add-tab select[name='itemtype']").change(function (e) {
+	$("#add-tab select[name='template']").change(function (e) {
 		var typeSelector = $("#add-tab select[name='itemtype']");
 		var target = $(e.target);
 		
@@ -57,9 +59,9 @@ _cms.add.behaviour.changetype = function() {
 	});
 }
 
-_cms.add.behaviour.changetemplate = function() {
+_cms.add.behaviour.changetype = function() {
 	// Add commerce form controls when user selects Product for item type 
-	$("#add-tab select[name='template']").change(function (e) {
+	$("#add-tab select[name='itemtype']").change(function (e) {
 		_cms.support.displayCommerceElements($(e.target));
 	});
 }

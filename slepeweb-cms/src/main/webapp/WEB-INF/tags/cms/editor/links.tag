@@ -29,84 +29,27 @@
 
 <div class="spacer20">
 	<button id="addlink-button" type="button">Add link</button>
-	<button id="savelinks-button" type="button">Save changes</button>
+	<button id="savelinks-button" type="button" disabled="disabled">Save changes</button>
 </div>
 
-<div class="spacer20"></div>
-<div id="addlinkdiv">
-	<div>
-		<div class="ff">
-			<label>Type: </label>
-			<select name="linktype">
-				<option value="unknown">Choose ...</option>
-				<c:forTokens items="inline,relation,component,shortcut" delims="," var="type">
-					<option value="${type}">${type}</option>
-				</c:forTokens>
-			</select>	
-		</div>
-		
-		<div class="ff">
-			<label>Subtype: </label>
-			<select name="linkname">
-				<option value="unknown">Choose ...</option>
-			</select>	
-		</div>
-		
-		<div class="ff">
-			<label>Data: </label>
-			<input name="linkdata" value="" />
-		</div>
-					
-		<input type="hidden" name="linkId" value="-1" />
-		<input type="hidden" name="state" value="0" />
-	</div>	
-		
-	<div id="linknav-container">
-		<details>
-			<summary>TIP</summary>
-			<p>Choose a link type and subtype, and optionally provide any data that is relevant to this site. 
-			Then pick the item you wish to link to, and finally click the 'Use' button. You'll be able to save your changes on
-			the underlying form.</p>
-		</details>
-		
-		<div id="linknav"></div>
-	</div>
-</div>
-
-<div id="link-template" class="hide">
-	<div class="sortable-link ui-state-default">
-		<div class="left">
-			<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-			<span class="link-identifier">*</span>
-		</div>
-		
-		<div class="right">
-			<button class="link-linker" data-id="*" title="Navigate to this item"><i class="fas fa-location-arrow"></i></button>
-			<button class="edit-link" title="Edit link"><i class="far fa-edit"></i></button>
-			<button class="remove-link" title="Remove link"><i class="far fa-trash-alt"></i></button>
-			<span class="hide">*</span>
-		</div>
-	</div>
-</div>
-
-<div class="spacer20">&nbsp;</div>
-
-<h2>Linked from</h2>
-<c:choose><c:when test="${not empty editingItem.parentLinks}">
-	<table>
-		<tr>
-			<th align="left">Link type</th>
-			<th align="left">Link name</th>
-			<th align="left">From</th>
-		</tr>
-		<c:forEach items="${editingItem.parentLinks}" var="_link">
+<div class="spacer3em">
+	<h2>Linked from</h2>
+	<c:choose><c:when test="${not empty editingItem.parentLinks}">
+		<table>
 			<tr>
-				<td width="20%">${_link.type}</td>
-				<td width="20%">${_link.name}</td>
-				<td><span class="link-linker" data-id="${_link.child.origId}">${_link.child.name}</span></td>
+				<th align="left">Link type</th>
+				<th align="left">Link name</th>
+				<th align="left">From</th>
 			</tr>
-		</c:forEach>
-	</table>
-</c:when><c:otherwise>
-	<p>None</p>
-</c:otherwise></c:choose>
+			<c:forEach items="${editingItem.parentLinks}" var="_link">
+				<tr>
+					<td width="20%">${_link.type}</td>
+					<td width="20%">${_link.name}</td>
+					<td><span class="link-linker" data-id="${_link.child.origId}">${_link.child.name}</span></td>
+				</tr>
+			</c:forEach>
+		</table>
+	</c:when><c:otherwise>
+		<p>None</p>
+	</c:otherwise></c:choose>
+</div>

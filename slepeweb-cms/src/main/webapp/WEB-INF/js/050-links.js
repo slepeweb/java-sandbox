@@ -3,33 +3,36 @@ _cms.links = {
 	refresh: {},
 	dialog: {
 		obj: null
-	}
+	},
+	tree: null,
 };
 
-_cms.links.behaviour.fancytree = function() {
-	// Add a fancytree to identify child links 
-	$("#linknav").fancytree({
-		source: {
-			url: _cms.ctx + "/rest/leftnav/lazy/thread",
-			data: _cms.queryParams, /* TODO: Not sure this is right */
-			cache: false,
-			checkbox: true,
-			complete: function() {
-				// On completion of loading the tree, activate the node for the current item
-				_cms.links.tree = $("#linknav").fancytree("getTree");
-			}
-		},
-		lazyLoad: function(event, data) {
-			var node = data.node;
-			data.result = {
-				url: _cms.ctx + "/rest/leftnav/lazy/one",
-				data: {key: node.key}
-			};
-		},
-		activate: function(event, data) {
-			// Do nothing
-		}	
-	});
+_cms.links.behaviour.fancytree = function(rebuild) {
+	if (rebuild) {
+		// Add a fancytree to identify child links 
+		$("#linknav").fancytree({
+			source: {
+				url: _cms.ctx + "/rest/leftnav/lazy/thread",
+				data: _cms.queryParams, /* nodeKey and siteId */
+				cache: false,
+				checkbox: true,
+				complete: function() {
+					// On completion of loading the tree, activate the node for the current item
+					_cms.links.tree = $("#linknav").fancytree("getTree");
+				}
+			},
+			lazyLoad: function(event, data) {
+				var node = data.node;
+				data.result = {
+					url: _cms.ctx + "/rest/leftnav/lazy/one",
+					data: {key: node.key}
+				};
+			},
+			activate: function(event, data) {
+				// Do nothing
+			}	
+		});
+	}
 }
    
 _cms.links.behaviour.changetype = function() {
@@ -68,6 +71,8 @@ _cms.links.behaviour.save = function(nodeKey) {
 			success: function(obj, status, z) {
 				_cms.support.flashMessage(obj);
 				_cms.links.refresh.tab(nodeKey);
+				_cms.links.activateSaveButton(false);
+
 				
 				if (! obj.error && obj.data) {
 					// Need to refresh the FancyTree,
@@ -86,6 +91,7 @@ _cms.links.behaviour.remove = function() {
 	// Add behaviour to 'Remove links' button 
 	$(".remove-link").click(function(e) {
 		$(this).parent().parent().remove();
+		_cms.links.activateSaveButton(true);
 	});
 }
 
@@ -249,7 +255,9 @@ _cms.links.useLink = function() {
 					});
 				}
 			}
-		}	   	  	
+		}
+		
+		_cms.links.activateSaveButton(true);
 	}
 	else {
 		_cms.support.showDialog("dialog-choose-linktype");
@@ -326,14 +334,24 @@ _cms.links.behaviour.sortable = function() {
 	$( "#sortable-links" ).disableSelection();
 }
 
+_cms.links.activateSaveButton = function(activate) {
+	var button = $("#savelinks-button");
+	if (activate) {
+		button.removeAttr("disabled");
+	}
+	else {
+		button.attr("disabled", "disabled");
+	}
+}
+
 _cms.links.refresh.tab = function(nodeKey) {
 	_cms.support.refreshtab("links", nodeKey, _cms.links.behaviour.all);
 }
 
 // Behaviours to apply once html is loaded/reloaded
-_cms.links.behaviour.all = function(nodeKey) {
+_cms.links.behaviour.all = function(nodeKey, rebuildTree) {
+	_cms.links.behaviour.fancytree(rebuildTree);
 	_cms.links.behaviour.sortable(); 
-	_cms.links.behaviour.fancytree();
 	_cms.links.behaviour.changetype();
 	_cms.links.behaviour.add();
 	_cms.links.behaviour.save(nodeKey);

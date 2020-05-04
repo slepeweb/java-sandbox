@@ -20,6 +20,8 @@ _cms.copy.behaviour.submit = function(nodeKey) {
 				if (! obj.error) {
 					var sourceNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
 					var newNode = sourceNode.getParent().addNode(obj.data);
+
+					// This triggers a call to loads the editor with the newly created item
 					newNode.setActive();
 				}
 			},

@@ -56,7 +56,7 @@ div.hb {
 }
 
 #footer-wrapper {
-	clear: both;
+	margin-top: 2em;
 }
 
 h1.main-heading {
@@ -143,6 +143,10 @@ details {
 
 .spacer20 {
 	margin-top: 20px;
+}
+
+.spacer3em {
+	margin-top: 3em;
 }
 
 .top-align {
@@ -267,6 +271,13 @@ details {
 												float: right;
 												padding: 8px;
 												font-size: 1.2em;
+												border: 3px solid #0c8c16;
+											}
+											
+											button#savelinks-button[disabled="disabled"] {
+												opacity: 0.6;
+												font-size: 1.0em;
+												border-width: 0;
 											}
 										
 										/* <<<<< Buttons */

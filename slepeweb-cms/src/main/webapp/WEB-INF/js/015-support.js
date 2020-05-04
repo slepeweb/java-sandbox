@@ -179,7 +179,7 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 			_cms.add.behaviour.all(nodeKey);
 			_cms.copy.behaviour.submit(nodeKey);	
 			_cms.version.behaviour.all(nodeKey);
-			_cms.links.behaviour.all(nodeKey);
+			_cms.links.behaviour.all(nodeKey, true);
 			_cms.media.behaviour.upload(nodeKey);
 			_cms.misc.behaviour.trash.all(nodeKey);
 			_cms.misc.behaviour.reindex(nodeKey);			

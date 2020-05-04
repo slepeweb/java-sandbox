@@ -22,6 +22,7 @@
 <div id="core-tab"><edit:core /></div>
 <div id="field-tab"><edit:field /></div>
 <div id="links-tab"><edit:links /></div>
+<edit:links-addlink />
 
 <c:if test="${editingItem.type.media}">
 	<div id="media-tab"><edit:media /></div>
