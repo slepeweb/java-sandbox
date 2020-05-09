@@ -19,7 +19,7 @@ _cms.media.behaviour.upload = function(nodeKey) {
 	        xhr: function() {
 	            var myXhr = $.ajaxSettings.xhr();
 	            if(myXhr.upload) {
-	                myXhr.upload.addEventListener("progress",progressHandlingFunction, false);
+	                myXhr.upload.addEventListener("progress", _cms.media.behaviour.progressHandlingFunction, false);
 	            }
 	            return myXhr;
 	        },
@@ -34,5 +34,10 @@ _cms.media.behaviour.upload = function(nodeKey) {
 	        contentType: false,
 	        processData: false
 	    });
+	});
+
+
+	$("#media-form input[name=media]").click(function () {
+		$("#media-form progress").attr("value", 0);
 	});
 }

@@ -128,23 +128,14 @@ _cms.links.behaviour.navigate = function() {
 		}
 		else {
 			// This node hasn't been loaded yet - ask the server for the breadcrumb trail
-			$.ajax(_cms.ctx + "/rest/breadcrumbs/" + key, {
-				cache: false,
-				dataType: "json",
-				mimeType: "application/json",
-				success: function(json, status, z) {
-					// This attribute setting changes the active tab for when node activation completes
-					$("li.ui-tabs-active").attr("aria-controls", "core-tab");
-					_cms.leftnav.tree.loadKeyPath(json, function(node, stats) {
-						if (stats === "ok") {
-						    node.setActive();
-						}
-					});
-				},
-				error: function(json, status, z) {
-					_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
-				}
-			});
+			var fn = function() {
+				// This attribute setting changes the active tab for when node activation completes
+				$("li.ui-tabs-active").attr("aria-controls", "core-tab");
+			}
+			
+			if (! _cms.leftnav.loadBreadcrumbs(key, fn)) {
+				_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
+			}
 		}
 	});
 }

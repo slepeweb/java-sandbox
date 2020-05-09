@@ -11,6 +11,6 @@
 	<div class="ff">
 		<label>&nbsp;</label><button id="media-button" type="button">Update media</button>
 	</div>
-	<label>&nbsp;</label><progress class="spacer10"></progress>		
+	<label>&nbsp;</label><progress class="spacer10" value="0">0%</progress>		
 </form>
 	

@@ -7,8 +7,11 @@
 	<%-- Javascript looks for this input element --%>
 	<input id="itemIsProductFlag" type="hidden" value="${editingItem.product}" />
 	
+	<c:set var="_idStr" value="${editingItem.id}" />
+	<c:if test="${editingItem.version > 1}"><c:set var="_idStr" value="${editingItem.id} (Orig. ${editingItem.origId})" /> </c:if>
+	
 	<div class="ff">
-		<label for="id">Id: </label><input disabled="disabled" value="${editingItem.id} (Orig. ${editingItem.origId})" />
+		<label for="id">Id: </label><input disabled="disabled" value="${_idStr}" />
 	</div>
 	<div class="ff">
 		<label for="path">Path: </label><input disabled="disabled" value="${editingItem.path}" />

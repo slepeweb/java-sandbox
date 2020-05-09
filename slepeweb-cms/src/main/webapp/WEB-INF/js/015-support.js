@@ -76,9 +76,11 @@ _cms.support.displayCommerceElements = function(target) {
 /*
  * Tells the browser to get the item editor page for a given item.
  */
-/*
 _cms.support.fetchItemEditor = function(nodeKey, status, tabName) {
-	var url = _cms.pageEditorUrlPrefix + nodeKey;
+	var url = _cms.pageEditorUrlPrefix;
+	if (nodeKey) {
+		url += nodeKey;
+	}
 	
 	if (status) {
 		var param = status.error ? "error" : "success";
@@ -91,7 +93,6 @@ _cms.support.fetchItemEditor = function(nodeKey, status, tabName) {
 	
 	window.location = url; 
 };
-*/	
 
 /*
  * Shows a modal giving the user a chance to confirm his selection.

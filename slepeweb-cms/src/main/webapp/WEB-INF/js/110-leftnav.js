@@ -3,6 +3,7 @@ _cms.leftnav = {
 };
 
 _cms.leftnav.behaviour.fancytree = function() {
+	
 	// Manage the left-hand navigation
 	$("#leftnav").fancytree({
 		extensions: ["dnd"],
@@ -112,25 +113,36 @@ _cms.leftnav.behaviour.fancytree = function() {
 				}
 				else {
 					// The 'real' item hasn't been loaded yet - ask the server for the breadcrumb trail
-					$.ajax(_cms.ctx + "/rest/breadcrumbs/" + key, {
-						cache: false,
-						dataType: "json",
-						mimeType: "application/json",
-						success: function(json, status, z) {
-							_cms.leftnav.tree.loadKeyPath(json, function(node, stats) {
-								if (stats === "ok") {
-								    node.setActive();
-								}
-							});
-						},
-						error: function(json, status, z) {
-							_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
-						}
-					});
+					if (! _cms.leftnav.loadBreadcrumbs(key)) {
+						_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
+					}
 				}
 			}
 		}
 	});	
+}
+
+_cms.leftnav.loadBreadcrumbs = function(key, fn, args) {
+	$.ajax(_cms.ctx + "/rest/breadcrumbs/" + key, {
+		cache: false,
+		dataType: "json",
+		mimeType: "application/json",
+		success: function(json, status, z) {
+			_cms.leftnav.tree.loadKeyPath(json, function(node, stats) {
+				if (fn) {
+					fn(args);
+				}
+				
+				if (stats === "ok") {
+				    node.setActive();
+				    return true;
+				}
+			});
+		},
+		error: function(json, status, z) {
+			return false;
+		}
+	});
 }
 
 /* We are filtering the left array, by comparing it's elements with the right array.
