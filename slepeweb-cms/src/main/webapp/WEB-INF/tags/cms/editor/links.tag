@@ -32,6 +32,8 @@
 	<button id="savelinks-button" type="button" disabled="disabled">Save changes</button>
 </div>
 
+<edit:links-addlink />
+
 <div class="spacer3em">
 	<h2>Linked from</h2>
 	<c:choose><c:when test="${not empty editingItem.parentLinks}">

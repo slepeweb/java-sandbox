@@ -55,8 +55,8 @@
 			The leftnav is built once only per page request. Subsequent UI actions
 			that refresh tabs on the item editor will NOT rebuild the tree.
 		*/
-		_cms.leftnavStatus = false;
-		_cms.leftnav.behaviour.fancytree();
+		_cms.leftnav.define.dialog();
+		_cms.leftnav.define.fancytree();
 		
 		// Render item management forms when page is first loaded
 		if (_cms.editingItemId) {

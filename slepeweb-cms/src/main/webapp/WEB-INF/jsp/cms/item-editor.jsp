@@ -13,6 +13,7 @@
 	
 	<c:if test="${editingItem.path ne '/'}">
 		<li><a href="#copy-tab">Copy</a></li>
+		<li><a href="#move-tab">Move</a></li>
 	</c:if>
 	
 	<li><a href="#version-tab">Version</a></li>
@@ -22,7 +23,6 @@
 <div id="core-tab"><edit:core /></div>
 <div id="field-tab"><edit:field /></div>
 <div id="links-tab"><edit:links /></div>
-<edit:links-addlink />
 
 <c:if test="${editingItem.type.media}">
 	<div id="media-tab"><edit:media /></div>
@@ -34,6 +34,7 @@
 	<%-- Avoid calling the getCopyDetails() method more than once per request --%>
 	<c:set var="_copyDetails" value="${editingItem.copyDetails}" />
 	<div id="copy-tab"><edit:copy /></div>
+	<div id="move-tab"><edit:move /></div>
 </c:if>
 
 <div id="version-tab"><edit:version /></div>

@@ -10,7 +10,7 @@
 <div id="dialog-choose-linktype" class="hide" title="Choose link type">
   <p>
     <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
-    Please select the type and name for link you wish to create.
+    Please select the type and name for link you wish to create, and identify the target item.
   </p>
 </div>
 
@@ -26,6 +26,10 @@
 		<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
 		You are about to update field data, which CANNOT BE UNDONE. Are you sure you want to do this?
 	</p>
+</div>
+
+<div id="dialog-leftnav" class="hide" title="Main navigation">
+	<div id="leftnav"></div>
 </div>
 
 <audio id="bell" src="${applicationContextPath}/resources/pin-dropping.wav" preload="auto"></audio>

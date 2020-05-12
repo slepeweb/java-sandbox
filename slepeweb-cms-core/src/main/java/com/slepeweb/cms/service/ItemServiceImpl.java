@@ -597,6 +597,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		Item newParent = mode.equals(MOVE_OVER) ? target : targetParent;
 		LOG.debug(compose("  New parent", newParent));		
 		
+		if (newParent.getPath().startsWith(mover.getPath())) {
+			throw new ResourceException("Cannot move an item to one of its descendants");
+		}
+		
 		// Break the parent link for the mover, EVEN IF old-parent = new-parent
 		this.linkService.deleteLinks(currentParent.getId(), mover.getId());
 		LOG.debug("  Removed links between mover and old parent");		

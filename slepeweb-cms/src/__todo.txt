@@ -1,6 +1,7 @@
 TODO: This is the main todo file:
 
 HIGH
+- write test: cannot move item to one of it's children
 - need to protect against injection attacks
 - check sws search still working
 
@@ -12,6 +13,7 @@ MEDIUM
 - also, solr indexing needs to recognise nesting nature
 
 LOW
+- write test: cannot move item to one of it's children
 - hover over lefthand nav in cms reveals wrong icon
 - get site working on internet
 - 

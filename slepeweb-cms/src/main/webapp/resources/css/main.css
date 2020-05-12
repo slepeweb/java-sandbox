@@ -94,12 +94,11 @@ input, textarea {
 	width: 100%;
 }
 
-#addlinkdiv label {
-	display: inline;
-}
-
-#addlinkdiv input {
-	width: 95%;
+#addlinkdiv {
+	width: 90%;
+	margin-top: 2em;
+	padding: 1em;
+	border: 1px solid #999 ;
 }
 
 input[disabled="disabled"] {
@@ -113,11 +112,9 @@ input[type="checkbox"], input[type="radio"] {
 
 details {
 	padding-top: 1em;
-}
-
-#linknav-container details {
 	padding-bottom: 1em;
 }
+
 
 					/* >>>>> Used by cms-test */
 						.pass {
@@ -176,11 +173,6 @@ details {
 	display: block;
 }
 
-#addlinkdiv {
-	display: none;
-	width: 100%;
-}
-
 #link-confirm {
 	visibility: hidden;
 }
@@ -226,64 +218,58 @@ details {
 	background-color: #db9131;
 }
 
-					/* >>>>> Left navigation */
-						#leftnav-wrapper {
-							position: relative;
-						}
-						
-						#leftnav {
-							position: absolute;
-							width: 90%;
-							max-width: 400px;
-							left: 1.8em;
-							top: -0.5em;
-							z-index: 10;
-							box-shadow: 6px 6px 6px 6px #666;
-							height: 100%;
-							min-height: 480px;
-							overflow-y: scroll;
-						}
-					/* <<<<< Left navigation */
+#uselink-buttons {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+}
 
-										/* >>>>> Buttons */
-											#item-editor button, #login button {
-												background: #6eac2c;
-												border: 1px solid #acdd4a;
-												border-radius: 6px;
-												color: #fff;
-												padding: 6px;
-												margin-top: 1.5em;
-												cursor: pointer;
-											}
-											
-											#item-editor button.disabled {
-												background: #ccc;
-											}
-											
-											#item-editor #trash-button {
-												background: red;
-												float: right;
-											}
-											
-											#version-tab button {
-												margin-bottom: 1.5em;
-											}
-											
-											button#savelinks-button {
-												color: #fff;
-												float: right;
-												padding: 8px;
-												font-size: 1.2em;
-												border: 3px solid #0c8c16;
-											}
-											
-											button#savelinks-button[disabled="disabled"] {
-												opacity: 0.6;
-												font-size: 1.0em;
-												border-width: 0;
-											}
-										
-										/* <<<<< Buttons */
+#use-link-button {
+	justify-self: left;
+}
+
+#cancel-use-link-button {
+	justify-self: right;
+}
+
+						/* >>>>> Buttons */
+							#item-editor button, #login button {
+								background: #6eac2c;
+								border: 1px solid #acdd4a;
+								border-radius: 6px;
+								color: #fff;
+								padding: 6px;
+								margin-top: 1.5em;
+								cursor: pointer;
+							}
+							
+							#item-editor button.disabled {
+								background: #ccc;
+							}
+							
+							#item-editor #trash-button {
+								background: red;
+								float: right;
+							}
+							
+							#version-tab button {
+								margin-bottom: 1.5em;
+							}
+							
+							button#savelinks-button {
+								color: #fff;
+								float: right;
+								padding: 8px;
+								font-size: 1.2em;
+								border: 3px solid #0c8c16;
+							}
+							
+							button#savelinks-button[disabled="disabled"] {
+								opacity: 0.6;
+								font-size: 1.0em;
+								border-width: 0;
+							}
+						
+						/* <<<<< Buttons */
 
 #trash-table {
 	margin-top: 1em;
@@ -334,6 +320,18 @@ details {
 	margin-bottom: 0;
 }
 	
+#move-target-identifier, #link-target-identifier {
+	padding-left: 3em;
+}
+
+#move-item-button[disabled=disabled] {
+	opacity: 0.5;
+}
+
+#move-wrapper span {
+	padding-right: 1em;
+}
+
 					/* >>>>> Fancytree styles */
 					ul.fancytree-container {
 						background-color: #ccc;

@@ -8,23 +8,14 @@
 	</head>
 	<body>
 
-		<!-- Header -->
 		<div id="header-wrapper">
 			<cms:navigation-top />
 		</div>
 		
-		<!-- Main -->	
 		<div id="main-wrapper">
-			<!-- Left navigation -->
-			<!-- The body of the next div is populated by an ajax call, so should be empty initially. -->
-			<div id="leftnav" class="hide"></div>
-
-			<!-- Main content -->	
 			<!-- The body of the next div is populated by an ajax call, so should be empty initially. -->
 			<div id="item-editor"></div>
 		</div>
-	
-		<!-- Footer -->
 	
 		<div id="footer-wrapper">
 			<cms:footer />

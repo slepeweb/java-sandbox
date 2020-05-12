@@ -1,12 +1,16 @@
 _cms.leftnav = {
 	behaviour: {},
+	define: {},
+	dialog: {}
 };
 
-_cms.leftnav.behaviour.fancytree = function() {
+// Other modes are "link" and "move"
+_cms.leftnav.mode = "navigate";
+
+_cms.leftnav.define.fancytree = function() {
 	
 	// Manage the left-hand navigation
 	$("#leftnav").fancytree({
-		extensions: ["dnd"],
 		source: {
 			url: _cms.ctx + "/rest/leftnav/lazy/thread",
 			data: _cms.queryParams,
@@ -23,7 +27,6 @@ _cms.leftnav.behaviour.fancytree = function() {
 				}
 				
 				_cms.leftnav.behaviour.click();
-				_cms.leftnav.behaviour.mouseleave();
 			}
 		},
 		lazyLoad: function(event, data) {
@@ -33,91 +36,42 @@ _cms.leftnav.behaviour.fancytree = function() {
 				data: {key: _cms.leftnav.removeShortcutMarker(node.key)}
 			};
 		},
-		dnd: {
-			autoExpandMS: 400,
-			focusOnClick: false,
-			preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
-			preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
-			
-			dragExpand: function(node, data) {
-				return false;
-			},
-			
-			dragStart: function(node, data) {
-				return true;
-			},
-			dragEnter: function(node, data) {
-				return true;
-			},
-			dragDrop: function(node, data) {
-			/*
-				- data.otherNode is the item being dragged (mover)
-				- node is item which is the target of the drop (target)
-			*/
-				var theDialog = $("#dialog-move-confirm");
-				theDialog.dialog({
-					resizable: false,
-					height:200,
-					modal: true,
-					buttons: {
-						"Move item": function() {
-							// Don't allow root items to be moved
-							if (! data.otherNode.parent.key.startsWith("root")) {
-								$.ajax(_cms.ctx + "/rest/item/" + _cms.leftnav.removeShortcutMarker(data.otherNode.key) + "/move", {
-									type: "POST",
-									cache: false,
-									data: {
-										targetId: _cms.leftnav.removeShortcutMarker(node.key),
-										targetParentId: _cms.leftnav.removeShortcutMarker(node.parent.key),
-										moverParentId: _cms.leftnav.removeShortcutMarker(data.otherNode.parent.key),
-										moverIsShortcut: data.otherNode.data.shortcut,
-										mode: data.hitMode
-									}, 
-									dataType: "json",
-									success: function(obj, status, z) {
-										theDialog.dialog("close");
-										data.otherNode.moveTo(node, data.hitMode);
-										_cms.support.flashMessage(obj);
-									},
-									error: function(json, status, z) {
-										theDialog.dialog("close");
-										_cms.support.serverError();
-									}
-								});
-							}
-							else {
-								$(this).dialog("close");
-							}
-						},
-						Cancel: function() {
-							$(this).dialog("close");
-						}
-					}
-				});
-			}
-		},
 		activate: function(event, data) {
-			if (! data.node.data.shortcut) {
-				// Update the item forms
-				var tabName = $("li.ui-tabs-active").attr("aria-controls");
-				_cms.support.renderItemForms(data.node.key, tabName);
-			}
-			else {
-				// Do not allow the user to work with the shortcut item - automatically
-				// navigate to the real item
-				var key = _cms.leftnav.removeShortcutMarker(data.node.key);
-				var node = _cms.leftnav.tree.getNodeByKey(key);
-				
-				if (node) {
-					_cms.leftnav.tree.activateKey(node.key);
+			if (_cms.leftnav.mode == "navigate") {
+				if (! data.node.data.shortcut) {
+					// Update the item forms
+					var tabName = $("li.ui-tabs-active").attr("aria-controls");
+					_cms.support.renderItemForms(data.node.key, tabName);
 				}
 				else {
-					// The 'real' item hasn't been loaded yet - ask the server for the breadcrumb trail
-					if (! _cms.leftnav.loadBreadcrumbs(key)) {
-						_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
+					// Do not allow the user to work with the shortcut item - automatically
+					// navigate to the real item
+					var key = _cms.leftnav.removeShortcutMarker(data.node.key);
+					var node = _cms.leftnav.tree.getNodeByKey(key);
+					
+					if (node) {
+						_cms.leftnav.tree.activateKey(node.key);search
+					}
+					else {
+						// The 'real' item hasn't been loaded yet - ask the server for the breadcrumb trail
+						if (! _cms.leftnav.loadBreadcrumbs(key)) {
+							_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
+						}
 					}
 				}
 			}
+			else if (_cms.leftnav.mode == "link") {
+				$("#link-target-identifier").html("'" + _cms.leftnav.tree.activeNode.title + "'");
+				$("#addlinkdiv input[name=childId]").val(_cms.leftnav.tree.activeNode.key);
+			}
+			else if (_cms.leftnav.mode == "move") {
+				$("#move-target-identifier").html("'" + data.node.title + "'");
+				_cms.move.activateActionButton();
+			}
+			
+			// Close left nav as soon as node has been selected
+			_cms.leftnav.mode = "navigate";
+			_cms.leftnav.dialog.close();
 		}
 	});	
 }
@@ -215,24 +169,36 @@ _cms.leftnav.removeShortcutMarker = function(key) {
 
 _cms.leftnav.behaviour.click = function() {
 	$("#leftnav-hider").click(function(event) {
-		_cms.leftnavStatus = ! _cms.leftnavStatus;
-		if (_cms.leftnavStatus) {
-			$("#leftnav").show();
-		}
-		else {
-			$("#leftnav").hide();
-		}
+		_cms.leftnav.mode = "navigate";
+		_cms.leftnav.dialog.open();
 	});
 }
 
-_cms.leftnav.behaviour.mouseleave = function() {
-	$("#leftnav").mouseleave(function() {
-		$("#leftnav").hide();
-		_cms.leftnavStatus = false;
+_cms.leftnav.dialog.open = function() {
+	_cms.leftnav.dialog.obj.dialog("open");
+}
+
+_cms.leftnav.dialog.close = function() {
+	_cms.leftnav.dialog.obj.dialog("close");
+}
+
+_cms.leftnav.define.dialog = function() {
+	_cms.leftnav.dialog.obj = $("#dialog-leftnav").dialog({
+		  autoOpen: false,
+		  minHeight: 250,
+		  minWidth: 350,
+		  modal: true,
+		  title: "Content structure",
+		  buttons: {
+			  Close: function() {
+				  _cms.leftnav.dialog.close();
+			  }
+		  },
+		  close: function() {}
 	});
 }
+
 
 // Behaviours to apply once html is loaded/reloaded
 _cms.leftnav.behaviour.all = function() {
-	_cms.leftnav.behaviour.fancytree();
 }

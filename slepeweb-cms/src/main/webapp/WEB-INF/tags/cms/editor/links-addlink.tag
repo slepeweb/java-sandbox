@@ -4,6 +4,12 @@
 <cms:debug><!-- tags/cms/editor/links-addlink.tag --></cms:debug>
 	
 <div id="addlinkdiv">
+	<details>
+		<summary>HELP</summary>
+		<p>Choose a link type and subtype, and optionally provide any data that is relevant to this site. 
+		Then pick the target item you wish to link to in the content structure. DON'T FORGET to save your changes.</p>
+	</details>	
+		
 	<div>
 		<div class="ff">
 			<label>Type: </label>
@@ -27,20 +33,22 @@
 			<input name="linkdata" value="" />
 		</div>
 					
+		<div class="ff">
+			<label>Target: </label>
+			<span><i class="fas fa-bars itempicker"></i></span>
+			<span id="link-target-identifier"></span>
+		</div>
+					
+		<div id="uselink-buttons">
+			<button id="use-link-button" type="button">Use</button>
+			<button id="cancel-use-link-button" type="button">Cancel</button>
+		</div>
+		
 		<input type="hidden" name="linkId" value="-1" />
 		<input type="hidden" name="state" value="0" />
+		<input type="hidden" name="childId" value="-1" />
 	</div>	
 		
-	<div id="linknav-container">
-		<details>
-			<summary>TIP</summary>
-			<p>Choose a link type and subtype, and optionally provide any data that is relevant to this site. 
-			Then pick the item you wish to link to, and finally click the 'Use' button. You'll be able to save your changes on
-			the underlying form.</p>
-		</details>
-		
-		<div id="linknav"></div>
-	</div>
 </div>
 
 <div id="link-template" class="hide">
