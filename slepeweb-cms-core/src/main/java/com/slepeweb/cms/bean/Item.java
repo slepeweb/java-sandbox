@@ -354,6 +354,11 @@ public class Item extends CmsBean {
 		return CmsUtil.getParentPathFromPath(this);
 	}
 
+	// Need a getter to simplify jsp functionality
+	public boolean isMediaLoaded() {
+		return hasMedia();
+	}
+	
 	public boolean hasMedia() {
 		return getCmsService().getMediaService().hasMedia(this);
 	}

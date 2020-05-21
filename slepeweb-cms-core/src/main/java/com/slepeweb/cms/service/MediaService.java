@@ -8,6 +8,7 @@ import com.slepeweb.cms.except.ResourceException;
 public interface MediaService {
 	void delete(Long id);
 	Media getMedia(Long id);
+	Media getMedia(Long id, boolean b);
 	void writeMedia(Long id, String outputFilePath);
 	Media save(Media m) throws ResourceException;
 	boolean hasMedia(Item i);

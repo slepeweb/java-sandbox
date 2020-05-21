@@ -87,7 +87,7 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 
 	public List<Host> getAllHosts(Long siteId) {
 		return this.jdbcTemplate.query(
-				String.format(SELECT_TEMPLATE, " h.siteid = ?"), new RowMapperUtil.HostMapper());
+				String.format(SELECT_TEMPLATE, " h.siteid = ?"), new Object[] {siteId}, new RowMapperUtil.HostMapper());
 	}
 
 }

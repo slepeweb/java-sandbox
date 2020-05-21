@@ -140,10 +140,15 @@ public class AncestryPageController extends BaseController {
 			@PathVariable long targetId,
 			ModelMap model) {	
 		
-		// Use the same jsp as for records
 		Person subject = new Person(i);
-		return galleryAndRecordController(i, shortSitename, targetId, model, 
-				subject, subject.getGallery(), RECORD_VIEW, GALLERY_VIEW);
+		Page page = getStandardPage(i, shortSitename, GALLERY_VIEW, model);
+		
+		model.addAttribute("_person", subject);
+		model.addAttribute("_menu", createPersonMenu(i, subject, GALLERY_VIEW));
+		model.addAttribute("_gallery", subject.getGallery());
+		
+		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));
+		return page.getView();
 	}	
 
 	@RequestMapping(value="/primary/record/{targetId}")	

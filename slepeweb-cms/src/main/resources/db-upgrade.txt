@@ -51,3 +51,8 @@ alter table field modify column fieldtype enum ('text', 'markup', 'integer', 'da
 Adding link data
 ----------------
 alter table link add column data varchar(512) default null after ordering
+
+Thumbnails
+----------
+alter table media add column thumbnail boolean default false after data
+ALTER TABLE media DROP PRIMARY KEY, add constraint PK_MEDIA PRIMARY KEY (itemid, thumbnail)

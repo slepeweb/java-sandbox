@@ -58,7 +58,9 @@ footer {
 }
 
 .menu {
-	font-size: 1.1em;
+	font-size: 1.1em;		display: grid;
+		grid-gap: 6px;
+	
 	grid-area: menu;
 	padding: $std-container-padding;
 	padding-bottom: 0;
@@ -139,7 +141,27 @@ footer {
 	@include std-container-padding{}
 }
 
-@media (min-width: 700px) {
+div.image-gallery {
+	display: grid;
+	grid-gap: 6px;
+}
+
+.hide {
+	display: none;
+}	
+
+h3.emphasis {
+/* 	border-bottom: 2px solid $color-accent-bg; */
+	text-decoration: underline;
+}
+
+@media (min-width: 480px) {
+	div.image-gallery {
+			grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 800px) {
 	header {
 		grid-template-columns: repeat(3, 1fr);
 		grid-template-areas: 
@@ -181,6 +203,10 @@ footer {
 			"side side main main main main main main main"
 			"ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
 	}
+	
+	div.image-gallery {
+			grid-template-columns: repeat(3, 1fr);
+	}
 }
 
 @media (min-width: 1000px) {
@@ -192,11 +218,11 @@ footer {
 			"side side side main main main main main main"
 			"ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
 	}
+	
+	div.image-gallery {
+			grid-template-columns: repeat(4, 1fr);
+	}
 }
-
-.hide {
-	display: none;
-}	
 
 /*
 .solr-page {

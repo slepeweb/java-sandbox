@@ -157,6 +157,10 @@ public class ItemType extends CmsBean {
 			! getMimeType().equals(JS_MIMETYPE);
 	}
 
+	public boolean isImage() {
+		return getMimeType().startsWith("image");
+	}
+
 	public String getMimeType() {
 		return mimeType;
 	}

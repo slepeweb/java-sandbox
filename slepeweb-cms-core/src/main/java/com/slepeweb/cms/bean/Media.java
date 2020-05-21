@@ -11,6 +11,7 @@ public class Media extends CmsBean {
 	private Long itemId, size;
 	private InputStream inputStream;
 	private Blob blob;
+	private boolean thumbnail;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Media) {
@@ -25,7 +26,7 @@ public class Media extends CmsBean {
 	public boolean isDefined4Insert() {
 		return 
 			getItemId() != null &&
-			getSize() != null && 
+			//getSize() != null && 
 			getInputStream() != null;
 	}
 	
@@ -85,12 +86,22 @@ public class Media extends CmsBean {
 		return this;
 	}
 
+	public boolean isThumbnail() {
+		return thumbnail;
+	}
+
+	public Media setThumbnail(boolean thumbnail) {
+		this.thumbnail = thumbnail;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
 		result = prime * result + ((size == null) ? 0 : size.hashCode());
+		result = prime * result + (thumbnail ? 1231 : 1237);
 		return result;
 	}
 
@@ -103,6 +114,8 @@ public class Media extends CmsBean {
 		if (getClass() != obj.getClass())
 			return false;
 		Media other = (Media) obj;
+		if (thumbnail != other.thumbnail)
+			return false;
 		if (itemId == null) {
 			if (other.itemId != null)
 				return false;

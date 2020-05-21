@@ -175,8 +175,9 @@ create table media
 (
    itemid int,
    data mediumblob,
+   thumbnail boolean,
    size int,
-   primary key (itemid),
+   primary key (itemid, thumbnail),
 	 constraint foreign key (itemid) references item(id) on delete cascade
 ) ENGINE=InnoDB;
 

@@ -1,12 +1,7 @@
 package com.slepeweb.site.servlet;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -17,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +33,7 @@ import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
+import com.slepeweb.common.util.ImageUtil;
 
 @Component
 public class CmsDeliveryServlet {
@@ -164,6 +159,7 @@ public class CmsDeliveryServlet {
 			}
 			else {
 				LOG.error(LogUtil.compose("Site not registered here", req.getServerName()));
+				notFound(res, "Item not found", path);
 			}
 		}
 		else {
@@ -339,7 +335,13 @@ public class CmsDeliveryServlet {
 	private void stream(Item item, HttpServletRequest req, HttpServletResponse res, long requestTime)
 			throws ServletException, IOException {
 
-		Media media = this.cmsService.getMediaService().getMedia(item.getId());
+		String viewParam = req.getParameter("view");
+		boolean thumbnailRequired = false;
+		if (StringUtils.isNotBlank(viewParam)) {
+			thumbnailRequired = viewParam.equals("thumbnail");
+		}
+		
+		Media media = this.cmsService.getMediaService().getMedia(item.getId(), thumbnailRequired);
 		if (media == null) {
 			LOG.error(String.format("No media found for item", item));
 			return;
@@ -352,14 +354,16 @@ public class CmsDeliveryServlet {
 			
 			try {
 				in = media.getBlob().getBinaryStream();
-				int width = getImageSizeParam(req.getParameter("width"));
-				int height = getImageSizeParam(req.getParameter("height"));
+				
+				// Disabled image scaling functionality - too much load on the app.
+				int width = -1; //getImageSizeParam(req.getParameter("width"));
+				int height = -1; //getImageSizeParam(req.getParameter("height"));
 				if (width == -1 && height == -1) {
 					res.setHeader("Content-Length", String.valueOf(media.getSize()));
 					streamOldSchool(in, res.getOutputStream());
 				}
 				else {
-					streamScaled(in, res, width, height, item.getType().getMimeType());
+					ImageUtil.streamScaled(in, res.getOutputStream(), width, height, item.getType().getMimeType());
 				}
 			}
 			catch (SQLException e) {
@@ -373,6 +377,7 @@ public class CmsDeliveryServlet {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private int getImageSizeParam(String value) {
 		if (value == null) {
 			return -1;
@@ -395,35 +400,6 @@ public class CmsDeliveryServlet {
 			// Return buffer to the pool
 			putBuff(buff);
 		}
-	}
-	
-	private void streamScaled(InputStream in, HttpServletResponse res, int width, int height, String mediaType) 
-			throws ServletException, IOException {
-		
-		// Create the tumbnail
-		BufferedImage src = ImageIO.read(in);
-		Image img = src.getScaledInstance(width, height, Image.SCALE_SMOOTH);		
-		BufferedImage thumb = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = thumb.createGraphics();
-		g.drawImage(img, 0, 0, null);
-		g.dispose();
-		
-		int c = mediaType.lastIndexOf("/");
-		String thumbType = mediaType.toLowerCase().substring(c + 1);
-		if (thumbType.equals("jpeg")) {
-			thumbType = "jpg";
-		}
-		
-		// Write it to a temporary in-memory stream, so that you can work out the content length
-	    ByteArrayOutputStream tmpStream = new ByteArrayOutputStream();
-	    ImageIO.write(thumb, thumbType, tmpStream);
-	    tmpStream.close();
-
-	    // Write the temporary stream to the servlet output
-	    res.setHeader("Content-Length", String.valueOf(tmpStream.size()));
-	    OutputStream out = res.getOutputStream();
-	    out.write(tmpStream.toByteArray());
-	    out.close();
 	}
 	
 	private boolean isCacheable(Item i) {

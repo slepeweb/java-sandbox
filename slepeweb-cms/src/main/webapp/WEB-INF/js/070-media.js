@@ -1,5 +1,6 @@
 _cms.media = {
 	behaviour: {},
+	refresh: {},
 };
 
 
@@ -25,6 +26,8 @@ _cms.media.behaviour.upload = function(nodeKey) {
 	        },
 	        success: function() {
 	        	_cms.support.flashMessage(_cms.support.toStatus(false, "Media successfully uploaded"));
+	        	_cms.media.refresh.tab(nodeKey);
+	        	
 	        },
 	        error: function() {
 	        	_cms.support.serverError();
@@ -40,4 +43,37 @@ _cms.media.behaviour.upload = function(nodeKey) {
 	$("#media-form input[name=media]").click(function () {
 		$("#media-form progress").attr("value", 0);
 	});
+}
+
+_cms.media.thumbnailRequired = false;
+
+_cms.media.behaviour.thumbnailRequired = function() {
+	$("#media-form input[name='thumbnail']").click(function () {
+		var ele = $("#media-form .thumbnail-option");
+		if (! _cms.media.thumbnailRequired) {
+			ele.show();
+		}
+		else {
+			ele.hide();
+		}
+		
+		_cms.media.thumbnailRequired = ! _cms.media.thumbnailRequired;
+	});
+}
+
+_cms.media.behaviour.enableUploadButton = function() {
+	$("#media-form input[name='media']").change(function(){
+		$("#media-button").removeAttr("disabled");
+	});
+}
+
+_cms.media.refresh.tab = function(nodeKey) {
+	_cms.support.refreshtab("media", nodeKey, _cms.media.onrefresh);
+}
+
+
+_cms.media.onrefresh = function(nodeKey) {
+	_cms.media.behaviour.upload(nodeKey);
+	_cms.media.behaviour.thumbnailRequired();
+	_cms.media.behaviour.enableUploadButton();
 }

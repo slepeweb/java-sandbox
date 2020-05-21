@@ -2,6 +2,7 @@ package com.slepeweb.cms.control;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -39,6 +40,7 @@ import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.FieldValueSet;
+import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.ItemType;
@@ -54,6 +56,7 @@ import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.CookieService;
+import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemTypeService;
 import com.slepeweb.cms.service.LinkNameService;
@@ -66,11 +69,13 @@ import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.commerce.service.AxisService;
 import com.slepeweb.common.util.DateUtil;
 import com.slepeweb.common.util.HttpUtil;
+import com.slepeweb.common.util.ImageUtil;
 
 @Controller
 @RequestMapping("/rest")
 public class RestController extends BaseController {
 	private static Logger LOG = Logger.getLogger(RestController.class);
+	public static final String THUMBNAIL_EXT = "-thumb";
 	
 	@Autowired private ItemService itemService;
 	@Autowired private ItemTypeService itemTypeService;
@@ -83,6 +88,7 @@ public class RestController extends BaseController {
 	@Autowired private AxisService axisService;
 	@Autowired private CookieService cookieService;
 	@Autowired private NavigationController navigationController;
+	@Autowired private HostService hostService;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -103,6 +109,13 @@ public class RestController extends BaseController {
 			model.put("editingItem", i);
 			model.put("allVersions", i.getAllVersions());
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
+			
+			// Hostname to render content.
+			// TODO: should really be a staging host
+			List<Host> hosts = this.hostService.getAllHosts(i.getSite().getId());
+			if (hosts != null && hosts.size() > 0) {
+				model.addAttribute("host", hosts.get(0));
+			}
 			
 			if (i.isProduct()) {
 				model.addAttribute("availableAxes", this.axisService.get());
@@ -138,8 +151,12 @@ public class RestController extends BaseController {
 		RestResponse resp = new RestResponse();
 		Item i = this.itemService.getEditableVersion(origId);
 		Template t = this.templateService.getTemplate(getLongParam(req, "template"));
+		Object[] data = new Object[3];
 		
 		if (i != null) {
+			boolean wasPublished = i.isPublished();
+			
+			
 			i = i.setName(getParam(req, "name")).
 				setSimpleName(getParam(req, "simplename")).
 				setDateUpdated(new Timestamp(System.currentTimeMillis())).
@@ -167,7 +184,10 @@ public class RestController extends BaseController {
 					resp.addMessage("Core item data successfully updated");
 				}
 				
-				resp.setData(new Navigation.Node().setTitle(i.getName()));
+				data[0] = new Navigation.Node().setTitle(i.getName());
+				data[1] = i.getVersion() == 1 && ! wasPublished && i.isPublished();
+				data[2] = wasPublished ^ i.isPublished();
+				resp.setData(data);
 			}
 			catch (Exception e) {
 				return resp.setError(true).addMessage(e.getMessage());		
@@ -204,51 +224,81 @@ public class RestController extends BaseController {
 	public RestResponse updateItemMedia(
 			@PathVariable Long origId, 
 			@RequestParam("media") MultipartFile file, 
+			@RequestParam("thumbnail") Boolean thumbnailRequired, 
+			@RequestParam("width") Integer thumbnailWidth, 
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
 		InputStream is = null;
+		ByteArrayOutputStream baos = null;
 		
-		try {
-			is = file.getInputStream();
-			Item i = this.itemService.getEditableVersion(origId);
-			if (i != null) {
-				Media m = CmsBeanFactory.makeMedia().
-						setItemId(origId).
-						setInputStream(is).
-						setSize(file.getSize());
-					
-				// Save the media item
-				try {
-					this.mediaService.save(m);
-				}
-				catch (ResourceException e) {
-					String s = "Missing media data - not saved";
-					LOG.error(s, e);
-					return resp.setError(true).addMessage(s);		
-				}
-				
-				// Update the timestamp on the owning item
-				try {
-					i.setDateUpdated(new Timestamp(System.currentTimeMillis()));
-					i.save();
-				}
-				catch (ResourceException e) {
-					String s = "Missing item data ??? - not saved";
-					LOG.error(s, e);
-					return resp.setError(true).addMessage(s);		
-				}
-				
-				return resp.setError(false).addMessage("Media successfully uploaded");
-			}
-			
-			return resp.setError(true).addMessage(String.format("No item found with id %d", origId));		
+		if (thumbnailRequired == null) {
+			thumbnailRequired = false;
 		}
-		catch (IOException e) {
-			String s = "Failed to get input stream for media upload";
-			LOG.error(s, e);
-			return resp.setError(true).addMessage(s);		
-		}		
+		
+		if (file != null) {
+			try {
+				is = file.getInputStream();
+				Item i = this.itemService.getEditableVersion(origId);
+				if (i != null) {
+					Media m = CmsBeanFactory.makeMedia().
+							setItemId(i.getId()).
+							setInputStream(is);
+					
+					// Save the media item
+					try {
+						this.mediaService.save(m);
+						
+						if (thumbnailRequired) {
+							is.close();
+
+							m.setThumbnail(true);
+							is = file.getInputStream();							
+							baos = new ByteArrayOutputStream();
+							
+							ImageUtil.streamScaled(
+									is, baos, 
+									thumbnailWidth, 
+									-1, 
+									i.getType().getMimeType());
+							
+							m.setInputStream(ImageUtil.pipe(baos));
+							this.mediaService.save(m);
+						}
+					}
+					catch (ResourceException e) {
+						String s = "Failed to save Media data";
+						LOG.error(s, e);
+						return resp.setError(true).addMessage(s);		
+					}
+					
+					// Update the timestamp on the owning item
+					try {
+						i.setDateUpdated(new Timestamp(System.currentTimeMillis()));
+						i.save();
+					}
+					catch (ResourceException e) {
+						String s = "Missing item data ??? - not saved";
+						LOG.error(s, e);
+						return resp.setError(true).addMessage(s);		
+					}
+					
+					return resp.setError(false).addMessage("Media successfully uploaded");
+				}
+				
+				return resp.setError(true).addMessage(String.format("No item found with id %d", origId));		
+			}
+			catch (IOException e) {
+				String s = "Failed to get input stream for media upload";
+				LOG.error(s, e);
+				return resp.setError(true).addMessage(s);		
+			}		
+		}
+		else {
+			String s = "No file specified";
+			LOG.error(s);
+			return resp.setError(true).addMessage(s);
+		}
 	}
 	
 	@RequestMapping(value="/item/{origId}/update/fields", method=RequestMethod.POST, produces="application/json")

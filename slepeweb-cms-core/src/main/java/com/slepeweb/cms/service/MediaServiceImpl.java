@@ -21,7 +21,7 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	
 	public Media save(Media m) throws ResourceException {
 		if (m.isDefined4Insert()) {
-			Media dbRecord = getMedia(m.getItemId());
+			Media dbRecord = getMedia(m.getItemId(), m.isThumbnail());
 			if (dbRecord != null) {
 				updateMedia(dbRecord, m);
 			}
@@ -39,12 +39,15 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	}
 	
 	private void insertMedia(Media m) {
-		this.jdbcTemplate.update(
-				"insert into media (itemid, data, size) values (?, ?, ?)", 
-				m.getItemId(), getBytesFromStream(m.getInputStream()), m.getSize());
-		
-		this.cacheEvictor.evict(m);
-		LOG.info(compose("Added new media", m.getItemId()));
+		byte[] bytes = getBytesFromStream(m.getInputStream());
+		if (bytes.length > 0) {
+			this.jdbcTemplate.update(
+					"insert into media (itemid, data, size, thumbnail) values (?, ?, ?, ?)", 
+					m.getItemId(), bytes, bytes.length, m.isThumbnail());
+			
+			this.cacheEvictor.evict(m);
+			LOG.info(compose("Added new media", m.getItemId()));
+		}
 	}
 
 	private void updateMedia(Media dbRecord, Media m) {
@@ -52,11 +55,14 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(m);
 			
-			this.jdbcTemplate.update(
-					"update media set data = ?, size = ? where itemid = ?", 
-					getBytesFromStream(m.getInputStream()), m.getSize(), m.getItemId());
-			
-			LOG.info(compose("Updated media", m.getItemId()));
+			byte[] bytes = getBytesFromStream(m.getInputStream());
+			if (bytes.length > 0) {
+				this.jdbcTemplate.update(
+						"update media set data = ?, size = ? where itemid = ? and thumbnail = ?", 
+						bytes, bytes.length, m.getItemId(), m.isThumbnail());
+				
+				LOG.info(compose("Updated media", m.getItemId()));
+			}
 		}
 		else {
 			LOG.debug(compose("Media not changed", m));
@@ -109,16 +115,20 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	}
 	
 	public Media getMedia(Long id) {
+		return getMedia(id, false);
+	}
+	
+	public Media getMedia(Long id, boolean thumbnail) {
 		return (Media) getFirstInList(
-			this.jdbcTemplate.query("select itemid, data, size from media where itemid = ?", 
-				new Object[]{id},
+			this.jdbcTemplate.query("select itemid, data, size, thumbnail from media where itemid = ? and thumbnail = ?", 
+				new Object[]{id, thumbnail},
 				new RowMapperUtil.MediaMapper()));
 	}
 	
-	public long getSize(Long id) {
+	public long getSize(Long id, boolean thumbnail) {
 		return (Long) getFirstInList(
-			this.jdbcTemplate.query("select size from media where itemid = ?", 
-				new Object[]{id},
+			this.jdbcTemplate.query("select size from media where itemid = ? and thumbnail = ?", 
+				new Object[]{id, thumbnail},
 				new RowMapperUtil.MediaSizeMapper()));
 	}
 	

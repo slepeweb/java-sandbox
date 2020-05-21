@@ -27,18 +27,28 @@ _cms.core.behaviour.update = function(nodeKey) {
 			cache: false,
 			data: args, 
 			dataType: "json",
-			success: function(obj, status, z) {
-				if (! obj.error) {
+			success: function(resp, status, z) {
+				if (! resp.error) {
 					// Name may have changed, so navigation tree will need updating
 					var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
 					if (node) {
-						node.setTitle(obj.data.title);
+						node.setTitle(resp.data[0].title);
 					}
 				}
 				
-				_cms.support.flashMessage(obj);
+				_cms.support.flashMessage(resp.data[0]);
 				_cms.core.refresh.tab(nodeKey);
-				_cms.version.refresh.tab(nodeKey);
+				
+				if (resp.data[2]) {
+					// The published status of the item has changed
+					_cms.version.refresh.tab(nodeKey);
+				}
+				
+				if (resp.data[1]) {
+					// The first version has reach published status
+					// TODO: This is NOT needed on a staging server
+					_cms.media.refresh.tab(nodeKey);
+				}
 			},
 			error: function(json, status, z) {
 				_cms.support.serverError();

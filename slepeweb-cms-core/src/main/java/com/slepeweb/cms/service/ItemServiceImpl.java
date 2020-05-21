@@ -496,6 +496,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			new Object[]{siteId, path});
 	}
 
+	public Item getEditableVersion(Long siteId, String path) {
+		return getItem(
+			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=? and i.deleted=0 and i.editable=1"),
+			new Object[]{siteId, path});
+	}
+
 	/*
 	 * Intended for use where image may have a series of images related by name, and not
 	 * using the Link table.

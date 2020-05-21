@@ -772,6 +772,8 @@ footer {
 
 .menu {
   font-size: 1.1em;
+  display: grid;
+  grid-gap: 6px;
   grid-area: menu;
   padding: 15px;
   padding-bottom: 0;
@@ -838,7 +840,26 @@ footer {
   padding-bottom: 15px;
 }
 
-@media (min-width: 700px) {
+div.image-gallery {
+  display: grid;
+  grid-gap: 6px;
+}
+
+.hide {
+  display: none;
+}
+
+h3.emphasis {
+  /* 	border-bottom: 2px solid $color-accent-bg; */
+  text-decoration: underline;
+}
+
+@media (min-width: 480px) {
+  div.image-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 800px) {
   header {
     grid-template-columns: repeat(3, 1fr);
     grid-template-areas: "ha hb hc" "br br br";
@@ -867,17 +888,21 @@ footer {
     grid-template-columns: repeat(9, 1fr);
     grid-template-areas: "hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr" ".    .    menu menu menu menu menu menu menu" "side side main main main main main main main" "ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
   }
+
+  div.image-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 @media (min-width: 1000px) {
   .layout-person {
     grid-template-columns: repeat(9, 1fr);
     grid-template-areas: "hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr" ".    .    .    menu menu menu menu menu menu" "side side side main main main main main main" "ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
   }
-}
-.hide {
-  display: none;
-}
 
+  div.image-gallery {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
 /*
 .solr-page {
 	display: inline;

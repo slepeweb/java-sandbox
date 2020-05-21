@@ -34,9 +34,9 @@ import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.commerce.bean.Variant;
 import com.slepeweb.commerce.service.ProductService;
 import com.slepeweb.commerce.service.VariantService;
+import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.service.NavigationService;
-import com.slepeweb.site.util.SiteUtil;
 
 @Controller
 @RequestMapping("/rest")
@@ -266,7 +266,7 @@ public class SiteRestController extends BaseController {
 	}
 	
 	private Cookie getCookie(HttpServletRequest req) {
-		Cookie c = SiteUtil.getCookie(req.getCookies(), BASKET_COOKIE);
+		Cookie c = HttpUtil.getCookie(req.getCookies(), BASKET_COOKIE);
 		if (c == null) {
 			c = new Cookie(BASKET_COOKIE, "");
 		}
