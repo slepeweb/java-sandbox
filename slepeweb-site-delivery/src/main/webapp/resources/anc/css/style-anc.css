@@ -709,7 +709,6 @@ dl {
   margin: 0 0 2em 0;
 }
 
-/* For IE10 snap mode ??? */
 @media screen and (max-width: 400px) {
   @-ms-viewport {
     width: device-width;
@@ -852,6 +851,10 @@ div.image-gallery {
 h3.emphasis {
   /* 	border-bottom: 2px solid $color-accent-bg; */
   text-decoration: underline;
+}
+
+details {
+  font-size: 0.9em;
 }
 
 @media (min-width: 480px) {

@@ -20,3 +20,4 @@
 <gen:extraCSS />
 <gen:extraInpageCSS />
 <gen:extraJS />
+<gen:extraInpageJS />
