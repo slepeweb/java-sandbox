@@ -11,4 +11,7 @@ _cms.init = function(nodeKey, html, activeTab) {
 	
 	// Re-build the item editor tabs, and select the required tab
 	_cms.support.refreshtabs(html, activeTab);
+	
+	_cms.editingItemName = $("#current-item-name").html();
+	$("#currently-editing").html("Editing '" + _cms.editingItemName + "'");
 }

@@ -55,6 +55,7 @@ _cms.support.flashMessage = function(status) {
 	}
 	
 	$("#status-block").removeClass("red").removeClass("green").addClass(clazz).append(msg);
+	
 	var audio = $("#bell");
 	if (audio && audio.get(0)) {
 		audio.get(0).play();
@@ -114,7 +115,8 @@ _cms.support.showDialog = function(id, relocate) {
 _cms.support.addHistoryBehaviour = function(selector) {
 	selector.unbind();
 	selector.change(function() {	
-		_cms.support.renderItemForms(selector.val(), "core-tab");
+		//_cms.support.renderItemForms(selector.val(), "core-tab");
+		_cms.leftnav.activateNode(selector.val());
 	});
 };
 

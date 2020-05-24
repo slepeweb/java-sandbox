@@ -198,6 +198,12 @@ _cms.leftnav.define.dialog = function() {
 	});
 }
 
+_cms.leftnav.activateNode = function(key) {
+	var node = _cms.leftnav.tree.getNodeByKey(key);
+	if (node) {
+		node.setActive();
+	}
+}
 
 // Behaviours to apply once html is loaded/reloaded
 _cms.leftnav.behaviour.all = function() {

@@ -15,11 +15,12 @@ body {
 
 header {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(6, 1fr);
 	grid-template-areas: 
-		"ha ha ha ha"
-		"hb hb hc hc"
-		"hd he he he";
+		"ha ha ha ha ha ha"
+		"hb hb hb hc hc hc"
+		"hd hf hf hf hf hf"
+		".  he he he he he";
 }
 
 header select {
@@ -49,6 +50,14 @@ div.hb {
 	grid-area: he;
 	font-size: 1.6em;
 	text-decoration: underline;
+/* 	padding-bottom: 1em; */
+}
+
+#currently-editing {
+	grid-area: hf;
+	color: #0093ba;
+	font-size: 1.5em;
+	align-self: center;
 }
 
 #main-wrapper {
@@ -92,6 +101,19 @@ input, textarea {
 #item-editor label, #login label {
 	display: inline-block;
 	width: 100%;
+}
+
+div.instruct.addnew {
+	border-bottom: 1px solid #999;
+	padding-bottom: 6px;
+}
+
+.instruct.addnew>span {
+	padding-right: 1em;
+}
+
+.x1pt2em {
+	font-size: 1.2em;
 }
 
 #addlinkdiv {
@@ -403,8 +425,9 @@ details {
 		grid-template-columns: repeat(9, 1fr);
 		grid-template-areas: 
 			"ha ha ha ha hb hb hc hc hc"
-			"hd hd hd he he he he he he";
-	}	
+			"hd hf hf hf hf hf hf hf hf"
+			".  he he he he he he he he"
+	}
 	
 	body {
 	  max-width: 800px;

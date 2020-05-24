@@ -44,26 +44,43 @@ public class CookieServiceImpl implements CookieService {
 	
 	public List<ItemIdentifier> getHistoryCookieValue(long siteId, HttpServletRequest req) {
 		
-		for (Cookie c : req.getCookies()) {
-			if (/*c.getPath() != null && c.getPath().equals(COOKIE_PATH) &&*/ 
-					c.getName().equals(getHistoryCookieName(siteId))) {
-				
-				List<ItemIdentifier> list = new ArrayList<ItemIdentifier>();
-				
-				for (String s : c.getValue().split(",")) {
-					list.add(new ItemIdentifier(s));
-				}
-				
-				updateItemNames(list);
-				return list;
+		String cookieName = getHistoryCookieName(siteId);
+		String cookieValue = getCookieValue(cookieName, req);
+		
+		if (cookieValue != null) {
+			List<ItemIdentifier> list = new ArrayList<ItemIdentifier>();
+			
+			for (String s : cookieValue.split(",")) {
+				list.add(new ItemIdentifier(s));
 			}
+			
+			updateItemNames(list);
+			return list;
 		}
 		
 		// Didn't find the cookie
 		return new ArrayList<ItemIdentifier>();
 	}
 	
-	private void saveCookie(String cookieName, String value, HttpServletResponse res) {
+	public String getCookieValue(String name, HttpServletRequest req) {
+		for (Cookie c : req.getCookies()) {
+			if (/*c.getPath() != null && c.getPath().equals(COOKIE_PATH) &&*/ c.getName().equals(name)) {
+				return c.getValue();
+			}
+		}
+		
+		return null;
+	}
+	
+	public String getRelativePositionCookieValue(HttpServletRequest req) {
+		String pos = getCookieValue(RELATIVE_POSITION_NAME, req); 
+		if (pos == null) {
+			pos = "below";
+		}
+		return pos;
+	}
+	
+	public void saveCookie(String cookieName, String value, HttpServletResponse res) {
 		Cookie c = new Cookie(cookieName, value);
 		c.setPath(COOKIE_PATH);
 		c.setMaxAge(COOKIE_MAXAGE);

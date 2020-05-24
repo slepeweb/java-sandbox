@@ -5,6 +5,19 @@
 	
 <form>
 	<div class="ff">
+		<div class="instruct addnew x1pt2em">
+			<span>Add new item</span>
+				<span><select name="relativePosition">
+					<option value="0">Choose ...</option>
+					<c:forTokens items="below,alongside" delims="," var="relativePosition">
+						<option value="${relativePosition}" <c:if test="${_lastRelativePosition eq relativePosition}">selected</c:if>>${relativePosition}</option>
+					</c:forTokens>
+				</select></span>
+			<span>'${editingItem.name}'</span>
+		</div>
+	</div>
+	
+	<div class="ff">
 		<label for="type">Template: </label>
 		<select name="template">
 			<option value="0">Choose ...</option>
@@ -14,6 +27,7 @@
 			</c:forEach>
 		</select>
 	</div>
+	
 	<div class="ff">
 		<label for="type">Type: </label>
 		<select name="itemtype">
@@ -24,9 +38,11 @@
 			</c:forEach>
 		</select>			
 	</div>
+	
 	<div class="ff">
 		<label for="name">Name: </label><input name="name" value="" />
 	</div>
+	
 	<div class="ff">
 		<label for="simplename">Simple name: </label><input name="simplename" value="" />
 	</div>
@@ -36,12 +52,15 @@
 		<div class="ff">
 			<label for="partNum">Part number: </label><input type="text" name="partNum" value="" />
 		</div>
+		
 		<div class="ff">
 			<label for="price">Price: </label><input type="text" name="price" value="0" />
 		</div>
+		
 		<div class="ff">
 			<label for="stock">Stock: </label><input type="text" name="stock" value="0" />
 		</div>
+		
 		<div class="ff">
 			<label for="alphaaxis">Axis A: </label>
 			<select id="alphaaxis" name="alphaaxis">
@@ -52,6 +71,7 @@
 				</c:forEach>
 			</select>
 		</div>
+		
 		<div class="ff">
 			<label for="betaaxis">Axis B: </label>
 			<select id="betaaxis" name="betaaxis">
@@ -62,6 +82,7 @@
 				</c:forEach>
 			</select>
 		</div>
+		
 	</div>
 
 	<div>

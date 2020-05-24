@@ -6,10 +6,13 @@ _cms.add.behaviour.add = function(nodeKey) {
 
 	// Add behaviour to add new item 
 	$("#add-button").click(function () {
+		var position = $("#add-tab select[name='relativePosition']").val();
+		
 		$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/add", {
 			type: "POST",
 			cache: false,
 			data: {
+				relativePosition: position,
 				template: $("#add-tab select[name='template']").val(),
 				itemtype: $("#add-tab select[name='itemtype']").val(),
 				name: $("#add-tab input[name='name']").val(),
@@ -27,10 +30,17 @@ _cms.add.behaviour.add = function(nodeKey) {
 				if (! obj.error) {
 					var nodeData = obj.data;
 					var parentNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
-					var childNode = parentNode.addNode(nodeData);
 					
-					// This triggers a call to loads the editor with the newly created item
-					childNode.setActive();
+					if (position == 'alongside') {
+						parentNode = parentNode.getParent();
+					}
+					
+					if (parentNode != null) {
+						var childNode = parentNode.addNode(nodeData);
+						
+						// This triggers a call to loads the editor with the newly created item
+						childNode.setActive();
+					}
 				}
 			},
 			error: function(json, status, z) {

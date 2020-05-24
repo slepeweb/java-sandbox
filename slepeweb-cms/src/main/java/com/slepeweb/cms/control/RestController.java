@@ -126,6 +126,9 @@ public class RestController extends BaseController {
 			
 			// Store this item's id in a cookie			
 			this.cookieService.updateHistoryCookie(i, req, res);
+			
+			// Last relative position selection for 'addnew'
+			model.addAttribute("_lastRelativePosition", this.cookieService.getRelativePositionCookieValue(req));
 		}
 		
 		return "cms.item.editor";		
@@ -469,6 +472,7 @@ public class RestController extends BaseController {
 	@ResponseBody
 	public RestResponse addItem(
 			@PathVariable long parentOrigId, 
+			@RequestParam("relativePosition") String relativePosition, 
 			@RequestParam("template") long templateId, 
 			@RequestParam("itemtype") long itemTypeId, 
 			@RequestParam("name") String name, 
@@ -478,9 +482,13 @@ public class RestController extends BaseController {
 			@RequestParam(value="stock", required=false) Long stock, 
 			@RequestParam(value="alphaaxis", required=false) Long alphaAxisId, 
 			@RequestParam(value="betaaxis", required=false) Long betaAxisId, 
+			HttpServletResponse res,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
+		
+		this.cookieService.saveCookie(CookieService.RELATIVE_POSITION_NAME, relativePosition, res);
+		
 		Template t = null;
 		if (templateId > 0) {
 			t = this.templateService.getTemplate(templateId);
@@ -491,6 +499,9 @@ public class RestController extends BaseController {
 		
 		ItemType it = this.itemTypeService.getItemType(itemTypeId);
 		Item parent = this.itemService.getEditableVersion(parentOrigId);
+		if (relativePosition.equals("alongside") && ! parent.isRoot()) {
+			parent = parent.getParent();
+		}
 		 
 		Item i = CmsBeanFactory.makeItem(it.getName()).
 				setSite(parent.getSite()).

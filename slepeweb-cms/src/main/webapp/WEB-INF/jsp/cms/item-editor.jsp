@@ -2,6 +2,8 @@
 	page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
+<div id="current-item-name" class="hide">${editingItem.name}</div>
+
 <ul id="editor-tabs">
 	<li><a href="#core-tab">Core</a></li>
 	<li><a href="#field-tab">Fields</a></li>
