@@ -2,11 +2,17 @@ _cms.field = {
 	behaviour: {},
 	support: {},
 	refresh: {},
+	sel: {
+		ALL_INPUTS: "#field-tab input",
+		ALL_SELECTS: "#field-tab select",
+		UPDATE_BUTTON: "#field-button",
+		LANGUAGE_SELECT: "#field-language-selector select",
+	}
 };
 
 _cms.field.behaviour.update = function(nodeKey) {	
 	// Add behaviour to submit item field updates 
-	$("#field-button").click(function () {
+	$(_cms.field.sel.UPDATE_BUTTON).click(function () {
 		var theDialog = $("#dialog-fields-confirm");
 		theDialog.dialog({
 			resizable: false,
@@ -41,7 +47,7 @@ _cms.field.behaviour.update = function(nodeKey) {
 //Get form field names and values for forms on item-editor 
 _cms.field.getFieldsFormInputData = function() {
 	var result = {};
-	var language = $("#field-language-selector select").val();
+	var language = $(_cms.field.sel.LANGUAGE_SELECT).val();
 	if (! language) {
 		language = _siteDefaultLanguage;
 	}
@@ -98,21 +104,30 @@ _cms.field.setlanguage = function() {
 		language = _cms.siteDefaultLanguage;
 	}
 
-	$("#field-language-selector select").val(language);
+	$(_cms.field.sel.LANGUAGE_SELECT).val(language);
 	_cms.field.toggleFieldDivs(language);
 }
 	
 _cms.field.behaviour.changelanguage = function() {
-	$("#field-language-selector select").change(function(){
+	$(_cms.field.sel.LANGUAGE_SELECT).change(function(){
 		var lang = $(this).val();
 		localStorage.setItem("language", lang);
 		_cms.field.toggleFieldDivs(lang);
 	});
 }
 
+_cms.field.behaviour.formchange = function() {
+	$(_cms.field.sel.ALL_INPUTS + "," + _cms.field.sel.ALL_SELECTS).change(function() {
+		if ($(this).attr("name") != "language") {
+			_cms.support.enable(_cms.field.sel.UPDATE_BUTTON);
+		}
+	});
+}
+
 _cms.field.behaviour.all = function(nodeKey) {
 	_cms.field.behaviour.update(nodeKey);
 	_cms.field.behaviour.changelanguage();
+	_cms.field.behaviour.formchange();
 	
 	// Not really a behaviour, but required after the tab has been refreshed
 	_cms.field.setlanguage();

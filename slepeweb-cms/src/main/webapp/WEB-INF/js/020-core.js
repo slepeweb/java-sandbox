@@ -1,19 +1,30 @@
 _cms.core = {
 	behaviour: {},
-	refresh: {}
+	refresh: {},
+	sel: {
+		ALL_INPUTS: "#core-tab input",
+		ALL_SELECTS: "#core-tab select",
+		UPDATE_BUTTON: "#core-button",
+		NAME_INPUT: "#core-tab input[name='name']",
+		SIMPLENAME_INPUT: "#core-tab input[name='simplename']",
+		TEMPLATE_SELECT: "#core-tab select[name='template']",
+		SEARCHABLE_CHECKBOX: "#core-tab input[name='searchable']",
+		PUBLISHED_CHECKBOX: "#core-tab input[name='published']",
+		TAGS_INPUT: "#core-tab input[name='tags']",
+	}
 };
 
 _cms.core.behaviour.update = function(nodeKey) {
 	// Add behaviour to submit core item updates 
-	$("#core-button").click(function () {
+	$(_cms.core.sel.UPDATE_BUTTON).click(function () {
 		var isProduct = $("#itemIsProductFlag").val() == "true";
 		var args = {
-			name: $("#core-tab input[name='name']").val(),
-			simplename: $("#core-tab input[name='simplename']").val(),
-			template: $("#core-tab select[name='template']").val(),
-			searchable: $("#core-tab input[name='searchable']").is(':checked'),
-			published: $("#core-tab input[name='published']").is(':checked'),
-			tags: $("#core-tab input[name='tags']").val()
+			name: $(_cms.core.sel.NAME_INPUT).val(),
+			simplename: $(_cms.core.sel.SIMPLENAME_INPUT).val(),
+			template: $(_cms.core.sel.TEMPLATE_SELECT).val(),
+			searchable: $(_cms.core.sel.SEARCHABLE_CHECKBOX).is(':checked'),
+			published: $(_cms.core.sel.PUBLISHED_CHECKBOX).is(':checked'),
+			tags: $(_cms.core.sel.TAGS_INPUT).val()
 		};
 		
 		if (isProduct) {
@@ -64,6 +75,17 @@ _cms.core.behaviour.update = function(nodeKey) {
 	});
 }
 
+_cms.core.behaviour.formchange = function() {
+	$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).change(function() {
+		_cms.support.enable(_cms.core.sel.UPDATE_BUTTON);
+	});
+}
+
 _cms.core.refresh.tab = function(nodeKey) {
-	_cms.support.refreshtab("core", nodeKey, _cms.core.behaviour.update);
+	_cms.support.refreshtab("core", nodeKey, _cms.core.behaviour.all);
 };
+
+_cms.core.behaviour.all = function(nodeKey) {
+	_cms.core.behaviour.formchange();
+	_cms.core.behaviour.update(nodeKey);
+}

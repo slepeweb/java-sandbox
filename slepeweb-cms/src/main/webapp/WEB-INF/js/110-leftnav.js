@@ -47,22 +47,13 @@ _cms.leftnav.define.fancytree = function() {
 					// Do not allow the user to work with the shortcut item - automatically
 					// navigate to the real item
 					var key = _cms.leftnav.removeShortcutMarker(data.node.key);
-					var node = _cms.leftnav.tree.getNodeByKey(key);
-					
-					if (node) {
-						_cms.leftnav.tree.activateKey(node.key);search
-					}
-					else {
-						// The 'real' item hasn't been loaded yet - ask the server for the breadcrumb trail
-						if (! _cms.leftnav.loadBreadcrumbs(key)) {
-							_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
-						}
-					}
+					_cms.leftnav.activateKey(key);
 				}
 			}
 			else if (_cms.leftnav.mode == "link") {
 				$("#link-target-identifier").html("'" + _cms.leftnav.tree.activeNode.title + "'");
 				$("#addlinkdiv input[name=childId]").val(_cms.leftnav.tree.activeNode.key);
+				_cms.links.check_for_use();
 			}
 			else if (_cms.leftnav.mode == "move") {
 				$("#move-target-identifier").html("'" + data.node.title + "'");
@@ -74,6 +65,20 @@ _cms.leftnav.define.fancytree = function() {
 			_cms.leftnav.dialog.close();
 		}
 	});	
+}
+
+_cms.leftnav.activateKey = function(key) {
+	var node = _cms.leftnav.tree.getNodeByKey(key);
+	
+	if (node) {
+		_cms.leftnav.tree.activateKey(node.key);
+	}
+	else {
+		// The 'real' item hasn't been loaded yet - ask the server for the breadcrumb trail
+		if (! _cms.leftnav.loadBreadcrumbs(key)) {
+			_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
+		}
+	}
 }
 
 _cms.leftnav.loadBreadcrumbs = function(key, fn, args) {
@@ -196,13 +201,6 @@ _cms.leftnav.define.dialog = function() {
 		  },
 		  close: function() {}
 	});
-}
-
-_cms.leftnav.activateNode = function(key) {
-	var node = _cms.leftnav.tree.getNodeByKey(key);
-	if (node) {
-		node.setActive();
-	}
 }
 
 // Behaviours to apply once html is loaded/reloaded

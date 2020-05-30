@@ -346,7 +346,7 @@ details {
 	padding-left: 3em;
 }
 
-#move-item-button[disabled=disabled], #media-button[disabled=disabled] {
+button[disabled=disabled] {
 	opacity: 0.5;
 }
 

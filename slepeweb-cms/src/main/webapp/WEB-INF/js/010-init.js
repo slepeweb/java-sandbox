@@ -13,5 +13,5 @@ _cms.init = function(nodeKey, html, activeTab) {
 	_cms.support.refreshtabs(html, activeTab);
 	
 	_cms.editingItemName = $("#current-item-name").html();
-	$("#currently-editing").html("Editing '" + _cms.editingItemName + "'");
+	$("#currently-editing").html(_cms.editingItemName);
 }

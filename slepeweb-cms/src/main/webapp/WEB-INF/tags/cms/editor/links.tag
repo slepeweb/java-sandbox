@@ -21,11 +21,11 @@
 			</div>
 		</div>
 	</c:forEach>
-</div>
 
-<c:if test="${empty editingItem.allLinksShortcutsLast}">
-	<p>None</p>
-</c:if>
+	<c:if test="${empty editingItem.allLinksShortcutsLast}">
+		<p>None</p>
+	</c:if>
+</div>
 
 <div class="spacer20">
 	<button id="addlink-button" type="button">Add link</button>

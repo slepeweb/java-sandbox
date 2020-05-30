@@ -34,7 +34,7 @@
 	</c:forEach>
 	
 	<div>
-		<button id="field-button" type="button">Update</button>
+		<button id="field-button" type="button" disabled="disabled">Update</button>
 	</div>
 </form>
 	

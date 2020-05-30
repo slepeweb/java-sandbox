@@ -116,7 +116,7 @@ _cms.support.addHistoryBehaviour = function(selector) {
 	selector.unbind();
 	selector.change(function() {	
 		//_cms.support.renderItemForms(selector.val(), "core-tab");
-		_cms.leftnav.activateNode(selector.val());
+		_cms.leftnav.activateKey(selector.val());
 	});
 };
 
@@ -166,6 +166,14 @@ _cms.support.refreshtab = function(tab, nodeKey, behavioursFunction) {
 	});
 }
 
+_cms.support.disable = function(selector) {
+	$(selector).attr("disabled", "disabled");
+}
+
+_cms.support.enable = function(selector) {
+	$(selector).removeAttr("disabled");
+}
+
 _cms.support.renderItemForms = function(nodeKey, activeTab) {
 	$.ajax(_cms.ctx + "/rest/item/editor", {
 		cache: false,
@@ -177,7 +185,7 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 		success: function(html, status, z) {
 			_cms.init(nodeKey, html, activeTab);
 			_cms.support.refreshHistory(_cms.siteId);
-			_cms.core.behaviour.update(nodeKey);
+			_cms.core.behaviour.all(nodeKey);
 			_cms.field.behaviour.all(nodeKey);
 			_cms.add.behaviour.all(nodeKey);
 			_cms.copy.behaviour.submit(nodeKey);	

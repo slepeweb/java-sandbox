@@ -5,75 +5,99 @@ _cms.links = {
 		obj: null
 	},
 	tree: null,
+	selrel: {
+		LINKTYPE_SELECT: "select[name='linktype']",
+		LINKNAME_SELECT: "select[name='linkname']",
+		LINKDATA_INPUT: "input[name='linkdata']",
+		STATE_INPUT: "input[name='state']",
+		CHILDID_INPUT: "input[name='childId']",
+		LINKID_INPUT: "input[name='linkId']",
+	},
+	sel: {
+		ADD_LINK_CONTAINER: "#addlinkdiv",
+		ADD_LINK_BUTTON: "#addlink-button",
+		SAVE_LINKS_BUTTON: "#savelinks-button",
+		USE_LINK_BUTTON: "#use-link-button",
+		CANCEL_LINK_BUTTON: "#cancel-use-link-button",
+		ITEM_PICKER: "#addlinkdiv i.itempicker",
+		ALL_SELECTS: "#addlinkdiv select",
+		SORTABLE_LINKS_CONTAINER: "#sortable-links",
+		EDIT_LINK_BUTTONS: ".edit-link",
+		REMOVE_LINK_BUTTONS: ".remove-link",
+		LINKTO_BUTTONS: ".link-linker",
+		LINK_TARGET_IDENTIFIER: "#link-target-identifier",
+	}
 };
 
-_cms.links.show_addlink_form = function() {
-	$(_cms.sel.addlink.div).show();
-	_cms.links.addlink_form_is_visible = true;	
+_cms.links.sel.LINKTYPE_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKTYPE_SELECT;
+_cms.links.sel.LINKNAME_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKNAME_SELECT;
+_cms.links.sel.CHILDID_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.CHILDID_INPUT;
+
+_cms.links.show_addlink_form = function(data) {
+	if (data) {
+		_cms.links.setLinkForm(data);
+	}
+	_cms.support.disable(_cms.links.sel.USE_LINK_BUTTON);
+	
+	$(_cms.links.sel.ADD_LINK_CONTAINER).show();
+	_cms.support.disable(_cms.links.sel.ADD_LINK_BUTTON);
 }
 
 _cms.links.hide_addlink_form = function() {
-	$(_cms.sel.addlink.div).hide();
-	_cms.links.addlink_form_is_visible = false;	
-}
-
-_cms.links.toggle_addlink_form = function() {
-	if (! _cms.links.addlink_form_is_visible) {
-		_cms.links.show_addlink_form();
-	}
-	else {
-		_cms.links.hide_addlink_form();
-	}
+	$(_cms.links.sel.ADD_LINK_CONTAINER).hide();
 }
 
 _cms.links.behaviour.itempicker = function() {
-	$("#addlinkdiv i.itempicker").click(function() {
+	$(_cms.links.sel.ITEM_PICKER).click(function() {
 		_cms.leftnav.mode = "link";
 		_cms.leftnav.dialog.open();
 	});
 }
 
 _cms.links.behaviour.use_form_data = function() {
-	$("#use-link-button").click(function() {
-		var div = $("#addlinkdiv");
+	$(_cms.links.sel.USE_LINK_BUTTON).click(function() {
+		var div = $(_cms.links.sel.ADD_LINK_CONTAINER);
 		var formData = {};
-		formData.type = div.find("select[name='linktype']").val();
-		formData.name = div.find("select[name='linkname']").val();
-		formData.data = div.find("input[name='linkdata']").val();
-		formData.state = div.find("input[name='state']").val();
-		formData.childId = div.find("input[name='childId']").val();
-		var linkIdStr = div.find("input[name='linkId']").val();
+		formData.type = div.find(_cms.links.selrel.LINKTYPE_SELECT).val();
+		formData.name = div.find(_cms.links.selrel.LINKNAME_SELECT).val();
+		formData.data = div.find(_cms.links.selrel.LINKDATA_INPUT).val();
+		formData.state = div.find(_cms.links.selrel.STATE_INPUT).val();
+		formData.childId = div.find(_cms.links.selrel.CHILDID_INPUT).val();
+		var linkIdStr = div.find(_cms.links.selrel.LINKID_INPUT).val();
 		formData.ordering = parseInt(linkIdStr, 10);
 		
 		if (formData.type != 'unknown' && formData.name != 'unknown' && formData.childId > 0) {
 			_cms.links.useLink(formData);
 			_cms.links.hide_addlink_form();			
 			_cms.links.activateSaveButton(true);
+			_cms.support.enable(_cms.links.sel.ADD_LINK_BUTTON);
 		}
 		else {
 			_cms.links.activateSaveButton(false);
 			_cms.support.showDialog("dialog-choose-linktype");
+			_cms.support.disable(_cms.links.sel.USE_LINK_BUTTON);
 		}
 	});
 }
 
 _cms.links.behaviour.changetype = function() {
 	// Re-populate linkname options when link type is selected
-	$("#addlinkdiv select[name='linktype']").off().change(function(e) {
+	$(_cms.links.sel.LINKTYPE_SELECT).change(function(e) {
 		_cms.links.repopulateLinkNameDropdown($(this).val());
 	});
 }
 
 _cms.links.behaviour.add = function() {
 	// Show link addition form when 'Add link' button is clicked
-	$("#addlink-button").click(function(e) {
-		_cms.links.toggle_addlink_form();
+	$(_cms.links.sel.ADD_LINK_BUTTON).click(function(e) {
+		_cms.links.show_addlink_form(["-1", "unknown", "unknown", "", "-1", "0"]);
+		//_cms.links.toggle_addlink_form();
 	});
 }
 
 _cms.links.behaviour.save = function(nodeKey) {
 	// Add behaviour to 'Save links' button 
-	$("#savelinks-button").click(function(e) {
+	$(_cms.links.sel.SAVE_LINKS_BUTTON).click(function(e) {
 		var links = _cms.links.identifyHiddenLinkDataList($(_cms.sortableLinksSelector));
 		
 		// Remove the 'span' property from each object
@@ -111,7 +135,7 @@ _cms.links.behaviour.save = function(nodeKey) {
 
 _cms.links.behaviour.remove = function() {
 	// Add behaviour to 'Remove links' button 
-	$(".remove-link").click(function(e) {
+	$(_cms.links.sel.REMOVE_LINK_BUTTONS).click(function(e) {
 		$(this).parent().parent().remove();
 		_cms.links.activateSaveButton(true);
 	});
@@ -119,24 +143,25 @@ _cms.links.behaviour.remove = function() {
 
 _cms.links.behaviour.edit = function() {
 	// Open form to edit an existing link
-	$(".edit-link").click(function() {
-		var span = $(this).parent().find("span.hide");
+	$(_cms.links.sel.EDIT_LINK_BUTTONS).click(function() {
+		var parent = $(this).parent();
+		var span = parent.find("span.hide");
 		var dataparts = span.html().split("\|");
 		
-		// Ignore first element
-		dataparts.shift();
-		
-		_cms.links.repopulateLinkNameDropdown(dataparts[0], dataparts[1]);
-		_cms.links.setLinkForm(dataparts, "1");
-		
-		// Open the form
-		_cms.links.show_addlink_form();
+		// Append an element to the array identifying the name of the child link.
+		// This data is only available in the array for editing existing links, and NOT
+		// for adding new ones.
+		var grandparent = parent.parent();
+		dataparts.push(grandparent.find("span.link-identifier").html());
+
+		_cms.links.repopulateLinkNameDropdown(dataparts[1], dataparts[2]);
+		_cms.links.show_addlink_form(dataparts);
 	});
 }
 
 _cms.links.behaviour.navigate = function() {
 	// Add behaviour for when a link (in the links editor) is clicked 
-	$(".link-linker").click(function(e) {
+	$(_cms.links.sel.LINKTO_BUTTONS).click(function(e) {
 		var key = $(this).attr("data-id");
 		var node = _cms.leftnav.tree.getNodeByKey(key);
 		
@@ -159,7 +184,7 @@ _cms.links.behaviour.navigate = function() {
 	});
 }
 
-_cms.sortableLinksSelector = "#sortable-links div.sortable-link";
+_cms.sortableLinksSelector = _cms.links.sel.SORTABLE_LINKS_CONTAINER + " div.sortable-link";
 
 _cms.links.identifyHiddenLinkDataList = function(sortableLinks) {
 	var links = [];
@@ -195,7 +220,7 @@ _cms.links.formatHiddenLinkData = function(d) {
 // Use the link form data to add a new link for saving, or edit an existing link
 _cms.links.useLink = function(formData) {
 	
-	var sortableLinksContainer = $("div#sortable-links");
+	var sortableLinksContainer = $("div" + _cms.links.sel.SORTABLE_LINKS_CONTAINER);
 	var sortableLinks = $(_cms.sortableLinksSelector);
 
 	if (formData.state == "1") {
@@ -220,7 +245,9 @@ _cms.links.useLink = function(formData) {
 	else {
 		// This is a new link - append it to the end of any existing links
 		linkHtml = $("#link-template>div").clone(true);
+		/*
 		var links = _cms.links.identifyHiddenLinkDataList(sortableLinks);
+		
 		var nextId = -1;
 		
 		if (links) {
@@ -228,7 +255,8 @@ _cms.links.useLink = function(formData) {
 				if (links[i].ordering > nextId) {
 					nextId = links[i].ordering;
 				}
-			};
+			};var sortableLinksContainer = $("div" + _cms.links.sel.SORTABLE_LINKS_CONTAINER);
+	var sortableLinks = $(_cms.sortableLinksSelector);
 			
 			nextId += 1;
 		}
@@ -236,12 +264,19 @@ _cms.links.useLink = function(formData) {
 			// This is the first link
 			nextId = 0;				
 		}
+		*/
+		
+		
 		
 		$.ajax(_cms.ctx + "/rest/item/" + formData.childId + "/name", {
 			type: "POST",
 			cache: false,
 			dataType: "text",
 			success: function(itemName, status, z) {
+				if (sortableLinks.length == 0) {
+					sortableLinksContainer.empty();
+				}
+					
 				linkHtml.find("div.left span.link-identifier").html(formData.type + " (" + formData.name + "): " + itemName);
 				linkHtml.find("div.right button.link-linker").attr("data-id", formData.childId);
 				linkHtml.find("div.right span.hide").html(_cms.links.formatHiddenLinkData(formData));				
@@ -251,17 +286,29 @@ _cms.links.useLink = function(formData) {
 	}
 };
 
-_cms.links.setLinkForm = function(data, state) {
-	var form = $("#addlinkdiv");	
-	form.find("select[name='linktype']").val(data[0]);
-	form.find("select[name='linkname']").val(data[1]);
-	form.find("input[name='linkdata']").val(data[2]);
-	form.find("input[name='linkId']").val(data[3]);
-	form.find("input[name='state']").val(state);	
+_cms.links.setLinkForm = function(data) {
+	var form = $(_cms.links.sel.ADD_LINK_CONTAINER);	
+	form.find(_cms.links.selrel.CHILDID_INPUT).val(data[0]);
+	form.find(_cms.links.selrel.LINKTYPE_SELECT).val(data[1]);
+	form.find(_cms.links.selrel.LINKNAME_SELECT).val(data[2]);
+	form.find(_cms.links.selrel.LINKDATA_INPUT).val(data[3]);
+	form.find(_cms.links.selrel.LINKID_INPUT).val(data[4]);
+	form.find(_cms.links.selrel.STATE_INPUT).val(data[5]);	
+	
+	if (data[0] == "-1") {
+		$(_cms.links.sel.LINK_TARGET_IDENTIFIER).empty();
+	}
+	else if (data.length == 7) {
+		var idx = data[6].indexOf("&gt;");
+		if (idx > -1) {
+			var name = data[6].substring(idx + 5);
+			$(_cms.links.sel.LINK_TARGET_IDENTIFIER).html("'" + name + "'");
+		}
+	}
 };
 
-_cms.links.repopulateLinkNameDropdown = function(linkType, value) {
-	var selector = $("#addlinkdiv select[name='linkname']");
+_cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
+	var selector = $(_cms.links.sel.LINKNAME_SELECT);
 	selector.empty();
 	
 	$.ajax(_cms.ctx + "/rest/linknames/" + _cms.siteId + "/" + linkType, {
@@ -274,25 +321,26 @@ _cms.links.repopulateLinkNameDropdown = function(linkType, value) {
 				selector.append("<option value='" + result[i] + "'>" + result[i] + "</option>");
 			}
 			
-			if (value) {
-				selector.val(value);
+			if (currentLinkname) {
+				selector.val(currentLinkname);
 			}
+			
+			_cms.links.check_for_use();
 		}
 	});
 };
 
 _cms.links.behaviour.sortable = function() { 
-	$( "#sortable-links" ).sortable();
-	$( "#sortable-links" ).disableSelection();
+	$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).sortable();
+	$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).disableSelection();
 }
 
 _cms.links.activateSaveButton = function(activate) {
-	var button = $("#savelinks-button");
 	if (activate) {
-		button.removeAttr("disabled");
+		_cms.support.enable(_cms.links.sel.SAVE_LINKS_BUTTON);
 	}
 	else {
-		button.attr("disabled", "disabled");
+		_cms.support.disable(_cms.links.sel.SAVE_LINKS_BUTTON);
 	}
 }
 
@@ -301,9 +349,30 @@ _cms.links.refresh.tab = function(nodeKey) {
 }
 
 _cms.links.behaviour.cancel_use_link_button = function() {
-	$("#cancel-use-link-button").click(function() {
+	$(_cms.links.sel.CANCEL_LINK_BUTTON).click(function() {
 		_cms.links.hide_addlink_form();
+		_cms.support.enable(_cms.links.sel.ADD_LINK_BUTTON);
 	});
+}
+
+_cms.links.behaviour.check_for_use = function() {
+	$(_cms.links.sel.ALL_SELECTS).change(function() {
+		_cms.links.check_for_use();
+	});
+}
+_cms.links.check_for_use = function() {
+	if (
+			$(_cms.links.sel.LINKTYPE_SELECT).val() != 'unknown' &&
+			$(_cms.links.sel.LINKNAME_SELECT).val() != 'unknown' && 
+			$(_cms.links.sel.CHILDID_INPUT).val() > -1) {
+		
+		_cms.support.enable(_cms.links.sel.USE_LINK_BUTTON);
+		return true;
+	}
+	else {
+		_cms.support.disable(_cms.links.sel.USE_LINK_BUTTON);
+		return false;
+	}
 }
 
 // Behaviours to apply once html is loaded/reloaded
@@ -319,5 +388,6 @@ _cms.links.onrefresh = function(nodeKey) {
 	_cms.links.behaviour.itempicker();
 	_cms.links.behaviour.use_form_data();
 	_cms.links.behaviour.cancel_use_link_button();
+	_cms.links.behaviour.check_for_use();
 }
 

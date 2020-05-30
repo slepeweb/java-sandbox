@@ -6,6 +6,7 @@ HIGH
 - check sws search still working
 
 MEDIUM
+- addlink form should be modal
 - store preferred language in cookie (Ancestry)
 - resource bundles (Ancestry)
 - password protection for site visitors (Ancestry)
