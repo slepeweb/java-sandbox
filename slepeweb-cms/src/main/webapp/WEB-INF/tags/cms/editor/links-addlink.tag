@@ -6,9 +6,10 @@
 <div id="addlinkdiv">
 	<details>
 		<summary>HELP</summary>
-		<p>This will link '${editingItem.name}' to any other item of your choice. 
+		<p>This will link the current item to any other item of your choice. 
 		First, choose a link type and then a subtype, and optionally provide any data that is relevant to this site. 
-		Then pick the target item you wish to link to in the content structure. DON'T FORGET to save your changes.</p>
+		Then pick the target item you wish to link to in the content structure. DON'T FORGET to save your changes
+		after clicking the 'Use' button.</p>
 	</details>	
 		
 	<div>
@@ -39,12 +40,7 @@
 			<span><i class="fas fa-bars itempicker"></i></span>
 			<span id="link-target-identifier"></span>
 		</div>
-					
-		<div id="uselink-buttons">
-			<button id="use-link-button" type="button" disabled="disabled">Use</button>
-			<button id="cancel-use-link-button" type="button">Cancel</button>
-		</div>
-		
+
 		<input type="hidden" name="linkId" value="-1" />
 		<input type="hidden" name="state" value="0" />
 		<input type="hidden" name="childId" value="-1" />

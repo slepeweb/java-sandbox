@@ -1,4 +1,5 @@
-<%@ tag %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ tag %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div id="dialog-trash-confirm" class="hide" title="Delete item?">
 	<p>
@@ -7,10 +8,10 @@
 	</p>
 </div>
 
-<div id="dialog-choose-linktype" class="hide" title="Choose link type">
+<div id="dialog-choose-linktype" class="hide" title="Provide full link data">
   <p>
     <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
-    Please select the type and name for link you wish to create, and identify the target item.
+    Link data is incomplete. Close this dialog, and click on 'HELP' for guidance.
   </p>
 </div>
 
@@ -31,5 +32,7 @@
 <div id="dialog-leftnav" class="hide" title="Main navigation">
 	<div id="leftnav"></div>
 </div>
+
+<edit:links-addlink />
 
 <audio id="bell" src="${applicationContextPath}/resources/pin-dropping.wav" preload="auto"></audio>

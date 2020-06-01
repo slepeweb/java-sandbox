@@ -58,6 +58,9 @@
 		_cms.leftnav.define.dialog();
 		_cms.leftnav.define.fancytree();
 		
+		// Due to use of template to define new links, certain behaviours need only be defined on page load
+		_cms.links.onpageload();
+		
 		// Render item management forms when page is first loaded
 		if (_cms.editingItemId) {
 			// On first call to renderItemForms, we use _editingItemId.
