@@ -1,10 +1,25 @@
+/*
+ * Hidden span data format:
+ * Example:
+ * 	1226|relation|std|some data|-1|0
+ * 
+ * Format:
+ * 	childId|linktype|linkname|site-specific data string|linkId|state
+ * 
+ * where:
+ * 		state has binary values: 0 = new link, 1 = exisiting link
+ * 		linkId uniquely identifies links in the list
+ * 
+ */
+
+
 _cms.links = {
 	behaviour: {},
 	refresh: {},
 	addlink_dialog: {
 		obj: null
 	},
-	addlink_warning_dialog: {
+	link_errors_dialog: {
 		obj: null
 	},
 	define: {},
@@ -20,8 +35,6 @@ _cms.links = {
 		ADD_LINK_CONTAINER: "#addlinkdiv",
 		ADD_LINK_BUTTON: "#addlink-button",
 		SAVE_LINKS_BUTTON: "#savelinks-button",
-		USE_LINK_BUTTON: "#use-link-button",
-		CANCEL_LINK_BUTTON: "#cancel-use-link-button",
 		ITEM_PICKER: "#addlinkdiv i.itempicker",
 		ALL_SELECTS: "#addlinkdiv select",
 		SORTABLE_LINKS_CONTAINER: "#sortable-links",
@@ -29,31 +42,31 @@ _cms.links = {
 		REMOVE_LINK_BUTTONS: ".remove-link",
 		LINKTO_BUTTONS: ".link-linker",
 		LINK_TARGET_IDENTIFIER: "#link-target-identifier",
-		INCOMPLETE_LINK_DIALOG: "#dialog-choose-linktype",
+		LINK_ERRORS_DIALOG: "#link-errors-dialog",
 	}
 };
 
 _cms.links.sel.LINKTYPE_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKTYPE_SELECT;
 _cms.links.sel.LINKNAME_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKNAME_SELECT;
 _cms.links.sel.CHILDID_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.CHILDID_INPUT;
+_cms.links.sel.SORTABLE_LINKS = _cms.links.sel.SORTABLE_LINKS_CONTAINER + " div.sortable-link";
+
 
 _cms.links.show_addlink_form = function(data) {
 	if (data) {
 		_cms.links.setLinkForm(data);
 	}	
-	_cms.links.openDialog(_cms.links.addlink_dialog);
+	_cms.support.dialog.open(_cms.links.addlink_dialog);
 }
 
 _cms.links.behaviour.itempicker = function() {
 	$(_cms.links.sel.ITEM_PICKER).click(function() {
 		_cms.leftnav.mode = "link";
-		_cms.links.openDialog(_cms.leftnav.dialog);
+		_cms.support.dialog.open(_cms.leftnav.dialog);
 	});
 }
 
 _cms.links.use_form_data = function() {
-	// TODO: state property is redundant!
-	
 	var div = $(_cms.links.sel.ADD_LINK_CONTAINER);
 	var formData = {};
 	formData.type = div.find(_cms.links.selrel.LINKTYPE_SELECT).val();
@@ -62,7 +75,7 @@ _cms.links.use_form_data = function() {
 	formData.state = div.find(_cms.links.selrel.STATE_INPUT).val();
 	formData.childId = div.find(_cms.links.selrel.CHILDID_INPUT).val();
 	var linkIdStr = div.find(_cms.links.selrel.LINKID_INPUT).val();
-	formData.ordering = parseInt(linkIdStr, 10);
+	formData.linkId = parseInt(linkIdStr, 10);
 	
 	/*
 	 * We should only have got here if: 
@@ -89,7 +102,7 @@ _cms.links.behaviour.add = function() {
 _cms.links.behaviour.save = function(nodeKey) {
 	// Add behaviour to 'Save links' button 
 	$(_cms.links.sel.SAVE_LINKS_BUTTON).click(function(e) {
-		var links = _cms.links.identifyHiddenLinkDataList($(_cms.sortableLinksSelector));
+		var links = _cms.links.identifyHiddenLinkDataList($(_cms.links.sel.SORTABLE_LINKS));
 		
 		// Remove the 'span' property from each object
 		for (var i = 0; i < links.length; i++) {
@@ -175,8 +188,6 @@ _cms.links.behaviour.navigate = function() {
 	});
 }
 
-_cms.sortableLinksSelector = _cms.links.sel.SORTABLE_LINKS_CONTAINER + " div.sortable-link";
-
 _cms.links.identifyHiddenLinkDataList = function(sortableLinks) {
 	var links = [];
 	var span;
@@ -196,7 +207,7 @@ _cms.links.identifyHiddenLinkData4Span = function(span) {
 		type: parts[1],
 		name: parts[2],
 		data: decodeURIComponent(parts[3]),
-		ordering: parseInt(parts[4], 10),
+		linkId: parseInt(parts[4], 10),
 		state: parts[5]
 	};
 	
@@ -205,27 +216,28 @@ _cms.links.identifyHiddenLinkData4Span = function(span) {
 
 _cms.links.formatHiddenLinkData = function(d) {
 	var dl = "|";
-	return d.childId + dl + d.type + dl + d.name + dl + d.data + dl + d.ordering + dl + d.state;
+	return d.childId + dl + d.type + dl + d.name + dl + d.data + dl + d.linkId + dl + d.state;
 };
 
 // Use the link form data to add a new link for saving, or edit an existing link
 _cms.links.useLink = function(formData) {
 	
 	var sortableLinksContainer = $("div" + _cms.links.sel.SORTABLE_LINKS_CONTAINER);
-	var sortableLinks = $(_cms.sortableLinksSelector);
+	var sortableLinks = $(_cms.links.sel.SORTABLE_LINKS);
 
 	// Is this link already in the list?
 	var target = null;	
 	var links = _cms.links.identifyHiddenLinkDataList(sortableLinks);
 	
 	for (var i = 0; i < links.length; i++) {
-		if (links[i].childId == formData.childId) {
+		if (links[i].linkId == formData.linkId) {
 			target = links[i];
 			break;
 		}
 	}
 	
 	if (target) {
+		// This link is already in the list (target)
 		var span = target.span;
 		span.innerHTML = _cms.links.formatHiddenLinkData(formData);
 		
@@ -235,12 +247,16 @@ _cms.links.useLink = function(formData) {
 				span, identifier, formData);
 	}
 	else {
-		// This link is not in the list - clone the template, and append the clone to the end of the list
-		var linkHtml = $("#link-template>div").clone(true);
+		// This link is not in the list - it is a new link.
+		// Clone the template, and append the clone to the end of the list
+		var div = $("#link-template>div").clone(true);
+		
+		// Assign a linkId to the link - find the largest id and increment by 1
+		formData.linkId = _cms.links.getNextSortableLinkId(links);
 		
 		// Need an ajax call to identify the name of the child item, for list display purposes only
 		_cms.links.getItemNameAnd(formData.childId, _cms.links.insertClonedLink, sortableLinksContainer, 
-				linkHtml, formData);		
+				div, formData);		
 	}
 };
 
@@ -255,11 +271,11 @@ _cms.links.getItemNameAnd = function(childId, fn, param1, param2, param3, param4
 	});
 }
 
-_cms.links.insertClonedLink = function(itemName, sortableLinksContainer, jqe, formData) {
-	jqe.find("div.left span.link-identifier").html(_cms.links.formatLinkIdentifier(formData, itemName));
-	jqe.find("div.right button.link-linker").attr("data-id", formData.childId);
-	jqe.find("div.right span.hide").html(_cms.links.formatHiddenLinkData(formData));				
-	jqe.appendTo(sortableLinksContainer);					
+_cms.links.insertClonedLink = function(itemName, sortableLinksContainer, div, formData) {
+	div.find("div.left span.link-identifier").html(_cms.links.formatLinkIdentifier(formData, itemName));
+	div.find("div.right button.link-linker").attr("data-id", formData.childId);
+	div.find("div.right span.hide").html(_cms.links.formatHiddenLinkData(formData));				
+	div.appendTo(sortableLinksContainer);					
 }
 
 
@@ -267,10 +283,21 @@ _cms.links.insertClonedLink = function(itemName, sortableLinksContainer, jqe, fo
 _cms.links.updateLink = function(itemName, span, identifier, formData) {
 	span.innerHTML = _cms.links.formatHiddenLinkData(formData);
 	identifier.html(_cms.links.formatLinkIdentifier(formData, itemName));
+	$(span).parent().parent().addClass("changed-link");
 }
 
 _cms.links.formatLinkIdentifier = function(formData, itemName) {
 	return formData.type + " (" + formData.name + "): " + itemName;
+}
+
+_cms.links.getNextSortableLinkId = function(sortableLinks) {
+	var maxId = -1;
+	for (var i = 0; i < sortableLinks.length; i++) {
+		if (sortableLinks[i].linkId > maxId) {
+			maxId = sortableLinks[i].linkId;
+		}
+	}
+	return maxId + 1;
 }
 
 _cms.links.setLinkForm = function(data) {
@@ -285,12 +312,14 @@ _cms.links.setLinkForm = function(data) {
 	if (data[0] == "-1") {
 		$(_cms.links.sel.LINK_TARGET_IDENTIFIER).empty();
 	}
-	else if (data.length == 7) {
-		var idx = data[6].indexOf("&gt;");
+	
+	if (data.length == 7) {
+		var idx = data[6].indexOf(":");
+		var name = "n/a";
 		if (idx > -1) {
-			var name = data[6].substring(idx + 5);
-			$(_cms.links.sel.LINK_TARGET_IDENTIFIER).html("'" + name + "'");
+			name = data[6].substring(idx + 2);
 		}
+		$(_cms.links.sel.LINK_TARGET_IDENTIFIER).html("'" + name + "'");
 	}
 };
 
@@ -333,69 +362,111 @@ _cms.links.refresh.tab = function(nodeKey) {
 	_cms.support.refreshtab("links", nodeKey, _cms.links.onrefresh);
 }
 
-_cms.links.check_for_use = function() {
-	return $(_cms.links.sel.LINKTYPE_SELECT).val() != 'unknown' &&
-			$(_cms.links.sel.LINKNAME_SELECT).val() != 'unknown' && 
-			$(_cms.links.sel.CHILDID_INPUT).val() > -1;
+_cms.links.openDialog = function(dialog, id) {
+	$(_cms.links.sel.LINK_ERRORS_DIALOG + " .message").addClass("hide");
+	$(_cms.links.sel.LINK_ERRORS_DIALOG + " .message-" + id).removeClass("hide");
+	_cms.support.dialog.open(_cms.links.link_errors_dialog);
 }
 
-_cms.links.openDialog = function(d) {
-	d.obj.dialog("open");
+_cms.links.check_for_use = function(notify) {
+	var childId = $(_cms.links.sel.CHILDID_INPUT).val();
+	
+	if (
+		$(_cms.links.sel.LINKTYPE_SELECT).val() != 'unknown' &&
+		$(_cms.links.sel.LINKNAME_SELECT).val() != 'unknown' && 
+		childId > -1) {
+
+		if (! _cms.links.check_duplicate_link(childId)) {
+			if (notify) {
+				
+				_cms.links.openDialog(_cms.links.link_errors_dialog, "b");
+			}
+		}
+		else {
+			if (! _cms.links.check_not_binding(childId)) {
+				if (notify) {
+					_cms.links.openDialog(_cms.links.link_errors_dialog, "c");
+				}
+			}
+			else {
+				return true;
+			}
+		}
+	}
+	else if (notify) {
+		_cms.links.openDialog(_cms.links.link_errors_dialog, "a");
+	}
+	
+	return false;
 }
 
-_cms.links.closeDialog = function(d) {
-	d.obj.dialog("close");
+_cms.links.check_duplicate_link = function(childId) {
+	var ok = true;
+	var usedLinks = _cms.links.identifyHiddenLinkDataList($(_cms.links.sel.SORTABLE_LINKS));
+
+	for (var i = 0; i < usedLinks.length; i++) {
+		if (usedLinks[i].childId == childId) {
+			ok = false;
+			break;
+		}
+	}	
+	
+	return ok;
 }
 
-_cms.links.define.addlink_dialog = function() {
-	_cms.links.addlink_dialog.obj = $(_cms.links.sel.ADD_LINK_CONTAINER).dialog({
-		  autoOpen: false,
-		  minHeight: 250,
-		  minWidth: 300,
-		  modal: true,
-		  title: "Add/edit a link",
-		  buttons: {
-			  Use: function() {
-				  if (_cms.links.check_for_use()) {
-					  _cms.links.use_form_data();
-					  _cms.links.closeDialog(_cms.links.addlink_dialog);
-				  }
-				  else {
-					  _cms.links.openDialog(_cms.links.addlink_warning_dialog);
-				  }
-			  },
-			  Cancel: function() {
-				  _cms.links.closeDialog(_cms.links.addlink_dialog);
-			  }
-		  },
-		  close: function() {
-			  _cms.links.closeDialog(_cms.links.addlink_dialog);
+_cms.links.check_not_binding = function(childId) {
+	var node = _cms.leftnav.tree.getNodeByKey(childId);
+	if (node) {
+		var parentNode = node.getParent();
+		if (parentNode) {
+			return parentNode.key != _cms.editingItemId;
+		}
+	}
+	
+	// Otherwise, let it through, and let the back-end deal with it.
+	return true;
+}
+
+_cms.links.define.addlink_dialog = function() {	
+	var close = function() {
+		_cms.support.dialog.close(_cms.links.addlink_dialog);
+	}
+	
+	var buttons = {
+		Use: function() {
+			if (_cms.links.check_for_use(true)) {
+				_cms.links.use_form_data();
+				_cms.support.dialog.close(_cms.links.addlink_dialog);
+			}
+		},
+		Cancel: function() {
+			close();
+		}
+	}
+	
+	_cms.links.addlink_dialog.obj = _cms.support.dialog.define(
+			"Add/edit a link", _cms.links.sel.ADD_LINK_CONTAINER, 300, 250, buttons, close);
+}
+
+_cms.links.define.link_errors_dialog = function() {
+	  var close = function() {
+		  _cms.support.dialog.close(_cms.links.link_errors_dialog);
+	  }
+
+	  var buttons = {
+		  Close: function() {
+			  close();
 		  }
-	});
-}
-
-_cms.links.define.addlink_warning_dialog = function() {
-	_cms.links.addlink_warning_dialog.obj = $(_cms.links.sel.INCOMPLETE_LINK_DIALOG).dialog({
-		  autoOpen: false,
-		  minHeight: 200,
-		  minWidth: 250,
-		  modal: true,
-		  title: "Incomplete link data",
-		  buttons: {
-			  Close: function() {
-				  _cms.links.closeDialog(_cms.links.addlink_warning_dialog);
-			  }
-		  },
-		  close: function() {
-			  _cms.links.closeDialog(_cms.links.addlink_warning_dialog);
-		  }
-	});
+	  }
+	  
+	  _cms.links.link_errors_dialog.obj = _cms.support.dialog.define(
+				"Link error", _cms.links.sel.LINK_ERRORS_DIALOG, 250, 200, buttons, close);
 }
 
 // Things to do once-only on page load
 _cms.links.onpageload = function() {
 	_cms.links.define.addlink_dialog();
-	_cms.links.define.addlink_warning_dialog();
+	_cms.links.define.link_errors_dialog();
 	_cms.links.behaviour.changetype();
 	_cms.links.behaviour.itempicker();
 }

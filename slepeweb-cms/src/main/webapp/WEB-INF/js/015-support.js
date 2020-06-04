@@ -174,6 +174,28 @@ _cms.support.enable = function(selector) {
 	$(selector).removeAttr("disabled");
 }
 
+_cms.support.dialog.define = function(title, selector, width, height, buttons, close) {
+	var obj = $(selector).dialog({
+		  autoOpen: false,
+		  minHeight: height,
+		  minWidth: width,
+		  modal: true,
+		  title: title,
+		  buttons: buttons,
+		  close: close,
+	});
+	
+	return obj;
+}
+
+_cms.support.dialog.open = function(d) {
+	d.obj.dialog("open");
+}
+
+_cms.support.dialog.close = function(d) {
+	d.obj.dialog("close");
+}
+
 _cms.support.renderItemForms = function(nodeKey, activeTab) {
 	$.ajax(_cms.ctx + "/rest/item/editor", {
 		cache: false,

@@ -1,12 +1,11 @@
 TODO: This is the main todo file:
 
 HIGH
-- write test: cannot move item to one of it's children
 - need to protect against injection attacks
 - check sws search still working
 
 MEDIUM
-- addlink form should be modal
+- put a reset button on all forms
 - store preferred language in cookie (Ancestry)
 - resource bundles (Ancestry)
 - password protection for site visitors (Ancestry)

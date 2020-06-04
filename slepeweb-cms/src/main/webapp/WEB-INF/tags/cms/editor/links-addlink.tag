@@ -3,7 +3,7 @@
         
 <cms:debug><!-- tags/cms/editor/links-addlink.tag --></cms:debug>
 	
-<div id="addlinkdiv">
+<div id="addlinkdiv" class="hide">
 	<details>
 		<summary>HELP</summary>
 		<p>This will link the current item to any other item of your choice. 
@@ -49,7 +49,7 @@
 </div>
 
 <div id="link-template" class="hide">
-	<div class="sortable-link ui-state-default">
+	<div class="sortable-link changed-link ui-state-default">
 		<div class="left">
 			<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
 			<span class="link-identifier">*</span>

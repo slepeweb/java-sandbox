@@ -8,10 +8,12 @@
 	</p>
 </div>
 
-<div id="dialog-choose-linktype" class="hide" title="Provide full link data">
+<div id="link-errors-dialog" class="hide cms-dialog">
   <p>
-    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
-    Link data is incomplete. Close this dialog, and click on 'HELP' for guidance.
+    <span class="ui-icon ui-icon-circle-check cms-icon"></span>
+    <span class="message message-a hide">Link data is incomplete. Close this dialog, and click on 'HELP' for guidance.</span>
+    <span class="message message-b hide">A link from the current item to this target already exists.</span>
+    <span class="message message-c hide">You cannot link to a child (binding) of the current item.</span>
   </p>
 </div>
 

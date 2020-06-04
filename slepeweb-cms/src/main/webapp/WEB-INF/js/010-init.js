@@ -1,5 +1,7 @@
 var _cms = {
-	support: {},
+	support: {
+		dialog: {}
+	},
 	leftnav: {
 		behaviour: {}
 	}

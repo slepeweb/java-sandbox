@@ -53,7 +53,6 @@ _cms.leftnav.define.fancytree = function() {
 			else if (_cms.leftnav.mode == "link") {
 				$("#link-target-identifier").html("'" + _cms.leftnav.tree.activeNode.title + "'");
 				$("#addlinkdiv input[name=childId]").val(_cms.leftnav.tree.activeNode.key);
-				_cms.links.check_for_use();
 			}
 			else if (_cms.leftnav.mode == "move") {
 				$("#move-target-identifier").html("'" + data.node.title + "'");

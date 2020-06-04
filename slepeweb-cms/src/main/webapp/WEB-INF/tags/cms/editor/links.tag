@@ -10,7 +10,7 @@
 		<div class="sortable-link ui-state-default">
 			<div class="left">
 				<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-				<span class="link-identifier">${link}</span>
+				<span class="link-identifier">${link.type} (${link.name}): ${link.child.name}</span>
 			</div>
 			
 			<div class="right">

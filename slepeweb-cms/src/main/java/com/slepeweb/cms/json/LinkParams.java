@@ -2,7 +2,7 @@ package com.slepeweb.cms.json;
 
 public class LinkParams {
 	private long childId;
-	private int ordering, state;
+	private int linkId, state;
 	private String type, name, data;
 	
 	public long getChildId() {
@@ -13,12 +13,12 @@ public class LinkParams {
 		this.childId = childId;
 	}
 	
-	public int getOrdering() {
-		return ordering;
+	public int getLinkId() {
+		return linkId;
 	}
 	
-	public void setOrdering(int ordering) {
-		this.ordering = ordering;
+	public void setLinkId(int id) {
+		this.linkId = id;
 	}
 	
 	public String getType() {
