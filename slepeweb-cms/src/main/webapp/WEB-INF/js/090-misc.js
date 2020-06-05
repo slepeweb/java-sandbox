@@ -66,48 +66,6 @@ _cms.misc.behaviour.trash.showOrHide = function() {
 	});	
 }
 
-_cms.misc.behaviour.trash.action = function(nodeKey) {
-	// Add behaviour to trash an item and put it in the bin. Called from the core tab.
-	$("#trash-button").click(function () {
-		var theDialog = $("#dialog-trash-confirm");
-		theDialog.dialog({
-			resizable: false,
-			height:200,
-			modal: true,
-			buttons: {
-				"Delete all items": function() {
-					$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/trash", {
-						type: "POST",
-						cache: false,
-						data: {key: nodeKey}, 
-						dataType: "json",
-						success: function(obj, status, z) {
-							theDialog.dialog("close");
-							_cms.support.flashMessage(obj);
-							
-							if (! obj.error) {
-								var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
-								if (node) {
-									var parent = node.getParent();
-									node.remove();
-									_cms.leftnav.tree.activateKey(parent.key);
-								}
-							}
-						},
-						error: function(json, status, z) {
-							theDialog.dialog("close");
-							_cms.support.serverError();
-						}
-					});
-				},
-				Cancel: function() {
-					$(this).dialog("close");
-				}
-			}
-		});
-	});
-}
-
 _cms.misc.behaviour.trash.empty = function() {
 	// Add behaviour to empty the trash 
 	$("#trash-empty-button").click(function () {
@@ -187,7 +145,6 @@ _cms.misc.behaviour.trash.restore = function() {
 // Behaviours to apply once html is loaded/reloaded
 _cms.misc.behaviour.trash.all = function(nodeKey) {
 	_cms.misc.behaviour.reindex(nodeKey);
-	_cms.misc.behaviour.trash.action(nodeKey);
 	/*
 	 * empty() and restore() are triggered by buttons introduced by the refresh() function,
 	 * so do not appear here.

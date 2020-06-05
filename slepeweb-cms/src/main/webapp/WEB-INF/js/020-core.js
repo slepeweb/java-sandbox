@@ -75,6 +75,41 @@ _cms.core.behaviour.update = function(nodeKey) {
 	});
 }
 
+_cms.core.trashItem = function() {
+	$.ajax(_cms.ctx + "/rest/item/" + _cms.editingItemId + "/trash", {
+		type: "POST",
+		cache: false,
+		dataType: "json",
+		success: function(obj, status, z) {
+			_cms.dialog.close(_cms.dialog.trash);
+			_cms.support.flashMessage(obj);
+			
+			if (! obj.error) {
+				var node = _cms.leftnav.tree.getNodeByKey(_cms.editingItemId);
+				if (node) {
+					var parent = node.getParent();
+					node.remove();
+					
+					// This will make the parent item the current item, and refresh the page accordingly,
+					// thereby updating _cms.editingItemId
+					_cms.leftnav.tree.activateKey(parent.key);
+				}
+			}
+		},
+		error: function(json, status, z) {
+			_cms.dialog.close(_cms.dialog.trash);
+			_cms.support.serverError();
+		}
+	});
+}
+
+_cms.core.behaviour.trash = function(nodeKey) {
+	// Add behaviour to trash an item and put it in the bin.
+	$("#trash-button").click(function () {
+		_cms.dialog.open(_cms.dialog.trash, "b");
+	});
+}
+
 _cms.core.behaviour.formchange = function() {
 	$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).change(function() {
 		_cms.support.enable(_cms.core.sel.UPDATE_BUTTON);
@@ -88,4 +123,5 @@ _cms.core.refresh.tab = function(nodeKey) {
 _cms.core.behaviour.all = function(nodeKey) {
 	_cms.core.behaviour.formchange();
 	_cms.core.behaviour.update(nodeKey);
+	_cms.core.behaviour.trash();
 }

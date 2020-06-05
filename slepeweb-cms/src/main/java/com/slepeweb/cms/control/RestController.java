@@ -623,7 +623,7 @@ public class RestController extends BaseController {
 		Item parent = i.getParent();
 		i.trash();
 			
-		return resp.addMessage("Item trashed").setData(parent.getId());
+		return resp.addMessage("Item trashed").setData(parent.getOrigId());
 	}
 	
 	@RequestMapping(value="/trash/get")

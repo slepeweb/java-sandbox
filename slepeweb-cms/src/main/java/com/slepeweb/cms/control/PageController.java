@@ -49,6 +49,9 @@ public class PageController extends BaseController {
 			if (i.isProduct()) {
 				model.addAttribute("availableAxes", this.axisService.get());
 			}
+			
+			// Get a history of visited items
+			model.addAttribute("_history", this.cookieService.getHistoryCookieValue(i.getSite().getId(), req));
 		}
 			
 		String flash = req.getParameter("status");
@@ -58,9 +61,6 @@ public class PageController extends BaseController {
 			status.setError(flash.equals("error")).parseMessages(msg);
 			model.addAttribute("_flashMessage", status);
 		}
-		
-		// Get a history of visited items
-		model.addAttribute("_history", this.cookieService.getHistoryCookieValue(i.getSite().getId(), req));
 		
 		return "cms.editor";
 	}

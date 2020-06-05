@@ -16,13 +16,6 @@
 _cms.links = {
 	behaviour: {},
 	refresh: {},
-	addlink_dialog: {
-		obj: null
-	},
-	link_errors_dialog: {
-		obj: null
-	},
-	define: {},
 	selrel: {
 		LINKTYPE_SELECT: "select[name='linktype']",
 		LINKNAME_SELECT: "select[name='linkname']",
@@ -42,7 +35,6 @@ _cms.links = {
 		REMOVE_LINK_BUTTONS: ".remove-link",
 		LINKTO_BUTTONS: ".link-linker",
 		LINK_TARGET_IDENTIFIER: "#link-target-identifier",
-		LINK_ERRORS_DIALOG: "#link-errors-dialog",
 	}
 };
 
@@ -56,13 +48,13 @@ _cms.links.show_addlink_form = function(data) {
 	if (data) {
 		_cms.links.setLinkForm(data);
 	}	
-	_cms.support.dialog.open(_cms.links.addlink_dialog);
+	_cms.dialog.open(_cms.dialog.addLink);
 }
 
 _cms.links.behaviour.itempicker = function() {
 	$(_cms.links.sel.ITEM_PICKER).click(function() {
 		_cms.leftnav.mode = "link";
-		_cms.support.dialog.open(_cms.leftnav.dialog);
+		_cms.dialog.open(_cms.leftnav.dialog);
 	});
 }
 
@@ -362,12 +354,6 @@ _cms.links.refresh.tab = function(nodeKey) {
 	_cms.support.refreshtab("links", nodeKey, _cms.links.onrefresh);
 }
 
-_cms.links.openDialog = function(dialog, id) {
-	$(_cms.links.sel.LINK_ERRORS_DIALOG + " .message").addClass("hide");
-	$(_cms.links.sel.LINK_ERRORS_DIALOG + " .message-" + id).removeClass("hide");
-	_cms.support.dialog.open(_cms.links.link_errors_dialog);
-}
-
 _cms.links.check_for_use = function(notify) {
 	var childId = $(_cms.links.sel.CHILDID_INPUT).val();
 	
@@ -379,13 +365,13 @@ _cms.links.check_for_use = function(notify) {
 		if (! _cms.links.check_duplicate_link(childId)) {
 			if (notify) {
 				
-				_cms.links.openDialog(_cms.links.link_errors_dialog, "b");
+				_cms.dialog.open(_cms.dialog.linkError, "b");
 			}
 		}
 		else {
 			if (! _cms.links.check_not_binding(childId)) {
 				if (notify) {
-					_cms.links.openDialog(_cms.links.link_errors_dialog, "c");
+					_cms.dialog.open(_cms.dialog.linkError, "c");
 				}
 			}
 			else {
@@ -394,7 +380,7 @@ _cms.links.check_for_use = function(notify) {
 		}
 	}
 	else if (notify) {
-		_cms.links.openDialog(_cms.links.link_errors_dialog, "a");
+		_cms.dialog.open(_cms.dialog.linkError, "a");
 	}
 	
 	return false;
@@ -427,46 +413,8 @@ _cms.links.check_not_binding = function(childId) {
 	return true;
 }
 
-_cms.links.define.addlink_dialog = function() {	
-	var close = function() {
-		_cms.support.dialog.close(_cms.links.addlink_dialog);
-	}
-	
-	var buttons = {
-		Use: function() {
-			if (_cms.links.check_for_use(true)) {
-				_cms.links.use_form_data();
-				_cms.support.dialog.close(_cms.links.addlink_dialog);
-			}
-		},
-		Cancel: function() {
-			close();
-		}
-	}
-	
-	_cms.links.addlink_dialog.obj = _cms.support.dialog.define(
-			"Add/edit a link", _cms.links.sel.ADD_LINK_CONTAINER, 300, 250, buttons, close);
-}
-
-_cms.links.define.link_errors_dialog = function() {
-	  var close = function() {
-		  _cms.support.dialog.close(_cms.links.link_errors_dialog);
-	  }
-
-	  var buttons = {
-		  Close: function() {
-			  close();
-		  }
-	  }
-	  
-	  _cms.links.link_errors_dialog.obj = _cms.support.dialog.define(
-				"Link error", _cms.links.sel.LINK_ERRORS_DIALOG, 250, 200, buttons, close);
-}
-
 // Things to do once-only on page load
 _cms.links.onpageload = function() {
-	_cms.links.define.addlink_dialog();
-	_cms.links.define.link_errors_dialog();
 	_cms.links.behaviour.changetype();
 	_cms.links.behaviour.itempicker();
 }

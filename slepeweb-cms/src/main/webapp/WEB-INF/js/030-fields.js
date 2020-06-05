@@ -10,37 +10,30 @@ _cms.field = {
 	}
 };
 
+_cms.field.sel.ALL_FORM_ELEMENTS = "".concat(_cms.field.sel.ALL_INPUTS, ",", _cms.field.sel.ALL_INPUTS, ",#field-tab textarea");
+
 _cms.field.behaviour.update = function(nodeKey) {	
 	// Add behaviour to submit item field updates 
 	$(_cms.field.sel.UPDATE_BUTTON).click(function () {
-		var theDialog = $("#dialog-fields-confirm");
-		theDialog.dialog({
-			resizable: false,
-			height:200,
-			modal: true,
-			buttons: {
-				"Update field values": function() {
-					$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/update/fields", {
-						type: "POST",
-						cache: false,
-						data: _cms.field.getFieldsFormInputData(), 
-						dataType: "json",
-						success: function(obj, status, z) {
-							theDialog.dialog("close");
-							_cms.support.flashMessage(obj);
-							_cms.field.refresh.tab(nodeKey);
-						},
-						error: function(obj, status, z) {
-							theDialog.dialog("close");
-							_cms.support.serverError();
-						},
-					});
-				},
-				Cancel: function() {
-					$(this).dialog("close");
-				}
-			}
-		});
+		_cms.dialog.open(_cms.dialog.field, "a");
+	});
+}
+
+_cms.field.update = function(nodeKey) {
+	$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/update/fields", {
+		type: "POST",
+		cache: false,
+		data: _cms.field.getFieldsFormInputData(), 
+		dataType: "json",
+		success: function(obj, status, z) {
+			_cms.dialog.close(_cms.dialog.field);
+			_cms.support.flashMessage(obj);
+			_cms.field.refresh.tab(nodeKey);
+		},
+		error: function(obj, status, z) {
+			_cms.dialog.close(_cms.dialog.field);
+			_cms.support.serverError();
+		},
 	});
 }
 
@@ -117,7 +110,7 @@ _cms.field.behaviour.changelanguage = function() {
 }
 
 _cms.field.behaviour.formchange = function() {
-	$(_cms.field.sel.ALL_INPUTS + "," + _cms.field.sel.ALL_SELECTS).change(function() {
+	$(_cms.field.sel.ALL_FORM_ELEMENTS).change(function() {
 		if ($(this).attr("name") != "language") {
 			_cms.support.enable(_cms.field.sel.UPDATE_BUTTON);
 		}

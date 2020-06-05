@@ -95,23 +95,6 @@ _cms.support.fetchItemEditor = function(nodeKey, status, tabName) {
 	window.location = url; 
 };
 
-/*
- * Shows a modal giving the user a chance to confirm his selection.
- */
-_cms.support.showDialog = function(id, relocate) {
-	$("#" + id).dialog({
-		modal: true,
-		buttons: {
-			Ok: function() {
-				$(this).dialog("close");
-				if (relocate) {
-					window.location = relocate;
-				}
-			}
-		}
-	});
-};
-
 _cms.support.addHistoryBehaviour = function(selector) {
 	selector.unbind();
 	selector.change(function() {	
@@ -172,28 +155,6 @@ _cms.support.disable = function(selector) {
 
 _cms.support.enable = function(selector) {
 	$(selector).removeAttr("disabled");
-}
-
-_cms.support.dialog.define = function(title, selector, width, height, buttons, close) {
-	var obj = $(selector).dialog({
-		  autoOpen: false,
-		  minHeight: height,
-		  minWidth: width,
-		  modal: true,
-		  title: title,
-		  buttons: buttons,
-		  close: close,
-	});
-	
-	return obj;
-}
-
-_cms.support.dialog.open = function(d) {
-	d.obj.dialog("open");
-}
-
-_cms.support.dialog.close = function(d) {
-	d.obj.dialog("close");
 }
 
 _cms.support.renderItemForms = function(nodeKey, activeTab) {
