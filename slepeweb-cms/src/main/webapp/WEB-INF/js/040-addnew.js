@@ -6,28 +6,16 @@ _cms.add = {
 	}
 };
 
-var fs = function(name) {
-	return f(name, "select");
-}
-
-var fi = function(name) {
-	return f(name, "input");
-}
-
-var f = function (name, type) {
-	return _cms.add.sel.ADD_TAB + " " + type + "[name='" + name + "']";
-}
-
-_cms.add.sel.RELATIVE_POSITION_SELECTOR = fs("relativePosition");
-_cms.add.sel.TEMPLATE_SELECTOR = fs("template");
-_cms.add.sel.ITEMTYPE_SELECTOR = fs("itemtype");
-_cms.add.sel.NAME_INPUT = fi("name");
-_cms.add.sel.SIMPLENAME_INPUT = fi("simplename");
-_cms.add.sel.PARTNUM_INPUT = fi("partNum");
-_cms.add.sel.PRICE_INPUT = fi("price");
-_cms.add.sel.STOCK_INPUT = fi("stock");
-_cms.add.sel.ALPHA_SELECTOR = fs("alphaaxis");
-_cms.add.sel.BETA_SELECTOR = fs("betaaxis");
+_cms.add.sel.RELATIVE_POSITION_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "relativePosition");
+_cms.add.sel.TEMPLATE_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "template");
+_cms.add.sel.ITEMTYPE_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "itemtype");
+_cms.add.sel.NAME_INPUT = _cms.support.fi(_cms.add.sel.ADD_TAB, "name");
+_cms.add.sel.SIMPLENAME_INPUT = _cms.support.fi(_cms.add.sel.ADD_TAB, "simplename");
+_cms.add.sel.PARTNUM_INPUT = _cms.support.fi(_cms.add.sel.ADD_TAB, "partNum");
+_cms.add.sel.PRICE_INPUT = _cms.support.fi(_cms.add.sel.ADD_TAB, "price");
+_cms.add.sel.STOCK_INPUT = _cms.support.fi(_cms.add.sel.ADD_TAB, "stock");
+_cms.add.sel.ALPHA_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "alphaaxis");
+_cms.add.sel.BETA_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "betaaxis");
 _cms.add.sel.ALL_FORM_ELEMENTS = "".concat(_cms.add.sel.ADD_TAB, " select,", _cms.add.sel.ADD_TAB, " input");
 
 _cms.add.behaviour.add = function(nodeKey) {

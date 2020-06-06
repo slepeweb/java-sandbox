@@ -410,6 +410,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	/*
 	 * Restored items are set to 'not-published', and so shouldn't be re-indexed
 	 * by Solr, but they will be once they are published manually by the user.
+	 * 
+	 * NOTE: This method might restore an item whose parent is still in the bin. In such a
+	 * case, the cms will not display the item.
 	 */
 	public int restoreSelectedItems(long[] origIdArr) {
 		int num = 0;

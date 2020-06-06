@@ -3,11 +3,15 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <c:choose><c:when test="${fn:length(_trashContents) > 0}">
+	<p>Note that trashed items are displayed in path order. Should you restore an item whose 
+		parent is also in the bin, then you won't see that item in the content structure until the parent has also been restored.</p>
+		
 	<table id="trash-table">
-		<tr><th id="select-all-trash">Select</th><th>Path</th><th>Version</th></tr>
+		<tr><th id="select-all-trash">Select</th><th>Name</th><th>Path</th><th>Version</th></tr>
 		<c:forEach items="${_trashContents}" var="_item">
 			<tr>
 				<td><input type="checkbox" value="${_item.origId}" /></td>
+				<td>${_item.name}</td>
 				<td>${_item.path}</td>
 				<td>${_item.version}</td>
 			</tr>

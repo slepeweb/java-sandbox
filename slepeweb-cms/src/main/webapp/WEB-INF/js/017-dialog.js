@@ -1,13 +1,16 @@
 _cms.dialog = {
-	warning: {obj: null},
-	confirmation: {obj: null},
-	trash: {obj: null},
-	field: {obj: null},
+	linkNotDefined: {obj: null},
+	duplicateTarget: {obj: null},
+	illegalTarget: {obj: null},
+	confirmFieldUpdate: {obj: null},
+	confirmTrash: {obj: null},
 	addLink: {obj: null},
-	linkError: {obj: null},
 	sel: {
-		CONFIRMATION: "#confirmation-dialog",
-		ERROR: "#warning-dialog",
+		LINK_NOT_DEFINED: "#link-not-defined-dialog",
+		DUPLICATE_TARGET: "#duplicate-link-target-dialog",
+		ILLEGAL_TARGET: "#illegal-link-target-dialog",
+		CONFIRM_FIELD_UPDATE: "#confirm-field-update-dialog",
+		CONFIRM_TRASH_ACTION: "#confirm-trash-dialog",
 	}
 }
 
@@ -25,18 +28,7 @@ _cms.dialog.define = function(title, selector, width, height, buttons, close) {
 	return obj;
 }
 
-_cms.dialog.open = function(d, id) {
-	var all = d.selector;
-	var one = d.selector;
-	
-	if (id) {
-		all += " .message";
-		one += " .message-" + id;
-	}
-	
-	$(all).addClass("hide");
-	$(one).removeClass("hide");
-	
+_cms.dialog.open = function(d) {
 	d.obj.dialog("open");
 }
 
@@ -44,9 +36,9 @@ _cms.dialog.close = function(d) {
 	d.obj.dialog("close");
 }
 
-_cms.dialog.trash.define = function() {
+_cms.dialog.confirmTrash.define = function() {
 	var close = function() {
-		_cms.dialog.close(_cms.dialog.trash);
+		_cms.dialog.close(_cms.dialog.confirmTrash);
 	}
 	
 	var buttons = {
@@ -58,13 +50,13 @@ _cms.dialog.trash.define = function() {
 		}
 	}
 	
-	_cms.dialog.trash.selector = _cms.dialog.sel.CONFIRMATION;
-	_cms.dialog.trash.obj = _cms.dialog.define("Confirm deletion", _cms.dialog.sel.CONFIRMATION, 200, 200, buttons, close);
+	_cms.dialog.confirmTrash.obj = _cms.dialog.define("Confirm deletion", 
+			_cms.dialog.sel.CONFIRM_TRASH_ACTION, 200, 200, buttons, close);
 }
 
-_cms.dialog.field.define = function() {
+_cms.dialog.confirmFieldUpdate.define = function() {
 	var close = function() {
-		_cms.dialog.close(_cms.dialog.field);
+		_cms.dialog.close(_cms.dialog.confirmFieldUpdate);
 	}
 	
 	var buttons = {
@@ -76,8 +68,7 @@ _cms.dialog.field.define = function() {
 		}
 	}
 	
-	_cms.dialog.field.selector = _cms.dialog.sel.CONFIRMATION;
-	_cms.dialog.field.obj = _cms.dialog.define("Confirm updates", _cms.dialog.sel.CONFIRMATION, 200, 200, buttons, close);
+	_cms.dialog.confirmFieldUpdate.obj = _cms.dialog.define("Confirm updates", _cms.dialog.sel.CONFIRM_FIELD_UPDATE, 200, 200, buttons, close);
 }
 
 _cms.dialog.addLink.define = function() {	
@@ -97,14 +88,13 @@ _cms.dialog.addLink.define = function() {
 		}
 	}
 	
-	_cms.dialog.addLink.selector = _cms.links.sel.ADD_LINK_CONTAINER;
 	_cms.dialog.addLink.obj = _cms.dialog.define(
 			"Add/edit a link", _cms.links.sel.ADD_LINK_CONTAINER, 300, 250, buttons, close);
 }
 
-_cms.dialog.linkError.define = function() {
+_cms.dialog.warning = function(title, d, selector) {
 	  var close = function() {
-		  _cms.dialog.close(_cms.dialog.linkError);
+		  _cms.dialog.close(d);
 	  }
 
 	  var buttons = {
@@ -113,14 +103,14 @@ _cms.dialog.linkError.define = function() {
 		  }
 	  }
 	  
-	  _cms.dialog.linkError.selector = _cms.dialog.sel.ERROR;
-	  _cms.dialog.linkError.obj = _cms.dialog.define(
-				"Link error", _cms.dialog.sel.ERROR, 250, 200, buttons, close);
+	  d.obj = _cms.dialog.define(title, selector, 250, 200, buttons, close);
 }
 
 _cms.dialog.onpageload = function() {
-	_cms.dialog.trash.define();
-	_cms.dialog.field.define();
+	_cms.dialog.confirmTrash.define();
+	_cms.dialog.confirmFieldUpdate.define();
 	_cms.dialog.addLink.define();
-	_cms.dialog.linkError.define();
+	_cms.dialog.warning("Link not adequately defined", _cms.dialog.linkNotDefined, _cms.dialog.sel.LINK_NOT_DEFINED);
+	_cms.dialog.warning("Duplicate link target", _cms.dialog.duplicateTarget, _cms.dialog.sel.DUPLICATE_TARGET);
+	_cms.dialog.warning("Illegal target", _cms.dialog.illegalTarget, _cms.dialog.sel.ILLEGAL_TARGET);
 }

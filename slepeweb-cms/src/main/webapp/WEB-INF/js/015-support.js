@@ -157,6 +157,18 @@ _cms.support.enable = function(selector) {
 	$(selector).removeAttr("disabled");
 }
 
+_cms.support.fs = function(base, name) {
+	return _cms.support.f(base, name, "select");
+}
+
+_cms.support.fi = function(base, name) {
+	return _cms.support.f(base, name, "input");
+}
+
+_cms.support.f = function (base, name, type) {
+	return base + " " + type + "[name='" + name + "']";
+}
+
 _cms.support.renderItemForms = function(nodeKey, activeTab) {
 	$.ajax(_cms.ctx + "/rest/item/editor", {
 		cache: false,

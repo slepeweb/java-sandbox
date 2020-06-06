@@ -2,22 +2,29 @@ _cms.core = {
 	behaviour: {},
 	refresh: {},
 	sel: {
-		ALL_INPUTS: "#core-tab input",
-		ALL_SELECTS: "#core-tab select",
+		CORE_TAB: "#core-tab",
 		UPDATE_BUTTON: "#core-button",
-		NAME_INPUT: "#core-tab input[name='name']",
-		SIMPLENAME_INPUT: "#core-tab input[name='simplename']",
-		TEMPLATE_SELECT: "#core-tab select[name='template']",
-		SEARCHABLE_CHECKBOX: "#core-tab input[name='searchable']",
-		PUBLISHED_CHECKBOX: "#core-tab input[name='published']",
-		TAGS_INPUT: "#core-tab input[name='tags']",
+		PRODUCT_FLAG: "#itemIsProductFlag",
+		TRASH_BUTTON: "#trash-button",
 	}
 };
+
+_cms.core.sel.ALL_INPUTS = _cms.core.sel.CORE_TAB + "#core-tab input";
+_cms.core.sel.ALL_SELECTS = _cms.core.sel.CORE_TAB + "#core-tab select";
+_cms.core.sel.NAME_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "name");
+_cms.core.sel.SIMPLENAME_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "simplename");
+_cms.core.sel.TEMPLATE_SELECT = _cms.support.fs(_cms.core.sel.CORE_TAB, "template");
+_cms.core.sel.SEARCHABLE_CHECKBOX = _cms.support.fi(_cms.core.sel.CORE_TAB, "searchable");
+_cms.core.sel.PUBLISHED_CHECKBOX = _cms.support.fi(_cms.core.sel.CORE_TAB, "published");
+_cms.core.sel.TAGS_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "tags");
+_cms.core.sel.PARTNUM_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
+_cms.core.sel.PRICE_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
+_cms.core.sel.STOCK_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 
 _cms.core.behaviour.update = function(nodeKey) {
 	// Add behaviour to submit core item updates 
 	$(_cms.core.sel.UPDATE_BUTTON).click(function () {
-		var isProduct = $("#itemIsProductFlag").val() == "true";
+		var isProduct = $(_cms.core.sel.PRODUCT_FLAG).val() == "true";
 		var args = {
 			name: $(_cms.core.sel.NAME_INPUT).val(),
 			simplename: $(_cms.core.sel.SIMPLENAME_INPUT).val(),
@@ -28,9 +35,9 @@ _cms.core.behaviour.update = function(nodeKey) {
 		};
 		
 		if (isProduct) {
-				args.partNum = $("#core-tab input[name='partNum']").val();
-				args.price = Math.floor($("#core-tab input[name='price']").val() * 100);
-				args.stock = $("#core-tab input[name='stock']").val();
+				args.partNum = $(_cms.core.sel.PARTNUM_INPUT).val();
+				args.price = Math.floor($(_cms.core.sel.PRICE_INPUT).val() * 100);
+				args.stock = $(_cms.core.sel.STOCK_INPUT).val();
 		}
 		
 		$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/update/core", {
@@ -81,7 +88,7 @@ _cms.core.trashItem = function() {
 		cache: false,
 		dataType: "json",
 		success: function(obj, status, z) {
-			_cms.dialog.close(_cms.dialog.trash);
+			_cms.dialog.close(_cms.dialog.confirmTrash);
 			_cms.support.flashMessage(obj);
 			
 			if (! obj.error) {
@@ -97,7 +104,7 @@ _cms.core.trashItem = function() {
 			}
 		},
 		error: function(json, status, z) {
-			_cms.dialog.close(_cms.dialog.trash);
+			_cms.dialog.close(_cms.dialog.confirmTrash);
 			_cms.support.serverError();
 		}
 	});
@@ -105,8 +112,8 @@ _cms.core.trashItem = function() {
 
 _cms.core.behaviour.trash = function(nodeKey) {
 	// Add behaviour to trash an item and put it in the bin.
-	$("#trash-button").click(function () {
-		_cms.dialog.open(_cms.dialog.trash, "b");
+	$(_cms.core.sel.TRASH_BUTTON).click(function () {
+		_cms.dialog.open(_cms.dialog.confirmTrash, "b");
 	});
 }
 

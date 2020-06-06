@@ -365,13 +365,13 @@ _cms.links.check_for_use = function(notify) {
 		if (! _cms.links.check_duplicate_link(childId)) {
 			if (notify) {
 				
-				_cms.dialog.open(_cms.dialog.linkError, "b");
+				_cms.dialog.open(_cms.dialog.linkNotDefined, "b");
 			}
 		}
 		else {
 			if (! _cms.links.check_not_binding(childId)) {
 				if (notify) {
-					_cms.dialog.open(_cms.dialog.linkError, "c");
+					_cms.dialog.open(_cms.dialog.linkNotDefined, "c");
 				}
 			}
 			else {
@@ -380,7 +380,7 @@ _cms.links.check_for_use = function(notify) {
 		}
 	}
 	else if (notify) {
-		_cms.dialog.open(_cms.dialog.linkError, "a");
+		_cms.dialog.open(_cms.dialog.linkNotDefined, "a");
 	}
 	
 	return false;

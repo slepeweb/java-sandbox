@@ -191,6 +191,9 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		}
 	}
 
+	/*
+	 * TODO: This service is not used. Remove some time.
+	 */
 	public List<Link> getBindings2TrashedItems(Long parentId) {
 		LinkType lt = this.linkTypeService.getLinkType("binding");
 		String sql = String.format(CHILD_SELECT_TEMPLATE, "l.parentid = ? and l.linktypeid = ? and deleted = 1");
