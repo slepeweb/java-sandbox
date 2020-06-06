@@ -20,7 +20,6 @@ header {
 		"ha ha ha ha ha ha"
 		"hb hb hb hc hc hc"
 		"hd hf hf hf hf hf"
-		".  he he he he he";
 }
 
 header select {
@@ -35,6 +34,10 @@ div.hb {
 	grid-area: hb;
 }
 
+div.hf {
+	grid-area: hf;
+}
+
 #history-div {
 	grid-area: hc;
 	margin-left: 1em;
@@ -47,14 +50,12 @@ div.hb {
 }
 
 #status-block {
-	grid-area: he;
+	margin-left: 3em;
 	font-size: 1.6em;
 	text-decoration: underline;
-/* 	padding-bottom: 1em; */
 }
 
 #currently-editing {
-	grid-area: hf;
 	color: #0093ba;
 	font-size: 1.5em;
 	align-self: center;
@@ -106,15 +107,6 @@ input, textarea {
 .cms-dialog span.cms-icon {
 	float:left; 
 	margin:0 7px 50px 0;
-}
-
-div.instruct.addnew {
-	border-bottom: 1px solid #999;
-	padding-bottom: 6px;
-}
-
-.instruct.addnew>span {
-	padding-right: 1em;
 }
 
 .x1pt2em {
@@ -448,7 +440,6 @@ button[disabled=disabled] {
 		grid-template-areas: 
 			"ha ha ha ha hb hb hc hc hc"
 			"hd hf hf hf hf hf hf hf hf"
-			".  he he he he he he he he"
 	}
 	
 	body {

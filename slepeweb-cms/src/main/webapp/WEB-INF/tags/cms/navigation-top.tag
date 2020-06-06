@@ -29,7 +29,9 @@
 		
 		<div id="leftnav-hider"><i class="fas fa-bars fa-2x"></i></div>
 		
-		<div id="currently-editing"></div>						
-		<div id="status-block"></div>
+		<div class="hf">
+			<span id="currently-editing"></span>						
+			<span id="status-block"></span>
+		</div>
 </header>
 

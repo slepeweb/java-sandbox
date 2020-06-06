@@ -5,16 +5,14 @@
 	
 <form>
 	<div class="ff">
-		<div class="instruct addnew x1pt2em">
-			<span>Add new item</span>
-				<span><select name="relativePosition">
-					<option value="0">Choose ...</option>
-					<c:forTokens items="below,alongside" delims="," var="relativePosition">
-						<option value="${relativePosition}" <c:if test="${_lastRelativePosition eq relativePosition}">selected</c:if>>${relativePosition}</option>
-					</c:forTokens>
-				</select></span>
+			<label>Add new item: </label>
+			<select name="relativePosition">
+				<option value="0">Choose ...</option>
+				<c:forTokens items="below,alongside" delims="," var="relativePosition">
+					<option value="${relativePosition}" <c:if test="${_lastRelativePosition eq relativePosition}">selected</c:if>>${relativePosition}</option>
+				</c:forTokens>
+			</select>
 			<span>'${editingItem.name}'</span>
-		</div>
 	</div>
 	
 	<div class="ff">
@@ -86,7 +84,7 @@
 	</div>
 
 	<div>
-		<button id="add-button" type="button"
+		<button id="add-button" type="button" disabled="disabled"
 			title="Add a new item of the specified type below the current item">Add</button>
 	</div>
 </form>

@@ -1,27 +1,55 @@
 _cms.add = {
 	behaviour: {},
+	sel: {
+		ADD_BUTTON: "#add-button",
+		ADD_TAB: "#add-tab",
+	}
 };
+
+var fs = function(name) {
+	return f(name, "select");
+}
+
+var fi = function(name) {
+	return f(name, "input");
+}
+
+var f = function (name, type) {
+	return _cms.add.sel.ADD_TAB + " " + type + "[name='" + name + "']";
+}
+
+_cms.add.sel.RELATIVE_POSITION_SELECTOR = fs("relativePosition");
+_cms.add.sel.TEMPLATE_SELECTOR = fs("template");
+_cms.add.sel.ITEMTYPE_SELECTOR = fs("itemtype");
+_cms.add.sel.NAME_INPUT = fi("name");
+_cms.add.sel.SIMPLENAME_INPUT = fi("simplename");
+_cms.add.sel.PARTNUM_INPUT = fi("partNum");
+_cms.add.sel.PRICE_INPUT = fi("price");
+_cms.add.sel.STOCK_INPUT = fi("stock");
+_cms.add.sel.ALPHA_SELECTOR = fs("alphaaxis");
+_cms.add.sel.BETA_SELECTOR = fs("betaaxis");
+_cms.add.sel.ALL_FORM_ELEMENTS = "".concat(_cms.add.sel.ADD_TAB, " select,", _cms.add.sel.ADD_TAB, " input");
 
 _cms.add.behaviour.add = function(nodeKey) {
 
 	// Add behaviour to add new item 
-	$("#add-button").click(function () {
-		var position = $("#add-tab select[name='relativePosition']").val();
+	$(_cms.add.sel.ADD_BUTTON).click(function () {
+		var position = $(_cms.add.sel.RELATIVE_POSITION_SELECTOR).val();
 		
 		$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/add", {
 			type: "POST",
 			cache: false,
 			data: {
 				relativePosition: position,
-				template: $("#add-tab select[name='template']").val(),
-				itemtype: $("#add-tab select[name='itemtype']").val(),
-				name: $("#add-tab input[name='name']").val(),
-				simplename: $("#add-tab input[name='simplename']").val(),
-				partNum: $("#add-tab input[name='partNum']").val(),
-				price: $("#add-tab input[name='price']").val(),
-				stock: $("#add-tab input[name='stock']").val(),
-				alphaaxis: $("#add-tab select[name='alphaaxis']").val(),
-				betaaxis: $("#add-tab select[name='betaaxis']").val()
+				template: $(_cms.add.sel.TEMPLATE_SELECTOR).val(),
+				itemtype: $(_cms.add.sel.ITEMTYPE_SELECTOR).val(),
+				name: $(_cms.add.sel.NAME_INPUT).val(),
+				simplename: $(_cms.add.sel.SIMPLENAME_INPUT).val(),
+				partNum: $(_cms.add.sel.PARTNUM_INPUT).val(),
+				price: $(_cms.add.sel.PRICE_INPUT).val(),
+				stock: $(_cms.add.sel.STOCK_INPUT).val(),
+				alphaaxis: $(_cms.add.sel.ALPHA_SELECTOR).val(),
+				betaaxis: $(_cms.add.sel.BETA_SELECTOR).val()
 			}, 
 			dataType: "json",
 			success: function(obj, status, z) {
@@ -52,8 +80,8 @@ _cms.add.behaviour.add = function(nodeKey) {
 
 _cms.add.behaviour.changetemplate = function() {
 	//Add behaviour to template & itemtype selectors 
-	$("#add-tab select[name='template']").change(function (e) {
-		var typeSelector = $("#add-tab select[name='itemtype']");
+	$(_cms.add.sel.TEMPLATE_SELECTOR).change(function (e) {
+		var typeSelector = $(_cms.add.sel.ITEMTYPE_SELECTOR);
 		var target = $(e.target);
 		
 		if (target.val() != "0") {
@@ -71,8 +99,27 @@ _cms.add.behaviour.changetemplate = function() {
 
 _cms.add.behaviour.changetype = function() {
 	// Add commerce form controls when user selects Product for item type 
-	$("#add-tab select[name='itemtype']").change(function (e) {
+	$(_cms.add.sel.ITEMTYPE_SELECTOR).change(function (e) {
 		_cms.support.displayCommerceElements($(e.target));
+	});
+}
+
+_cms.add.check_data_is_complete = function() {
+	var template = $(_cms.add.sel.TEMPLATE_SELECTOR).val();
+	var itemtype = $(_cms.add.sel.ITEMTYPE_SELECTOR).val();
+	var name = $(_cms.add.sel.NAME_INPUT).val();
+	
+	return (template != 0 || itemtype != 0) && name;
+}
+
+_cms.add.behaviour.formElementChange = function() {
+	$(_cms.add.sel.ALL_FORM_ELEMENTS).change(function(){
+		if (_cms.add.check_data_is_complete()) {
+			_cms.support.enable(_cms.add.sel.ADD_BUTTON);
+		}
+		else {
+			_cms.support.disable(_cms.add.sel.ADD_BUTTON);
+		}
 	});
 }
 
@@ -81,4 +128,5 @@ _cms.add.behaviour.all = function(nodeKey) {
 	_cms.add.behaviour.add(nodeKey);
 	_cms.add.behaviour.changetype();
 	_cms.add.behaviour.changetemplate();
+	_cms.add.behaviour.formElementChange();
 }
