@@ -1,19 +1,30 @@
 _cms.media = {
 	behaviour: {},
 	refresh: {},
+	sel: {
+		UPLOAD_BUTTON: "#media-button",
+		FORM: "#media-form",
+	}
 };
+
+_cms.media.sel.PROGRESS = _cms.media.sel.FORM + " progress";
+_cms.media.sel.THUMBNAIL_CHECKBOX = _cms.support.fi(_cms.media.sel.FORM, "thumbnail");
+_cms.media.sel.FILE_INPUT = _cms.support.fi(_cms.media.sel.FORM, "media");
+_cms.media.sel.WIDTH_INPUT_CONTAINER = _cms.media.sel.FORM + " .thumbnail-option";
+_cms.media.sel.WIDTH_INPUT = _cms.support.fi(_cms.media.sel.FORM, "width");
+_cms.media.sel.ALL_FORM_ELEMENTS = _cms.media.sel.FORM + " :input";
 
 
 _cms.media.behaviour.progressHandlingFunction = function(e) {	
 	// Add behaviour to update media content 
     if(e.lengthComputable){
-        $("progress").attr({value:e.loaded,max:e.total});
+        $(_cms.media.sel.PROGRESS).attr({value:e.loaded,max:e.total});
     }
 }
 
 _cms.media.behaviour.upload = function(nodeKey) {
-	$("#media-button").click(function () {
-		var formData = new FormData($("#media-form")[0]);
+	$(_cms.media.sel.UPLOAD_BUTTON).click(function () {
+		var formData = new FormData($(_cms.media.sel.FORM)[0]);
 	    $.ajax({
 	        url: _cms.ctx + "/rest/item/" + nodeKey + "/update/media",
 	        type: "POST",
@@ -40,31 +51,44 @@ _cms.media.behaviour.upload = function(nodeKey) {
 	});
 
 
-	$("#media-form input[name=media]").click(function () {
-		$("#media-form progress").attr("value", 0);
+	$(_cms.media.sel.FILE_INPUT).click(function () {
+		$(_cms.media.sel.PROGRESS).attr("value", 0);
 	});
 }
 
-_cms.media.thumbnailRequired = false;
-
 _cms.media.behaviour.thumbnailRequired = function() {
-	$("#media-form input[name='thumbnail']").click(function () {
-		var ele = $("#media-form .thumbnail-option");
-		if (! _cms.media.thumbnailRequired) {
+	$(_cms.media.sel.THUMBNAIL_CHECKBOX).click(function () {
+		var ele = $(_cms.media.sel.WIDTH_INPUT_CONTAINER);
+
+		if ($(this).is(':checked')) {
 			ele.show();
 		}
 		else {
 			ele.hide();
 		}
 		
-		_cms.media.thumbnailRequired = ! _cms.media.thumbnailRequired;
+		_cms.media.check_data_is_complete();
 	});
 }
 
-_cms.media.behaviour.enableUploadButton = function() {
-	$("#media-form input[name='media']").change(function(){
-		$("#media-button").removeAttr("disabled");
+_cms.media.behaviour.formchange = function() {
+	$(_cms.media.sel.ALL_FORM_ELEMENTS).mouseleave(function(){
+		_cms.media.check_data_is_complete();
 	});
+}
+
+_cms.media.check_data_is_complete = function() {
+	var isComplete = false;
+	if ($(_cms.media.sel.FILE_INPUT).val()) {
+		if ($(_cms.media.sel.THUMBNAIL_CHECKBOX).is(":checked")) {
+			isComplete = $(_cms.media.sel.WIDTH_INPUT).val() != "";
+		}
+		else {
+			isComplete = true;
+		}
+	}
+	
+	_cms.support.enableIf(_cms.media.sel.UPLOAD_BUTTON, isComplete);
 }
 
 _cms.media.refresh.tab = function(nodeKey) {
@@ -75,5 +99,5 @@ _cms.media.refresh.tab = function(nodeKey) {
 _cms.media.onrefresh = function(nodeKey) {
 	_cms.media.behaviour.upload(nodeKey);
 	_cms.media.behaviour.thumbnailRequired();
-	_cms.media.behaviour.enableUploadButton();
+	_cms.media.behaviour.formchange();
 }

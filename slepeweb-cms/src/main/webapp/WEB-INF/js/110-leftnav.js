@@ -56,7 +56,7 @@ _cms.leftnav.define.fancytree = function() {
 			}
 			else if (_cms.leftnav.mode == "move") {
 				$("#move-target-identifier").html("'" + data.node.title + "'");
-				_cms.move.activateActionButton();
+				_cms.move.check_data_is_complete();
 			}
 			
 			// Close left nav as soon as node has been selected

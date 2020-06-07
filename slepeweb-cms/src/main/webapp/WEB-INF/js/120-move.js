@@ -1,10 +1,18 @@
 _cms.move = {
 	behaviour: {},
 	tree: null,
+	sel: {
+		MOVE_WRAPPER: "#move-wrapper",
+		MOVE_BUTTON: "#move-item-button",
+		MOVE_TARGET_ID: "#move-target-identifier",
+	}
 };
 
+_cms.move.sel.POSITION_SELECTOR = _cms.support.fs(_cms.move.sel.MOVE_WRAPPER, "position");
+_cms.move.sel.ITEM_PICKER = _cms.move.sel.MOVE_WRAPPER + " i.itempicker";
+
 _cms.move.action = function(nodeKey) {
-	var position = $("#move-wrapper select[name='position']").val();
+	var position = $(_cms.move.sel.POSITION_SELECTOR).val();
 	var moverNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
 	var targetNode = _cms.leftnav.tree.activeNode;
 	var targetKey = targetNode.key;
@@ -37,46 +45,41 @@ _cms.move.action = function(nodeKey) {
 };
 
 _cms.move.behaviour.action = function(nodeKey) {
-	$("#move-item-button").click(function() {
+	$(_cms.move.sel.MOVE_BUTTON).click(function() {
 		_cms.move.action(nodeKey);
 	});
 }
 
 _cms.move.behaviour.itempicker = function() {
-	$("#move-wrapper i.itempicker").click(function() {
+	$(_cms.move.sel.ITEM_PICKER).click(function() {
 		_cms.leftnav.mode = "move";
 		_cms.leftnav.dialog.open();
 	});
 }
 
 _cms.move.dataIsComplete = function() {
-	var position = $("#move-wrapper select[name='position']").val();
-	var target = $("#move-target-identifier").html();
+	var position = $(_cms.move.sel.POSITION_SELECTOR).val();
+	var target = $(_cms.move.sel.MOVE_TARGET_ID).html();
 	return position != "none" && target.startsWith("'");
 }
 
-_cms.move.activateActionButton = function() {
-	var button = $("#move-item-button");
-	 
-	if (_cms.move.dataIsComplete()) {
-		button.removeAttr("disabled");
-	}
-	else {
-		button.attr("disabled", "disabled");
-	}
-}
-
-_cms.move.behaviour.position = function() {
-	$("#move-wrapper select[name='position']").change(function(){
-		_cms.move.activateActionButton();
+_cms.move.behaviour.changePosition = function() {
+	$(_cms.move.sel.POSITION_SELECTOR).change(function(){
+		_cms.move.check_data_is_complete();
 	});
 }
 
+_cms.move.check_data_is_complete = function() {
+	var isComplete = $(_cms.move.sel.POSITION_SELECTOR).val() != "none" && 
+		$(_cms.move.sel.MOVE_TARGET_ID).html().startsWith("'");
+	
+	_cms.support.enableIf(_cms.move.sel.MOVE_BUTTON, isComplete);
+}
 
 // Behaviours to apply once html is loaded/reloaded
 _cms.move.behaviour.all = function(nodeKey) {
 	_cms.move.behaviour.action(nodeKey);
 	_cms.move.behaviour.itempicker();
-	_cms.move.behaviour.position();
+	_cms.move.behaviour.changePosition();
 }
 
