@@ -3,14 +3,14 @@ _cms.field = {
 	support: {},
 	refresh: {},
 	sel: {
-		ALL_INPUTS: "#field-tab input",
-		ALL_SELECTS: "#field-tab select",
+		FIELD_TAB: "#field-tab",
 		UPDATE_BUTTON: "#field-button",
 		LANGUAGE_SELECT: "#field-language-selector select",
 	}
 };
 
-_cms.field.sel.ALL_FORM_ELEMENTS = "".concat(_cms.field.sel.ALL_INPUTS, ",", _cms.field.sel.ALL_INPUTS, ",#field-tab textarea");
+_cms.field.sel.FORM = "".concat(_cms.field.sel.FIELD_TAB, " form");
+_cms.field.sel.ALL_FORM_ELEMENTS = "".concat(_cms.field.sel.FORM, " :input");
 
 _cms.field.behaviour.update = function(nodeKey) {	
 	// Add behaviour to submit item field updates 
@@ -110,14 +110,16 @@ _cms.field.behaviour.changelanguage = function() {
 }
 
 _cms.field.behaviour.formchange = function() {
-	$(_cms.field.sel.ALL_FORM_ELEMENTS).change(function() {
+	$(_cms.field.sel.ALL_FORM_ELEMENTS).mouseleave(function() {
 		if ($(this).attr("name") != "language") {
-			_cms.support.enable(_cms.field.sel.UPDATE_BUTTON);
+			_cms.support.enableIf(_cms.field.sel.UPDATE_BUTTON, 
+					_cms.field.originalFormState !== $(_cms.field.sel.FORM).serialize());
 		}
 	});
 }
 
-_cms.field.behaviour.all = function(nodeKey) {
+_cms.field.onrefresh = function(nodeKey) {
+	_cms.field.originalFormState = $(_cms.field.sel.FORM).serialize();
 	_cms.field.behaviour.update(nodeKey);
 	_cms.field.behaviour.changelanguage();
 	_cms.field.behaviour.formchange();
@@ -127,5 +129,5 @@ _cms.field.behaviour.all = function(nodeKey) {
 }
 
 _cms.field.refresh.tab = function(nodeKey) {
-	_cms.support.refreshtab("field", nodeKey, _cms.field.behaviour.all);
+	_cms.support.refreshtab("field", nodeKey, _cms.field.onrefresh);
 };

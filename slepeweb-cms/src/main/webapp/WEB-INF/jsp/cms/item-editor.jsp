@@ -34,7 +34,7 @@
 
 <c:if test="${editingItem.path ne '/'}">
 	<%-- Avoid calling the getCopyDetails() method more than once per request --%>
-	<c:set var="_copyDetails" value="${editingItem.copyDetails}" />
+	<c:set var="_copyDetails" value="${editingItem.copyDetails}" scope="request" />
 	<div id="copy-tab"><edit:copy /></div>
 	<div id="move-tab"><edit:move /></div>
 </c:if>

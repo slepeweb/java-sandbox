@@ -20,6 +20,7 @@ _cms.core.sel.TAGS_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "tags");
 _cms.core.sel.PARTNUM_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.PRICE_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.STOCK_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
+_cms.core.sel.FORM = "".concat(_cms.core.sel.CORE_TAB, " form");
 
 _cms.core.behaviour.update = function(nodeKey) {
 	// Add behaviour to submit core item updates 
@@ -118,17 +119,19 @@ _cms.core.behaviour.trash = function(nodeKey) {
 }
 
 _cms.core.behaviour.formchange = function() {
-	$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).change(function() {
-		_cms.support.enable(_cms.core.sel.UPDATE_BUTTON);
+	$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).mouseleave(function() {
+		_cms.support.enableIf(_cms.core.sel.UPDATE_BUTTON, 
+				$(_cms.core.sel.FORM).serialize() !== _cms.core.originalFormState);
 	});
 }
 
 _cms.core.refresh.tab = function(nodeKey) {
-	_cms.support.refreshtab("core", nodeKey, _cms.core.behaviour.all);
+	_cms.support.refreshtab("core", nodeKey, _cms.core.onrefresh);
 };
 
-_cms.core.behaviour.all = function(nodeKey) {
+_cms.core.onrefresh = function(nodeKey) {
 	_cms.core.behaviour.formchange();
 	_cms.core.behaviour.update(nodeKey);
 	_cms.core.behaviour.trash();
+	_cms.core.originalFormState = $(_cms.core.sel.FORM).serialize();
 }

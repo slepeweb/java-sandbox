@@ -100,21 +100,16 @@ _cms.add.check_data_is_complete = function() {
 	return (template != 0 || itemtype != 0) && name;
 }
 
-_cms.add.behaviour.formElementChange = function() {
-	$(_cms.add.sel.ALL_FORM_ELEMENTS).change(function(){
-		if (_cms.add.check_data_is_complete()) {
-			_cms.support.enable(_cms.add.sel.ADD_BUTTON);
-		}
-		else {
-			_cms.support.disable(_cms.add.sel.ADD_BUTTON);
-		}
+_cms.add.behaviour.formchange = function() {
+	$(_cms.add.sel.ALL_FORM_ELEMENTS).mouseleave(function(){
+		_cms.support.enableIf(_cms.add.sel.ADD_BUTTON, _cms.add.check_data_is_complete());
 	});
 }
 
 // Behaviours to apply once html is loaded/reloaded
-_cms.add.behaviour.all = function(nodeKey) {
+_cms.add.onrefresh = function(nodeKey) {
 	_cms.add.behaviour.add(nodeKey);
 	_cms.add.behaviour.changetype();
 	_cms.add.behaviour.changetemplate();
-	_cms.add.behaviour.formElementChange();
+	_cms.add.behaviour.formchange();
 }

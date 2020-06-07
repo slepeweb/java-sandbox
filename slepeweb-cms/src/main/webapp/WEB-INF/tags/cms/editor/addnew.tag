@@ -85,6 +85,6 @@
 
 	<div>
 		<button id="add-button" type="button" disabled="disabled"
-			title="Add a new item of the specified type below the current item">Add</button>
+			title="Add a new item below/alongside the current item">Add</button>
 	</div>
 </form>

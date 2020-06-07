@@ -157,6 +157,15 @@ _cms.support.enable = function(selector) {
 	$(selector).removeAttr("disabled");
 }
 
+_cms.support.enableIf = function(selector, condition) {
+	if (condition) {
+		_cms.support.enable(selector);
+	}
+	else {
+		_cms.support.disable(selector);
+	}
+}
+
 _cms.support.fs = function(base, name) {
 	return _cms.support.f(base, name, "select");
 }
@@ -180,10 +189,10 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 		success: function(html, status, z) {
 			_cms.init(nodeKey, html, activeTab);
 			_cms.support.refreshHistory(_cms.siteId);
-			_cms.core.behaviour.all(nodeKey);
-			_cms.field.behaviour.all(nodeKey);
-			_cms.add.behaviour.all(nodeKey);
-			_cms.copy.behaviour.submit(nodeKey);	
+			_cms.core.onrefresh(nodeKey);
+			_cms.field.onrefresh(nodeKey);
+			_cms.add.onrefresh(nodeKey);
+			_cms.copy.onrefresh(nodeKey);	
 			_cms.version.behaviour.all(nodeKey);
 			_cms.links.onrefresh(nodeKey);
 			_cms.media.onrefresh(nodeKey);

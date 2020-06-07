@@ -103,7 +103,7 @@
 	</div>
 		
 	<div>
-		<button id="core-button" type="button" disabled="disabled">Update</button>
+		<button id="core-button" type="button" disabled="disabled" title="Update changes to core data">Update</button>
 		<button id="trash-button" type="button">Delete</button>
 	</div>
 </form>
