@@ -1,6 +1,6 @@
 _cms.move = {
 	behaviour: {},
-	tree: null,
+	refresh: {},
 	sel: {
 		MOVE_WRAPPER: "#move-wrapper",
 		MOVE_BUTTON: "#move-item-button",
@@ -10,6 +10,8 @@ _cms.move = {
 
 _cms.move.sel.POSITION_SELECTOR = _cms.support.fs(_cms.move.sel.MOVE_WRAPPER, "position");
 _cms.move.sel.ITEM_PICKER = _cms.move.sel.MOVE_WRAPPER + " i.itempicker";
+
+_cms.support.setTabIds(_cms.move, "move");
 
 _cms.move.action = function(nodeKey) {
 	var position = $(_cms.move.sel.POSITION_SELECTOR).val();
@@ -33,6 +35,8 @@ _cms.move.action = function(nodeKey) {
 				success: function(obj, status, z) {
 					if (! obj.error) {
 						moverNode.moveTo(targetNode, position);
+						targetNode.setActive(false);
+						_cms.move.refresh.tab(nodeKey);
 					}
 					_cms.support.flashMessage(obj);
 				},
@@ -76,8 +80,12 @@ _cms.move.check_data_is_complete = function() {
 	_cms.support.enableIf(_cms.move.sel.MOVE_BUTTON, isComplete);
 }
 
+_cms.move.refresh.tab = function(nodeKey) {
+	_cms.support.refreshtab(_cms.move.TABNAME, nodeKey, _cms.move.onrefresh);
+};
+
 // Behaviours to apply once html is loaded/reloaded
-_cms.move.behaviour.all = function(nodeKey) {
+_cms.move.onrefresh = function(nodeKey) {
 	_cms.move.behaviour.action(nodeKey);
 	_cms.move.behaviour.itempicker();
 	_cms.move.behaviour.changePosition();

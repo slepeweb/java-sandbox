@@ -178,6 +178,11 @@ _cms.support.f = function (base, name, type) {
 	return base + " " + type + "[name='" + name + "']";
 }
 
+_cms.support.setTabIds = function(obj, tabname) {
+	obj.TABNAME = tabname;
+	obj.TABID = tabname + "-tab";
+}
+
 _cms.support.renderItemForms = function(nodeKey, activeTab) {
 	$.ajax(_cms.ctx + "/rest/item/editor", {
 		cache: false,
@@ -193,12 +198,12 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 			_cms.field.onrefresh(nodeKey);
 			_cms.add.onrefresh(nodeKey);
 			_cms.copy.onrefresh(nodeKey);	
-			_cms.version.behaviour.all(nodeKey);
+			_cms.version.onrefresh(nodeKey);
 			_cms.links.onrefresh(nodeKey);
 			_cms.media.onrefresh(nodeKey);
 			_cms.misc.behaviour.trash.all(nodeKey);
 			_cms.misc.behaviour.reindex(nodeKey);			
-			_cms.move.behaviour.all(nodeKey);
+			_cms.move.onrefresh(nodeKey);
 		}
 	});
 };

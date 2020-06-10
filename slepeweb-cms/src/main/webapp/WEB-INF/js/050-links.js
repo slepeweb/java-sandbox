@@ -43,6 +43,7 @@ _cms.links.sel.LINKNAME_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.
 _cms.links.sel.CHILDID_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.CHILDID_INPUT;
 _cms.links.sel.SORTABLE_LINKS = _cms.links.sel.SORTABLE_LINKS_CONTAINER + " div.sortable-link";
 
+_cms.support.setTabIds(_cms.links, "links");
 
 _cms.links.show_addlink_form = function(data) {
 	if (data) {

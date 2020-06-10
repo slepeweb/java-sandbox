@@ -10,6 +10,8 @@ _cms.copy.sel.NAME_INPUT = _cms.support.fi(_cms.copy.sel.COPY_TAB, "name");
 _cms.copy.sel.SIMPLENAME_INPUT = _cms.support.fi(_cms.copy.sel.COPY_TAB, "simplename");
 _cms.copy.sel.ALL_INPUTS = "".concat(_cms.copy.sel.NAME_INPUT, ",", _cms.copy.sel.SIMPLENAME_INPUT);
 
+_cms.support.setTabIds(_cms.copy, "copy");
+
 _cms.copy.behaviour.submit = function(nodeKey) {
 
 	// Add behaviour to copy an item 

@@ -18,6 +18,8 @@ _cms.add.sel.ALPHA_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "alphaaxis")
 _cms.add.sel.BETA_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "betaaxis");
 _cms.add.sel.ALL_FORM_ELEMENTS = "".concat(_cms.add.sel.ADD_TAB, " select,", _cms.add.sel.ADD_TAB, " input");
 
+_cms.support.setTabIds(_cms.add, "add");
+
 _cms.add.behaviour.add = function(nodeKey) {
 
 	// Add behaviour to add new item 

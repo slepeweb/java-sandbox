@@ -12,6 +12,8 @@ _cms.field = {
 _cms.field.sel.FORM = "".concat(_cms.field.sel.FIELD_TAB, " form");
 _cms.field.sel.ALL_FORM_ELEMENTS = "".concat(_cms.field.sel.FORM, " :input");
 
+_cms.support.setTabIds(_cms.field, "field");
+
 _cms.field.behaviour.update = function(nodeKey) {	
 	// Add behaviour to submit item field updates 
 	$(_cms.field.sel.UPDATE_BUTTON).click(function () {

@@ -5,12 +5,23 @@ _cms.misc = {
 	trash: {
 		visible: false
 	},
-	refresh: {}
+	refresh: {},
+	sel: {
+		REINDEX_BUTTON: "#reindex-button",
+		TRASH_CONTAINER: "#trash-container",
+		SHOW_TRASH_BUTTON: "#trash-show-button",
+		EMPTY_TRASH_BUTTON: "#trash-empty-button",
+		RESTORE_TRASH_BUTTON: "#trash-restore-button",
+		SELECTED_TRASH_OPTION: "#trash-action input:checked",
+		SELECTED_TRASH_ITEMS: "#trash-table input:checked",
+	}
 };
+
+_cms.support.setTabIds(_cms.misc, "misc");
 
 _cms.misc.behaviour.reindex = function(nodeKey) {
 	// Add behaviour to re-index content for search 
-	$("#reindex-button").click(function () {
+	$(_cms.misc.sel.REINDEX_BUTTON).click(function () {
 		$.ajax(_cms.ctx + "/rest/search/reindex/" + nodeKey, {
 			type: "GET",
 			cache: false,
@@ -33,7 +44,7 @@ _cms.misc.refresh.trash = function(fn) {
 		mimeType: "text/html",
 		
 		success: function(html, status, z) {
-			var mydiv = $("#trash-container");
+			var mydiv = $(_cms.misc.sel.TRASH_CONTAINER);
 			mydiv.empty().append(html);
 			
 			// Apply behaviour for new/replaced buttons
@@ -52,23 +63,23 @@ _cms.misc.refresh.trash = function(fn) {
 
 _cms.misc.behaviour.trash.showOrHide = function() {
 	// Add behaviour to show trash contents 
-	$("#trash-show-button").click(function () {
+	$(_cms.misc.sel.SHOW_TRASH_BUTTON).click(function () {
 		if (! _cms.misc.trash.visible) {
 			_cms.misc.refresh.trash();
 			_cms.misc.trash.visible = true;
-			$("#trash-show-button").empty().append("Hide bin ...");
+			$(_cms.misc.sel.SHOW_TRASH_BUTTON).empty().append("Hide bin ...");
 		}
 		else {
-			$("#trash-container").empty();
+			$(_cms.misc.sel.TRASH_CONTAINER).empty();
 			_cms.misc.trash.visible = false;
-			$("#trash-show-button").empty().append("Show bin ...");
+			$(_cms.misc.sel.SHOW_TRASH_BUTTON).empty().append("Show bin ...");
 		}	
 	});	
 }
 
 _cms.misc.behaviour.trash.empty = function() {
 	// Add behaviour to empty the trash 
-	$("#trash-empty-button").click(function () {
+	$(_cms.misc.sel.EMPTY_TRASH_BUTTON).click(function () {
 		
 		// Are we emptying specific items, or all of them?
 		var option = _cms.misc.trash.getOption();
@@ -94,7 +105,7 @@ _cms.misc.behaviour.trash.empty = function() {
 _cms.misc.trash.getOption = function() {
 	// Are we emptying specific itesm, or all of them?
 	var option = null;
-	$("#trash-action input:checked").each(function() {
+	$(_cms.misc.sel.SELECTED_TRASH_OPTION).each(function() {
 	    option = $(this).attr("value");
 	});
 	
@@ -104,7 +115,7 @@ _cms.misc.trash.getOption = function() {
 _cms.misc.trash.getIdParams = function(option) {
 	if (option == "selected") {
 		var idList = "";
-		$("#trash-table input:checked").each(function() {
+		$(_cms.misc.sel.SELECTED_TRASH_ITEMS).each(function() {
 		    idList += ($(this).attr("value") + ",");
 		});
 		return {id: idList};
@@ -114,7 +125,7 @@ _cms.misc.trash.getIdParams = function(option) {
 
 _cms.misc.behaviour.trash.restore = function() {
 	// Add behaviour to restore the trash 
-	$("#trash-restore-button").click(function () {
+	$(_cms.misc.sel.RESTORE_TRASH_BUTTON).click(function () {
 		
 		// Are we restoring specific items, or all of them?
 		var option = _cms.misc.trash.getOption();
@@ -133,7 +144,7 @@ _cms.misc.behaviour.trash.restore = function() {
 				 */ 
 				_cms.support.fetchItemEditor(_cms.editingItemId, 
 						{error: false, messageEncoded: encodeURI("Page reloaded; check leftnav for restored items")}, 
-						"core-tab");
+						_cms.core.TABID);
 			},
 			error: function(json, status, z) {
 				_cms.support.serverError();

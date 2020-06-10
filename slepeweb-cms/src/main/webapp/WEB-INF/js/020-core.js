@@ -22,6 +22,8 @@ _cms.core.sel.PRICE_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.STOCK_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.FORM = "".concat(_cms.core.sel.CORE_TAB, " form");
 
+_cms.support.setTabIds(_cms.core, "core");
+
 _cms.core.behaviour.update = function(nodeKey) {
 	// Add behaviour to submit core item updates 
 	$(_cms.core.sel.UPDATE_BUTTON).click(function () {

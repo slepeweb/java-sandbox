@@ -31,4 +31,5 @@
 	<definition name="cms.refresh.links" template="/WEB-INF/jsp/cms/refresh/links.jsp" />
 	<definition name="cms.refresh.version" template="/WEB-INF/jsp/cms/refresh/version.jsp" />
 	<definition name="cms.refresh.media" template="/WEB-INF/jsp/cms/refresh/media.jsp" />
+	<definition name="cms.refresh.move" template="/WEB-INF/jsp/cms/refresh/move.jsp" />
 </tiles-definitions>

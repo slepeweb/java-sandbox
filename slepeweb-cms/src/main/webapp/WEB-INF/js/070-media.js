@@ -14,6 +14,7 @@ _cms.media.sel.WIDTH_INPUT_CONTAINER = _cms.media.sel.FORM + " .thumbnail-option
 _cms.media.sel.WIDTH_INPUT = _cms.support.fi(_cms.media.sel.FORM, "width");
 _cms.media.sel.ALL_FORM_ELEMENTS = _cms.media.sel.FORM + " :input";
 
+_cms.support.setTabIds(_cms.media, "media");
 
 _cms.media.behaviour.progressHandlingFunction = function(e) {	
 	// Add behaviour to update media content 

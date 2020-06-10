@@ -96,4 +96,14 @@ public class RefreshController extends BaseController {
 		
 		return "cms.refresh.media";		
 	}
+	
+	@RequestMapping(value="/item/{origId}/refresh/move", method=RequestMethod.GET)
+	public String refreshMoveTab(
+			@PathVariable long origId, ModelMap model) {	
+		
+		Item i = this.itemService.getEditableVersion(origId);
+		model.addAttribute("editingItem", i);
+		return "cms.refresh.move";		
+	}
+		
 }
