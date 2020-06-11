@@ -48,7 +48,7 @@ public class AncestryPageController extends BaseController {
 		Page page = getStandardPage(i, shortSitename, "homepage", model);
 		
 		List<Person> tops = new ArrayList<Person>();
-		for (Item c : i.getBoundItems(new ItemFilter().setTypes(new String[] {Person.PRIMARY, Person.PARTNER}))) {
+		for (Item c : i.getBoundItems(new ItemFilter().setTypes(new String[] {Person.BOY, Person.GIRL}))) {
 			tops.add(new Person(c));
 		}
 		
@@ -78,8 +78,8 @@ public class AncestryPageController extends BaseController {
 		return page.getView();
 	}
 
-	@RequestMapping(value="/primary")	
-	public String primary(
+	@RequestMapping(value="/boy")	
+	public String boy(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			ModelMap model) {	
@@ -106,13 +106,13 @@ public class AncestryPageController extends BaseController {
 		return page.getView();
 	}
 	
-	@RequestMapping(value="/partner")	
-	public String partner(
+	@RequestMapping(value="/girl")	
+	public String girl(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			ModelMap model) {	
 		
-		return primary(i, shortSitename, model);
+		return boy(i, shortSitename, model);
 	}
 	
 	@RequestMapping(value="/document")	
@@ -133,8 +133,8 @@ public class AncestryPageController extends BaseController {
 		return page.getView();
 	}	
 
-	@RequestMapping(value="/primary/gallery/{targetId}")	
-	public String primaryGallery(
+	@RequestMapping(value="/boy/gallery/{targetId}")	
+	public String boyGallery(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long targetId,
@@ -151,8 +151,8 @@ public class AncestryPageController extends BaseController {
 		return page.getView();
 	}	
 
-	@RequestMapping(value="/primary/record/{targetId}")	
-	public String primaryRecord(
+	@RequestMapping(value="/boy/record/{targetId}")	
+	public String boyRecord(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long targetId,
@@ -163,24 +163,24 @@ public class AncestryPageController extends BaseController {
 				subject, subject.getRecords(), RECORD_VIEW, RECORD_VIEW);
 	}	
 	
-	@RequestMapping(value="/partner/gallery/{targetId}")	
-	public String partnerGallery(
+	@RequestMapping(value="/girl/gallery/{targetId}")	
+	public String girlGallery(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
 		
-		return primaryGallery(i, shortSitename, targetId, model);
+		return boyGallery(i, shortSitename, targetId, model);
 	}	
 
-	@RequestMapping(value="/partner/record/{targetId}")	
-	public String partnerRecord(
+	@RequestMapping(value="/girl/record/{targetId}")	
+	public String girlRecord(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
 		
-		return primaryRecord(i, shortSitename, targetId, model);
+		return boyRecord(i, shortSitename, targetId, model);
 	}	
 	
 	@RequestMapping(value="/search", method=RequestMethod.POST)	
@@ -313,7 +313,7 @@ public class AncestryPageController extends BaseController {
 		List<Person> trail = new ArrayList<Person>();
 
 		for (Item i : p.getHeader().getBreadcrumbItems()) {
-			if (i.getType().getName().equals(Person.PRIMARY) || i.getType().getName().equals(Person.PARTNER)) {
+			if (i.getType().getName().equals(Person.BOY) || i.getType().getName().equals(Person.GIRL)) {
 				trail.add(new Person(i));
 			}
 		}

@@ -748,6 +748,10 @@ public class Item extends CmsBean {
 		return list;
 	}
 	
+	public boolean equalsId(Item other) {
+		return getId().equals(other.getId());
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -14,8 +14,8 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.common.util.DateUtil;
 
 /*
- * The subject can be either person in a relationship. It can be either the 'man' in a
- * relationship, or the other member of the pair. It is the person that has the focus.
+ * The subject can be either person in a relationship. It can be either the 'boy' in a
+ * relationship, or the other member of the pair. It is the subject that has the focus.
  */
 public class Relationship {
 	
@@ -99,17 +99,39 @@ public class Relationship {
 
 	private void setChildren() {
 		this.children = new ArrayList<Person>();
-		Item p = null;
 		
+		/*
+		 * In 1-to-many relationships, the content author MUST first add a child item
+		 * to the item representing the 'father' role, and then create a shortcut from the 'mother' 
+		 * item to the same child item. In this way, the parents of a child are clearly identified. 
+		 * 
+		 * In a 1-to-1 relationship, the content author only needs to attach child items to the
+		 * 'father' item. The code makes the assumption in this case that all the child items
+		 * had the same 'mother'.
+		 */
 		if (getSubject().isMultiPartnered()) {
 			/*
-			 * In this situation, where the subject has multiple partners, we examine
-			 * the children below the subject, AND the primary person, and draw out the
-			 * intersection of the two sets.
+			 * So, in the situation where the subject has multiple partners, we examine
+			 * the children below the subject, AND the partner, and draw out the
+			 * _intersection_ of the two sets. 
 			 */
+			intersect();
+		}
+		else {
+			/*
+			 * The subject has only one partner, so we just look at the bindings/shortcuts
+			 * of each person, and add them together (even though normal practise would be
+			 * to attach the child items to either one parent item or the other).
+			 */
+			union();
+		}
+	}
+	
+	private void intersect() {
+		if (this.partner != null) {
 			for (Person childOfSubject : identifyChildren(this.subject.getItem())) {
 				for (Person childOfPartner : identifyChildren(this.partner.getItem())) {
-					if (childOfPartner.getItem().getId().equals(childOfSubject.getItem().getId())) {
+					if (childOfPartner.getItem().equalsId(childOfSubject.getItem())) {
 						this.children.add(childOfPartner);
 						break;
 					}
@@ -117,19 +139,35 @@ public class Relationship {
 			}
 		}
 		else {
-			/*
-			 * The subject has only one partner, so we just look at the bindings/shortcuts
-			 * of the primary person.
-			 */
-			p = this.subject.isPrimary() ? this.subject.getItem() : this.partner.getItem();
-			this.children.addAll(identifyChildren(p));
+			this.children.addAll(identifyChildren(this.subject.getItem()));
+		}
+	}
+	
+	private void union() {
+		this.children.addAll(identifyChildren(this.subject.getItem()));
+		
+		if (this.partner != null) {
+			boolean isDuplicate;
+			for (Person childOfPartner : identifyChildren(this.partner.getItem())) {
+				isDuplicate = false;
+				for (Person c : this.children) {
+					if (childOfPartner.getItem().equalsId(c.getItem())) {
+						isDuplicate = true;
+						break;
+					}
+				}
+				
+				if (! isDuplicate) {
+					this.children.add(childOfPartner);
+				}
+			}
 		}
 	}
 	
 	private List<Person> identifyChildren(Item p) {
 		List<Person> children = new ArrayList<Person>();
 		
-		for (Item i : p.getBoundItems(new ItemFilter().setTypes(new String[] {Person.PRIMARY, Person.PARTNER}))) {
+		for (Item i : p.getBoundItems(new ItemFilter().setTypes(new String[] {Person.BOY, Person.GIRL}))) {
 			children.add(new Person(i));
 		}
 		

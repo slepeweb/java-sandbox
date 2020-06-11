@@ -123,12 +123,11 @@ public class Link extends CmsBean {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Link other = (Link) obj;
-		if (child == null) {
-			if (other.child != null)
-				return false;
-		} else if (!child.getId().equals(other.child.getId()))
+		
+		if (! equalsIds(obj))
 			return false;
+		
+		Link other = (Link) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -138,11 +137,6 @@ public class Link extends CmsBean {
 			if (other.ordering != null)
 				return false;
 		} else if (!ordering.equals(other.ordering))
-			return false;
-		if (parentId == null) {
-			if (other.parentId != null)
-				return false;
-		} else if (!parentId.equals(other.parentId))
 			return false;
 		if (type == null) {
 			if (other.type != null)
@@ -157,4 +151,19 @@ public class Link extends CmsBean {
 		return true;
 	}
 
+	public boolean equalsIds(Object obj) {
+		Link other = (Link) obj;
+		if (child == null) {
+			if (other.child != null)
+				return false;
+		} else if (!child.getId().equals(other.child.getId()))
+			return false;
+		if (parentId == null) {
+			if (other.parentId != null)
+				return false;
+		} else if (!parentId.equals(other.parentId))
+			return false;
+
+		return true;
+	}
 }

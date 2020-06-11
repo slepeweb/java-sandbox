@@ -387,12 +387,12 @@ button[disabled=disabled] {
 						background-image: url("fancytree-cms-icons.gif");
 					}
 					
-					span.fancytree-node.cms-icon-primary>span.fancytree-icon {
+					span.fancytree-node.cms-icon-boy>span.fancytree-icon {
 						background-position: -32px 0px;
 						background-image: url("fancytree-cms-icons.gif");
 					}
 					
-					span.fancytree-node.cms-icon-partner>span.fancytree-icon {
+					span.fancytree-node.cms-icon-girl>span.fancytree-icon {
 						background-position: -48px 0px;
 						background-image: url("fancytree-cms-icons.gif");
 					}

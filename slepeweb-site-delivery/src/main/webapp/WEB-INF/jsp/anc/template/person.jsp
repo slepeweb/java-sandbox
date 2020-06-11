@@ -37,7 +37,7 @@
 				
 			<c:if test="${_person.multiPartnered}">
 				<div id="partner-options">
-					${_person.firstName}'s partners: <br />
+					Choose partner: <br />
 					<c:forEach items="${_person.relationships}" var="_rel" varStatus="_stat">
 						<span><input type="radio" name="svgindex" value="${_stat.index}" 
 							<c:if test="${_stat.index eq 0}">checked</c:if>/> ${_rel.partner.name} </span>

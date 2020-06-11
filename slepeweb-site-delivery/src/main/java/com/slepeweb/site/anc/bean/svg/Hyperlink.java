@@ -19,13 +19,19 @@ public class Hyperlink extends Coord {
 	}
 	
 	public String getLinkTag() {
-		return String.format(ANCHOR_FORMAT_STR, 
-				this.person.getItem().getUrl(), getText());
+		if (this.person != null) {
+			return String.format(ANCHOR_FORMAT_STR, 
+					this.person.getItem().getUrl(), getText());
+		}
+		return "";
 	}
 
 	public String getSingleLineTextLinkTag() {
-		return String.format(ANCHOR_FORMAT_STR, 
-				this.person.getItem().getUrl(), getSingleLineText());
+		if (this.person != null) {
+			return String.format(ANCHOR_FORMAT_STR, 
+					this.person.getItem().getUrl(), getSingleLineText());
+		}
+		return "";
 	}
 
 	public String getText() {

@@ -15,21 +15,21 @@ import com.slepeweb.cms.bean.LinkType;
 
 public class Person {
 	
-	public static final String PRIMARY = "Primary";
-	public static final String PARTNER = "Partner";
+	public static final String BOY = "Boy";
+	public static final String GIRL = "Girl";
 
 	private String firstName, lastName, middleNames;
 	private String birthSummary, deathSummary;
 	private Person mother, father;
 	private List<Person> siblings;
 	private List<Relationship> relationships;
-	private boolean primary;
+	private boolean boy;
 	private Item item, photo;
 	private List<Item> documents, records, gallery;
 	
 	public Person(Item i) {
 		this.item = i;
-		this.primary = i.getType().getName().equals(Person.PRIMARY);
+		this.boy = i.getType().getName().equals(Person.BOY);
 		
 		this.birthSummary = i.getFieldValue("birthsummary");
 		this.deathSummary = i.getFieldValue("deathsummary");
@@ -89,22 +89,39 @@ public class Person {
 		if (
 				parentItem != null && 
 				! parentItem.getPath().equals("/") && 
-				(parentItem.getType().getName().equals(Person.PRIMARY) || parentItem.getType().getName().equals(Person.PARTNER))) {
+				(parentItem.getType().getName().equals(Person.BOY) || parentItem.getType().getName().equals(Person.GIRL))) {
 			
 			Person parentPerson = new Person(parentItem);
-			this.father = parentPerson;
+			Person otherParentPerson = null;
 			List<Relationship> relationships = parentPerson.getRelationships();
 			
 			if (relationships.size() == 1) {
-				this.mother = relationships.get(0).getPartner();
+				otherParentPerson = relationships.get(0).getPartner();
 			}
 			else {
-				LinkFilter f = new LinkFilter().setLinkType(LinkType.shortcut).setItemType(Person.PARTNER);;
+				LinkFilter f = new LinkFilter().setLinkType(LinkType.shortcut).setItemType(Person.GIRL);
 				Link l = f.filterFirst(this.item.getParentLinks());
 				
 				if (l != null) {
-					this.mother = new Person(l.getChild());
+					otherParentPerson = new Person(l.getChild());
 				}
+				else {
+					f.setLinkType(Person.BOY);
+					l = f.filterFirst(this.item.getParentLinks());
+					
+					if (l != null) {
+						otherParentPerson = new Person(l.getChild());
+					}
+				}
+			}
+			
+			if (parentPerson.isBoy()) {
+				this.father = parentPerson;
+				this.mother = otherParentPerson;
+			}
+			else {
+				this.father = otherParentPerson;
+				this.mother = parentPerson;
 			}
 		}
 	}
@@ -112,14 +129,27 @@ public class Person {
 	private void setRelationships() {
 		this.relationships = new ArrayList<Relationship>();
 		
-		LinkFilter f = new LinkFilter().setName("partner").setLinkType(LinkType.relation);
+		LinkFilter f = new LinkFilter().setName("partner").setLinkType(LinkType.relation);		
 		
-		List<Link> partners = isPrimary() ? 
-				f.filterLinks(this.item.getRelations()) :
-					f.filterLinks(this.item.getParentLinks());
+		// Who does this person have partner links with? (ie child links)
+		List<Link> partners = f.filterLinks(this.item.getRelations());
+		
+		// Which persons have partner links to this person? (ie parent links)
+		for (Link l : f.filterLinks(this.item.getParentLinks(false))) {
+			if ( ! l.getChild().getOrigId().equals(getItem().getOrigId())) {
+				partners.add(l);
+			}
+		}
 					
-		for (Link l : partners) {
-			this.relationships.add(new Relationship(this, l));
+		if (partners.size() > 0) {
+			for (Link l : partners) {
+				this.relationships.add(new Relationship(this, l));
+			}
+		}
+		else {
+			// Single parent case:
+			Person p = null;
+			this.relationships.add(new Relationship(this, p));
 		}
 		
 		// Order relationships by date
@@ -136,7 +166,7 @@ public class Person {
 	
 	private void setSiblings() {
 		this.siblings = new ArrayList<Person>();
-		for (Item sibling : this.item.getParent().getBoundItems(new ItemFilter().setTypes(new String[] {Person.PRIMARY, Person.PARTNER}))) {
+		for (Item sibling : this.item.getParent().getBoundItems(new ItemFilter().setTypes(new String[] {Person.BOY, Person.GIRL}))) {
 			if (! sibling.getPath().equals(this.item.getPath())) {
 				this.siblings.add(new Person(sibling));
 			}
@@ -194,8 +224,8 @@ public class Person {
 		return r == null ? new ArrayList<Person>() : r.getChildren();
 	}
 
-	public boolean isPrimary() {
-		return primary;
+	public boolean isBoy() {
+		return boy;
 	}
 
 	public Item getItem() {
