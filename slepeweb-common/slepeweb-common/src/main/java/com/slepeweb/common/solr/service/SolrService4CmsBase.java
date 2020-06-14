@@ -27,7 +27,7 @@ public abstract class SolrService4CmsBase extends SolrServiceBase {
 	 */
 	protected abstract List<Object> makeDocuments(Object i);
 	
-	protected boolean save(long siteId, Object i) {
+	protected boolean saveItem(Object i) {
 		List<Object> docs = makeDocuments(i);
 		try {
 			/*UpdateResponse resp = */ getBatchingClient().addBeans(docs);
@@ -41,7 +41,7 @@ public abstract class SolrService4CmsBase extends SolrServiceBase {
 		}
 	}
 	
-	protected boolean remove(long siteId, long origId) {
+	protected boolean removeItemByOrigId(long origId) {
 		try {
 			/*UpdateResponse resp = */ getClient().deleteById(String.valueOf(origId));
 			getClient().commit();
@@ -54,9 +54,22 @@ public abstract class SolrService4CmsBase extends SolrServiceBase {
 		}
 	}
 	
-	protected boolean remove(long siteId) {
+	protected boolean removeItemBySiteId(long siteId) {
 		try {
 			/*UpdateResponse resp = */ getClient().deleteByQuery(String.format("siteid:%d", siteId));
+			getClient().commit();
+			LOG.debug("Items successfully removed from Solr index");
+			return true;
+		}
+		catch (Exception e) {
+			LOG.error("Solr failed to remove items from Solr index", e);
+			return false;
+		}
+	}
+	
+	protected boolean removeSectionByPath(long siteId, String path) {
+		try {
+			/*UpdateResponse resp = */ getClient().deleteByQuery(String.format("siteid:%d AND path_tokens:\"%s\"", siteId, path));
 			getClient().commit();
 			LOG.debug("Items successfully removed from Solr index");
 			return true;

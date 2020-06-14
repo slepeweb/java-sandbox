@@ -201,8 +201,7 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 			_cms.version.onrefresh(nodeKey);
 			_cms.links.onrefresh(nodeKey);
 			_cms.media.onrefresh(nodeKey);
-			_cms.misc.behaviour.trash.all(nodeKey);
-			_cms.misc.behaviour.reindex(nodeKey);			
+			_cms.misc.onrefresh(nodeKey);
 			_cms.move.onrefresh(nodeKey);
 		}
 	});

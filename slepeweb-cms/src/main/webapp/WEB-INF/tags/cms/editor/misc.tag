@@ -4,8 +4,17 @@
 <cms:debug><!-- tags/cms/editor/version.tag --></cms:debug>
 	
 <div>
+	<button id="publish-button" type="button"
+		title="Publish this item and all its descendants">Publish</button>
+	<span> '${editingItem.name}' and ALL its descendants</span>
+	<div id="publish-progressbar" class="progressbar"></div>
+</div>
+
+<div>
 	<button id="reindex-button" type="button"
 		title="Refresh the search index for this item and all its descendants">Re-index</button>
+	<span> '${editingItem.name}' and ALL its descendants</span>
+	<div id="reindex-progressbar" class="progressbar"></div>
 </div>
 
 <div>

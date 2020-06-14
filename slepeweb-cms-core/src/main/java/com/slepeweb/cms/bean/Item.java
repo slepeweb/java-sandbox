@@ -643,6 +643,10 @@ public class Item extends CmsBean {
 		return filterLinks(new String[] {LinkType.binding, LinkType.shortcut});
 	}
 
+	public List<Link> getBindingsNoShortcuts() {
+		return filterLinks(new String[] {LinkType.binding});
+	}
+
 	public List<Link> getInlines() {
 		return filterLinks(new String[] {LinkType.inline});
 	}

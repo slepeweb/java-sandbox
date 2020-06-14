@@ -31,27 +31,52 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 	}
 	
 	public boolean save(Item i) {
-		return super.save(i.getSite().getId(), i);
+		return super.saveItem(i);
 	}
 	
 	public boolean remove(Item i) {
-		return super.remove(i.getSite().getId(), i.getOrigId());
+		return super.removeItemByOrigId(i.getOrigId());
 	}
 	
 	public boolean remove(Site s) {
-		return super.remove(s.getId());
+		return super.removeItemBySiteId(s.getId());
+	}
+	
+	public boolean removeSection(Item i) {
+		Site site = i.getSite();
+		boolean result = true;
+		
+		if (site.isMultilingual()) {
+			for (String language : site.getAllLanguages()) {
+				result = result && super.removeSectionByPath(site.getId(), String.format("/%s%s", language, i.getPath()));
+			}
+		}
+		else {
+			result = super.removeSectionByPath(site.getId(), i.getPath());
+		}
+		
+		return result;
 	}
 		
 	public void indexSection(Item parentItem) {
+		// First, wipe section from solr
+		removeSection(parentItem);
+		
+		// Now recursively crawl down section, and save each item found
+		indexSectionRecursive(parentItem);
+		
+	}
+	
+	private void indexSectionRecursive(Item parentItem) {
 		// The solrService composites content from this item and its main components
 		save(parentItem);
 		
 		for (Link l : parentItem.getBindings()) {
 			if (! l.getType().equals(LinkType.shortcut)) {
-				indexSection(l.getChild());
+				indexSectionRecursive(l.getChild());
 			}
 		}
-	}	
+	}
 	
 	/*
 	 * NOTE: This method is site-specific, since item field names will probably vary,
@@ -112,7 +137,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				if (i.getSite().getShortname().equals("anc")) {
 					doc.setBodytext(getFieldValue(i, FieldName.OVERVIEW, language, true, null));
 					
-					if (i.getType().getName().equals("Primary") || i.getType().getName().equals("Partner")) {
+					if (i.getType().getName().equals("Boy") || i.getType().getName().equals("Girl")) {
 						StringBuilder sb = new StringBuilder(i.getFieldValue("firstname")).append(" ").
 								append(i.getFieldValue("middlenames")).append(" ").
 								append(i.getFieldValue("lastname"));

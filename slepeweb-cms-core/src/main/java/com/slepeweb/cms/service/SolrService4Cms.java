@@ -9,6 +9,7 @@ public interface SolrService4Cms {
 	boolean save(Item i);
 	boolean remove(Item i);
 	boolean remove(Site s);
+	boolean removeSection(Item i);
 	Object getDocument(Item i);
 	Object getDocument(Item i, String language);
 }

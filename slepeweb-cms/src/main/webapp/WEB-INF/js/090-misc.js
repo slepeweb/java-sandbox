@@ -7,6 +7,7 @@ _cms.misc = {
 	},
 	refresh: {},
 	sel: {
+		PUBLISH_BUTTON: "#publish-button",
 		REINDEX_BUTTON: "#reindex-button",
 		TRASH_CONTAINER: "#trash-container",
 		SHOW_TRASH_BUTTON: "#trash-show-button",
@@ -14,6 +15,8 @@ _cms.misc = {
 		RESTORE_TRASH_BUTTON: "#trash-restore-button",
 		SELECTED_TRASH_OPTION: "#trash-action input:checked",
 		SELECTED_TRASH_ITEMS: "#trash-table input:checked",
+		PUBLISH_PROGRESSBAR: "#publish-progressbar",
+		REINDEX_PROGRESSBAR: "#reindex-progressbar",
 	}
 };
 
@@ -22,6 +25,9 @@ _cms.support.setTabIds(_cms.misc, "misc");
 _cms.misc.behaviour.reindex = function(nodeKey) {
 	// Add behaviour to re-index content for search 
 	$(_cms.misc.sel.REINDEX_BUTTON).click(function () {
+		var bar = $(_cms.misc.sel.REINDEX_PROGRESSBAR);
+		_cms.misc.updateProgressbar(bar, false);
+		
 		$.ajax(_cms.ctx + "/rest/search/reindex/" + nodeKey, {
 			type: "GET",
 			cache: false,
@@ -29,9 +35,34 @@ _cms.misc.behaviour.reindex = function(nodeKey) {
 			
 			success: function(obj, status, z) {
 				_cms.support.flashMessage(obj);
+				_cms.misc.updateProgressbar(bar, "destroy");
 			},
 			error: function(json, status, z) {
 				_cms.support.serverError();
+				_cms.misc.updateProgressbar(bar, "destroy");
+			},
+		});
+	});
+}
+
+_cms.misc.behaviour.publish = function(nodeKey) {
+	// Add behaviour to publish an entire section 
+	$(_cms.misc.sel.PUBLISH_BUTTON).click(function () {
+		var bar = $(_cms.misc.sel.PUBLISH_PROGRESSBAR);
+		_cms.misc.updateProgressbar(bar, false);
+		
+		$.ajax(_cms.ctx + "/rest/search/publish/" + nodeKey, {
+			type: "GET",
+			cache: false,
+			dataType: "json",
+			
+			success: function(obj, status, z) {
+				_cms.support.flashMessage(obj);
+				_cms.misc.updateProgressbar(bar, "destroy");
+			},
+			error: function(json, status, z) {
+				_cms.support.serverError();
+				_cms.misc.updateProgressbar(bar, "destroy");
 			},
 		});
 	});
@@ -153,8 +184,18 @@ _cms.misc.behaviour.trash.restore = function() {
 	});
 }
 
+_cms.misc.updateProgressbar = function(bar, value) {
+	if (value == false) {
+		bar.progressbar({value: value});
+	}
+	else if (value == "destroy") {
+		bar.progressbar("destroy");
+	}
+}
+
 // Behaviours to apply once html is loaded/reloaded
-_cms.misc.behaviour.trash.all = function(nodeKey) {
+_cms.misc.onrefresh = function(nodeKey) {
+	_cms.misc.behaviour.publish(nodeKey);
 	_cms.misc.behaviour.reindex(nodeKey);
 	/*
 	 * empty() and restore() are triggered by buttons introduced by the refresh() function,

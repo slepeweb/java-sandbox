@@ -117,9 +117,9 @@ public class SolrDocument4Cms {
 		return this;
 	}
 	
-	public SolrDocument4Cms setKey(String id, String language) {
-		this.key = String.format("%s-%s", id, language);
-		this.id = id;
+	public SolrDocument4Cms setKey(String origId, String language) {
+		this.key = String.format("%s-%s", origId, language);
+		this.id = origId;
 		this.language = language;
 		return this;
 	}

@@ -332,6 +332,12 @@ details {
 	justify-self: center;
 }
 
+.progressbar {
+	display: inline-block;
+	width: 15em;
+	margin-left: 1em;
+}
+
 #core-commerce {
 	display: none;
 }
