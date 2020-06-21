@@ -63,6 +63,7 @@ import com.slepeweb.cms.service.LinkNameService;
 import com.slepeweb.cms.service.LinkService;
 import com.slepeweb.cms.service.LinkTypeService;
 import com.slepeweb.cms.service.MediaService;
+import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.service.TemplateService;
 import com.slepeweb.commerce.bean.Product;
@@ -89,6 +90,7 @@ public class RestController extends BaseController {
 	@Autowired private CookieService cookieService;
 	@Autowired private NavigationController navigationController;
 	@Autowired private HostService hostService;
+	@Autowired private SolrService4Cms solrService4Cms;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -129,6 +131,9 @@ public class RestController extends BaseController {
 			
 			// Last relative position selection for 'addnew'
 			model.addAttribute("_lastRelativePosition", this.cookieService.getRelativePositionCookieValue(req));
+			
+			// Total number of editable items in this section
+			model.addAttribute("_numItemsInSection", this.itemService.getCountByPath(i));
 		}
 		
 		return "cms.item.editor";		
@@ -624,6 +629,73 @@ public class RestController extends BaseController {
 		i.trash();
 			
 		return resp.addMessage("Item trashed").setData(parent.getOrigId());
+	}
+	
+	@RequestMapping(value="/item/{origId}/publish/section", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public RestResponse publishSection(
+			@PathVariable long origId, 
+			@RequestParam(value="publish_option", required=true) String publishOption,
+			ModelMap model) {	
+		
+		RestResponse resp = new RestResponse();		
+		Item i = this.itemService.getEditableVersion(origId);
+		int count = 0;
+		
+		if (i != null) {
+			count = actionSection(i, "published", publishOption.equals("publish"));
+			return resp.addMessage(String.format("Section publication status updated, total %d items", count));
+		}
+		
+		return resp.addMessage(String.format("Section not identifiable [%d]", origId)).setError(true);
+	}
+	
+	@RequestMapping(value="/item/{origId}/searchable/section", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public RestResponse searchableSection(
+			@PathVariable long origId, 
+			@RequestParam(value="searchable_option", required=true) String searchableOption,
+			ModelMap model) {	
+		
+		RestResponse resp = new RestResponse();		
+		Item i = this.itemService.getEditableVersion(origId);
+		int count = 0;
+		
+		if (i != null) {
+			if (searchableOption.equals("re-index")) {
+				count = this.solrService4Cms.indexSection(i);
+				return resp.addMessage(String.format("Section re-indexed, total %d items", count));
+			}
+			else {
+				count = actionSection(i, "searchable", searchableOption.equals("searchable"));
+				return resp.addMessage(String.format("Section searchability actioned, total %d items updated", count));
+			}
+		}
+		
+		return resp.addMessage(String.format("Section not identifiable [%d]", origId)).setError(true);
+	}
+	
+	private int actionSection(Item i, String selector, boolean value) {
+		int count = actionItem(i, selector, value);
+
+		for (Link l : i.getBindingsNoShortcuts()) {
+			count += actionItem(l.getChild(), selector, value);
+		}
+		
+		return count;
+	}
+	
+	private int actionItem(Item i, String selector, boolean value) {
+		if (selector.equals("published") && i.isPublished() != value) {
+			this.itemService.updatePublished(i.getId(), value);
+			return 1;
+		}
+		else if (selector.equals("searchable") && i.isSearchable() != value) {
+			this.itemService.updateSearchable(i.getId(), value);
+			return 1;
+		}
+		
+		return 0;
 	}
 	
 	@RequestMapping(value="/trash/get")

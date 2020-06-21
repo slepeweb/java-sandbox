@@ -5,7 +5,7 @@ import com.slepeweb.cms.bean.Site;
 
 public interface SolrService4Cms {
 	
-	void indexSection(Item parentItem);
+	int indexSection(Item parentItem);
 	boolean save(Item i);
 	boolean remove(Item i);
 	boolean remove(Site s);

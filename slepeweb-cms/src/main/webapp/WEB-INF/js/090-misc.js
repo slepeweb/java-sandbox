@@ -8,7 +8,7 @@ _cms.misc = {
 	refresh: {},
 	sel: {
 		PUBLISH_BUTTON: "#publish-button",
-		REINDEX_BUTTON: "#reindex-button",
+		SEARCH_BUTTON: "#reindex-button",
 		TRASH_CONTAINER: "#trash-container",
 		SHOW_TRASH_BUTTON: "#trash-show-button",
 		EMPTY_TRASH_BUTTON: "#trash-empty-button",
@@ -16,56 +16,79 @@ _cms.misc = {
 		SELECTED_TRASH_OPTION: "#trash-action input:checked",
 		SELECTED_TRASH_ITEMS: "#trash-table input:checked",
 		PUBLISH_PROGRESSBAR: "#publish-progressbar",
-		REINDEX_PROGRESSBAR: "#reindex-progressbar",
+		SEARCH_PROGRESSBAR: "#reindex-progressbar",
+		PUBLISH_OPTION: "#misc-tab input[name=publish_option]:checked",
+		SEARCH_OPTION: "#misc-tab input[name=searchable_option]:checked",
+		ANY_OPTION: "#misc-tab input[type=radio]",
 	}
 };
 
 _cms.support.setTabIds(_cms.misc, "misc");
 
-_cms.misc.behaviour.reindex = function(nodeKey) {
+_cms.misc.behaviour.section_ops = function(nodeKey) {
+	
 	// Add behaviour to re-index content for search 
-	$(_cms.misc.sel.REINDEX_BUTTON).click(function () {
-		var bar = $(_cms.misc.sel.REINDEX_PROGRESSBAR);
-		_cms.misc.updateProgressbar(bar, false);
+	$(_cms.misc.sel.SEARCH_BUTTON).click(function () {
+		var option = {
+				searchable_option: $(_cms.misc.sel.SEARCH_OPTION).val(),
+		}
 		
-		$.ajax(_cms.ctx + "/rest/search/reindex/" + nodeKey, {
-			type: "GET",
-			cache: false,
-			dataType: "json",
-			
-			success: function(obj, status, z) {
-				_cms.support.flashMessage(obj);
-				_cms.misc.updateProgressbar(bar, "destroy");
-			},
-			error: function(json, status, z) {
-				_cms.support.serverError();
-				_cms.misc.updateProgressbar(bar, "destroy");
-			},
-		});
+		_cms.misc.opSection(
+				nodeKey,
+				"POST",
+				"/rest/item/" + nodeKey + "/searchable/section",
+				$(_cms.misc.sel.SEARCH_PROGRESSBAR),
+				option);
+	});
+
+	// Add behaviour to publish an entire section 
+	$(_cms.misc.sel.PUBLISH_BUTTON).click(function () {
+		var option = {
+				publish_option: $(_cms.misc.sel.PUBLISH_OPTION).val(),
+		}
+		
+		_cms.misc.opSection(
+				nodeKey,
+				"POST",
+				"/rest/item/" + nodeKey + "/publish/section",
+				$(_cms.misc.sel.PUBLISH_PROGRESSBAR),
+				option);
+	});
+	
+	$(_cms.misc.sel.ANY_OPTION).click(function(){
+		var ancestor = $(this).parent().parent().parent();
+		var button = ancestor.find("button");
+		button.removeAttr("disabled");
 	});
 }
 
-_cms.misc.behaviour.publish = function(nodeKey) {
-	// Add behaviour to publish an entire section 
-	$(_cms.misc.sel.PUBLISH_BUTTON).click(function () {
-		var bar = $(_cms.misc.sel.PUBLISH_PROGRESSBAR);
-		_cms.misc.updateProgressbar(bar, false);
-		
-		$.ajax(_cms.ctx + "/rest/search/publish/" + nodeKey, {
-			type: "GET",
-			cache: false,
-			dataType: "json",
-			
-			success: function(obj, status, z) {
-				_cms.support.flashMessage(obj);
-				_cms.misc.updateProgressbar(bar, "destroy");
-			},
-			error: function(json, status, z) {
-				_cms.support.serverError();
-				_cms.misc.updateProgressbar(bar, "destroy");
-			},
-		});
+_cms.misc.opSection = function(nodeKey, method, url, bar, data, success, error) {
+	_cms.misc.updateProgressbar(bar, false);
+	
+	if (! success) {
+		success = function(obj, status, z) {
+			_cms.support.flashMessage(obj);
+			_cms.misc.updateProgressbar(bar, "destroy");
+			_cms.support.refreshtab("core", nodeKey);
+		}
+	}
+	
+	if (! error) {
+		error = function(json, status, z) {
+			_cms.support.serverError();
+			_cms.misc.updateProgressbar(bar, "destroy");
+		}
+	}
+	
+	$.ajax(_cms.ctx + url, {
+		type: method,
+		cache: false,
+		dataType: "json",
+		data: data,
+		success: success,
+		error: error,
 	});
+
 }
 
 _cms.misc.refresh.trash = function(fn) {
@@ -185,18 +208,19 @@ _cms.misc.behaviour.trash.restore = function() {
 }
 
 _cms.misc.updateProgressbar = function(bar, value) {
-	if (value == false) {
-		bar.progressbar({value: value});
-	}
-	else if (value == "destroy") {
-		bar.progressbar("destroy");
+	if (bar) {
+		if (value == false) {
+			bar.progressbar({value: value});
+		}
+		else if (value == "destroy") {
+			bar.progressbar("destroy");
+		}
 	}
 }
 
 // Behaviours to apply once html is loaded/reloaded
 _cms.misc.onrefresh = function(nodeKey) {
-	_cms.misc.behaviour.publish(nodeKey);
-	_cms.misc.behaviour.reindex(nodeKey);
+	_cms.misc.behaviour.section_ops(nodeKey);
 	/*
 	 * empty() and restore() are triggered by buttons introduced by the refresh() function,
 	 * so do not appear here.

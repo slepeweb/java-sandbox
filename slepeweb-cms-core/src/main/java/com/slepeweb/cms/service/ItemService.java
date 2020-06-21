@@ -23,8 +23,8 @@ public interface ItemService {
 	Item save(Item i, boolean extended) throws ResourceException;
 	void saveFieldValues(FieldValueSet fvs) throws ResourceException;
 	void saveLinks(Item i) throws ResourceException, DuplicateItemException;
-	int getCount();
-	int getCount(String path);
+	//int getCount();
+	//int getCount(String path);
 	int getCountByType(Long itemTypeId);
 	int getVersionCount(long origid);
 	boolean move(Item child, Item currentParent, Item targetParent, Item target, 
@@ -40,4 +40,7 @@ public interface ItemService {
 	Item copy(Item source, String name, String simplename) throws ResourceException;
 	Item version(Item source) throws ResourceException;
 	Item revert(Item source) throws ResourceException;
+	int getCountByPath(Item i);
+	boolean updatePublished(Long id, boolean b);
+	boolean updateSearchable(Long id, boolean b);
 }

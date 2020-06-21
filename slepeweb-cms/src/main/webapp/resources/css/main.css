@@ -79,6 +79,7 @@ p.main-heading {
 
 hr {
 	opacity: 0.4;
+	margin-top: 1.0em;
 	margin-bottom: 1.0em;
 }
 
@@ -284,7 +285,7 @@ details {
 							
 							#item-editor #trash-button {
 								background: red;
-								float: right;
+/* 								float: right; */
 							}
 							
 							#version-tab button {
@@ -334,8 +335,34 @@ details {
 
 .progressbar {
 	display: inline-block;
-	width: 15em;
+/* 	width: 15em; */
 	margin-left: 1em;
+}
+
+.section-ops {
+	display: grid;
+	grid-template-columns: 4fr 1fr 2fr;
+	margin-top: 1.0em;
+}
+
+.section-ops.delete {
+	margin-top: 2.0em;
+}
+
+.section-ops span {
+	margin-left: -0.5em
+}
+
+.section-ops input[type=radio] {
+	margin-left: 1.0em
+}
+
+.section-ops .radio-pair {
+	display: block;
+}
+
+#item-editor .section-ops button {
+	margin-top: 0em;
 }
 
 #core-commerce {
@@ -474,5 +501,10 @@ button[disabled=disabled] {
 		max-width: 150px;
 		width: 100%;
 	}
+	
+	.section-ops .radio-pair {
+		display: inline-block;
+	}
+
 }
 

@@ -58,24 +58,27 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 		return result;
 	}
 		
-	public void indexSection(Item parentItem) {
+	public int indexSection(Item parentItem) {
 		// First, wipe section from solr
 		removeSection(parentItem);
 		
 		// Now recursively crawl down section, and save each item found
-		indexSectionRecursive(parentItem);
+		return indexSectionRecursive(parentItem);
 		
 	}
 	
-	private void indexSectionRecursive(Item parentItem) {
+	private int indexSectionRecursive(Item parentItem) {
 		// The solrService composites content from this item and its main components
 		save(parentItem);
+		int count = 1;
 		
 		for (Link l : parentItem.getBindings()) {
 			if (! l.getType().equals(LinkType.shortcut)) {
-				indexSectionRecursive(l.getChild());
+				count += indexSectionRecursive(l.getChild());
 			}
 		}
+		
+		return count;
 	}
 	
 	/*

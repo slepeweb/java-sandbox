@@ -565,6 +565,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			new Object[]{origId});
 	}
 	
+	/*
 	public int getCount() {
 		return getCount(null);
 	}
@@ -578,6 +579,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			return this.jdbcTemplate.queryForInt("select count(*) from item");
 		}
 	}
+	*/
 	
 	@SuppressWarnings("deprecation")
 	public int getCountByType(Long itemTypeId) {
@@ -810,6 +812,27 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			throw new NotVersionableException("Cannot version un-published item");
 		}
 		return copy(true, source, null, null);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public int getCountByPath(Item i) {
+		return this.jdbcTemplate.queryForInt(
+				"select count(*) from item where siteid=? and path like ?", new Object[] {i.getSite().getId(), i.getPath() + "%"});
+	}
+	
+	public boolean updatePublished(Long id, boolean option) {
+		return updateBinaryProperty("published", id, option);
+	}
+	
+	public boolean updateSearchable(Long id, boolean option) {
+		return updateBinaryProperty("searchable", id, option);
+	}
+	
+	private boolean updateBinaryProperty(String column, Long id, boolean option) {
+		int flag = option ? 1 : 0;
+		String sql = String.format("update item set %s = ? where id = ?", column);
+		
+		return this.jdbcTemplate.update(sql, flag, id) > 0;
 	}
 	
 	private Item getItem(String sql, Object[] params) {
