@@ -18,7 +18,8 @@
 
 <c:set var="_extraInpageJs" scope="request">
 	lightbox.option({
-		'wrapAround': true
+		wrapAround: true,
+		alwaysShowNavOnTouchDevices: true
 	});
 </c:set>
 
@@ -31,11 +32,9 @@
 			<details>
 				<summary>Guide</summary>
 				<ul>
-					<li>Click on any thumbnail to view the image at maximum size.</li>
-					<li>On the large image that appears, click 
-					the right half to move forwards through the photo gallery, or the left half to go backwards</li> 
-					<li>Alternatively, use the right/left arraow keys to achieve the same.</li>
-					<li>Click anywhere outside the large image to return to the gallery view.</li>
+					<li>Click on any thumbnail to view the larger version of the image.</li>
+					<li>Then use the left-arrow and right-arrow keys on the keyboard to navigate the gallery.</li>
+					<li>Alternatively, you can click on the arrow icons.</li>
 				</ul>
 			</details>
 		</div>

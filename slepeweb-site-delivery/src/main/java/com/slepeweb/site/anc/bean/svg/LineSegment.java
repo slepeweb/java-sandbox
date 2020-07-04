@@ -1,5 +1,8 @@
 package com.slepeweb.site.anc.bean.svg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LineSegment {
 
 	private Coord start, end;
@@ -64,4 +67,26 @@ public class LineSegment {
 		return new Coord(getStart().copy().move(new Coord(dx, dy)));
 	}
 
+	
+	public static List<LineSegment> copy(List<LineSegment> polyline) {
+		List<LineSegment> copy = new ArrayList<LineSegment>();
+
+		for (LineSegment seg : polyline) {
+			copy.add(seg.copy());
+		}
+		
+		return copy;
+	}
+	
+	public static List<LineSegment> move(List<LineSegment> polyline, Coord shift) {
+		for (LineSegment seg : polyline) {
+			seg.move(shift);
+		}
+		
+		return polyline;
+	}
+	
+	public int getMaxX() {
+		return this.end.getX() > this.start.getX() ? this.end.getX() : this.start.getX();
+	}
 }

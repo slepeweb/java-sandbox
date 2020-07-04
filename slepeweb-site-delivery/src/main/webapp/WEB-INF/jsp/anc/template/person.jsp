@@ -44,6 +44,8 @@
 					</c:forEach>
 				</div>
 			</c:if>
+			
+			<span id="get-full-diagram" title="See full ancester tree"><i class="fas fa-sitemap fa-1g"></i></span>
 		</div>
 	</div>
 		
@@ -55,7 +57,13 @@
 		<anc:standardPerson />	
 	</div>
 	
+	<div id="diagram-svg" class="hide"></div>
+	
 	<script>
+		var _itemId = "${_item.id}";
+		var _language = "${_item.language}";
+		var _fullDiagramDialog = null;
+		
 		var switchHierarchy = function(target) {
 			$(".hierarchy-diagram").each(function(idx){
 				if (idx != target) {
@@ -74,6 +82,32 @@
 				var index = $("#partner-options input:checked").val();
 				switchHierarchy(index);
 			});
+			
+			$("#get-full-diagram").click(function() {
+				$.ajax("/" + _language + "?view=diagram/" + _itemId, {
+					type: "GET",
+					cache: false,
+					dataType: "html",
+					mimeType: "text/html",
+					
+					success: function(html, status, z) {
+						var div = $("#diagram-svg");
+						div.empty().append(html);
+						_fullDiagramDialog = div.dialog({
+							autoOpen: true,
+							width: $(window).width() * 0.9,
+						  height: $(window).height() * 0.9,
+						  modal: true,
+						  title: "Full ancestry tree",
+						  close: function() {
+							  _fullDiagramDialog.dialog("close");
+							  console.log("Dialog closed");
+						  }
+						});
+					}
+				});
+			});
+			
 		});
 	</script>
 	

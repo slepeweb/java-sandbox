@@ -44,6 +44,7 @@ public class Person {
 		return getName();
 	}
 	
+	// First, middle and last names
 	public String getFullName() {
 		StringBuilder sb = new StringBuilder();
 		if (! isBlank(this.firstName)) {
@@ -58,9 +59,14 @@ public class Person {
 			sb.append(" ").append(this.lastName);			
 		}
 		
+		if (sb.length() == 0) {
+			sb.append(getItem().getName());
+		}
+		
 		return sb.toString();
 	}
 	
+	// First and last names
 	public String getName() {
 		StringBuilder sb = new StringBuilder();
 		if (! isBlank(this.firstName)) {
@@ -69,6 +75,14 @@ public class Person {
 		
 		if (! isBlank(this.lastName)) {
 			sb.append(" ").append(this.lastName);			
+		}
+		
+		if (sb.length() == 0) {
+			String[] splits = getItem().getName().split("\\s");
+			sb.append(splits[0]);
+			if (splits.length > 1) {
+				sb.append(" ").append(splits[1]);
+			}
 		}
 		
 		return sb.toString();
@@ -178,7 +192,10 @@ public class Person {
 	}
 	
 	public String getFirstName() {
-		return firstName;
+		if (StringUtils.isBlank(this.firstName)) {
+			return getItem().getName().split("\\s")[0];
+		}
+		return this.firstName;
 	}
 	
 	public String getLastName() {

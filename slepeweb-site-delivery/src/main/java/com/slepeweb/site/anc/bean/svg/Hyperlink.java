@@ -18,8 +18,12 @@ public class Hyperlink extends Coord {
 		this.person = p;
 	}
 	
+	public boolean isBlank() {
+		return this.person == null;
+	}
+	
 	public String getLinkTag() {
-		if (this.person != null) {
+		if (! isBlank()) {
 			return String.format(ANCHOR_FORMAT_STR, 
 					this.person.getItem().getUrl(), getText());
 		}
@@ -27,7 +31,7 @@ public class Hyperlink extends Coord {
 	}
 
 	public String getSingleLineTextLinkTag() {
-		if (this.person != null) {
+		if (! isBlank()) {
 			return String.format(ANCHOR_FORMAT_STR, 
 					this.person.getItem().getUrl(), getSingleLineText());
 		}
@@ -59,15 +63,23 @@ public class Hyperlink extends Coord {
 		
 		sb.append(">");
 		
+		String name = getPerson().getName();
+		String[] nameParts = name.split("\\s");
+		
 		if (isMultiline) {
-			sb.append(String.format(TSPAN_FORMAT_STR, getX(), getPerson().getFirstName()));
-			sb.append(String.format(TSPAN_FORMAT_STR, getX(), getPerson().getLastName()));
+			for (int i = 0; i < min(2, nameParts.length); i++) {
+				sb.append(String.format(TSPAN_FORMAT_STR, getX(), nameParts[i]));
+			}
 		}
 		else {
-			sb.append(getPerson().getFirstName());
+				sb.append(name);
 		}
 		
 		return sb.append("</text>").toString();
+	}
+	
+	private int min(int a, int b) {
+		return a < b ? a : b;
 	}
 
 	public Person getPerson() {

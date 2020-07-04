@@ -21,6 +21,7 @@ import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.site.anc.bean.MenuItem;
 import com.slepeweb.site.anc.bean.Person;
+import com.slepeweb.site.anc.bean.svg.AncestryDiagram;
 import com.slepeweb.site.anc.bean.svg.SvgSupport;
 import com.slepeweb.site.anc.service.SolrService4Ancestry;
 import com.slepeweb.site.bean.SolrParams4Site;
@@ -202,6 +203,25 @@ public class AncestryPageController extends BaseController {
 		model.addAttribute("_params", params);
 		model.addAttribute("_search", this.solrService4Ancestry.query(params));
 		return page.getView();
+	}
+	
+	@RequestMapping(value="/homepage/diagram/{id}", method=RequestMethod.GET)	
+	public String diagram(
+			@PathVariable long id, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			ModelMap model) {	
+				
+		Item i = this.itemService.getItem(id);
+		String view = "diagram";
+		
+		if (i != null && (i.getType().getName().equals(Person.BOY) || i.getType().getName().equals(Person.GIRL))) {
+			AncestryDiagram a = new AncestryDiagram(new Person(i));
+			Page page = getStandardPage(i, shortSitename, view, model);			
+			model.addAttribute("_diagram", a.build(new Person(i)));
+			return page.getView();
+		}
+		
+		return getFullyQualifiedViewName(shortSitename, view);
 	}
 	
 	private String galleryAndRecordController(Item i, String shortSitename, long targetId, ModelMap model,

@@ -23,8 +23,8 @@ public interface ItemService {
 	Item save(Item i, boolean extended) throws ResourceException;
 	void saveFieldValues(FieldValueSet fvs) throws ResourceException;
 	void saveLinks(Item i) throws ResourceException, DuplicateItemException;
-	//int getCount();
-	//int getCount(String path);
+	int getCount();
+	int getCount(String path);
 	int getCountByType(Long itemTypeId);
 	int getVersionCount(long origid);
 	boolean move(Item child, Item currentParent, Item targetParent, Item target, 

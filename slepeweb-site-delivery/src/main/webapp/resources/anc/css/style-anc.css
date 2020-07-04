@@ -783,7 +783,7 @@ footer {
   list-style-type: none;
 }
 
-.layout-std {
+.layout-std, .layout-wide {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-areas: "hdr" "main" "ftr";
@@ -833,10 +833,14 @@ footer {
   padding-top: 0.5em;
 }
 
-#person-svg {
+#person-svg, #diagram-svg {
   padding-left: 15px;
   padding-right: 15px;
   padding-bottom: 15px;
+}
+
+#diagram-svg {
+  background-color: #e1eaef;
 }
 
 div.image-gallery {

@@ -565,12 +565,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			new Object[]{origId});
 	}
 	
-	/*
+	@Deprecated
 	public int getCount() {
 		return getCount(null);
 	}
 	
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public int getCount(String path) {
 		if (StringUtils.isNotBlank(path)) {
 			return this.jdbcTemplate.queryForInt("select count(*) from item where path like ?", path + "%");
@@ -579,7 +579,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			return this.jdbcTemplate.queryForInt("select count(*) from item");
 		}
 	}
-	*/
 	
 	@SuppressWarnings("deprecation")
 	public int getCountByType(Long itemTypeId) {
