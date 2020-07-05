@@ -28,11 +28,11 @@
 		  	<c:forEach items="${_row.list}" var="_comp" varStatus="_stat2">
 		  
 					<c:if test="${not _comp.parentA.blank}">
-						${_comp.parentA.linkTag}
+						${_comp.parentA.linkTagWithYears}
 					</c:if>
 			
 					<c:if test="${not _comp.parentB.blank}">
-						${_comp.parentB.linkTag}
+						${_comp.parentB.linkTagWithYears}
 					</c:if>
 						
 					<c:forEach items="${_comp.segments}" var="_segment">
@@ -43,7 +43,7 @@
 				</c:forEach>
 			</c:forEach>
 			
-			${svgdata.subject.linkTag}
+			${svgdata.subject.linkTagWithYears}
 		</c:if>
 </svg>
 

@@ -30,6 +30,14 @@ public class Hyperlink extends Coord {
 		return "";
 	}
 
+	public String getLinkTagWithYears() {
+		if (! isBlank()) {
+			return String.format(ANCHOR_FORMAT_STR, 
+					this.person.getItem().getUrl(), getText(true));
+		}
+		return "";
+	}
+
 	public String getSingleLineTextLinkTag() {
 		if (! isBlank()) {
 			return String.format(ANCHOR_FORMAT_STR, 
@@ -39,18 +47,22 @@ public class Hyperlink extends Coord {
 	}
 
 	public String getText() {
-		return getText(true, false);
+		return getText(true, false, false);
+	}
+
+	public String getText(boolean withYears) {
+		return getText(true, false, withYears);
 	}
 
 	public String getSubjectText() {
-		return getText(true, true);
+		return getText(true, true, false);
 	}
 
 	public String getSingleLineText() {
-		return getText(false, false);
+		return getText(false, false, false);
 	}
 	
-	private String getText(boolean isMultiline, boolean isSubject) {
+	private String getText(boolean isMultiline, boolean isSubject, boolean withYears) {
 		StringBuilder sb = new StringBuilder(String.format("<text x=\"%d\" y=\"%d\"", getX(), getY()));
 		
 		if (isMultiline) {
@@ -70,9 +82,25 @@ public class Hyperlink extends Coord {
 			for (int i = 0; i < min(2, nameParts.length); i++) {
 				sb.append(String.format(TSPAN_FORMAT_STR, getX(), nameParts[i]));
 			}
+			
+			if (withYears) {
+				boolean isEmpty = getPerson().getBirthYear() == null && getPerson().getDeathYear() == null;
+				
+				if (! isEmpty) {
+					StringBuilder years = new StringBuilder();
+					if (getPerson().getBirthYear() != null) {
+						years.append(getPerson().getBirthYear());
+					}
+					years.append(" - ");
+					if (getPerson().getDeathYear() != null) {
+						years.append(getPerson().getDeathYear());
+					}
+					sb.append(String.format(TSPAN_FORMAT_STR, getX(), years.toString()));
+				}
+			}
 		}
 		else {
-				sb.append(name);
+			sb.append(name);
 		}
 		
 		return sb.append("</text>").toString();

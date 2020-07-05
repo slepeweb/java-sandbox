@@ -82,7 +82,7 @@ public class AncestorComponent {
 			
 			// Now adjust the positions of the person links
 			int xOffset = -30;
-			int yOffset = 2 * xOffset - 10;
+			int yOffset = 2 * xOffset - 15;
 			this.parentA.set(xOffset, yOffset);
 			
 			if (! this.parentB.isBlank()) {

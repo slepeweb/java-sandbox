@@ -1,8 +1,10 @@
 package com.slepeweb.site.anc.bean;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +14,7 @@ import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.common.util.DateUtil;
 
 public class Person {
 	
@@ -26,6 +29,7 @@ public class Person {
 	private boolean boy;
 	private Item item, photo;
 	private List<Item> documents, records, gallery;
+	private Integer birthYear, deathYear;
 	
 	public Person(Item i) {
 		this.item = i;
@@ -303,4 +307,31 @@ public class Person {
 		
 		return this.records;
 	}
+
+	public Integer getBirthYear() {
+		if (this.birthYear == null) {
+			this.birthYear = getYearFromSummary(this.birthSummary);
+		}
+		return birthYear;
+	}
+
+	public Integer getDeathYear() {
+		if (this.deathYear == null) {
+			this.deathYear = getYearFromSummary(this.deathSummary);
+		}
+		return deathYear;
+	}
+	
+	private Integer getYearFromSummary(String summary) {
+		if (StringUtils.isNotBlank(summary)) {
+			Date d = DateUtil.parseLooseDateString(summary);
+			if (d != null) {
+				Calendar c = Calendar.getInstance();;
+				c.setTime(d);
+				return c.get(Calendar.YEAR);
+			}
+		}
+		return null;
+	}
+
 }

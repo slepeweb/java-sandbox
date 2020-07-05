@@ -1,12 +1,8 @@
 package com.slepeweb.site.anc.bean;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
@@ -19,9 +15,6 @@ import com.slepeweb.common.util.DateUtil;
  */
 public class Relationship {
 	
-	private static SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy");
-	private static Pattern DATE_PATTERN = Pattern.compile("^.*?(\\d{1,2}/)?(\\d{1,2}/)?(\\d{4}).*$");
-
 	private String summary;
 	private Person subject, partner;
 	private List<Person> children;
@@ -36,7 +29,7 @@ public class Relationship {
 		this.subject = subject;
 		this.partner = new Person(partner.getChild());
 		this.summary = partner.getData();
-		parseDate(partner.getData());
+		this.date = DateUtil.parseLooseDateString(partner.getData());
 	}
 	
 	@Override
@@ -44,42 +37,15 @@ public class Relationship {
 		return String.format("%s ==> %s", this.subject.toString(), this.partner.toString());
 	}
 	
-	private void parseDate(String str) {
-		if (str == null) {
-			return;
-		}
-	
-		Matcher m = DATE_PATTERN.matcher(str);
-		if (m.matches()) {
-			Calendar cal = DateUtil.today();
-			cal.set(Calendar.DATE, getDatePart(m.group(1), 1));
-			cal.set(Calendar.MONTH, getDatePart(m.group(2), 1) - 1);
-			cal.set(Calendar.YEAR, getDatePart(m.group(3), 1970));
-			this.date = cal.getTime();
-		}
-	}
-	
-	private int getDatePart(String s, int dflt) {
-		if (s == null) {
-			return dflt;
-		}
-		
-		if (s.endsWith("/")) {
-			s = s.substring(0, s.length() - 1);
-		}
-		
-		return Integer.parseInt(s);
-	}
-
 	public Date getDate() {
 		return this.date;
 	}
 	
 	public String getDateStr() {
 		if (this.date != null) {
-			return SDF.format(this.date);
+			return DateUtil.DATE_PATTERN_B.format(this.date);
 		}
-		return "";
+		return null;
 	}
 	
 	public String getSummary() {

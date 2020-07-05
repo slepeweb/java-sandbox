@@ -4,14 +4,18 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DateUtil {
-	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+	public static final SimpleDateFormat DATE_PATTERN_A = new SimpleDateFormat("yyyy-MM-dd");
+	public static final SimpleDateFormat DATE_PATTERN_B = new SimpleDateFormat("dd/MM/yyyy");
 	public static final SimpleDateFormat SOLR_SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	public static final Pattern LOOSE_DATE_PATTERN = Pattern.compile("^.*?(\\d{1,2}/)?(\\d{1,2}/)?(\\d{4}).*$");
 	
 	public static String formatTimestamp(Date d) {
 		if (d != null) {
-			return SDF.format(d);
+			return DATE_PATTERN_A.format(d);
 		}
 		return "";
 	}
@@ -25,7 +29,7 @@ public class DateUtil {
 	
 	public static Timestamp parseTimestamp(String s) {
 		try {
-			return new Timestamp(SDF.parse(s).getTime());
+			return new Timestamp(DATE_PATTERN_A.parse(s).getTime());
 		} 
 		catch (Exception e) {
 			return null;
@@ -113,4 +117,33 @@ public class DateUtil {
 		return (yearB - yearA) * 12 + (monthB - monthA) + 1;
 	}
 	
+	public static Date parseLooseDateString(String str) {
+		if (str == null) {
+			return null;
+		}
+	
+		Matcher m = LOOSE_DATE_PATTERN.matcher(str);
+		if (m.matches()) {
+			Calendar cal = DateUtil.today();
+			cal.set(Calendar.DATE, getDatePart(m.group(1), 1));
+			cal.set(Calendar.MONTH, getDatePart(m.group(2), 1) - 1);
+			cal.set(Calendar.YEAR, getDatePart(m.group(3), 1970));
+			return cal.getTime();
+		}
+		
+		return null;
+	}
+	
+	private static int getDatePart(String s, int dflt) {
+		if (s == null) {
+			return dflt;
+		}
+		
+		if (s.endsWith("/")) {
+			s = s.substring(0, s.length() - 1);
+		}
+		
+		return Integer.parseInt(s);
+	}
+
 }
