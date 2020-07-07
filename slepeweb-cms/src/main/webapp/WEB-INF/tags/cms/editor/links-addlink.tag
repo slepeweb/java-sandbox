@@ -5,11 +5,14 @@
 	
 <div id="addlinkdiv" class="hide">
 	<details>
-		<summary>HELP</summary>
-		<p>This will link the current item to any other item of your choice. 
-		First, choose a link type and then a subtype, and optionally provide any data that is relevant to this site. 
-		Then pick the target item you wish to link to in the content structure. DON'T FORGET to save your changes
-		after clicking the 'Use' button.</p>
+		<summary>GUIDE</summary>
+		<ul>
+			<li>This dialog will link the current item to any other item of your choice.</li> 
+			<li>First, choose a link type and then a subtype.</li>
+			<li>Optionally provide additional link data. The format will vary by site - refer to the documentation.</li>
+			<li>Then pick the target item you wish to link to.</li>
+			<li>DON'T FORGET to save your changes after clicking the 'Use' button.</li>
+		</ul>
 	</details>	
 		
 	<div>

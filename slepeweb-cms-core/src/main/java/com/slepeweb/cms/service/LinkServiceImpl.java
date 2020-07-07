@@ -224,7 +224,8 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	public Link getParent(Long childId) {
 		LinkType lt = this.linkTypeService.getLinkType(LinkType.binding);
 		if (lt != null) {		
-			String sql = String.format(PARENT_SELECT_TEMPLATE, "l.childid = ? and l.linktypeid = ? and i.deleted = 0");
+			String sql = String.format(PARENT_SELECT_TEMPLATE, "l.childid = ? and l.linktypeid = ? and i.deleted = 0" + 
+					getVersionClause());
 			return (Link) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {childId, lt.getId()}, 
 					new RowMapperUtil.ParentLinkMapper()));
 		}
@@ -234,7 +235,8 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	public List<Link> getRelatedParents(Long childId) {
 		LinkType lt = this.linkTypeService.getLinkType(LinkType.relation);
 		if (lt != null) {		
-			String sql = String.format(PARENT_SELECT_TEMPLATE, "l.childid = ? and l.linktypeid = ? and i.deleted = 0");
+			String sql = String.format(PARENT_SELECT_TEMPLATE, "l.childid = ? and l.linktypeid = ? and i.deleted = 0" + 
+					getVersionClause());
 			return this.jdbcTemplate.query(sql, new Object[] {childId, lt.getId()}, 
 					new RowMapperUtil.ParentLinkMapper());
 		}

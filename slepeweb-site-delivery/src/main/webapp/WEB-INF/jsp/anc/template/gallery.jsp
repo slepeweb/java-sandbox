@@ -30,7 +30,7 @@
 		<div class="leftside">
 			<h3 class="emphasis">${_person.firstName}'s photo gallery</h3>
 			<details>
-				<summary>Guide</summary>
+				<summary>GUIDE</summary>
 				<ul>
 					<li>Click on any thumbnail to view the larger version of the image.</li>
 					<li>Then use the left-arrow and right-arrow keys on the keyboard to navigate the gallery.</li>
