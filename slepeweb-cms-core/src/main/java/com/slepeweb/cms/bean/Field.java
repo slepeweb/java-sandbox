@@ -4,11 +4,13 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.utils.LogUtil;
+import com.slepeweb.common.util.DateUtil;
 
 
 public class Field extends CmsBean {
@@ -71,7 +73,7 @@ public class Field extends CmsBean {
 		return getInputTag(null);
 	}
 	
-	public String getInputTag(String value) {
+	public String getInputTag(FieldValue fv) {
 		StringBuilder sb = new StringBuilder();
 		String tag = null, inputType = "";
 		String rows = null, cols = null;
@@ -104,7 +106,7 @@ public class Field extends CmsBean {
 		}
 		
 		ValidValueList vvl = getValidValueListObject();
-		String notNullValue = value != null ? value : "";
+		String notNullStringValue = fv != null && fv.getStringValue() != null ? fv.getStringValue() : "";
 		
 		if (tag.equals(INPUT_TAG)) {
 			// We need to produce an <input> element
@@ -113,8 +115,8 @@ public class Field extends CmsBean {
 					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s ", 
 							inputType, getVariable(), vv, getTooltip()));
 					
-					if (value != null) {
-						for (String partValue : value.split("\\|")) {
+					if (fv != null && fv.getStringValue() != null) {
+						for (String partValue : fv.getStringValue().split("\\|")) {
 							if (partValue.equals(vv)) {
 								sb.append(" checked"); 
 							}
@@ -129,22 +131,12 @@ public class Field extends CmsBean {
 			}
 			else {
 				if (inputType.equals(FieldType.date.name()) || inputType.equals(FieldType.datetime.name())) {
-					// This is a date/datetime input field
-					String dateValueStr = null, timeValueStr = null;
-
-					int c = notNullValue.indexOf(" ");
-					if (c > -1) {
-						// The supplied value comprises both date and time components
-						dateValueStr = notNullValue.substring(0, c);
-						timeValueStr = notNullValue.substring(c + 1);
-						int maxTimeStrLen = 5;
-						if (timeValueStr.length() > maxTimeStrLen) {
-							timeValueStr = timeValueStr.substring(0, maxTimeStrLen);
-						}
-					}
-					else {
-						// The supplied value has no time component
-						dateValueStr = notNullValue;
+					Date d = null;
+					String dateValueStr = "", timeValueStr = "";
+					if (fv != null) {
+						d = fv.getDateValue();
+						dateValueStr = DateUtil.DATE_PATTERN_B.format(d);
+						timeValueStr = DateUtil.TIME_PATTERN.format(d);
 					}
 					
 					// Input field for the datepicker
@@ -160,23 +152,23 @@ public class Field extends CmsBean {
 				else {
 					// This is a plain text input field, and NOT a date/datetime one
 					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s />", 
-							inputType, getVariable(), notNullValue, getTooltip()));
+							inputType, getVariable(), notNullStringValue, getTooltip()));
 				}
 			}
 		}
 		else if (tag.equals(SELECT_TAG)) {
 			sb.append("<").append(tag).append(String.format(" name=\"%s\" value=\"%s\"%s>", 
-					getVariable(), notNullValue, getTooltip()));
+					getVariable(), notNullStringValue, getTooltip()));
 			
 			for (String vv : vvl.getValues()) {
 				sb.append(String.format("<option value=\"%s\"%s>%s</option>", 
-						vv, notNullValue.equals(vv) ? " selected" : "", vv));
+						vv, notNullStringValue.equals(vv) ? " selected" : "", vv));
 			}
 			sb.append("</").append(SELECT_TAG).append(">");
 		}
 		else if (tag.equals(TEXT_AREA_TAG)) {
 			sb.append("<").append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\"%s>%s</%s>", 
-					getVariable(), cols, rows, getTooltip(), notNullValue, tag));
+					getVariable(), cols, rows, getTooltip(), notNullStringValue, tag));
 		}
 		
 		return sb.toString();

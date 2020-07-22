@@ -2,7 +2,9 @@ _cms.media = {
 	behaviour: {},
 	refresh: {},
 	sel: {
+		MEDIA_TAB: "#media-tab",
 		UPLOAD_BUTTON: "#media-button",
+		CANCEL_UPLOAD_BUTTON: "#cancel-media-button",
 		FORM: "#media-form",
 	}
 };
@@ -13,6 +15,8 @@ _cms.media.sel.FILE_INPUT = _cms.support.fi(_cms.media.sel.FORM, "media");
 _cms.media.sel.WIDTH_INPUT_CONTAINER = _cms.media.sel.FORM + " .thumbnail-option";
 _cms.media.sel.WIDTH_INPUT = _cms.support.fi(_cms.media.sel.FORM, "width");
 _cms.media.sel.ALL_FORM_ELEMENTS = _cms.media.sel.FORM + " :input";
+_cms.media.sel.UPLOAD_BUTTON = _cms.media.sel.MEDIA_TAB + " button.action",
+_cms.media.sel.RESET_BUTTON = _cms.media.sel.MEDIA_TAB + " button.reset",
 
 _cms.support.setTabIds(_cms.media, "media");
 
@@ -89,7 +93,19 @@ _cms.media.check_data_is_complete = function() {
 		}
 	}
 	
-	_cms.support.enableIf(_cms.media.sel.UPLOAD_BUTTON, isComplete);
+	if (_cms.support.enableIf(_cms.media.sel.UPLOAD_BUTTON, isComplete)) {
+		_cms.support.enable(_cms.media.sel.RESET_BUTTON);
+	}
+	else {
+		_cms.support.disable(_cms.media.sel.RESET_BUTTON);
+	}
+}
+
+_cms.media.behaviour.reset = function(nodeKey) {
+	// Add behaviour to cancel upload.
+	$(_cms.media.sel.RESET_BUTTON).click(function (e) {
+		_cms.support.resetForm(_cms.media.refresh.tab, nodeKey, e);
+	});
 }
 
 _cms.media.refresh.tab = function(nodeKey) {
@@ -99,6 +115,7 @@ _cms.media.refresh.tab = function(nodeKey) {
 
 _cms.media.onrefresh = function(nodeKey) {
 	_cms.media.behaviour.upload(nodeKey);
+	_cms.media.behaviour.reset(nodeKey);
 	_cms.media.behaviour.thumbnailRequired();
 	_cms.media.behaviour.formchange();
 }

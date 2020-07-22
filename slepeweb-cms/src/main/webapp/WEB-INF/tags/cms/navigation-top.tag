@@ -30,7 +30,7 @@
 		<div id="leftnav-hider"><i class="fas fa-bars fa-2x"></i></div>
 		
 		<div class="hf">
-			<span id="currently-editing"></span>						
+			<span id="currently-editing" class="current-item-name"></span>						
 			<span id="status-block"></span>
 		</div>
 </header>

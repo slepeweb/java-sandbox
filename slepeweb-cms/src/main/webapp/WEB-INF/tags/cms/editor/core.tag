@@ -102,9 +102,9 @@
 		<label for="published">Published? </label><input type="checkbox" name="published" <c:if test="${editingItem.published}">checked="checked"</c:if> />
 	</div>
 		
-	<div>
-		<button id="core-button" type="button" disabled="disabled" title="Update changes to core data">Update</button>
-<!-- 		<button id="trash-button" type="button">Delete</button> -->
+	<div class="button-set">
+		<button class="action" type="button" disabled="disabled" title="Update changes to core data">Update</button>
+		<button class="reset" type="button" disabled="disabled">Reset form</button>
 	</div>
 </form>
 	

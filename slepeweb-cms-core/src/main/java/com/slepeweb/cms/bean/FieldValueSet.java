@@ -64,7 +64,7 @@ public class FieldValueSet {
 		FieldValue fv = getFieldValueObj(variable, language);
 		
 		// Fallback to default site language if necessary
-		if ((fv == null || StringUtils.isBlank(fv.getValue())) && ! language.equals(getSite().getLanguage())) {
+		if ((fv == null || StringUtils.isBlank(fv.getStringValue())) && ! language.equals(getSite().getLanguage())) {
 			return getFieldValueObj(variable, getSite().getLanguage());
 		}
 		
@@ -132,7 +132,7 @@ public class FieldValueSet {
 				doMerge = true;
 			}
 			else {
-				o = fv.getValue();
+				o = fv.getStringValue();
 				doMerge = existing == null || ! StringUtils.isBlank(fv.getStringValue());
 			}
 			

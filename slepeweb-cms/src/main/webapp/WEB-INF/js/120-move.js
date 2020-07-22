@@ -2,6 +2,7 @@ _cms.move = {
 	behaviour: {},
 	refresh: {},
 	sel: {
+		MOVE_TAB: "#move-tab",
 		MOVE_WRAPPER: "#move-wrapper",
 		MOVE_BUTTON: "#move-item-button",
 		MOVE_TARGET_ID: "#move-target-identifier",
@@ -10,6 +11,8 @@ _cms.move = {
 
 _cms.move.sel.POSITION_SELECTOR = _cms.support.fs(_cms.move.sel.MOVE_WRAPPER, "position");
 _cms.move.sel.ITEM_PICKER = _cms.move.sel.MOVE_WRAPPER + " i.itempicker";
+_cms.move.sel.MOVE_BUTTON = _cms.move.sel.MOVE_TAB + " button.action",
+_cms.move.sel.RESET_BUTTON = _cms.move.sel.MOVE_TAB + " button.reset",
 
 _cms.support.setTabIds(_cms.move, "move");
 
@@ -77,7 +80,18 @@ _cms.move.check_data_is_complete = function() {
 	var isComplete = $(_cms.move.sel.POSITION_SELECTOR).val() != "none" && 
 		$(_cms.move.sel.MOVE_TARGET_ID).html().startsWith("'");
 	
-	_cms.support.enableIf(_cms.move.sel.MOVE_BUTTON, isComplete);
+	if (_cms.support.enableIf(_cms.move.sel.MOVE_BUTTON, isComplete)) {
+		_cms.support.enable(_cms.move.sel.RESET_BUTTON);
+	}
+	else {
+		_cms.support.disable(_cms.move.sel.RESET_BUTTON);
+	}
+}
+
+_cms.move.behaviour.reset = function(nodeKey) {
+	$(_cms.move.sel.RESET_BUTTON).click(function (e) {
+		_cms.support.resetForm(_cms.move.refresh.tab, nodeKey, e);
+	});
 }
 
 _cms.move.refresh.tab = function(nodeKey) {
@@ -87,6 +101,7 @@ _cms.move.refresh.tab = function(nodeKey) {
 // Behaviours to apply once html is loaded/reloaded
 _cms.move.onrefresh = function(nodeKey) {
 	_cms.move.behaviour.action(nodeKey);
+	_cms.move.behaviour.reset(nodeKey);
 	_cms.move.behaviour.itempicker();
 	_cms.move.behaviour.changePosition();
 }

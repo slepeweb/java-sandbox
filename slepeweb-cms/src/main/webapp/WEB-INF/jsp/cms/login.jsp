@@ -29,7 +29,7 @@
 					<div>
 						<label for="password">Password: </label><input type="password" name="password" size="32" />
 					</div>
-					<button type="submit">Login</button>
+					<button class="action" type="submit">Login</button>
 				</form>	
 			</c:if>		
 		</div>

@@ -7,6 +7,7 @@ _cms.misc = {
 	},
 	refresh: {},
 	sel: {
+		MISC_TAB: "#misc-tab",
 		PUBLISH_BUTTON: "#publish-button",
 		SEARCH_BUTTON: "#reindex-button",
 		TRASH_CONTAINER: "#trash-container",
@@ -22,6 +23,8 @@ _cms.misc = {
 		ANY_OPTION: "#misc-tab input[type=radio]",
 	}
 };
+
+_cms.misc.sel.DELETE_BUTTON = _cms.misc.sel.MISC_TAB + " #trash-button";
 
 _cms.support.setTabIds(_cms.misc, "misc");
 
@@ -207,6 +210,13 @@ _cms.misc.behaviour.trash.restore = function() {
 	});
 }
 
+_cms.misc.behaviour.trash.trash = function(nodeKey) {
+	$(_cms.misc.sel.DELETE_BUTTON).click(function() {
+		$(".num-descendants").empty().html(_cms.numDeletableItems);
+		_cms.dialog.open(_cms.dialog.confirmTrash);
+	});
+}
+
 _cms.misc.updateProgressbar = function(bar, value) {
 	if (bar) {
 		if (value == false) {
@@ -229,4 +239,5 @@ _cms.misc.onrefresh = function(nodeKey) {
 	 * _cms.misc.behaviour.trash.restore();
 	 */
 	_cms.misc.behaviour.trash.showOrHide();
+	_cms.misc.behaviour.trash.trash(nodeKey);
 }

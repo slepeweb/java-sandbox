@@ -27,9 +27,12 @@
 	</c:if>
 </div>
 
-<div class="spacer20">
-	<button id="addlink-button" type="button">Add link</button>
-	<button id="savelinks-button" type="button" disabled="disabled">Save changes</button>
+<div class="button-set spacer20">
+	<button class="action add" type="button">Add link</button>
+	<div class="action-reset-combo">
+		<button class="reset" type="button" disabled="disabled">Reset form</button>
+		<button class="action save" type="button" disabled="disabled">Save changes</button>
+	</div>
 </div>
 
 <div class="spacer3em">

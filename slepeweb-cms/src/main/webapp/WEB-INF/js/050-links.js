@@ -7,7 +7,7 @@
  * 	childId|linktype|linkname|site-specific data string|linkId|state
  * 
  * where:
- * 		state has binary values: 0 = new link, 1 = exisiting link
+ * 		state has binary values: 0 = new link, 1 = existing link
  * 		linkId uniquely identifies links in the list
  * 
  */
@@ -25,9 +25,8 @@ _cms.links = {
 		LINKID_INPUT: "input[name='linkId']",
 	},
 	sel: {
+		LINKS_TAB: "#links-tab",
 		ADD_LINK_CONTAINER: "#addlinkdiv",
-		ADD_LINK_BUTTON: "#addlink-button",
-		SAVE_LINKS_BUTTON: "#savelinks-button",
 		ITEM_PICKER: "#addlinkdiv i.itempicker",
 		ALL_SELECTS: "#addlinkdiv select",
 		SORTABLE_LINKS_CONTAINER: "#sortable-links",
@@ -35,13 +34,23 @@ _cms.links = {
 		REMOVE_LINK_BUTTONS: ".remove-link",
 		LINKTO_BUTTONS: ".link-linker",
 		LINK_TARGET_IDENTIFIER: "#link-target-identifier",
-	}
+	},
+	validate: {
+		linkdata: {},
+	},
 };
 
 _cms.links.sel.LINKTYPE_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKTYPE_SELECT;
 _cms.links.sel.LINKNAME_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKNAME_SELECT;
+_cms.links.sel.LINKDATA_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKDATA_INPUT;
 _cms.links.sel.CHILDID_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.CHILDID_INPUT;
+_cms.links.sel.STATE_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.STATE_INPUT;
+_cms.links.sel.LINKID_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKID_INPUT;
 _cms.links.sel.SORTABLE_LINKS = _cms.links.sel.SORTABLE_LINKS_CONTAINER + " div.sortable-link";
+
+_cms.links.sel.ADD_LINK_BUTTON = _cms.links.sel.LINKS_TAB + " button.action.add",
+_cms.links.sel.SAVE_LINKS_BUTTON = _cms.links.sel.LINKS_TAB + " button.action.save",
+_cms.links.sel.RESET_BUTTON = _cms.links.sel.LINKS_TAB + " button.reset",
 
 _cms.support.setTabIds(_cms.links, "links");
 
@@ -127,6 +136,12 @@ _cms.links.behaviour.save = function(nodeKey) {
 				_cms.support.serverError();
 			},
 		});
+	});
+}
+
+_cms.links.behaviour.reset = function(nodeKey) {
+	$(_cms.links.sel.RESET_BUTTON).click(function(e) {
+		_cms.support.resetForm(_cms.links.refresh.tab, nodeKey, e);
 	});
 }
 
@@ -319,6 +334,11 @@ _cms.links.setLinkForm = function(data) {
 _cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
 	var selector = $(_cms.links.sel.LINKNAME_SELECT);
 	
+	// currentLinkname is not set for new links
+	if (! currentLinkname) {
+		currentLinkname = "std";
+	}
+	
 	$.ajax(_cms.ctx + "/rest/linknames/" + _cms.siteId + "/" + linkType, {
 		type: "POST",
 		cache: false,
@@ -345,9 +365,11 @@ _cms.links.behaviour.sortable = function() {
 _cms.links.activateSaveButton = function(activate) {
 	if (activate) {
 		_cms.support.enable(_cms.links.sel.SAVE_LINKS_BUTTON);
+		_cms.support.enable(_cms.links.sel.RESET_BUTTON);
 	}
 	else {
 		_cms.support.disable(_cms.links.sel.SAVE_LINKS_BUTTON);
+		_cms.support.disable(_cms.links.sel.RESET_BUTTON);
 	}
 }
 
@@ -355,36 +377,42 @@ _cms.links.refresh.tab = function(nodeKey) {
 	_cms.support.refreshtab("links", nodeKey, _cms.links.onrefresh);
 }
 
-_cms.links.check_for_use = function(notify) {
+_cms.links.check_for_use = function() {
 	var childId = $(_cms.links.sel.CHILDID_INPUT).val();
+	var error = false;
+	var linkType = $(_cms.links.sel.LINKTYPE_SELECT).val();
+	var linkName = $(_cms.links.sel.LINKNAME_SELECT).val();
+	var linkData = $(_cms.links.sel.LINKDATA_INPUT).val();
+	var linkId = $(_cms.links.sel.LINKID_INPUT).val();
 	
-	if (
-		$(_cms.links.sel.LINKTYPE_SELECT).val() != 'unknown' &&
-		$(_cms.links.sel.LINKNAME_SELECT).val() != 'unknown' && 
-		childId > -1) {
+	if (linkType == 'unknown' || linkName == 'unknown' || childId == -1) {
+		_cms.dialog.open(_cms.dialog.linkNotDefined);
+		error = true;
+	}
 
-		if (! _cms.links.check_duplicate_link(childId)) {
-			if (notify) {
-				
-				_cms.dialog.open(_cms.dialog.linkNotDefined, "b");
-			}
-		}
-		else {
-			if (! _cms.links.check_not_binding(childId)) {
-				if (notify) {
-					_cms.dialog.open(_cms.dialog.linkNotDefined, "c");
-				}
-			}
-			else {
-				return true;
-			}
-		}
+	// Only check this link for duplicate target if this link is new to the list
+	if (! error && linkId == -1 && ! _cms.links.check_duplicate_link(childId)) {
+		_cms.dialog.open(_cms.dialog.duplicateTarget);
+		error = true;
 	}
-	else if (notify) {
-		_cms.dialog.open(_cms.dialog.linkNotDefined, "a");
+
+	if (! error && ! _cms.links.check_not_binding(childId)) {
+		_cms.dialog.open(_cms.dialog.illegalTarget);
+		error = true;
 	}
 	
-	return false;
+	if (! error) {
+		var fn = eval("_cms.links.validate.linkdata." + _cms.siteShortname);
+		if (fn) {
+			var result = fn(linkType, linkName, linkData);
+			if (! result.ok) {
+				_cms.dialog.open(_cms.dialog.badLinkDataFormat);
+				error = true;
+			}
+		}
+	}
+	
+	return ! error;
 }
 
 _cms.links.check_duplicate_link = function(childId) {
@@ -414,6 +442,115 @@ _cms.links.check_not_binding = function(childId) {
 	return true;
 }
 
+// This validation only applies to partner links
+_cms.links.validate.linkdata.anc = function(linkType, linkName, linkData) {
+	/* 
+	 * Link data on the Ancestry site provides the date and location the relationship
+	 * was established, and must be formatted as follows:
+	 * 
+	 * 	<type>. <date>[, <location>]
+	 * 
+	 * <type> and <date> are mandatory, <location> is optional.
+	 * 
+	 * <type> can have 2 possible values, followed by a period:
+	 * a) m (married)
+	 * b) p (partner)
+	 * 
+	 * <date> can take one of four possible forms:
+	 * a) 01/02/1956 (all components present), or
+	 * b)    02/1956 (month and year only), or
+	 * c)       1956 (year only)
+	 * d)          ? (don't know)
+	 * 
+	 * <location> can be any text string, and if present, must be separated from <type> and
+	 * <date> by a comma.
+	 */
+	var error = false;
+	var dateStr = "", location = "";
+	var day = -1, month = -1, year = -1;
+	var debug = "";
+	var type = "unspecified";
+	
+	if (linkType == 'relation' && linkName == 'partner') {
+		if (linkData) {
+			linkData = linkData.trim();
+			
+			if (linkData.match(/^[mp]\. [\d\?]/)) {
+				type = linkData.substring(0, 1);
+				linkData = linkData.substring(2).trim();
+				
+				var firstCommaIndex = linkData.indexOf(",");
+			
+				if (firstCommaIndex > -1) {
+					// Only interested in checking date part
+					dateStr = linkData.substring(0, firstCommaIndex).trim();
+					location = linkData.substring(firstCommaIndex + 1).trim();
+				}
+				else {
+					dateStr = linkData;
+					location = "";
+				}
+				
+				if (! dateStr.startsWith("?")) {
+					var dateParts = dateStr.split("/");
+					var len = dateParts.length;
+					
+					if (len == 1) {
+						year = parseInt(dateParts[0]);
+					}
+					
+					if (len == 2) {
+						month = parseInt(dateParts[0]);
+						year = parseInt(dateParts[1]);
+					}
+					
+					if (len == 3) {
+						day = parseInt(dateParts[0]);
+						month = parseInt(dateParts[1]);
+						year = parseInt(dateParts[2]);
+					}
+					
+					if (len > 3) {
+						error = true;
+					}
+					
+					error = 
+						error || 
+						! _cms.support.isBlankOrInRange(year, 1000, 2020) || 
+						! _cms.support.isBlankOrInRange(month, 1, 12) || 
+						! _cms.support.isBlankOrInRange(day, 1, 31);
+				}
+			}
+			else {
+				debug = "linkdata starting format should be, eg, 'm. ?' or 'm. 1956', etc";
+				error = true;
+			}
+		}
+		else {
+			debug = "linkdata field is empty";
+		}
+	}
+	else {
+		debug = "linkdata is not recognised for " + linkType + "/" + linkName;
+	}
+	
+	var result = {
+		ok: ! error,
+		type: type,
+		day: day,
+		month: month,
+		year: year,
+		location: location,
+		debug: debug,
+	};
+	
+	if (console) {
+		//console.log(result);
+	}
+	
+	return result;
+}
+
 // Things to do once-only on page load
 _cms.links.onpageload = function() {
 	_cms.links.behaviour.changetype();
@@ -425,6 +562,7 @@ _cms.links.onrefresh = function(nodeKey) {
 	_cms.links.behaviour.sortable(); 
 	_cms.links.behaviour.add();
 	_cms.links.behaviour.save(nodeKey);
+	_cms.links.behaviour.reset(nodeKey);
 	_cms.links.behaviour.remove();
 	_cms.links.behaviour.edit();
 	_cms.links.behaviour.navigate();	

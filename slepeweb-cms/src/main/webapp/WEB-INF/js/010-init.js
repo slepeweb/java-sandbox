@@ -12,8 +12,14 @@ _cms.init = function(nodeKey, html, activeTab) {
 	_cms.editingItemId = nodeKey;
 	
 	// Re-build the item editor tabs, and select the required tab
-	_cms.support.refreshtabs(html, activeTab);
+	_cms.support.refreshAllTabs(html, activeTab);
 	
-	_cms.editingItemName = $("#current-item-name").html();
-	$("#currently-editing").html(_cms.editingItemName);
+	// Update the item identifier in all tabs
+	_cms.support.updateItemName($("#current-item-name").html());
+//	_cms.editingItemName = $("#current-item-name").html();
+//	$("#currently-editing").html($("#current-item-name").html());
+
+	// Required for delete confirmation dialog
+	_cms.numDeletableItems = $("#num-deletable-items").html();
+	$(".num-deletable-items").html(_cms.numDeletableItems);
 }

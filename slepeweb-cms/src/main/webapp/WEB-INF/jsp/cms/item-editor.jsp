@@ -3,6 +3,7 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div id="current-item-name" class="hide">${editingItem.name}</div>
+<div id="num-deletable-items" class="hide">${_numItemsInSection}</div>
 
 <ul id="editor-tabs">
 	<li><a href="#core-tab">Core</a></li>
@@ -33,8 +34,6 @@
 <div id="add-tab"><edit:addnew /></div>
 
 <c:if test="${editingItem.path ne '/'}">
-	<%-- Avoid calling the getCopyDetails() method more than once per request --%>
-	<c:set var="_copyDetails" value="${editingItem.copyDetails}" scope="request" />
 	<div id="copy-tab"><edit:copy /></div>
 	<div id="move-tab"><edit:move /></div>
 </c:if>

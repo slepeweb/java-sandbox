@@ -19,6 +19,7 @@
 		_cms.editingItemId = ${editingItem.origId};
 		_cms.siteId = ${editingItem.site.id};
 		_cms.siteDefaultLanguage = "${editingItem.site.language}";
+		_cms.siteShortname = "${editingItem.site.shortname}";
 	</c:if>
 	
 	// Flash messages passed through when window.location is set 

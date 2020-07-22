@@ -9,8 +9,8 @@ to '${editingItem.name}' and ALL its descendants (total = ${_numItemsInSection} 
 
 <div class="section-ops">
 	<div>
-		<div class="radio-pair"><input type="radio" name="publish_option" value="publish" /> <span>Publish</span></div>
-		<div class="radio-pair"><input type="radio" name="publish_option" value="unpublish" /> <span>Un-publish</span></div>
+		<div class="radio-pair"><input type="radio" name="publish_option" value="publish" /> <span class="radio-label">Publish</span></div>
+		<div class="radio-pair"><input type="radio" name="publish_option" value="unpublish" /> <span class="radio-label">Un-publish</span></div>
 	</div>
 	<div><button id="publish-button" type="button" disabled="disabled">Submit</button></div>
 	<div id="publish-progressbar" class="progressbar"></div>
@@ -18,9 +18,9 @@ to '${editingItem.name}' and ALL its descendants (total = ${_numItemsInSection} 
 
 <div class="section-ops">
 	<div>
-		<div class="radio-pair"><input type="radio" name="searchable_option" value="searchable" /> <span>Searchable</span></div>
-		<div class="radio-pair"><input type="radio" name="searchable_option" value="not-searchable" /> <span>Un-searchable</span></div>
-		<div class="radio-pair"><input type="radio" name="searchable_option" value="re-index" /> <span>Re-index</span></div>
+		<div class="radio-pair"><input type="radio" name="searchable_option" value="searchable" /> <span class="radio-label">Searchable</span></div>
+		<div class="radio-pair"><input type="radio" name="searchable_option" value="not-searchable" /> <span class="radio-label">Un-searchable</span></div>
+		<div class="radio-pair"><input type="radio" name="searchable_option" value="re-index" /> <span class="radio-label">Re-index</span></div>
 	</div>
 	<div><button id="reindex-button" type="button" disabled="disabled">Submit</button></div>
 	<div id="reindex-progressbar" class="progressbar"></div>
@@ -28,7 +28,8 @@ to '${editingItem.name}' and ALL its descendants (total = ${_numItemsInSection} 
 
 <div class="section-ops delete">
 	<div>
-		Clicking the 'Delete' button will delete a total of ${_numItemsInSection} items, PLUS any older versions of those items.
+		<p>Clicking the 'Delete' button will delete <strong>'<span class="current-item-name">${editingItem.name}</span>'</strong> and <strong>ALL</strong> its descendants, 
+			making a total of <strong>${_numItemsInSection}</strong> deletions.</p>
 	</div>
 	<div><button id="trash-button" type="button">Delete</button></div>
 	<div></div>

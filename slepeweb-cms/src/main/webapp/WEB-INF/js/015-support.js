@@ -1,4 +1,4 @@
-_cms.support.refreshtabs = function(html, activeTab) {
+_cms.support.refreshAllTabs = function(html, activeTab) {
 	var tabsdiv = $("#item-editor");
 	tabsdiv.empty().append(html);
 	
@@ -54,7 +54,7 @@ _cms.support.flashMessage = function(status) {
 		msg = "";
 	}
 	
-	$("#status-block").removeClass("red").removeClass("green").addClass(clazz).append(msg);
+	$("header #status-block").removeClass("red").removeClass("green").addClass(clazz).append(msg);
 	
 	var audio = $("#bell");
 	if (audio && audio.get(0)) {
@@ -98,7 +98,6 @@ _cms.support.fetchItemEditor = function(nodeKey, status, tabName) {
 _cms.support.addHistoryBehaviour = function(selector) {
 	selector.unbind();
 	selector.change(function() {	
-		//_cms.support.renderItemForms(selector.val(), "core-tab");
 		_cms.leftnav.activateKey(selector.val());
 	});
 };
@@ -160,9 +159,11 @@ _cms.support.enable = function(selector) {
 _cms.support.enableIf = function(selector, condition) {
 	if (condition) {
 		_cms.support.enable(selector);
+		return true;
 	}
 	else {
 		_cms.support.disable(selector);
+		return false;
 	}
 }
 
@@ -181,6 +182,23 @@ _cms.support.f = function (base, name, type) {
 _cms.support.setTabIds = function(obj, tabname) {
 	obj.TABNAME = tabname;
 	obj.TABID = tabname + "-tab";
+}
+
+_cms.support.isBlankOrInRange = function(value, min, max) {
+	if (value && value > -1) {
+		return value >= min && value <= max;
+	}
+	return true;
+}
+
+_cms.support.resetForm = function(fn, nodeKey, e) {
+	fn(nodeKey);
+	_cms.support.flashMessage(_cms.support.toStatus(true, "Form reset"));
+	e.stopPropagation();
+}
+
+_cms.support.updateItemName = function(name) {
+	$(".current-item-name").empty().html(name);
 }
 
 _cms.support.renderItemForms = function(nodeKey, activeTab) {

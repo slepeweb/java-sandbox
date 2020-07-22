@@ -3,6 +3,8 @@
         
 <cms:debug><!-- tags/cms/editor/copy.tag --></cms:debug>
 	
+<c:set var="_copyDetails" value="${editingItem.copyDetails}" scope="request" />
+
 <form>
 	<div class="ff">
 		<label for="name">Name: </label><input name="name" value="${_copyDetails[2]}" />
@@ -17,9 +19,10 @@
 		<p>Deep copy is NOT available.</p>
 	</details>
 	
-	<div>
-		<button id="copy-button" type="button"
+	<div class="button-set">
+		<button class="action" type="button"
 			title="Produce an identical copy of this item, including it's links">Copy</button>
+		<button class="reset" type="button">Reset form</button>
 	</div>
 </form>
 	

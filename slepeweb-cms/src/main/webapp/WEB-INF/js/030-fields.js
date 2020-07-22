@@ -4,20 +4,22 @@ _cms.field = {
 	refresh: {},
 	sel: {
 		FIELD_TAB: "#field-tab",
-		UPDATE_BUTTON: "#field-button",
 		LANGUAGE_SELECT: "#field-language-selector select",
 	}
 };
 
 _cms.field.sel.FORM = "".concat(_cms.field.sel.FIELD_TAB, " form");
 _cms.field.sel.ALL_FORM_ELEMENTS = "".concat(_cms.field.sel.FORM, " :input");
+_cms.field.sel.UPDATE_BUTTON = _cms.field.sel.FIELD_TAB + " button.action",
+_cms.field.sel.RESET_BUTTON = _cms.field.sel.FIELD_TAB + " button.reset",
 
 _cms.support.setTabIds(_cms.field, "field");
 
 _cms.field.behaviour.update = function(nodeKey) {	
 	// Add behaviour to submit item field updates 
 	$(_cms.field.sel.UPDATE_BUTTON).click(function () {
-		_cms.dialog.open(_cms.dialog.confirmFieldUpdate, "a");
+		//_cms.dialog.open(_cms.dialog.confirmFieldUpdate);
+		_cms.field.update(nodeKey)
 	});
 }
 
@@ -111,11 +113,24 @@ _cms.field.behaviour.changelanguage = function() {
 	});
 }
 
+_cms.field.behaviour.cancel = function(nodeKey) {
+	// Add behaviour to cancel update.
+	$(_cms.field.sel.RESET_BUTTON).click(function (e) {
+		_cms.support.resetForm(_cms.field.refresh.tab, nodeKey, e);
+	});
+}
+
 _cms.field.behaviour.formchange = function() {
 	$(_cms.field.sel.ALL_FORM_ELEMENTS).mouseleave(function() {
 		if ($(this).attr("name") != "language") {
-			_cms.support.enableIf(_cms.field.sel.UPDATE_BUTTON, 
-					_cms.field.originalFormState !== $(_cms.field.sel.FORM).serialize());
+			if (_cms.support.enableIf(_cms.field.sel.UPDATE_BUTTON, 
+					_cms.field.originalFormState !== $(_cms.field.sel.FORM).serialize())) {
+				
+				_cms.support.enable(_cms.field.sel.RESET_BUTTON);
+			}
+			else {
+				_cms.support.disable(_cms.field.sel.RESET_BUTTON);
+			}
 		}
 	});
 }
@@ -123,11 +138,18 @@ _cms.field.behaviour.formchange = function() {
 _cms.field.onrefresh = function(nodeKey) {
 	_cms.field.originalFormState = $(_cms.field.sel.FORM).serialize();
 	_cms.field.behaviour.update(nodeKey);
+	_cms.field.behaviour.cancel(nodeKey);
 	_cms.field.behaviour.changelanguage();
 	_cms.field.behaviour.formchange();
 	
 	// Not really a behaviour, but required after the tab has been refreshed
 	_cms.field.setlanguage();
+	
+	$(_cms.field.sel.FIELD_TAB + " .datepicker").datepicker({
+		dateFormat: "dd/mm/yy",
+		changeMonth: true,
+		changeYear: true
+	});
 }
 
 _cms.field.refresh.tab = function(nodeKey) {

@@ -12,7 +12,7 @@
 					<option value="${relativePosition}" <c:if test="${_lastRelativePosition eq relativePosition}">selected</c:if>>${relativePosition}</option>
 				</c:forTokens>
 			</select>
-			<span>'${editingItem.name}'</span>
+			'<span class="current-item-name">${editingItem.name}</span>'
 	</div>
 	
 	<div class="ff">
@@ -83,8 +83,9 @@
 		
 	</div>
 
-	<div>
-		<button id="add-button" type="button" disabled="disabled"
+	<div class="button-set">
+		<button class="action" type="button" disabled="disabled"
 			title="Add a new item below/alongside the current item">Add</button>
+		<button class="reset" type="button" disabled="disabled">Reset form</button>
 	</div>
 </form>

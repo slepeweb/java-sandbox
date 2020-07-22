@@ -29,7 +29,7 @@
 		<button id="version-button" type="button">Version</button>
 	</c:when><c:otherwise>
 		<p>(You cannot create a new version until this version is Published.)</p>
-		<button id="version-button-disabled" class="disabled" type="button">Version</button>
+		<button id="version-button-disabled" disabled="disabled" type="button">Version</button>
 	</c:otherwise></c:choose>
 	
 	<c:if test="${editingItem.version > 1}">

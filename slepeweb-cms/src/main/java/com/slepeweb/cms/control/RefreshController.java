@@ -2,6 +2,8 @@ package com.slepeweb.cms.control;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.commerce.service.AxisService;
@@ -28,7 +31,7 @@ public class RefreshController extends BaseController {
 //	@Autowired private LinkNameService linkNameService;
 	@Autowired private HostService hostService;
 	@Autowired private AxisService axisService;
-//	@Autowired private CookieService cookieService;
+	@Autowired private CookieService cookieService;
 //	@Autowired private NavigationController navigationController;
 	
 	@RequestMapping(value="/item/{origId}/refresh/core", method=RequestMethod.GET)
@@ -104,6 +107,28 @@ public class RefreshController extends BaseController {
 		Item i = this.itemService.getEditableVersion(origId);
 		model.addAttribute("editingItem", i);
 		return "cms.refresh.move";		
+	}
+		
+	@RequestMapping(value="/item/{origId}/refresh/add", method=RequestMethod.GET)
+	public String refreshAddTab(
+			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
+		
+		Item i = this.itemService.getEditableVersion(origId);
+		model.addAttribute("editingItem", i);
+		
+		// Last relative position selection for 'addnew'
+		model.addAttribute("_lastRelativePosition", this.cookieService.getRelativePositionCookieValue(req));
+		
+		return "cms.refresh.add";		
+	}
+		
+	@RequestMapping(value="/item/{origId}/refresh/copy", method=RequestMethod.GET)
+	public String refreshCopyTab(
+			@PathVariable long origId, ModelMap model) {	
+		
+		Item i = this.itemService.getEditableVersion(origId);
+		model.addAttribute("editingItem", i);
+		return "cms.refresh.copy";		
 	}
 		
 }

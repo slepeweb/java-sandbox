@@ -13,20 +13,19 @@
 	</details>	
 
 	<div>
-		<span>Move current item '${editingItem.name}', placing it </span>
-		<span>
-		<select name="position">
-			<option value="none">Choose ...</option>
-			<option value="before">Before</option>
-			<option value="over">Below</option>
-			<option value="after">After</option>
-		</select>	
-		</span>
+		<span class="space-after">Move current item '<span class="current-item-name">${editingItem.name}</span>', placing it </span>
+		<span class="space-after"><select name="position">
+				<option value="none">Choose ...</option>
+				<option value="before">Before</option>
+				<option value="over">Below</option>
+				<option value="after">After</option>
+			</select></span>
 		<i class="fas fa-bars itempicker" title="Pick a target from the content structure"></i>
 		<span id="move-target-identifier">your chosen target</span> 
 	</div>
 	
-	<div class="spacer20">
-		<button id="move-item-button" disabled="disabled" type="button">Move item</button>
+	<div class="button-set spacer20">
+		<button class="action" disabled="disabled" type="button">Move item</button>
+		<button class="reset" disabled="disabled" type="button">Reset form</button>
 	</div>
 </div>

@@ -2,11 +2,13 @@ _cms.dialog = {
 	linkNotDefined: {obj: null},
 	duplicateTarget: {obj: null},
 	illegalTarget: {obj: null},
+	badLinkDataFormat: {obj: null},
 	confirmFieldUpdate: {obj: null},
 	confirmTrash: {obj: null},
 	addLink: {obj: null},
 	sel: {
 		LINK_NOT_DEFINED: "#link-not-defined-dialog",
+		LINK_DATA_FORMAT: "#link-data-format-dialog",
 		DUPLICATE_TARGET: "#duplicate-link-target-dialog",
 		ILLEGAL_TARGET: "#illegal-link-target-dialog",
 		CONFIRM_FIELD_UPDATE: "#confirm-field-update-dialog",
@@ -43,7 +45,7 @@ _cms.dialog.confirmTrash.define = function() {
 	
 	var buttons = {
 		"Delete all items": function() {
-			_cms.core.trashItem();
+			_cms.core.trashItem(_cms.editingItemId);
 		},
 		Cancel: function() {
 			close();
@@ -78,7 +80,7 @@ _cms.dialog.addLink.define = function() {
 	
 	var buttons = {
 		Use: function() {
-			if (_cms.links.check_for_use(true)) {
+			if (_cms.links.check_for_use()) {
 				_cms.links.use_form_data();
 				close();
 			}
@@ -113,4 +115,5 @@ _cms.dialog.onpageload = function() {
 	_cms.dialog.warning("Link not adequately defined", _cms.dialog.linkNotDefined, _cms.dialog.sel.LINK_NOT_DEFINED);
 	_cms.dialog.warning("Duplicate link target", _cms.dialog.duplicateTarget, _cms.dialog.sel.DUPLICATE_TARGET);
 	_cms.dialog.warning("Illegal target", _cms.dialog.illegalTarget, _cms.dialog.sel.ILLEGAL_TARGET);
+	_cms.dialog.warning("Link data badly formatted", _cms.dialog.badLinkDataFormat, _cms.dialog.sel.LINK_DATA_FORMAT);
 }

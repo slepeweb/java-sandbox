@@ -607,8 +607,17 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		Item newParent = mode.equals(MOVE_OVER) ? target : targetParent;
 		LOG.debug(compose("  New parent", newParent));		
 		
+		// Cannot move an item to one of its descendants
 		if (newParent.getPath().startsWith(mover.getPath())) {
 			throw new ResourceException("Cannot move an item to one of its descendants");
+		}
+		
+		// Cannot create a binding to a parent when the same item is already linked
+		// to the parent as an inline/relation/shortcut.
+		for (Link l : newParent.getAllLinksBarBindings()) {
+			if (l.getChild().equalsId(mover)) {
+				throw new ResourceException("This item is already linked to the new parent as a relation/inline/shortcut");
+			}
 		}
 		
 		// Break the parent link for the mover, EVEN IF old-parent = new-parent

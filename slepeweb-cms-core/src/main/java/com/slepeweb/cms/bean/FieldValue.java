@@ -74,7 +74,7 @@ public class FieldValue extends CmsBean {
 	}
 	
 	public String getInputTag() {
-		return getField().getInputTag(getStringValue());
+		return getField().getInputTag(this);
 	}
 	
 	public Field getField() {
@@ -99,10 +99,6 @@ public class FieldValue extends CmsBean {
 			}
 		}
 		return this;
-	}
-	
-	public String getValue() {
-		return getStringValue();
 	}
 	
 	public String getStringValue() {

@@ -50,7 +50,6 @@ import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Template;
-import com.slepeweb.cms.component.Navigation;
 import com.slepeweb.cms.component.Navigation.Node;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
@@ -163,7 +162,7 @@ public class RestController extends BaseController {
 		
 		if (i != null) {
 			boolean wasPublished = i.isPublished();
-			
+			String oldName = i.getName();
 			
 			i = i.setName(getParam(req, "name")).
 				setSimpleName(getParam(req, "simplename")).
@@ -192,9 +191,15 @@ public class RestController extends BaseController {
 					resp.addMessage("Core item data successfully updated");
 				}
 				
-				data[0] = new Navigation.Node().setTitle(i.getName());
+				// Navigation node with title assigned to saved item name IF changed
+				data[0] = i.getName().equals(oldName) ? null : i.getName();
+				
+				// Boolean value assigned IF version 1 has been published
 				data[1] = i.getVersion() == 1 && ! wasPublished && i.isPublished();
+				
+				// Boolean value assigned IF published status has changed
 				data[2] = wasPublished ^ i.isPublished();
+				
 				resp.setData(data);
 			}
 			catch (Exception e) {
@@ -232,8 +237,8 @@ public class RestController extends BaseController {
 	public RestResponse updateItemMedia(
 			@PathVariable Long origId, 
 			@RequestParam("media") MultipartFile file, 
-			@RequestParam("thumbnail") Boolean thumbnailRequired, 
-			@RequestParam("width") Integer thumbnailWidth, 
+			@RequestParam(value="thumbnail", required=false) Boolean thumbnailRequired, 
+			@RequestParam(value="width", required=false) Integer thumbnailWidth, 
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
@@ -357,7 +362,7 @@ public class RestController extends BaseController {
 			fv = fvs.getFieldValueObj(param, language);
 			stringValue = request.getParameter(param);
 			
-			if (ft == FieldType.date || ft == FieldType.datetime) {
+			if ((ft == FieldType.date || ft == FieldType.datetime) && StringUtils.isNotBlank(stringValue)) {
 				/* 
 				 * For a datetime field, there will be 2 query parameters, eg. for a field 
 				 * named 'datepublished', param 'datepublished_d' will hold the date value,
@@ -397,10 +402,10 @@ public class RestController extends BaseController {
 				}
 				else if (ft == FieldType.date || ft == FieldType.datetime) {
 					if (ft == FieldType.date) {
-						sdf = new SimpleDateFormat("yyyy-MM-dd");
+						sdf = DateUtil.DATE_PATTERN_B;
 					}
 					else {
-						sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+						sdf = DateUtil.DATE_AND_TIME_PATTERN;
 					}
 					
 					try {
@@ -481,7 +486,7 @@ public class RestController extends BaseController {
 			@RequestParam("template") long templateId, 
 			@RequestParam("itemtype") long itemTypeId, 
 			@RequestParam("name") String name, 
-			@RequestParam("simplename") String simplename, 
+			@RequestParam(value="simplename", required=false) String simplename, 
 			@RequestParam(value="partNum", required=false) String partNum, 
 			@RequestParam(value="price", required=false) Long price, 
 			@RequestParam(value="stock", required=false) Long stock, 
@@ -628,7 +633,7 @@ public class RestController extends BaseController {
 		Item parent = i.getParent();
 		i.trash();
 			
-		return resp.addMessage("Item trashed").setData(parent.getOrigId());
+		return resp.addMessage("Item trashed: PARENT ITEM IS NOW CURRENT").setData(parent.getOrigId());
 	}
 	
 	@RequestMapping(value="/item/{origId}/publish/section", method=RequestMethod.POST, produces="application/json")

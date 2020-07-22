@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 public class DateUtil {
 	public static final SimpleDateFormat DATE_PATTERN_A = new SimpleDateFormat("yyyy-MM-dd");
 	public static final SimpleDateFormat DATE_PATTERN_B = new SimpleDateFormat("dd/MM/yyyy");
+	public static final SimpleDateFormat TIME_PATTERN = new SimpleDateFormat("HH:mm:ss");
+	public static final SimpleDateFormat DATE_AND_TIME_PATTERN = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	public static final SimpleDateFormat SOLR_SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	public static final Pattern LOOSE_DATE_PATTERN = Pattern.compile("^.*?(\\d{1,2}/)?(\\d{1,2}/)?(\\d{4}).*$");
 	

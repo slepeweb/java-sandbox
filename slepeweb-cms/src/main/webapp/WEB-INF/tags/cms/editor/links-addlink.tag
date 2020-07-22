@@ -20,7 +20,7 @@
 			<label>Type: </label>
 			<select name="linktype">
 				<option value="unknown">Choose ...</option>
-				<c:forTokens items="inline,relation,component,shortcut" delims="," var="type">
+				<c:forTokens items="relation,inline,shortcut,component" delims="," var="type">
 					<option value="${type}">${type}</option>
 				</c:forTokens>
 			</select>	

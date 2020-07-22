@@ -35,8 +35,9 @@
 		</div>
 	</c:if>
 	
-	<div class="ff">
-		<button id="media-button" type="button" disabled="disabled">Upload</button>
+	<div class="button-set ff">
+		<button class="action" type="button" disabled="disabled">Upload</button>
+		<button class="reset" type="button" disabled="disabled">Reset form</button>
 	</div>
 	
 	<progress class="spacer10" value="0">0%</progress>		

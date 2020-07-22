@@ -3,14 +3,13 @@ _cms.core = {
 	refresh: {},
 	sel: {
 		CORE_TAB: "#core-tab",
-		UPDATE_BUTTON: "#core-button",
+		CURRENTLY_EDITING_HEADER: "#currently-editing",
 		PRODUCT_FLAG: "#itemIsProductFlag",
-		TRASH_BUTTON: "#trash-button",
 	}
 };
 
-_cms.core.sel.ALL_INPUTS = _cms.core.sel.CORE_TAB + "#core-tab input";
-_cms.core.sel.ALL_SELECTS = _cms.core.sel.CORE_TAB + "#core-tab select";
+_cms.core.sel.ALL_INPUTS = _cms.core.sel.CORE_TAB + " input";
+_cms.core.sel.ALL_SELECTS = _cms.core.sel.CORE_TAB + " select";
 _cms.core.sel.NAME_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "name");
 _cms.core.sel.SIMPLENAME_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "simplename");
 _cms.core.sel.TEMPLATE_SELECT = _cms.support.fs(_cms.core.sel.CORE_TAB, "template");
@@ -21,6 +20,9 @@ _cms.core.sel.PARTNUM_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.PRICE_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.STOCK_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.FORM = "".concat(_cms.core.sel.CORE_TAB, " form");
+_cms.core.sel.UPDATE_BUTTON = _cms.core.sel.CORE_TAB + " button.action",
+_cms.core.sel.RESET_BUTTON = _cms.core.sel.CORE_TAB + " button.reset",
+
 
 _cms.support.setTabIds(_cms.core, "core");
 
@@ -50,43 +52,49 @@ _cms.core.behaviour.update = function(nodeKey) {
 			dataType: "json",
 			success: function(resp, status, z) {
 				if (! resp.error) {
-					// Name may have changed, so navigation tree will need updating
-					var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
-					if (node) {
-						node.setTitle(resp.data[0].title);
+					_cms.support.flashMessage(_cms.support.toStatus(false, "Core data updated"));
+					
+					// Name may have changed, so navigation tree will need updating, and 
+					// many of the tabs will need refreshing
+					if (resp.data[0]) {
+						var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
+						if (node) {
+							node.setTitle(resp.data[0]);
+						}
+						
+						_cms.support.updateItemName(resp.data[0]);
+						//$(_cms.core.sel.CURRENTLY_EDITING_HEADER).html(resp.data[0]);
+						// TODO: implement: _cms.add.refresh.tab(nodeKey);
+						_cms.copy.refresh.tab(nodeKey);
+						_cms.support.refreshHistory(_cms.siteId);
+						// TODO:_cms.move.refresh.tab(nodeKey);
+						// TODO: implement: _cms.misc.refresh.tab(nodeKey);
 					}
-				}
-				
-				_cms.support.flashMessage(resp.data[0]);
-				_cms.core.refresh.tab(nodeKey);
-				
-				if (resp.data[2]) {
-					// The published status of the item has changed
-					_cms.version.refresh.tab(nodeKey);
-				}
-				
-				if (resp.data[1]) {
-					// The first version has reach published status
-					// TODO: This is NOT needed on a staging server
-					_cms.media.refresh.tab(nodeKey);
-				}
+					
+					_cms.core.refresh.tab(nodeKey);
+					
+					if (resp.data[2]) {
+						// The published status of the item has changed
+						_cms.version.refresh.tab(nodeKey);
+					}
+					
+					if (resp.data[1]) {
+						// The first version has reached published status
+						// TODO: This is NOT needed on a staging server
+						// TODO: Why refresh the media tab?
+						_cms.media.refresh.tab(nodeKey);
+					}
+				}				
 			},
 			error: function(json, status, z) {
 				_cms.support.serverError();
 			}
 		});
 	});
-	
-	// TODO: there are NO date field on the core tab - move to field tab
-	$("#core-tab .datepicker").datepicker({
-		dateFormat: "yy-mm-dd",
-		changeMonth: true,
-		changeYear: true
-	});
 }
 
-_cms.core.trashItem = function() {
-	$.ajax(_cms.ctx + "/rest/item/" + _cms.editingItemId + "/trash", {
+_cms.core.trashItem = function(nodeKey) {
+	$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/trash", {
 		type: "POST",
 		cache: false,
 		dataType: "json",
@@ -102,7 +110,8 @@ _cms.core.trashItem = function() {
 					
 					// This will make the parent item the current item, and refresh the page accordingly,
 					// thereby updating _cms.editingItemId
-					_cms.leftnav.tree.activateKey(parent.key);
+					//_cms.leftnav.tree.activateKey(parent.key);
+					_cms.support.renderItemForms(parent.key, "core-tab");
 				}
 			}
 		},
@@ -113,17 +122,22 @@ _cms.core.trashItem = function() {
 	});
 }
 
-_cms.core.behaviour.trash = function(nodeKey) {
-	// Add behaviour to trash an item and put it in the bin.
-	$(_cms.core.sel.TRASH_BUTTON).click(function () {
-		_cms.dialog.open(_cms.dialog.confirmTrash, "b");
+_cms.core.behaviour.reset = function(nodeKey) {
+	$(_cms.core.sel.RESET_BUTTON).click(function (e) {
+		_cms.support.resetForm(_cms.core.refresh.tab, nodeKey, e);
 	});
 }
 
 _cms.core.behaviour.formchange = function() {
 	$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).mouseleave(function() {
-		_cms.support.enableIf(_cms.core.sel.UPDATE_BUTTON, 
-				$(_cms.core.sel.FORM).serialize() !== _cms.core.originalFormState);
+		if (_cms.support.enableIf(_cms.core.sel.UPDATE_BUTTON, 
+				$(_cms.core.sel.FORM).serialize() !== _cms.core.originalFormState)) {
+			
+			_cms.support.enable(_cms.core.sel.RESET_BUTTON);
+		}
+		else {
+			_cms.support.disable(_cms.core.sel.RESET_BUTTON);
+		}
 	});
 }
 
@@ -134,6 +148,6 @@ _cms.core.refresh.tab = function(nodeKey) {
 _cms.core.onrefresh = function(nodeKey) {
 	_cms.core.behaviour.formchange();
 	_cms.core.behaviour.update(nodeKey);
-	_cms.core.behaviour.trash();
+	_cms.core.behaviour.reset(nodeKey);
 	_cms.core.originalFormState = $(_cms.core.sel.FORM).serialize();
 }

@@ -255,22 +255,33 @@ details {
 	background-color: #db9131;
 }
 
-#uselink-buttons {
+#sortable-links button.edit-link {
+	padding-left: 6px;
+	background-color: #6eac2c;
+}
+
+div.button-set {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 }
 
-#use-link-button {
+#item-editor button.action {
 	justify-self: left;
+	background-color: #6eac2c;
 }
 
-#cancel-use-link-button {
+#item-editor button.reset {
+	justify-self: right;
+	background-color: #d27e00;
+}
+
+div.action-reset-combo {
 	justify-self: right;
 }
 
 						/* >>>>> Buttons */
 							#item-editor button, #login button {
-								background: #6eac2c;
+								background-color: #6eac2c;
 								border: 1px solid #acdd4a;
 								border-radius: 6px;
 								color: #fff;
@@ -279,33 +290,15 @@ details {
 								cursor: pointer;
 							}
 							
-							#item-editor button.disabled {
-								background: #ccc;
-							}
-							
 							#item-editor #trash-button {
 								background: red;
-/* 								float: right; */
 							}
 							
 							#version-tab button {
 								margin-bottom: 1.5em;
+								background-color: #6eac2c;
 							}
 							
-							button#savelinks-button {
-								color: #fff;
-								float: right;
-								padding: 8px;
-								font-size: 1.2em;
-								border: 3px solid #0c8c16;
-							}
-							
-							button#savelinks-button[disabled="disabled"] {
-								opacity: 0.6;
-								font-size: 1.0em;
-								border-width: 0;
-							}
-						
 						/* <<<<< Buttons */
 
 #trash-table {
@@ -349,7 +342,7 @@ details {
 	margin-top: 2.0em;
 }
 
-.section-ops span {
+.section-ops span.radio-label {
 	margin-left: -0.5em
 }
 
@@ -390,14 +383,14 @@ details {
 }
 	
 #move-target-identifier, #link-target-identifier {
-	padding-left: 3em;
+	padding-left: 1em;
 }
 
 button[disabled=disabled] {
 	opacity: 0.5;
 }
 
-#move-wrapper span {
+#move-wrapper span.space-after {
 	padding-right: 1em;
 }
 
