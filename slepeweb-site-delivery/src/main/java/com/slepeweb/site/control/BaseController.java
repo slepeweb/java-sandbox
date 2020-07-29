@@ -25,7 +25,7 @@ import com.slepeweb.site.service.NavigationService;
 @Controller
 public class BaseController {
 	private static Logger LOG = Logger.getLogger(BaseController.class);
-	public static final String USER = "_user";
+	public static final String USER = "_userOld";
 	public static final String ITEM = "_item";
 	public static final String SITE = "_site";
 	
@@ -73,7 +73,16 @@ public class BaseController {
 	}
 	
 	@ModelAttribute(value=USER)
-	protected User getUser(@AuthenticationPrincipal User u) {
+	protected org.springframework.security.core.userdetails.User 
+			getUserOld(@AuthenticationPrincipal org.springframework.security.core.userdetails.User u) {
+		LOG.trace(String.format("Model attribute (_userOld): [%s]", u));
+		return u;
+	}
+	
+	
+	@ModelAttribute(value="_user")
+	protected com.slepeweb.cms.bean.User getUser(HttpServletRequest req) {
+		com.slepeweb.cms.bean.User u = (com.slepeweb.cms.bean.User) req.getSession().getAttribute("_user");
 		LOG.trace(String.format("Model attribute (_user): [%s]", u));
 		return u;
 	}

@@ -42,6 +42,14 @@ footer {
 	@include std-container-padding{}
 }
 
+div.welcome {
+	font-size: 0.9em;
+	margin-top: -0.5em;
+	margin-bottom: -1.0em;
+	margin-right: 0.5em;
+	display: inline-block;
+}
+
 .main {
 	grid-area: main;
 	@include std-container-padding{}
@@ -142,6 +150,10 @@ footer {
 
 #diagram-svg {
 	background-color: #e1eaef;
+}
+
+#get-full-diagram {
+	cursor: pointer;
 }
 
 div.image-gallery {

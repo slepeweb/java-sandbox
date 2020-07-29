@@ -1,3 +1,5 @@
+drop table if exists access;
+
 drop table if exists axisvalue;
 drop table if exists axis;
 drop table if exists variant;
@@ -257,3 +259,18 @@ create table axisvalue
    unique key idx_axisvalue_value (value),
 	 constraint foreign key (axisid) references axis(id) on delete cascade
 ) ENGINE=InnoDB;
+
+create table access
+(
+	id int not null auto_increment,
+	site varchar(64),
+	name varchar(64),
+	itemtype varchar(64),
+	template varchar(64),
+	path varchar(64),
+	role varchar(64),
+	access boolean,
+	primary key (id),
+	unique key idx_access_site_name (site, name)
+) ENGINE=InnoDB;
+

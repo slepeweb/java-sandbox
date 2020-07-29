@@ -182,4 +182,16 @@ public class CmsBeanFactory {
 		return oi;
 	}
 	
+	public static AccessRule makeAccessRule() {
+		AccessRule ar = new AccessRule();
+		ar.setCmsService(CMS);
+		return ar;
+	}
+	
+	public static User makeUser() {
+		User u = new User();
+		u.setCmsService(CMS);
+		return u;
+	}
+	
 }

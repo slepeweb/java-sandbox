@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
+import com.slepeweb.cms.bean.AccessRule;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
@@ -22,6 +23,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.bean.User;
 
 public class RowMapperUtil {
 
@@ -261,6 +263,31 @@ public class RowMapperUtil {
 			return CmsBeanFactory.makeTag().
 					setItem(mapItem(rs)).
 					setValue(rs.getString("tagvalue"));
+		}
+	}
+	
+	public static final class AccessMapper implements RowMapper<AccessRule> {
+		public AccessRule mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeAccessRule().
+					setId(rs.getLong("id")).
+					setSiteShortname(rs.getString("site")).
+					setName(rs.getString("name")).
+					setRolePattern(rs.getString("role")).
+					setItemTypePattern(rs.getString("itemtype")).
+					setTemplatePattern(rs.getString("template")).
+					setItemPathPattern(rs.getString("path")).
+					setAccess(rs.getBoolean("access"));
+		}
+	}
+	
+	public static final class UserMapper implements RowMapper<User> {
+		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeUser().
+					setId(rs.getLong("user_id")).
+					setName(rs.getString("name")).
+					setAlias(rs.getString("alias")).
+					setPassword(rs.getString("password")).
+					setEnabled(rs.getBoolean("enabled"));
 		}
 	}
 	

@@ -37,6 +37,8 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected VariantService variantService;
 	@Autowired protected ServerConfig serverConfig;
 	@Autowired protected SiteConfiguration siteConfiguration;
+	@Autowired protected UserService userService;
+	@Autowired protected AccessService accessService;
 	
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {
@@ -141,5 +143,13 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public SiteConfiguration getSiteConfiguration() {
 		return siteConfiguration;
+	}
+
+	public UserService getUserService() {
+		return userService;
+	}
+
+	public AccessService getAccessService() {
+		return accessService;
 	}
 }

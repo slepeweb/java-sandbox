@@ -30,4 +30,6 @@ public interface CmsService {
 	VariantService getVariantService();
 	ServerConfig getServerConfig();
 	SiteConfiguration getSiteConfiguration();
+	UserService getUserService();
+	AccessService getAccessService();
 }

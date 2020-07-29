@@ -684,7 +684,7 @@ public class RestController extends BaseController {
 		int count = actionItem(i, selector, value);
 
 		for (Link l : i.getBindingsNoShortcuts()) {
-			count += actionItem(l.getChild(), selector, value);
+			count += actionSection(l.getChild(), selector, value);
 		}
 		
 		return count;

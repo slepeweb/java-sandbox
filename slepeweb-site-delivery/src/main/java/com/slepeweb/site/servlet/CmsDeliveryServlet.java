@@ -26,10 +26,14 @@ import org.springframework.ui.ModelMap;
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
+import com.slepeweb.cms.bean.Redirector;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.SiteAccess;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.FieldName;
+import com.slepeweb.cms.service.AccessService;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
@@ -38,35 +42,15 @@ import com.slepeweb.common.util.ImageUtil;
 @Component
 public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
+	@Autowired private AccessService accessService;
 	
-	//private String[] bypass2DefaultPatterns = new String[] {"/\\w\\w/notfound", "/\\w\\w/error"};	
 	private final Object buffPoolLock = new Object();
 	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
 	private long defaultPrivateCacheTime, defaultPublicCacheTime;
 	private Map<Long, Long> lastDeliveryTable = new HashMap<Long, Long>(127);
-
+	
 	@Autowired private CmsService cmsService;
 
-	public void setBypass2Default(String s) {
-		// This method should be called when Spring does its injection stuff, 
-		// but it has been disabled for the foreseeable future.
-//		this.bypass2DefaultPatterns = s != null ? s.split("\\|") : new String[] {};
-	}
-	
-	private boolean bypass2Default(String path) {
-		/*
-		 * Forwarding the request to the default servlet is not working in this Spring
-		 * environment, thereby breaking this bypass functionality.
-		 * 
-		*/
-//		for (String regex : this.bypass2DefaultPatterns) {
-//			if (path.matches(regex)) {
-//				return true;
-//			}
-//		}
-		return false;
-	}
-	
 	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		doGet(req, res, model);
 	}
@@ -75,102 +59,79 @@ public class CmsDeliveryServlet {
 		
 		String path = getItemPath(req);
 		String trimmedPath = path;
-		boolean isBypass2Default = bypass2Default(path);
-		long requestTime = System.currentTimeMillis();
+		long requestTime = System.currentTimeMillis();		
+		Site site = getSite(req);
 		
-		if (! isBypass2Default) {
-			Site site = getSite(req);
-			if (site != null) {
-				req.setAttribute("_site", site);
-				LOG.trace(LogUtil.compose("Site ...", site));
+		if (site != null) {
+			req.setAttribute("_site", site);
+			LOG.trace(LogUtil.compose("Site ...", site));
 
-				String language = site.getLanguage();
-				boolean redirect = false;
+			String language = site.getLanguage();				
+			Redirector director = multilingualPathChecker(site, path);
+			language = director.getLanguage();
+			trimmedPath = director.getPath();
+			
+			if (director.isRequired()) {
+				// language is missing on a multilingual site - redirect to default language
+				res.sendRedirect(String.format("/%s%s", language, trimmedPath));
+				return;
+			}
+			
+			Item item = site.getItem(trimmedPath);
+			
+			if (item != null) {
+				LOG.info(LogUtil.compose("Requesting", item));
+				item.setLanguage(language);
 				
-				if (site.isMultilingual() && ! path.equals("/favicon.ico")) {
-					if (path.length() > 2) {
-						String[] slugs = path.substring(1).split("/");
-						if (slugs.length > 0 && slugs[0].length() == 2) {
-							language = path.substring(1, 3);
-							trimmedPath = path.substring(3);
-							
-							// Special treatment for homepage
-							if (StringUtils.isBlank(trimmedPath)) {
-								trimmedPath = "/";
-							}
-						}
-						else {
-							redirect = true;
-						}
-					}
-					else {
-						// Special treatment for homepage
-						trimmedPath = "";
-						redirect = true;
-					}
-				}
+				User u = (User) req.getSession().getAttribute("_user");
+				SiteAccess siteAccess = new SiteAccess();
+				siteAccess.setRules(this.accessService.getList(item.getSite().getShortname()));
+				director = accessibilityChecker(item, u, siteAccess);
 				
-				if (redirect) {
-					// language is missing on a multilingual site - redirect to default language
-					res.sendRedirect(String.format("/%s%s", language, trimmedPath));
+				if (director.isRequired()) {
+					res.sendRedirect(director.getPath());
 					return;
 				}
 				
-				Item item = site.getItem(trimmedPath);
-				
-				if (item != null) {
-					LOG.info(LogUtil.compose("Requesting", item));
-					item.setLanguage(language);
-					logRequestHeaders(req, path);					
-					long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
+				logRequestHeaders(req, path);					
+				long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
 
-					if (isCacheable(item) && isFresh(item, requestTime, ifModifiedSince, req.getMethod())) {
-						res.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-					}
-					else {
-						req.setAttribute("_item", item);
-						setCacheHeaders(item, requestTime, res);
-						
-						if (item.getType().isMedia()) {
-							LOG.debug(LogUtil.compose("Streaming binary content ...", item));
-							stream(item, req, res, requestTime);
-						}
-						else {
-							res.setContentType("text/html;charset=utf-8");
-							res.setCharacterEncoding("utf-8");
-							Template tmplt = item.getTemplate();
-							String view = req.getParameter("view");
-							
-							if (tmplt != null) {
-								String springMapping = StringUtils.isBlank(view) ? tmplt.getForward() : tmplt.getForward() + "/" + view;
-								LOG.debug(LogUtil.compose("Forwarding request to template", springMapping));
-								req.getRequestDispatcher(springMapping).forward(req, res);
-								this.lastDeliveryTable.put(item.getId(), zeroMillis(requestTime));
-							}
-							else {
-								notFound(res, "Item has no template", item);
-							}
-						}
-					}
+				if (isCacheable(item) && isFresh(item, requestTime, ifModifiedSince, req.getMethod())) {
+					res.sendError(HttpServletResponse.SC_NOT_MODIFIED);
 				}
 				else {
-					notFound(res, "Item not found", path);
+					req.setAttribute("_item", item);
+					setCacheHeaders(item, requestTime, res);
+					
+					if (item.getType().isMedia()) {
+						LOG.debug(LogUtil.compose("Streaming binary content ...", item));
+						stream(item, req, res, requestTime);
+					}
+					else {
+						res.setContentType("text/html;charset=utf-8");
+						res.setCharacterEncoding("utf-8");
+						Template tmplt = item.getTemplate();
+						String view = req.getParameter("view");
+						
+						if (tmplt != null) {
+							String springMapping = StringUtils.isBlank(view) ? tmplt.getForward() : tmplt.getForward() + "/" + view;
+							LOG.debug(LogUtil.compose("Forwarding request to template", springMapping));
+							req.getRequestDispatcher(springMapping).forward(req, res);
+							this.lastDeliveryTable.put(item.getId(), zeroMillis(requestTime));
+						}
+						else {
+							notFound(res, "Item has no template", item);
+						}
+					}
 				}
 			}
 			else {
-				LOG.error(LogUtil.compose("Site not registered here", req.getServerName()));
 				notFound(res, "Item not found", path);
 			}
 		}
 		else {
-			/*
-			 * The bypass functionality has been effectively disabled, so this block of code
-			 * should never get executed. It has been disabled, because forwarding to Tomcat's default
-			 * servlet has been 'broken' by Spring's use of the 'default' servlet.
-			 */
-			LOG.debug(LogUtil.compose("Forwarding bypassed request to default servlet", path));
-			HttpUtil.setCacheHeaders(requestTime, -1L, this.defaultPrivateCacheTime, this.defaultPublicCacheTime, res);
-			req.getServletContext().getNamedDispatcher("default").forward(req, res);
+			LOG.error(LogUtil.compose("Site not registered here", req.getServerName()));
+			notFound(res, "Item not found", path);
 		}
 		
 		logResponseHeaders(res, path);
@@ -455,6 +416,60 @@ public class CmsDeliveryServlet {
 			
 			return failed;
 		}
+	}
+	
+	// Returns true if resource is accessible
+	private Redirector accessibilityChecker(Item i, User u, SiteAccess siteAccess) {
+		
+		Redirector r = new Redirector();
+
+		if (! siteAccess.grantAccess(i, u)) {
+			if (u == null) {
+				if (! i.getPath().equals(SiteAccess.LOGIN_PATH)) {
+					// Redirect to login page
+					r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccess.LOGIN_PATH));
+					r.setRequired(true);
+				}
+			}
+			else {
+				if (! i.getPath().equals(SiteAccess.NOT_AUTHORISED_PATH)) {
+					// Redirect to not-authorised page
+					r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccess.NOT_AUTHORISED_PATH));
+					r.setRequired(true);
+				}
+			}
+		}
+		
+		return r;
+	}
+	
+	private Redirector multilingualPathChecker(Site site, String path) {
+		Redirector r = new Redirector().setPath(path);
+		
+		if (site.isMultilingual() && ! path.equals("/favicon.ico")) {
+			if (path.length() > 2) {
+				String[] slugs = path.substring(1).split("/");
+				if (slugs.length > 0 && slugs[0].length() == 2) {
+					r.setLanguage(path.substring(1, 3));
+					r.setPath(path.substring(3));
+					
+					// Special treatment for homepage
+					if (StringUtils.isBlank(r.getPath())) {
+						r.setPath("/");
+					}
+				}
+				else {
+					r.setRequired(true);
+				}
+			}
+			else {
+				// Special treatment for homepage
+				r.setPath("");
+				r.setRequired(true);
+			}
+		}
+		
+		return r;
 	}
 	
 	private long toLong(String s) {

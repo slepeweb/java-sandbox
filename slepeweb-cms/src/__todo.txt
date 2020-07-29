@@ -1,12 +1,17 @@
 TODO: This is the main todo file:
 
 HIGH
-- deploy to web
+- remove spring security from site app - remove sws site functionality if necessary. Check whether
+  spring security jars are required for password generator.
+- update anc dbtables.sql to define user, role and user_role
+- bug? Create new item below / ... not visible in the tree; had to refresh page to see it
 - think about creating shortcuts on the 'Add new' tab - offer radio buttons: 'New', 'Shortcut'
 - need to protect against injection attacks
 - check sws search still working
 
 MEDIUM
+- PDFs not viewable on my android phone (chrome)
+- PDFs not rendered with scrollbars on iPad
 - store preferred language in cookie (Ancestry)
 - resource bundles (Ancestry)
 - password protection for site visitors (Ancestry)
