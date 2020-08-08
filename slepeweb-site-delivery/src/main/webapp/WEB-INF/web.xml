@@ -44,28 +44,16 @@
 		<param-name>contextConfigLocation</param-name>
 		<!-- For Production, using localhost database connection -->
 		<param-value>
-			/WEB-INF/security-beans.xml, /WEB-INF/database-beans.xml
+			/WEB-INF/database-beans.xml
 		</param-value>
 		
 		<!-- For remote database connection 
 		<param-value>
-			/WEB-INF/security-beans.xml, /WEB-INF/remote-database-beans.xml
+			/WEB-INF/remote-database-beans.xml
 		</param-value>
  		-->
 	</context-param>
  	
-	<!-- Spring Security -->
-	<filter>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy
-		</filter-class>
-	</filter>
- 
-	<filter-mapping>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>  
-	
   <servlet-mapping>
     <servlet-name>slepeweb-site</servlet-name>
     <url-pattern>/</url-pattern>

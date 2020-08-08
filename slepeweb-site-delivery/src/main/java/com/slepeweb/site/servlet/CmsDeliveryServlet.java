@@ -67,7 +67,7 @@ public class CmsDeliveryServlet {
 			LOG.trace(LogUtil.compose("Site ...", site));
 
 			String language = site.getLanguage();				
-			Redirector director = multilingualPathChecker(site, path);
+			Redirector director = multilingualPathChecker(site, path, language);
 			language = director.getLanguage();
 			trimmedPath = director.getPath();
 			
@@ -443,8 +443,8 @@ public class CmsDeliveryServlet {
 		return r;
 	}
 	
-	private Redirector multilingualPathChecker(Site site, String path) {
-		Redirector r = new Redirector().setPath(path);
+	private Redirector multilingualPathChecker(Site site, String path, String defaultLanguage) {
+		Redirector r = new Redirector().setPath(path).setLanguage(defaultLanguage);
 		
 		if (site.isMultilingual() && ! path.equals("/favicon.ico")) {
 			if (path.length() > 2) {
