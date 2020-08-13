@@ -7,7 +7,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.utils.LogUtil;
@@ -130,7 +132,7 @@ public class ItemTest extends BaseTest {
 				Item imageItem = site.getContentItem("/media/ex1");
 				
 				if (articleItem != null && imageItem != null) {
-					articleItem.addInline(imageItem);
+					addInline(articleItem, imageItem);
 					articleItem.saveLinks();
 					
 					// 4050: Assert that article has an inline item
@@ -155,9 +157,9 @@ public class ItemTest extends BaseTest {
 					}
 					
 					// Leave some links in place
-					articleItem.addInline(imageItem);
+					addInline(articleItem, imageItem);
 					articleItem.saveLinks();
-					newsSectionItem.addRelation(articleItem);
+					addRelation(newsSectionItem, articleItem);
 					newsSectionItem.saveLinks();
 				}
 				
@@ -317,4 +319,23 @@ public class ItemTest extends BaseTest {
 				
 		return trs;
 	}
+	
+	@SuppressWarnings("unlikely-arg-type")
+	public Item addInline(Item parent, Item inline) {
+		if (! parent.getLinks().contains(inline)) {
+			parent.getLinks().add(CmsBeanFactory.toChildLink(parent, inline, LinkType.inline));
+		}
+		
+		return parent;
+	}
+	
+	@SuppressWarnings("unlikely-arg-type")
+	public Item addRelation(Item parent, Item relation) {
+		if (! parent.getLinks().contains(relation)) {
+			parent.getLinks().add(CmsBeanFactory.toChildLink(parent, relation, LinkType.relation));
+		}
+		
+		return parent;
+	}
+	
 }

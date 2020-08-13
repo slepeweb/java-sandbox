@@ -19,7 +19,6 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.site.model.TwitterComponent;
-import com.slepeweb.site.ntc.service.NtcHtmlScraperService;
 import com.slepeweb.site.service.TwitterService;
 import com.slepeweb.site.sws.bean.LotteryNumbersBean;
 import com.slepeweb.ws.bean.PasswordBean;
@@ -34,7 +33,6 @@ public class WebServicesController {
 
 	@Autowired private PasswordJaxwsClient passwordJaxwsClient;	
 	@Autowired private WeatherJaxwsClient weatherJaxwsClient;
-	@Autowired private NtcHtmlScraperService scraperService;
 	@Autowired private TwitterService twitterService;
 	@Autowired private ItemService itemService;
 	
@@ -75,13 +73,6 @@ public class WebServicesController {
 	@ResponseBody
 	public WeatherBeanWrapper doWeatherWrapper(@PathVariable String country, @PathVariable String city) {
 		return this.weatherJaxwsClient.getWeatherWrapper(country, city);
-	}	
-	
-	@RequestMapping(value="/scrape/{organiserId}/{tableId}", method=RequestMethod.POST, produces="text/html")	
-	@ResponseBody
-	public String scrape(@RequestParam String url, @PathVariable Integer organiserId, 
-			@PathVariable Integer tableId) {
-		return this.scraperService.scrape(url, organiserId, tableId);
 	}	
 	
 	@RequestMapping(value="/login/user", method=RequestMethod.GET, produces="application/json")	

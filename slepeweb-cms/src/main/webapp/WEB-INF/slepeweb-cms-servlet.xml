@@ -29,6 +29,10 @@
 
 	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.commerce" />
 		
+	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl">
+		<property name="editorialMode" value="true" />
+	</bean>
+	
 	<bean id="config" class="com.slepeweb.cms.component.ServerConfig">
 		<property name="liveDelivery" value="false" />
 		<property name="commerceEnabled" value="false" />

@@ -29,6 +29,10 @@
 
 	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.commerce, com.slepeweb.site, com.slepeweb.ws" />
 		
+	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl">
+		<property name="editorialMode" value="false" />
+	</bean>
+	
 	<bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder" />
 	
 	<bean id="config" class="com.slepeweb.cms.component.ServerConfig">
@@ -36,7 +40,6 @@
 		<property name="commerceEnabled" value="false" />
 	</bean>
 	
-	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl" />
 	<bean id="springContext" class="com.slepeweb.cms.utils.SpringContext" />
 
 	<bean id="cmsDeliveryServlet" class="com.slepeweb.site.servlet.CmsDeliveryServlet">

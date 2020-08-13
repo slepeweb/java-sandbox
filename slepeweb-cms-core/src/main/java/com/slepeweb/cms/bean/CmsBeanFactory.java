@@ -47,16 +47,23 @@ public class CmsBeanFactory {
 	}
 	
 	public static Item makeItem(String itemTypeName, String language) {
+		Item i = null;
+		
 		if (
 				CMS.getServerConfig().isCommerceEnabled() && 
 				itemTypeName != null && 
 				itemTypeName.equals(ItemTypeName.PRODUCT)) {
 			
-			return makeProduct();
+			i = makeProduct();
+		}
+		else if (itemTypeName != null && itemTypeName.equals(ItemTypeName.SHORTCUT)) {
+			i = makeShortcut();
+		}
+		else {
+			i = new Item();
+			i.setCmsService(CMS);
 		}
 		
-		Item i = new Item();
-		i.setCmsService(CMS);
 		i.setLanguage(language);
 		return i;
 	}
@@ -152,6 +159,12 @@ public class CmsBeanFactory {
 			setDeleted(false);
 	}
 	
+	public static Shortcut makeShortcut() {
+		Shortcut sh = new Shortcut();
+		sh.setCmsService(CMS);
+		return sh;
+	}
+	
 	public static Product makeProduct() {
 		Product p = new Product();
 		p.setCmsService(CMS);
@@ -192,6 +205,15 @@ public class CmsBeanFactory {
 		User u = new User();
 		u.setCmsService(CMS);
 		return u;
+	}
+	
+	public static Link toChildLink(Item parent, Item child, String linkType) {
+		return CmsBeanFactory.makeLink().
+				setParentId(parent.getId()).
+				setChild(child).
+				setType(linkType).
+				setName("std").
+				setOrdering(0); // Arbitrary value
 	}
 	
 }

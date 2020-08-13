@@ -82,6 +82,7 @@ _cms.dialog.addLink.define = function() {
 		Use: function() {
 			if (_cms.links.check_for_use()) {
 				_cms.links.use_form_data();
+				_cms.links.shortcut.buttonstates();
 				close();
 			}
 		},

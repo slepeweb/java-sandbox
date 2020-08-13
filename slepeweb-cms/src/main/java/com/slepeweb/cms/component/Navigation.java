@@ -6,6 +6,8 @@ import java.util.List;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.Shortcut;
 
 public class Navigation {
 	
@@ -34,26 +36,35 @@ public class Navigation {
 		private boolean folder, lazy = true, expanded, selected, shortcut;
 		private List<Node> children = new ArrayList<Node>();
 		
-		public static Node toNode(Item i, boolean isShortcut) {
+		public static Node toNode(Item i) {
 			return new Navigation.Node().setTitle(i.getName()).setKey(i.getOrigId().toString()).
-					setExtraClasses(getCmsIconClass(i, isShortcut));
+					setExtraClasses(getCmsIconClass(i));
 		}
 		
-		public static String getCmsIconClass(Item i, boolean isShortcut) {
-			String type = i.getType().getName().toLowerCase();
-			if (type.endsWith("homepage")) {
-				type = "homepage";
+		public static String getCmsIconClass(Item i) {
+			ItemType t = i.getType(); 
+			if (i.isShortcut()) {
+				Shortcut sh = (Shortcut) i;
+				if (sh.getReferred() != null) {
+					t = sh.getReferred().getType();
+				}
 			}
-			else if (type.startsWith("image")) {
-				type = "image";
+			
+			String typeName = t.getName().toLowerCase();
+			
+			if (typeName.endsWith("homepage")) {
+				typeName = "homepage";
+			}
+			else if (typeName.startsWith("image")) {
+				typeName = "image";
 			}
 			
 			String prefix = "cms-icon-";
-			if (isShortcut) {
+			if (i.isShortcut()) {
 				prefix = prefix + "shortcut-";
 			}
 			
-			return String.format(prefix + "%s", type);
+			return String.format(prefix + "%s", typeName);
 		}
 		
 		@Override
@@ -150,14 +161,9 @@ public class Navigation {
 			return shortcut;
 		}
 
-		/*
-		 * If this node represents a shortcut, then modify the key, so that
-		 * it doesn't conflict with the key of the 'real' node.
-		 */
 		public Node setShortcut(boolean shortcut) {
 			this.shortcut = shortcut;
 			if (shortcut) {
-				this.key += ".s";
 				if (this.extraClasses == null) {
 					setExtraClasses("shortcut");
 				}

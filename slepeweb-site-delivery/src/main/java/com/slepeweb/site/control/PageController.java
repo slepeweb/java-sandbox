@@ -177,72 +177,6 @@ public class PageController extends BaseController {
 		return page.getView();
 	}
 
-	@RequestMapping(value="/spring/event/index")	
-	public String eventsIndex(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			@ModelAttribute("_site") Site site, 
-			ModelMap model) {	
-		
-		Page page = getStandardPage(i, shortSitename, "eventsIndex", model);
-		model.addAttribute("_defaultThumb", site.getContentItem("/images/default-thumb"));
-		return page.getView();
-	}
-
-	@RequestMapping(value="/spring/news/index")	
-	public String newsIndex(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			@ModelAttribute("_site") Site site, 
-			ModelMap model) {	
-		
-		Page page = getStandardPage(i, shortSitename, "newsIndex", model);
-		model.addAttribute("_defaultThumb", site.getContentItem("/images/default-thumb"));
-		return page.getView();
-	}
-
-	@RequestMapping(value="/spring/event")	
-	public String eventDetail(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			@ModelAttribute("_site") Site site, 
-			ModelMap model) {	
-		
-		Page page = getStandardPage(i, shortSitename, "eventDetail", model);
-		if (i.getImage() == null) {
-			i.addInline(site.getContentItem("/images/logo"));
-		}
-		
-		model.addAttribute("_siblingPager", getSiblings(i, new String[] {"Event"}, 4));
-		return page.getView();
-	}	
-
-	@RequestMapping(value="/spring/news")	
-	public String newsDetail(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			@ModelAttribute("_site") Site site, 
-			ModelMap model) {	
-		
-		Page page = getStandardPage(i, shortSitename, "newsDetail", model);
-		if (i.getImage() == null) {
-			i.addInline(site.getContentItem("/images/logo"));
-		}
-
-		model.addAttribute("_siblingPager", getSiblings(i, new String[] {"News"}, 4));
-		return page.getView();
-	}
-	
-	@RequestMapping(value="/spring/angular-spa")	
-	public String angularSpa(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			ModelMap model) {	
-		
-		Page page = getStandardPage(i, shortSitename, "angular-spa", model);
-		return page.getView();
-	}
-
 	@RequestMapping(value="/spring/product")	
 	public String standardProduct(
 			@ModelAttribute("_item") Item i, 
@@ -276,6 +210,7 @@ public class PageController extends BaseController {
 		return page.getView();
 	}
 	
+	@SuppressWarnings("unused")
 	private SiblingItemPager getSiblings(Item i, String[] typesOfInterest, int max) {
 		ItemFilter f = new ItemFilter().setTypes(typesOfInterest);
 		List<Item> children = i.getParent().getBoundItems(f);		

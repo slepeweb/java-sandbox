@@ -237,44 +237,12 @@ public class Item extends CmsBean {
 		return this;
 	}
 	
-	public Item addChild(Item child) throws ResourceException {
-		child.setParent(this);
-		return getItemService().save(child);
-	}
-	
-	@SuppressWarnings("unlikely-arg-type")
-	public Item addInline(Item inline) {
-		if (! getLinks().contains(inline)) {
-			getLinks().add(toChildLink(inline, LinkType.inline));
-		}
-		
-		return this;
-	}
-	
-	@SuppressWarnings("unlikely-arg-type")
-	public Item addRelation(Item relation) {
-		if (! getLinks().contains(relation)) {
-			getLinks().add(toChildLink(relation, LinkType.relation));
-		}
-		
-		return this;
-	}
-	
 	public boolean removeInline(Item inline) {
-		return getLinks().remove(toChildLink(inline, LinkType.inline));
+		return getLinks().remove(CmsBeanFactory.toChildLink(this, inline, LinkType.inline));
 	}
 	
 	public boolean removeRelation(Item relation) {
-		return getLinks().remove(toChildLink(relation, LinkType.relation));
-	}
-	
-	private Link toChildLink(Item i, String linkType) {
-		return CmsBeanFactory.makeLink().
-				setParentId(getId()).
-				setChild(i).
-				setType(linkType).
-				setName("std").
-				setOrdering(0); // Arbitrary value
+		return getLinks().remove(CmsBeanFactory.toChildLink(this, relation, LinkType.relation));
 	}
 	
 	/*
@@ -650,6 +618,14 @@ public class Item extends CmsBean {
 	public List<Link> getInlines() {
 		return filterLinks(new String[] {LinkType.inline});
 	}
+	
+	public Media getMedia() {
+		return getMedia(false);
+	}
+	
+	public Media getMedia(boolean thumbnailRequired) {
+		return this.cmsService.getMediaService().getMedia(getId(), thumbnailRequired);
+	}
 
 	public List<Link> getRelations() {
 		return filterLinks(new String[] {LinkType.relation});
@@ -754,6 +730,10 @@ public class Item extends CmsBean {
 	
 	public boolean equalsId(Item other) {
 		return getId().equals(other.getId());
+	}
+	
+	public boolean isShortcut() {
+		return false;
 	}
 	
 	@Override

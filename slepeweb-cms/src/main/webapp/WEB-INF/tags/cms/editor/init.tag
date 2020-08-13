@@ -14,12 +14,14 @@
 	_cms.siteId = <c:choose><c:when test="${not empty site}">${site.id}</c:when><c:otherwise>0</c:otherwise></c:choose>;
 	_cms.editingItemId = null;
 	_cms.siteDefaultLanguage = "en";
+	_cms.editingItemIsShortcut = false;
 	
 	<c:if test="${not empty editingItem}">
 		_cms.editingItemId = ${editingItem.origId};
 		_cms.siteId = ${editingItem.site.id};
 		_cms.siteDefaultLanguage = "${editingItem.site.language}";
 		_cms.siteShortname = "${editingItem.site.shortname}";
+		_cms.editingItemIsShortcut = ${editingItem.shortcut};
 	</c:if>
 	
 	// Flash messages passed through when window.location is set 

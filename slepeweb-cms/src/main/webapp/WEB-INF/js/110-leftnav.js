@@ -33,7 +33,7 @@ _cms.leftnav.define.fancytree = function() {
 			var node = data.node;
 			data.result = {
 				url: _cms.ctx + "/rest/leftnav/lazy/one",
-				data: {key: _cms.leftnav.removeShortcutMarker(node.key)}
+				data: {key: node.key}
 			};
 		},
 		activate: function(event, data) {
@@ -46,7 +46,7 @@ _cms.leftnav.define.fancytree = function() {
 				else {
 					// Do not allow the user to work with the shortcut item - automatically
 					// navigate to the real item
-					var key = _cms.leftnav.removeShortcutMarker(data.node.key);
+					var key = data.node.key;
 					_cms.leftnav.activateKey(key);
 				}
 			}
@@ -157,18 +157,6 @@ _cms.leftnav.refreshShortcuts = function(parentKey, updatedChildData) {
 			}		
 		}
 	}
-};
-
-/* Nodes representing shortcuts in the FancyTree have '.s' appended to their standard key value,
- * so that they are distinguishable from the node representing the 'real' item. This method
- * identifies the numeric part preceding the '.s' suffix.
-*/
-_cms.leftnav.removeShortcutMarker = function(key) {
-	var cursor = key.indexOf(".s");
-	if (cursor > -1) {
-		return key.substring(0, cursor);
-	}
-	return key;
 };
 
 _cms.leftnav.behaviour.click = function() {

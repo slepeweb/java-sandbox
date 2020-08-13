@@ -24,13 +24,13 @@ _cms.move.action = function(nodeKey) {
 	
 	if (position != 'none' && moverNode && targetNode) {			
 		if (! moverNode.parent.key.startsWith("root")) {
-			$.ajax(_cms.ctx + "/rest/item/" + _cms.leftnav.removeShortcutMarker(moverNode.key) + "/move", {
+			$.ajax(_cms.ctx + "/rest/item/" + moverNode.key + "/move", {
 				type: "POST",
 				cache: false,
 				data: {
-					targetId: _cms.leftnav.removeShortcutMarker(targetNode.key),
-					targetParentId: _cms.leftnav.removeShortcutMarker(targetNode.parent.key),
-					moverParentId: _cms.leftnav.removeShortcutMarker(moverNode.parent.key),
+					targetId: targetNode.key,
+					targetParentId: targetNode.parent.key,
+					moverParentId: moverNode.parent.key,
 					moverIsShortcut: moverNode.data.shortcut,
 					mode: position
 				}, 
@@ -100,7 +100,7 @@ _cms.move.refresh.tab = function(nodeKey) {
 
 // Behaviours to apply once html is loaded/reloaded
 _cms.move.onrefresh = function(nodeKey) {
-	_cms.move.behaviour.action(nodeKey);
+	_cms.move.behaviour.action(nodeKey.toString());
 	_cms.move.behaviour.reset(nodeKey);
 	_cms.move.behaviour.itempicker();
 	_cms.move.behaviour.changePosition();

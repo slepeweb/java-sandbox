@@ -35,24 +35,26 @@
 	</div>
 </div>
 
-<div class="spacer3em">
-	<h2>Linked from</h2>
-	<c:choose><c:when test="${not empty editingItem.parentLinks}">
-		<table>
-			<tr>
-				<th align="left">Link type</th>
-				<th align="left">Link name</th>
-				<th align="left">From</th>
-			</tr>
-			<c:forEach items="${editingItem.parentLinks}" var="_link">
+<c:if test="${not editingItem.shortcut}">
+	<div class="spacer3em">
+		<h2>Linked from</h2>
+		<c:choose><c:when test="${not empty editingItem.parentLinks}">
+			<table>
 				<tr>
-					<td width="20%">${_link.type}</td>
-					<td width="20%">${_link.name}</td>
-					<td><span class="link-linker" data-id="${_link.child.origId}">${_link.child.name}</span></td>
+					<th align="left">Link type</th>
+					<th align="left">Link name</th>
+					<th align="left">From</th>
 				</tr>
-			</c:forEach>
-		</table>
-	</c:when><c:otherwise>
-		<p>None</p>
-	</c:otherwise></c:choose>
-</div>
+				<c:forEach items="${editingItem.parentLinks}" var="_link">
+					<tr>
+						<td width="20%">${_link.type}</td>
+						<td width="20%">${_link.name}</td>
+						<td><span class="link-linker" data-id="${_link.child.origId}">${_link.child.name}</span></td>
+					</tr>
+				</c:forEach>
+			</table>
+		</c:when><c:otherwise>
+			<p>None</p>
+		</c:otherwise></c:choose>
+	</div>
+</c:if>

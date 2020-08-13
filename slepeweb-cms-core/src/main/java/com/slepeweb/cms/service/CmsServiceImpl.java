@@ -13,7 +13,7 @@ import com.slepeweb.commerce.service.AxisValueService;
 import com.slepeweb.commerce.service.ProductService;
 import com.slepeweb.commerce.service.VariantService;
 
-@Service
+// Bean defined in xml
 public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	
 	@Autowired protected HostService hostService;	
@@ -39,6 +39,22 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected SiteConfiguration siteConfiguration;
 	@Autowired protected UserService userService;
 	@Autowired protected AccessService accessService;
+	
+	/* 
+	 * In editorial mode, Shortcuts are seen as separate items to the items they reference.
+	 * This is essential to allow the content editor to relate a Shortcut to its reference.
+	 * In (the opposite) site delivery mode, a Shortcut item is effectively merged with its 
+	 * reference item.
+	 */
+	private boolean editorialMode = true;
+	
+	public void setEditorialMode(boolean b) {
+		this.editorialMode = b;
+	}
+	
+	public boolean isEditorialMode() {
+		return this.editorialMode;
+	}
 	
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {

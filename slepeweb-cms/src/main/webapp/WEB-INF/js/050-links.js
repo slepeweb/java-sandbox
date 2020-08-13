@@ -38,6 +38,7 @@ _cms.links = {
 	validate: {
 		linkdata: {},
 	},
+	shortcut: {},
 };
 
 _cms.links.sel.LINKTYPE_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKTYPE_SELECT;
@@ -97,7 +98,13 @@ _cms.links.behaviour.changetype = function() {
 _cms.links.behaviour.add = function() {
 	// Show link addition form when 'Add link' button is clicked
 	$(_cms.links.sel.ADD_LINK_BUTTON).click(function(e) {
-		_cms.links.show_addlink_form(["-1", "unknown", "unknown", "", "-1", "0"]);
+		var linkType = "unknown";
+		var linkSubtype = "unknown";
+		if (_cms.editingItemIsShortcut) {
+			linkType = "shortcut";
+			linkSubtype = "std";
+		}
+		_cms.links.show_addlink_form(["-1", linkType, linkSubtype, "", "-1", "0"]);
 	});
 }
 
@@ -150,6 +157,11 @@ _cms.links.behaviour.remove = function() {
 	$(_cms.links.sel.REMOVE_LINK_BUTTONS).off().click(function(e) {
 		$(this).parent().parent().remove();
 		_cms.links.activateSaveButton(true);
+		_cms.links.shortcut.buttonstates();
+		
+		if ( $(_cms.links.sel.SORTABLE_LINKS).length == 0) {
+			$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).html("<p>None</p>")
+		}
 	});
 }
 
@@ -280,6 +292,10 @@ _cms.links.getItemNameAnd = function(childId, fn, param1, param2, param3, param4
 }
 
 _cms.links.insertClonedLink = function(itemName, sortableLinksContainer, div, formData) {
+	if ( $(_cms.links.sel.SORTABLE_LINKS).length == 0) {
+		$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).empty();
+	}
+
 	div.find("div.left span.link-identifier").html(_cms.links.formatLinkIdentifier(formData, itemName));
 	div.find("div.right button.link-linker").attr("data-id", formData.childId);
 	div.find("div.right span.hide").html(_cms.links.formatHiddenLinkData(formData));				
@@ -544,11 +560,18 @@ _cms.links.validate.linkdata.anc = function(linkType, linkName, linkData) {
 		debug: debug,
 	};
 	
-	if (console) {
-		//console.log(result);
-	}
-	
 	return result;
+}
+
+_cms.links.shortcut.buttonstates = function() {
+	if (_cms.editingItemIsShortcut) {
+		if ( $(_cms.links.sel.SORTABLE_LINKS).length > 0) {
+			_cms.support.disable(_cms.links.sel.ADD_LINK_BUTTON);
+		}
+		else {
+			_cms.support.enable(_cms.links.sel.ADD_LINK_BUTTON);
+		}
+	}
 }
 
 // Things to do once-only on page load
@@ -565,6 +588,8 @@ _cms.links.onrefresh = function(nodeKey) {
 	_cms.links.behaviour.reset(nodeKey);
 	_cms.links.behaviour.remove();
 	_cms.links.behaviour.edit();
-	_cms.links.behaviour.navigate();	
+	_cms.links.behaviour.navigate();
+	
+	_cms.links.shortcut.buttonstates();
 }
 

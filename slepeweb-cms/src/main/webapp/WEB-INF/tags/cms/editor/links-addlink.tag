@@ -14,13 +14,18 @@
 			<li>DON'T FORGET to save your changes after clicking the 'Use' button.</li>
 		</ul>
 	</details>	
-		
+	
+	<c:set var="_linkTypes">relation,inline,shortcut,component</c:set>
+	<c:if test="${editingItem.shortcut}">
+		<c:set var="_linkTypes">shortcut</c:set>
+	</c:if>
+	
 	<div>
 		<div class="ff">
 			<label>Type: </label>
 			<select name="linktype">
 				<option value="unknown">Choose ...</option>
-				<c:forTokens items="relation,inline,shortcut,component" delims="," var="type">
+				<c:forTokens items="${_linkTypes}" delims="," var="type">
 					<option value="${type}">${type}</option>
 				</c:forTokens>
 			</select>	
@@ -30,6 +35,7 @@
 			<label>Subtype: </label>
 			<select name="linkname">
 				<option value="unknown">Choose ...</option>
+				<option value="std">std</option>
 			</select>	
 		</div>
 		

@@ -2,6 +2,7 @@ package com.slepeweb.cms.utils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.springframework.jdbc.core.RowMapper;
 
@@ -19,6 +20,7 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.LoggerBean;
 import com.slepeweb.cms.bean.Media;
+import com.slepeweb.cms.bean.Shortcut;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.bean.Tag;
@@ -66,16 +68,16 @@ public class RowMapperUtil {
 	}
 	
 	public static final class ItemMapper implements RowMapper<Item> {
-		public Item mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public Item mapRow(ResultSet rs, int rowNum) throws SQLException {			
 			return mapItem(rs);
 		}
 	}
 	
-	private static Item mapItem(ResultSet rs) throws SQLException {
+	private static Item mapItem(ResultSet rs) throws SQLException {		
+
 		String itemTypeName = rs.getString("typename");
-		
 		/*
-		 *  CmsBeanFactory.makeItem() will make either an Item or a Product,
+		 *  CmsBeanFactory.makeItem() will make either an Item or a Shortcut or a Product,
 		 *  depending on the item type name.
 		 */
 		Item item = CmsBeanFactory.makeItem(itemTypeName).
@@ -106,30 +108,47 @@ public class RowMapperUtil {
 		Site site = mapSite(rs, "siteid", "sitename", "site_shortname");		
 		item.setSite(site);
 		
-		Template t = null;
-		long templateId = rs.getLong("templateid");
-		if (templateId != 0) {
-			t = CmsBeanFactory.makeTemplate().
-					setId(templateId).
-					setName(rs.getString("templatename")).
-					setForward(rs.getString("forward")).
-					setItemTypeId(rs.getLong("typeid")).
-					setSiteId(rs.getLong("siteid"));
+		if (! item.isShortcut()) {
+			Template t = null;
+			long templateId = rs.getLong("templateid");
+			if (templateId != 0) {
+				t = CmsBeanFactory.makeTemplate().
+						setId(templateId).
+						setName(rs.getString("templatename")).
+						setForward(rs.getString("forward")).
+						setItemTypeId(rs.getLong("typeid")).
+						setSiteId(rs.getLong("siteid"));
+			}
+			
+			item.setTemplate(t);
 		}
 		
-		item.setTemplate(t);
+		updateIfShortcut(item);
 		return item;
+	}
+	
+	private static void updateIfShortcut(Item i) {
+		if (i.isShortcut()) {
+			List<Link> links = i.getCmsService().getLinkService().getLinks(i.getId(), LinkType.shortcut);
+			if (links.size() > 0) {
+				Shortcut sh = (Shortcut) i;
+				sh.setReferred(links.get(0).getChild());
+			}
+		}
 	}
 	
 	public static final class LinkMapper implements RowMapper<Link> {
 		public Link mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return CmsBeanFactory.makeLink().
+			Link l = CmsBeanFactory.makeLink().
 					setParentId(rs.getLong("parentid")).
 					setChild(mapItem(rs)).
 					setType(rs.getString("linktype")).
 					setName(rs.getString("linkname")).
 					setOrdering(rs.getInt("ordering")).
 					setData(rs.getString("data"));
+			
+			updateIfShortcut(l.getChild());
+			return l;
 		}
 	}
 	

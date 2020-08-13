@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.component.Navigation;
 import com.slepeweb.cms.component.Navigation.Node;
@@ -29,6 +28,7 @@ public class NavigationController extends BaseController {
 	@Autowired private SiteService siteService;
 	@Autowired private ItemService itemService;
 	
+	/*
 	@RequestMapping(value="/leftnav/full", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public List<Navigation.Node> doFullNav() {	
@@ -47,6 +47,7 @@ public class NavigationController extends BaseController {
 		
 		return nav.getNodes();
 	}
+	*/
 	
 	@RequestMapping(value="/leftnav/lazy/one", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
@@ -144,15 +145,15 @@ public class NavigationController extends BaseController {
 	}
 	
 	private Navigation.Node dive(Item parentItem, int numLevels) {
-		Navigation.Node pNode = Node.toNode(parentItem, false), cNode;		
+		Navigation.Node pNode = Node.toNode(parentItem), cNode;		
 		List<Link> bindings = parentItem.getBindings();
 		pNode.setFolder(bindings.size() > 0);
 		
 		if (numLevels > 0) {
 			for (Link l : bindings) {
 				cNode = dive(l.getChild(), numLevels - 1);
-				cNode.setShortcut(l.getType().equals(LinkType.shortcut));
-				cNode.setExtraClasses(Node.getCmsIconClass(l.getChild(), cNode.isShortcut()));
+				cNode.setShortcut(l.getChild().isShortcut());
+				cNode.setExtraClasses(Node.getCmsIconClass(l.getChild()));
 				pNode.addChild(cNode);
 			}
 		}
@@ -161,18 +162,20 @@ public class NavigationController extends BaseController {
 	}
 	
 	private Navigation.Node dive(Item parentItem, final Vector<String> pathComponents) {
-		Navigation.Node pNode = Node.toNode(parentItem, false);		
+		Navigation.Node pNode = Node.toNode(parentItem);		
 		Navigation.Node cNode;
 		List<Link> bindings = parentItem.getBindings();
 		pNode.setFolder(bindings.size() > 0);
 		Item child;
-		boolean shortcut;
 		
 		for (Link l : bindings) {
 			child = l.getChild();
-			shortcut = l.getType().equals(LinkType.shortcut);
 			
-			if (! shortcut && pathComponents.size() > 0 && child.getSimpleName().equals(pathComponents.get(0))) {
+			if (
+					! child.isShortcut() && 
+					pathComponents.size() > 0 && 
+					child.getSimpleName().equals(pathComponents.get(0))) {
+				
 				@SuppressWarnings("unchecked")
 				Vector<String> workingPath = (Vector<String>) pathComponents.clone();
 				workingPath.remove(0);
@@ -185,11 +188,11 @@ public class NavigationController extends BaseController {
 			}
 			else {
 				// We've reached the end of this trail
-				cNode = Node.toNode(child, shortcut);
+				cNode = Node.toNode(child);
 				cNode.setFolder(child.getBoundItems().size() > 0);
 			}
 			
-			cNode.setShortcut(shortcut);
+			cNode.setShortcut(child.isShortcut());
 			pNode.addChild(cNode);
 		}
 		

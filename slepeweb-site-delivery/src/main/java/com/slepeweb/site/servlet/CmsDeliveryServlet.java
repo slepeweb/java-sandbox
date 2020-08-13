@@ -302,7 +302,7 @@ public class CmsDeliveryServlet {
 			thumbnailRequired = viewParam.equals("thumbnail");
 		}
 		
-		Media media = this.cmsService.getMediaService().getMedia(item.getId(), thumbnailRequired);
+		Media media = item.getMedia(thumbnailRequired);
 		if (media == null) {
 			LOG.error(String.format("No media found for item", item));
 			return;

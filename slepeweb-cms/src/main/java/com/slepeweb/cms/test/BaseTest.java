@@ -83,11 +83,16 @@ public abstract class BaseTest {
 		setSite(site).setType(type).setTemplate(t);
 	
 		try {
-			return parent != null ? parent.addChild(i) : null;
+			return parent != null ? addChild(parent, i) : null;
 		}
 		catch (Exception e) {
 			return null;
 		}
+	}
+	
+	protected Item addChild(Item parent, Item child) throws ResourceException {
+		child.setParent(parent);
+		return this.cmsService.getItemService().save(child);
 	}
 	
 	protected Product addProduct(Item parent, String name, String simplename, 

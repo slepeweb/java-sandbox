@@ -179,7 +179,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		return getLinks(parentId, "component");		 
 	}
 
-	private List<Link> getLinks(Long parentId, String linkType) {
+	public List<Link> getLinks(Long parentId, String linkType) {
 		LinkType lt = this.linkTypeService.getLinkType(linkType);
 		if (lt != null) {
 			String sql = String.format(CHILD_SELECT_TEMPLATE, "l.parentid = ? and l.linktypeid = ? and i.deleted = 0" + getVersionClause());

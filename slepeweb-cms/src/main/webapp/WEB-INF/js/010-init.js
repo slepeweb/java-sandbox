@@ -16,8 +16,6 @@ _cms.init = function(nodeKey, html, activeTab) {
 	
 	// Update the item identifier in all tabs
 	_cms.support.updateItemName($("#current-item-name").html());
-//	_cms.editingItemName = $("#current-item-name").html();
-//	$("#currently-editing").html($("#current-item-name").html());
 
 	// Required for delete confirmation dialog
 	_cms.numDeletableItems = $("#num-deletable-items").html();

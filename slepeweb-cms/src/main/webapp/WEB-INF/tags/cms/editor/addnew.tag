@@ -3,12 +3,19 @@
         
 <cms:debug><!-- tags/cms/editor/addnew.tag --></cms:debug>
 	
+<c:set var="_positionOptions">below,alongside</c:set>
+<c:if test="${editingItem.shortcut}">
+	<c:set var="_positionOptions">alongside</c:set>
+	<%-- Overriding the cookie value setting will force the 'alongside' option to be selected --%>
+	<c:set var="_lastRelativePosition">alongside</c:set>
+</c:if>
+
 <form>
 	<div class="ff">
 			<label>Add new item: </label>
 			<select name="relativePosition">
 				<option value="0">Choose ...</option>
-				<c:forTokens items="below,alongside" delims="," var="relativePosition">
+				<c:forTokens items="${_positionOptions}" delims="," var="relativePosition">
 					<option value="${relativePosition}" <c:if test="${_lastRelativePosition eq relativePosition}">selected</c:if>>${relativePosition}</option>
 				</c:forTokens>
 			</select>

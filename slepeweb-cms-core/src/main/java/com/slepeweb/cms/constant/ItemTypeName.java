@@ -12,4 +12,5 @@ public class ItemTypeName {
 	public static final String NEWS = "News";
 	public static final String PDF = "PDF";
 	public static final String PRODUCT = "Product";
+	public static final String SHORTCUT = "Shortcut";
 }

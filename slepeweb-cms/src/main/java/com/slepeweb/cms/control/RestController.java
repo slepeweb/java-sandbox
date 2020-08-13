@@ -545,7 +545,7 @@ public class RestController extends BaseController {
 				i.save();
 			}
 			
-			Node n = Node.toNode(i, false);		
+			Node n = Node.toNode(i);		
 			return resp.addMessage("Item added").setData(n);
 		}
 		catch (Exception e) {
@@ -567,7 +567,7 @@ public class RestController extends BaseController {
 		try {
 			Item c = this.itemService.copy(i, name, simplename);	
 			if (c != null) {
-				Node n = Node.toNode(c, false);
+				Node n = Node.toNode(c);
 				resp.addMessage("Item copied").setData(n);
 			}
 			else {
@@ -594,7 +594,7 @@ public class RestController extends BaseController {
 			Item c = this.itemService.version(i);			
 			return resp.
 					setError(false).
-					setData(Node.toNode(c, false)).
+					setData(Node.toNode(c)).
 					addMessage("New version created");
 		}
 		catch (Exception e) {
