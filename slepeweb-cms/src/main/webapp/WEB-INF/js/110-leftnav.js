@@ -38,17 +38,9 @@ _cms.leftnav.define.fancytree = function() {
 		},
 		activate: function(event, data) {
 			if (_cms.leftnav.mode == "navigate") {
-				if (! data.node.data.shortcut) {
-					// Update the item forms
-					var tabName = $("li.ui-tabs-active").attr("aria-controls");
-					_cms.support.renderItemForms(data.node.key, tabName);
-				}
-				else {
-					// Do not allow the user to work with the shortcut item - automatically
-					// navigate to the real item
-					var key = data.node.key;
-					_cms.leftnav.activateKey(key);
-				}
+				// Update the item forms
+				var tabName = $("li.ui-tabs-active").attr("aria-controls");
+				_cms.support.renderItemForms(data.node.key, tabName);
 			}
 			else if (_cms.leftnav.mode == "link") {
 				$("#link-target-identifier").html("'" + _cms.leftnav.tree.activeNode.title + "'");

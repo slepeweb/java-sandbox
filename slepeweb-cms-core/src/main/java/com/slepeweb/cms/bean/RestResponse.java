@@ -24,7 +24,7 @@ public class RestResponse {
 	}
 
 	public String getMessage() {
-		return StringUtils.join(this.messages, "|");
+		return StringUtils.join(this.messages, "...");
 	}
 	
 	public RestResponse parseMessages(String s) {

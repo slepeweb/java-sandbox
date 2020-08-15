@@ -48,8 +48,11 @@ _cms.add.behaviour.add = function(nodeKey) {
 				_cms.support.flashMessage(obj);
 				
 				if (! obj.error) {
-					var nodeData = obj.data;
-					var parentNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
+					var nodeData = obj.data[0];
+					var isShortcut = obj.data[1];
+					var isMedia = obj.data[2];
+					
+					var parentNode = _cms.leftnav.tree.getNodeByKey(nodeKey.toString());
 					
 					if (position == 'alongside') {
 						parentNode = parentNode.getParent();
@@ -57,9 +60,15 @@ _cms.add.behaviour.add = function(nodeKey) {
 					
 					if (parentNode != null) {
 						var childNode = parentNode.addNode(nodeData);
+						var tab = "core-tab";
+						if (isShortcut) {
+							tab = "links-tab";
+						}
+						else if  (isMedia) {
+							tab = "media-tab";
+						}
 						
-						// This triggers a call to loads the editor with the newly created item
-						childNode.setActive();
+						_cms.support.renderItemForms(childNode.key, tab);
 					}
 				}
 			},

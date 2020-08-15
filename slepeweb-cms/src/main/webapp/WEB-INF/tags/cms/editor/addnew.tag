@@ -4,7 +4,7 @@
 <cms:debug><!-- tags/cms/editor/addnew.tag --></cms:debug>
 	
 <c:set var="_positionOptions">below,alongside</c:set>
-<c:if test="${editingItem.shortcut}">
+<c:if test="${editingItem.shortcut or editingItem.type.media}">
 	<c:set var="_positionOptions">alongside</c:set>
 	<%-- Overriding the cookie value setting will force the 'alongside' option to be selected --%>
 	<c:set var="_lastRelativePosition">alongside</c:set>

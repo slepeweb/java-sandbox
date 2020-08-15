@@ -171,6 +171,12 @@ public class RestController extends BaseController {
 				setPublished(getBooleanParam(req, "published")).
 				setTemplate(t);
 			
+			if (i.isShortcut()) {
+				// Whilst the corresponding form fields are disabled ...
+				i.setPublished(true);
+				i.setSearchable(false);
+			}
+			
 			Product p = null;
 			
 			if (i.isProduct()) {
@@ -545,8 +551,17 @@ public class RestController extends BaseController {
 				i.save();
 			}
 			
-			Node n = Node.toNode(i);		
-			return resp.addMessage("Item added").setData(n);
+			Object[] o = new Object[]{Node.toNode(i), i.isShortcut(), i.getType().isMedia()};		
+			resp.addMessage("Item added").setData(o);
+			
+			if (i.isShortcut()) {
+				resp.addMessage("Don't forget to identify shortcut target");
+			}
+			else if (i.getType().isMedia()) {
+				resp.addMessage("Don't forget to load media from file");
+			}
+			
+			return resp;
 		}
 		catch (Exception e) {
 			return resp.setError(true).addMessage(e.getMessage()).setData(parentOrigId);
@@ -633,7 +648,7 @@ public class RestController extends BaseController {
 		Item parent = i.getParent();
 		i.trash();
 			
-		return resp.addMessage("Item trashed: PARENT ITEM IS NOW CURRENT").setData(parent.getOrigId());
+		return resp.addMessage("Item trashed").addMessage("PARENT ITEM IS NOW CURRENT").setData(parent.getOrigId());
 	}
 	
 	@RequestMapping(value="/item/{origId}/publish/section", method=RequestMethod.POST, produces="application/json")

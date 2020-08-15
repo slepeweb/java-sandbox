@@ -3,11 +3,11 @@
         
 <cms:debug><!-- tags/cms/editor/misc.tag --></cms:debug>
 
-<c:if test="${not editingItem.shortcut}">
-	<h2>Section operations</h2>
-	<p>Use with a little caution because these operations will apply 
+<h2>Section operations</h2>
+<p>Use with a little caution because these operations will apply 
 	to '${editingItem.name}' and ALL its descendants (total = ${_numItemsInSection} items).</p>
 	
+<c:if test="${not editingItem.shortcut}">
 	<div class="section-ops">
 		<div>
 			<div class="radio-pair"><input type="radio" name="publish_option" value="publish" /> <span class="radio-label">Publish</span></div>
@@ -26,6 +26,7 @@
 		<div><button id="reindex-button" type="button" disabled="disabled">Submit</button></div>
 		<div id="reindex-progressbar" class="progressbar"></div>
 	</div>
+</c:if>
 	
 	<div class="section-ops delete">
 		<div>
@@ -38,7 +39,6 @@
 	
 	<hr />
 	<br />
-</c:if>
 
 <h2>Miscellaneous operations</h2>
 

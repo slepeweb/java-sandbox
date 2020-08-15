@@ -107,10 +107,6 @@ _cms.core.trashItem = function(nodeKey) {
 				if (node) {
 					var parent = node.getParent();
 					node.remove();
-					
-					// This will make the parent item the current item, and refresh the page accordingly,
-					// thereby updating _cms.editingItemId
-					//_cms.leftnav.tree.activateKey(parent.key);
 					_cms.support.renderItemForms(parent.key, "core-tab");
 				}
 			}

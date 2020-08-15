@@ -37,7 +37,9 @@ public class Navigation {
 		private List<Node> children = new ArrayList<Node>();
 		
 		public static Node toNode(Item i) {
-			return new Navigation.Node().setTitle(i.getName()).setKey(i.getOrigId().toString()).
+			return new Navigation.Node().
+					setTitle(i.getName()).
+					setKey(i.getOrigId().toString()).
 					setExtraClasses(getCmsIconClass(i));
 		}
 		
@@ -59,12 +61,7 @@ public class Navigation {
 				typeName = "image";
 			}
 			
-			String prefix = "cms-icon-";
-			if (i.isShortcut()) {
-				prefix = prefix + "shortcut-";
-			}
-			
-			return String.format(prefix + "%s", typeName);
+			return String.format("cms-icon-%s", typeName);
 		}
 		
 		@Override

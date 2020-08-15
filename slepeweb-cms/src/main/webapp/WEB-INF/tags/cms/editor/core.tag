@@ -95,11 +95,15 @@
 	<div class="ff">
 		<label for="tags">Tags: </label><input type="text" name="tags" value="${editingItem.tagsAsString}" />
 	</div>
+	
+	<c:set var="_disabled"></c:set>
+	<c:if test="${editingItem.shortcut}"><c:set var="_disabled">disabled="disabled"</c:set></c:if>
 	<div class="ff">
-		<label for="searchable">Searchable? </label><input type="checkbox" name="searchable" <c:if test="${editingItem.searchable}">checked="checked"</c:if> />
+		<label for="searchable">Searchable? </label><input ${_disabled} type="checkbox" name="searchable" <c:if test="${editingItem.searchable}">checked="checked"</c:if> />
 	</div>
+	
 	<div class="ff">
-		<label for="published">Published? </label><input type="checkbox" name="published" <c:if test="${editingItem.published}">checked="checked"</c:if> />
+		<label for="published">Published? </label><input ${_disabled} type="checkbox" name="published" <c:if test="${editingItem.published}">checked="checked"</c:if> />
 	</div>
 		
 	<div class="button-set">

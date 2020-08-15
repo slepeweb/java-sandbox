@@ -1,9 +1,8 @@
 TODO: This is the main todo file:
 
 HIGH
-- think about creating shortcuts on the 'Add new' tab - offer radio buttons: 'New', 'Shortcut'
---- this would allow creation of a shortcut item, that could be moved like any other item
-- update anc dbtables.sql to define user, role and user_role
+- update dbtables.sql to define user, role and user_role
+- also, create typeavail table, and associated code
 - bug? Create new item below / ... not visible in the tree; had to refresh page to see it
 - need to protect against injection attacks
 - check sws search still working
