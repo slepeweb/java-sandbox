@@ -17,6 +17,7 @@ drop table if exists linktype;
 drop table if exists linkname;
 drop table if exists item;
 drop table if exists template;
+drop table if exists sitetype;
 drop table if exists itemtype;
 drop table if exists host;
 drop table if exists site;
@@ -54,6 +55,12 @@ create table itemtype
 	unique key idx_itemtype_name (name)
 ) ENGINE=InnoDB;
 
+create table sitetype
+(
+	siteid int,
+	typeid int,
+	primary key (siteid, typeid)
+) ENGINE=InnoDB;
 
 create table template
 (

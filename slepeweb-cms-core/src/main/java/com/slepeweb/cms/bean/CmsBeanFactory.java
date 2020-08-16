@@ -216,4 +216,10 @@ public class CmsBeanFactory {
 				setOrdering(0); // Arbitrary value
 	}
 	
+	public static SiteType makeSiteType() {
+		SiteType st = new SiteType();
+		st.setCmsService(CMS);
+		return st;
+	}
+	
 }

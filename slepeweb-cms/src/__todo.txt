@@ -1,8 +1,7 @@
 TODO: This is the main todo file:
 
 HIGH
-- update dbtables.sql to define user, role and user_role
-- also, create typeavail table, and associated code
+- need history mechanism in anc (for site visitors)
 - bug? Create new item below / ... not visible in the tree; had to refresh page to see it
 - need to protect against injection attacks
 - check sws search still working

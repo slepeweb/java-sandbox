@@ -37,9 +37,9 @@
 		<label for="type">Type: </label>
 		<select name="itemtype">
 			<option value="0">Choose ...</option>
-			<c:forEach items="${editingItem.site.availableItemTypes}" var="it">
-				<option value="${it.id}"
-					data-isproduct="${it.id == _productTypeId ? 1 : 0}">${it.name}</option>
+			<c:forEach items="${editingItem.site.availableItemTypes}" var="st">
+				<option value="${st.type.id}"
+					data-isproduct="${st.type.id == _productTypeId ? 1 : 0}">${st.type.name}</option>
 			</c:forEach>
 		</select>			
 	</div>

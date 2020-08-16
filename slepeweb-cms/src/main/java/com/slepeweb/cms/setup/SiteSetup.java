@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Row;
@@ -22,9 +23,11 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.SiteType;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.cms.service.SiteTypeService;
 import com.slepeweb.cms.setup.SiteSetupStatistics.ResultType;
 import com.slepeweb.cms.utils.LogUtil;
 
@@ -100,9 +103,11 @@ public class SiteSetup {
 
 	private void processCsv(HSSFWorkbook wb, SiteSetupStatistics stats) throws ResourceException {
 		if (wb != null) {
-			createSites(wb.getSheetAt(0).rowIterator(), stats);
+			HSSFSheet siteSheet = wb.getSheetAt(0);
+			createSites(siteSheet.rowIterator(), stats);
 			createFields(wb.getSheetAt(1).rowIterator(), stats);
 			createItemTypes(wb.getSheetAt(2).rowIterator(), stats);
+			createSiteTypes(siteSheet.rowIterator(), stats);
 			
 			if (this.siteCache.size() > 0) {
 				createLinkNames(wb.getSheetAt(3).rowIterator(), stats);
@@ -156,6 +161,55 @@ public class SiteSetup {
 				}
 				else {
 					LOG.debug(LogUtil.compose("Site is not updateable", s));
+				}
+			}
+		}
+	}
+	
+	private void createSiteTypes(Iterator<Row> rowIter, SiteSetupStatistics stats) throws ResourceException {
+		Row row;
+		Site s = null;
+		SiteType st;
+		String firstCell, name, typeList;
+		ItemType itype;
+		boolean updateable = false;
+		
+		while (rowIter.hasNext()) {
+			row = rowIter.next();
+			firstCell = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(0));
+
+			if (firstCell.startsWith("###")) {
+				break;
+			} else if (firstCell.startsWith("#") || StringUtils.isBlank(firstCell)) {
+				continue;
+			} else {
+				//stats.inc(ResultType.ROWS_PROCESSED);
+				updateable = firstCell.equals("1");
+				name = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(1));
+				typeList = SiteSetupUtils.getStringIgnoreDecimal(row.getCell(6));
+				
+				if (StringUtils.isNotBlank(typeList)) {
+					s = this.cmsService.getSiteService().getSite(name);
+					
+					if (s != null && updateable) {
+						SiteTypeService sts = this.cmsService.getSiteTypeService();
+						
+						// Delete all existing SiteType records from the db
+						sts.delete(s.getId());
+						
+						// Add current SiteType records back in
+						for (String type : typeList.split(",")) {
+							itype = this.cmsService.getItemTypeService().getItemType(type.trim());
+							
+							if (itype != null) {
+								st = CmsBeanFactory.makeSiteType().setSiteId(s.getId()).setType(itype).save();
+								LOG.info(LogUtil.compose("Sitetype saved", st));
+							}
+						}
+					}
+					else {
+						LOG.debug(LogUtil.compose("Sitetype is not updateable", s));
+					}
 				}
 			}
 		}

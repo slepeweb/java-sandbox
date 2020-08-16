@@ -76,8 +76,8 @@ public class Site extends CmsBean {
 		return getCmsService().getTemplateService().getAvailableTemplates(getId(), itemTypeId);
 	}
 	
-	public List<ItemType> getAvailableItemTypes() {
-		return getCmsService().getItemTypeService().getAvailableItemTypes();
+	public List<SiteType> getAvailableItemTypes() {
+		return getCmsService().getSiteTypeService().get(this.getId());
 	}
 	
 	public String getName() {

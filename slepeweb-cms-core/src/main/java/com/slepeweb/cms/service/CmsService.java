@@ -33,4 +33,5 @@ public interface CmsService {
 	SiteConfiguration getSiteConfiguration();
 	UserService getUserService();
 	AccessService getAccessService();
+	SiteTypeService getSiteTypeService();
 }

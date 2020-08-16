@@ -3,7 +3,6 @@ package com.slepeweb.cms.service;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.component.ServerConfig;
@@ -39,6 +38,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected SiteConfiguration siteConfiguration;
 	@Autowired protected UserService userService;
 	@Autowired protected AccessService accessService;
+	@Autowired protected SiteTypeService siteTypeService;
 	
 	/* 
 	 * In editorial mode, Shortcuts are seen as separate items to the items they reference.
@@ -167,5 +167,9 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public AccessService getAccessService() {
 		return accessService;
+	}
+
+	public SiteTypeService getSiteTypeService() {
+		return siteTypeService;
 	}
 }

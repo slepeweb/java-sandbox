@@ -23,6 +23,7 @@ import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Shortcut;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
+import com.slepeweb.cms.bean.SiteType;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
@@ -94,16 +95,7 @@ public class RowMapperUtil {
 				setSearchable(rs.getBoolean("searchable")).
 				setVersion(rs.getInt("version"));
 		
-		// TODO: refactor: there are several places here where item types are created, but with different sql
-		// TODO: check also for similar instances on other bean makers
-		ItemType type = CmsBeanFactory.makeItemType().
-				setId(rs.getLong("typeid")).
-				setName(itemTypeName).
-				setMimeType(rs.getString("mimetype")).
-				setPrivateCache(rs.getLong("privatecache")).
-				setPublicCache(rs.getLong("publiccache"));
-		
-		item.setType(type);
+		item.setType(mapItemType(rs));
 		
 		Site site = mapSite(rs, "siteid", "sitename", "site_shortname");		
 		item.setSite(site);
@@ -125,6 +117,15 @@ public class RowMapperUtil {
 		
 		updateIfShortcut(item);
 		return item;
+	}
+	
+	private static ItemType mapItemType(ResultSet rs) throws SQLException {	
+		return CmsBeanFactory.makeItemType().
+			setId(rs.getLong("typeid")).
+			setName(rs.getString("typename")).
+			setMimeType(rs.getString("mimetype")).
+			setPrivateCache(rs.getLong("privatecache")).
+			setPublicCache(rs.getLong("publiccache"));
 	}
 	
 	private static void updateIfShortcut(Item i) {
@@ -307,6 +308,14 @@ public class RowMapperUtil {
 					setAlias(rs.getString("alias")).
 					setPassword(rs.getString("password")).
 					setEnabled(rs.getBoolean("enabled"));
+		}
+	}
+	
+	public static final class SiteTypeMapper implements RowMapper<SiteType> {
+		public SiteType mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeSiteType().
+					setSiteId(rs.getLong("siteid")).
+					setType(mapItemType(rs));
 		}
 	}
 	
