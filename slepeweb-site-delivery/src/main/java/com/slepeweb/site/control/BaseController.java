@@ -24,7 +24,7 @@ import com.slepeweb.site.service.NavigationService;
 
 @Controller
 public class BaseController {
-	private static Logger LOG = Logger.getLogger(BaseController.class);
+	public static Logger LOG = Logger.getLogger(BaseController.class);
 	public static final String USER = "_userOld";
 	public static final String ITEM = "_item";
 	public static final String SITE = "_site";

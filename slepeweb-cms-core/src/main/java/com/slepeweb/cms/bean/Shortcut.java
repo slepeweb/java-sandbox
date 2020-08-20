@@ -23,8 +23,12 @@ public class Shortcut extends Item {
 		return true;
 	}
 	
+	public boolean isComplete() {
+		return this.referred != null;
+	}
+	
 	private boolean isMergeable() {
-		return ! (this.referred == null || getCmsService().isEditorialMode());
+		return isComplete() && ! getCmsService().isEditorialMode();
 	}
 
 	// There should only be one version of a Shortcut item.
@@ -152,4 +156,10 @@ public class Shortcut extends Item {
 		
 		return super.getDateUpdated();
 	}
+	
+	@Override
+	public long getIdentifier() {
+		return isComplete() ? this.referred.getId() : -1;
+	}
+
 }

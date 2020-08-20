@@ -20,4 +20,7 @@ _cms.init = function(nodeKey, html, activeTab) {
 	// Required for delete confirmation dialog
 	_cms.numDeletableItems = $("#num-deletable-items").html();
 	$(".num-deletable-items").html(_cms.numDeletableItems);
+	
+	// Is this a shortcut item?
+	_cms.editingItemIsShortcut = $("#editingItem-is-shortcut").html() == 'true';
 }

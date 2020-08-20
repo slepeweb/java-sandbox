@@ -49,6 +49,7 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.RestResponse;
+import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.component.Navigation.Node;
 import com.slepeweb.cms.except.MissingDataException;
@@ -62,6 +63,7 @@ import com.slepeweb.cms.service.LinkNameService;
 import com.slepeweb.cms.service.LinkService;
 import com.slepeweb.cms.service.LinkTypeService;
 import com.slepeweb.cms.service.MediaService;
+import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.service.TemplateService;
@@ -81,15 +83,16 @@ public class RestController extends BaseController {
 	@Autowired private ItemTypeService itemTypeService;
 	@Autowired private TemplateService templateService;
 	@Autowired private MediaService mediaService;
-	@Autowired private LinkService linkService;
 	@Autowired private LinkTypeService linkTypeService;
 	@Autowired private LinkNameService linkNameService;
+	@Autowired private LinkService linkService;
 	@Autowired private TagService tagService;
 	@Autowired private AxisService axisService;
 	@Autowired private CookieService cookieService;
 	@Autowired private NavigationController navigationController;
 	@Autowired private HostService hostService;
 	@Autowired private SolrService4Cms solrService4Cms;
+	@Autowired private SiteService siteService;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -126,7 +129,7 @@ public class RestController extends BaseController {
 			model.addAttribute("_fieldSupport", fieldEditorSupport(i));
 			
 			// Store this item's id in a cookie			
-			this.cookieService.updateHistoryCookie(i, req, res);
+			this.cookieService.updateBreadcrumbsCookie(i, req, res);
 			
 			// Last relative position selection for 'addnew'
 			model.addAttribute("_lastRelativePosition", this.cookieService.getRelativePositionCookieValue(req));
@@ -503,7 +506,7 @@ public class RestController extends BaseController {
 		
 		RestResponse resp = new RestResponse();
 		
-		this.cookieService.saveCookie(CookieService.RELATIVE_POSITION_NAME, relativePosition, res);
+		this.cookieService.saveCookie(CookieService.RELATIVE_POSITION_NAME, relativePosition, CookieService.CMS_COOKIE_PATH, res);
 		
 		Template t = null;
 		if (templateId > 0) {
@@ -698,7 +701,7 @@ public class RestController extends BaseController {
 	private int actionSection(Item i, String selector, boolean value) {
 		int count = actionItem(i, selector, value);
 
-		for (Link l : i.getBindingsNoShortcuts()) {
+		for (Link l : i.getBindings()) {
 			count += actionSection(l.getChild(), selector, value);
 		}
 		
@@ -807,7 +810,6 @@ public class RestController extends BaseController {
 			@RequestParam(value="targetId", required=true) Long targetId,
 			@RequestParam(value="targetParentId", required=true) Long targetParentId,
 			@RequestParam(value="moverParentId", required=true) Long moverParentId,
-			@RequestParam(value="moverIsShortcut", required=true) boolean moverIsShortcut,
 			@RequestParam(value="mode", required=true) String mode,
 			ModelMap model) {	
 		
@@ -822,7 +824,7 @@ public class RestController extends BaseController {
 		Item targetParent = this.itemService.getEditableVersion(targetParentId);
 		
 		try {
-			mover.move(currentParent, targetParent, target, moverIsShortcut, mode);		
+			mover.move(currentParent, targetParent, target, mode);		
 			return resp.setError(false).setData(mover.getId()).addMessage("Item moved");
 		}
 		catch (MissingDataException e) {
@@ -841,9 +843,22 @@ public class RestController extends BaseController {
 		Item parent = this.itemService.getEditableVersion(parentId);
 		Item child;
 		List<Link> links = new ArrayList<Link>();
-		Link l, existing;
+		Link l;
 		Item i;
 		int count = 0;
+		
+		// Need to return extra information if parent is a Shortcut, and its target has been completed/broken
+		String shortcutAction = "none";
+		String shortCutTargetType = null;
+		
+		if (parent.isShortcut()) {
+			for (Link old : this.linkService.getLinks(parentId)) {
+				if (old.getType().equals(LinkType.shortcut)) {
+					shortCutTargetType = old.getChild().getType().getName();
+					break;
+				}
+			}
+		}
 		
 		for (LinkParams lp : linkParams) {
 			l = CmsBeanFactory.makeLink().
@@ -860,31 +875,34 @@ public class RestController extends BaseController {
 			}
 			
 			child = this.itemService.getEditableVersion(lp.getChildId());
-			
-			// Do not modify ordering for existing shortcuts
-			if (l.getType().equals(LinkType.shortcut)) {
-				existing = this.linkService.getLink(l.getParentId(), child.getId());
-				if (existing != null) {
-					l.setOrdering(existing.getOrdering());
-				}
-				else {
-					l.setOrdering(1000);
-				}
-			}
-			
 			i = CmsBeanFactory.makeItem(null).setId(child.getId());			
 			l.setChild(i);			
 			links.add(l);
+			
+			if (parent.isShortcut() && lp.getType().equals(LinkType.shortcut)) {
+				shortcutAction = "add";
+				shortCutTargetType = child.getType().getName();
+			}
 		}
 		
 		parent.setLinks(links);
+		
+		if (links.size() == 0) {
+			shortcutAction = "remove";
+			// original shortcutType was captured earlier
+		}
 		
 		try {
 			parent.saveLinks();		
 			resp.addMessage(String.format("%d links saved", links.size()));
 			
+			Object[] response = new Object[] {
+					this.navigationController.doLazyNavOneLevel(parent.getOrigId(), parent.getSite().getId()),
+					shortcutAction,
+					shortCutTargetType == null ? null : shortCutTargetType.toLowerCase()
+			};
 			// Return a list of shortcuts as response data, so that leftnav tree can be refreshed
-			resp.setData(this.navigationController.doLazyNavOneLevel(parent.getOrigId(), parent.getSite().getId()));
+			resp.setData(response);
 		}
 		catch (ResourceException e) {
 			resp.setError(true).addMessage(e.getMessage());
@@ -927,7 +945,8 @@ public class RestController extends BaseController {
 	@ResponseBody
 	public List<ItemIdentifier> history(@PathVariable long siteId, HttpServletRequest req) {	
 		
-		return this.cookieService.getHistoryCookieValue(siteId, req);
+		Site s = this.siteService.getSite(siteId);
+		return this.cookieService.getBreadcrumbsCookieValue(s, req);
 	}
 
 	@RequestMapping(value="/js", method=RequestMethod.GET, produces="text/javascript")

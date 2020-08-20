@@ -585,10 +585,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
 	}
 	
-	public boolean move(Item mover, Item currentParent, Item targetParent, Item target, 
-			boolean moverIsShortcut) throws ResourceException {
+	public boolean move(Item mover, Item currentParent, Item targetParent, Item target) throws ResourceException {
 		
-		return move(mover, currentParent, targetParent, target, moverIsShortcut, "over");
+		return move(mover, currentParent, targetParent, target, "over");
 	}
 	
 	/*
@@ -596,7 +595,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 * If mode == "over", then target is effectively a new parent.
 	 */
 	public boolean move(Item mover, Item currentParent, Item targetParent, Item target, 
-			boolean moverIsShortcut, String mode) throws ResourceException {
+			String mode) throws ResourceException {
 		
 		if (mover == null || target == null || currentParent == null || mode == null) {
 			throw new ResourceException("Missing item data for move");
@@ -628,7 +627,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		Link moverLink = CmsBeanFactory.makeLink().
 				setParentId(newParent.getId()).
 				setChild(mover).
-				setType(moverIsShortcut ? LinkType.shortcut : LinkType.binding).
+				setType(LinkType.binding).
 				setName("std");
 		
 		// Add mover to new parent's bindings
@@ -679,15 +678,13 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			cursor++;
 		}
 		
-		// Update paths of descendant items, but NOT for shortcuts
-		if (! moverIsShortcut) {
-			String divider = newParent.isRoot() ? "" : "/";
-			String newChildPath = newParent.getPath() + divider + mover.getSimpleName();
-			updateDescendantPaths(mover.getPath(), newChildPath);
-			
-			// Update child item path
-			updateItemPath(mover.getId(), newChildPath);
-		}
+		// Update paths of descendant items
+		String divider = newParent.isRoot() ? "" : "/";
+		String newChildPath = newParent.getPath() + divider + mover.getSimpleName();
+		updateDescendantPaths(mover.getPath(), newChildPath);
+		
+		// Update child item path
+		updateItemPath(mover.getId(), newChildPath);
 		
 		// Force newParent links to be re-calculated, since they have now changed
 		newParent.setLinks(null);

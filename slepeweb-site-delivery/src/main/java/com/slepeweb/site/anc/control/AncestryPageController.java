@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
+import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.ItemService;
@@ -28,6 +29,7 @@ import com.slepeweb.site.anc.bean.MenuItem;
 import com.slepeweb.site.anc.bean.Person;
 import com.slepeweb.site.anc.bean.svg.AncestryDiagram;
 import com.slepeweb.site.anc.bean.svg.SvgSupport;
+import com.slepeweb.site.anc.service.AncCookieService;
 import com.slepeweb.site.anc.service.SolrService4Ancestry;
 import com.slepeweb.site.bean.SolrParams4Site;
 import com.slepeweb.site.control.BaseController;
@@ -45,6 +47,14 @@ public class AncestryPageController extends BaseController {
 	@Autowired private ItemService itemService;
 	@Autowired private UserService userService;
 	@Autowired private SolrService4Ancestry solrService4Ancestry;
+	@Autowired private AncCookieService ancCookieService;
+	
+	@ModelAttribute(value="_history")
+	public List<ItemIdentifier> breadcrumbTrail(HttpServletRequest req) {
+		Item i = (Item) req.getAttribute(ITEM);
+		List<ItemIdentifier> list = this.ancCookieService.getBreadcrumbsCookieValue(i.getSite(), req);
+		return list;
+	}
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
@@ -90,6 +100,8 @@ public class AncestryPageController extends BaseController {
 	public String boy(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
+			HttpServletRequest req,
+			HttpServletResponse res,
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "person", model);
@@ -110,7 +122,9 @@ public class AncestryPageController extends BaseController {
 		
 		model.addAttribute("_menu", createPersonMenu(i, subject, null));
 		
-		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));		
+		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));
+		
+		this.ancCookieService.updateBreadcrumbsCookie(i, req, res);
 		return page.getView();
 	}
 	
@@ -118,9 +132,11 @@ public class AncestryPageController extends BaseController {
 	public String girl(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
+			HttpServletRequest req,
+			HttpServletResponse res,
 			ModelMap model) {	
 		
-		return boy(i, shortSitename, model);
+		return boy(i, shortSitename, req, res, model);
 	}
 	
 	@RequestMapping(value="/document")	

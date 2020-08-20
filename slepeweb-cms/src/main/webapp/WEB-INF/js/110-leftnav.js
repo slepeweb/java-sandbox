@@ -100,6 +100,7 @@ _cms.leftnav.loadBreadcrumbs = function(key, fn, args) {
  * leftIsFancytreeNode = true indicates the left array contains fancytree nodes, and the right array contains form data.
  * leftIsFancytreeNode = false indicates the left array contains form data, and the right array contains fancytree nodes.
  */
+/*
 _cms.leftnav.filterShortcuts = function(left, leftIsFancytreeNode, right) {
 	if (left) {
 		return left.filter(function(node, index, fullArray) {
@@ -122,7 +123,9 @@ _cms.leftnav.filterShortcuts = function(left, leftIsFancytreeNode, right) {
 		});
 	}
 }
+*/
 
+/*
 _cms.leftnav.refreshShortcuts = function(parentKey, updatedChildData) {
 	var existingParentNode = _cms.leftnav.tree.getNodeByKey(parentKey);
 	if (existingParentNode) {
@@ -150,6 +153,22 @@ _cms.leftnav.refreshShortcuts = function(parentKey, updatedChildData) {
 		}
 	}
 };
+*/
+
+_cms.leftnav.refreshShortcut = function(nodeKey, action, type) {
+	if (action != "none" && type) {
+		var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
+		if (node && /* node.addClass is only available in later versions */ node.addClass) {
+			var clazz = "cms-icon-shortcut-" + type;
+			if (action == "add") {
+				node.addClass(clazz);
+			}
+			else if (action == "remove") {
+				node.removeClass(clazz);
+			}
+		}
+	}
+}
 
 _cms.leftnav.behaviour.click = function() {
 	$("#leftnav-hider").click(function(event) {

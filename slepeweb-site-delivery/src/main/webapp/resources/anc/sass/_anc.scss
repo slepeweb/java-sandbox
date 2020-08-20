@@ -1,9 +1,3 @@
-@media screen and (max-width:400px) {
-  @-ms-viewport{
-    width: device-width;
-  }
-}
-
 body {
   max-width: $max-page-width;
   /* This centres the page horizontally */
@@ -13,11 +7,12 @@ body {
 header {
 	grid-area: hdr;
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(1, 1fr);
 	grid-template-areas: 
-		"ha ha ha hb"
-		"hc hc hc hc"
-		"br br br br";
+		"ha"
+		"hb"
+		"hc"
+		"br";
 		
 	@include std-container-padding{}
   background-color: #e4ddd0;
@@ -65,9 +60,9 @@ div.welcome {
 }
 
 .menu {
-	font-size: 1.1em;		display: grid;
-		grid-gap: 6px;
-	
+	font-size: 1.1em;
+	display: grid;
+	grid-gap: 6px;
 	grid-area: menu;
 	padding: $std-container-padding;
 	padding-bottom: 0;
@@ -113,10 +108,11 @@ div.welcome {
 	grid-area: ha;
 }
 
-#language-selector {
-	padding-top: 1.0em;
+#header-center {
 	grid-area: hb;
-	justify-self: end;
+}
+
+#language-selector {
 	
 	img {
 		width: 30px;
@@ -142,6 +138,13 @@ div.welcome {
 
 #breadcrumbs {
 	padding-top: 0.5em;
+}
+
+#history-selector select {
+	display: inline-block;
+	width: 75%;
+	-webkit-appearance: menulist;
+	max-width: 220px;
 }
 	
 #person-svg, #diagram-svg {
@@ -174,6 +177,10 @@ details {
 	font-size: 0.9em;
 }
 
+.smaller {
+	font-size: 0.8em;
+}
+
 @media (min-width: 480px) {
 	div.image-gallery {
 			grid-template-columns: repeat(2, 1fr);
@@ -188,8 +195,8 @@ details {
 			"br br br";
 	}
 	
-	#language-selector {
-		justify-self: center;	
+	#header-center {
+		justify-items: center;
 	}
 	
 	#search-bar {

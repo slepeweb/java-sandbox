@@ -414,7 +414,7 @@ button[disabled=disabled] {
 					}
 					
 					span.fancytree-node.cms-icon-boy>span.fancytree-icon {
-						background-position: -32px 0px;
+						background-position: -33px 0px;
 						background-image: url("fancytree-cms-icons.gif");
 					}
 					
@@ -435,6 +435,16 @@ button[disabled=disabled] {
 					
 					span.fancytree-node.cms-icon-image>span.fancytree-icon {
 						background-position: -96px 0px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-shortcut-boy>span.fancytree-icon {
+						background-position: -32px -16px;
+						background-image: url("fancytree-cms-icons.gif");
+					}
+					
+					span.fancytree-node.cms-icon-shortcut-girl>span.fancytree-icon {
+						background-position: -48px -16px;
 						background-image: url("fancytree-cms-icons.gif");
 					}
 					

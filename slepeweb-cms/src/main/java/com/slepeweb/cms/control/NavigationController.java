@@ -28,27 +28,6 @@ public class NavigationController extends BaseController {
 	@Autowired private SiteService siteService;
 	@Autowired private ItemService itemService;
 	
-	/*
-	@RequestMapping(value="/leftnav/full", method=RequestMethod.GET, produces="application/json")	
-	@ResponseBody
-	public List<Navigation.Node> doFullNav() {	
-		Site site = this.siteService.getSite("Integration Testing"); // TODO: Only used for testing ???
-		Item homepage = site.getItem("/");
-		Item contentFolder = site.getItem(Item.CONTENT_ROOT_PATH);		
-		Navigation nav = new Navigation();
-		
-		if (homepage != null) {
-			nav.getNodes().add(dive(homepage));		
-		}
-		
-		if (contentFolder != null) {
-			nav.getNodes().add(dive(contentFolder));		
-		}
-		
-		return nav.getNodes();
-	}
-	*/
-	
 	@RequestMapping(value="/leftnav/lazy/one", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public List<Navigation.Node> doLazyNavOneLevel(

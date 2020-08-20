@@ -3,7 +3,7 @@ package com.slepeweb.cms.bean;
 public class ItemIdentifier {
 
 	private long itemId;
-	private String name;
+	private String name, path;
 	
 	public ItemIdentifier(long i) {
 		this.itemId = i;
@@ -22,12 +22,22 @@ public class ItemIdentifier {
 		return name;
 	}
 
-	public void setName(String name) {
+	public ItemIdentifier setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public long getItemId() {
 		return itemId;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public ItemIdentifier setPath(String path) {
+		this.path = path;
+		return this;
 	}
 
 	@Override

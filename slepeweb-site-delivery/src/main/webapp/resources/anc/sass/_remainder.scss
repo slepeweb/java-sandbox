@@ -1,0 +1,94 @@
+body {
+  max-width: $max-page-width;
+  /* This centres the page horizontally */
+  margin: auto;
+}
+
+footer {
+	grid-area: ftr;
+	text-align: center;
+	font-size: 0.85em;
+	opacity: 0.6;
+	line-height: 1.3em;
+	@include std-container-padding{}
+}
+
+.main {
+	grid-area: main;
+	@include std-container-padding{}
+}
+
+.leftside {
+	grid-area: side;
+	@include std-container-padding{}
+}
+
+.menu {
+	font-size: 1.1em;
+	display: grid;
+	grid-gap: 6px;
+	grid-area: menu;
+	padding: $std-container-padding;
+	padding-bottom: 0;
+}
+
+.submenu {
+	margin: 0 0 1em 0;
+	list-style-type: none;
+}
+
+#person-svg, #diagram-svg {
+	@include std-container-padding{}
+}
+
+#diagram-svg {
+	background-color: #e1eaef;
+}
+
+#get-full-diagram {
+	cursor: pointer;
+}
+
+div.image-gallery {
+	display: grid;
+	grid-gap: 6px;
+}
+
+.hide {
+	display: none;
+}	
+
+h3.emphasis {
+/* 	border-bottom: 2px solid $color-accent-bg; */
+	text-decoration: underline;
+}
+
+details {
+	font-size: 0.9em;
+}
+
+.smaller {
+	font-size: 0.8em;
+}
+
+@media (min-width: 480px) {
+	div.image-gallery {
+			grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 800px) {
+	div.image-gallery {
+			grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (min-width: 1000px) {
+	div.image-gallery {
+			grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+.fa-angle-double-right {
+	color: $color-accent-bg;
+}

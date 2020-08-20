@@ -3,7 +3,6 @@ package com.slepeweb.cms.bean;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -249,17 +248,15 @@ public class Item extends CmsBean {
 	 * Shortcut items must be treated differently when subject to move. In 
 	 * particular, need to know which of possibly many parents is affected.
 	 */
-	public boolean move(Item currentParent, Item targetParent, Item target, 
-			boolean moverIsShortcut) throws ResourceException {
+	public boolean move(Item currentParent, Item targetParent, Item target) throws ResourceException {
 		
-		return move(currentParent, targetParent, target, moverIsShortcut, "over");
+		return move(currentParent, targetParent, target, "over");
 	}
 	
-	public boolean move(Item currentParent, Item targetParent, Item target, 
-			boolean moverIsShortcut, String mode) throws ResourceException {
+	public boolean move(Item currentParent, Item targetParent, Item target, String mode) throws ResourceException {
 		
 		return getCmsService().getItemService().
-				move(this, currentParent, targetParent, target, moverIsShortcut, mode);
+				move(this, currentParent, targetParent, target, mode);
 	}
 	
 	public Object[] getCopyDetails() {
@@ -608,11 +605,12 @@ public class Item extends CmsBean {
 	}
 
 	public List<Link> getBindings() {
-		return filterLinks(new String[] {LinkType.binding, LinkType.shortcut});
+		return filterLinks(new String[] {LinkType.binding});
 	}
 
+	@Deprecated
 	public List<Link> getBindingsNoShortcuts() {
-		return filterLinks(new String[] {LinkType.binding});
+		return getBindings();
 	}
 
 	public List<Link> getInlines() {
@@ -653,32 +651,6 @@ public class Item extends CmsBean {
 				LinkType.relation, 
 				LinkType.component, 
 				LinkType.shortcut});
-	}
-
-	public List<Link> getAllLinksShortcutsLast() {
-		List<Link> list = getAllLinksBarBindings();
-		Collections.sort(list, new Comparator<Link>() {
-
-			@Override
-			public int compare(Link a, Link b) {
-				boolean aIsShortcut = a.getType().equals(LinkType.shortcut);
-				boolean bIsShortcut = b.getType().equals(LinkType.shortcut);
-				
-				if (!(aIsShortcut ^ bIsShortcut)) {
-					return a.getOrdering().compareTo(b.getOrdering());
-				}
-				else if (aIsShortcut) {
-					return 1;
-				}
-				else if (bIsShortcut) {
-					return -1;
-				}
-				return 0;
-			}
-			
-		});
-		
-		return list;
 	}
 
 	public List<Item> getAllVersions() {
@@ -883,4 +855,9 @@ public class Item extends CmsBean {
 		this.language = language;
 		return this;
 	}
+	
+	public long getIdentifier() {
+		return getId();
+	}
+
 }

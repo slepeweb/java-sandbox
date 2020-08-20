@@ -1,0 +1,110 @@
+package com.slepeweb.cms.utils;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemIdentifier;
+import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.service.ItemService;
+
+
+public class CookieHelper {
+	
+	public final static String BREADCRUMBS = "breadcrumbs";
+	public final static int COOKIE_MAXAGE = 7 * 24 * 60 * 60;
+	
+	public void updateBreadcrumbsCookie(String cookiePath, Item i, HttpServletRequest req, HttpServletResponse res) {
+		
+		ItemIdentifier target = new ItemIdentifier(i.getOrigId());
+		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);	
+		updateItemNames(breadcrumbs, i.getCmsService().getItemService());
+		pushBreadcrumbs(breadcrumbs, target);
+		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), StringUtils.join(breadcrumbs, ","), cookiePath, res);
+	}
+	
+	public String getBreadcrumbsCookieName(long siteId) {
+		return String.format("%s-%d", BREADCRUMBS, siteId);
+	}
+	
+	public List<ItemIdentifier> getBreadcrumbsCookieValue(Site s, HttpServletRequest req) {
+		
+		String cookieName = getBreadcrumbsCookieName(s.getId());
+		String cookieValue = getCookieValue(cookieName, req);		
+		return parseBreadcrumbsString(cookieValue, s.getCmsService().getItemService());
+	}
+	
+	public void pushBreadcrumbs(List<ItemIdentifier> nodeList, ItemIdentifier target) {
+		
+		if (nodeList.contains(target)) {
+			int index = nodeList.indexOf(target);
+			nodeList.remove(index);
+		}
+		
+		if (nodeList.size() > 10) {
+			nodeList.remove(nodeList.size() - 1);
+		}
+		
+		nodeList.add(0, target);
+	}
+	
+	public List<ItemIdentifier> parseBreadcrumbsString(String cookieValue, ItemService itemService) {
+		
+		if (cookieValue != null) {
+			List<ItemIdentifier> list = new ArrayList<ItemIdentifier>();
+			
+			for (String s : cookieValue.split(",")) {
+				list.add(new ItemIdentifier(s));
+			}
+			
+			updateItemNames(list, itemService);
+			return list;
+		}
+		
+		return new ArrayList<ItemIdentifier>();
+	}
+	
+	public String getCookieValue(String name, HttpServletRequest req) {
+		for (Cookie c : req.getCookies()) {
+			if (/*c.getPath() != null && c.getPath().equals(COOKIE_PATH) &&*/ c.getName().equals(name)) {
+				return c.getValue();
+			}
+		}
+		
+		return null;
+	}
+	
+	public void saveCookie(String name, String value, String path, HttpServletResponse res) {
+		Cookie c = new Cookie(name, value);
+		c.setPath(path);
+		c.setMaxAge(COOKIE_MAXAGE);
+		res.addCookie(c);
+	}
+	
+	protected void updateItemNames(List<ItemIdentifier> list, ItemService itemService) {
+		Item h;		
+		Iterator<ItemIdentifier> iter = list.iterator();
+		ItemIdentifier ii;
+		
+		while (iter.hasNext()) {
+			ii = iter.next();
+			h = itemService.getEditableVersion(ii.getItemId());
+			if (h != null) {
+				ii.
+					setName(StringUtils.abbreviate(h.getName(), 24)).
+					setPath(h.getUrl());
+			}
+			else {
+				iter.remove();
+			}
+		}
+	}
+	
+}

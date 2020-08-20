@@ -34,7 +34,7 @@ public class Navigation {
 		private Node parentNode;
 		private String title, key, extraClasses;
 		private boolean folder, lazy = true, expanded, selected, shortcut;
-		private List<Node> children = new ArrayList<Node>();
+		private List<Node> children;
 		
 		public static Node toNode(Item i) {
 			return new Navigation.Node().
@@ -61,7 +61,12 @@ public class Navigation {
 				typeName = "image";
 			}
 			
-			return String.format("cms-icon-%s", typeName);
+			String prefix = "cms-icon-";
+			if (i.isShortcut()) {
+				prefix = prefix + "shortcut-";
+			}
+			
+			return prefix + typeName;
 		}
 		
 		@Override
@@ -70,7 +75,11 @@ public class Navigation {
 		}
 		
 		public Node addChild(Node n) {
-			getChildren().add(n);
+			if (this.children == null) {
+				this.children = new ArrayList<Navigation.Node>();
+			}
+			
+			this.children.add(n);
 			n.setParentNode(this);
 			n.getParentNode().setFolder(true).setExpanded(true);
 			return this;

@@ -131,12 +131,12 @@ _cms.links.behaviour.save = function(nodeKey) {
 				_cms.support.flashMessage(obj);
 				_cms.links.refresh.tab(nodeKey);
 				_cms.links.activateSaveButton(false);
-
 				
 				if (! obj.error && obj.data) {
 					// Need to refresh the FancyTree,
 					// since one or more shortcuts have been added/removed
-					_cms.leftnav.refreshShortcuts("" + _cms.editingItemId, obj.data);
+					//_cms.leftnav.refreshShortcuts("" + _cms.editingItemId, obj.data[0]);
+					_cms.leftnav.refreshShortcut("" + nodeKey, obj.data[1], obj.data[2]);
 				}
 			},
 			error: function(obj, status, z) {
@@ -157,7 +157,7 @@ _cms.links.behaviour.remove = function() {
 	$(_cms.links.sel.REMOVE_LINK_BUTTONS).off().click(function(e) {
 		$(this).parent().parent().remove();
 		_cms.links.activateSaveButton(true);
-		_cms.links.shortcut.buttonstates();
+		_cms.links.shortcut.settings();
 		
 		if ( $(_cms.links.sel.SORTABLE_LINKS).length == 0) {
 			$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).html("<p>None</p>")
@@ -189,12 +189,7 @@ _cms.links.behaviour.navigate = function() {
 		var key = $(this).attr("data-id");
 		var node = _cms.leftnav.tree.getNodeByKey(key);
 		
-		if (node) {
-			// This attribute setting changes the active tab for when node activation completes
-			$("li.ui-tabs-active").attr("aria-controls", "core-tab");
-			_cms.leftnav.tree.activateKey(node.key);
-		}
-		else {
+		if (! node) {
 			// This node hasn't been loaded yet - ask the server for the breadcrumb trail
 			var fn = function() {
 				// This attribute setting changes the active tab for when node activation completes
@@ -205,6 +200,8 @@ _cms.links.behaviour.navigate = function() {
 				_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
 			}
 		}
+		
+		_cms.support.renderItemForms(key, "core-tab");
 	});
 }
 
@@ -563,14 +560,24 @@ _cms.links.validate.linkdata.anc = function(linkType, linkName, linkData) {
 	return result;
 }
 
-_cms.links.shortcut.buttonstates = function() {
+_cms.links.shortcut.settings = function() {
 	if (_cms.editingItemIsShortcut) {
 		if ( $(_cms.links.sel.SORTABLE_LINKS).length > 0) {
 			_cms.support.disable(_cms.links.sel.ADD_LINK_BUTTON);
 		}
 		else {
 			_cms.support.enable(_cms.links.sel.ADD_LINK_BUTTON);
+			$(_cms.links.sel.LINKTYPE_SELECT).empty().html('<option value="shortcut">shortcut</option>');
 		}
+		
+	}
+	else {
+		_cms.support.enable(_cms.links.sel.ADD_LINK_BUTTON);
+		$(_cms.links.sel.LINKTYPE_SELECT).empty().html(
+				'<option value="unknown">Choose ...</option>' + 
+				'<option value="relation">relation</option>' + 
+				'<option value="inline">inline</option>' + 
+				'<option value="component">component</option>');
 	}
 }
 
@@ -590,6 +597,6 @@ _cms.links.onrefresh = function(nodeKey) {
 	_cms.links.behaviour.edit();
 	_cms.links.behaviour.navigate();
 	
-	_cms.links.shortcut.buttonstates();
+	_cms.links.shortcut.settings();
 }
 

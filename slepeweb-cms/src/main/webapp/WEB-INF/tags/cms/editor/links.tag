@@ -6,7 +6,7 @@
 <h2>Linked to</h2>
 
 <div id="sortable-links">
-	<c:forEach items="${editingItem.allLinksShortcutsLast}" var="link" varStatus="_stat">
+	<c:forEach items="${editingItem.allLinksBarBindings}" var="link" varStatus="_stat">
 		<div class="sortable-link ui-state-default">
 			<div class="left">
 				<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
@@ -22,7 +22,7 @@
 		</div>
 	</c:forEach>
 
-	<c:if test="${empty editingItem.allLinksShortcutsLast}">
+	<c:if test="${empty editingItem.allLinksBarBindings}">
 		<p>None</p>
 	</c:if>
 </div>

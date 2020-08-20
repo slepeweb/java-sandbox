@@ -1,0 +1,69 @@
+.layout-std, .layout-wide {
+	display: grid;
+  grid-template-columns: 1fr;
+	grid-template-areas: 
+		"hdr"
+		"main"
+		"ftr";
+}
+
+.layout-person {
+	display: grid;
+  grid-template-columns: 1fr;
+	grid-template-areas: 
+		"hdr"
+		"side"
+		"menu"
+		"main"
+		"ftr";
+}
+
+.layout-leftmenu {
+	display: grid;
+  grid-template-columns: 1fr;
+	grid-template-areas: 
+		"hdr"
+		"menu"
+		"side"
+		"main"
+		"ftr";
+}
+
+@media (min-width: 800px) {
+	.layout-std {
+		grid-template-columns: repeat(9, 1fr);
+		grid-template-areas: 
+			"hdr hdr hdr  hdr  hdr  hdr  hdr  hdr  hdr"
+			".   .   main main main main main main ."
+			"ftr ftr ftr  ftr  ftr  ftr  ftr  ftr  ftr";
+	}
+	
+	.layout-person {
+		grid-template-columns: repeat(9, 1fr);
+		grid-template-areas: 
+			"hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr"
+			".    .    .    .    menu menu menu menu menu"
+			"side side side side main main main main main"
+			"ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
+	}
+	
+	.layout-leftmenu {
+		grid-template-columns: repeat(9, 1fr);
+		grid-template-areas: 
+			"hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr"
+			".    .    menu menu menu menu menu menu menu"
+			"side side main main main main main main main"
+			"ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
+	}
+}
+
+@media (min-width: 1000px) {
+	.layout-person {
+		grid-template-columns: repeat(9, 1fr);
+		grid-template-areas: 
+			"hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr  hdr"
+			".    .    .    menu menu menu menu menu menu"
+			"side side side main main main main main main"
+			"ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr  ftr";
+	}
+}

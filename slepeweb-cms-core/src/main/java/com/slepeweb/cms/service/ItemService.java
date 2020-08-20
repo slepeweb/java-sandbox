@@ -27,10 +27,9 @@ public interface ItemService {
 	int getCount(String path);
 	int getCountByType(Long itemTypeId);
 	int getVersionCount(long origid);
+	boolean move(Item child, Item currentParent, Item targetParent, Item target) throws ResourceException;
 	boolean move(Item child, Item currentParent, Item targetParent, Item target, 
-			boolean moverIsShortcut) throws ResourceException;
-	boolean move(Item child, Item currentParent, Item targetParent, Item target, 
-			boolean moverIsShortcut, String mode) throws ResourceException;
+			String mode) throws ResourceException;
 	int trashItemAndDirectChildren(Item i);
 	Item restoreItem(Long id);
 	List<Item> getTrashedItems();

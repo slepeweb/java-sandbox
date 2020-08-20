@@ -97,7 +97,7 @@ public class Relationship {
 		if (this.partner != null) {
 			for (Person childOfSubject : identifyChildren(this.subject.getItem())) {
 				for (Person childOfPartner : identifyChildren(this.partner.getItem())) {
-					if (childOfPartner.getItem().equalsId(childOfSubject.getItem())) {
+					if (matches(childOfPartner, childOfSubject)) {
 						this.children.add(childOfPartner);
 						break;
 					}
@@ -108,6 +108,11 @@ public class Relationship {
 			this.children.addAll(identifyChildren(this.subject.getItem()));
 		}
 	}
+	
+	private boolean matches(Person a, Person b) {
+		return a.getItem().getIdentifier() == b.getItem().getIdentifier();
+	}
+	
 	
 	private void union() {
 		this.children.addAll(identifyChildren(this.subject.getItem()));

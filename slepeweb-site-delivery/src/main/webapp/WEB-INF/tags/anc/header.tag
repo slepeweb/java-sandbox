@@ -9,3 +9,14 @@
 	<anc:searchBar />	
 	<anc:personBreadcrumbs />
 </header>
+
+<script>
+	$(function(){
+		$("#history-selector").change(function(){
+			var path = $(this).val();
+			if (path != 'unset') {
+				window.location = path;
+			}
+		});
+	});
+</script>

@@ -31,7 +31,6 @@ _cms.move.action = function(nodeKey) {
 					targetId: targetNode.key,
 					targetParentId: targetNode.parent.key,
 					moverParentId: moverNode.parent.key,
-					moverIsShortcut: moverNode.data.shortcut,
 					mode: position
 				}, 
 				dataType: "json",
@@ -40,6 +39,7 @@ _cms.move.action = function(nodeKey) {
 						moverNode.moveTo(targetNode, position);
 						targetNode.setActive(false);
 						_cms.move.refresh.tab(nodeKey);
+						_cms.core.refresh.tab(nodeKey);
 					}
 					_cms.support.flashMessage(obj);
 				},
