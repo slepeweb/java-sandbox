@@ -10,9 +10,38 @@ header {
 		
 	@include std-container-padding{}
   background-color: #e4ddd0;
+  
+	.user-block {
+		padding-left: 1em;
+		color: $color-fg-bold;
+		position: relative;
+		display: inline-block;
+	}
+	
+	#user-menu {
+		width: 200px;
+		background-color: #eee;
+		position: absolute;
+		box-shadow: 5px 10px $color-fg-bold;
+		left: 15px;
+		top: 15px;
+		
+		ul {
+			list-style-type: none;
+			padding-top: 0.5em;
+		}
+		
+		p {
+			color: $color-fg-bold;
+			background-color: #ef9d9d;
+			padding: 0em 1em 0 1em;
+			margin-bottom: 0;
+		}
+	}
 }
 
 #site-identifier {
+	padding-top: 0.5em;
 	grid-area: ha;
 }
 

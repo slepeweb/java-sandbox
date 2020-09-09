@@ -35,7 +35,7 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 	private void insertTemplate(Template t) {
 		this.jdbcTemplate.update(
 				"insert into template (name, forward, siteid, typeid) values (?, ?, ?, ?)", 
-				t.getName(), t.getForward(), t.getSiteId(), t.getItemTypeId());
+				t.getName(), t.getController(), t.getSiteId(), t.getItemTypeId());
 
 		t.setId(getLastInsertId());
 		this.cacheEvictor.evict(t);
@@ -49,7 +49,7 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 			
 			this.jdbcTemplate.update(
 					"update template set name = ?, forward = ? where id = ?", 
-					t.getName(), t.getForward(), t.getId());
+					t.getName(), t.getController(), t.getId());
 			
 			LOG.info(compose("Updated template", t));
 		}

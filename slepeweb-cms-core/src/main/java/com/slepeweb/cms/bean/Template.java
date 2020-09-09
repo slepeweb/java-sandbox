@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Template extends CmsBean {
 	private static final long serialVersionUID = 1L;
-	private String name, forward;
+	private String name, controller;
 	private Long id, siteId, itemTypeId;
 	private ItemType itemType;
 	
@@ -12,14 +12,14 @@ public class Template extends CmsBean {
 		if (obj instanceof Template) {
 			Template t = (Template) obj;
 			setName(t.getName());
-			setForward(t.getForward());
+			setController(t.getController());
 		}
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
 			StringUtils.isNotBlank(getName()) &&
-			StringUtils.isNotBlank(getForward());
+			StringUtils.isNotBlank(getController());
 	}
 	
 	public Template save() {
@@ -32,7 +32,7 @@ public class Template extends CmsBean {
 	
 	@Override
 	public String toString() {
-		return String.format("%s: %s", getName(), getForward());
+		return String.format("%s: %s", getName(), getController());
 	}
 
 	public String getName() {
@@ -44,12 +44,12 @@ public class Template extends CmsBean {
 		return this;
 	}
 
-	public String getForward() {
-		return forward;
+	public String getController() {
+		return controller;
 	}
 
-	public Template setForward(String forward) {
-		this.forward = forward;
+	public Template setController(String forward) {
+		this.controller = forward;
 		return this;
 	}
 
@@ -91,7 +91,7 @@ public class Template extends CmsBean {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((forward == null) ? 0 : forward.hashCode());
+		result = prime * result + ((controller == null) ? 0 : controller.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -105,10 +105,10 @@ public class Template extends CmsBean {
 		if (getClass() != obj.getClass())
 			return false;
 		Template other = (Template) obj;
-		if (forward == null) {
-			if (other.forward != null)
+		if (controller == null) {
+			if (other.controller != null)
 				return false;
-		} else if (!forward.equals(other.forward))
+		} else if (!controller.equals(other.controller))
 			return false;
 		if (name == null) {
 			if (other.name != null)

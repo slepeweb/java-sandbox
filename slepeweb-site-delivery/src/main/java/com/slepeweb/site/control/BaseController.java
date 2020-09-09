@@ -53,7 +53,7 @@ public class BaseController {
 	@ModelAttribute(value=ITEM)
 	public Item getRequestItem(HttpServletRequest req) {
 		Item i = (Item) req.getAttribute(ITEM);
-		LOG.trace(String.format("Model attribute (%s): [%s]", ITEM, i));
+		LOG.info(String.format("Model attribute retrieved by BaseController (%s): [%s]", ITEM, i));
 		return i;
 	}
 	
@@ -114,7 +114,7 @@ public class BaseController {
 		return false;
 	}
 	
-	protected String getFullyQualifiedViewName(String shortHostName, String viewNameSuffix) {
+	protected String composeJspPath(String shortHostName, String viewNameSuffix) {
 		String view = shortHostName + "/template/" + viewNameSuffix;
 		LOG.trace(String.format("CMS page view: [%s]", view));
 		return view;
@@ -126,7 +126,7 @@ public class BaseController {
 				setHeading(i.getFieldValue("title")).
 				setBody(i.getFieldValueResolved("bodytext", new StringWrapper(""))).
 				setItem(i).
-				setView(getFullyQualifiedViewName(shortSitename, viewNameSuffix));
+				setView(composeJspPath(shortSitename, viewNameSuffix));
 		
 		p.setComponents(this.componentService.getComponents(i.getComponents(), LinkName.MAIN));
 		p.getLeftSidebar().setComponents(this.componentService.getComponents(i.getComponents(), LinkName.LEFT_SIDE));

@@ -71,6 +71,7 @@ h1 {
 }
 
 h2 {
+  margin-top: 0.5em;
   font-size: 1.75em;
   line-height: 1.5em;
 }
@@ -764,8 +765,33 @@ header {
   padding-bottom: 15px;
   background-color: #e4ddd0;
 }
+header .user-block {
+  padding-left: 1em;
+  color: #666;
+  position: relative;
+  display: inline-block;
+}
+header #user-menu {
+  width: 200px;
+  background-color: #eee;
+  position: absolute;
+  box-shadow: 5px 10px #666;
+  left: 15px;
+  top: 15px;
+}
+header #user-menu ul {
+  list-style-type: none;
+  padding-top: 0.5em;
+}
+header #user-menu p {
+  color: #666;
+  background-color: #ef9d9d;
+  padding: 0em 1em 0 1em;
+  margin-bottom: 0;
+}
 
 #site-identifier {
+  padding-top: 0.5em;
   grid-area: ha;
 }
 
@@ -914,6 +940,13 @@ details {
   font-size: 0.8em;
 }
 
+.error-message {
+  color: red;
+  font-size: 1.5em;
+  text-decoration: underline;
+  margin-top: 1em;
+}
+
 @media (min-width: 480px) {
   div.image-gallery {
     grid-template-columns: repeat(2, 1fr);
@@ -931,4 +964,8 @@ details {
 }
 .fa-angle-double-right {
   color: #24604e;
+}
+
+input[readonly='true'] {
+  opacity: 0.5;
 }

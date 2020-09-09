@@ -24,10 +24,10 @@
 			<c:if test="${not _isAuthor}">	
 				<form id="login" method="post" action="<c:url value="/j_spring_security_check" />">
 					<div>
-						<label for="alias">User name: </label><input name="alias" size="32" />
+						<label>Email: </label><input name="email" size="128" />
 					</div>
 					<div>
-						<label for="password">Password: </label><input type="password" name="password" size="32" />
+						<label>Password: </label><input type="password" name="password" size="32" />
 					</div>
 					<button class="action" type="submit">Login</button>
 				</form>	

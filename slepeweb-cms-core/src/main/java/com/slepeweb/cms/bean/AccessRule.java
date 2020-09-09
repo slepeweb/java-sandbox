@@ -131,14 +131,14 @@ public class AccessRule extends CmsBean {
 		return this;
 	}
 
-	public boolean matchesConstraints(Item i) {
+	public boolean matchesConstraints(Item i, String springTemplatePath) {
 		// Must match ALL constraints
 		
 		if (StringUtils.isNotBlank(getTemplatePattern())) {
 			// Template rule applies
 			if (
-				i.getTemplate() == null || 
-				! i.getTemplate().getName().matches(getTemplatePattern())) {
+				springTemplatePath == null || 
+				! springTemplatePath.matches(getTemplatePattern())) {
 			
 				return false; 
 			}
@@ -165,8 +165,8 @@ public class AccessRule extends CmsBean {
 		
 		if (u != null) {
 			// Must match ANY of the user's roles
-			for (String r : u.getRoles()) {
-				if (r.matches(getRolePattern())) {
+			for (Role r : u.getRoles()) {
+				if (r.getName().matches(getRolePattern())) {
 					return true;
 				}
 			}

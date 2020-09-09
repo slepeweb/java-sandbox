@@ -10,23 +10,29 @@ public class User extends CmsBean {
 	
 	private static final long serialVersionUID = 1L;
 	private Long id;
-	private String name, alias, password;
-	private boolean enabled;
-	private List<String> roles;
+	private String firstName, lastName, email, phone, password, secret;
+	private boolean enabled, loggedIn;
+	private List<Role> roles;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof User) {
 			User u = (User) obj;
-			setAlias(u.getAlias());
+			setFirstName(u.getFirstName());
+			setLastName(u.getLastName());
+			setEmail(u.getEmail());
+			setPhone(u.getPhone());
 			setPassword(u.getPassword());
 			setEnabled(u.isEnabled());
+			setSecret(u.getSecret());
 		}
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
-			StringUtils.isNotBlank(getAlias()) &&
-			StringUtils.isNotBlank(getPassword());
+			StringUtils.isNotBlank(getFirstName()) &&
+			StringUtils.isNotBlank(getLastName()) &&
+			StringUtils.isNotBlank(getEmail()) &&
+			StringUtils.isNotBlank(getPhone());
 	}
 	
 	@Override
@@ -43,7 +49,7 @@ public class User extends CmsBean {
 
 	@Override
 	public String toString() {
-		return getAlias();
+		return getFullName();
 	}
 	
 	public User setId(Long id) {
@@ -56,12 +62,24 @@ public class User extends CmsBean {
 		return id;
 	}
 
-	public String getAlias() {
-		return alias;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public User setAlias(String alias) {
-		this.alias = alias;
+	public String getFullName() {
+		StringBuilder sb = new StringBuilder();
+		if (this.firstName != null) {
+			sb.append(this.firstName).append(" ");
+		}
+		if (this.lastName != null) {
+			sb.append(this.lastName);
+		}
+		
+		return sb.toString().trim();
+	}
+
+	public User setLastName(String name) {
+		this.lastName = name;
 		return this;
 	}
 
@@ -83,24 +101,65 @@ public class User extends CmsBean {
 		return this;
 	}
 
-	public List<String> getRoles() {
+	public List<Role> getRoles() {
 		if (this.roles == null) {
 			this.roles = getCmsService().getUserService().getRoles(getId());
 		}
 		return this.roles;
 	}
 
-	public User setRoles(List<String> roles) {
+	public User setRoles(List<Role> roles) {
 		this.roles = roles;
 		return this;
 	}
 
-	public String getName() {
-		return name;
+	public User addRole(Role r) {
+		getRoles().add(r);
+		return this;
+	}
+	
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public User setName(String name) {
-		this.name = name;
+	public User setFirstName(String name) {
+		this.firstName = name;
+		return this;
+	}
+
+	public boolean isLoggedIn() {
+		return loggedIn;
+	}
+
+	public User setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
+		return this;
+	}
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public User setSecret(String secret) {
+		this.secret = secret;
+		return this;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public User setEmail(String email) {
+		this.email = email;
+		return this;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public User setPhone(String phone) {
+		this.phone = phone;
 		return this;
 	}
 
@@ -108,10 +167,11 @@ public class User extends CmsBean {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((alias == null) ? 0 : alias.hashCode());
-		result = prime * result + (enabled ? 1231 : 1237);
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((phone == null) ? 0 : phone.hashCode());
 		return result;
 	}
 
@@ -124,22 +184,30 @@ public class User extends CmsBean {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		if (alias == null) {
-			if (other.alias != null)
+		if (lastName == null) {
+			if (other.lastName != null)
 				return false;
-		} else if (!alias.equals(other.alias))
+		} else if (!lastName.equals(other.lastName))
 			return false;
-		if (enabled != other.enabled)
-			return false;
-		if (name == null) {
-			if (other.name != null)
+		if (email == null) {
+			if (other.email != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!email.equals(other.email))
+			return false;
+		if (firstName == null) {
+			if (other.firstName != null)
+				return false;
+		} else if (!firstName.equals(other.firstName))
 			return false;
 		if (password == null) {
 			if (other.password != null)
 				return false;
 		} else if (!password.equals(other.password))
+			return false;
+		if (phone == null) {
+			if (other.phone != null)
+				return false;
+		} else if (!phone.equals(other.phone))
 			return false;
 		return true;
 	}

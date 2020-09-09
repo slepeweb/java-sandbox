@@ -17,7 +17,7 @@
 		  login-page="/page/login" 
 		  default-target-url="/page/editor" 
 			authentication-failure-url="/page/login?error" 
-			username-parameter="alias"
+			username-parameter="email"
 			password-parameter="password" />
 			
 		<logout logout-success-url="/page/login?logout" />	
@@ -31,9 +31,9 @@
 			<password-encoder ref="passwordEncoder" />	    
 			<jdbc-user-service data-source-ref="dataSource"
 				users-by-username-query=
-			    "select alias, password, enabled from user where alias=?"
+			    "select email, password, enabled from user where email=?"
 			  authorities-by-username-query=
-			    "select u.alias, r.name from user u, role r, user_role ur where u.alias=? and u.user_id = ur.user_id and r.role_id = ur.role_id" />
+			    "select u.email, r.name from user u, role r, user_role ur where u.email=? and u.user_id = ur.user_id and r.role_id = ur.role_id" />
 	  </authentication-provider>
 	</authentication-manager>
  

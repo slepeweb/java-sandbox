@@ -6,7 +6,7 @@
 </c:set>
 
 <anc:pageLayout type="std">
-	<gen:debug><!-- jsp/anc/login.jsp --></gen:debug>
+	<gen:debug><!-- jsp/anc/template/login.jsp --></gen:debug>
 	
 	<div class="main">
 		<c:if test="${not empty error}">
@@ -22,17 +22,19 @@
 		<form method="post" action="">
 			<table>
 				<tr>
-					<td class="heading"><label for="alias">User name</label></td>
-					<td><input type="text" name="alias" /></td>
+					<td class="heading"><label>Email</label></td>
+					<td><input type="text" name="email" /></td>
 				</tr>
 				<tr>
-					<td class="heading"><label for="password">Password</label></td>
+					<td class="heading"><label>Password</label></td>
 					<td><input type="password" name="password" /></td>
 				</tr>
 			</table>
 			<input class="button special small" type="submit" value="Login" />
 			<input type="hidden" name="originalPath" value="${_originalPath}" />
 		</form>	
+		
+		<p>Forgotten your password? <a href="/${_item.language}/login/forgotten?view=forgotten">Reset</a></p>
 	</div>
 	
 </anc:pageLayout>

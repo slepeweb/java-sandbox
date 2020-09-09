@@ -255,7 +255,7 @@ public class SiteRestController extends BaseController {
 			shortSitename = h.getSite().getShortname();
 		}
 
-		return getFullyQualifiedViewName(shortSitename, "commerce/basket");
+		return composeJspPath(shortSitename, "commerce/basket");
 	}
 	
 	private void saveBasket2Cookie(Basket b, Cookie c, HttpServletResponse res) {

@@ -78,15 +78,17 @@ public class CmsDeliveryServlet {
 			}
 			
 			Item item = site.getItem(trimmedPath);
+			String view = req.getParameter("view");
 			
 			if (item != null) {
 				LOG.info(LogUtil.compose("Requesting", item));
+				String springTemplatePath = getTemplatePath(item, view);
 				item.setLanguage(language);
 				
 				User u = (User) req.getSession().getAttribute("_user");
 				SiteAccess siteAccess = new SiteAccess();
 				siteAccess.setRules(this.accessService.getList(item.getSite().getShortname()));
-				director = accessibilityChecker(item, u, siteAccess);
+				director = accessibilityChecker(item, u, springTemplatePath, siteAccess);
 				
 				if (director.isRequired()) {
 					res.sendRedirect(director.getPath());
@@ -101,6 +103,7 @@ public class CmsDeliveryServlet {
 				}
 				else {
 					req.setAttribute("_item", item);
+					LOG.info(String.format("Model attribute set by CmsDeliveryServlet (%s): [%s]", "_item", item));
 					setCacheHeaders(item, requestTime, res);
 					
 					if (item.getType().isMedia()) {
@@ -110,13 +113,10 @@ public class CmsDeliveryServlet {
 					else {
 						res.setContentType("text/html;charset=utf-8");
 						res.setCharacterEncoding("utf-8");
-						Template tmplt = item.getTemplate();
-						String view = req.getParameter("view");
 						
-						if (tmplt != null) {
-							String springMapping = StringUtils.isBlank(view) ? tmplt.getForward() : tmplt.getForward() + "/" + view;
-							LOG.debug(LogUtil.compose("Forwarding request to template", springMapping));
-							req.getRequestDispatcher(springMapping).forward(req, res);
+						if (springTemplatePath != null) {
+							LOG.debug(LogUtil.compose("Forwarding request to template", springTemplatePath));
+							req.getRequestDispatcher(springTemplatePath).forward(req, res);
 							this.lastDeliveryTable.put(item.getId(), zeroMillis(requestTime));
 						}
 						else {
@@ -135,6 +135,14 @@ public class CmsDeliveryServlet {
 		}
 		
 		logResponseHeaders(res, path);
+	}
+	
+	private String getTemplatePath(Item i, String view) {
+		Template tmplt = i.getTemplate();
+		if (tmplt != null) {
+			return StringUtils.isBlank(view) ? tmplt.getController() : tmplt.getController() + "/" + view;
+		}
+		return null;
 	}
 	
 	private void logRequestHeaders(HttpServletRequest req, String path) {
@@ -419,24 +427,15 @@ public class CmsDeliveryServlet {
 	}
 	
 	// Returns true if resource is accessible
-	private Redirector accessibilityChecker(Item i, User u, SiteAccess siteAccess) {
+	private Redirector accessibilityChecker(Item i, User u, String springTemplatePath, SiteAccess siteAccess) {
 		
 		Redirector r = new Redirector();
 
-		if (! siteAccess.grantAccess(i, u)) {
-			if (u == null) {
-				if (! i.getPath().equals(SiteAccess.LOGIN_PATH)) {
-					// Redirect to login page
-					r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccess.LOGIN_PATH));
-					r.setRequired(true);
-				}
-			}
-			else {
-				if (! i.getPath().equals(SiteAccess.NOT_AUTHORISED_PATH)) {
-					// Redirect to not-authorised page
-					r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccess.NOT_AUTHORISED_PATH));
-					r.setRequired(true);
-				}
+		if (! siteAccess.grantAccess(i, springTemplatePath, u)) {
+			if (! i.getPath().equals(SiteAccess.NOT_AUTHORISED_PATH)) {
+				// Redirect to not-authorised page
+				r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccess.NOT_AUTHORISED_PATH));
+				r.setRequired(true);
 			}
 		}
 		

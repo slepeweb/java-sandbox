@@ -207,6 +207,12 @@ public class CmsBeanFactory {
 		return u;
 	}
 	
+	public static Role makeRole() {
+		Role r = new Role();
+		r.setCmsService(CMS);
+		return r;
+	}
+	
 	public static Link toChildLink(Item parent, Item child, String linkType) {
 		return CmsBeanFactory.makeLink().
 				setParentId(parent.getId()).

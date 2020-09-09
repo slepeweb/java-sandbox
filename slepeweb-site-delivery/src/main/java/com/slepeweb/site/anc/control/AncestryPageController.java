@@ -1,6 +1,5 @@
 package com.slepeweb.site.anc.control;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,9 +19,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.cms.service.UserService;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.site.anc.bean.MenuItem;
 import com.slepeweb.site.anc.bean.Person;
@@ -42,12 +38,23 @@ public class AncestryPageController extends BaseController {
 	public static final String HISTORY_VIEW = "history";
 	public static final String GALLERY_VIEW = "gallery";
 	public static final String RECORD_VIEW = "record";
-	public static final String USER_ATTR = "_user";
 	
 	@Autowired private ItemService itemService;
-	@Autowired private UserService userService;
 	@Autowired private SolrService4Ancestry solrService4Ancestry;
 	@Autowired private AncCookieService ancCookieService;
+	
+	@Override
+	public Page getStandardPage(Item i, String shortSitename, String viewNameSuffix, ModelMap model) {		
+		Page p = super.getStandardPage(i, shortSitename, viewNameSuffix, model);
+		
+		String langPrefix = "";		
+		if (i.getSite().isMultilingual()) {
+			langPrefix = "/" + i.getLanguage();
+		}	
+		model.addAttribute("_languageUrlPrefix", langPrefix);
+		
+		return p;
+	}
 	
 	@ModelAttribute(value="_history")
 	public List<ItemIdentifier> breadcrumbTrail(HttpServletRequest req) {
@@ -244,51 +251,7 @@ public class AncestryPageController extends BaseController {
 			return page.getView();
 		}
 		
-		return getFullyQualifiedViewName(shortSitename, view);
-	}
-	
-	@RequestMapping(value="/login")	
-	public String login (
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			HttpServletRequest req,
-			HttpServletResponse res,
-			ModelMap model) throws IOException {	
-				
-		Page page = getStandardPage(i, shortSitename, "login", model);
-		
-		if (req.getMethod().equalsIgnoreCase("post")) {
-			String alias = req.getParameter("alias");
-			String password = req.getParameter("password");
-			String originalPath = req.getParameter("originalPath");
-			boolean error = true;
-			
-			if (StringUtils.isNotBlank(alias) && StringUtils.isNotBlank(password)) {
-				User u = this.userService.get(alias);
-				
-				if (u != null) {
-					StandardPasswordEncoder encoder = new StandardPasswordEncoder();					
-					if (encoder.matches(password, u.getPassword())) {
-						req.getSession().setAttribute(USER_ATTR, u);
-						
-						String path = StringUtils.isNotBlank(originalPath) ? originalPath : "/" + i.getLanguage();
-						error = false;
-						res.sendRedirect(path);
-					}
-				}
-			}
-			
-			if (error) {
-				model.addAttribute("error", "Invalid username and/or password!");
-			}
-		}
-		else if (req.getMethod().equalsIgnoreCase("get")) {
-			if (req.getParameter("logout") != null) {
-				req.getSession().removeAttribute(USER_ATTR);
-			}
-		}
-		
-		return page.getView(); 
+		return composeJspPath(shortSitename, view);
 	}
 	
 	private String galleryAndRecordController(Item i, String shortSitename, long targetId, ModelMap model,
@@ -422,5 +385,4 @@ public class AncestryPageController extends BaseController {
 		}
 		return s;
 	}
-	
 }

@@ -1,14 +1,16 @@
 TODO: This is the main todo file:
 
 HIGH
-- need history mechanism in anc (for site visitors)
-- bug? Create new item below / ... not visible in the tree; had to refresh page to see it
-- need to protect against injection attacks
-- check sws search still working
+- Need a read/write column in SiteAccess table, so that same access control can be used in editor.
+- when you navigate the links in cms, the leftnav/selected node needs to be updated too
+- need extra column in host table: 'type' == staging / live
+- i.getSite().getHost("live");
 
 MEDIUM
+- check sws search still working
 - PDFs not viewable on my android phone (chrome)
 - PDFs not rendered with scrollbars on iPad
+- need to protect against injection attacks
 - store preferred language in cookie (Ancestry)
 - resource bundles (Ancestry)
 - password protection for site visitors (Ancestry)

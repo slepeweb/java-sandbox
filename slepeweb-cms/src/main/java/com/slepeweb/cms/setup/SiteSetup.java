@@ -437,7 +437,7 @@ public class SiteSetup {
 								setSiteId(s.getId()).
 								setItemTypeId(it.getId()).
 								setName(templateName).
-								setForward(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))).
+								setController(SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3))).
 								save();
 							
 							LOG.info(String.format("Updated template [%s]", templateName));

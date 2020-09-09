@@ -20,6 +20,7 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.LoggerBean;
 import com.slepeweb.cms.bean.Media;
+import com.slepeweb.cms.bean.Role;
 import com.slepeweb.cms.bean.Shortcut;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
@@ -107,7 +108,7 @@ public class RowMapperUtil {
 				t = CmsBeanFactory.makeTemplate().
 						setId(templateId).
 						setName(rs.getString("templatename")).
-						setForward(rs.getString("forward")).
+						setController(rs.getString("forward")).
 						setItemTypeId(rs.getLong("typeid")).
 						setSiteId(rs.getLong("siteid"));
 			}
@@ -255,7 +256,7 @@ public class RowMapperUtil {
 			return CmsBeanFactory.makeTemplate().
 					setId(rs.getLong("id")).
 					setName(rs.getString("name")).
-					setForward(rs.getString("forward")).
+					setController(rs.getString("forward")).
 					setSiteId(rs.getLong("siteid")).
 					setItemTypeId(rs.getLong("typeid"));
 		}
@@ -304,10 +305,21 @@ public class RowMapperUtil {
 		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return CmsBeanFactory.makeUser().
 					setId(rs.getLong("user_id")).
-					setName(rs.getString("name")).
-					setAlias(rs.getString("alias")).
+					setFirstName(rs.getString("firstname")).
+					setLastName(rs.getString("lastname")).
+					setEmail(rs.getString("email")).
+					setPhone(rs.getString("phone")).
 					setPassword(rs.getString("password")).
-					setEnabled(rs.getBoolean("enabled"));
+					setEnabled(rs.getBoolean("enabled")).
+					setSecret(rs.getString("secret"));
+		}
+	}
+	
+	public static final class RoleMapper implements RowMapper<Role> {
+		public Role mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return CmsBeanFactory.makeRole().
+					setId(rs.getLong("role_id")).
+					setName(rs.getString("name"));
 		}
 	}
 	
