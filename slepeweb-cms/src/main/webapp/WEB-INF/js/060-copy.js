@@ -45,16 +45,18 @@ _cms.copy.behaviour.submit = function(nodeKey) {
 }
 
 _cms.copy.behaviour.formchange = function(nodeKey) {
-	$(_cms.copy.sel.ALL_INPUTS).mouseleave(function() {
-		if (_cms.support.enableIf(_cms.copy.sel.COPY_BUTTON,
-				$(_cms.copy.sel.NAME_INPUT).val() && $(_cms.copy.sel.SIMPLENAME_INPUT).val())) {
-			
-			_cms.support.enable(_cms.copy.sel.RESET_BUTTON);
-		}
-		else {
-			_cms.support.disable(_cms.copy.sel.RESET_BUTTON);
-		}
-	});
+	if (! _cms.editingItemIsReadonly) {
+		$(_cms.copy.sel.ALL_INPUTS).mouseleave(function() {
+			if (_cms.support.enableIf(_cms.copy.sel.COPY_BUTTON,
+					$(_cms.copy.sel.NAME_INPUT).val() && $(_cms.copy.sel.SIMPLENAME_INPUT).val())) {
+				
+				_cms.support.enable(_cms.copy.sel.RESET_BUTTON);
+			}
+			else {
+				_cms.support.disable(_cms.copy.sel.RESET_BUTTON);
+			}
+		});
+	}
 }
 
 _cms.copy.refresh.tab = function(nodeKey) {

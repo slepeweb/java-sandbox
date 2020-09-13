@@ -6,7 +6,7 @@ public class AccessRule extends CmsBean {
 
 	private static final long serialVersionUID = 3525217730680353953L;
 	private Long id;
-	private String name, siteShortname, itemTypePattern, templatePattern, itemPathPattern, rolePattern;
+	private String name, mode, siteShortname, itemTypePattern, templatePattern, itemPathPattern, rolePattern;
 	private boolean access;
 
 	@Override
@@ -62,6 +62,15 @@ public class AccessRule extends CmsBean {
 	public void assimilate(Object obj) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	public AccessRule setMode(String mode) {
+		this.mode = mode;
+		return this;
 	}
 
 	public String getName() {
@@ -131,47 +140,4 @@ public class AccessRule extends CmsBean {
 		return this;
 	}
 
-	public boolean matchesConstraints(Item i, String springTemplatePath) {
-		// Must match ALL constraints
-		
-		if (StringUtils.isNotBlank(getTemplatePattern())) {
-			// Template rule applies
-			if (
-				springTemplatePath == null || 
-				! springTemplatePath.matches(getTemplatePattern())) {
-			
-				return false; 
-			}
-		}
-
-		if (StringUtils.isNotBlank(getItemTypePattern())) {
-			// Item type rule applies
-			if (! i.getType().getName().matches(getItemTypePattern())) {			
-				return false; 
-			}
-		}
-
-		if (StringUtils.isNotBlank(getItemPathPattern())) {
-			// Item path rule applies
-			if (! i.getPath().matches(getItemPathPattern())) {			
-				return false; 
-			}
-		}
-		
-		return true;
-	}
-	
-	public boolean matchesRoles(User u) {
-		
-		if (u != null) {
-			// Must match ANY of the user's roles
-			for (Role r : u.getRoles()) {
-				if (r.getName().matches(getRolePattern())) {
-					return true;
-				}
-			}
-		}
-		
-		return false;
-	}
 }

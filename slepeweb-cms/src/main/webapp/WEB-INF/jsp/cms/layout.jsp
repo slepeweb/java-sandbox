@@ -13,6 +13,7 @@
 		</div>
 		
 		<div id="main-wrapper">
+			<div class="readonly-layer"></div>
 			<!-- The body of the next div is populated by an ajax call, so should be empty initially. -->
 			<div id="item-editor"></div>
 		</div>

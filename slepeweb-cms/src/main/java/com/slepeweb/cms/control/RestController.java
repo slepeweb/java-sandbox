@@ -51,24 +51,14 @@ import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.component.Navigation.Node;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.CookieService;
-import com.slepeweb.cms.service.HostService;
-import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.cms.service.ItemTypeService;
-import com.slepeweb.cms.service.LinkNameService;
-import com.slepeweb.cms.service.LinkService;
-import com.slepeweb.cms.service.LinkTypeService;
-import com.slepeweb.cms.service.MediaService;
-import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.cms.service.SolrService4Cms;
-import com.slepeweb.cms.service.TagService;
-import com.slepeweb.cms.service.TemplateService;
 import com.slepeweb.commerce.bean.Product;
-import com.slepeweb.commerce.service.AxisService;
 import com.slepeweb.common.util.DateUtil;
 import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.common.util.ImageUtil;
@@ -79,20 +69,9 @@ public class RestController extends BaseController {
 	private static Logger LOG = Logger.getLogger(RestController.class);
 	public static final String THUMBNAIL_EXT = "-thumb";
 	
-	@Autowired private ItemService itemService;
-	@Autowired private ItemTypeService itemTypeService;
-	@Autowired private TemplateService templateService;
-	@Autowired private MediaService mediaService;
-	@Autowired private LinkTypeService linkTypeService;
-	@Autowired private LinkNameService linkNameService;
-	@Autowired private LinkService linkService;
-	@Autowired private TagService tagService;
-	@Autowired private AxisService axisService;
 	@Autowired private CookieService cookieService;
-	@Autowired private NavigationController navigationController;
-	@Autowired private HostService hostService;
 	@Autowired private SolrService4Cms solrService4Cms;
-	@Autowired private SiteService siteService;
+	@Autowired private NavigationController navigationController;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -104,7 +83,7 @@ public class RestController extends BaseController {
 			@RequestParam(value="language", required=false) String requestedLanguage,
 			HttpServletRequest req, HttpServletResponse res) {	
 		
-		Item i = this.itemService.getEditableVersion(origId);
+		Item i = this.getItem(origId, getUser(req));
 		
 		if (i != null) {
 			String lang = chooseLanguage(i.getSite().isMultilingual(), requestedLanguage, i.getSite().getLanguage());
@@ -116,13 +95,13 @@ public class RestController extends BaseController {
 			
 			// Hostname to render content.
 			// TODO: should really be a staging host
-			List<Host> hosts = this.hostService.getAllHosts(i.getSite().getId());
+			List<Host> hosts = this.cmsService.getHostService().getAllHosts(i.getSite().getId());
 			if (hosts != null && hosts.size() > 0) {
 				model.addAttribute("host", hosts.get(0));
 			}
 			
 			if (i.isProduct()) {
-				model.addAttribute("availableAxes", this.axisService.get());
+				model.addAttribute("availableAxes", this.cmsService.getAxisService().get());
 			}
 			
 			// Work out form data to build the field editor page
@@ -135,7 +114,7 @@ public class RestController extends BaseController {
 			model.addAttribute("_lastRelativePosition", this.cookieService.getRelativePositionCookieValue(req));
 			
 			// Total number of editable items in this section
-			model.addAttribute("_numItemsInSection", this.itemService.getCountByPath(i));
+			model.addAttribute("_numItemsInSection", this.cmsService.getItemService().getCountByPath(i));
 		}
 		
 		return "cms.item.editor";		
@@ -159,8 +138,8 @@ public class RestController extends BaseController {
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getEditableVersion(origId);
-		Template t = this.templateService.getTemplate(getLongParam(req, "template"));
+		Item i = getItem(origId, getUser(req), true);
+		Template t = this.cmsService.getTemplateService().getTemplate(getLongParam(req, "template"));
 		Object[] data = new Object[3];
 		
 		if (i != null) {
@@ -219,7 +198,7 @@ public class RestController extends BaseController {
 			String tagStr = getParam(req, "tags");
 			List<String> latestTags = Arrays.asList(tagStr.split("[ ,]+"));
 			if (existingTags.size() != latestTags.size() || ! existingTags.containsAll(latestTags)) {
-				this.tagService.save(i, tagStr);
+				this.cmsService.getTagService().save(i, tagStr);
 				resp.addMessage("Tags updated");
 			}
 			
@@ -248,6 +227,7 @@ public class RestController extends BaseController {
 			@RequestParam("media") MultipartFile file, 
 			@RequestParam(value="thumbnail", required=false) Boolean thumbnailRequired, 
 			@RequestParam(value="width", required=false) Integer thumbnailWidth, 
+			HttpServletRequest req,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
@@ -261,7 +241,7 @@ public class RestController extends BaseController {
 		if (file != null) {
 			try {
 				is = file.getInputStream();
-				Item i = this.itemService.getEditableVersion(origId);
+				Item i = getItem(origId, getUser(req), true);
 				if (i != null) {
 					Media m = CmsBeanFactory.makeMedia().
 							setItemId(i.getId()).
@@ -269,7 +249,7 @@ public class RestController extends BaseController {
 					
 					// Save the media item
 					try {
-						this.mediaService.save(m);
+						this.cmsService.getMediaService().save(m);
 						
 						if (thumbnailRequired) {
 							is.close();
@@ -285,7 +265,7 @@ public class RestController extends BaseController {
 									i.getType().getMimeType());
 							
 							m.setInputStream(ImageUtil.pipe(baos));
-							this.mediaService.save(m);
+							this.cmsService.getMediaService().save(m);
 						}
 					}
 					catch (ResourceException e) {
@@ -328,7 +308,7 @@ public class RestController extends BaseController {
 	public RestResponse updateFields(@PathVariable long origId, HttpServletRequest request, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getEditableVersion(origId);
+		Item i = getItem(origId, getUser(request), true);
 		String param, stringValue, dateValueStr = null, timeValueStr = null;
 		FieldType ft;
 		FieldValue fv;
@@ -501,6 +481,7 @@ public class RestController extends BaseController {
 			@RequestParam(value="stock", required=false) Long stock, 
 			@RequestParam(value="alphaaxis", required=false) Long alphaAxisId, 
 			@RequestParam(value="betaaxis", required=false) Long betaAxisId, 
+			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
 		
@@ -510,14 +491,14 @@ public class RestController extends BaseController {
 		
 		Template t = null;
 		if (templateId > 0) {
-			t = this.templateService.getTemplate(templateId);
+			t = this.cmsService.getTemplateService().getTemplate(templateId);
 			if (t != null) {
 				itemTypeId = t.getItemTypeId();
 			}
 		}
 		
-		ItemType it = this.itemTypeService.getItemType(itemTypeId);
-		Item parent = this.itemService.getEditableVersion(parentOrigId);
+		ItemType it = this.cmsService.getItemTypeService().getItemType(itemTypeId);
+		Item parent = getItem(parentOrigId, getUser(req), true);
 		if (relativePosition.equals("alongside") && ! parent.isRoot()) {
 			parent = parent.getParent();
 		}
@@ -577,13 +558,14 @@ public class RestController extends BaseController {
 			@PathVariable long origId, 
 			@RequestParam(value="name", required=true) String name, 
 			@RequestParam(value="simplename", required=true) String simplename, 
+			HttpServletRequest req,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getEditableVersion(origId);
+		Item i = getItem(origId, getUser(req));
 		
 		try {
-			Item c = this.itemService.copy(i, name, simplename);	
+			Item c = this.cmsService.getItemService().copy(i, name, simplename);	
 			if (c != null) {
 				Node n = Node.toNode(c);
 				resp.addMessage("Item copied").setData(n);
@@ -602,14 +584,15 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/item/{origId}/version", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public RestResponse versionItem(
-			@PathVariable long origId, 
+			@PathVariable long origId,
+			HttpServletRequest req,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getEditableVersion(origId);
+		Item i = getItem(origId, getUser(req), true);
 		
 		try {
-			Item c = this.itemService.version(i);			
+			Item c = this.cmsService.getItemService().version(i);			
 			return resp.
 					setError(false).
 					setData(Node.toNode(c)).
@@ -624,14 +607,15 @@ public class RestController extends BaseController {
 	@ResponseBody
 	public RestResponse revertItem(
 			@PathVariable long origId,
+			HttpServletRequest req,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getEditableVersion(origId);
+		Item i = getItem(origId, getUser(req));
 		
 		if (i != null) {
 			try {
-				Item r = this.itemService.revert(i);
+				Item r = this.cmsService.getItemService().revert(i);
 				return resp.setError(false).addMessage("Item reverted to previous version").setData(r.getId());
 			}
 			catch (ResourceException e) {
@@ -644,10 +628,10 @@ public class RestController extends BaseController {
 	
 	@RequestMapping(value="/item/{origId}/trash", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public RestResponse trashItem(@PathVariable long origId, ModelMap model) {	
+	public RestResponse trashItem(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = this.itemService.getEditableVersion(origId);
+		Item i = getItem(origId, getUser(req), true);
 		Item parent = i.getParent();
 		i.trash();
 			
@@ -659,10 +643,11 @@ public class RestController extends BaseController {
 	public RestResponse publishSection(
 			@PathVariable long origId, 
 			@RequestParam(value="publish_option", required=true) String publishOption,
+			HttpServletRequest req,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();		
-		Item i = this.itemService.getEditableVersion(origId);
+		Item i = getItem(origId, getUser(req), true);
 		int count = 0;
 		
 		if (i != null) {
@@ -678,10 +663,11 @@ public class RestController extends BaseController {
 	public RestResponse searchableSection(
 			@PathVariable long origId, 
 			@RequestParam(value="searchable_option", required=true) String searchableOption,
+			HttpServletRequest req,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();		
-		Item i = this.itemService.getEditableVersion(origId);
+		Item i = getItem(origId, getUser(req), true);
 		int count = 0;
 		
 		if (i != null) {
@@ -710,11 +696,11 @@ public class RestController extends BaseController {
 	
 	private int actionItem(Item i, String selector, boolean value) {
 		if (selector.equals("published") && i.isPublished() != value) {
-			this.itemService.updatePublished(i.getId(), value);
+			this.cmsService.getItemService().updatePublished(i.getId(), value);
 			return 1;
 		}
 		else if (selector.equals("searchable") && i.isSearchable() != value) {
-			this.itemService.updateSearchable(i.getId(), value);
+			this.cmsService.getItemService().updateSearchable(i.getId(), value);
 			return 1;
 		}
 		
@@ -723,7 +709,7 @@ public class RestController extends BaseController {
 	
 	@RequestMapping(value="/trash/get")
 	public String getTrashedItems(ModelMap model) {			
-		model.put("_trashContents", this.itemService.getTrashedItems());			
+		model.put("_trashContents", this.cmsService.getItemService().getTrashedItems());			
 		return "cms.trash.contents";
 	}
 	
@@ -732,7 +718,7 @@ public class RestController extends BaseController {
 	public RestResponse deleteAllTrashedItems(ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		int num = this.itemService.deleteTrashedItems(null);			
+		int num = this.cmsService.getItemService().deleteTrashedItems(null);			
 		return resp.setError(false).addMessage(String.format("Emptied %d items from the trash", num));
 	}
 	
@@ -758,7 +744,7 @@ public class RestController extends BaseController {
 			}
 			
 			return resp.setError(false).addMessage(
-					String.format("Restored %d items from the trash", this.itemService.restoreSelectedItems(origIds)));
+					String.format("Restored %d items from the trash", this.cmsService.getItemService().restoreSelectedItems(origIds)));
 		}
 		else {
 			return resp.setError(true).addMessage("No items selected by user");
@@ -770,7 +756,7 @@ public class RestController extends BaseController {
 	public RestResponse restoreAllTrashedItems(ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		int num = this.itemService.restoreSelectedItems(null);		
+		int num = this.cmsService.getItemService().restoreSelectedItems(null);		
 		return resp.setError(false).addMessage(String.format("Restored %d items from the trash", num));
 	}
 	
@@ -796,7 +782,7 @@ public class RestController extends BaseController {
 			}
 			
 			return resp.setError(false).addMessage(
-					String.format("Emptied %d items from the trash bin", this.itemService.deleteTrashedItems(ids)));
+					String.format("Emptied %d items from the trash bin", this.cmsService.getItemService().deleteTrashedItems(ids)));
 		}
 		else {
 			return resp.setError(true).addMessage("No items selected by user");
@@ -811,17 +797,19 @@ public class RestController extends BaseController {
 			@RequestParam(value="targetParentId", required=true) Long targetParentId,
 			@RequestParam(value="moverParentId", required=true) Long moverParentId,
 			@RequestParam(value="mode", required=true) String mode,
+			HttpServletRequest req,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item mover = this.itemService.getEditableVersion(moverId);
+		User u = getUser(req);
+		Item mover = getItem(moverId, u, true);
 		if (mover.isRoot()) {
 			return resp.setError(true).setData(mover.getId()).addMessage("Cannot move the root item");
 		}
 		
-		Item target = this.itemService.getEditableVersion(targetId);
-		Item currentParent = this.itemService.getEditableVersion(moverParentId);
-		Item targetParent = this.itemService.getEditableVersion(targetParentId);
+		Item target = getItem(targetId, u, true);
+		Item currentParent = getItem(moverParentId, u, true);
+		Item targetParent = getItem(targetParentId, u, true);
 		
 		try {
 			mover.move(currentParent, targetParent, target, mode);		
@@ -837,10 +825,15 @@ public class RestController extends BaseController {
 	
 	@RequestMapping(value="/links/{parentId}/save", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public RestResponse saveLinks(@RequestBody LinkParams[] linkParams, @PathVariable long parentId, ModelMap model) {	
+	public RestResponse saveLinks(
+			@RequestBody LinkParams[] linkParams, 
+			@PathVariable long parentId, 
+			HttpServletRequest req, 
+			ModelMap model) {	
 
 		RestResponse resp = new RestResponse();
-		Item parent = this.itemService.getEditableVersion(parentId);
+		User u = getUser(req);
+		Item parent = getItem(parentId, u, true);
 		Item child;
 		List<Link> links = new ArrayList<Link>();
 		Link l;
@@ -852,7 +845,7 @@ public class RestController extends BaseController {
 		String shortCutTargetType = null;
 		
 		if (parent.isShortcut()) {
-			for (Link old : this.linkService.getLinks(parentId)) {
+			for (Link old : this.cmsService.getLinkService().getLinks(parentId)) {
 				if (old.getType().equals(LinkType.shortcut)) {
 					shortCutTargetType = old.getChild().getType().getName();
 					break;
@@ -874,7 +867,7 @@ public class RestController extends BaseController {
 				catch (UnsupportedEncodingException e) {}
 			}
 			
-			child = this.itemService.getEditableVersion(lp.getChildId());
+			child = getItem(lp.getChildId(), u);
 			i = CmsBeanFactory.makeItem(null).setId(child.getId());			
 			l.setChild(i);			
 			links.add(l);
@@ -897,7 +890,7 @@ public class RestController extends BaseController {
 			resp.addMessage(String.format("%d links saved", links.size()));
 			
 			Object[] response = new Object[] {
-					this.navigationController.doLazyNavOneLevel(parent.getOrigId(), parent.getSite().getId()),
+					this.navigationController.doLazyNavOneLevel(parent.getOrigId(), parent.getSite().getId(), req),
 					shortcutAction,
 					shortCutTargetType == null ? null : shortCutTargetType.toLowerCase()
 			};
@@ -919,10 +912,10 @@ public class RestController extends BaseController {
 		List<String> names = new ArrayList<String>();
 		
 		if (! linkType.equals("unknown")) {
-			LinkType lt = this.linkTypeService.getLinkType(linkType);
+			LinkType lt = this.cmsService.getLinkTypeService().getLinkType(linkType);
 			
 			if (lt != null) {
-				for (LinkName ln : this.linkNameService.getLinkNames(siteId, lt.getId())) {
+				for (LinkName ln : this.cmsService.getLinkNameService().getLinkNames(siteId, lt.getId())) {
 					names.add(ln.getName());
 				}
 			}
@@ -933,8 +926,8 @@ public class RestController extends BaseController {
 	
 	@RequestMapping(value="/item/{origId}/name", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public String getItemName(@PathVariable long origId, ModelMap model) {	
-		Item i =  this.itemService.getEditableVersion(origId);
+	public String getItemName(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
+		Item i = getItem(origId, getUser(req));
 		if (i != null) {
 			return i.getName();
 		}
@@ -945,7 +938,7 @@ public class RestController extends BaseController {
 	@ResponseBody
 	public List<ItemIdentifier> history(@PathVariable long siteId, HttpServletRequest req) {	
 		
-		Site s = this.siteService.getSite(siteId);
+		Site s = this.cmsService.getSiteService().getSite(siteId);
 		return this.cookieService.getBreadcrumbsCookieValue(s, req);
 	}
 

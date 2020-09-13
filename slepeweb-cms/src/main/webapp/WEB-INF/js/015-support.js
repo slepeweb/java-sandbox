@@ -141,6 +141,8 @@ _cms.support.refreshtab = function(tab, nodeKey, behavioursFunction) {
 			if (behavioursFunction) {
 				behavioursFunction(nodeKey);
 			}
+			
+			_cms.support.disableFormsIfReadonly();
 		},
 		error: function(html, status, z) {
 			console.log("Error: " + html);
@@ -201,6 +203,16 @@ _cms.support.updateItemName = function(name) {
 	$(".current-item-name").empty().html(name);
 }
 
+_cms.support.disableFormsIfReadonly = function() {
+	if (_cms.editingItemIsReadonly) {
+		$("#item-editor input, #item-editor textarea, #item-editor select, #item-editor button").attr("disabled", "disabled");
+		$(".readonly-layer").css("z-index", "1").css("opacity", "0.2");
+	}
+	else {
+		$(".readonly-layer").css("z-index", "-1").css("opacity", "0");
+	}
+}
+
 _cms.support.renderItemForms = function(nodeKey, activeTab) {
 	$.ajax(_cms.ctx + "/rest/item/editor", {
 		cache: false,
@@ -220,7 +232,8 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 			_cms.links.onrefresh(nodeKey);
 			_cms.media.onrefresh(nodeKey);
 			_cms.misc.onrefresh(nodeKey);
-			_cms.move.onrefresh(nodeKey);
+			_cms.move.onrefresh(nodeKey);			
+			_cms.support.disableFormsIfReadonly();
 		}
 	});
 };

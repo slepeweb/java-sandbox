@@ -5,7 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,26 +19,22 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.component.Navigation;
 import com.slepeweb.cms.component.Navigation.Node;
-import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.cms.service.SiteService;
 
 @Controller
 @RequestMapping("/rest")
 public class NavigationController extends BaseController {
 	
-	@Autowired private SiteService siteService;
-	@Autowired private ItemService itemService;
-	
 	@RequestMapping(value="/leftnav/lazy/one", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public List<Navigation.Node> doLazyNavOneLevel(
 			@RequestParam(value="key", required=false) Long origId,
-			@RequestParam(value="site", required=false) Long siteId) {	
+			@RequestParam(value="site", required=false) Long siteId,
+			HttpServletRequest req) {	
 		
 		List<Navigation.Node> level0 = new ArrayList<Navigation.Node>();
 		
 		if (origId == null) {
-			Site site = this.siteService.getSite(siteId);
+			Site site = this.cmsService.getSiteService().getSite(siteId);
 			if (site != null) {				
 				level0.add(dive(site.getItem("/")));
 				level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH)));
@@ -49,20 +46,21 @@ public class NavigationController extends BaseController {
 			}
 		}
 		
-		return dive(this.itemService.getEditableVersion(origId), 1).getChildren();		
+		return dive(getItem(origId, getUser(req)), 1).getChildren();		
 	}
 	
 	@RequestMapping(value="/leftnav/lazy/thread", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public List<Navigation.Node> doLazyNavThread(
 			@RequestParam(value="key", required=false) Long origId,
-			@RequestParam(value="site", required=false) Long siteId) {	
+			@RequestParam(value="site", required=false) Long siteId,
+			HttpServletRequest req) {	
 		
 		if (origId == null) {
-			return doLazyNavOneLevel(origId, siteId);
+			return doLazyNavOneLevel(origId, siteId, req);
 		}
 		
-		Item item = this.itemService.getEditableVersion(origId);
+		Item item = this.getItem(origId, getUser(req));
 		String[] parts = item.getPath().substring(1).split("/");
 		final Vector<String> pathComponents = new Vector<String>(parts.length);
 		for (String s : parts) {
@@ -95,8 +93,8 @@ public class NavigationController extends BaseController {
 	 */
 	@RequestMapping(value="/breadcrumbs/{origId}", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
-	public String[] breadcrumbs(@PathVariable long origId) {	
-		Item i = this.itemService.getEditableVersion(origId);
+	public String[] breadcrumbs(@PathVariable long origId, HttpServletRequest req) {	
+		Item i = getItem(origId, getUser(req));
 		List<Long> trail = new ArrayList<Long>();
 		String[] result = null;
 		

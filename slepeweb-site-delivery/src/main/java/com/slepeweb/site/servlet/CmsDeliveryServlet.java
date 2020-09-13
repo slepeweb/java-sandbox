@@ -28,13 +28,12 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Redirector;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.bean.SiteAccess;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.FieldName;
-import com.slepeweb.cms.service.AccessService;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.cms.service.SiteAccessService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.common.util.ImageUtil;
@@ -42,7 +41,7 @@ import com.slepeweb.common.util.ImageUtil;
 @Component
 public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
-	@Autowired private AccessService accessService;
+	@Autowired private SiteAccessService siteAccessService;
 	
 	private final Object buffPoolLock = new Object();
 	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
@@ -86,9 +85,7 @@ public class CmsDeliveryServlet {
 				item.setLanguage(language);
 				
 				User u = (User) req.getSession().getAttribute("_user");
-				SiteAccess siteAccess = new SiteAccess();
-				siteAccess.setRules(this.accessService.getList(item.getSite().getShortname()));
-				director = accessibilityChecker(item, u, springTemplatePath, siteAccess);
+				director = accessibilityChecker(item, u, springTemplatePath);
 				
 				if (director.isRequired()) {
 					res.sendRedirect(director.getPath());
@@ -427,14 +424,14 @@ public class CmsDeliveryServlet {
 	}
 	
 	// Returns true if resource is accessible
-	private Redirector accessibilityChecker(Item i, User u, String springTemplatePath, SiteAccess siteAccess) {
+	private Redirector accessibilityChecker(Item i, User u, String springTemplatePath) {
 		
 		Redirector r = new Redirector();
 
-		if (! siteAccess.grantAccess(i, springTemplatePath, u)) {
-			if (! i.getPath().equals(SiteAccess.NOT_AUTHORISED_PATH)) {
+		if (! this.siteAccessService.hasReadAccess(i, springTemplatePath, u)) {
+			if (! i.getPath().equals(SiteAccessService.NOT_AUTHORISED_PATH)) {
 				// Redirect to not-authorised page
-				r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccess.NOT_AUTHORISED_PATH));
+				r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccessService.NOT_AUTHORISED_PATH));
 				r.setRequired(true);
 			}
 		}

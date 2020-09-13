@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.Role;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.service.LoginService;
 import com.slepeweb.cms.service.RoleService;
 import com.slepeweb.cms.service.UserService;
 import com.slepeweb.common.service.SendMailService;
@@ -40,6 +42,7 @@ public class UserAccountController extends BaseController {
 	@Autowired private UserService userService;
 	@Autowired private RoleService roleService;
 	@Autowired private SendMailService sendMailService;
+	@Autowired private LoginService loginService;
 	
 	@RequestMapping(value="/login")
 	public String login (
@@ -53,56 +56,26 @@ public class UserAccountController extends BaseController {
 			String email = req.getParameter("email");
 			String password = req.getParameter("password");
 			String originalPath = req.getParameter("originalPath");
+			LoginSupport supp = this.loginService.login(email, password, req);
 			
-			if (StringUtils.isNotBlank(email) && StringUtils.isNotBlank(password)) {
-				User u = this.userService.get(email);
-				
-				if (u != null) {
-					StandardPasswordEncoder encoder = new StandardPasswordEncoder();					
-					if (encoder.matches(password, u.getPassword())) {
-						if (u.isEnabled()) {
-							req.getSession().setAttribute(USER_ATTR, u.setLoggedIn(true));
-							
-							String path = StringUtils.isNotBlank(originalPath) ? originalPath : "/" + i.getLanguage();
-							res.sendRedirect(path);
-							LOG.info(String.format("Successful login [%s]", email));
-						}
-						else {
-							model.addAttribute("error", "The user account is disabled right now.");
-							LOG.info(String.format("Failed attempt to login to disabled account [%s]", email));
-						}
-					}
-				}
-				else {
-					model.addAttribute("error", "Invalid username and/or password!");
-					LOG.info(String.format("Failed login [%s]", email));
-				}
+			if (supp.isSuccess()) {
+				String path = StringUtils.isNotBlank(originalPath) ? originalPath : "/" + i.getLanguage();
+				res.sendRedirect(path);
 			}
 			else {
-				model.addAttribute("error", "One of the form fields is blank!");
+				model.addAttribute("error", supp.getErrorMessage());
 			}
+			
 		}
 		else if (req.getMethod().equalsIgnoreCase("get")) {
 			if (req.getParameter("logout") != null) {
-				logout(req);
+				this.loginService.logout(req);
 			}
 		}
 		
 		return composeJspPath(shortSitename, "login"); 
 	}
-	
-	private void logout(HttpServletRequest req) {
-		User u = (User) req.getSession().getAttribute(USER_ATTR);
 		
-		if (u != null) {
-			// Attribute removal doesn't seem to happen immediately, so user object now has a 'loggedIn' property
-			u.setLoggedIn(false);
-			LOG.info(String.format("User logout [%s]", u.getEmail()));
-		}
-		
-		req.getSession().removeAttribute(USER_ATTR);
-	}
-	
 	/*
 	 * A GET request renders a blank form. A POST request 
 	 * a) returns an error message if the user is already registered
@@ -253,7 +226,7 @@ public class UserAccountController extends BaseController {
 				this.userService.partialUpdate(u);
 				
 				// TODO: urls should NOT be hardcoded
-				String href = String.format("http://ancestry.slepeweb.com:8081/%s/login/register2?view=password/%s", i.getLanguage(), secret);
+				String href = String.format("http://ancestry.slepeweb.com:8081/%s/login/register?view=password/%s", i.getLanguage(), secret);
 				String [] values = pickBlockFields(i, legend, "validationEmailContent", false, model);
 				values[1] = updateBodyField(model, values[1].
 						replaceAll("__user__", u.getFullName()).
@@ -442,7 +415,7 @@ public class UserAccountController extends BaseController {
 							u.setPassword(encoder.encode(pwdA));
 							this.userService.partialUpdate(u);
 							pickBlockFields(i, legend, "processComplete", model);
-							logout(req);
+							this.loginService.logout(req);
 							LOG.info(String.format("User successfully changed password [%s]", u.getEmail()));
 						}
 						else {

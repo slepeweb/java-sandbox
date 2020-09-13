@@ -7,6 +7,21 @@
 	
   <display-name>Slepeweb CMS</display-name>
   
+  <!-- Filter to apply cache times to static resources -->
+  <filter>
+    <filter-name>loginFilter</filter-name>
+    <filter-class>com.slepeweb.cms.filter.LoginFilter</filter-class>
+    <init-param>
+      <param-name>loginPath</param-name>
+      <param-value>/page/login</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>loginFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
 	<!-- For Spring MVC -->
   <servlet>
     <servlet-name>slepeweb-cms</servlet-name>
@@ -22,22 +37,10 @@
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
-			/WEB-INF/security-beans.xml, /WEB-INF/database-beans.xml
+			/WEB-INF/database-beans.xml
 		</param-value>
 	</context-param>
  
-	<!-- Spring Security -->
-	<filter>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy
-		</filter-class>
-	</filter>
- 
-	<filter-mapping>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>  
-	
 	<!-- For Tiles -->
   <context-param>
     <param-name>org.apache.tiles.factory.TilesContainerFactory.MUTABLE</param-name>

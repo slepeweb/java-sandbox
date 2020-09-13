@@ -29,6 +29,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected TemplateService templateService;
 	@Autowired protected SiteConfigService siteConfigService;
 	@Autowired protected LoglevelService loglevelService;
+	@Autowired protected LoglevelUpdateService loglevelUpdateService;
 	@Autowired protected TagService tagService;
 	@Autowired protected ProductService productService;
 	@Autowired protected AxisService axisService;
@@ -38,6 +39,7 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected SiteConfiguration siteConfiguration;
 	@Autowired protected UserService userService;
 	@Autowired protected AccessService accessService;
+	@Autowired protected SiteAccessService siteAccessService;
 	@Autowired protected SiteTypeService siteTypeService;
 	
 	/* 
@@ -133,6 +135,10 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 		return loglevelService;
 	}
 
+	public LoglevelUpdateService getLoglevelUpdateService() {
+		return loglevelUpdateService;
+	}
+
 	public TagService getTagService() {
 		return tagService;
 	}
@@ -167,6 +173,10 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public AccessService getAccessService() {
 		return accessService;
+	}
+
+	public SiteAccessService getSiteAccessService() {
+		return siteAccessService;
 	}
 
 	public SiteTypeService getSiteTypeService() {

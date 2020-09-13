@@ -5,33 +5,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldEditorSupport;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
-import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.constant.ItemTypeName;
-import com.slepeweb.cms.service.ItemTypeService;
-import com.slepeweb.cms.service.LoglevelUpdateService;
+import com.slepeweb.cms.service.CmsService;
 
 @Controller
 public class BaseController {
 	
-	@Autowired protected ServerConfig config;
-	@Autowired private LoglevelUpdateService loglevelUpdateService;
-	@Autowired private ItemTypeService itemTypeService;
+	@Autowired protected CmsService cmsService;
 	
 	private String contextPath;
 
@@ -45,47 +41,30 @@ public class BaseController {
 	
 	@ModelAttribute(value="_serverConfig")
 	public ServerConfig getConfig() {
-		return this.config;
+		return this.cmsService.getServerConfig();
 	}
 	
 	@ModelAttribute(value="_user")
-	protected User getUser(@AuthenticationPrincipal User u) {
-		return u;
-	}
-	
-	@ModelAttribute(value="_isAuthor")
-	protected boolean isAdmin(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, "CMS_ADMIN");
+	protected User getUser(HttpServletRequest req) {
+		return (User) req.getSession().getAttribute("_user");
 	}
 	
 	@ModelAttribute(value="_loglevel")
 	protected boolean getLogLevelTrigger(@RequestParam(value="loglevel", required=false) String trigger) {
 		if (trigger != null) {
-			this.loglevelUpdateService.updateLoglevels();
+			this.cmsService.getLoglevelUpdateService().updateLoglevels();
 			return true;
-		}
-		
+		}		
 		return false;
 	}
 	
 	@ModelAttribute(value="_productTypeId")
 	protected String getProductTypeId() {
-		ItemType productType = this.itemTypeService.getItemType(ItemTypeName.PRODUCT);
+		ItemType productType = this.cmsService.getItemTypeService().getItemType(ItemTypeName.PRODUCT);
 		if (productType != null) {
 			return String.valueOf(productType.getId());
 		}
 		return "0";
-	}
-	
-	private boolean hasAuthority(User u, String name) {
-		if (u != null) {
-			for (GrantedAuthority auth : u.getAuthorities()) {
-				if (auth.getAuthority().equals(name)) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 	
 	protected Map<String, List<FieldEditorSupport>> fieldEditorSupport(Item i) {
@@ -130,4 +109,19 @@ public class BaseController {
 		return fieldSupport;
 	}
 	
+	protected Item getItem(Long origId, User u) throws RuntimeException {
+		return getItem(origId, u, false);
+	}
+	
+	protected Item getItem(Long origId, User u, boolean throwable) throws RuntimeException {
+		Item i = this.cmsService.getItemService().getEditableVersion(origId);
+		i.setWriteable(this.cmsService.getSiteAccessService().hasWriteAccess(i, u));	
+		
+		if (throwable && ! i.isWriteable()) {
+			throw new RuntimeException("Access control violation");
+		}
+		
+		return i;
+	}
 }
+

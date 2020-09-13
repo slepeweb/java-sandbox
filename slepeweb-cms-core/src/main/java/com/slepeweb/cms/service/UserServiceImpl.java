@@ -15,8 +15,8 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 	private static Logger LOG = Logger.getLogger(UserServiceImpl.class);
 	
 	private final static String SELECT_TEMPLATE = 
-			"select u.user_id, u.firstname, u.lastname, u.email, u.phone, u.password, u.enabled, u.secret " +
-			"from user u " +
+			"select * " +
+			"from user " +
 			"where %s";
 	
 	public User save(User u) {
@@ -53,12 +53,12 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 	}
 	
 	private void insertUserRole(User u, Role r) {
-		this.jdbcTemplate.update( "insert into user_role (user_id, role_id) values (?,?)", 
+		this.jdbcTemplate.update( "insert into user_role (userid, roleid) values (?,?)", 
 				u.getId(), r.getId());	
 	}
 	
 	private void deleteUserRoles(User u) {
-		if (this.jdbcTemplate.update("delete from user_role where user_id = ?", u.getId()) > 0) {
+		if (this.jdbcTemplate.update("delete from user_role where userid = ?", u.getId()) > 0) {
 			LOG.warn(compose("Deleted user roles", u.getId()));
 		}
 	}
@@ -77,7 +77,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 			dbRecord.assimilate(u);
 			
 			this.jdbcTemplate.update(
-					"update user set firstname=?, lastname=?, phone=?, password=?, enabled=?, secret=? where user_id=?", 
+					"update user set firstname=?, lastname=?, phone=?, password=?, enabled=?, secret=? where id=?", 
 					dbRecord.getFirstName(), dbRecord.getLastName(), dbRecord.getPhone(),  
 					dbRecord.getPassword(), dbRecord.isEnabled(), dbRecord.getSecret(), dbRecord.getId());
 			
@@ -91,28 +91,28 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
 	public User partialUpdate(User u) {
 		this.jdbcTemplate.update(
-				"update user set password=?, enabled=?, secret=? where user_id=?", 
+				"update user set password=?, enabled=?, secret=? where id=?", 
 				u.getPassword(), u.isEnabled(), u.getSecret(), u.getId());
 		
 		return u;
 	}
 	
 	public void delete(Long id) {
-		if (this.jdbcTemplate.update("delete from user where user_id = ?", id) > 0) {
+		if (this.jdbcTemplate.update("delete from user where id = ?", id) > 0) {
 			LOG.warn(compose("Deleted user", id));
 		}
 	}
 
 	public User get(String email) {
-		return get(String.format(SELECT_TEMPLATE, " u.email = ?"), new Object[]{email});
+		return get(String.format(SELECT_TEMPLATE, " email = ?"), new Object[]{email});
 	}
 
 	public User get(Long id) {
-		return get(String.format(SELECT_TEMPLATE, " u.user_id = ?"), new Object[]{id});
+		return get(String.format(SELECT_TEMPLATE, " id = ?"), new Object[]{id});
 	}
 	
 	public User getBySecret(String secret) {
-		return get(String.format(SELECT_TEMPLATE, " u.secret = ?"), new Object[]{secret});
+		return get(String.format(SELECT_TEMPLATE, " secret = ?"), new Object[]{secret});
 	}
 
 	private User get(String sql, Object[] params) {
@@ -122,9 +122,9 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
 	public List<Role> getRoles(Long userId) {
 		return this.jdbcTemplate.query(
-				"select r.role_id, r.name from user u, role r, user_role ur " +
-				"where ur.user_id = u.user_id and ur.role_id = r.role_id and u.user_id = ? ", 
+				"select r.id as roleid, r.name from user u, role r, user_role ur " +
+				"where ur.userid = u.id and ur.roleid = r.id and u.id = ? ", 
 				new Object[]{userId},
 				new RowMapperUtil.RoleMapper());
-	}
+	}	
 }

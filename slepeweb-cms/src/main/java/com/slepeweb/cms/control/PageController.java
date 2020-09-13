@@ -1,5 +1,6 @@
 package com.slepeweb.cms.control;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,25 +13,22 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
+import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.CookieService;
-import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.cms.service.SiteService;
-import com.slepeweb.commerce.service.AxisService;
+import com.slepeweb.cms.service.LoginService;
 
 @Controller
 @RequestMapping("/page")
 public class PageController extends BaseController {
 	
-	@Autowired private SiteService siteService;
-	@Autowired private ItemService itemService;
-	@Autowired private AxisService axisService;
+	//private static Logger LOG = Logger.getLogger(PageController.class);
 	@Autowired private CookieService cookieService;
+	@Autowired private LoginService loginService;
 	
 	@RequestMapping(value="/editor")	
 	public String doMain(ModelMap model) {		
@@ -40,14 +38,15 @@ public class PageController extends BaseController {
 	@RequestMapping(value="/editor/{origId}")	
 	public String doWithItem(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = this.itemService.getEditableVersion(origId);
+		Item i = this.getItem(origId, getUser(req));
+		
 		if (i != null) {
 			model.addAttribute("editingItem", i);
 			model.addAttribute("site", i.getSite());
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
 			
 			if (i.isProduct()) {
-				model.addAttribute("availableAxes", this.axisService.get());
+				model.addAttribute("availableAxes", this.cmsService.getAxisService().get());
 			}
 			
 			// Get a history of visited items
@@ -69,7 +68,7 @@ public class PageController extends BaseController {
 	public String chooseSite(@PathVariable long siteId, 
 			HttpServletRequest req, HttpServletResponse res, ModelMap model) {	
 		
-		Site site = this.siteService.getSite(siteId);
+		Site site = this.cmsService.getSiteService().getSite(siteId);
 		if (site != null) {
 			model.addAttribute("site", site);
 		}
@@ -77,7 +76,7 @@ public class PageController extends BaseController {
 		Item i = null;
 		List<ItemIdentifier> history = this.cookieService.getBreadcrumbsCookieValue(site, req);
 		if (history.size() > 0) {
-			i = this.itemService.getItem(history.get(0).getItemId());
+			i = this.cmsService.getItemService().getItem(history.get(0).getItemId());
 		}
 		else {
 			i = site.getItem("/");
@@ -92,16 +91,30 @@ public class PageController extends BaseController {
 	
 	@RequestMapping(value="/login")
 	public String login(
-		@RequestParam(value="error", required = false) String error,
-		@RequestParam(value="logout", required = false) String logout,
-		ModelMap model) {
+		HttpServletRequest req,
+		HttpServletResponse res,
+		ModelMap model) throws IOException {
  
-		if (error != null) {
-			model.addAttribute("error", "Invalid username and password!");
-		}
- 
-		if (logout != null) {
+		if (req.getParameter("logout") != null) {
 			model.addAttribute("msg", "You've been successfully logged out.");
+		}
+		
+		if (req.getMethod().equalsIgnoreCase("post")) {
+			String email = req.getParameter("email");
+			String pwd = req.getParameter("password");
+			LoginSupport supp = this.loginService.login(email, pwd, req);
+			
+			if (! supp.isSuccess()) {
+				model.addAttribute("error", supp.getErrorMessage());
+			}
+			else {
+				res.sendRedirect(req.getContextPath() + "/page/editor");
+			}
+		}
+		else if (req.getMethod().equalsIgnoreCase("get")) {
+			if (req.getParameter("logout") != null) {
+				this.loginService.logout(req);
+			}
 		}
  
 		return "cms.login"; 
@@ -109,6 +122,6 @@ public class PageController extends BaseController {
 	
 	@ModelAttribute("allSites")
 	public List<Site> getAllSites() {
-		return this.siteService.getAllSites();
+		return this.cmsService.getSiteService().getAllSites();
 	}
 }

@@ -121,22 +121,23 @@ _cms.field.behaviour.cancel = function(nodeKey) {
 }
 
 _cms.field.behaviour.formchange = function() {
-	$(_cms.field.sel.ALL_FORM_ELEMENTS).mouseleave(function() {
-		if ($(this).attr("name") != "language") {
-			if (_cms.support.enableIf(_cms.field.sel.UPDATE_BUTTON, 
-					_cms.field.originalFormState !== $(_cms.field.sel.FORM).serialize())) {
-				
-				_cms.support.enable(_cms.field.sel.RESET_BUTTON);
+	if (! _cms.editingItemIsReadonly) {
+		$(_cms.field.sel.ALL_FORM_ELEMENTS).mouseleave(function() {
+			if ($(this).attr("name") != "language") {
+				if (_cms.support.enableIf(_cms.field.sel.UPDATE_BUTTON, 
+						_cms.field.originalFormState != $(_cms.field.sel.FORM).serialize())) {
+					
+					_cms.support.enable(_cms.field.sel.RESET_BUTTON);
+				}
+				else {
+					_cms.support.disable(_cms.field.sel.RESET_BUTTON);
+				}
 			}
-			else {
-				_cms.support.disable(_cms.field.sel.RESET_BUTTON);
-			}
-		}
-	});
+		});
+	}
 }
 
 _cms.field.onrefresh = function(nodeKey) {
-	_cms.field.originalFormState = $(_cms.field.sel.FORM).serialize();
 	_cms.field.behaviour.update(nodeKey);
 	_cms.field.behaviour.cancel(nodeKey);
 	_cms.field.behaviour.changelanguage();
@@ -150,6 +151,8 @@ _cms.field.onrefresh = function(nodeKey) {
 		changeMonth: true,
 		changeYear: true
 	});
+	
+	_cms.field.originalFormState = $(_cms.field.sel.FORM).serialize();
 }
 
 _cms.field.refresh.tab = function(nodeKey) {

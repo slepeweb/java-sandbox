@@ -125,16 +125,18 @@ _cms.core.behaviour.reset = function(nodeKey) {
 }
 
 _cms.core.behaviour.formchange = function() {
-	$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).mouseleave(function() {
-		if (_cms.support.enableIf(_cms.core.sel.UPDATE_BUTTON, 
-				$(_cms.core.sel.FORM).serialize() !== _cms.core.originalFormState)) {
-			
-			_cms.support.enable(_cms.core.sel.RESET_BUTTON);
-		}
-		else {
-			_cms.support.disable(_cms.core.sel.RESET_BUTTON);
-		}
-	});
+	if (! _cms.editingItemIsReadonly) {
+		$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).mouseleave(function() {
+			if (_cms.support.enableIf(_cms.core.sel.UPDATE_BUTTON, 
+					$(_cms.core.sel.FORM).serialize() !== _cms.core.originalFormState)) {
+				
+				_cms.support.enable(_cms.core.sel.RESET_BUTTON);
+			}
+			else {
+				_cms.support.disable(_cms.core.sel.RESET_BUTTON);
+			}
+		});
+	}
 }
 
 _cms.core.refresh.tab = function(nodeKey) {

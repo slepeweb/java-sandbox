@@ -21,17 +21,17 @@
 			
 			<p>Please enter your login details to gain access to the CMS:</p>
 			
-			<c:if test="${not _isAuthor}">	
-				<form id="login" method="post" action="<c:url value="/j_spring_security_check" />">
-					<div>
-						<label>Email: </label><input name="email" size="128" />
-					</div>
-					<div>
-						<label>Password: </label><input type="password" name="password" size="32" />
-					</div>
-					<button class="action" type="submit">Login</button>
-				</form>	
-			</c:if>		
+			<form id="login" method="post" action="">
+				<div>
+					<label>Email: </label><input name="email" size="128" />
+				</div>
+				
+				<div>
+					<label>Password: </label><input type="password" name="password" size="32" />
+				</div>
+				
+				<button class="action" type="submit">Login</button>
+			</form>	
 		</div>
 	
 		<!-- Footer -->

@@ -7,6 +7,7 @@ public interface AccessService {
 	void delete(Long id);
 	AccessRule get(Long id);
 	AccessRule get(String siteName, String ruleName);
-	List<AccessRule> getList(String siteName);
+	List<AccessRule> getReadable(String siteName);
+	List<AccessRule> getWriteable(String siteName);
 	AccessRule save(AccessRule ar);
 }

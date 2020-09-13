@@ -6,7 +6,7 @@
 		<div class="ha">
 			<h1 class="main-heading">slepe web solutions CMS</h1>
 			<c:if test="${not empty _user}"><p class="main-heading">You are logged in as  
-								'${_user.username}'&nbsp;&nbsp;&nbsp;[<a href="/cms/j_spring_security_logout">Logout</a>]</p>
+								'${_user.fullName}'&nbsp;&nbsp;&nbsp;[<a href="/cms/page/login?logout">Logout</a>]</p>
 						</c:if>
 		</div>
 		

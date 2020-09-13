@@ -276,6 +276,7 @@ create table access
 (
 	id int not null auto_increment,
 	site varchar(64),
+	mode varchar(1),
 	name varchar(64),
 	itemtype varchar(64),
 	template varchar(64),
@@ -283,19 +284,19 @@ create table access
 	role varchar(64),
 	access boolean,
 	primary key (id),
-	unique key idx_access_site_name (site, name)
+	unique key idx_access_site_mode_name (site, mode, name)
 ) ENGINE=InnoDB;
 
 create table role
 (
-	role_id int not null auto_increment,
+	id int not null auto_increment,
 	name varchar(64) not null,
-	primary key (role_id)
+	primary key (id)
 ) ENGINE=InnoDB;
 
 create table user
 (
-	user_id int not null auto_increment,
+	id int not null auto_increment,
 	firstname varchar(128) not null,
 	lastname varchar(128) not null,
 	email varchar(128) not null,
@@ -305,16 +306,16 @@ create table user
 	secret varchar(256),
 	unique key idx_user_email (email),
 	index idx_user_secret (secret),
-	primary key (user_id)
+	primary key (id)
 ) ENGINE=InnoDB;
 
 create table user_role
 (
-	user_id int not null,
-	role_id int not null,
-	primary key (user_id, role_id),
-	constraint foreign key (user_id) references user(user_id) on delete cascade,
-	constraint foreign key (role_id) references role(role_id) on delete cascade
+	userid int not null,
+	roleid int not null,
+	primary key (userid, roleid),
+	constraint foreign key (userid) references user(id) on delete cascade,
+	constraint foreign key (roleid) references role(id) on delete cascade
 ) ENGINE=InnoDB;
 
 

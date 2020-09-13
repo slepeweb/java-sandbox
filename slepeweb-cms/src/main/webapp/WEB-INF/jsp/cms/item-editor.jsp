@@ -5,6 +5,7 @@
 <div id="current-item-name" class="hide">${editingItem.name}</div>
 <div id="num-deletable-items" class="hide">${_numItemsInSection}</div>
 <div id="editingItem-is-shortcut" class="hide">${editingItem.shortcut}</div>
+<div id="editingItem-is-readonly" class="hide">${not editingItem.writeable}</div>
 
 <ul id="editor-tabs">
 	<li><a href="#core-tab">Core</a></li>

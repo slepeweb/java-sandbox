@@ -130,13 +130,21 @@ input, textarea {
 	width: 5em;
 }
 
-input[disabled="disabled"] {
-	background-color: #d8d8d8;
-	color: #909090;
-}
-
 input[type="checkbox"], input[type="radio"] {
 	width: 2em;
+}
+
+.readonly-layer {
+	position: absolute;
+	top: 40px;
+	left: 5px;
+	background-image: url('/cms/resources/css/readonly.png');
+	height: 100%;
+	width: 100%;
+	background-repeat: repeat;
+	background-color: pink;
+	opacity: 0;
+	z-index: -1;
 }
 
 details {

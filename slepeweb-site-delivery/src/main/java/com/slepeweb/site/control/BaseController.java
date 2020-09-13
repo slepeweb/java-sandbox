@@ -4,9 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -72,14 +69,6 @@ public class BaseController {
 		return shortName;
 	}
 	
-	@ModelAttribute(value=USER)
-	protected org.springframework.security.core.userdetails.User 
-			getUserOld(@AuthenticationPrincipal org.springframework.security.core.userdetails.User u) {
-		LOG.trace(String.format("Model attribute (_userOld): [%s]", u));
-		return u;
-	}
-	
-	
 	@ModelAttribute(value="_user")
 	protected com.slepeweb.cms.bean.User getUser(HttpServletRequest req) {
 		com.slepeweb.cms.bean.User u = (com.slepeweb.cms.bean.User) req.getSession().getAttribute("_user");
@@ -87,32 +76,6 @@ public class BaseController {
 		return u;
 	}
 	
-	
-	@ModelAttribute(value="_isGuest")
-	protected boolean isGuest(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, "SWS_GUEST");
-	}
-	
-	@ModelAttribute(value="_isAdmin")
-	protected boolean isAdmin(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, "SWS_ADMIN");
-	}
-	
-	@ModelAttribute(value="_isPasswordClient")
-	protected boolean isPasswordClient(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, "SWS_PWD");
-	}
-	
-	private boolean hasAuthority(User u, String name) {
-		if (u != null) {
-			for (GrantedAuthority auth : u.getAuthorities()) {
-				if (auth.getAuthority().equals(name)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 	
 	protected String composeJspPath(String shortHostName, String viewNameSuffix) {
 		String view = shortHostName + "/template/" + viewNameSuffix;

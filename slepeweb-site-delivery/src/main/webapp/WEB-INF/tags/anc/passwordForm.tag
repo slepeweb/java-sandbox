@@ -80,7 +80,7 @@
 	$(function(){
 		_nonMatchingDialog = _simpleDialogCreator("#simple-dialog-1", "Non-matching passwords");
 		var currentPasswordField = $("#password-form input[name=current]");
-		if (currentPasswordField) {
+		if (currentPasswordField.length > 0) {
 			_emptyCurrentPasswordDialog = _simpleDialogCreator("#simple-dialog-2", "Current password not specified");
 		}
 		
@@ -89,8 +89,9 @@
 			var pwdB = $("#password-form input[name=pwdB]").val().trim();
 			var ok = true;
 			
-			if (currentPasswordField) {
-				currentPassword = currentPasswordField.val().trim();
+			var currentPasswordField = $("#password-form input[name=current]");
+			if (currentPasswordField.length > 0) {
+				var currentPassword = currentPasswordField.val().trim();
 				if (! currentPassword) {
 					ok = false;
 					_emptyCurrentPasswordDialog.dialog("open");

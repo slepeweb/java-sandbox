@@ -22,6 +22,7 @@
 		_cms.siteDefaultLanguage = "${editingItem.site.language}";
 		_cms.siteShortname = "${editingItem.site.shortname}";
 		_cms.editingItemIsShortcut = ${editingItem.shortcut};
+		_cms.editingItemIsWriteable = ${editingItem.writeable};
 	</c:if>
 	
 	// Flash messages passed through when window.location is set 

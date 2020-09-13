@@ -33,6 +33,10 @@ public class Item extends CmsBean {
 	private String name, simpleName, path;
 	private Timestamp dateCreated, dateUpdated;
 	private boolean deleted, editable = true, published, searchable;
+	
+	// These properties pertain to access control
+	private boolean writeable, viewable;
+	
 	private Long id = -1L, origId;
 	private List<Link> links, parentLinks;
 	private List<String> tags;
@@ -858,6 +862,24 @@ public class Item extends CmsBean {
 	
 	public long getIdentifier() {
 		return getId();
+	}
+
+	public boolean isWriteable() {
+		return writeable;
+	}
+
+	public Item setWriteable(boolean writeable) {
+		this.writeable = writeable;
+		return this;
+	}
+
+	public boolean isViewable() {
+		return viewable;
+	}
+
+	public Item setViewable(boolean viewable) {
+		this.viewable = viewable;
+		return this;
 	}
 
 }

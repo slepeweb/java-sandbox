@@ -24,6 +24,7 @@ public interface CmsService {
 	TemplateService getTemplateService();
 	SiteConfigService getSiteConfigService();
 	LoglevelService getLoglevelService();
+	LoglevelUpdateService getLoglevelUpdateService();
 	TagService getTagService();
 	ProductService getProductService();
 	AxisService getAxisService();
@@ -33,5 +34,6 @@ public interface CmsService {
 	SiteConfiguration getSiteConfiguration();
 	UserService getUserService();
 	AccessService getAccessService();
+	SiteAccessService getSiteAccessService();
 	SiteTypeService getSiteTypeService();
 }

@@ -49,7 +49,7 @@ public class User extends CmsBean {
 
 	@Override
 	public String toString() {
-		return getFullName();
+		return getEmail();
 	}
 	
 	public User setId(Long id) {
