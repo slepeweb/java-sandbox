@@ -1,19 +1,17 @@
 TODO: This is the main todo file:
 
 HIGH
-- Need a read/write column in SiteAccess table, so that same access control can be used in editor.
-- when you navigate the links in cms, the leftnav/selected node needs to be updated too
-- need extra column in host table: 'type' == staging / live
-- i.getSite().getHost("live");
+- search capability in the cms editor ... may need to distinguish between viewable and editable content,
+  in order to use the same solr index ... ?
 
 MEDIUM
+- ServerConfig properties should be held by CmsService object
 - check sws search still working
 - PDFs not viewable on my android phone (chrome)
 - PDFs not rendered with scrollbars on iPad
 - need to protect against injection attacks
 - store preferred language in cookie (Ancestry)
 - resource bundles (Ancestry)
-- password protection for site visitors (Ancestry)
 - documents need to be nest-able (Ancestry)
 - also, solr indexing needs to recognise nesting nature
 

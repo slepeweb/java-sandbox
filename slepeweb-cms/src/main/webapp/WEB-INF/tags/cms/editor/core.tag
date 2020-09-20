@@ -13,12 +13,17 @@
 	<div class="ff">
 		<label for="id">Id: </label><input disabled="disabled" value="${_idStr}" />
 	</div>
+	
 	<div class="ff">
 		<label for="path">Path: </label><input disabled="disabled" value="${editingItem.path}" />
-		<c:set var="url" value="${editingItem.path}" />
-		<c:if test="${editingItem.site.multilingual}"><c:set var="url" value="/${editingItem.site.language}${url}" /></c:if>
-		<a href="${url}" target="_blank">View</a>
+		
+		<c:if test="${not empty _host}">
+			<c:set var="url" value="${editingItem.path}" />
+			<c:if test="${editingItem.site.multilingual}"><c:set var="url" value="/${editingItem.site.language}${url}" /></c:if>
+			<a href="${_host.namePortAndProtocol}${url}" target="_blank">View</a>
+		</c:if>		
 	</div>
+	
 	<div class="ff">
 		<label for="type">Type: </label><input disabled="disabled" value="${editingItem.type.name}" />
 	</div>

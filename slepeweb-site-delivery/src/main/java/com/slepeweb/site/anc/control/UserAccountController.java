@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.Role;
 import com.slepeweb.cms.bean.User;
@@ -29,6 +31,7 @@ import com.slepeweb.cms.service.RoleService;
 import com.slepeweb.cms.service.UserService;
 import com.slepeweb.common.service.SendMailService;
 import com.slepeweb.common.util.HttpUtil;
+import com.slepeweb.site.anc.service.AncCookieService;
 import com.slepeweb.site.control.BaseController;
 
 @Controller
@@ -43,6 +46,7 @@ public class UserAccountController extends BaseController {
 	@Autowired private RoleService roleService;
 	@Autowired private SendMailService sendMailService;
 	@Autowired private LoginService loginService;
+	@Autowired private AncCookieService ancCookieService;
 	
 	@RequestMapping(value="/login")
 	public String login (
@@ -59,7 +63,11 @@ public class UserAccountController extends BaseController {
 			LoginSupport supp = this.loginService.login(email, password, req);
 			
 			if (supp.isSuccess()) {
-				String path = StringUtils.isNotBlank(originalPath) ? originalPath : "/" + i.getLanguage();
+				String path = originalPath;
+				if (StringUtils.isBlank(path)) {
+					ItemIdentifier iid = this.ancCookieService.getLatestBreadcrumb(i.getSite(), req);
+					path = iid.getPath();
+				}
 				res.sendRedirect(path);
 			}
 			else {
@@ -225,8 +233,12 @@ public class UserAccountController extends BaseController {
 				u.setSecret(secret);
 				this.userService.partialUpdate(u);
 				
-				// TODO: urls should NOT be hardcoded
-				String href = String.format("http://ancestry.slepeweb.com:8081/%s/login/register?view=password/%s", i.getLanguage(), secret);
+				Host h = i.getSite().getPublicLiveHost();
+				String href = String.format("%s/%s/login/register?view=password/%s", 
+						h != null ? h.getNamePortAndProtocol() : "",
+						i.getLanguage(), 
+						secret);
+				
 				String [] values = pickBlockFields(i, legend, "validationEmailContent", false, model);
 				values[1] = updateBodyField(model, values[1].
 						replaceAll("__user__", u.getFullName()).

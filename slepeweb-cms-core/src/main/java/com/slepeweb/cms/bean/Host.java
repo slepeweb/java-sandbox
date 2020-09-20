@@ -4,15 +4,25 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Host extends CmsBean {
 	private static final long serialVersionUID = 1L;
-	private String name;
+	private String name, protocol = "http";
 	private Long id;
 	private Site site;
+	private Integer port;
+	private HostType type;
+	
+	public enum HostType {
+		staging, live, publicstaging, publiclive;
+	}
+
 		
 	public void assimilate(Object obj) {
 		if (obj instanceof Host) {
 			Host h = (Host) obj;
-			setName(h.getName());
-			setSite(h.getSite());
+			setName(h.getName()).
+			setProtocol(h.getProtocol()).
+			setSite(h.getSite()).
+			setPort(h.getPort()).
+			setType(h.getType());
 		}
 	}
 	
@@ -25,7 +35,7 @@ public class Host extends CmsBean {
 	
 	@Override
 	public String toString() {
-		return getName();
+		return getNamePortAndProtocol();
 	}
 	
 	public Host save() {
@@ -38,6 +48,17 @@ public class Host extends CmsBean {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public String getNamePortAndProtocol() {
+		StringBuilder sb = new StringBuilder(getProtocol()).
+				append("://").
+				append(getName());
+		
+		if (getPort() != null && getPort() != 80) {
+			sb.append(":").append(getPort());
+		}
+		return sb.toString();
 	}
 	
 	public Host setName(String name) {
@@ -63,11 +84,41 @@ public class Host extends CmsBean {
 		return this;
 	}
 	
+	public Integer getPort() {
+		return port;
+	}
+
+	public Host setPort(Integer port) {
+		this.port = port;
+		return this;
+	}
+
+	public HostType getType() {
+		return type;
+	}
+
+	public Host setType(HostType type) {
+		this.type = type;
+		return this;
+	}
+
+	public String getProtocol() {
+		return protocol;
+	}
+
+	public Host setProtocol(String protocol) {
+		this.protocol = protocol;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
+		result = prime * result + ((port == null) ? 0 : port.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -85,6 +136,19 @@ public class Host extends CmsBean {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (protocol == null) {
+			if (other.protocol != null)
+				return false;
+		} else if (!protocol.equals(other.protocol))
+			return false;
+		if (port == null) {
+			if (other.port != null)
+				return false;
+		} else if (!port.equals(other.port))
+			return false;
+		if (type != other.type)
+			return false;
 		return true;
 	}
+
 }

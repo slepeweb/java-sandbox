@@ -26,7 +26,7 @@
 	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.commerce, com.slepeweb.site, com.slepeweb.ws, com.slepeweb.common" />
 		
 	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl">
-		<property name="editorialMode" value="false" />
+		<property name="editorialContext" value="false" />
 	</bean>
 	
 	<bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder" />

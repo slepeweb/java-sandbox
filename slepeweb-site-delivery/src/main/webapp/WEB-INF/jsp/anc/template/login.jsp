@@ -34,7 +34,11 @@
 			<input type="hidden" name="originalPath" value="${_originalPath}" />
 		</form>	
 		
-		<p>Forgotten your password? <a href="/${_item.language}/login/forgotten?view=forgotten">Reset</a></p>
+		<p>
+			Not registered yet? <a href="/${_item.language}/login/register?view=form">Register</a>
+			<br />
+			Forgotten your password? <a href="/${_item.language}/login/forgotten?view=forgotten">Reset</a>
+		</p>
 	</div>
 	
 </anc:pageLayout>

@@ -125,13 +125,17 @@ public class AncestryPageController extends BaseController {
 				svgs.add(new SvgSupport(subject, j));
 			}
 		}
-		model.addAttribute("_svgList", svgs);
 		
-		model.addAttribute("_menu", createPersonMenu(i, subject, null));
+		model.addAttribute("_svgList", svgs);		
+		model.addAttribute("_menu", createPersonMenu(i, subject, null));	
 		
+		// Confusing - these _breadcrumbs form the hierarchy of ancestor boy/girl items
 		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));
 		
-		this.ancCookieService.updateBreadcrumbsCookie(i, req, res);
+		// Whereas these 'proper' breadcrumbs identify the boy/girl click history !!!
+		// See also breadcrumbTrail() method, which sets the _history attribute for all other pages.
+		model.addAttribute("_history", this.ancCookieService.updateBreadcrumbsCookie(i, req, res));
+		
 		return page.getView();
 	}
 	
@@ -279,20 +283,6 @@ public class AncestryPageController extends BaseController {
 		m.setSelected(requestView == null && requestItem.getPath().equals(p.getItem().getPath()));
 		menu.add(m);
 		
-		// History
-		m = new MenuItem();
-		m.setTitle("History");
-		if (p.getDocuments().size() > 0) {
-			target = p.getDocuments().get(0);
-			m.setHref(target.getUrl());
-		}
-		else {
-			m.setEnabled(false);
-			m.setHref("");
-		}
-		m.setSelected(requestItem.getType().getName().equals("Document"));
-		menu.add(m);
-		
 		// Gallery
 		m = new MenuItem();
 		m.setTitle("Gallery");
@@ -307,9 +297,9 @@ public class AncestryPageController extends BaseController {
 		m.setSelected(requestView != null && requestView.equals(GALLERY_VIEW));
 		menu.add(m);
 		
-		// Records
+		// Scans
 		m = new MenuItem();
-		m.setTitle("Records");
+		m.setTitle("Scans");
 		if (p.getRecords().size() > 0) {
 			target = p.getRecords().get(0);
 			m.setHref(String.format("%s?view=%s/%d", p.getItem().getUrl(), RECORD_VIEW, target.getId()));
@@ -319,6 +309,20 @@ public class AncestryPageController extends BaseController {
 			m.setHref("");
 		}
 		m.setSelected(requestView != null && requestView.equals(RECORD_VIEW));
+		menu.add(m);
+		
+		// Notes
+		m = new MenuItem();
+		m.setTitle("Notes");
+		if (p.getDocuments().size() > 0) {
+			target = p.getDocuments().get(0);
+			m.setHref(target.getUrl());
+		}
+		else {
+			m.setEnabled(false);
+			m.setHref("");
+		}
+		m.setSelected(requestItem.getType().getName().equals("Document"));
 		menu.add(m);
 		
 		return menu;

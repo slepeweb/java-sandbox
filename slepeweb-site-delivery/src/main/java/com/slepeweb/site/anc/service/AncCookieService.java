@@ -12,8 +12,9 @@ import com.slepeweb.cms.bean.Site;
 public interface AncCookieService {
 	String ANC_COOKIE_PATH = "/";	
 	
-	void updateBreadcrumbsCookie(Item i, HttpServletRequest req, HttpServletResponse res);
+	List<ItemIdentifier> updateBreadcrumbsCookie(Item i, HttpServletRequest req, HttpServletResponse res);
 	List<ItemIdentifier> getBreadcrumbsCookieValue(Site s, HttpServletRequest req);
+	ItemIdentifier getLatestBreadcrumb(Site s, HttpServletRequest req);
 	String getCookieValue(String name, HttpServletRequest req);
 	void saveCookie(String name, String value, String path, HttpServletResponse res);
 }

@@ -15,13 +15,14 @@ import com.slepeweb.cms.utils.CookieHelper;
 @Service
 public class AncCookieServiceImpl extends CookieHelper implements AncCookieService {
 	
-	public void updateBreadcrumbsCookie(Item i, HttpServletRequest req, HttpServletResponse res) {
+	public List<ItemIdentifier> updateBreadcrumbsCookie(Item i, HttpServletRequest req, HttpServletResponse res) {
 		
 		ItemIdentifier targetKey = new ItemIdentifier(i.getOrigId());
 		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);	
-		updateItemNames(breadcrumbs, i.getCmsService().getItemService());
 		pushBreadcrumbs(breadcrumbs, targetKey);
+		updateItemNames(breadcrumbs, i.getCmsService()); // We need item names in order to reorder existing matching entries
 		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), StringUtils.join(breadcrumbs, ","), ANC_COOKIE_PATH, res);
+		return breadcrumbs;
 	}
 	
 }

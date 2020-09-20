@@ -40,7 +40,6 @@ import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.FieldValueSet;
-import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.ItemType;
@@ -93,12 +92,8 @@ public class RestController extends BaseController {
 			model.put("allVersions", i.getAllVersions());
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
 			
-			// Hostname to render content.
-			// TODO: should really be a staging host
-			List<Host> hosts = this.cmsService.getHostService().getAllHosts(i.getSite().getId());
-			if (hosts != null && hosts.size() > 0) {
-				model.addAttribute("host", hosts.get(0));
-			}
+			// Host to render content
+			model.addAttribute("_host", i.getSite().getPublicStagingHost());
 			
 			if (i.isProduct()) {
 				model.addAttribute("availableAxes", this.cmsService.getAxisService().get());

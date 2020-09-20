@@ -13,6 +13,7 @@ import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Host;
+import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
@@ -35,7 +36,10 @@ public class RowMapperUtil {
 		public Host mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Host h = CmsBeanFactory.makeHost().
 					setId(rs.getLong("id")).
-					setName(rs.getString("name"));
+					setName(rs.getString("name")).
+					setPort(rs.getInt("port")).
+					setType(HostType.valueOf(rs.getString("type"))).
+					setProtocol(rs.getString("protocol"));
 			
 			Site s = mapSite(rs, "siteid", "sitename", "shortname");
 			

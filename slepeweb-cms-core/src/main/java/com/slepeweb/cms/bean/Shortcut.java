@@ -28,7 +28,7 @@ public class Shortcut extends Item {
 	}
 	
 	private boolean isMergeable() {
-		return isComplete() && ! getCmsService().isEditorialMode();
+		return isComplete() && ! getCmsService().isEditorialContext();
 	}
 
 	// There should only be one version of a Shortcut item.
@@ -62,7 +62,7 @@ public class Shortcut extends Item {
 		if (isMergeable()) {
 			return this.referred.getLinks();
 		}
-		else if (getCmsService().isEditorialMode()) {
+		else if (getCmsService().isEditorialContext()) {
 			return super.getLinks();
 		}
 		

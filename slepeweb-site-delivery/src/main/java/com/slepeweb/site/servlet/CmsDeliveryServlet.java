@@ -66,11 +66,11 @@ public class CmsDeliveryServlet {
 			LOG.trace(LogUtil.compose("Site ...", site));
 
 			String language = site.getLanguage();				
-			Redirector director = multilingualPathChecker(site, path, language);
-			language = director.getLanguage();
-			trimmedPath = director.getPath();
+			Redirector redirector = multilingualPathChecker(site, path, language);
+			language = redirector.getLanguage();
+			trimmedPath = redirector.getPath();
 			
-			if (director.isRequired()) {
+			if (redirector.isRequired()) {
 				// language is missing on a multilingual site - redirect to default language
 				res.sendRedirect(String.format("/%s%s", language, trimmedPath));
 				return;
@@ -85,10 +85,10 @@ public class CmsDeliveryServlet {
 				item.setLanguage(language);
 				
 				User u = (User) req.getSession().getAttribute("_user");
-				director = accessibilityChecker(item, u, springTemplatePath);
+				redirector = accessibilityChecker(item, u, springTemplatePath);
 				
-				if (director.isRequired()) {
-					res.sendRedirect(director.getPath());
+				if (redirector.isRequired()) {
+					res.sendRedirect(redirector.getPath());
 					return;
 				}
 				

@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Host;
+import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -15,7 +16,7 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	private static Logger LOG = Logger.getLogger(HostServiceImpl.class);
 	
 	private final static String SELECT_TEMPLATE = 
-			"select h.id, h.name, s.id as siteid, s.name as sitename, s.shortname, s.language, s.xlanguages " +
+			"select h.id, h.name, h.protocol, h.port, h.type, s.id as siteid, s.name as sitename, s.shortname, s.language, s.xlanguages " +
 			"from host h " +
 			"join site s on h.siteid = s.id " +
 			"where %s";
@@ -39,7 +40,9 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	}
 	
 	private Host insertHost(Host h) {		
-		this.jdbcTemplate.update( "insert into host (name) values (?)", h.getName());		
+		this.jdbcTemplate.update( "insert into host (name, port, type, protocol) values (?, ?, ?, ?)", 
+				h.getName(), h.getPort(), h.getType(), h.getProtocol());		
+		
 		h.setId(getLastInsertId());			
 		this.cacheEvictor.evict(h);
 		LOG.info(compose("Added new host", h));		
@@ -52,8 +55,8 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 			dbRecord.assimilate(h);
 			
 			this.jdbcTemplate.update(
-					"update host set name = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getId());
+					"update host set name = ?, port = ?, type = ?, protocol = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getPort(), dbRecord.getType(), dbRecord.getProtocol(), dbRecord.getId());
 			
 			LOG.info(compose("Updated host", h));
 		}
@@ -85,9 +88,18 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 			sql, params, new RowMapperUtil.HostMapper()));
 	}
 
+	@Cacheable(value="serviceCache")
 	public List<Host> getAllHosts(Long siteId) {
 		return this.jdbcTemplate.query(
 				String.format(SELECT_TEMPLATE, " h.siteid = ?"), new Object[] {siteId}, new RowMapperUtil.HostMapper());
 	}
 
+
+	@Cacheable(value="serviceCache")
+	public List<Host> getHosts(Long siteId, HostType type) {
+		return this.jdbcTemplate.query(
+				String.format(SELECT_TEMPLATE, " h.siteid = ? and h.type = ?"), 
+				new Object[] {siteId, type.name()}, 
+				new RowMapperUtil.HostMapper());
+	}
 }

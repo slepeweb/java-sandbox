@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.service.ItemService;
+import com.slepeweb.cms.service.CmsService;
 
 
 public class CookieHelper {
@@ -25,7 +25,7 @@ public class CookieHelper {
 		
 		ItemIdentifier target = new ItemIdentifier(i.getOrigId());
 		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);	
-		updateItemNames(breadcrumbs, i.getCmsService().getItemService());
+		updateItemNames(breadcrumbs, i.getCmsService());
 		pushBreadcrumbs(breadcrumbs, target);
 		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), StringUtils.join(breadcrumbs, ","), cookiePath, res);
 	}
@@ -34,11 +34,19 @@ public class CookieHelper {
 		return String.format("%s-%d", BREADCRUMBS, siteId);
 	}
 	
+	public ItemIdentifier getLatestBreadcrumb(Site s, HttpServletRequest req) {
+		List<ItemIdentifier> list = getBreadcrumbsCookieValue(s, req);
+		if (list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+	}
+	
 	public List<ItemIdentifier> getBreadcrumbsCookieValue(Site s, HttpServletRequest req) {
 		
 		String cookieName = getBreadcrumbsCookieName(s.getId());
 		String cookieValue = getCookieValue(cookieName, req);		
-		return parseBreadcrumbsString(cookieValue, s.getCmsService().getItemService());
+		return parseBreadcrumbsString(cookieValue, s.getCmsService());
 	}
 	
 	public void pushBreadcrumbs(List<ItemIdentifier> nodeList, ItemIdentifier target) {
@@ -55,7 +63,7 @@ public class CookieHelper {
 		nodeList.add(0, target);
 	}
 	
-	public List<ItemIdentifier> parseBreadcrumbsString(String cookieValue, ItemService itemService) {
+	public List<ItemIdentifier> parseBreadcrumbsString(String cookieValue, CmsService cmsService) {
 		
 		if (cookieValue != null) {
 			List<ItemIdentifier> list = new ArrayList<ItemIdentifier>();
@@ -64,7 +72,7 @@ public class CookieHelper {
 				list.add(new ItemIdentifier(s));
 			}
 			
-			updateItemNames(list, itemService);
+			updateItemNames(list, cmsService);
 			return list;
 		}
 		
@@ -88,14 +96,17 @@ public class CookieHelper {
 		res.addCookie(c);
 	}
 	
-	protected void updateItemNames(List<ItemIdentifier> list, ItemService itemService) {
+	protected void updateItemNames(List<ItemIdentifier> list, CmsService cmsService) {
 		Item h;		
 		Iterator<ItemIdentifier> iter = list.iterator();
 		ItemIdentifier ii;
 		
 		while (iter.hasNext()) {
 			ii = iter.next();
-			h = itemService.getEditableVersion(ii.getItemId());
+			h = cmsService.isEditorialContext() ? 
+					cmsService.getItemService().getEditableVersion(ii.getItemId()) :
+					cmsService.getItemService().getItem(ii.getItemId());
+						
 			if (h != null) {
 				ii.
 					setName(StringUtils.abbreviate(h.getName(), 24)).

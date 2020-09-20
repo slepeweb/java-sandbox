@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.except.ResourceException;
 
 public class Site extends CmsBean {
@@ -138,6 +139,24 @@ public class Site extends CmsBean {
 	public Site setShortname(String shortname) {
 		this.shortname = shortname;
 		return this;
+	}
+	
+	public Host getPublicLiveHost() {
+		return getHost(HostType.valueOf("publiclive"));
+	}
+	
+	public Host getPublicStagingHost() {
+		return getHost(HostType.valueOf("publicstaging"));
+	}
+	
+	private Host getHost(HostType type) {
+		List<Host> all = getCmsService().getHostService().getHosts(getId(), type);
+		if (all.size() == 0) {
+			return null;
+		}
+		else {
+			return all.get(0);
+		}
 	}
 
 	@Override

@@ -58,7 +58,7 @@ _cms.leftnav.define.fancytree = function() {
 	});	
 }
 
-_cms.leftnav.activateKey = function(key) {
+_cms.leftnav.activateKey = function(key, fn, args) {
 	var node = _cms.leftnav.tree.getNodeByKey(key);
 	
 	if (node) {
@@ -66,7 +66,7 @@ _cms.leftnav.activateKey = function(key) {
 	}
 	else {
 		// The 'real' item hasn't been loaded yet - ask the server for the breadcrumb trail
-		if (! _cms.leftnav.loadBreadcrumbs(key)) {
+		if (! _cms.leftnav.loadBreadcrumbs(key, fn, args)) {
 			_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
 		}
 	}

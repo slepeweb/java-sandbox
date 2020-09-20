@@ -44,6 +44,8 @@ create table host
 	id int not null auto_increment,
 	siteid int,
 	name varchar(255),
+	port int,
+	type enum ('staging', 'live', 'publicstaging', 'publiclive'),
 	primary key (id),
 	unique key idx_host_name (name),
 	constraint foreign key (siteid) references site(id) on delete cascade

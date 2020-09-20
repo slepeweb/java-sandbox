@@ -8,7 +8,7 @@ import com.slepeweb.commerce.service.ProductService;
 import com.slepeweb.commerce.service.VariantService;
 
 public interface CmsService {
-	boolean isEditorialMode();
+	boolean isEditorialContext();
 	boolean isLiveServer();
 	HostService getHostService();
 	SiteService getSiteService();

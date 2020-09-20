@@ -7,7 +7,7 @@
 
 <html>
 	<head>
-		<cms:head />
+		<cms:head  loadjs="${false}" />
 	</head>
 	<body>
 

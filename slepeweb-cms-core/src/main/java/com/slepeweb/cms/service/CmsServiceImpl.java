@@ -43,19 +43,19 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected SiteTypeService siteTypeService;
 	
 	/* 
-	 * In editorial mode, Shortcuts are seen as separate items to the items they reference.
+	 * In editorial context, Shortcuts are seen as separate items to the items they reference.
 	 * This is essential to allow the content editor to relate a Shortcut to its reference.
-	 * In (the opposite) site delivery mode, a Shortcut item is effectively merged with its 
+	 * In (the opposite) site delivery context, a Shortcut item is effectively merged with its 
 	 * reference item.
 	 */
-	private boolean editorialMode = true;
+	private boolean editorialContext = true;
 	
-	public void setEditorialMode(boolean b) {
-		this.editorialMode = b;
+	public void setEditorialContext(boolean b) {
+		this.editorialContext = b;
 	}
 	
-	public boolean isEditorialMode() {
-		return this.editorialMode;
+	public boolean isEditorialContext() {
+		return this.editorialContext;
 	}
 	
 	@PostConstruct
