@@ -50,7 +50,7 @@ public class CmsBeanFactory {
 		Item i = null;
 		
 		if (
-				CMS.getServerConfig().isCommerceEnabled() && 
+				CMS.isCommerceEnabled() && 
 				itemTypeName != null && 
 				itemTypeName.equals(ItemTypeName.PRODUCT)) {
 			

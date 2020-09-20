@@ -1,6 +1,5 @@
 package com.slepeweb.cms.service;
 
-import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.component.SiteConfiguration;
 import com.slepeweb.commerce.service.AxisService;
 import com.slepeweb.commerce.service.AxisValueService;
@@ -9,7 +8,11 @@ import com.slepeweb.commerce.service.VariantService;
 
 public interface CmsService {
 	boolean isEditorialContext();
-	boolean isLiveServer();
+	boolean isDeliveryContext();
+	boolean isLiveDeliveryContext();
+	boolean isStagingDeliveryContext();
+	boolean isCommerceEnabled();
+	
 	HostService getHostService();
 	SiteService getSiteService();
 	ItemTypeService getItemTypeService();
@@ -30,7 +33,6 @@ public interface CmsService {
 	AxisService getAxisService();
 	AxisValueService getAxisValueService();
 	VariantService getVariantService();
-	ServerConfig getServerConfig();
 	SiteConfiguration getSiteConfiguration();
 	UserService getUserService();
 	AccessService getAccessService();

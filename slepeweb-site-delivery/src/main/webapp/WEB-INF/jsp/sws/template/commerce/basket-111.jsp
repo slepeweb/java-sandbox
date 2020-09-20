@@ -8,7 +8,7 @@
 <sw:standardLayout>
 	<gen:debug><!-- jsp/sws/commerce/basket-111.jsp --></gen:debug>
 	
-	<c:if test="${_serverConfig.commerceEnabled}">
+	<c:if test="${_cmsService.commerceEnabled}">
 		<div class="col-1-1">	
 			<h2>${_page.title}</h2>
 			${_page.body}

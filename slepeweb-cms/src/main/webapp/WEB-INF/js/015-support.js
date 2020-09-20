@@ -207,6 +207,7 @@ _cms.support.disableFormsIfReadonly = function() {
 	if (_cms.editingItemIsReadonly) {
 		$("#item-editor input, #item-editor textarea, #item-editor select, #item-editor button").attr("disabled", "disabled");
 		$(".readonly-layer").css("z-index", "1").css("opacity", "0.2");
+		_cms.support.flashMessage({error: true, message: "Not Authorised"});
 	}
 	else {
 		$(".readonly-layer").css("z-index", "-1").css("opacity", "0");

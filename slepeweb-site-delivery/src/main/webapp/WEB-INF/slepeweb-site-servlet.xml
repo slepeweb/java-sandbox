@@ -27,14 +27,16 @@
 		
 	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl">
 		<property name="editorialContext" value="false" />
+		<property name="stagingDeliveryContext" value="false" />
+		<property name="commerceEnabled" value="false" />
 	</bean>
 	
 	<bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder" />
 	
-	<bean id="config" class="com.slepeweb.cms.component.ServerConfig">
-		<property name="liveDelivery" value="true" />
-		<property name="commerceEnabled" value="false" />
-	</bean>
+<!-- 	<bean id="config" class="com.slepeweb.cms.component.ServerConfig"> -->
+<!-- 		<property name="liveDelivery" value="true" /> -->
+<!-- 		<property name="commerceEnabled" value="false" /> -->
+<!-- 	</bean> -->
 	
 	<bean id="springContext" class="com.slepeweb.cms.utils.SpringContext" />
 

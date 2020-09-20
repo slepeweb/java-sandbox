@@ -5,7 +5,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
-import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.component.SiteConfiguration;
 import com.slepeweb.commerce.service.AxisService;
 import com.slepeweb.commerce.service.AxisValueService;
@@ -13,7 +12,7 @@ import com.slepeweb.commerce.service.ProductService;
 import com.slepeweb.commerce.service.VariantService;
 
 // Bean defined in xml
-public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
+public class CmsServiceImpl implements CmsService {
 	
 	@Autowired protected HostService hostService;	
 	@Autowired protected SiteService siteService;	
@@ -35,18 +34,22 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 	@Autowired protected AxisService axisService;
 	@Autowired protected AxisValueService axisValueService;
 	@Autowired protected VariantService variantService;
-	@Autowired protected ServerConfig serverConfig;
-	@Autowired protected SiteConfiguration siteConfiguration;
 	@Autowired protected UserService userService;
 	@Autowired protected AccessService accessService;
 	@Autowired protected SiteAccessService siteAccessService;
 	@Autowired protected SiteTypeService siteTypeService;
+	@Autowired protected SiteConfiguration siteConfiguration;
 	
 	/* 
-	 * In editorial context, Shortcuts are seen as separate items to the items they reference.
-	 * This is essential to allow the content editor to relate a Shortcut to its reference.
-	 * In (the opposite) site delivery context, a Shortcut item is effectively merged with its 
-	 * reference item.
+	 * In editorial context:
+	 * 
+	 * 1) 	Shortcuts are seen as separate items to the items they reference.
+	 * 		This is essential to allow the content editor to relate a Shortcut to its reference.
+	 * 		In (the opposite) site delivery context, a Shortcut item is effectively merged with its 
+	 * 		reference item.
+	 * 
+	 * 2)	Access rules designated with type=='w' (ie writeable) are followed. Otherwise, readonly
+	 * 		rules are followed (ie type=='r').
 	 */
 	private boolean editorialContext = true;
 	
@@ -58,13 +61,45 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 		return this.editorialContext;
 	}
 	
+	public boolean isDeliveryContext() {
+		return ! isEditorialContext();
+	}
+	
+	/*
+	 * In staging delivery context, the editable versions of items are delivered to web pages,
+	 * as opposed to live delivery context.
+	 */
+	private boolean stagingDeliveryContext = true;
+	
+	public void setStagingDeliveryContext(boolean b) {
+		this.stagingDeliveryContext = b;
+	}
+
+	public boolean isStagingDeliveryContext() {
+		return stagingDeliveryContext;
+	}
+
+	public boolean isLiveDeliveryContext() {
+		return ! isStagingDeliveryContext();
+	}
+	
+	/*
+	 * This is the storefron context. WARNING: this code has had very little usage or testing for
+	 * too long.
+	 */
+	private boolean commerceEnabled = false;
+
+	public boolean isCommerceEnabled() {
+		return commerceEnabled;
+	}
+
+	public void setCommerceEnabled(boolean b) {
+		this.commerceEnabled = b;
+	}
+
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {
 		CmsBeanFactory.init(this);
-	}
-	
-	public boolean isLiveServer() {
-		return this.config.isLiveDelivery();
 	}
 	
 	public HostService getHostService() {
@@ -157,10 +192,6 @@ public class CmsServiceImpl extends BaseServiceImpl implements CmsService {
 
 	public VariantService getVariantService() {
 		return variantService;
-	}
-
-	public ServerConfig getServerConfig() {
-		return serverConfig;
 	}
 
 	public SiteConfiguration getSiteConfiguration() {

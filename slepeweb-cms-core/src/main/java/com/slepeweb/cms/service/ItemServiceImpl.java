@@ -20,7 +20,6 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
-import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.NotRevertableException;
@@ -53,7 +52,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected MediaService mediaService;
 	@Autowired protected SolrService4Cms solrService4Cms;
 	@Autowired protected CmsService cmsService;
-	@Autowired protected ServerConfig config;
 	
 	public Item save(Item i) throws ResourceException {
 		return save(i, false);

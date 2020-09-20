@@ -20,7 +20,6 @@ import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.User;
-import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
 
@@ -39,9 +38,9 @@ public class BaseController {
 		return this.contextPath;
 	}
 	
-	@ModelAttribute(value="_serverConfig")
-	public ServerConfig getConfig() {
-		return this.cmsService.getServerConfig();
+	@ModelAttribute(value="_cmsService")
+	public CmsService getCmsService() {
+		return this.cmsService;
 	}
 	
 	@ModelAttribute(value="_user")

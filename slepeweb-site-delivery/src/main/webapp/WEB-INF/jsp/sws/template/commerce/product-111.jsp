@@ -13,7 +13,7 @@
 <sw:standardLayout>
 	<gen:debug><!-- jsp/sws/commerce/product-111.jsp --></gen:debug>
 	
-	<c:if test="${_serverConfig.commerceEnabled}">
+	<c:if test="${_cmsService.commerceEnabled}">
 		<div class="col-2-3 pull-right-sm">	
 			<div>
 				<!-- Main content -->	

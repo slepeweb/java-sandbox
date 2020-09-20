@@ -370,7 +370,7 @@ public class CmsDeliveryServlet {
 	
 	private boolean isCacheable(Item i) {
 		return 
-				this.cmsService.isLiveServer() &&
+				this.cmsService.isLiveDeliveryContext() &&
 				i.isPublished() && 
 				! i.getFieldValue(FieldName.CACHEABLE, new StringWrapper("yes")).equalsIgnoreCase("no");
 	}

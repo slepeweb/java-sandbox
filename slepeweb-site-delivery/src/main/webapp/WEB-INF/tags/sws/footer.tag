@@ -7,7 +7,7 @@
 	<span class="smaller">${site:formatUKDate(_now, 'MMMM d, h:mm a')}</span>
 </div>
 
-<c:if test="${_serverConfig.liveDelivery}">
+<c:if test="${_cmsService.liveDeliveryContext}">
 	<script>
 	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

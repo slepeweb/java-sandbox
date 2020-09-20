@@ -13,7 +13,6 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StringWrapper;
-import com.slepeweb.cms.component.ServerConfig;
 import com.slepeweb.cms.service.LoglevelUpdateService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.ComponentService;
@@ -26,16 +25,10 @@ public class BaseController {
 	public static final String ITEM = "_item";
 	public static final String SITE = "_site";
 	
-	@Autowired protected ServerConfig config;
 	@Autowired private ComponentService componentService;
 	@Autowired private LoglevelUpdateService loglevelUpdateService;
 	@Autowired private NavigationService navigationService;	
 
-	@ModelAttribute(value="_serverConfig")
-	public ServerConfig getConfig() {
-		return this.config;
-	}
-	
 	@ModelAttribute(value="_loglevel")
 	protected boolean getLogLevelTrigger(@RequestParam(value="loglevel", required=false) String trigger) {
 		if (trigger != null) {

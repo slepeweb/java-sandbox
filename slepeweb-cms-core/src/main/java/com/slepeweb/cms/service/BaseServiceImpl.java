@@ -6,21 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.slepeweb.cms.cache.CacheEvictor;
-import com.slepeweb.cms.component.ServerConfig;
-import com.slepeweb.cms.component.SiteConfiguration;
 import com.slepeweb.cms.utils.LogUtil;
 
 public class BaseServiceImpl {
 	
 	//private static Logger LOG = Logger.getLogger(BaseServiceImpl.class);
 
+	@Autowired protected CmsService cmsService;
 	@Autowired protected JdbcTemplate jdbcTemplate;
-	@Autowired protected ServerConfig config;
 	@Autowired protected CacheEvictor cacheEvictor;
-	@Autowired protected SiteConfiguration siteConfiguration;
 	
 	protected String getVersionClause() {
-		return this.config.isLiveDelivery() ? " and i.published = 1" : " and i.editable = 1";
+		return this.cmsService.isLiveDeliveryContext() ? " and i.published = 1" : " and i.editable = 1";
 	}
 	
 	@SuppressWarnings("deprecation")
