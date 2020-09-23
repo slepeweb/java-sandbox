@@ -1,6 +1,6 @@
 package com.slepeweb.money.bean;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties({"defined4Insert", "inDatabase", "legacy"})
 public class Category extends DbEntity {

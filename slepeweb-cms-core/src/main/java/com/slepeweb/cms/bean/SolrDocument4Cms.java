@@ -14,6 +14,8 @@ public class SolrDocument4Cms {
 	@Field("teaser") private String teaser;
 	@Field("bodytext") private String bodytext;
 	@Field("path") private String path;
+	@Field("editable") private boolean editable;
+	@Field("viewable") private boolean viewable;
 	
 	public SolrDocument4Cms() {}
 	
@@ -100,6 +102,24 @@ public class SolrDocument4Cms {
 
 	public SolrDocument4Cms setLanguage(String language) {
 		this.language = language;
+		return this;
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public SolrDocument4Cms setEditable(boolean editable) {
+		this.editable = editable;
+		return this;
+	}
+
+	public boolean isViewable() {
+		return viewable;
+	}
+
+	public SolrDocument4Cms setViewable(boolean viewable) {
+		this.viewable = viewable;
 		return this;
 	}
 

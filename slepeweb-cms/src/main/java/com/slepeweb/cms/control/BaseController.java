@@ -114,9 +114,9 @@ public class BaseController {
 	
 	protected Item getItem(Long origId, User u, boolean throwable) throws RuntimeException {
 		Item i = this.cmsService.getItemService().getEditableVersion(origId);
-		i.setWriteable(this.cmsService.getSiteAccessService().hasWriteAccess(i, u));	
+		i.grantWriteAccess(this.cmsService.getSiteAccessService().hasWriteAccess(i, u));	
 		
-		if (throwable && ! i.isWriteable()) {
+		if (throwable && ! i.isWriteAccessGranted()) {
 			throw new RuntimeException("Access control violation");
 		}
 		

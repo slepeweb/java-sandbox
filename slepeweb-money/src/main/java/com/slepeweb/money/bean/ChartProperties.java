@@ -3,7 +3,7 @@ package com.slepeweb.money.bean;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties({"ready"})
 public class ChartProperties {

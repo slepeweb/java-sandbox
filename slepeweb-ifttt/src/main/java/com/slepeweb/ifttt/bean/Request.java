@@ -2,8 +2,8 @@ package com.slepeweb.ifttt.bean;
 
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 public abstract class Request {
 

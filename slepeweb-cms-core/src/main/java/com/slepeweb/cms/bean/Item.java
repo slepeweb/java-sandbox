@@ -35,7 +35,7 @@ public class Item extends CmsBean {
 	private boolean deleted, editable = true, published, searchable;
 	
 	// These properties pertain to access control
-	private boolean writeable, viewable;
+	private boolean writeAccess, readAccess;
 	
 	private Long id = -1L, origId;
 	private List<Link> links, parentLinks;
@@ -864,21 +864,21 @@ public class Item extends CmsBean {
 		return getId();
 	}
 
-	public boolean isWriteable() {
-		return writeable;
+	public boolean isWriteAccessGranted() {
+		return writeAccess;
 	}
 
-	public Item setWriteable(boolean writeable) {
-		this.writeable = writeable;
+	public Item grantWriteAccess(boolean b) {
+		this.writeAccess = b;
 		return this;
 	}
 
-	public boolean isViewable() {
-		return viewable;
+	public boolean isReadAccessGranted() {
+		return readAccess;
 	}
 
-	public Item setViewable(boolean viewable) {
-		this.viewable = viewable;
+	public Item grantReadAccess(boolean b) {
+		this.readAccess = b;
 		return this;
 	}
 

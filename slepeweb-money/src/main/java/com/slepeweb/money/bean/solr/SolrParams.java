@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
@@ -27,6 +27,7 @@ public class SolrParams {
 
 	// For Jackson
 	public SolrParams() {}
+	
 	
 	public SolrParams(SolrConfig config) {
 		this.config = config;

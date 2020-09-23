@@ -121,7 +121,7 @@ _cms.field.behaviour.cancel = function(nodeKey) {
 }
 
 _cms.field.behaviour.formchange = function() {
-	if (! _cms.editingItemIsReadonly) {
+	if (_cms.editingItemIsWriteable) {
 		$(_cms.field.sel.ALL_FORM_ELEMENTS).mouseleave(function() {
 			if ($(this).attr("name") != "language") {
 				if (_cms.support.enableIf(_cms.field.sel.UPDATE_BUTTON, 

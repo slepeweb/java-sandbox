@@ -1,6 +1,6 @@
 package com.slepeweb.ifttt.bean;
 
-import org.codehaus.jackson.annotate.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 public class PasswordTrigger extends Request {
 

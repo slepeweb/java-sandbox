@@ -102,7 +102,9 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 					setType(i.getType().getName()).
 					setTitle(getFieldValue(i, FieldName.TITLE, language, false, null)).
 					setTeaser(getFieldValue(i, FieldName.TEASER, language, false, null)).
-					setPath(i.getPath());
+					setPath(i.getPath()).
+					setEditable(i.isEditable()).
+					setViewable(i.isPublished());
 				
 				if (i.getSite().isMultilingual()) {
 					doc.setPath(String.format("/%s%s", language, i.getPath()));

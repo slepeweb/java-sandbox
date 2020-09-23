@@ -69,18 +69,18 @@ public class CmsServiceImpl implements CmsService {
 	 * In staging delivery context, the editable versions of items are delivered to web pages,
 	 * as opposed to live delivery context.
 	 */
-	private boolean stagingDeliveryContext = true;
+	private boolean editableContentRequired = true;
 	
-	public void setStagingDeliveryContext(boolean b) {
-		this.stagingDeliveryContext = b;
+	public void setEditableContentRequired(boolean b) {
+		this.editableContentRequired = b;
 	}
 
-	public boolean isStagingDeliveryContext() {
-		return stagingDeliveryContext;
+	public boolean isEditableContentRequired() {
+		return editableContentRequired;
 	}
 
-	public boolean isLiveDeliveryContext() {
-		return ! isStagingDeliveryContext();
+	public boolean isViewableContentRequired() {
+		return ! isEditableContentRequired();
 	}
 	
 	/*

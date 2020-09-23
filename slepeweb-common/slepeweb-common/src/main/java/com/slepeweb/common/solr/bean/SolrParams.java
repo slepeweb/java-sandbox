@@ -1,8 +1,7 @@
 package com.slepeweb.common.solr.bean;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonSetter;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.slepeweb.common.util.NumberUtil;
 
 @JsonIgnoreProperties({"start", "hrefBase"})

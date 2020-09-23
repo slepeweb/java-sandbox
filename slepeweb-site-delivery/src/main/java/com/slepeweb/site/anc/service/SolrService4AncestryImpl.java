@@ -41,6 +41,7 @@ public class SolrService4AncestryImpl extends SolrService4SiteBase implements So
 				q.setQuery(params.getSearchText());
 				q.addFilterQuery(String.format("siteid:\"%d\"", params.getSiteId()));
 				q.addFilterQuery(String.format("language:\"%s\"", params.getSearchResultsItem().getLanguage()));
+				q.addFilterQuery(String.format("viewable:\"%s\"", "true"));
 				q.add("defType", "dismax");
 				q.add("qf", "title^10 subtitle^4 bodytext");
 				q.setStart(params.getStart());

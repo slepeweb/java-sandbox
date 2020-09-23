@@ -1,7 +1,7 @@
 package com.slepeweb.money.bean;
 
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import com.slepeweb.money.Util;
 

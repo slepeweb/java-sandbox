@@ -45,7 +45,7 @@ _cms.copy.behaviour.submit = function(nodeKey) {
 }
 
 _cms.copy.behaviour.formchange = function(nodeKey) {
-	if (! _cms.editingItemIsReadonly) {
+	if (_cms.editingItemIsWriteable) {
 		$(_cms.copy.sel.ALL_INPUTS).mouseleave(function() {
 			if (_cms.support.enableIf(_cms.copy.sel.COPY_BUTTON,
 					$(_cms.copy.sel.NAME_INPUT).val() && $(_cms.copy.sel.SIMPLENAME_INPUT).val())) {

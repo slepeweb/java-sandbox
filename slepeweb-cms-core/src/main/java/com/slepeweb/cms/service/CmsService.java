@@ -9,8 +9,8 @@ import com.slepeweb.commerce.service.VariantService;
 public interface CmsService {
 	boolean isEditorialContext();
 	boolean isDeliveryContext();
-	boolean isLiveDeliveryContext();
-	boolean isStagingDeliveryContext();
+	boolean isViewableContentRequired();
+	boolean isEditableContentRequired();
 	boolean isCommerceEnabled();
 	
 	HostService getHostService();

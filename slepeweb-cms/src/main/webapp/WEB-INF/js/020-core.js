@@ -125,7 +125,7 @@ _cms.core.behaviour.reset = function(nodeKey) {
 }
 
 _cms.core.behaviour.formchange = function() {
-	if (! _cms.editingItemIsReadonly) {
+	if (_cms.editingItemIsWriteable) {
 		$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).mouseleave(function() {
 			if (_cms.support.enableIf(_cms.core.sel.UPDATE_BUTTON, 
 					$(_cms.core.sel.FORM).serialize() !== _cms.core.originalFormState)) {

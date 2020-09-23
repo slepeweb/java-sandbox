@@ -17,7 +17,7 @@ public class BaseServiceImpl {
 	@Autowired protected CacheEvictor cacheEvictor;
 	
 	protected String getVersionClause() {
-		return this.cmsService.isLiveDeliveryContext() ? " and i.published = 1" : " and i.editable = 1";
+		return this.cmsService.isViewableContentRequired() ? " and i.published = 1" : " and i.editable = 1";
 	}
 	
 	@SuppressWarnings("deprecation")

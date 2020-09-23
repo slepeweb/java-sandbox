@@ -25,5 +25,5 @@ _cms.init = function(nodeKey, html, activeTab) {
 	_cms.editingItemIsShortcut = $("#editingItem-is-shortcut").html() == 'true';
 	
 	// Can the user edit this item?
-	_cms.editingItemIsReadonly = $("#editingItem-is-readonly").html() == 'true';
+	_cms.editingItemIsWriteable = $("#editingItem-is-writeable").html() == 'true';
 }
