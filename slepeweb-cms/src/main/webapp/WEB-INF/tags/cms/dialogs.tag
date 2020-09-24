@@ -50,5 +50,10 @@
 
 <edit:links-addlink />
 
+<div id="searchresults-container" class="hide">
+	<p>Pick an item in the list</p>
+	<div id="searchresults"></div>
+</div>
+
 <audio id="bell" src="${applicationContextPath}/resources/pin-dropping.wav" preload="auto"></audio>
 

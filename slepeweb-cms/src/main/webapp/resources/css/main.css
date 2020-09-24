@@ -14,12 +14,13 @@ body {
 }
 
 header {
+	padding-bottom: 0.5em;
 	display: grid;
 	grid-template-columns: repeat(6, 1fr);
 	grid-template-areas: 
 		"ha ha ha ha ha ha"
 		"hb hb hb hc hc hc"
-		"hd hf hf hf hf hf"
+		"hd hf hf hg hg hg"		
 }
 
 header select {
@@ -36,6 +37,11 @@ div.hb {
 
 div.hf {
 	grid-area: hf;
+}
+
+div.hf {
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
 }
 
 #history-div {
@@ -59,6 +65,30 @@ div.hf {
 	color: #0093ba;
 	font-size: 1.5em;
 	align-self: center;
+}
+
+#search-bar {
+	grid-area: hg;
+	margin-left: 1.0em;
+	margin-top: 0.5em;
+}
+
+#search-bar input {
+	display: inline-block;
+	width: 72%
+}
+
+#search-bar button {
+	padding: 0;
+}
+
+#searchresults ul {
+	list-style-type: none;
+}
+
+#searchresults li {
+	margin-bottom: 0.5em;
+	margin-left: -2em;
 }
 
 #main-wrapper {
@@ -478,12 +508,32 @@ button[disabled=disabled] {
 					/* <<<<< Fancytree styles */
 
 
+
+div.cms-icon {
+	background-image: url("fancytree-cms-icons.gif");
+	width: 16px;
+	height: 16px;
+	display:inline-block;
+}
+
+div.cms-icon-boy { background-position: -33px 0px; }
+div.cms-icon-girl { background-position: -48px 0px; }
+div.cms-icon-pdf { background-position: -64px 0px; }
+div.cms-icon-document { background-position: -80px 0px; }
+div.cms-icon-image { background-position: -96px 0px; }
+
+span.fancytree-node.cms-icon-girl>span.fancytree-icon {
+	background-position: -48px 0px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+
 @media (min-width: 700px) {
 	header {
 		grid-template-columns: repeat(9, 1fr);
 		grid-template-areas: 
 			"ha ha ha ha hb hb hc hc hc"
-			"hd hf hf hf hf hf hf hf hf"
+			"hd hf hf hf hf hf hg hg hg"
 	}
 	
 	body {
@@ -492,6 +542,12 @@ button[disabled=disabled] {
 	
 	div.hb {
 		margin-top: 1.5em;
+	}
+	
+	#search-bar {
+		margin-top: 0em;
+		margin-left: 2em;
+		width: 100%;
 	}
 	
 	#history-div {
@@ -516,6 +572,5 @@ button[disabled=disabled] {
 	.section-ops .radio-pair {
 		display: inline-block;
 	}
-
 }
 

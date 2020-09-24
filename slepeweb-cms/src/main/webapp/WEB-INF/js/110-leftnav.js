@@ -95,66 +95,6 @@ _cms.leftnav.loadBreadcrumbs = function(key, fn, args) {
 	});
 }
 
-/* We are filtering the left array, by comparing it's elements with the right array.
- * All links that are NOT shortcuts will be filtered out. So will all MATCHING shortcuts.
- * leftIsFancytreeNode = true indicates the left array contains fancytree nodes, and the right array contains form data.
- * leftIsFancytreeNode = false indicates the left array contains form data, and the right array contains fancytree nodes.
- */
-/*
-_cms.leftnav.filterShortcuts = function(left, leftIsFancytreeNode, right) {
-	if (left) {
-		return left.filter(function(node, index, fullArray) {
-		
-			var isShortcut = leftIsFancytreeNode ? node.data.shortcut : node.shortcut;	
-			if (! isShortcut) {
-				return false;
-			}
-			
-			if (right) {
-				for (var j = 0; j < right.length; j++) {
-					isShortcut = leftIsFancytreeNode ? right[j].shortcut : right[j].data.shortcut
-					if (isShortcut && right[j].key == node.key) {
-						return false;
-					}
-				}
-			}
-			
-			return true;
-		});
-	}
-}
-*/
-
-/*
-_cms.leftnav.refreshShortcuts = function(parentKey, updatedChildData) {
-	var existingParentNode = _cms.leftnav.tree.getNodeByKey(parentKey);
-	if (existingParentNode) {
-		var existingChildren = existingParentNode.getChildren();
-	
-		// Remove non-shortcuts, and matching shortcuts from each array
-		// First, existing shortcuts
-		var filteredExisting = _cms.leftnav.filterShortcuts(existingChildren, true, updatedChildData);
-		
-		// Next, the updated form data
-		var filteredUpdates = _cms.leftnav.filterShortcuts(updatedChildData, false, existingChildren);;
-		
-		// Remove any nodes remaining in the filteredExisting array
-		if (filteredExisting) {
-			for (var j = 0; j < filteredExisting.length; j++) {
-				existingParentNode.removeChild(filteredExisting[j]);
-			}
-		}
-		
-		// Add any nodes remaining in the filteredUpdates array
-		if (filteredUpdates) {
-			for (var i = 0; i < filteredUpdates.length; i++) {
-				existingParentNode.addNode(filteredUpdates[i]);
-			}		
-		}
-	}
-};
-*/
-
 _cms.leftnav.refreshShortcut = function(nodeKey, action, type) {
 	if (action != "none" && type) {
 		var node = _cms.leftnav.tree.getNodeByKey(nodeKey);

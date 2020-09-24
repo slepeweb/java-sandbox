@@ -27,6 +27,8 @@
 			<cms:navigation-history />
 		</div>
 		
+		<cms:searchBar />
+		
 		<div id="leftnav-hider"><i class="fas fa-bars fa-2x"></i></div>
 		
 		<div class="hf">

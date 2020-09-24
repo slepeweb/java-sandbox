@@ -49,6 +49,7 @@ import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.SolrParams4Cms;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.component.Navigation.Node;
@@ -58,6 +59,7 @@ import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.commerce.bean.Product;
+import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.util.DateUtil;
 import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.common.util.ImageUtil;
@@ -995,4 +997,23 @@ public class RestController extends BaseController {
 		}
 	}
 
+	@RequestMapping("/search")
+	public String search(ModelMap model, 
+			@RequestParam(value="key", required=true) Long origId,
+			@RequestParam(value="searchtext", required=true) String searchtext,
+			HttpServletRequest req) {	
+		
+		Item i = this.getItem(origId, getUser(req));
+		
+		if (i != null) {
+			SolrParams4Cms params = new SolrParams4Cms(new SolrConfig().setPageSize(20)).
+					setSearchText(searchtext).
+					setSiteId(i.getSite().getId()).setLanguage(i.getLanguage());
+			
+			model.addAttribute("_response", this.solrService4Cms.query(params));
+		}
+		
+		return "cms.searchresults";		
+	}
+	
 }

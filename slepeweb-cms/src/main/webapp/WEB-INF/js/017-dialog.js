@@ -6,6 +6,7 @@ _cms.dialog = {
 	confirmFieldUpdate: {obj: null},
 	confirmTrash: {obj: null},
 	addLink: {obj: null},
+	searchresults: {obj: null},
 	sel: {
 		LINK_NOT_DEFINED: "#link-not-defined-dialog",
 		LINK_DATA_FORMAT: "#link-data-format-dialog",
@@ -95,6 +96,21 @@ _cms.dialog.addLink.define = function() {
 			"Add/edit a link", _cms.links.sel.ADD_LINK_CONTAINER, 300, 250, buttons, close);
 }
 
+_cms.dialog.searchresults.define = function() {	
+	var close = function() {
+		_cms.dialog.close(_cms.dialog.searchresults);
+	}
+	
+	var buttons = {
+		Cancel: function() {
+			close();
+		}
+	}
+	
+	_cms.dialog.searchresults.obj = _cms.dialog.define(
+			"Search results", "#searchresults-container", 300, 600, buttons, close);
+}
+
 _cms.dialog.warning = function(title, d, selector) {
 	  var close = function() {
 		  _cms.dialog.close(d);
@@ -113,6 +129,7 @@ _cms.dialog.onpageload = function() {
 	_cms.dialog.confirmTrash.define();
 	_cms.dialog.confirmFieldUpdate.define();
 	_cms.dialog.addLink.define();
+	_cms.dialog.searchresults.define();
 	_cms.dialog.warning("Link not adequately defined", _cms.dialog.linkNotDefined, _cms.dialog.sel.LINK_NOT_DEFINED);
 	_cms.dialog.warning("Duplicate link target", _cms.dialog.duplicateTarget, _cms.dialog.sel.DUPLICATE_TARGET);
 	_cms.dialog.warning("Illegal target", _cms.dialog.illegalTarget, _cms.dialog.sel.ILLEGAL_TARGET);

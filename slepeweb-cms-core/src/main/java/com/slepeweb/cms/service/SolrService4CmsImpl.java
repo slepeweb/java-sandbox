@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.FieldValue;
@@ -15,7 +17,10 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
+import com.slepeweb.cms.bean.SolrParams4Cms;
 import com.slepeweb.cms.constant.FieldName;
+import com.slepeweb.common.solr.bean.SolrPager;
+import com.slepeweb.common.solr.bean.SolrResponse;
 import com.slepeweb.common.solr.service.SolrService4CmsBase;
 
 @Service
@@ -206,6 +211,56 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 		if (o instanceof SolrDocument4Cms) {
 			return o;
 		}
+		return null;
+	}
+
+	public SolrResponse<SolrDocument4Cms> query(Object p) {
+		
+		if (p instanceof SolrParams4Cms) {
+			SolrParams4Cms params = (SolrParams4Cms) p;
+			SolrResponse<SolrDocument4Cms> response = new SolrResponse<SolrDocument4Cms>();
+			
+			if (StringUtils.isBlank(params.getSearchText())) {
+				response.setError(true);
+				response.setMessage("Please enter terms to search");
+			}
+			else {
+				SolrQuery q = new SolrQuery();
+				q.setQuery(params.getSearchText());
+				q.addFilterQuery(String.format("siteid:\"%d\"", params.getSiteId()));
+				q.addFilterQuery(String.format("language:\"%s\"", params.getLanguage()));
+				q.addFilterQuery(String.format("editable:\"%s\"", "true"));
+				q.add("defType", "dismax");
+				q.add("qf", "title^10 subtitle^4 bodytext");
+				q.setStart(params.getStart());
+				q.setRows(params.getPageSize());
+				//LOG.info(String.format("Solr query: [%s]", q.getQuery()));
+				
+				try {
+					QueryResponse qr = getClient().query(q);
+					response.setResults(qr.getBeans(SolrDocument4Cms.class));
+					response.setTotalHits(qr.getResults().getNumFound());
+//					LOG.debug(String.format("Query returned %d results out of %s", 
+//							response.getResults().size(), qr.getHeader().toString()));
+					
+					response.setPager(new SolrPager<SolrDocument4Cms>(
+							response.getTotalHits(), 
+							params.getPageSize(), 
+							params.getPageNum()));		
+					
+					return response;
+					
+				} catch (Exception e) {
+					response.setError(true);
+					response.setMessage("Search system error");
+				} 
+			}
+			
+			response.setTotalHits(0);
+			response.setResults(new ArrayList<SolrDocument4Cms>(0));
+			return response;
+		}
+		
 		return null;
 	}
 	
