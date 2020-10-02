@@ -48,7 +48,7 @@
 		<label for="name">Name: </label><input type="text" name="name" value="${editingItem.name}" />
 	</div>
 	<div class="ff">
-		<label for="simplename">Simple name: </label><input type="text" name="simplename" value="${editingItem.simpleName}" <c:if 
+		<label for="simplename">URL slug: </label><input type="text" name="simplename" value="${editingItem.simpleName}" <c:if 
 			test="${editingItem.root}">disabled="disabled"</c:if> />
 	</div>
 	

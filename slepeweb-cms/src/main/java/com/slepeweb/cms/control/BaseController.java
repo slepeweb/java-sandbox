@@ -48,6 +48,14 @@ public class BaseController {
 		return (User) req.getSession().getAttribute("_user");
 	}
 	
+	protected String userLog(User u, Object... message) {
+		StringBuilder sb = new StringBuilder(String.format("User '%s'", u.getFullName()));
+		for (Object o : message) {
+			sb.append(" ").append(o.toString());
+		}		
+		return sb.toString();
+	}
+	
 	@ModelAttribute(value="_loglevel")
 	protected boolean getLogLevelTrigger(@RequestParam(value="loglevel", required=false) String trigger) {
 		if (trigger != null) {

@@ -78,6 +78,11 @@ div.hf {
 	width: 72%
 }
 
+#search-bar.search-comps {
+	display: inline-block;
+	width: 100%;
+}
+
 #search-bar button {
 	padding: 0;
 }

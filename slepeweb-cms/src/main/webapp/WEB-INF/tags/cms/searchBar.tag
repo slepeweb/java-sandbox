@@ -1,8 +1,11 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div id="search-bar">
-	<input type="text" name="searchtext" value="${_params.searchText}" placeholder="Enter search terms" />
-	<button type="button"><span><i class="fa fa-search"></i></span></button>				
+	<span>Search: </span>
+	<div class="search-comps">
+		<input type="text" name="searchtext" value="${_params.searchText}" placeholder="Enter search terms" />
+		<button type="button"><span><i class="fa fa-search"></i></span></button>	
+	</div>			
 </div>
 
 <script>

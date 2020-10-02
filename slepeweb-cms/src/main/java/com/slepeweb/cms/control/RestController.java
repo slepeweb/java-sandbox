@@ -135,7 +135,8 @@ public class RestController extends BaseController {
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getItem(origId, getUser(req), true);
+		User u = getUser(req);
+		Item i = getItem(origId, u, true);
 		Template t = this.cmsService.getTemplateService().getTemplate(getLongParam(req, "template"));
 		Object[] data = new Object[3];
 		
@@ -175,6 +176,8 @@ public class RestController extends BaseController {
 					i.save();
 					resp.addMessage("Core item data successfully updated");
 				}
+				
+				LOG.info(userLog(u, "updated core data for", i));
 				
 				// Navigation node with title assigned to saved item name IF changed
 				data[0] = i.getName().equals(oldName) ? null : i.getName();
@@ -495,7 +498,8 @@ public class RestController extends BaseController {
 		}
 		
 		ItemType it = this.cmsService.getItemTypeService().getItemType(itemTypeId);
-		Item parent = getItem(parentOrigId, getUser(req), true);
+		User u = getUser(req);
+		Item parent = getItem(parentOrigId, u, true);
 		if (relativePosition.equals("alongside") && ! parent.isRoot()) {
 			parent = parent.getParent();
 		}
@@ -531,6 +535,8 @@ public class RestController extends BaseController {
 			else {
 				i.save();
 			}
+			
+			LOG.info(userLog(u, "saved item", i));
 			
 			Object[] o = new Object[]{Node.toNode(i), i.isShortcut(), i.getType().isMedia()};		
 			resp.addMessage("Item added").setData(o);

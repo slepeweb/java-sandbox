@@ -11,7 +11,7 @@
 		</div>
 		
 		<div class="hb">
-			<span>Site: </span>
+			<span>Site selection: </span>
 			<select id="site-selector">
 				<option value="0">Choose site ...</option>
 				<c:forEach items="${allSites}" var="_site">
@@ -23,7 +23,7 @@
 		
 		<!-- History -->
 		<div id="history-div">
-			<span>Recent history: </span>
+			<span>Breadcrumbs: </span>
 			<cms:navigation-history />
 		</div>
 		
