@@ -38,7 +38,7 @@ public class PageController extends BaseController {
 	@RequestMapping(value="/editor/{origId}")	
 	public String doWithItem(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = this.getItem(origId, getUser(req));
+		Item i = this.getEditableVersion(origId, getUser(req));
 		
 		if (i != null) {
 			model.addAttribute("editingItem", i);

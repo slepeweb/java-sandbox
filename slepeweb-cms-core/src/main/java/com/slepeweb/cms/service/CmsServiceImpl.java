@@ -96,6 +96,16 @@ public class CmsServiceImpl implements CmsService {
 	public void setCommerceEnabled(boolean b) {
 		this.commerceEnabled = b;
 	}
+	
+	private String staticSiteRoot;
+
+	public String getStaticSiteRoot() {
+		return staticSiteRoot;
+	}
+
+	public void setStaticSiteRoot(String staticSiteRoot) {
+		this.staticSiteRoot = staticSiteRoot;
+	}
 
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {

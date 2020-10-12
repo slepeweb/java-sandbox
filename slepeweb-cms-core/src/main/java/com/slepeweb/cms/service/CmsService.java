@@ -12,6 +12,7 @@ public interface CmsService {
 	boolean isViewableContentRequired();
 	boolean isEditableContentRequired();
 	boolean isCommerceEnabled();
+	String getStaticSiteRoot();
 	
 	HostService getHostService();
 	SiteService getSiteService();

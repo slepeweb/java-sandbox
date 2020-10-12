@@ -17,6 +17,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +85,7 @@ public class CmsDeliveryServlet {
 				String springTemplatePath = getTemplatePath(item, view);
 				item.setLanguage(language);
 				
-				User u = (User) req.getSession().getAttribute("_user");
+				User u = identifyUser(req);
 				redirector = accessibilityChecker(item, u, springTemplatePath);
 				
 				if (redirector.isRequired()) {
@@ -132,6 +133,34 @@ public class CmsDeliveryServlet {
 		}
 		
 		logResponseHeaders(res, path);
+	}
+	
+	private User identifyUser(HttpServletRequest req) {
+		
+		User u = (User) req.getSession().getAttribute("_user");
+		
+		if (u == null) {
+			// Check to see if user credentials have been provided in the request headers
+			String authHeader = req.getHeader("Authorization");
+			String prefix = "Basic ";
+			if (authHeader != null && authHeader.startsWith(prefix)) {
+				String encoded = authHeader.substring(prefix.length());
+				byte[] bytes = Base64.decodeBase64(encoded);
+				
+				if (bytes != null) {
+					String[] s = new String(bytes).split("___");
+					if (s.length == 2) {
+						u = this.cmsService.getUserService().get(s[0]);
+						if (u != null && ! u.getPassword().equals(s[1])) {
+							// Right username, wrong password
+							u = null;
+						}
+					}
+				}
+			}
+		}
+		
+		return u;
 	}
 	
 	private String getTemplatePath(Item i, String view) {

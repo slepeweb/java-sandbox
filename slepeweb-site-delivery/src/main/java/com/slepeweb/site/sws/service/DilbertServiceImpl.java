@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.slepeweb.site.service.HttpService;
+import com.slepeweb.common.service.HttpService;
 
 @Service("dilbertService")
 public class DilbertServiceImpl implements DilbertService {
@@ -18,7 +18,7 @@ public class DilbertServiceImpl implements DilbertService {
 
 	@Cacheable(value="serviceCache")
 	public String getTodaysDilbert(String url) {
-		String res = this.httpService.getResource(url);
+		String res = this.httpService.get(url);
 		if (res != null) {
 			Document doc = Jsoup.parse(res);
 			

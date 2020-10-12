@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.utils.SpringContext;
-import com.slepeweb.site.service.HttpService;
+import com.slepeweb.common.service.HttpService;
 
 public class HttpProxyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -24,7 +24,7 @@ public class HttpProxyServlet extends HttpServlet {
 
 			try {
 				PrintWriter pw = res.getWriter();
-				String markup = svc.getResource(url);
+				String markup = svc.get(url);
 				pw.write(markup);
 				pw.flush();
 			} catch (IOException e) {

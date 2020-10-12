@@ -80,9 +80,11 @@ public class CookieHelper {
 	}
 	
 	public String getCookieValue(String name, HttpServletRequest req) {
-		for (Cookie c : req.getCookies()) {
-			if (/*c.getPath() != null && c.getPath().equals(COOKIE_PATH) &&*/ c.getName().equals(name)) {
-				return c.getValue();
+		if (req.getCookies() != null) {
+			for (Cookie c : req.getCookies()) {
+				if (/*c.getPath() != null && c.getPath().equals(COOKIE_PATH) &&*/ c.getName().equals(name)) {
+					return c.getValue();
+				}
 			}
 		}
 		

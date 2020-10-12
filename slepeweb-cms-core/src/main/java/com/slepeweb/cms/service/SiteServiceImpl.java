@@ -99,6 +99,11 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	}
 
 	@Cacheable(value="serviceCache")
+	public Site getSiteByShortname(String name) {
+		return getSite("select * from site where shortname = ?", new Object[]{name});
+	}
+
+	@Cacheable(value="serviceCache")
 	public Site getSite(Long id) {
 		return getSite("select * from site where id = ?", new Object[]{id});
 	}

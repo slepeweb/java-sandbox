@@ -194,7 +194,7 @@ public class FieldValue extends CmsBean {
 			if (m.pattern().equals(ANCHOR_PATTERN)) {
 				if (i != null) {
 					// Replace link ref with item path
-					r = m.group(1) + i.getPath() + m.group(3) + m.group(4) + m.group(5);
+					r = m.group(1) + i.getUrl() + m.group(3) + m.group(4) + m.group(5);
 				}
 				else {
 					// Remove surrounding <a> tag, and leave behind the body.
@@ -204,7 +204,7 @@ public class FieldValue extends CmsBean {
 			else if (m.pattern().equals(IMAGE_PATTERN)) {
 				if (i != null) {
 					// Replace link ref with item path
-					r = m.group(1) + i.getPath() + m.group(3);
+					r = m.group(1) + i.getUrl() + m.group(3);
 				}
 				else {
 					// Remove <img> tag.

@@ -84,7 +84,7 @@ public class RestController extends BaseController {
 			@RequestParam(value="language", required=false) String requestedLanguage,
 			HttpServletRequest req, HttpServletResponse res) {	
 		
-		Item i = this.getItem(origId, getUser(req));
+		Item i = this.getEditableVersion(origId, getUser(req));
 		
 		if (i != null) {
 			String lang = chooseLanguage(i.getSite().isMultilingual(), requestedLanguage, i.getSite().getLanguage());
@@ -136,7 +136,7 @@ public class RestController extends BaseController {
 		
 		RestResponse resp = new RestResponse();
 		User u = getUser(req);
-		Item i = getItem(origId, u, true);
+		Item i = getEditableVersion(origId, u, true);
 		Template t = this.cmsService.getTemplateService().getTemplate(getLongParam(req, "template"));
 		Object[] data = new Object[3];
 		
@@ -241,7 +241,7 @@ public class RestController extends BaseController {
 		if (file != null) {
 			try {
 				is = file.getInputStream();
-				Item i = getItem(origId, getUser(req), true);
+				Item i = getEditableVersion(origId, getUser(req), true);
 				if (i != null) {
 					Media m = CmsBeanFactory.makeMedia().
 							setItemId(i.getId()).
@@ -308,7 +308,7 @@ public class RestController extends BaseController {
 	public RestResponse updateFields(@PathVariable long origId, HttpServletRequest request, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getItem(origId, getUser(request), true);
+		Item i = getEditableVersion(origId, getUser(request), true);
 		String param, stringValue, dateValueStr = null, timeValueStr = null;
 		FieldType ft;
 		FieldValue fv;
@@ -499,7 +499,7 @@ public class RestController extends BaseController {
 		
 		ItemType it = this.cmsService.getItemTypeService().getItemType(itemTypeId);
 		User u = getUser(req);
-		Item parent = getItem(parentOrigId, u, true);
+		Item parent = getEditableVersion(parentOrigId, u, true);
 		if (relativePosition.equals("alongside") && ! parent.isRoot()) {
 			parent = parent.getParent();
 		}
@@ -565,7 +565,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getItem(origId, getUser(req));
+		Item i = getEditableVersion(origId, getUser(req));
 		
 		try {
 			Item c = this.cmsService.getItemService().copy(i, name, simplename);	
@@ -592,7 +592,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getItem(origId, getUser(req), true);
+		Item i = getEditableVersion(origId, getUser(req), true);
 		
 		try {
 			Item c = this.cmsService.getItemService().version(i);			
@@ -614,7 +614,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getItem(origId, getUser(req));
+		Item i = getEditableVersion(origId, getUser(req));
 		
 		if (i != null) {
 			try {
@@ -634,7 +634,7 @@ public class RestController extends BaseController {
 	public RestResponse trashItem(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getItem(origId, getUser(req), true);
+		Item i = getEditableVersion(origId, getUser(req), true);
 		Item parent = i.getParent();
 		i.trash();
 			
@@ -650,7 +650,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();		
-		Item i = getItem(origId, getUser(req), true);
+		Item i = getEditableVersion(origId, getUser(req), true);
 		int count = 0;
 		
 		if (i != null) {
@@ -670,7 +670,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();		
-		Item i = getItem(origId, getUser(req), true);
+		Item i = getEditableVersion(origId, getUser(req), true);
 		int count = 0;
 		
 		if (i != null) {
@@ -805,14 +805,14 @@ public class RestController extends BaseController {
 		
 		RestResponse resp = new RestResponse();
 		User u = getUser(req);
-		Item mover = getItem(moverId, u, true);
+		Item mover = getEditableVersion(moverId, u, true);
 		if (mover.isRoot()) {
 			return resp.setError(true).setData(mover.getId()).addMessage("Cannot move the root item");
 		}
 		
-		Item target = getItem(targetId, u, true);
-		Item currentParent = getItem(moverParentId, u, true);
-		Item targetParent = getItem(targetParentId, u, true);
+		Item target = getEditableVersion(targetId, u, true);
+		Item currentParent = getEditableVersion(moverParentId, u, true);
+		Item targetParent = getEditableVersion(targetParentId, u, true);
 		
 		try {
 			mover.move(currentParent, targetParent, target, mode);		
@@ -836,7 +836,7 @@ public class RestController extends BaseController {
 
 		RestResponse resp = new RestResponse();
 		User u = getUser(req);
-		Item parent = getItem(parentId, u, true);
+		Item parent = getEditableVersion(parentId, u, true);
 		Item child;
 		List<Link> links = new ArrayList<Link>();
 		Link l;
@@ -870,7 +870,7 @@ public class RestController extends BaseController {
 				catch (UnsupportedEncodingException e) {}
 			}
 			
-			child = getItem(lp.getChildId(), u);
+			child = getEditableVersion(lp.getChildId(), u);
 			i = CmsBeanFactory.makeItem(null).setId(child.getId());			
 			l.setChild(i);			
 			links.add(l);
@@ -930,7 +930,7 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/item/{origId}/name", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
 	public String getItemName(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
-		Item i = getItem(origId, getUser(req));
+		Item i = getEditableVersion(origId, getUser(req));
 		if (i != null) {
 			return i.getName();
 		}
@@ -1009,7 +1009,7 @@ public class RestController extends BaseController {
 			@RequestParam(value="searchtext", required=true) String searchtext,
 			HttpServletRequest req) {	
 		
-		Item i = this.getItem(origId, getUser(req));
+		Item i = this.getEditableVersion(origId, getUser(req));
 		
 		if (i != null) {
 			SolrParams4Cms params = new SolrParams4Cms(new SolrConfig().setPageSize(20)).

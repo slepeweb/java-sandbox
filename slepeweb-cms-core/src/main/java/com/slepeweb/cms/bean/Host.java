@@ -50,14 +50,20 @@ public class Host extends CmsBean {
 		return name;
 	}
 	
-	public String getNamePortAndProtocol() {
-		StringBuilder sb = new StringBuilder(getProtocol()).
-				append("://").
-				append(getName());
+	public String getNameAndPort() {
+		StringBuilder sb = new StringBuilder(getName());
 		
 		if (getPort() != null && getPort() != 80) {
 			sb.append(":").append(getPort());
 		}
+		return sb.toString();
+	}
+	
+	public String getNamePortAndProtocol() {
+		StringBuilder sb = new StringBuilder(getProtocol()).
+				append("://").
+				append(getNameAndPort());
+		
 		return sb.toString();
 	}
 	

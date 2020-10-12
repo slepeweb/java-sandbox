@@ -46,7 +46,7 @@ public class NavigationController extends BaseController {
 			}
 		}
 		
-		return dive(getItem(origId, getUser(req)), 1).getChildren();		
+		return dive(getEditableVersion(origId, getUser(req)), 1).getChildren();		
 	}
 	
 	@RequestMapping(value="/leftnav/lazy/thread", method=RequestMethod.GET, produces="application/json")	
@@ -60,7 +60,7 @@ public class NavigationController extends BaseController {
 			return doLazyNavOneLevel(origId, siteId, req);
 		}
 		
-		Item item = this.getItem(origId, getUser(req));
+		Item item = this.getEditableVersion(origId, getUser(req));
 		String[] parts = item.getPath().substring(1).split("/");
 		final Vector<String> pathComponents = new Vector<String>(parts.length);
 		for (String s : parts) {
@@ -94,7 +94,7 @@ public class NavigationController extends BaseController {
 	@RequestMapping(value="/breadcrumbs/{origId}", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public String[] breadcrumbs(@PathVariable long origId, HttpServletRequest req) {	
-		Item i = getItem(origId, getUser(req));
+		Item i = getEditableVersion(origId, getUser(req));
 		List<Long> trail = new ArrayList<Long>();
 		String[] result = null;
 		

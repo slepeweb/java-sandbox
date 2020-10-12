@@ -27,12 +27,13 @@
 	    </mvc:argument-resolvers>
 	</mvc:annotation-driven>
 
-	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.commerce" />
+	<context:component-scan	base-package="com.slepeweb.cms, com.slepeweb.common, com.slepeweb.commerce" />
 		
 	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl">
 		<property name="editorialContext" value="true" />
 		<property name="editableContentRequired" value="true" />
 		<property name="commerceEnabled" value="false" />
+		<property name="staticSiteRoot" value="/var/www/html" />
 	</bean>
 	
 <!-- 	<bean id="config" class="com.slepeweb.cms.component.ServerConfig"> -->

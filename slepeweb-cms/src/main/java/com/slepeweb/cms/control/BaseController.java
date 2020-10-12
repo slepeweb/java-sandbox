@@ -19,6 +19,7 @@ import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
@@ -116,19 +117,44 @@ public class BaseController {
 		return fieldSupport;
 	}
 	
-	protected Item getItem(Long origId, User u) throws RuntimeException {
-		return getItem(origId, u, false);
+	protected Item getEditableVersion(Long origId, User u) throws RuntimeException {
+		return getEditableVersion(origId, u, false);
 	}
 	
-	protected Item getItem(Long origId, User u, boolean throwable) throws RuntimeException {
+	protected Item getEditableVersion(Long origId, User u, boolean throwable) throws RuntimeException {
 		Item i = this.cmsService.getItemService().getEditableVersion(origId);
+		checkWriteAccess(i, u, throwable);
+		return i;
+	}
+	
+	protected Item getEditableVersion(Site s, String path, User u) throws RuntimeException {
+		return getEditableVersion(s, path, u, false);
+	}
+	
+	protected Item getEditableVersion(Site s, String path, User u, boolean throwable) throws RuntimeException {
+		Item i = this.cmsService.getItemService().getEditableVersion(s.getId(), path);
+		checkWriteAccess(i, u, throwable);
+		return i;
+	}
+	
+	protected boolean checkWriteAccess(Item i, User u, boolean throwable) throws RuntimeException {
 		i.grantWriteAccess(this.cmsService.getSiteAccessService().hasWriteAccess(i, u));	
 		
 		if (throwable && ! i.isWriteAccessGranted()) {
-			throw new RuntimeException("Access control violation");
+			throw new RuntimeException("No write access");
 		}
 		
-		return i;
+		return i.isWriteAccessGranted();
+	}
+	
+	protected boolean checkReadAccess(Item i, User u, boolean throwable) throws RuntimeException {
+		i.grantReadAccess(this.cmsService.getSiteAccessService().hasReadAccess(i, null, u));	
+		
+		if (throwable && ! i.isReadAccessGranted()) {
+			throw new RuntimeException("No read access");
+		}
+		
+		return i.isReadAccessGranted();
 	}
 }
 
