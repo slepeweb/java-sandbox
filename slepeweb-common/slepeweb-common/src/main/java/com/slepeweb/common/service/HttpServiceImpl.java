@@ -3,6 +3,7 @@ package com.slepeweb.common.service;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
@@ -10,52 +11,31 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.common.bean.NameValuePair;
+
 @Service("httpService")
 public class HttpServiceImpl implements HttpService {
 
 	private static Logger LOG = Logger.getLogger(HttpServiceImpl.class);
-
-	public String get(String url) {		
-		return get(url, null, null);
-	}
-
-	public String get(String url, String userName, String password) {
-		return new String(getBytes(url, userName, password));
-	}
+	private CloseableHttpClient client;
 	
-	public byte[] getBytes(String url, String userName, String password) {
-		CloseableHttpResponse res = null;
-		
-		try {
-			res = getResponse(url, userName, password);						
-		    HttpEntity entity = res.getEntity();
-		    LOG.info(String.format("Retrieved resource [%s] with status [%s]", url, res.getStatusLine()));
-		    return EntityUtils.toByteArray(entity);
-		} 
-		catch (IOException e) {
-		    LOG.error(String.format("Failed to retrieve resource [%s]", url));
+	public CloseableHttpClient getClient() {
+		if (this.client == null) {
+			this.client = HttpClients.custom().build();
 		}
-		finally {
-		    try {res.close();}
-		    catch (Exception e) {}
-		}
-		
-		return null;
+		return this.client;
 	}
 
-	private CloseableHttpResponse getResponse(String url, String userName, String password) throws IOException{
-		
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpGet httpGet = new HttpGet(url);
-		
+	public NameValuePair getAuthorisationHeader(String userName, String password) {
 		if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(password)) {
 			byte[] encoded = null;
 			String credentials = String.format("%s___%s", userName, password);
@@ -67,8 +47,52 @@ public class HttpServiceImpl implements HttpService {
 				LOG.error("Failed to encode string", e1);
 			}
 			
-			String authHeader = "Basic " + new String(encoded);
-			httpGet.addHeader("Authorization", authHeader);
+			return new NameValuePair("Authorization", "Basic " + new String(encoded));
+		}
+		
+		return null;
+	}
+
+	public String get(String url) {		
+		return get(url, null);
+	}
+
+	public String get(String url, List<NameValuePair> headers) {
+		byte[] bytes = getBytes(url, headers);
+		return bytes == null ? new String() : new String(bytes);
+	}
+	
+	public byte[] getBytes(String url, List<NameValuePair> headers) {
+		CloseableHttpResponse res = null;
+		
+		try {
+			res = getResponse(url, headers);						
+		    HttpEntity entity = res.getEntity();
+		    LOG.info(String.format("Retrieved resource [%s] with status [%s]", url, res.getStatusLine()));
+		    return EntityUtils.toByteArray(entity);
+		} 
+		catch (IOException e) {
+		    LOG.error(String.format("Failed to retrieve resource [%s]", url), e);
+		    
+		    // Force the client object to be re-created, in case it was the cause
+		    this.client = null;
+		}
+		finally {
+		    try {res.close();}
+		    catch (Exception e) {}
+		}
+		
+		return null;
+	}
+
+	private CloseableHttpResponse getResponse(String url, List<NameValuePair> headers) throws IOException {
+		
+		RequestBuilder builder = RequestBuilder.get().setUri(url);
+
+		if (headers != null) {
+			for (NameValuePair nvp : headers) {
+				builder.setHeader(nvp.getName(), nvp.getValue());
+			}
 		}
 		
 		// In order to ensure correct deallocation of system resources
@@ -76,7 +100,8 @@ public class HttpServiceImpl implements HttpService {
 		// Please note that if response content is not fully consumed the underlying
 		// connection cannot be safely re-used and will be shut down and discarded
 		// by the connection manager. 
-		return client.execute(httpGet);
+		HttpUriRequest request = builder.build();
+		return getClient().execute(request);
 	}
 
 	public Map<String, String> getHeaders(String url) {
@@ -113,13 +138,4 @@ public class HttpServiceImpl implements HttpService {
 		return null;
 	}
 	
-	/*
-	private String getResponseMimetype(HttpEntity e) {
-		String[] h = e.getContentType().getValue().split("\\s");
-		if (h.length > 0) {
-			return h[0];
-		}
-		return null;
-	}
-	*/
 }

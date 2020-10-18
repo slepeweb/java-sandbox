@@ -36,11 +36,6 @@
 		<property name="staticSiteRoot" value="/var/www/html" />
 	</bean>
 	
-<!-- 	<bean id="config" class="com.slepeweb.cms.component.ServerConfig"> -->
-<!-- 		<property name="liveDelivery" value="false" /> -->
-<!-- 		<property name="commerceEnabled" value="false" /> -->
-<!-- 	</bean> -->
-	
 	<!-- Tiles -->
 	<bean id="tilesViewResolver"
 		class="org.springframework.web.servlet.view.UrlBasedViewResolver">

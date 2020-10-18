@@ -43,19 +43,23 @@ public class AncestryPageController extends BaseController {
 	@Autowired private SolrService4Ancestry solrService4Ancestry;
 	@Autowired private AncCookieService ancCookieService;
 	
-	@Override
-	public Page getStandardPage(Item i, String shortSitename, String viewNameSuffix, ModelMap model) {		
-		Page p = super.getStandardPage(i, shortSitename, viewNameSuffix, model);
+	@ModelAttribute(value="_languageUrlPrefix")
+	public String setLanguageAttr(HttpServletRequest req) {
+		// CmsDeliveryServlet will have created this request attribute earlier in the request/response cycle
+		Item i = (Item) req.getAttribute(ITEM);
 		
 		String langPrefix = "";		
 		if (i.getSite().isMultilingual()) {
 			langPrefix = "/" + i.getLanguage();
-		}	
-		model.addAttribute("_languageUrlPrefix", langPrefix);
-		
-		return p;
+		}
+		return langPrefix;
 	}
-	
+
+	@ModelAttribute(value="_staticDelivery")
+	public Boolean setStaticDeliveryAttr(HttpServletRequest req) {
+		return StringUtils.isNotBlank(req.getHeader("X-Static-Delivery"));
+	}
+
 	@ModelAttribute(value="_history")
 	public List<ItemIdentifier> breadcrumbTrail(HttpServletRequest req) {
 		Item i = (Item) req.getAttribute(ITEM);

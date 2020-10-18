@@ -1,12 +1,9 @@
 TODO: This is the main todo file:
 
 HIGH
-- search capability in the cms editor ... may need to distinguish between viewable and editable content,
-  in order to use the same solr index ... ?
 
 MEDIUM
-- ServerConfig properties should be held by CmsService object
-- check sws search still working
+- check sws (search) still working
 - PDFs not viewable on my android phone (chrome)
 - PDFs not rendered with scrollbars on iPad
 - need to protect against injection attacks
@@ -16,6 +13,7 @@ MEDIUM
 - also, solr indexing needs to recognise nesting nature
 
 LOW
+- find best way to disable certain features when delivered statically
 - write test: cannot move item to one of it's children, OR descendants
 - write test: cannot move item to one of it's linked parents (ie via relations, inlines, etc)
 - hover over lefthand nav in cms reveals wrong icon

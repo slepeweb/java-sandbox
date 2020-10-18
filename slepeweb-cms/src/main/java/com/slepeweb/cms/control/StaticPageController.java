@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import com.slepeweb.cms.bean.Url;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.SiteService;
+import com.slepeweb.common.bean.NameValuePair;
 import com.slepeweb.common.service.HttpService;
 
 @Controller
@@ -66,15 +68,18 @@ public class StaticPageController extends BaseController {
 
 			if (h != null) {
 				User u = getUser(req);
+				NameValuePair authorisationHeader = this.httpService.getAuthorisationHeader(u.getEmail(), u.getPassword());
+				NameValuePair staticDeliveryHeader = new NameValuePair("X-Static-Delivery", "1");
+				List<NameValuePair> headers = Arrays.asList(new NameValuePair[] {authorisationHeader, staticDeliveryHeader});
 				
 				// Stage 1: Scrape content from CMS delivery server, and save html in temporary files
 				if (s.isMultilingual()) {
 					for (String language : s.getAllLanguages()) {
-						crawlDynamicSite(new Url().setPath("/" + language), s, h, u, urlMap);
+						crawlDynamicSite(new Url().setPath("/" + language), headers, s, h, u, urlMap);
 					}
 				}
 				else {
-					crawlDynamicSite(new Url().setPath("/"), s, h, u, urlMap);
+					crawlDynamicSite(new Url().setPath("/"), headers, s, h, u, urlMap);
 				}
 				
 				// Stage 2: Edit each temporary html file, replacing internal urls to match how the files were saved
@@ -90,7 +95,8 @@ public class StaticPageController extends BaseController {
 		return "cms.crawl";
 	}
 	
-	private void crawlDynamicSite(Url sourceUrl, Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+	private void crawlDynamicSite(Url sourceUrl, List<NameValuePair> httpHeaders, Site s, Host h, User u, 
+			Map<String, StaticItem> pathMap) {
 		/*
 		 * This url will represent any url that can be delivered by the cms, including:
 		 * - stylesheet
@@ -143,7 +149,7 @@ public class StaticPageController extends BaseController {
 			si = new StaticItem(sourceUrl, mimetype, i.getBindings().size() > 0);
 			
 			if (mimetype.equals("application/cms")) {
-				html = this.httpService.get(sourceUrl.toString(), u.getEmail(), u.getPassword());
+				html = this.httpService.get(sourceUrl.toString(), httpHeaders);
 				if (StringUtils.isNotBlank(html)) {
 					try {
 						is = new BufferedInputStream(new ByteArrayInputStream(html.getBytes("utf-8")));
@@ -167,7 +173,7 @@ public class StaticPageController extends BaseController {
 			// This must be a resource, given that it is being delivered by the cms,
 			// yet is NOT an item.
 			si = new StaticItem(sourceUrl, "not/classified", false);
-			byte[] content = this.httpService.getBytes(sourceUrl.toString(), u.getEmail(), u.getPassword());
+			byte[] content = this.httpService.getBytes(sourceUrl.toString(), httpHeaders);
 			is = new BufferedInputStream(new ByteArrayInputStream(content));
 			writeToFile(is, toAbsoluteStaticPath(si.getStaticPath(), s.getShortname()));				
 		}
@@ -188,7 +194,7 @@ public class StaticPageController extends BaseController {
 				
 				while (m.find()) {
 					uri = m.group(1);
-					crawlDynamicSite(new Url().parse(uri), s, h, u, pathMap);
+					crawlDynamicSite(new Url().parse(uri), httpHeaders, s, h, u, pathMap);
 				}
 			}
 		}

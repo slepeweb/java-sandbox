@@ -45,7 +45,9 @@
 				</div>
 			</c:if>
 			
-			<span id="get-full-diagram" title="See full ancester tree"><i class="fas fa-sitemap fa-1g"></i></span>
+			<c:if test="${not _staticDelivery}">
+				<span id="get-full-diagram" title="See full ancester tree"><i class="fas fa-sitemap fa-1g"></i></span>
+			</c:if>
 		</div>
 	</div>
 		
