@@ -9,7 +9,7 @@ import com.slepeweb.money.bean.TimeWindow;
 import com.slepeweb.money.bean.Transaction;
 
 public interface MSAccessService {
-	void init(Payee p, Category c, TimeWindow twin) throws IOException;
+	void init(String mdbPath, Payee p, Category c, TimeWindow twin) throws IOException;
 	void cacheAccount(Long l, Account a);
 	void cachePayee(Long l, Payee a);
 	void cacheCategory(Long l, Category c);

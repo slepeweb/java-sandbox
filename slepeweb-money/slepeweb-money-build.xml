@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project slepeweb-money with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <!--define folder properties-->
+	
+		<!-- 
+			Properties dir.install, dir.tomcatlib, dir.gitrepos and dir.workspace must be provided on the ant command line. 
+		-->
+	
+		<property name="dir.moneylib" value="${dir.install}/lib" />
+		<property name="dir.dist" value="${dir.install}/dist" />
+	
+    <target name="create_run_jar" depends="create_lib">
+        <jar destfile="${dir.dist}/slepeweb-money-import.jar">
+            <manifest>
+                <attribute name="Main-Class" value="com.slepeweb.money.MoneyImportManager"/>
+              	<attribute name="Class-Path" value="${dir.moneylib}/slepeweb-common.jar ${dir.moneylib}/annotations-api.jar ${dir.moneylib}/jasper-el.jar ${dir.moneylib}/servlet-api-3.0.jar ${dir.moneylib}/mysql-connector-java-5.1.27.jar ${dir.moneylib}/el-api.jar ${dir.moneylib}/spring-context-3.2.12.RELEASE.jar ${dir.moneylib}/spring-aop-3.2.12.RELEASE.jar ${dir.moneylib}/spring-core-3.2.12.RELEASE.jar ${dir.moneylib}/spring-expression-3.2.12.RELEASE.jar ${dir.moneylib}/spring-beans-3.2.12.RELEASE.jar ${dir.moneylib}/spring-jdbc-3.2.12.RELEASE.jar ${dir.moneylib}/spring-tx-3.2.12.RELEASE.jar ${dir.moneylib}/aopalliance-1.0.jar ${dir.moneylib}/aspectjweaver-1.6.8.jar ${dir.moneylib}/slf4j-api-1.6.4.jar ${dir.moneylib}/commons-lang3-3.1.jar ${dir.moneylib}/log4j-1.2.17.jar ${dir.moneylib}/validation-api-1.1.0.Final.jar ${dir.moneylib}/httpclient-4.3.jar ${dir.moneylib}/httpcore-4.3.jar ${dir.moneylib}/commons-logging-1.1.3.jar ${dir.moneylib}/jackcess-2.1.11.jar ${dir.moneylib}/solr-solrj-5.5.4.jar ${dir.moneylib}/httpmime-4.4.1.jar ${dir.moneylib}/noggit-0.6.jar ${dir.moneylib}/jcl-over-slf4j-1.7.7.jar"/>
+            </manifest>
+            <fileset dir="${dir.gitrepos}/slepeweb-money/target/classes"/>
+        </jar>
+    </target>
+	
+	  <target name="create_lib">
+	      <mkdir dir="${dir.moneylib}" />
+	  	
+	      <copy todir="${dir.moneylib}">
+	      	<fileset dir="${dir.workspace}/.metadata/.plugins/org.eclipse.wst.server.core/tmp1/wtpwebapps/slepeweb-money/WEB-INF/lib" />
+	      </copy>
+	  	
+	      <copy file="${dir.tomcatlib}/annotations-api.jar" todir="${dir.moneylib}"/>
+	      <copy file="${dir.tomcatlib}/jasper-el.jar" todir="${dir.moneylib}"/>
+	      <copy file="${dir.tomcatlib}/el-api.jar" todir="${dir.moneylib}"/>	  	
+	      
+      	<copy file="/usr/share/java/servlet-api-3.0.jar" todir="${dir.moneylib}"/>
+	      <copy file="/usr/share/tomcat7/lib/mysql-connector-java-5.1.27.jar" todir="${dir.moneylib}"/>
+	  </target>
+</project>

@@ -1,10 +1,36 @@
 #/bin/bash
 #
 
-JAR=~/slepeweb-money-import.jar
-LIBS=~/slepeweb-money-import_lib
-DIST=~/slepeweb-money
+# The directory containing the data import application files
+INSTALL=/home/george/money
+
+# The location of the .MNY file
 MONEY=/media/george/Data/George/Kryptonite/home.MNY
+
+# The Tomcat installation
+TOMCAT_INST=/opt/tomcat
+
+# The location of the class files to be jar'ed
+GIT_REPOS=/home/george/git-repos
+
+# The eclipse workspace
+ECLIPSE_WS=/home/george/workspace
+
+# All other locations are relative to the money installation, and assume  the following file structure:
+# INSTALL
+# -- lib (contains supporting jar files)
+# -- dist
+# ---- slepeweb-money-import.jar (the runnable jar file that executes the data import)
+# ---- home.MNY (a working copy of the input data)
+# ---- home.MDB (the .MDB conversion of .MNY)
+# -- sunriise-export-0.0.1-SNAPSHOT-exec.jar (the file conversion app)
+# -- slepeweb-money-import.sh (this bash script)
+# -- slepeweb-money-build.xml (ant script to produce the jar file and supporting libraries)
+
+
+LIBS=$INSTALL/lib
+DIST=$INSTALL/dist
+JAR=$DIST/slepeweb-money-import.jar
 WORKING_MONEY=$DIST/home.MNY
 WORKING_MDB=$DIST/home.MDB
 FROM=""
@@ -27,7 +53,7 @@ then
 	exit 1
 fi
 
-ant -f slepeweb-money.xml
+ant -Ddir.install=$INSTALL -Ddir.tomcatlib=$TOMCAT_INST/lib -Ddir.gitrepos=$GIT_REPOS -Ddir.workspace=$ECLIPSE_WS -f $INSTALL/slepeweb-money-build.xml
 
 if [ $? -ne 0 ]
 then
@@ -61,7 +87,7 @@ fi
 
 cp $MONEY $WORKING_MONEY
 cd $DIST
-java -jar ./sunriise-export-0.0.1-SNAPSHOT-exec.jar $WORKING_MONEY g1ga50ft $WORKING_MDB
+java -jar $INSTALL/sunriise-export-0.0.1-SNAPSHOT-exec.jar $WORKING_MONEY g1ga50ft $WORKING_MDB
 
 if [ $? -ne 0 ]
 then
@@ -73,4 +99,4 @@ cd $DIST
 jar xvf $JAR
 
 cd
-java -cp $LIBS/*:$DIST com.slepeweb.money.MoneyImportManager -from $FROM
+java -cp $LIBS/*:$DIST com.slepeweb.money.MoneyImportManager -mdb $WORKING_MDB -from $FROM

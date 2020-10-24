@@ -6,7 +6,7 @@ import com.slepeweb.money.bean.TimeWindow;
 import com.slepeweb.money.bean.Transaction;
 
 public interface MoneyImportService {
-	void init(TimeWindow twin) throws IOException;
+	void init(String mdbFilePath, TimeWindow twin) throws IOException;
 	Transaction importTransaction(TimeWindow twin);
 	Long[] importTransfer();
 	Transaction importSplitTransactionsParentId();

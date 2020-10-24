@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -30,33 +31,59 @@ public class MoneyImportManager {
 		MoneyImportService mis = (MoneyImportService) context.getBean("moneyImportService");		
 		MoneyImportManager exe = new MoneyImportManager();
 		exe.transactionCache = new HashMap<Long, Transaction>(17001);
-		TimeWindow twin = new TimeWindow();
+		TimeWindow twin = null;
+		String mdbFilePath = null;
+		String param, value;
+		boolean dateParseError = false;
 		
-		if (args.length > 1) {
-			if (args[0].equals("-from")) {
-				Timestamp from = Util.parseTimestamp(args[1]);
-				if (from != null) {
-					twin.setFrom(from);
-					LOG.info(String.format("Time window starts at %s", args[1]));
+		for (int i = 0; i < args.length; i++) {
+			param = args[i];
+			if (param.startsWith("-")) {				
+				if (param.equals("-from")) {
+					value = argValue(i, args);
+					if (StringUtils.isNotBlank(value)) {
+						Timestamp from = Util.parseTimestamp(value);
+						if (from != null) {
+							twin = new TimeWindow();
+							twin.setFrom(from);
+							LOG.info(String.format("Time window starts at %s", value));
+						}
+						else {
+							LOG.fatal(String.format("Failed to parse date [%s]", value));
+							dateParseError = true;
+						}
+					}
 				}
-				else {
-					LOG.fatal(String.format("Failed to parse date [%s]", args[1]));
+				else if (param.equals("-mdb")) {
+					mdbFilePath = argValue(i, args);
 				}
 			}
 		}
 		
-		if (exe.init(mis, twin)) {
-			exe.importTransactions(mis, twin);
-			exe.importTransfers(mis, twin);
-			exe.importSplitTransactions(mis, twin);
+		if (StringUtils.isNotBlank(mdbFilePath) && twin != null && ! dateParseError) {
+			if (exe.init(mdbFilePath, mis, twin)) {
+				exe.importTransactions(mis, twin);
+				exe.importTransfers(mis, twin);
+				exe.importSplitTransactions(mis, twin);
+			}
+		}
+		else {
+			LOG.error("Usage: MoneyImportManager -mdb <filePath> -from <yyyy-mm-dd>");
 		}
 		
 		LOG.info("... MoneyImportManager has finished");
 	}
 	
-	private boolean init(MoneyImportService mis, TimeWindow twin) {
+	private static String argValue(int index, String[] args) {
+		if ((index + 1) < args.length) {
+			return args[index + 1];
+		}
+		return null;
+	}
+	
+	private boolean init(String mdbFilePath, MoneyImportService mis, TimeWindow twin) {
 		try {
-			mis.init(twin);
+			mis.init(mdbFilePath, twin);
 			return true;
 		}
 		catch (Exception e) {

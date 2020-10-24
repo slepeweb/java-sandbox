@@ -28,9 +28,9 @@ public class MoneyImportServiceImpl implements MoneyImportService {
 	@Autowired private MSAccessService msAccessService;
 	@Autowired private SolrService4Money solrService4Money;
 	
-	public void init(TimeWindow twin) throws IOException {
+	public void init(String mdbFilePath, TimeWindow twin) throws IOException {
 		// Create null entries for Payee and Category, if not already created
-		this.msAccessService.init(getNoPayee(), getNoCategory(), twin);
+		this.msAccessService.init(mdbFilePath, getNoPayee(), getNoCategory(), twin);
 		
 		// Get all accounts from MSAccess, save them in mysql, and store them in a temporary cache
 		Account mysqlAccount, accessAccount;

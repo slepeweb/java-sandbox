@@ -75,7 +75,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	public static final String CLOSED = "fClosed";
 	public static final String COMMENT = "mComment";
 
-	private String accessFilePath = "/home/george/slepeweb-money/home.MDB";
+	//private String mdbFilePath = "/home/george/money/dist/home.MDB";
 	
 	private Map<Long, Account> accountMap = new HashMap<Long, Account>();
 	private Map<Long, Payee> payeeMap = new HashMap<Long, Payee>();
@@ -89,11 +89,11 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	private Cursor trnCursorFinder, trnXferCursorSeq, trnSplitCursorSeq, trnSplitCursorFinder;
 	private IndexCursor trnCursorSeq;
 	
-	public void init(Payee noPayee, Category noCategory, TimeWindow twin) throws IOException {
+	public void init(String mdbFilePath, Payee noPayee, Category noCategory, TimeWindow twin) throws IOException {
 		this.noPayee = noPayee;
 		this.noCategory = noCategory;
 		
-		Database db = DatabaseBuilder.open(new File(this.accessFilePath));
+		Database db = DatabaseBuilder.open(new File(mdbFilePath));
 		Table trn = db.getTable(TRANSACTION_TBL);
 		Index transactionDateIndex = null;
 		try {
