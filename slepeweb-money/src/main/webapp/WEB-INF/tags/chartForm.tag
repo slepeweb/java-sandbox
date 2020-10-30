@@ -1,5 +1,7 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
+	
+<!-- chartForm.tag -->
 
 <mny:multiCategoryInputSupport />
 <mny:multiCategoryJavascript />

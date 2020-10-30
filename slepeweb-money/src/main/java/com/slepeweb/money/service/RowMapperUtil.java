@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.RowMapper;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.FlatTransaction;
+import com.slepeweb.money.bean.NakedTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.Property;
 import com.slepeweb.money.bean.SavedSearch;
@@ -93,12 +94,13 @@ public class RowMapperUtil {
 		}
 	}
 	
-	public static final class NakedTransactionMapper implements RowMapper<Transaction> {
-		public Transaction mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new Transaction().
+	public static final class NakedTransactionMapper implements RowMapper<NakedTransaction> {
+		public NakedTransaction mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new NakedTransaction().
 					setEntered(rs.getTimestamp("entered")).
-					setXferId(rs.getLong("transferid")).
-					setAmount(rs.getLong("amount"));			
+					setTransferid(rs.getLong("transferid")).
+					setAmount(rs.getLong("amount")).
+					setExpense(rs.getBoolean("expense"));			
 		}
 	}
 	
@@ -150,19 +152,22 @@ public class RowMapperUtil {
 	}
 	
 	private static Category makeCategory(ResultSet rs) throws SQLException {
-		return makeCategory(rs, "id", "origid", "major", "minor");
+		return makeCategory(rs, "id", "origid", "major", "minor", "expense");
 	}
 	
 	private static Category makeCategoryX(ResultSet rs) throws SQLException {
-		return makeCategory(rs, "categoryid", "categoryorigid", "major", "minor");
+		return makeCategory(rs, "categoryid", "categoryorigid", "major", "minor", "expense");
 	}
 	
-	private static Category makeCategory(ResultSet rs, String id, String origId, String major, String minor) throws SQLException {
+	private static Category makeCategory(ResultSet rs, String id, String origId, String major, String minor, 
+			String expense) throws SQLException {
+		
 		return new Category().
 			setId(rs.getLong(id)).
 			setOrigId(rs.getLong(origId)).
 			setMajor(rs.getString(major)).
-			setMinor(rs.getString(minor));
+			setMinor(rs.getString(minor)).
+			setExpense(rs.getBoolean(expense));
 	}
 
 	public static final class ScheduledTransactionMapper implements RowMapper<ScheduledTransaction> {

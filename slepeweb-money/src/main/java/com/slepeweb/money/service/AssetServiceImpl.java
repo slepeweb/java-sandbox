@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import com.slepeweb.money.bean.Transaction;
+import com.slepeweb.money.bean.NakedTransaction;
 
 @Service("assetService")
 public class AssetServiceImpl implements AssetService {
@@ -20,14 +20,16 @@ public class AssetServiceImpl implements AssetService {
 	 * 		entered
 	 * 		amount
 	 * 		transferId
+	 * 		memo (hack: using memo property to store the category type
 	 */
-	public List<Transaction> get(Timestamp from, Timestamp to) {
+	public List<NakedTransaction> get(Timestamp from, Timestamp to) {
 		return this.jdbcTemplate.query(
-				"select t.entered, t.amount, t.transferid " + 
-				"from transaction t, account a " + 
+				"select t.entered, t.amount, t.transferid, c.expense " + 
+				"from transaction t, account a, category c " + 
 				"where " +
 				"t.accountid = a.id and " +
-				"a.type in ('current', 'savings', 'pension') and " +
+				"t.categoryid = c.id and " +
+				"a.type != 'other' and " +
 				"t.entered >= ? and " +
 				"t.entered <= ? " +
 				"order by t.entered", 

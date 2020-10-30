@@ -83,7 +83,8 @@ public class CategoryController extends BaseController {
 		Category c = new Category().
 				setId(Long.valueOf(req.getParameter("id"))).
 				setMajor(req.getParameter("major")).
-				setMinor(req.getParameter("minor"));
+				setMinor(req.getParameter("minor")).
+				setType(req.getParameter("categorytype"));
 		
 		try {
 			this.categoryService.save(c);

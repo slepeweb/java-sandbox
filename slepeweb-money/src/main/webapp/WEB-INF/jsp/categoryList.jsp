@@ -19,6 +19,7 @@
 						<c:forEach items="${_m.objects}" var="_c">
 							<tr>
 								<td class="name"><a href="${_ctxPath}/category/form/${_c.id}">${_c.minor}</a></td>
+								<td>${_c.type}</td>
 							</tr>
 						</c:forEach>
 					</table>

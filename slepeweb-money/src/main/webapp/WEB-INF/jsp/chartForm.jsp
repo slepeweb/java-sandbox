@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<!-- chartForm.jsp -->
+
 <mny:flash />
 
 <c:choose><c:when test="${_formMode eq 'create'}">

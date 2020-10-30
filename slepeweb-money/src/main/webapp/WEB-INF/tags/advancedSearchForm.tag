@@ -1,6 +1,8 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
+<!-- advancedSearchForm.tag -->
+
 <c:set var="_selectedAccountId" value="${_params.accountIdStr}" />
 <c:set var="_selectedPayeeId" value="${_params.payeeIdStr}" />
 <c:set var="_selectedPayeeName" value="${_params.payeeName}" />

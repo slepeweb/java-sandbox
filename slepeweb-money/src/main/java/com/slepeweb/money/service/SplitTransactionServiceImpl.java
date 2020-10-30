@@ -19,7 +19,7 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 	private static final String SELECT = 
 			"select " +
 					"st.id, st.transactionid, st.amount, st.memo, " + 
-					"c.id as categoryid, c.origid as categoryorigid, c.major, c.minor " + 
+					"c.id as categoryid, c.origid as categoryorigid, c.major, c.minor, c.expense " + 
 			"from splittransaction st " +
 					"join category c on c.id = st.categoryid ";
 	

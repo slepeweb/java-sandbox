@@ -1,0 +1,15 @@
+/* Many of Adam's monthly repayments (and loans) are against category 'Miscellaneous', and should be 'Other Income > Repayment' 
+   or 'Personal Loan > Adam'. This is corrected manually in MySql db. */
+
+/* For credits, ie repayments by Adam */
+update transaction set categoryid=149 where payeeid=610 and categoryid=30 and accountid=21 and amount > 0
+
+/* For debits, ie loans to Adam */
+update transaction set categoryid=331 where payeeid=610 and categoryid=30 and accountid=21 and amount < 0
+
+where:
+accountid=21   // Halifax Current
+categoryid=30  // Miscellaneous
+categoryid=149 // Other Income > Repayment
+categoryid=331 // Personal Loan > Adam
+payeeid=610    // Adam Buttigieg

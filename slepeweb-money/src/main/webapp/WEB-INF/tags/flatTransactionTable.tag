@@ -26,7 +26,7 @@
 		<td></td>
 		<td></td>
 		<td></td>
-		<td>Total</td>
+		<td>Total on <strong>this</strong> page</td>
 		<td class="currency amount">${mon:displayAmountNS(_totalCredit)}</td>
 		<td></td>
 	</tr>

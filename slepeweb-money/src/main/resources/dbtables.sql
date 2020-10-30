@@ -15,6 +15,7 @@ create table category
 	origid int,
 	major varchar(255),
 	minor varchar(255),
+	expense boolean,
 	primary key (id),
 	index idx_category_origid (origid),
 	unique key idx_category (major, minor)

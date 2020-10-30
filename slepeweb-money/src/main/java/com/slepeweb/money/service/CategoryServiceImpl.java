@@ -48,8 +48,8 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into category (origid, major, minor) values (?, ?, ?)", 
-					c.getOrigId(), c.getMajor(), c.getMinor());
+					"insert into category (origid, major, minor, expense) values (?, ?, ?, ?)", 
+					c.getOrigId(), c.getMajor(), c.getMinor(), c.isExpense());
 			
 			c.setId(getLastInsertId());	
 			
@@ -66,8 +66,8 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 			dbRecord.assimilate(c);
 			
 			this.jdbcTemplate.update(
-					"update category set major = ?, minor = ? where id = ?", 
-					dbRecord.getMajor(), dbRecord.getMinor(), dbRecord.getId());
+					"update category set major = ?, minor = ?, expense = ? where id = ?", 
+					dbRecord.getMajor(), dbRecord.getMinor(), dbRecord.isExpense(), dbRecord.getId());
 			
 			LOG.info(compose("Updated category", c));
 		}

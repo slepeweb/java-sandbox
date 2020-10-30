@@ -113,7 +113,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	}
 	
 	public List<Account> getAssets() {
-		String sql = "select * from account where type in ('current', 'savings', 'pension') order by name";
+		//String sql = "select * from account where type in ('current', 'savings', 'pension') order by name";
+		String sql = "select * from account where type != 'other' order by name";
 		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
 	}
 	

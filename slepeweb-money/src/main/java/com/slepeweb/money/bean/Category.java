@@ -2,10 +2,14 @@ package com.slepeweb.money.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties({"defined4Insert", "inDatabase", "legacy"})
+@JsonIgnoreProperties({"defined4Insert", "inDatabase", "legacy", "expense"})
 public class Category extends DbEntity {
+	
+	public static final String EXPENSE_TYPE = "expense";
+	public static final String INCOME_TYPE = "income";
+	
 	private String major = "", minor = "";
-	private boolean exclude;
+	private boolean exclude, expense = true;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Category) {
@@ -13,6 +17,7 @@ public class Category extends DbEntity {
 			setMajor(c.getMajor());
 			setMinor(c.getMinor());
 			setOrigId(c.getOrigId());
+			setExpense(c.isExpense());
 		}
 	}
 	
@@ -71,10 +76,29 @@ public class Category extends DbEntity {
 		return this;
 	}
 
+	public boolean isExpense() {
+		return expense;
+	}
+
+	public Category setExpense(boolean expense) {
+		this.expense = expense;
+		return this;
+	}
+	
+	public Category setType(String s) {
+		this.expense = s != null && s.equals(EXPENSE_TYPE);
+		return this;
+	}
+	
+	public String getType() {
+		return isExpense() ? EXPENSE_TYPE : INCOME_TYPE;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (expense ? 1231 : 1237);
 		result = prime * result + ((major == null) ? 0 : major.hashCode());
 		result = prime * result + ((minor == null) ? 0 : minor.hashCode());
 		return result;
@@ -89,6 +113,8 @@ public class Category extends DbEntity {
 		if (getClass() != obj.getClass())
 			return false;
 		Category other = (Category) obj;
+		if (expense != other.expense)
+			return false;
 		if (major == null) {
 			if (other.major != null)
 				return false;
@@ -101,4 +127,5 @@ public class Category extends DbEntity {
 			return false;
 		return true;
 	}
+
 }

@@ -18,8 +18,8 @@ public class YearlyAssetStatus {
 		return year;
 	}
 	
-	public long getNetAmount() {
-		return getIncome() - getExpense();
+	public long getGrowth() {
+		return getIncome() + getExpense();
 	}
 	
 	public YearlyAssetStatus setYear(int year) {
@@ -53,11 +53,12 @@ public class YearlyAssetStatus {
 		this.expense += l;
 	}
 	
-	public void count(long l) {
-		if (l < 0) {
-			debit(-l);
-			return;
+	public void count(NakedTransaction nt) {
+		if (nt.isExpense()) {
+			debit(nt.getAmount());
 		}
-		credit(l);
+		else {
+			credit(nt.getAmount());
+		}
 	}
 }

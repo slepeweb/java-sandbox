@@ -1,8 +1,8 @@
 package com.slepeweb.money.control;
 
+import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,16 +11,20 @@ import java.util.Map;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.graphics2d.svg.SVGGraphics2D;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.NakedTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.YearlyAssetHistory;
 import com.slepeweb.money.bean.YearlyAssetStatus;
@@ -42,6 +46,18 @@ public class AssetController extends BaseController {
 	
 	@RequestMapping(value="/history")	
 	public String history(ModelMap model) { 
+		int thisYear = Util.getYear(new Date());
+		return historyStart(thisYear - 10, model);
+	}
+	
+	@RequestMapping(value="/history/{displayYearStart}")	
+	public String historyStart(@PathVariable int displayYearStart, ModelMap model) { 
+		int thisYear = Util.getYear(new Date());
+		return historyWindow(displayYearStart, thisYear, model);
+	}
+	
+	@RequestMapping(value="/history/{displayYearStart}/{displayYearEnd}")	
+	public String historyWindow(@PathVariable int displayYearStart, @PathVariable int displayYearEnd, ModelMap model) { 
 		YearlyAssetHistory history = new YearlyAssetHistory();
 		YearlyAssetStatus assetStatus;
 		Calendar from = Calendar.getInstance();
@@ -49,7 +65,6 @@ public class AssetController extends BaseController {
 		Util.startOfYear(from);
 		Util.endOfYear(to);
 		Transaction mirror;
-		List<String> validAccountTypes = Arrays.asList(new String[] {"current", "savings", "pension"});
 		DefaultCategoryDataset ds = new DefaultCategoryDataset();
 		Long openingBalance, closingBalance;
 		
@@ -93,6 +108,8 @@ public class AssetController extends BaseController {
 		long overallBalance = 0L;
 		List<YearlyAssetStatus> data = new ArrayList<YearlyAssetStatus>();
 		model.addAttribute("_data", data);
+		
+		String accountType;
 				
 		for (int yearStepper = minYear; yearStepper <= thisYear; yearStepper++) {
 			from.set(Calendar.YEAR, yearStepper);
@@ -110,31 +127,38 @@ public class AssetController extends BaseController {
 			// (If the account is closed, it shouldn't have any funds in it, but some older ones do!)
 			closingBalance = yearlyClosingBalance.get(yearStepper);
 			if (closingBalance != null) {
-				assetStatus.debit(closingBalance);
+				//assetStatus.debit(closingBalance);
+				assetStatus.credit(-closingBalance);
 			}
 			
-			for (Transaction t : this.assetService.get(Util.toTimestamp(from), Util.toTimestamp(to))) {
+			for (NakedTransaction t : this.assetService.get(Util.toTimestamp(from), Util.toTimestamp(to))) {
 				if (t.isTransfer()) {
-					mirror = this.transactionService.get(t.getTransferId());
-					if (! validAccountTypes.contains(mirror.getAccount().getType())) {
-						assetStatus.count(t.getAmount());
+					mirror = this.transactionService.get(t.getTransferid());
+					accountType = mirror.getAccount().getType();
+					if (accountType == null || accountType.equals("other")) {
+						// Some of the old (now closed) accounts used to be (for example) for Gas and Electricity, etc
+						assetStatus.count(t);
 					}
 					else {
-						// Ignore transfers to accounts that do no reflect wealth measurement.
+						// Ignore transfers between accounts that are considered assets,
+						// ie, savings, current, pension. Such transfers do not affect
+						// overall wealth.
 					}
 				}
 				else {
-					assetStatus.count(t.getAmount());
+					assetStatus.count(t);
 				}
 			}
 			
-			overallBalance += assetStatus.getNetAmount();
+			overallBalance += assetStatus.getGrowth();
 			totalStatus.add(assetStatus);
 			data.add(assetStatus);
 			
-			ds.addValue(Util.toPounds(assetStatus.getIncome()), INCOME_LABEL, Integer.valueOf(yearStepper));
-			ds.addValue(Util.toPounds(assetStatus.getExpense()), EXPENSE_LABEL, Integer.valueOf(yearStepper));
-			ds.addValue(Util.toPounds(overallBalance), BALANCE_LABEL, Integer.valueOf(yearStepper));
+			if (yearStepper >= displayYearStart && yearStepper <= displayYearEnd) {
+				ds.addValue(Util.toPounds(assetStatus.getIncome()), INCOME_LABEL, Integer.valueOf(yearStepper));
+				ds.addValue(Util.toPounds(assetStatus.getExpense()), EXPENSE_LABEL, Integer.valueOf(yearStepper));
+				ds.addValue(Util.toPounds(overallBalance), BALANCE_LABEL, Integer.valueOf(yearStepper));
+			}
 		}
 
 		JFreeChart chart = ChartFactory.createBarChart(
@@ -142,7 +166,14 @@ public class AssetController extends BaseController {
 		         ds,
 		         PlotOrientation.VERTICAL, true, true, false);
 		
-		int width = 1600, height = 600;
+		CategoryPlot categoryplot = chart.getCategoryPlot();
+		BarRenderer bar = new BarRenderer();		
+		bar.setSeriesPaint(0, Color.BLUE);
+		bar.setSeriesPaint(1, Color.RED);
+		bar.setSeriesPaint(2, Color.GREEN);
+		categoryplot.setRenderer(bar);
+
+		int width = 1170, height = 600;
 		SVGGraphics2D svg2d = new SVGGraphics2D(width, height);
 		chart.draw(svg2d,new Rectangle2D.Double(0, 0, width, height));
 		model.addAttribute("_assetSVG", svg2d.getSVGElement());
