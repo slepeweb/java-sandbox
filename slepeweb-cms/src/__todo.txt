@@ -1,6 +1,8 @@
 TODO: This is the main todo file:
 
 HIGH
+- re-test registration process
+- check backup processes
 
 MEDIUM
 - check sws (search) still working

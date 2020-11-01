@@ -226,7 +226,7 @@
 	}
 
 	input[type="checkbox"],
-	input[type="radio"], {
+	input[type="radio"] {
 		/*@include vendor-property('appearance', 'none');
 		display: block;
 		float: left;
@@ -786,5 +786,9 @@ input[type="submit"] {
 span {
 	&.debit-amount {
 		color: red;
+	}
+	
+	.fa-info-circle {
+		color: #645e55;	
 	}
 }

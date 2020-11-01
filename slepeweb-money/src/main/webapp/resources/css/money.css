@@ -900,3 +900,6 @@ input[type="submit"] {
 span.debit-amount {
   color: red;
 }
+span .fa-info-circle {
+  color: #645e55;
+}

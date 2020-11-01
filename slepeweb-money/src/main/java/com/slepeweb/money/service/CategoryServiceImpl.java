@@ -28,7 +28,7 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 					return dbRecord;
 				}
 				else {
-					throw new DataInconsistencyException(error(LOG, "Categroy does not exist in DB", c));
+					throw new DataInconsistencyException(error(LOG, "Category does not exist in DB", c));
 				}
 			}
 			else {

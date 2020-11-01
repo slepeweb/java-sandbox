@@ -79,6 +79,11 @@ public class Transaction extends DbEntity {
 				getAccount(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
+	// This is overriden by Transfer class
+	public Account getMirrorAccount() {
+		return null;
+	}
+	
 	public static Transaction adapt(ScheduledTransaction scht) {
 		Transaction t = new Transaction();
 		if (scht.getMirror() != null) {
@@ -172,6 +177,10 @@ public class Transaction extends DbEntity {
 
 	public boolean isDebit() {
 		return getAmount() <= 0L;
+	}
+	
+	public boolean isCredit() {
+		return ! isDebit();
 	}
 	
 	public boolean isTransfer() {

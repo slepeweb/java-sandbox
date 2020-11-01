@@ -8,9 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
@@ -136,12 +135,6 @@ public class TransactionController extends BaseController {
 		
 		for (int i = numTransactions - 1; i >= 0; i--) {
 			t = transactions.get(i);
-			
-			if (t.isTransfer() && StringUtils.isBlank(t.getMemo())) {
-				Transaction tt = this.transactionService.get(t.getTransferId());
-				t.setMemo(String.format("%s '%s'", t.isDebit() ? "To " : "From ", tt.getAccount().getName()));
-			}
-			
 			tl.getRunningBalances()[numTransactions - i - 1] = new RunningBalance(t).setBalance(balance);
 			balance -= t.getAmount();			
 		}

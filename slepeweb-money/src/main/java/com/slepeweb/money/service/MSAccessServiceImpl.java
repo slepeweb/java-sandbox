@@ -65,6 +65,8 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	public static final String ACCOUNT_ID = "hacct";
 	public static final String PAYEE_ID = "hpay";
 	public static final String CATEGORY_ID = "hcat";
+	public static final String CATEGORY_TYPE = "lType";
+	public static final String CATEGORY_LEVEL = "nLevel";
 	public static final String PARENT_CATEGORY_ID = "hcatParent";
 	public static final String TRANSACTION_ID = "htrn";
 	public static final String TRANSACTION_PARENT_ID = "htrnParent";
@@ -74,9 +76,35 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 	public static final String OPENING_AMOUNT = "amtOpen";
 	public static final String CLOSED = "fClosed";
 	public static final String COMMENT = "mComment";
-
-	//private String mdbFilePath = "/home/george/money/dist/home.MDB";
 	
+	/*
+	 * Take care with the format of entries in this list: <major>__<minor>
+	 * (There are 2 underscores between the two parts).
+	 */
+	private static Map<String, Boolean> OVERRIDES = new HashMap<String, Boolean>();
+	
+	private static String[] INCOME_OVERRIDES_ARR = new String[] {
+			"Taxes__Child tax credit",
+			"Moving House__Proceeds"
+	};
+	
+	private static String[] EXPENSE_OVERRIDES_ARR = new String[] {
+			"Private loan__",
+			"Private loan__Adam",
+			"Needingworth Tennis Club__",
+			"Needingworth Tennis Club__Match fees"
+	};
+	
+	static {
+		for (String s : INCOME_OVERRIDES_ARR) {
+			OVERRIDES.put(s, false);
+		}
+		
+		for (String s : EXPENSE_OVERRIDES_ARR) {
+			OVERRIDES.put(s, true);
+		}
+	}
+
 	private Map<Long, Account> accountMap = new HashMap<Long, Account>();
 	private Map<Long, Payee> payeeMap = new HashMap<Long, Payee>();
 	private Map<Long, Category> categoryMap = new HashMap<Long, Category>();
@@ -155,29 +183,47 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		Row childCategoryRow = this.catCursorSeq.getNextRow();
 		
 		if (childCategoryRow != null) {
-			String childCategoryName = childCategoryRow.getString(FULL_NAME);
+			String name = childCategoryRow.getString(FULL_NAME);
 			Category c = new Category().setOrigId(childCategoryRow.getInt(CATEGORY_ID));
-			
-			if (this.parentCatCursorFinder.findFirstRow(Collections.singletonMap("hcat", childCategoryRow.getInt(PARENT_CATEGORY_ID)))) {
-				String parentCategoryName = (String) this.parentCatCursorFinder.getCurrentRowValue(this.catTable.getColumn(FULL_NAME));
-				
-				if (parentCategoryName.equals("INCOME") || parentCategoryName.equals("EXPENSE")) {
-					// This is a root category 
-					c.setMajor(childCategoryName);
+
+			int level = childCategoryRow.getInt(CATEGORY_LEVEL);			
+			if (level == 1) {
+				c.setMajor(name);
+			}
+			else if (level == 2) {
+				if (this.parentCatCursorFinder.findFirstRow(Collections.singletonMap("hcat", childCategoryRow.getInt(PARENT_CATEGORY_ID)))) {
+					// Identified the parent category
+					String parentCategoryName = (String) this.parentCatCursorFinder.getCurrentRowValue(this.catTable.getColumn(FULL_NAME));					
+					c.setMajor(parentCategoryName);
+					c.setMinor(name);
 				}
 				else {
-					c.setMajor(parentCategoryName);
-					c.setMinor(childCategoryName);
+					LOG.error(String.format("FAILED to identify the parent category [child category=%s]", name));
 				}
 			}
 			else {
-				c.setMajor(childCategoryName);
+				LOG.info(String.format("Skipping this category [%s]", name));
+				return getNextCategory();
 			}
+			
+			int type = childCategoryRow.getInt(CATEGORY_TYPE);
+			c.setExpense(type == 0 || type == 1);
+			
+			// Override?
+			overrideExpenseFlagIf(c);
 			
 			return c;
 		}
 		
 		return null;
+	}
+	
+	private void overrideExpenseFlagIf(Category c) {
+		String coded = String.format("%s__%s", c.getMajor(), c.getMinor());
+		Boolean flag;
+		if ((flag = OVERRIDES.get(coded)) != null) {
+			c.setExpense(flag);
+		}
 	}
 	
 	public void cacheAccount(Long origId, Account a) {

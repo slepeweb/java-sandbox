@@ -81,7 +81,9 @@
 					<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 					<td class="memo">${_trn.memo}</td>
 				</c:when><c:when test="${_trn.transfer}">
-					<td class="category">Transfer</td>
+					<c:set var="_info">${mon:tertiaryOp(_trn.credit, 'From', 'To')} -> ${_trn.mirror.name}</c:set>
+					<td class="category">Transfer <span class="tooltipinfo"><i 
+						class="fas fa-info-circle" title="${_info}"></i></span></td>
 					<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 					<td class="memo">${_trn.memo}</td>
 				</c:when><c:when test="${_trn.split}">

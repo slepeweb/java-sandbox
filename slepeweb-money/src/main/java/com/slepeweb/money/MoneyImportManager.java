@@ -144,7 +144,7 @@ public class MoneyImportManager {
 				Transaction toTrn = getCachedTransaction(ptArr[1], mis);
 				
 				if (fromTrn == null || toTrn == null) {
-					LOG.warn(String.format("Missing transaction data in cache [%d/%d]", ptArr[0], ptArr[1]));
+					LOG.debug(String.format("Missing transaction data in cache [%d/%d]", ptArr[0], ptArr[1]));
 					continue;
 				}
 				
@@ -227,7 +227,7 @@ public class MoneyImportManager {
 				}
 			}
 			else {
-				LOG.warn(String.format("Parent transaction [%d] not in cache", parentId));
+				LOG.debug(String.format("Parent transaction [%d] not in cache", parentId));
 			}
 			
 			// Mark this parent transaction as processed, regardless of success or failure
