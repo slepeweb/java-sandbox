@@ -521,6 +521,7 @@ table th {
 }
 table thead {
   border-bottom: solid 2px rgba(144, 144, 144, 0.25);
+  background-color: #afdfdf;
 }
 table tfoot {
   border-top: solid 2px rgba(144, 144, 144, 0.25);
@@ -831,6 +832,7 @@ input[type="button"]:disabled,
 
 #year-selector {
   width: 6em;
+  margin-right: 2em;
 }
 
 .flash {

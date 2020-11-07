@@ -424,6 +424,7 @@
 
 		thead {
 			border-bottom: solid ($size-border-width * 2) $color-border;
+			background-color: #afdfdf;
 		}
 
 		tfoot {
@@ -711,6 +712,7 @@
 
 #year-selector {
 	width: 6em;
+	margin-right: 2em;
 }
 
 .flash {
