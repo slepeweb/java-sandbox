@@ -113,6 +113,8 @@ public class MoneyImportManager {
 			}
 			else {
 				// Yes - update the existing record
+				// If dbRecord is actually a Transfer, we need to give t the same xferId
+				// in order for equals() to give the desired result in TransactionServiceImpl
 				t = mis.updateTransaction(dbRecord, t);
 			}
 			

@@ -8,7 +8,7 @@ INSTALL=/home/george/money
 MONEY=/media/george/Data/George/Kryptonite/home.MNY
 
 # The Tomcat installation
-TOMCAT_INST=/opt/tomcat
+TOMCAT_INST=/opt/tomcat7
 
 # The location of the class files to be jar'ed
 GIT_REPOS=/home/george/git-repos
@@ -34,18 +34,31 @@ JAR=$DIST/slepeweb-money-import.jar
 WORKING_MONEY=$DIST/home.MNY
 WORKING_MDB=$DIST/home.MDB
 FROM=""
+WEBAPPID=""
 
 while [[ $# -gt 0 ]]
 do
 case $1 in
-	-from)
+-from)
 	FROM=$2
 	echo "Time window is from $FROM"
 	shift
 	shift
 	;;
+-webappid)
+	WEBAPPID=$2
+	echo "Tmp folder in eclipse workspace is tmp$WEBAPPID"
+	shift
+	shift
+	;;
 esac
 done
+
+if [ -z $FROM ] || [ -z $WEBAPPID ]
+then
+	echo "Usage $0 -from <yyy-mm-dd> -webappid <n>"
+	exit 1
+fi
 
 if [ ! -r $MONEY ]
 then
@@ -53,7 +66,7 @@ then
 	exit 1
 fi
 
-ant -Ddir.install=$INSTALL -Ddir.tomcatlib=$TOMCAT_INST/lib -Ddir.gitrepos=$GIT_REPOS -Ddir.workspace=$ECLIPSE_WS -f $INSTALL/slepeweb-money-build.xml
+ant -Ddir.install=$INSTALL -Ddir.tomcatlib=$TOMCAT_INST/lib -Ddir.gitrepos=$GIT_REPOS -Ddir.workspace=$ECLIPSE_WS -Dwebappid=$WEBAPPID -f $INSTALL/slepeweb-money-build.xml
 
 if [ $? -ne 0 ]
 then

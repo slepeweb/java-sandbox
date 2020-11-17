@@ -66,7 +66,12 @@ public class UserAccountController extends BaseController {
 				String path = originalPath;
 				if (StringUtils.isBlank(path)) {
 					ItemIdentifier iid = this.ancCookieService.getLatestBreadcrumb(i.getSite(), req);
-					path = iid.getPath();
+					if (iid != null) {
+						path = iid.getPath();
+					}
+					else {
+						path = "/";
+					}
 				}
 				res.sendRedirect(path);
 			}
