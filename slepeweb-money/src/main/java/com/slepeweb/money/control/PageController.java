@@ -24,7 +24,7 @@ public class PageController extends BaseController {
 		
 		for (Account a : all) {
 			// Not interested in 'other' accounts, ie not to be included in the summary or asset history
-			if (! a.getType().equals("other")) {
+			if (a.getType() != null && ! a.getType().equals("other")) {
 				if (lastType == null || ! lastType.equals(a.getType())) {
 					index++;
 					grandTotal += total;

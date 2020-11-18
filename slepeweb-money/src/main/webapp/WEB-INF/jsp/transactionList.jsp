@@ -18,8 +18,8 @@
 <mny:standardLayout>
 	<div class="transaction-list-header">
 		<div class="right">
-			<a href="${_ctxPath}/transaction/add/${_tl.account.id}">New transaction</a><br />
-			<a href="${_ctxPath}/index/by/account/${_tl.account.id}">Re-index</a><br />
+			<a href="${_ctxPath}/transaction/add/${_tl.account.id}" title="Create a new transaction record">New transaction</a><br />
+			<a href="${_ctxPath}/index/by/account/${_tl.account.id}" title="Re-index all transactions for this account (for searching)">Re-index</a><br />
 		</div>
 		
 		<div class="inline-block">
@@ -53,9 +53,9 @@
 		<p>
 			<c:if test="${_tl.pager.previous}"><span 
 					class="pager arrow left"><a href="${_urlPrefix}/${_tl.pager.previousBlock.index}"><i 
-						class="fas fa-angle-double-left" title="Jump left"></i></a></span><span 
+						class="fas fa-angle-double-left" title="Jump ${_tl.pager.blocksize} months earlier"></i></a></span><span 
 					class="pager arrow left"><a href="${_urlPrefix}/${_tl.pager.previousMonth.index}"><i 
-						class="fas fa-angle-left" title="Previous"></i>Previous</a></span></c:if>
+						class="fas fa-angle-left" title="Previous month"></i>Previous</a></span></c:if>
 						
 			<c:forEach items="${_tl.pager.navigation}" var="_option">
 				<span class="pager <c:if test="${_option.selected}">selected</c:if>"><a href="${_urlPrefix}/${_option.value}">${_option.name}</a></span>
@@ -63,9 +63,9 @@
 			
 			<c:if test="${_tl.pager.next}"><span 
 				class="pager arrow"><a href="${_urlPrefix}/${_tl.pager.nextMonth.index}">Next<i 
-					class="fas fa-angle-right" title="Next"></i></a></span><span 
+					class="fas fa-angle-right" title="Next month"></i></a></span><span 
 				class="pager arrow"><a href="${_urlPrefix}/${_tl.pager.nextBlock.index}"><i 
-					class="fas fa-angle-double-right" title="Jump right"></i></a></span></c:if>
+					class="fas fa-angle-double-right" title="Jump ${_tl.pager.blocksize} months later"></i></a></span></c:if>
 		</p>
 	</div>
 	
@@ -85,7 +85,8 @@
 		<tbody>
 			<c:forEach items="${_tl.runningBalances}" var="_trn">
 				<tr>
-					<td class="date"><a href="${_ctxPath}/transaction/form/${_trn.id}">${_trn.enteredStr}</a></td>
+					<td class="date"><a href="${_ctxPath}/transaction/form/${_trn.id}"
+						title="Update this transaction">${_trn.enteredStr}</a></td>
 					<td class="payee">${_trn.payee.name}</td>
 					
 					<c:choose><c:when test="${not _trn.split and not _trn.transfer}">

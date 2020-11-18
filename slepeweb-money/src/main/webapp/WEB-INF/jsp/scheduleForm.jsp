@@ -20,7 +20,7 @@
 	
 	<c:if test="${_formMode eq 'update'}">
 		<div class="right">
-			<a href="${_ctxPath}/schedule/add">New schedule</a><br />
+			<a href="${_ctxPath}/schedule/add" title="Define a new scheduled transaction">New schedule</a><br />
 		</div>
 	</c:if>
 	

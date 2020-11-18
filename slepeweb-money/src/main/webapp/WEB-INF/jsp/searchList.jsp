@@ -6,8 +6,8 @@
 		
 <mny:standardLayout>
 	<div class="right">
-		<a href="${_ctxPath}/search/create">New search</a><br />
-		<a href="${_ctxPath}/search/adhoc">Ad-hoc</a>
+		<a href="${_ctxPath}/search/create" title="Define and save new search critera">New search</a><br />
+		<a href="${_ctxPath}/search/adhoc" title="Define an ad-hoc search that won't get saved in the database">Ad-hoc</a>
 	</div>
 	
 	<h2>Saved searches <c:if test="${not empty param.flash}"><span 
@@ -22,7 +22,7 @@
 			</tr>
 			<c:forEach items="${_searches}" var="_ss">
 				<tr>
-					<td><a href="${_ctxPath}/search/edit/${_ss.id}">${_ss.name}</a></td>
+					<td><a href="${_ctxPath}/search/edit/${_ss.id}" title="Update parameters for this search">${_ss.name}</a></td>
 					<td>${_ss.savedWithMinutes}</td>
 					<td><i class="far fa-caret-square-right" title="Execute this search" data-id="${_ss.id}"></i></td>
 				</tr>

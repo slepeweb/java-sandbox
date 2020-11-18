@@ -8,7 +8,8 @@
 		<table>			
 			<c:forEach items="${list}" var="_a">
 				<tr>
-					<td class="name"><a href="${_ctxPath}/account/form/${_a.id}">${_a.name}</a></td>
+					<td class="name"><a href="${_ctxPath}/account/form/${_a.id}" 
+						title="Update details of this account">${_a.name}</a></td>
 					<td class="type">${_a.type}</td>
 				</tr>
 			</c:forEach>

@@ -8,7 +8,7 @@
 	<h2 class="inline-block">Accounts <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
 		
-	<div class="right"><a href="add">New account</a></div>
+	<div class="right"><a href="add" title="Create a new account">New account</a></div>
 	
 	<p><strong>${fn:length(_openAccounts)} Open accounts, ${fn:length(_closedAccounts)} Closed accounts</strong></p>
 

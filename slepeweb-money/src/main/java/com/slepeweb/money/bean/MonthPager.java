@@ -111,4 +111,8 @@ public class MonthPager {
 	public boolean isPrevious() {
 		return getSelectedMonth().isAfter(getFirstMonth()); 
 	}
+	
+	public int getBlocksize() {
+		return BLOCK;
+	}
 }

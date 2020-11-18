@@ -6,7 +6,7 @@
 		
 <mny:standardLayout>
 	<div class="right">
-		<a href="${_ctxPath}/schedule/add">New schedule</a>
+		<a href="${_ctxPath}/schedule/add" title="Define a new scheduled transaction">New schedule</a>
 	</div>
 
 	<h2>Scheduled Transactions <c:if test="${not empty param.flash}"><span 
@@ -22,7 +22,8 @@
 			
 			<c:forEach items="${_scheduled}" var="_schedule">
 				<tr>
-					<td><a href="${_ctxPath}/schedule/edit/${_schedule.id}">${_schedule.label}</a></td>
+					<td><a href="${_ctxPath}/schedule/edit/${_schedule.id}"
+						title="Update the details for this scheduled transaction">${_schedule.label}</a></td>
 					<td>${_schedule.day}</td>
 					<td>${_schedule.entered}</td>
 				</tr>

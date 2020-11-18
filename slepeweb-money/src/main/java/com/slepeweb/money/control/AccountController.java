@@ -96,13 +96,13 @@ public class AccountController extends BaseController {
 		User u = (User) model.get(USER);
 		long numDeletables = this.transactionService.getNumTransactionsForAccount(accountId);
 		
-		if ((u != null && u.getUsername().equals("MONEY_ADMIN")) || numDeletables == 0) {		
+		if (hasAuthority(u, ADMIN_ROLE) || numDeletables == 0) {		
 			try {
 				this.accountService.delete(accountId);
 				flash="success|Account successfully deleted";
 			}
 			catch (Exception e) {
-				flash="failure|Failed to delete account";
+				flash = "failure|Failed to delete account";		
 			}
 		}
 		else {

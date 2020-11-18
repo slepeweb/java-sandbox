@@ -1,10 +1,11 @@
 TODO: This is the main todo file for the Money project:
 
 HIGH
-- investigate saving asset data (perhaps as serialised objects)
+
 
 MEDIUM
+- egg timer for asset history page
+- stored results for asset history page
+- stored notes   "   "     "       "
 
 LOW
-- 'charts' and 'search' forms could have similar form controls
----	Perhaps add 'chart' option to search form?

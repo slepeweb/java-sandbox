@@ -45,6 +45,8 @@ public class BaseController {
 
 	private static Logger LOG = Logger.getLogger(BaseController.class);
 	public static final String USER = "_user";
+	public static final String ADMIN_ROLE = "MONEY_ADMIN";
+	public static final String USER_ROLE = "MONEY_USER";
 	
 	@Autowired protected PayeeService payeeService;
 	@Autowired protected AccountService accountService;
@@ -210,15 +212,15 @@ public class BaseController {
 	
 	@ModelAttribute(value="_isUser")
 	protected boolean isUser(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, "MONEY_USER");
+		return hasAuthority(u, USER_ROLE);
 	}
 	
 	@ModelAttribute(value="_isAdmin")
 	protected boolean isAdmin(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, "MONEY_ADMIN");
+		return hasAuthority(u, ADMIN_ROLE);
 	}
 	
-	private boolean hasAuthority(User u, String name) {
+	protected boolean hasAuthority(User u, String name) {
 		if (u != null) {
 			for (GrantedAuthority auth : u.getAuthorities()) {
 				if (auth.getAuthority().equals(name)) {

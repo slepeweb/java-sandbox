@@ -19,9 +19,10 @@
 			</tr>
 			<c:forEach items="${_charts}" var="_ss">
 				<tr>
-					<td><a href="${_ctxPath}/chart/edit/${_ss.id}">${_ss.savedWithMinutes}</a></td>
+					<td><a href="${_ctxPath}/chart/edit/${_ss.id}" 
+						title="Update the search parameters for this chart">${_ss.savedWithMinutes}</a></td>
 					<td>${_ss.name}</td>
-					<td><i class="far fa-caret-square-right" title="Execute this search"
+					<td><i class="far fa-caret-square-right" title="Execute the search and plot the results"
 						data-id="${_ss.id}"></i></td>
 				</tr>
 			</c:forEach>			
