@@ -708,6 +708,11 @@ public class Item extends CmsBean {
 		return getId().equals(other.getId());
 	}
 	
+	// This test of equality was introduced to support use of shortcuts in a delivery context
+	public boolean equalsIdentifier(Item other) {
+		return getIdentifier() == other.getIdentifier();
+	}
+	
 	public boolean isShortcut() {
 		return false;
 	}

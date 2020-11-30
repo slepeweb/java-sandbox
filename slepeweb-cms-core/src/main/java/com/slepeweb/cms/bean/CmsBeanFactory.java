@@ -162,6 +162,11 @@ public class CmsBeanFactory {
 	public static Shortcut makeShortcut() {
 		Shortcut sh = new Shortcut();
 		sh.setCmsService(CMS);
+		
+		// A shortcut item must always be published in order for it to be visible as
+		// a child link.
+		// (see LinkServiceImpl.getLinks())
+		sh.setPublished(true);
 		return sh;
 	}
 	

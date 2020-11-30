@@ -30,6 +30,7 @@ public class Person {
 	private Item item, photo;
 	private List<Item> documents, records, gallery;
 	private Integer birthYear, deathYear;
+	private Boolean singlePartnerModel;
 	
 	public Person(Item i) {
 		this.item = i;
@@ -149,16 +150,16 @@ public class Person {
 		
 		LinkFilter f = new LinkFilter().setName("partner").setLinkType(LinkType.relation);		
 		
-		// Who does this person have partner links with? (ie child links)
+		// Who is the subject (ie. this) partnered to?
 		List<Link> partners = f.filterLinks(this.item.getRelations());
 		
-		// Which persons have partner links to this person? (ie parent links)
+		// Who is partnered to the subject?
 		for (Link l : f.filterLinks(this.item.getParentLinks(false))) {
-			if ( ! l.getChild().getOrigId().equals(getItem().getOrigId())) {
+			if ( l.getChild().getIdentifier() != this.getItem().getIdentifier()) {
 				partners.add(l);
 			}
 		}
-					
+		
 		if (partners.size() > 0) {
 			for (Link l : partners) {
 				this.relationships.add(new Relationship(this, l));
@@ -275,6 +276,20 @@ public class Person {
 
 	public boolean isMultiPartnered() {
 		return getRelationships() != null && getRelationships().size() > 1;
+	}
+	
+	public boolean isSinglePartnerModel() {
+		if (this.singlePartnerModel == null) {
+			this.singlePartnerModel = true;
+			
+			if (getRelationships().size() > 1) {
+				this.singlePartnerModel = false;
+			}
+			else if (getRelationships().size() == 1 && getRelationship(0).getPartner() != null) {
+				this.singlePartnerModel = getRelationship(0).getPartner().getRelationships().size() <= 1;
+			}
+		}
+		return this.singlePartnerModel;
 	}
 	
 	public Item getPhoto() {

@@ -38,6 +38,7 @@
 				
 			</c:forEach>
 		
+			<tr><td colspan="3"><hr /></td></tr>
 			<tr><td colspan="3">&nbsp;</td></tr>
 			<c:forEach items="${_summary}" var="_pair" varStatus="_status">
 				<tr>

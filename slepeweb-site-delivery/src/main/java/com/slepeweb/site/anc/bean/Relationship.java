@@ -73,9 +73,9 @@ public class Relationship {
 		 * 
 		 * In a 1-to-1 relationship, the content author only needs to attach child items to the
 		 * 'father' item. The code makes the assumption in this case that all the child items
-		 * had the same 'mother'.
+		 * have the same 'mother'.
 		 */
-		if (getSubject().isMultiPartnered()) {
+		if (! getSubject().isSinglePartnerModel()) {
 			/*
 			 * So, in the situation where the subject has multiple partners, we examine
 			 * the children below the subject, AND the partner, and draw out the
@@ -122,7 +122,7 @@ public class Relationship {
 			for (Person childOfPartner : identifyChildren(this.partner.getItem())) {
 				isDuplicate = false;
 				for (Person c : this.children) {
-					if (childOfPartner.getItem().equalsId(c.getItem())) {
+					if (matches(childOfPartner, c)) {
 						isDuplicate = true;
 						break;
 					}

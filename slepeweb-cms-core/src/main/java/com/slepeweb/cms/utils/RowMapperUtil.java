@@ -153,7 +153,9 @@ public class RowMapperUtil {
 					setOrdering(rs.getInt("ordering")).
 					setData(rs.getString("data"));
 			
-			updateIfShortcut(l.getChild());
+			// This will already have been executed in the call to mapItem(rs)
+			// updateIfShortcut(l.getChild());
+			
 			return l;
 		}
 	}

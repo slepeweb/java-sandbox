@@ -1,18 +1,15 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 import re, dropbox, os, subprocess, datetime, filecmp, sys
+from dropbox.files import WriteMode
+from dropbox.exceptions import ApiError, AuthError
 
-numArgs = len(sys.argv)
-if numArgs < 2:
-    print("\n***\nUsage: db-backup <folder> \n\n")
-    sys.exit()
-    
 # Calculate a timestamp for use with sqldump files
 def fileQualifier(d):
     fq = str(d.year) + pad(d.month) + pad(d.day) + "_"
     fq += pad(d.hour) + pad(d.minute) + pad(d.second)
     return fq
-    
+
 # Prefix integers less than 10 with a '0'
 def pad(v):
     if v < 10:
@@ -20,27 +17,29 @@ def pad(v):
     return str(v)
 
 # Copy source_file to dropbox folder
-def backup(source_file_path, dropbox_client):
+def backup(source_file_path, dbx):
     file_parts = source_file_path.split("/")
     source_file = file_parts[-1]
     dest_file_path = '/' + source_file
+    print("Dropbox file path is [%s]" % dest_file_path)
     
-    try:
-        f = open(source_file_path, 'rb')
-        resp = dropbox_client.put_file(dest_file_path, f)
-        print ('Uploaded %s to dropbox path %s (%d bytes)' % (source_file_path, dest_file_path, resp['bytes']))
-    except Exception as err:
-        print("Failed to upload %s\n%s" % (source_file_path, err))
+    with open(source_file_path, 'rb') as f:
+        try:
+            dbx.files_upload(f.read(), dest_file_path, mode=WriteMode('overwrite'))
+            print ('Uploaded %s to dropbox file path %s' % (source_file_path, dest_file_path))
+        except Exception as err:
+            print("Failed to upload %s\n%s" % (source_file_path, err))
+            sys.exit()
 
 # Delete earlier backup from dropbox
-def unbackup(dest_file_path, dropbox_client):
+def unbackup(dest_file_path, dbx):
     try:
-        dropbox_client.file_delete(dest_file_path)
+        dbx.files_delete(dest_file_path)
         print ('Deleted %s from dropbox' % dest_file_path)
     except Exception as err:
         print("Failed to delete %s from dropbox\n%s" % (dest_file_path, err))
-        
-# Compine filename with parent folder to produce full URL
+
+# Combine filename with parent folder to produce full URL
 def to_path(filename, folder):
     return None if filename == None else folder + '/' + filename
 
@@ -64,32 +63,59 @@ def remove_file_locally(f, verbose=True):
             print("Removed local file [%s]" % f)
     except:
         print("Failed to delete local file [%s]" % f)
-        
+
 # Count the number of sqldumps stored remotely
-def count_remote_files(dropbox_client):
-    meta = dropbox_client.metadata("/")
+def count_remote_files(dbx):
     count = 0
-    for file_meta in meta['contents']:
-        m = re.search("/" + file_prefix + "\d{8}_\d{6}\.sql$", file_meta['path'])
-        if (m):
+    for entry in dbx.files_list_folder('').entries:
+        if (file_pattern.match(entry.name)):
             count += 1
     return count
 
+def usage():
+    print("\n***\nUsage: db-backup -cms|-mon \n\n")
+
+
+# Checks on usage
+numArgs = len(sys.argv)
+if numArgs < 2:
+    usage()
+    sys.exit()
     
-source_folder = sys.argv[1] if sys.argv[1][-1] != '/' else sys.argv[1][0:-1]
+db_user = None
+
+for i in range(1, len(sys.argv)):
+  if sys.argv[i] == "-cms":
+    db_user = "slepeweb_cms"
+    file_prefix = "slepeweb-cms-"
+  elif sys.argv[i] == "-mon":
+    db_user = "money"
+    file_prefix = "slepeweb-money-"
+
+if db_user == None:
+  usage()
+  sys.exit()
+
+source_folder = "db-backup-files"
 dest_folder = "/"
-file_prefix = "slepeweb-cms-"
 file_list = []
-access_token = '4wPGw33d4lcAAAAAAAAAfVl873ag8OxmIoay_NNAGqol8rtv8QH3oPEADSSHiLhf'
-dropbox_client = dropbox.client.DropboxClient(access_token)
+access_token = '-AOlFPvMV9wAAAAAAAAAAY2wOGLtQC6v5M4_DC0haY1uF6umJ86paAL4IZ0oVdRV'
+dbx = dropbox.Dropbox(access_token, timeout=None)
+file_pattern = re.compile("^" + file_prefix + "\\d{8}_\\d{6}\\.sql$")
+
+try:
+    meta = dbx.users_get_current_account()
+    print("Retrieved account details for %s" % meta.name.display_name)
+except AuthError:
+    print("Authorisation error")
+    sys.exit()
 
 # Identify the latest_backup_path backup
 for f in os.listdir(source_folder):
-    m = re.search(file_prefix + "\d{8}_\d{6}\.sql$", f)
-    if (m):
+    if (file_pattern.match(f)):
         file_list.append(f)
 
-print(">>>\nFound %d earlier dump(s)" % len(file_list))
+print("Found %d earlier dump(s) in local folder [%s]" % (len(file_list), source_folder))
 
 fq = fileQualifier(datetime.datetime.now())
 ordered_files = sorted(file_list)
@@ -100,24 +126,24 @@ latest_backup = file_prefix + fq + ".sql"
 latest_backup_path = to_path(latest_backup, source_folder)
 
 # Dump the database
-cmd = "mysqldump -u root slepeweb_cms > " + latest_backup_path;
+cmd = "mysqldump -u root " + db_user + " > " + latest_backup_path;
 size0 = -1
 retained_dump = False
 
 if subprocess.call(cmd, shell=True) == 0:
-    print("Dumped tables to [%s]" % latest_backup_path)
+    print("Dumped database tables to local folder [%s]" % latest_backup_path)
     
     if most_recent_backup_path == None:
         # First ever sqldump - copy to dropbox
-        backup(latest_backup_path, dropbox_client)
+        backup(latest_backup_path, dbx)
         retained_dump = True
     elif files_match(latest_backup_path, most_recent_backup_path) != True:
         # Latest sqldump is different to most recent - copy to dropbox
-        backup(latest_backup_path, dropbox_client)
+        backup(latest_backup_path, dbx)
         retained_dump = True
     else:
         # No change to database - delete latest sqldump
-        print("Duplicate backup!")
+        print("Latest backup indicates that database has not changed since last backup!")
         remove_file_locally(latest_backup_path)
 
 if retained_dump == True:
@@ -125,10 +151,10 @@ if retained_dump == True:
     num_local_files += 1
 
 # Simple file sync check on local and remote stores    
-num_remote_files = count_remote_files(dropbox_client)
+num_remote_files = count_remote_files(dbx)
 if num_remote_files != num_local_files:
     print("*** Warning: dropbox folder has %d files, whilst local folder has %d" % (num_remote_files, num_local_files))
-    
+
 # Remove old dumps, both locally and remote
 max_files_to_keep = 7
 if most_recent_backup_path != None and num_local_files > max_files_to_keep:
@@ -136,5 +162,5 @@ if most_recent_backup_path != None and num_local_files > max_files_to_keep:
     for i in range(0, num_local_files - max_files_to_keep):
         f = ordered_files[i]
         remove_file_locally(to_path(f, source_folder))
-        unbackup(to_path(f, ""), dropbox_client)
+        unbackup(to_path(f, ""), dbx)
         

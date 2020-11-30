@@ -54,16 +54,17 @@
 			<c:if test="${_tl.pager.previous}"><span 
 					class="pager arrow left"><a href="${_urlPrefix}/${_tl.pager.previousBlock.index}"><i 
 						class="fas fa-angle-double-left" title="Jump ${_tl.pager.blocksize} months earlier"></i></a></span><span 
-					class="pager arrow left"><a href="${_urlPrefix}/${_tl.pager.previousMonth.index}"><i 
-						class="fas fa-angle-left" title="Previous month"></i>Previous</a></span></c:if>
+					class="pager arrow left"><a href="${_urlPrefix}/${_tl.pager.previousMonth.index}" 
+						title="Step 1 month earlier"><i class="fas fa-angle-left"></i>Previous</a></span>
+			</c:if>
 						
 			<c:forEach items="${_tl.pager.navigation}" var="_option">
 				<span class="pager <c:if test="${_option.selected}">selected</c:if>"><a href="${_urlPrefix}/${_option.value}">${_option.name}</a></span>
 			</c:forEach>
 			
 			<c:if test="${_tl.pager.next}"><span 
-				class="pager arrow"><a href="${_urlPrefix}/${_tl.pager.nextMonth.index}">Next<i 
-					class="fas fa-angle-right" title="Next month"></i></a></span><span 
+				class="pager arrow"><a href="${_urlPrefix}/${_tl.pager.nextMonth.index}"
+					title="Step 1 month later">Next<i class="fas fa-angle-right"></i></a></span><span 
 				class="pager arrow"><a href="${_urlPrefix}/${_tl.pager.nextBlock.index}"><i 
 					class="fas fa-angle-double-right" title="Jump ${_tl.pager.blocksize} months later"></i></a></span></c:if>
 		</p>
