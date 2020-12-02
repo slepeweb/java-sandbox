@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.ItemIdentifier;
+import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.common.solr.bean.SolrConfig;
@@ -77,7 +77,9 @@ public class AncestryPageController extends BaseController {
 		Page page = getStandardPage(i, shortSitename, "homepage", model);
 		
 		List<Person> tops = new ArrayList<Person>();
-		for (Item c : i.getBoundItems(new ItemFilter().setTypes(new String[] {Person.BOY, Person.GIRL}))) {
+		LinkFilter f = new LinkFilter().setItemTypes(new String[] {Person.BOY, Person.GIRL});
+		
+		for (Item c : f.filterItems(i.getBindings())) {
 			tops.add(new Person(c));
 		}
 		

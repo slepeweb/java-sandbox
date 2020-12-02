@@ -134,10 +134,10 @@ public class Item extends CmsBean {
 	}
 	
 	public List<Item> getRelatedParents() {
-		return getRelatedItems(null);
+		return getRelatedItems();
 	}
 	
-	public List<Item> getRelatedParents(ItemFilter filter) {
+	public List<Item> getRelatedParents(LinkFilter filter) {
 		if (this.relatedParents == null) {
 			if (getId() != null) {
 				this.relatedParents = new ArrayList<Item>();
@@ -145,7 +145,7 @@ public class Item extends CmsBean {
 				
 				if (list != null) {
 					if (filter != null) {
-						this.relatedParents = filter.filterLinks(list);
+						this.relatedParents = filter.filterItems(list);
 					}
 					else {				
 						for (Link l : list) {
@@ -175,8 +175,8 @@ public class Item extends CmsBean {
 	}
 		
 	public Item getImage(String classification) {
-		ItemFilter f = new ItemFilter().setLinkName(classification);
-		List<Item> images = getInlineItems(f);
+		LinkFilter f = new LinkFilter().setLinkName(classification);
+		List<Item> images = f.filterItems(getInlines());
 		if (images.size() > 0) {
 			return images.get(0);
 		}
@@ -637,10 +637,10 @@ public class Item extends CmsBean {
 		return filterLinks(new String[] {LinkType.component});
 	}
 	
-	private List<Link> filterLinks(String[] types) {
+	private List<Link> filterLinks(String[] linkTypes) {
 		List<Link> list = new ArrayList<Link>();
 		for (Link l : getLinks()) {
-			for (String type : types) {
+			for (String type : linkTypes) {
 				if (l.getType().equals(type)) {
 					list.add(l);
 				}
@@ -667,41 +667,15 @@ public class Item extends CmsBean {
 	}
 	
 	public final List<Item> getBoundItems() {
-		return getBoundItems(null);
+		return CmsUtil.toItems(getBindings());
 	}
 	
 	public List<Item> getRelatedItems() {
-		return getRelatedItems(null);
+		return CmsUtil.toItems(getRelations());
 	}
 	
 	public List<Item> getInlineItems() {
-		return getInlineItems(null);
-	}
-	
-	public final List<Item> getBoundItems(ItemFilter filter) {
-		return toItems(getBindings(), filter);
-	}
-	
-	public final List<Item> getRelatedItems(ItemFilter filter) {
-		return toItems(getRelations(), filter);
-	}
-	
-	public final List<Item> getInlineItems(ItemFilter filter) {
-		return toItems(getInlines(), filter);
-	}
-	
-	private final List<Item> toItems(List<Link> links, ItemFilter filter) {
-		if (filter != null) {
-			return filter.filterLinks(links);
-		}
-		
-		List<Item> list = new ArrayList<Item>();
-
-		for (Link l : links) {
-			list.add(l.getChild());
-		}
-
-		return list;
+		return CmsUtil.toItems(getInlines());
 	}
 	
 	public boolean equalsId(Item other) {

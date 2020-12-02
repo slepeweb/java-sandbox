@@ -3,30 +3,35 @@ package com.slepeweb.cms.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.slepeweb.cms.utils.CmsUtil;
+
 public class LinkFilter {
 
-	private String[] linkTypes, names, itemTypes;
+	private String[] linkTypes, linkNames, itemTypes, simpleNamePatterns;
 	
 	private boolean test(Link l) {
-		boolean linkTypeMatch, nameMatch, itemTypeMatch;
-		linkTypeMatch = nameMatch = itemTypeMatch = true;
+		boolean linkTypeMatch = true, linkNameMatch = true, itemTypeMatch = true, simplenameMatch = true;
 
 		if (getLinkTypes() != null) {
 			linkTypeMatch = matches(getLinkTypes(), l.getType());
 		}
 
-		if (getNames() != null) {
-			nameMatch = matches(getNames(), l.getName());
+		if (getLinkNames() != null) {
+			linkNameMatch = matches(getLinkNames(), l.getName());
 		}
 		
 		if (getItemTypes() != null) {
 			itemTypeMatch = matches(getItemTypes(), l.getChild().getType().getName());
 		}
 
-		return linkTypeMatch && nameMatch && itemTypeMatch;
+		if (getSimpleNamePatterns() != null) {
+			simplenameMatch = matchesRegex(getSimpleNamePatterns(), l.getChild().getSimpleName());
+		}
+
+		return linkTypeMatch && linkNameMatch && itemTypeMatch && simplenameMatch;
 	}
 
-	public List<Link> filterLinks(List<Link> list) {
+	public List<Link> filter(List<Link> list) {
 		List<Link> result = new ArrayList<Link>(list.size());
 		for (Link l : list) {
 			if (test(l)) {
@@ -44,7 +49,19 @@ public class LinkFilter {
 		}
 		return null;
 	}
+	
+	public List<Item> filterItems(List<Link> list) {
+		return CmsUtil.toItems(filter(list));
+	}
 
+	public Item filterFirstItem(List<Link> list) {
+		Link l = filterFirst(list);
+		if (l != null) {
+			return l.getChild();
+		}
+		return null;
+	}
+	
 	private <T> boolean matches(T[] arr, T target) {
 		// Must match ANY element in the array
 		for (T ele : arr) {
@@ -57,6 +74,17 @@ public class LinkFilter {
 		return false;
 	}
 	
+	private <T> boolean matchesRegex(String[] regex, String target) {
+		// Must match ANY element in the array
+		for (String pattern : regex) {
+			if (target.matches(pattern)) {
+				return true;
+			}
+		}
+		
+		// There were NO matching elements in the array
+		return false;
+	}
 	public String[] getLinkTypes() {
 		return linkTypes;
 	}
@@ -71,26 +99,22 @@ public class LinkFilter {
 		return this;
 	}
 
-	public String[] getNames() {
-		return names;
+	public String[] getLinkNames() {
+		return linkNames;
 	}
 
-	public LinkFilter setName(String linkName) {
-		this.names = new String[] {linkName};
+	public LinkFilter setLinkName(String linkName) {
+		this.linkNames = new String[] {linkName};
 		return this;
 	}
 
-	public LinkFilter setNames(String[] linkNames) {
-		this.names = linkNames;
+	public LinkFilter setLinkNames(String[] linkNames) {
+		this.linkNames = linkNames;
 		return this;
 	}
-
+		
 	public String[] getItemTypes() {
 		return itemTypes;
-	}
-
-	public void setItemTypes(String[] itemTypes) {
-		this.itemTypes = itemTypes;
 	}
 
 	public LinkFilter setItemType(String typeName) {
@@ -98,4 +122,23 @@ public class LinkFilter {
 		return this;
 	}
 
+	public LinkFilter setItemTypes(String[] types) {
+		this.itemTypes = types;
+		return this;
+	}
+
+	public String[] getSimpleNamePatterns() {
+		return simpleNamePatterns;
+	}
+
+	public LinkFilter setSimpleNamePattern(String simpleName) {
+		this.simpleNamePatterns = new String[] {simpleName};
+		return this;
+	}
+
+	public LinkFilter setSimpleNamePatterns(String[] simpleNames) {
+		this.simpleNamePatterns = simpleNames;
+		return this;
+	}
+	
 }

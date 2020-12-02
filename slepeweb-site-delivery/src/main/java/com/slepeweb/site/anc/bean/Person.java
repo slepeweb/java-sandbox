@@ -10,7 +10,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.LinkType;
@@ -148,13 +147,13 @@ public class Person {
 	private void setRelationships() {
 		this.relationships = new ArrayList<Relationship>();
 		
-		LinkFilter f = new LinkFilter().setName("partner").setLinkType(LinkType.relation);		
+		LinkFilter f = new LinkFilter().setLinkName("partner").setLinkType(LinkType.relation);		
 		
 		// Who is the subject (ie. this) partnered to?
-		List<Link> partners = f.filterLinks(this.item.getRelations());
+		List<Link> partners = f.filter(this.item.getRelations());
 		
 		// Who is partnered to the subject?
-		for (Link l : f.filterLinks(this.item.getParentLinks(false))) {
+		for (Link l : f.filter(this.item.getParentLinks(false))) {
 			if ( l.getChild().getIdentifier() != this.getItem().getIdentifier()) {
 				partners.add(l);
 			}
@@ -184,8 +183,10 @@ public class Person {
 	}
 	
 	private void setSiblings() {
+		LinkFilter f = new LinkFilter().setItemTypes(new String[] {Person.BOY, Person.GIRL});
+
 		this.siblings = new ArrayList<Person>();
-		for (Item sibling : this.item.getParent().getBoundItems(new ItemFilter().setTypes(new String[] {Person.BOY, Person.GIRL}))) {
+		for (Item sibling : f.filterItems(this.item.getParent().getBindings())) {
 			if (! sibling.getPath().equals(this.item.getPath())) {
 				this.siblings.add(new Person(sibling));
 			}
@@ -301,26 +302,28 @@ public class Person {
 
 	public List<Item> getDocuments() {
 		if (this.documents == null) {
-			this.documents = this.item.getBoundItems(new ItemFilter().setType("Document"));
-		}
-		
+			this.documents = getResources("Document");
+		}		
 		return this.documents;
 	}
 
 	public List<Item> getGallery() {
 		if (this.gallery == null) {
-			this.gallery = this.item.getBoundItems(new ItemFilter().setType("Image JPG"));
-		}
-		
+			this.gallery = getResources("Image JPG");
+		}		
 		return this.gallery;
 	}
 	
 	public List<Item> getRecords() {
 		if (this.records == null) {
-			this.records = this.item.getBoundItems(new ItemFilter().setType("PDF"));
-		}
-		
+			this.records = getResources("PDF");
+		}		
 		return this.records;
+	}
+	
+	private List<Item> getResources(String itemType) {
+		LinkFilter f = new LinkFilter().setItemType(itemType);
+		return f.filterItems(this.item.getBindings());
 	}
 
 	public Integer getBirthYear() {

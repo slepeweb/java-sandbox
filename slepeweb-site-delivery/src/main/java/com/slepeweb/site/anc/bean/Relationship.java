@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.common.util.DateUtil;
 
 /*
@@ -135,10 +135,11 @@ public class Relationship {
 		}
 	}
 	
-	private List<Person> identifyChildren(Item p) {
+	private List<Person> identifyChildren(Item j) {
 		List<Person> children = new ArrayList<Person>();
+		LinkFilter f = new LinkFilter().setItemTypes(new String[] {Person.BOY, Person.GIRL});
 		
-		for (Item i : p.getBoundItems(new ItemFilter().setTypes(new String[] {Person.BOY, Person.GIRL}))) {
+		for (Item i : f.filterItems(j.getBindings())) {
 			children.add(new Person(i));
 		}
 		

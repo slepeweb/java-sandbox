@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemFilter;
+import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.CmsUtil;
@@ -178,13 +178,13 @@ public class Product extends Item {
 				if (container != null) {
 					
 					// Carousel & Hifi images
-					ItemFilter imageFilter = new ItemFilter().setTypes(new String[] {
+					LinkFilter imageFilter = new LinkFilter().setItemTypes(new String[] {
 							ItemTypeName.IMAGE_JPG,
 							ItemTypeName.IMAGE_PNG,
 							ItemTypeName.IMAGE_GIF
 					});
 					
-					for (Item img : imageFilter.filterItems(container.getBoundItems())) {
+					for (Item img : imageFilter.filterItems(container.getBindings())) {
 						if (img.getSimpleName().endsWith(HIFI_EXT)) {
 							this.hifiImages.add(img);
 						}
@@ -195,16 +195,16 @@ public class Product extends Item {
 					
 					// Variant images
 					if (getAlphaAxisId() > 0L || getBetaAxisId() > 0L) {
-						ItemFilter folderFilter = new ItemFilter().
-								setType(ItemTypeName.CONTENT_FOLDER).
-								setSimpleNamePattern(VARIANTS_FOLDER_SIMPLENAME);
+						LinkFilter folderFilter = new LinkFilter().
+								setSimpleNamePattern(VARIANTS_FOLDER_SIMPLENAME).
+								setItemType(ItemTypeName.CONTENT_FOLDER);								
 						
 						if (this.variantImageFolder == null) {
-							this.variantImageFolder = folderFilter.filterFirst(container.getBoundItems());
+							this.variantImageFolder = folderFilter.filterFirstItem(container.getBindings());
 						}
 						
 						if (this.variantImageFolder != null) {
-							this.variantImages = imageFilter.filterItems(this.variantImageFolder.getBoundItems());
+							this.variantImages = imageFilter.filterItems(this.variantImageFolder.getBindings());
 						}
 					}
 				}

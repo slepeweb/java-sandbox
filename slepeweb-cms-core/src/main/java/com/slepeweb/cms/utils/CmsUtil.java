@@ -1,8 +1,12 @@
 package com.slepeweb.cms.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
 
 public class CmsUtil {
 	
@@ -39,5 +43,13 @@ public class CmsUtil {
 		
 		// A null parent means that this item is a root item
 		return null;
+	}
+
+	public static List<Item> toItems(List<Link> list) {
+		List<Item> result = new ArrayList<Item>(list.size());
+		for (Link l : list) {
+			result.add(l.getChild());
+		}
+		return result;
 	}
 }

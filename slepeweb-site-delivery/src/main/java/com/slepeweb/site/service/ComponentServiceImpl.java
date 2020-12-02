@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.utils.LogUtil;
@@ -157,9 +157,10 @@ public class ComponentServiceImpl implements ComponentService {
 				setNextCellOffset(i.getIntFieldValue("nextcelloffset", 1));
 		
 		String[] imageTypes = new String[] {ItemTypeName.IMAGE_GIF, ItemTypeName.IMAGE_JPG, ItemTypeName.IMAGE_PNG};
-		ItemFilter filter = new ItemFilter().setTypes(imageTypes);
+		LinkFilter f = new LinkFilter().setItemTypes(imageTypes);
 		Link dummy = new Link();
-		for (Item j : l.getChild().getBoundItems(filter)) {
+		
+		for (Item j : f.filterItems(l.getChild().getBindings())) {
 			dummy.setChild(j);
 			c.getComponents().add(image(dummy));
 		}

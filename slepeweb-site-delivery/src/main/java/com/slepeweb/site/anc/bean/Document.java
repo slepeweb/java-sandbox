@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemFilter;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.site.model.Image;
 
 public class Document {
@@ -41,8 +41,8 @@ public class Document {
 	public List<Image> getImages() {
 		if (this.images == null) {
 			this.images = new ArrayList<Image>();
-			ItemFilter f = new ItemFilter().setLinkNames(new String[] {"std", "passport_photo"});
-			for (Link l : f.filterLinksAsLinks(getItem().getInlines())) {
+			LinkFilter f = new LinkFilter().setLinkNames(new String[] {"std", "passport_photo"});
+			for (Link l : f.filter(getItem().getInlines())) {
 				this.images.add(new Image(l));
 			}
 		}
@@ -54,8 +54,9 @@ public class Document {
 		if (this.subSections == null) {
 			this.subSections = new ArrayList<Document>();
 			Document d;
+			LinkFilter f = new LinkFilter().setItemType("Document");
 			
-			for (Item i : this.item.getBoundItems(new ItemFilter().setType("Document"))) {
+			for (Item i : f.filterItems(this.item.getBindings())) {
 				d = new Document(i);
 				this.subSections.add(d);
 			}

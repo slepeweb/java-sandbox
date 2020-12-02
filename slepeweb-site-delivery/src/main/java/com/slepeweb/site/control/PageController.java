@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemFilter;
+import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.SiteConfigService;
 import com.slepeweb.commerce.bean.Basket;
@@ -212,8 +212,8 @@ public class PageController extends BaseController {
 	
 	@SuppressWarnings("unused")
 	private SiblingItemPager getSiblings(Item i, String[] typesOfInterest, int max) {
-		ItemFilter f = new ItemFilter().setTypes(typesOfInterest);
-		List<Item> children = i.getParent().getBoundItems(f);		
+		LinkFilter f = new LinkFilter().setItemTypes(typesOfInterest);
+		List<Item> children = f.filterItems(i.getParent().getBindings());		
 		return new SiblingItemPager(children, i, max);
 	}
 }
