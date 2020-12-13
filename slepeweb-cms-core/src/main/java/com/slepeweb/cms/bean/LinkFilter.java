@@ -7,7 +7,8 @@ import com.slepeweb.cms.utils.CmsUtil;
 
 public class LinkFilter {
 
-	private String[] linkTypes, linkNames, itemTypes, simpleNamePatterns;
+	private String[] linkTypes, linkNames, itemTypes,
+		/* Only used currently for identifying images in commerce app */ simpleNamePatterns;
 	
 	private boolean test(Link l) {
 		boolean linkTypeMatch = true, linkNameMatch = true, itemTypeMatch = true, simplenameMatch = true;

@@ -6,4 +6,5 @@ target/
 .settings/
 classes/
 /.gitignore
+**/.gitignore
 .pydevproject
