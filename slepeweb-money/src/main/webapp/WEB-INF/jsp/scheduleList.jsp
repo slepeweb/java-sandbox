@@ -14,20 +14,24 @@
 	
 	<c:choose><c:when test="${fn:length(_scheduled) > 0}">
 		<table>
-			<tr>
-				<th>Name</th>
-				<th>Day of month</th>
-				<th>Last entered</th>
-			</tr>
-			
-			<c:forEach items="${_scheduled}" var="_schedule">
+			<thead>
 				<tr>
-					<td><a href="${_ctxPath}/schedule/edit/${_schedule.id}"
-						title="Update the details for this scheduled transaction">${_schedule.label}</a></td>
-					<td>${_schedule.day}</td>
-					<td>${_schedule.entered}</td>
+					<th>Name</th>
+					<th>Day of month</th>
+					<th>Last entered</th>
 				</tr>
-			</c:forEach>			
+			</thead>
+			
+			<tbody>
+				<c:forEach items="${_scheduled}" var="_schedule">
+					<tr>
+						<td><a href="${_ctxPath}/schedule/edit/${_schedule.id}"
+							title="Update the details for this scheduled transaction">${_schedule.label}</a></td>
+						<td>${_schedule.day}</td>
+						<td>${_schedule.entered}</td>
+					</tr>
+				</c:forEach>
+			</tbody>		
 		</table>
 					
 	</c:when><c:otherwise>

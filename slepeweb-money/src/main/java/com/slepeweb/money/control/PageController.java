@@ -1,47 +1,34 @@
 package com.slepeweb.money.control;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Dashboard;
+import com.slepeweb.money.bean.DashboardAccountGroup;
 
 @Controller
 public class PageController extends BaseController {
 	
 	@RequestMapping(value="/")	
 	public String dashboard(ModelMap model) { 
+		Dashboard dash = new Dashboard();
+		DashboardAccountGroup group;
 		List<Account> all = this.accountService.getAllWithBalances();
-		String lastType = null;
-		List<Pair<String, Long>> summary = new ArrayList<Pair<String, Long>>();
-		int index = -1;
-		long total = 0L, grandTotal = 0L;
 		
 		for (Account a : all) {
 			// Not interested in 'other' accounts, ie not to be included in the summary or asset history
 			if (a.getType() != null && ! a.getType().equals("other")) {
-				if (lastType == null || ! lastType.equals(a.getType())) {
-					index++;
-					grandTotal += total;
-					total = 0;
-					lastType = a.getType();
-					summary.add(Pair.of("dummy", 0L));
-				}
-				
-				total += a.getBalance();
-				summary.set(index, Pair.of(a.getType(), total));
+				group = dash.addIfMissing(a.getType());
+				group.getAccounts().add(a);
 			}
 		}
 		
-		grandTotal += total;
-		model.addAttribute("_accounts", all);
-		model.addAttribute("_summary", summary);
-		model.addAttribute("_grandTotal", grandTotal);
+		model.addAttribute("_dash", dash);
 		return "dashboard";
 	}
 

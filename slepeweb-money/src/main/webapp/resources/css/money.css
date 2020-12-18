@@ -722,23 +722,46 @@ input[type="button"]:disabled,
   color: #808080;
 }
 
-.trn_listing td {
+table.trn_listing td {
   vertical-align: top;
-  /* 	&.payee { */
-  /* 		width: 20%; */
-  /* 	} */
-  /* 	&.category { */
-  /* 		width: 20%; */
-  /* 	} */
 }
-.trn_listing td.date {
+table.trn_listing td.date {
   width: 10%;
 }
-.trn_listing td.amount {
+table.trn_listing td.amount {
   width: 10%;
 }
-.trn_listing td.memo {
+table.trn_listing td.memo {
   width: 30%;
+}
+
+div.dashboard-group {
+  margin-bottom: 1em;
+  border: 1px solid black;
+}
+div.dashboard-group.current {
+  background-color: #fdffdb;
+}
+div.dashboard-group.savings {
+  background-color: #e3fafc;
+}
+div.dashboard-group.credit {
+  background-color: #ffe8e8;
+}
+div.dashboard-group.pension {
+  background-color: #e0ffe7;
+}
+div.dashboard-group.summary {
+  background-color: #fff3e8;
+}
+div.dashboard-group table {
+  margin-bottom: 0;
+}
+div.dashboard-group table td.amount, div.dashboard-group table td.type {
+  width: 10%;
+}
+div.dashboard-group table h3 {
+  margin-bottom: 0;
 }
 
 #trn-form tr td:first-child {

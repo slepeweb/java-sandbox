@@ -28,6 +28,16 @@
 	</style>
 </c:if>
 
+<c:if test="${not empty _extraJs}">
+	<script>
+		${_extraJs}
+	</script>
+</c:if>
+
+<c:if test="${not empty _headExtra}">
+	${_headExtra}
+</c:if>
+
 <script>
 	var webContext = "${_ctxPath}";
 </script>

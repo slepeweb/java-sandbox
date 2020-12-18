@@ -598,7 +598,7 @@
 	color: #808080;
 }
 
-.trn_listing td {
+table.trn_listing td {
 	vertical-align: top;
 	
 	&.date {
@@ -607,15 +607,45 @@
 	&.amount {
 		width: 10%;
 	}
-/* 	&.payee { */
-/* 		width: 20%; */
-/* 	} */
-/* 	&.category { */
-/* 		width: 20%; */
-/* 	} */
 	&.memo {
 		width: 30%;
 	}
+}
+
+div.dashboard-group {
+	margin-bottom: 1em;
+	border: 1px solid black;
+	
+	&.current {
+		background-color: #fdffdb;
+	}
+	
+	&.savings {
+		background-color: #e3fafc;
+	}
+	
+	&.credit {
+		background-color: #ffe8e8;
+	}
+	
+	&.pension {
+		background-color: #e0ffe7;
+	}
+	
+	&.summary {
+		background-color: #fff3e8;
+	}
+			
+	table {
+		margin-bottom: 0;		
+		td.amount, td.type {
+			width: 10%;
+		}
+		
+		h3 {
+			margin-bottom: 0;
+		}
+	}			
 }
 
 #trn-form tr {

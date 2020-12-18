@@ -15,18 +15,23 @@
 	
 	<c:choose><c:when test="${not empty _searches}">
 		<table>
-			<tr>
-				<th>Name</th>
-				<th>Date created</th>
-				<th>Execute</th>
-			</tr>
-			<c:forEach items="${_searches}" var="_ss">
+			<thead>
 				<tr>
-					<td><a href="${_ctxPath}/search/edit/${_ss.id}" title="Update parameters for this search">${_ss.name}</a></td>
-					<td>${_ss.savedWithMinutes}</td>
-					<td><i class="far fa-caret-square-right" title="Execute this search" data-id="${_ss.id}"></i></td>
+					<th>Name</th>
+					<th>Date created</th>
+					<th>Execute</th>
 				</tr>
-			</c:forEach>			
+			</thead>
+			
+			<tbody>
+				<c:forEach items="${_searches}" var="_ss">
+					<tr>
+						<td><a href="${_ctxPath}/search/edit/${_ss.id}" title="Update parameters for this search">${_ss.name}</a></td>
+						<td>${_ss.savedWithMinutes}</td>
+						<td><i class="far fa-caret-square-right" title="Execute this search" data-id="${_ss.id}"></i></td>
+					</tr>
+				</c:forEach>	
+			</tbody>		
 		</table>					
 	</c:when><c:otherwise>
 		<p><strong>No saved searches</strong></p>

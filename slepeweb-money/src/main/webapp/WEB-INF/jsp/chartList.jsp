@@ -12,20 +12,25 @@
 		
 	<c:choose><c:when test="${not empty _charts}">
 		<table>
-			<tr>
-				<th>Date created</th>
-				<th>Name</th>
-				<th>Execute</th>
-			</tr>
-			<c:forEach items="${_charts}" var="_ss">
+			<thead>
 				<tr>
-					<td><a href="${_ctxPath}/chart/edit/${_ss.id}" 
-						title="Update the search parameters for this chart">${_ss.savedWithMinutes}</a></td>
-					<td>${_ss.name}</td>
-					<td><i class="far fa-caret-square-right" title="Execute the search and plot the results"
-						data-id="${_ss.id}"></i></td>
+					<th>Date created</th>
+					<th>Name</th>
+					<th>Execute</th>
 				</tr>
-			</c:forEach>			
+			</thead>
+			
+			<tbody>
+				<c:forEach items="${_charts}" var="_ss">
+					<tr>
+						<td><a href="${_ctxPath}/chart/edit/${_ss.id}" 
+							title="Update the search parameters for this chart">${_ss.savedWithMinutes}</a></td>
+						<td>${_ss.name}</td>
+						<td><i class="far fa-caret-square-right" title="Execute the search and plot the results"
+							data-id="${_ss.id}"></i></td>
+					</tr>
+				</c:forEach>
+			</tbody>			
 		</table>					
 	</c:when><c:otherwise>
 		<p><strong>No saved charts</strong></p>
