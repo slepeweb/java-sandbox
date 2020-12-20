@@ -21,8 +21,10 @@
 				dataType: "html",
 				success: function(html, status, z) {
 					$("#searchresults").html(html);
-					$("#searchresults .navigate").click(function(event){
-						_cms.support.renderItemForms($(this).attr("href"));
+					$("#searchresults .navigate").click(function(event) {
+						var key = $(this).attr("href");
+						_cms.leftnav.activateKey(key);
+						_cms.support.renderItemForms(key);
 						event.preventDefault();
 						_cms.dialog.close(_cms.dialog.searchresults);
 					});

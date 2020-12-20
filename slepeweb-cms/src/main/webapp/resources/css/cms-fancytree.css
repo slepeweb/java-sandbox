@@ -1,0 +1,97 @@
+ul.fancytree-container {
+	background-color: #ccc;
+}
+
+span.fancytree-icon:hover {
+	opacity: 0.5;
+}
+
+span.fancytree-node.shortcut>span.fancytree-icon {
+	background-position: -64px -160px;
+	margin-left: 19px;
+}
+
+span.fancytree-node.shortcut>span.fancytree-expander {
+	display: none;
+}
+
+span.fancytree-node.cms-icon-homepage>span.fancytree-icon,
+span.fancytree-node.cms-icon-homepage>span.fancytree-icon:hover 
+ {
+	background-position: -16px 0px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-boy>span.fancytree-icon,
+span.fancytree-node.cms-icon-boy>span.fancytree-icon:hover {
+	background-position: -33px 0px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-girl>span.fancytree-icon,
+span.fancytree-node.cms-icon-girl>span.fancytree-icon:hover {
+	background-position: -48px 0px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-pdf>span.fancytree-icon,
+span.fancytree-node.cms-icon-pdf>span.fancytree-icon:hover {
+	background-position: -64px 0px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-document>span.fancytree-icon,
+span.fancytree-node.cms-icon-document>span.fancytree-icon:hover {
+	background-position: -80px 0px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-image>span.fancytree-icon,
+span.fancytree-node.cms-icon-image>span.fancytree-icon:hover {
+	background-position: -96px 0px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-shortcut-boy>span.fancytree-icon,
+span.fancytree-node.cms-icon-shortcut-boy>span.fancytree-icon:hover {
+	background-position: -32px -16px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-shortcut-girl>span.fancytree-icon,
+span.fancytree-node.cms-icon-shortcut-girl>span.fancytree-icon:hover {
+	background-position: -48px -16px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-shortcut-pdf>span.fancytree-icon,
+span.fancytree-node.cms-icon-shortcut-pdf>span.fancytree-icon:hover {
+	background-position: -64px -16px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-shortcut-document>span.fancytree-icon,
+span.fancytree-node.cms-icon-shortcut-document>span.fancytree-icon:hover {
+	background-position: -80px -16px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-shortcut-image>span.fancytree-icon,
+span.fancytree-node.cms-icon-shortcut-image>span.fancytree-icon:hover {
+	background-position: -96px -16px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-shortcut-error>span.fancytree-icon,
+span.fancytree-node.cms-icon-shortcut-error>span.fancytree-icon:hover {
+	background-position: -16px -32px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+div.cms-icon {
+	background-image: url("fancytree-cms-icons.gif");
+	width: 16px;
+	height: 16px;
+	display:inline-block;
+}
+

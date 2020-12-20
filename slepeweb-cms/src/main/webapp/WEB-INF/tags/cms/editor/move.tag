@@ -7,8 +7,8 @@
 	<details>
 		<summary>HELP</summary>
 		<p>You need to set two things before the move can happen. 
-		You must identify whether you want the item to be moved to a position before/below/after the target item,
-		and the location in the content structure of the target item. These two things can be set in any order, and then
+		You must a) identify whether you want the item to be moved to a position before/below/after the target item,
+		and b) the location in the content structure of the target item. These two things can be set in any order, and then
 		you can action the move by clicking the corresponding button.</p>
 	</details>	
 

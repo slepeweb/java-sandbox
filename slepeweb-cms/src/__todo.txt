@@ -16,6 +16,5 @@ MEDIUM
 LOW
 - write test: cannot move item to one of it's children, OR descendants
 - write test: cannot move item to one of it's linked parents (ie via relations, inlines, etc)
-- hover over lefthand nav in cms reveals wrong icon
 - get site working on internet
 - 

@@ -1,3 +1,5 @@
+@import "cms-fancytree.css";
+
 @media screen and (max-width:400px) {
   @-ms-viewport{
     width: device-width;
@@ -172,9 +174,9 @@ input[type="checkbox"], input[type="radio"] {
 .readonly-layer {
 	position: absolute;
 	top: 40px;
-	left: 5px;
+	left: 0px;
 	background-image: url('/cms/resources/css/readonly.png');
-	height: 100%;
+	height: 95%;
 	width: 100%;
 	background-repeat: repeat;
 	background-color: pink;
@@ -437,100 +439,12 @@ button[disabled=disabled] {
 	padding-right: 1em;
 }
 
-					/* >>>>> Fancytree styles */
-					ul.fancytree-container {
-						background-color: #ccc;
-					}
-					
-					span.fancytree-node.shortcut>span.fancytree-icon {
-						background-position: -64px -160px;
-						margin-left: 19px;
-					}
-					
-					span.fancytree-node.shortcut>span.fancytree-expander {
-						display: none;
-					}
-					
-					span.fancytree-node.cms-icon-homepage>span.fancytree-icon {
-						background-position: -16px 0px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-boy>span.fancytree-icon {
-						background-position: -33px 0px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-girl>span.fancytree-icon {
-						background-position: -48px 0px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-pdf>span.fancytree-icon {
-						background-position: -64px 0px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-document>span.fancytree-icon {
-						background-position: -80px 0px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-image>span.fancytree-icon {
-						background-position: -96px 0px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-shortcut-boy>span.fancytree-icon {
-						background-position: -32px -16px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-shortcut-girl>span.fancytree-icon {
-						background-position: -48px -16px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-shortcut-pdf>span.fancytree-icon {
-						background-position: -64px -16px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-shortcut-document>span.fancytree-icon {
-						background-position: -80px -16px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-shortcut-image>span.fancytree-icon {
-						background-position: -96px -16px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					
-					span.fancytree-node.cms-icon-shortcut-error>span.fancytree-icon {
-						background-position: -16px -32px;
-						background-image: url("fancytree-cms-icons.gif");
-					}
-					/* <<<<< Fancytree styles */
-
-
-
-div.cms-icon {
-	background-image: url("fancytree-cms-icons.gif");
-	width: 16px;
-	height: 16px;
-	display:inline-block;
-}
-
+/* Probably used in search results dialog */
 div.cms-icon-boy { background-position: -33px 0px; }
 div.cms-icon-girl { background-position: -48px 0px; }
 div.cms-icon-pdf { background-position: -64px 0px; }
 div.cms-icon-document { background-position: -80px 0px; }
 div.cms-icon-image { background-position: -96px 0px; }
-
-span.fancytree-node.cms-icon-girl>span.fancytree-icon {
-	background-position: -48px 0px;
-	background-image: url("fancytree-cms-icons.gif");
-}
 
 
 @media (min-width: 700px) {
@@ -551,12 +465,10 @@ span.fancytree-node.cms-icon-girl>span.fancytree-icon {
 	
 	#search-bar {
 		margin-top: 0em;
-		margin-left: 2em;
 		width: 100%;
 	}
 	
 	#history-div {
-		justify-self: right;
 		margin-top: 1.5em;
 	}
 

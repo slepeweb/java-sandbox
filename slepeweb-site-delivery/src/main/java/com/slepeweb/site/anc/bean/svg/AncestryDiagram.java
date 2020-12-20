@@ -130,9 +130,11 @@ public class AncestryDiagram {
 		// Finally, position the subject relative to the last component.
 		// Need to identify the vertical tick at the bottom - usually the 
 		// last segment.
-		List<LineSegment> lastSet = lastComponent.getSegments();
-		LineSegment target = lastSet.get(lastSet.size() - 1);		
-		this.subject.move(target.getEnd().getX() - 20, target.getEnd().getY() + 10);
+		if (lastComponent != null) {
+			List<LineSegment> lastSet = lastComponent.getSegments();
+			LineSegment target = lastSet.get(lastSet.size() - 1);		
+			this.subject.move(target.getEnd().getX() - 20, target.getEnd().getY() + 10);
+		}
 	}
 	
 	public int getNumRows() {

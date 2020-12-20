@@ -16,7 +16,7 @@
 	
 	<details>
 		<summary>NOTE</summary>
-		<p>Deep copy is NOT available.</p>
+		<p>This copies the current item only, NOT including any ancestors.</p>
 	</details>
 	
 	<div class="button-set">

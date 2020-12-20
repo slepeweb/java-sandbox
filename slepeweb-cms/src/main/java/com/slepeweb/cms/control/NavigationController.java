@@ -46,7 +46,8 @@ public class NavigationController extends BaseController {
 			}
 		}
 		
-		return dive(getEditableVersion(origId, getUser(req)), 1).getChildren();		
+		List<Navigation.Node> children = dive(getEditableVersion(origId, getUser(req)), 1).getChildren();
+		return children != null ? children : new ArrayList<Navigation.Node>(0);		
 	}
 	
 	@RequestMapping(value="/leftnav/lazy/thread", method=RequestMethod.GET, produces="application/json")	
