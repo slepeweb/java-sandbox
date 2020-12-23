@@ -7,18 +7,14 @@ INSTALL=/home/george/money
 # The location of the .MNY file
 MONEY=/media/george/Data/George/Kryptonite/home.MNY
 
-# The Tomcat installation
-TOMCAT_INST=/opt/tomcat7
-
 # The location of the class files to be jar'ed
 GIT_REPOS=/home/george/git-repos
 
-# The eclipse workspace
-ECLIPSE_WS=/home/george/workspace
-
 # All other locations are relative to the money installation, and assume  the following file structure:
 # INSTALL
-# -- lib (contains supporting jar files)
+# -- jars (symbolic link to workspace folder containing supporting jar files, 
+# --   eg. /home/george/workspace/.metadata/.plugins/org.eclipse.wst.server.core/tmp1/wtpwebapps/slepeweb-money/WEB-INF/lib
+# -- tomcat-jars (some services refer to HttpServletRequest, etc)
 # -- dist
 # ---- slepeweb-money-import.jar (the runnable jar file that executes the data import)
 # ---- home.MNY (a working copy of the input data)
@@ -28,13 +24,13 @@ ECLIPSE_WS=/home/george/workspace
 # -- slepeweb-money-build.xml (ant script to produce the jar file and supporting libraries)
 
 
-LIBS=$INSTALL/lib
+JARS=$INSTALL/jars
+TOMCAT_JARS=$INSTALL/tomcat-jars
 DIST=$INSTALL/dist
 JAR=$DIST/slepeweb-money-import.jar
 WORKING_MONEY=$DIST/home.MNY
 WORKING_MDB=$DIST/home.MDB
 FROM=""
-WEBAPPID=""
 
 while [[ $# -gt 0 ]]
 do
@@ -45,18 +41,12 @@ case $1 in
 	shift
 	shift
 	;;
--webappid)
-	WEBAPPID=$2
-	echo "Tmp folder in eclipse workspace is tmp$WEBAPPID"
-	shift
-	shift
-	;;
 esac
 done
 
-if [ -z $FROM ] || [ -z $WEBAPPID ]
+if [ -z $FROM ]
 then
-	echo "Usage $0 -from <yyy-mm-dd> -webappid <n>"
+	echo "Usage $0 -from <yyyy-mm-dd>"
 	exit 1
 fi
 
@@ -66,7 +56,7 @@ then
 	exit 1
 fi
 
-ant -Ddir.install=$INSTALL -Ddir.tomcatlib=$TOMCAT_INST/lib -Ddir.gitrepos=$GIT_REPOS -Ddir.workspace=$ECLIPSE_WS -Dwebappid=$WEBAPPID -f $INSTALL/slepeweb-money-build.xml
+ant -Ddir.install=$INSTALL -Ddir.gitrepos=$GIT_REPOS -f $INSTALL/slepeweb-money-build.xml
 
 if [ $? -ne 0 ]
 then
@@ -80,9 +70,9 @@ then
 	exit 1
 fi
 
-if [ ! -d $LIBS ]
+if [ ! -d $JARS ]
 then
-	echo "*** Please export all dependant jars into $LIBS"
+	echo "*** Please export all dependant jars into $JARS"
 	exit 1
 fi
 
@@ -112,4 +102,4 @@ cd $DIST
 jar xvf $JAR
 
 cd
-java -cp $LIBS/*:$DIST com.slepeweb.money.MoneyImportManager -mdb $WORKING_MDB -from $FROM
+java -cp $JARS/*:$TOMCAT_JARS/*:$DIST com.slepeweb.money.MoneyImportManager -mdb $WORKING_MDB -from $FROM

@@ -23,39 +23,34 @@
 		</macrodef>
 
 		<!-- 
-			Properties dir.install, dir.tomcatlib, dir.gitrepos, dir.workspace and webappid must be provided on the ant command line. 
+			Properties dir.install and dir.gitrepos must be provided on the ant command line. 
 		-->
 	
-		<property name="dir.moneylib" value="${dir.install}/lib" />
+		<property name="dir.money.jars" value="${dir.install}/jars" />
+    <property name="dir.tomcat.lib" value="/opt/tomcat7/lib" />
+	  <property name="dir.tomcat.jars" value="${dir.install}/tomcat-jars" />
 		<property name="dir.dist" value="${dir.install}/dist" />
 	
 		<target name="properties_check">
 			<prop-require prop="dir.install" />
-			<prop-require prop="dir.tomcatlib" />
 			<prop-require prop="dir.gitrepos" />
-			<prop-require prop="dir.workspace" />
-			<prop-require prop="webappid" />
 		</target>
 
-    <target name="create_run_jar" depends="properties_check, create_lib">
+    <target name="create_run_jar" depends="properties_check, copy_tomcat_jars">
         <jar destfile="${dir.dist}/slepeweb-money-import.jar">
             <manifest>
                 <attribute name="Main-Class" value="com.slepeweb.money.MoneyImportManager"/>
-              	<attribute name="Class-Path" value="${dir.moneylib}/slepeweb-common.jar ${dir.moneylib}/annotations-api.jar ${dir.moneylib}/jasper-el.jar ${dir.moneylib}/mysql-connector-java-8.0.22.jar ${dir.moneylib}/el-api.jar ${dir.moneylib}/spring-context-3.2.12.RELEASE.jar ${dir.moneylib}/spring-aop-3.2.12.RELEASE.jar ${dir.moneylib}/spring-core-3.2.12.RELEASE.jar ${dir.moneylib}/spring-expression-3.2.12.RELEASE.jar ${dir.moneylib}/spring-beans-3.2.12.RELEASE.jar ${dir.moneylib}/spring-jdbc-3.2.12.RELEASE.jar ${dir.moneylib}/spring-tx-3.2.12.RELEASE.jar ${dir.moneylib}/aopalliance-1.0.jar ${dir.moneylib}/aspectjweaver-1.6.8.jar ${dir.moneylib}/slf4j-api-1.6.4.jar ${dir.moneylib}/commons-lang3-3.1.jar ${dir.moneylib}/log4j-1.2.17.jar ${dir.moneylib}/validation-api-1.1.0.Final.jar ${dir.moneylib}/httpclient-4.3.jar ${dir.moneylib}/httpcore-4.3.jar ${dir.moneylib}/commons-logging-1.1.3.jar ${dir.moneylib}/jackcess-2.1.11.jar ${dir.moneylib}/solr-solrj-5.5.4.jar ${dir.moneylib}/httpmime-4.4.1.jar ${dir.moneylib}/noggit-0.6.jar ${dir.moneylib}/jcl-over-slf4j-1.7.7.jar"/>
+            		<attribute name="Class-Path" value="${dir.money.jars}/slepeweb-common.jar ${dir.tomcat.jars}/annotations-api.jar ${dir.tomcat.jars}/jasper-el.jar ${dir.tomcat.jars}/el-api.jar ${dir.money.jars}/mysql-connector-java-8.0.22.jar ${dir.money.jars}/spring-context-3.2.12.RELEASE.jar ${dir.money.jars}/spring-aop-3.2.12.RELEASE.jar ${dir.money.jars}/spring-core-3.2.12.RELEASE.jar ${dir.money.jars}/spring-expression-3.2.12.RELEASE.jar ${dir.money.jars}/spring-beans-3.2.12.RELEASE.jar ${dir.money.jars}/spring-jdbc-3.2.12.RELEASE.jar ${dir.money.jars}/spring-tx-3.2.12.RELEASE.jar ${dir.money.jars}/aopalliance-1.0.jar ${dir.money.jars}/aspectjweaver-1.6.8.jar ${dir.money.jars}/slf4j-api-1.6.4.jar ${dir.money.jars}/commons-lang3-3.1.jar ${dir.money.jars}/log4j-1.2.17.jar ${dir.money.jars}/validation-api-1.1.0.Final.jar ${dir.money.jars}/httpclient-4.3.jar ${dir.money.jars}/httpcore-4.3.jar ${dir.money.jars}/commons-logging-1.1.3.jar ${dir.money.jars}/jackcess-2.1.11.jar ${dir.money.jars}/solr-solrj-5.5.4.jar ${dir.money.jars}/httpmime-4.4.1.jar ${dir.money.jars}/noggit-0.6.jar ${dir.money.jars}/jcl-over-slf4j-1.7.7.jar"/>
             </manifest>
             <fileset dir="${dir.gitrepos}/slepeweb-money/target/classes"/>
         </jar>
     </target>
 	
-	  <target name="create_lib">
-	      <mkdir dir="${dir.moneylib}" />
-	  	
-	      <copy todir="${dir.moneylib}">
-	      	<fileset dir="${dir.workspace}/.metadata/.plugins/org.eclipse.wst.server.core/tmp${webappid}/wtpwebapps/slepeweb-money/WEB-INF/lib" />
-	      </copy>
-	  	
-	      <copy file="${dir.tomcatlib}/annotations-api.jar" todir="${dir.moneylib}"/>
-	      <copy file="${dir.tomcatlib}/jasper-el.jar" todir="${dir.moneylib}"/>
-	      <copy file="${dir.tomcatlib}/el-api.jar" todir="${dir.moneylib}"/>	  	
+	  <target name="copy_tomcat_jars">
+	      <mkdir dir="${dir.tomcat.jars}" />
+	      <copy file="${dir.tomcat.lib}/annotations-api.jar" todir="${dir.tomcat.jars}"/>
+	      <copy file="${dir.tomcat.lib}/jasper-el.jar" todir="${dir.tomcat.jars}"/>
+	      <copy file="${dir.tomcat.lib}/el-api.jar" todir="${dir.tomcat.jars}"/>	  	
+        <copy file="${dir.tomcat.lib}/servlet-api.jar" todir="${dir.tomcat.jars}"/>	  	
 	  </target>
 </project>
