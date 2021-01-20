@@ -1,0 +1,20 @@
+doctype html
+html
+  head
+    title Security camera application
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    link(rel="stylesheet", href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css", type="text/css")
+    link(rel="stylesheet", href="/resource/style.css")
+    link(rel="stylesheet", href="/resource/colorbox.css")
+    link(rel="stylesheet", href="https://use.fontawesome.com/releases/v5.4.2/css/all.css", integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns", crossorigin="anonymous")
+    script(src="http://code.jquery.com/jquery-1.10.2.min.js")
+    script(src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js")
+    script(src="/resource/jquery.colorbox-min.js")
+    script(src="/socket.io/socket.io.js")
+    script(src="/resource/secam.js")
+  body
+    #main-wrapper
+      div#main-content
+        block content
+        audio#bell(src="/resource/pin-dropping.wav", preload="auto")

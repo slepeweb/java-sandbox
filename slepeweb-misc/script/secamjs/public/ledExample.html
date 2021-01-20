@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Control LED light</h1>
+<p><input type="checkbox" id="light"></p>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<script>
+  var socket;
+  $(function() {
+    socket = io();
+    $('#light').change(function(e) {
+      console.log('Checkbox value is now ' + ($(this).prop("checked") ? 'checked' : 'un-checked'));
+      socket.emit('light', $(this).prop("checked"));
+      console.log('... and node server has been notified')
+    });
+
+    socket.on('light', function (data) {
+      console.log("server has notified us that someone has flicked the switch (possibly from this page) [" + data + "]")
+      $("#light").prop("checked", Boolean(data)); 
+      console.log('... and this page has been updated accordingly')
+    });
+  });
+</script>
+
+</body>
+</html> 

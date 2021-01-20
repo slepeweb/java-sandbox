@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  h1 Secam
+  
+  #actions
+     .photo-action-cell
+       button(id="button-photo", value="photo") Take photo
+     .surveillance-cell
+       span Surveillance
+       input(id="surveillance", type="checkbox")
+  
+  #flash
+    p
+
+  h3
+    a(href="zzz") Video index
+
+  #video-table
+    //p (Video table is loading ...)
+    
+  include ./controls.pug
+
+  #delete-dialog(class="hide dialog")
+    p 
+      span(class="ui-icon ui-icon-alert", style="float:left; margin:12px 12px 20px 0;") 
+      span Are you sure you wish to delete file <i class="filename-placeholder"></i>?
+    
+  #file-info(class="hide dialog")

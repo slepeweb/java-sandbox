@@ -1,0 +1,61 @@
+- var val
+
+h3 Camera Settings
+  i#camera-settings-switch(class="fas fa-arrow-down")
+
+div#controls-wrapper
+  table#controls
+    tr
+      td Width (px)
+      td
+        input#width(type="text")
+
+    tr
+      td Height (px)
+      td
+        input#height(type="text")
+
+    tr
+      td Brightness
+      td
+        select#brightness(class="ctrl")
+          - val = 10
+          while val <= 100
+            option(value=val)= val
+            - val += 5
+    tr
+      td Contrast
+      td
+        select.ctrl(id="contrast")
+          - val = -80
+          while val <= 100
+            option(value=val)= val
+            - val += 5
+    tr
+      td Mode
+      td
+        select.ctrl(id="mode")
+          each val in ["auto", "night", "nightpreview", "backlight", "spotlight"]
+            option(value=val)= val
+
+    //tr
+    //  td ISO
+    //  td
+    //    select.ctrl(id="iso")
+    //      each val in [0, 100, 200, 400, 800]
+    //        option(value=val)= val
+
+    tr
+      td vflip
+      td 
+        input#vflip(type="checkbox")
+
+    tr
+      td Video duration (millis)
+      td 
+        input#timeout(type="input")
+
+//#live-video
+//  h3 Play live video
+//  img(src="/resource/video-play.png")                
+
