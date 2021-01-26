@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class SearchAgent {
 	private SearchCriteria criteria;
-	private SearchResults results, previous;
+	private SearchResults results;
 	private String serializedFilePrefix;
 	
 	public SearchAgent() {}
@@ -12,7 +12,6 @@ public class SearchAgent {
 	public SearchAgent(String heading, String trimFilter, String url, String filePrefix) {
 		this.criteria = new SearchCriteria(heading, trimFilter, url);
 		this.results = new SearchResults();
-		this.previous = new SearchResults();
 		this.serializedFilePrefix = filePrefix;
 	}	
 	
@@ -54,13 +53,5 @@ public class SearchAgent {
 
 	public void setSerializedFilePrefix(String serializedFilePrefix) {
 		this.serializedFilePrefix = serializedFilePrefix;
-	}
-
-	public SearchResults getPrevious() {
-		return previous;
-	}
-
-	public void setPrevious(SearchResults previous) {
-		this.previous = previous;
 	}
 }

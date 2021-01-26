@@ -12,6 +12,14 @@ public class VehicleBean implements Serializable {
 	private String id, title = "", href, location, sellerType, year, registration, bodystyle;
 	private String price, mileage, mileageRating = "", transmission, engine, fuel, description, power;
 	private String features;
+	private Date dateCreated;
+	
+	public boolean isExpired(Date d) {
+		long now = d.getTime();
+		long then = this.dateCreated.getTime();
+		long threshold = 30L * 24L * 60L * 60L * 1000L;
+		return (now - then) > threshold;
+	}
 	
 	public String getMileageRating() {
 		return mileageRating;
@@ -29,9 +37,6 @@ public class VehicleBean implements Serializable {
 		this.power = power;
 	}
 
-	private Date dateCreated, dateUpdated;
-	private Status status;
-
 	@Override
 	public String toString() {
 		return String.format("%s / %s / %s / %s / %s", getTitle(), getRegistration(), getLocation(), getMileage(), getPrice());
@@ -39,9 +44,8 @@ public class VehicleBean implements Serializable {
 	
 	public String toCsv() {
 		String[] parts = {
-			getStatus().name(),
 			getYear(),
-			String.format("Reg %s", getRegistration()),
+			String.format("\"%s\"", getRegistration()),
 			getMileage(),
 			getMileageRating(),
 			getPrice(),
@@ -54,7 +58,7 @@ public class VehicleBean implements Serializable {
 			getSellerType(),
 			getTitle(),
 			getFeatures(),
-			"http://www.autotrader.co.uk" + getHref()
+			getHref()
 		};
 		
 		StringBuilder sb = new StringBuilder();
@@ -81,10 +85,6 @@ public class VehicleBean implements Serializable {
 			return getId().equals(((VehicleBean)other).getId());
 		}
 		return false;
-	}
-	
-	public enum Status {
-		NEW, UPDATED, UNCHANGED, EXPIRED
 	}
 	
 	public String getTitle() {
@@ -205,22 +205,6 @@ public class VehicleBean implements Serializable {
 
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
-	}
-
-	public Date getDateUpdated() {
-		return dateUpdated;
-	}
-
-	public void setDateUpdated(Date dateUpdated) {
-		this.dateUpdated = dateUpdated;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public void setStatus(Status status) {
-		this.status = status;
 	}
 
 	public String getFeatures() {

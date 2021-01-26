@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -25,12 +26,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.slepeweb.carsearch.VehicleBean.Status;
-
 public class Searcher {
 	private static Logger LOG = Logger.getLogger(Searcher.class);
 	private static int MILLIS_IN_DAY = 24 * 60 * 60000;
 	private static String LOG_FOLDER = "/home/george/cars";
+	private static String AUTOTRADER_URL_PREFIX = "https://www.autotrader.co.uk/car-details/";
+	
 	
 	private static Pattern REG_PATTERN = Pattern.compile("(\\d{4}) \\((\\d{2}) reg\\)");
 	private static Pattern BODYSTYLE_PATTERN = Pattern.compile("(Saloon|Hatchback|Estate)", 
@@ -38,10 +39,9 @@ public class Searcher {
 	private static Pattern MILES_PATTERN = Pattern.compile("(\\d{1,3},)?(\\d{2,3}) miles");
 	private static Pattern TRANSMISSION_PATTERN = Pattern.compile("(Manual|Automatic)");
 	private static Pattern ENGINE_PATTERN = Pattern.compile("(\\d\\.\\d)L");
-	private static Pattern POWER_PATTERN = Pattern.compile("(\\d{2,3})PS");
+	private static Pattern POWER_PATTERN = Pattern.compile("(\\d{2,3})(PS|BHP)", Pattern.CASE_INSENSITIVE);
 	private static Pattern PRICE_PATTERN = Pattern.compile("£(\\d+,\\d{3})");
 	private static Pattern FUEL_PATTERN = Pattern.compile("(Petrol|Diesel|Hybrid - Petrol/Electric)");
-	private static Pattern HREF_PATTERN = Pattern.compile("/classified/advert/(\\d+)\\?.*");
 	private static Pattern TOTAL_FOUND_PATTERN = Pattern.compile("^(.*?) cars found");
 	private static Pattern SELLER_PATTERN = Pattern.compile("^(\\w+) seller .*");
 	
@@ -51,16 +51,21 @@ public class Searcher {
 		LOG.info("\n\n\n");
 
 		SearchAgent avensis = new SearchAgent("Avensis", "",
-		"https://www.autotrader.co.uk/car-search?postcode=e63qj&radius=50&make=TOYOTA&model=AVENSIS&include-delivery-option=on&fuel-type=Diesel&body-type=Saloon",
+		"https://www.autotrader.co.uk/car-search?postcode=e63qj&radius=150&make=TOYOTA&model=AVENSIS&include-delivery-option=on&fuel-type=Diesel&body-type=Saloon",
 		"avensis-");		
 		LOG.info(String.format("Search url: [%s]", avensis.getCriteria().getUrl()));
+		
+		SearchAgent audi = new SearchAgent("Audi", "",
+		"https://www.autotrader.co.uk/car-search?sort=relevance&postcode=e63qj&radius=100&make=AUDI&model=A4%20AVANT&include-delivery-option=on&fuel-type=Diesel&ulez-compliant=on",
+		"audi-");		
+		LOG.info(String.format("Search url: [%s]", audi.getCriteria().getUrl()));		
 		
 		SearchAgent i30 = new SearchAgent("Hyundai", "SE,DCT",
 		"https://www.autotrader.co.uk/car-search?sort=distance&postcode=ex109nn&radius=100&make=HYUNDAI&model=IONIQ&include-delivery-option=on&fuel-type=Hybrid%20%E2%80%93%20Petrol%2FElectric",
 		"i30-");
 		LOG.info(String.format("Search url: [%s]", i30.getCriteria().getUrl()));
 		
-		new Searcher( new SearchAgent[] {avensis}).execute();
+		new Searcher( new SearchAgent[] {audi}).execute();
 		
 		LOG.info("Finished!\n\n\n");
 	}
@@ -72,17 +77,19 @@ public class Searcher {
 	private void execute() {
 		for (SearchAgent agent : this.agents) {
 			// Load previous search results from file
-			agent.setPrevious(getSerializedModel(agent.getSerializedFilePrefix()));
+			agent.setResults(getSerializedModel(agent.getSerializedFilePrefix()));
 			
-			if (agent.getPrevious() == null) {
-				agent.setPrevious(new SearchResults());
+			if (agent.getResults() == null) {
+				agent.setResults(new SearchResults());
 			}
 			
-			// Re-build data map from old results
-			agent.getPrevious().mapVehicles();
-			
+			// Remove results older than one month ago
 			Date now = new Date();
+			removeExpiredSales(now, agent.getResults());
 			
+			// Build data map for remaining vehicles
+			agent.getResults().mapVehicles();
+						
 			try {
 				// Scrape the first page
 				scrape(agent, 1, 0, now);
@@ -93,9 +100,6 @@ public class Searcher {
 					scrape(agent, i, numPages, now);
 				}
 				
-				// Carry forward old search results
-				retainExpiredVehicles(agent);
-				
 				// Save combined results to file
 				serializeModel(agent, now);
 				
@@ -104,6 +108,19 @@ public class Searcher {
 			}
 			catch (Exception e) {
 				LOG.error("Search failure", e);
+			}
+		}
+	}
+	
+	private void removeExpiredSales(Date now, SearchResults results ) {
+		Iterator<VehicleBean> iter = results.getVehicles().iterator();
+		VehicleBean v;
+		
+		while (iter.hasNext()) {
+			v = iter.next();
+			if (v.isExpired(now)) {
+				iter.remove();
+				LOG.info(String.format("Removed expired vehicle [%s, %2$td/%2$tm/%2$ty]", v.getId(), v.getDateCreated()));
 			}
 		}
 	}
@@ -156,29 +173,12 @@ public class Searcher {
 		}
 	}
 	
-	private void retainExpiredVehicles(SearchAgent agent) {
-		SearchResults newModel = agent.getResults();
-		List<VehicleBean> oldList = agent.getPrevious().getVehicles();
-		List<VehicleBean> newList = agent.getResults().getVehicles();
-		
-		for (VehicleBean v : oldList) {
-			if (v.getStatus() == Status.EXPIRED) {
-				newList.add(v);
-			}
-			else if (newModel.getVehicleById().get(v.getId()) == null) {
-				v.setStatus(Status.EXPIRED);
-				newList.add(v);
-				newModel.incNumExpired();
-			}
-		}
-	}
-	
 	private void scrape(SearchAgent agent, int pageNum, int numPages, Date now) throws Exception {
 		
 		LOG.debug(String.format("Getting page [%d]", pageNum));
 		String baseUrl = agent.getCriteria().getUrl(); 
-		SearchResults oldModel = agent.getPrevious();
-		SearchResults newModel = agent.getResults();
+		SearchResults model = agent.getResults();
+		String id;
 		
 		String url = baseUrl;
 		if (pageNum > 1) {
@@ -186,13 +186,13 @@ public class Searcher {
 		}
 		
 		Document doc = getDocument(url);
-		VehicleBean v;
-		Element anchor;
+		VehicleBean v, tmp;
 		
 		if (doc != null) {
 			for (Element searchResult : doc.getElementsByClass("search-page__result")) {
-				newModel.incNumProcessed();
+				model.incNumProcessed();
 				v = new VehicleBean();
+				v.setDateCreated(now);
 				
 				v.setId(searchResult.attr("id"));
 				if (StringUtils.isBlank(v.getId())) {
@@ -200,79 +200,81 @@ public class Searcher {
 					continue;
 				}
 				
-				if (agent.getResults().getVehicleById().get(v.getId()) != null) {
-					LOG.debug("Duplicate vehicle id");
-					continue;
+				if ((tmp = model.getVehicleById().get(v.getId())) == null) {
+					v.setHref(AUTOTRADER_URL_PREFIX + v.getId());
+					
+					if (! scrapeProductCard(v, searchResult)) {
+						LOG.warn(String.format("Vehicle information not available [%s]", v));
+						continue;
+					}
+					
+					if (! agent.titleMatchesTrimFilter(v.getTitle().toLowerCase())) {
+						LOG.warn(String.format("No trim match on vehicle heading [%s], [%s]", 
+								v.getTitle(), agent.getCriteria().getTrimRegex()));
+						continue;
+					}
+					
+					if (! scrapePrice(v, searchResult)) {
+						LOG.warn(String.format("Vehicle price not available [%s]", v));
+						continue;
+					}
+					
+					scrapeSellerInfo(v, searchResult);
+					model.addVehicle(v);
 				}
-				
-				anchor = searchResult.select("a").last();
-				if (anchor != null) {
-					v.setHref(anchor.attr("href"));
+				else {
+					// Overwrite seller information, if blank, in case omissions are random!
+					id = v.getId();
+					v = tmp;
+					tmp = new VehicleBean();
+					tmp.setId(id);
+					scrapeSellerInfo(tmp, searchResult);
+					
+					if (StringUtils.isBlank(v.getLocation())) {
+						v.setLocation(tmp.getLocation());
+					}
+					
+					if (StringUtils.isBlank(v.getSellerType())) {
+						v.setSellerType(tmp.getSellerType());
+					}
+
+					LOG.debug("Vehicle already catalogued - seller info updated");
 				}
-				
-				if (! scrapeProductCard(v, searchResult)) {
-					LOG.warn(String.format("Vehicle information not available [%s]", v));
-					continue;
-				}
-				
-				if (! scrapePrice(v, searchResult)) {
-					LOG.warn(String.format("Vehicle price not available [%s]", v));
-					continue;
-				}
-				
-				scrapeSellerInfo(v, searchResult);
-								
-				newModel.addVehicle(v);
-				setVehicleStatus(v, now, oldModel, newModel);
 			}
 			
 			// How many pages can we scrape?
 			if (pageNum == 1) {
-				newModel.setNumPages(getNumPages(doc));
+				model.setNumPages(getNumPages(doc));
 			}
 		}
 	}
 	
-	private boolean scrapeProductCard(VehicleBean v, Element searchResult) {
-		Element productCardContent = searchResult.select("div.product-card-content").first();
-		
-		if (productCardContent == null) {
-			LOG.warn(String.format("Missing section (section.product-card-content) [id=%s]", v.getId()));
-			return false;
-		}
-		
-		Element productCardDetails = productCardContent.select("section.product-card-details").first();
-		
-		if (productCardDetails == null) {
-			LOG.warn(String.format("Missing section (section.product-card-details) [id=%s]", v.getId()));
-			return false;
-		}
-		
-		Element ele = productCardDetails.select("h3").first();
-		
+	private Element find(Element ctx, String selector, VehicleBean v) {
+		Element ele = ctx.select(selector).first();
 		if (ele == null) {
-			LOG.warn(String.format("Missing vehicle description [id=%s]", v.getId()));
+			LOG.info(String.format("Element not found [id=%s: '%s']", v.getId(), selector));
+		}
+		return ele;
+	}
+	
+	private boolean scrapeProductCard(VehicleBean v, Element searchResult) {
+		Element productCardDetails;
+		Element ele;
+		
+		if ((productCardDetails = find(searchResult, "section.product-card-details", v)) == null) {
 			return false;
 		}
 		
-		//v.setHref(anchor.attr("href"));
+		if ((ele = find(productCardDetails, "h3", v)) == null) {
+			return false;
+		}
+		
 		v.setTitle(ele.ownText());
 		LOG.debug(v.getTitle());
 		
-		ele = productCardDetails.select("p.product-card-details__attention-grabber").first();
-		
-		if (ele != null) {
+		if ((ele = find(productCardDetails, "p.product-card-details__attention-grabber", v)) != null) {
 			v.setFeatures(ele.ownText());
 		}
-		
-		/*
-		 * TODO: Is this functionality actioned elsewhere?
-		 * 
-		if (! agent.titleMatchesTrimFilter(v.getTitle().toLowerCase())) {
-			LOG.info(String.format("No trim match on vehicle heading [%s]", v.getTitle()));
-			continue;
-		}
-		*/
 		
 		scrapeKeySpecs(v, productCardDetails);		
 		return true;
@@ -281,9 +283,9 @@ public class Searcher {
 	private void scrapeKeySpecs(VehicleBean v, Element productCardDetails) {
 		Matcher m;
 		boolean doRegistration, doBodyStyle, doMileage, doTransmission, doEngineSize, doPower, doFuel;
-		Element specs = productCardDetails.select("ul.listing-key-specs").first();
+		Element specs;
 		
-		if (specs != null) {
+		if ((specs = find(productCardDetails, "ul.listing-key-specs", v)) != null) {
 			doRegistration = doMileage = doBodyStyle = doTransmission = 
 					doEngineSize = doPower = doFuel = true;
 			
@@ -342,7 +344,7 @@ public class Searcher {
 				if (doPower) {
 					m = POWER_PATTERN.matcher(spec.ownText());
 					if (m.matches()) {
-						v.setPower(m.group(1));
+						v.setPower(m.group(1) + " " + m.group(2));
 						doPower = false;
 						continue;
 					}
@@ -361,10 +363,10 @@ public class Searcher {
 	}
 	
 	private void scrapeSellerInfo(VehicleBean v, Element searchResult) {
-		Element sellerInfo = searchResult.select("div.product-card-seller__info").first();
-		if (sellerInfo != null) {
-			Element ele = sellerInfo.select("div.product-card-seller__seller-type").first();
-			if (ele != null) {
+		Element sellerInfo, ele;
+		
+		if ((sellerInfo = find(searchResult, "div.product-card-seller__info", v)) != null) {
+			if ((ele = find(sellerInfo, "div.product-card-seller__seller-type", v)) != null) {
 				Matcher m = SELLER_PATTERN.matcher(ele.ownText().trim());
 				if (m.matches()) {
 					v.setSellerType(m.group(1));
@@ -372,14 +374,15 @@ public class Searcher {
 			}
 			
 			ele = sellerInfo.select("span.seller-town").first();
-			if (ele != null) {
+			if ((ele = find(sellerInfo, "span.seller-town", v)) != null) {
 				v.setLocation(ele.ownText());
 			}
 		}
 	}
 	
 	private boolean scrapePrice(VehicleBean v, Element searchResult) {
-		Element priceContainer = searchResult.select("div.product-card-pricing__price span").first();
+		Element priceContainer = find(searchResult, "div.product-card-pricing__price span", v);
+		
 		if (priceContainer != null) {
 			Matcher m = PRICE_PATTERN.matcher(priceContainer.ownText());
 			if (m.matches()) {
@@ -389,42 +392,7 @@ public class Searcher {
 		}
 		return false;
 	}
-	
-	private void setVehicleStatus(VehicleBean v, Date now, SearchResults oldModel, SearchResults newModel) {
-		// Do we already know about this vehicle?
-		VehicleBean target = oldModel.getVehicleById().get(v.getId());				
-		
-		if (target == null) {
-			// This is the first time we've seen this vehicle
-			v.setDateCreated(now);
-			v.setDateUpdated(now);
-			newModel.incNumNew();
-			v.setStatus(VehicleBean.Status.NEW);
-		}
-		else {
-			v.setDateCreated(target.getDateCreated());
-			
-			// Both vehicles have the same ID, but have their key properties changed?
-			if (v.getId().equals(target.getId())) {
-				if (! v.equals(target)) {
-					// We've seen this vehicle before, but some key properties have changed
-					v.setStatus(VehicleBean.Status.UPDATED);
-					newModel.incNumUpdated();
-					v.setDateUpdated(new Date());
-				}
-				else {
-					// We've seen this vehicle before, AND NOTHING has changed
-					newModel.incNumUnchanged();
-					v.setStatus(VehicleBean.Status.UNCHANGED);
-				}
-			}
-			else {
-				// Not sure how we could get to this point in the code ...
-				newModel.incNumUnchanged();
-				v.setStatus(VehicleBean.Status.UNCHANGED);
-			}
-		}
-	}
+
 	
 	private int getNumPages(Document doc) {
 		int numPages = 1;
@@ -477,7 +445,6 @@ public class Searcher {
 		
 		String[] header = {
 				"Age (Years)",
-				"Status",
 				"Year",
 				"Registration",
 				"Mileage",
@@ -516,23 +483,14 @@ public class Searcher {
 		
 		SearchResults results = agent.getResults();
 		sortAndPrint(results.getVehicles(), ordering, "21", pw);
+		reportAveragePrices(agent, ordering, pw);
+		reportSearchCriteria(agent, pw);
 		pw.close();
 		
-		LOG.info(String.format("\n*** Statistics (%s):", agent.getCriteria().getHeading()));
-		LOG.info(String.format(" Num processed: %d", results.getNumProcessed()));
-		LOG.info(String.format("    Total cars: %d", results.getVehicles().size()));
-		LOG.info(String.format("      New cars: %d", results.getNumNew()));
-		LOG.info(String.format("  Updated cars: %d", results.getNumUpdated()));
-		LOG.info(String.format("Unchanged cars: %d", results.getNumUnchanged()));
-		LOG.info(String.format("  Expired cars: %d", results.getNumExpired()));
-		
-		// Average prices per registration
-		reportAveragePrices(agent, ordering);
 		LOG.info("\n\n\n");
 	}
 	
-	private void reportAveragePrices(SearchAgent agent, String[] ordering) {
-		String heading = agent.getCriteria().getHeading();
+	private void reportAveragePrices(SearchAgent agent, String[] ordering, PrintWriter pw) {
 		List<VehicleBean> vehicles = agent.getResults().getVehicles();
 		Map<String, StatisticBean> averagePrice = new HashMap<String, StatisticBean>();
 		StatisticBean stat;
@@ -545,11 +503,22 @@ public class Searcher {
 			stat.inc(Integer.parseInt(v.getPrice()));
 		}
 		
-		LOG.info(String.format("\n*** Average prices (%s)", heading));
+		pw.println("\n\n\tRegistration\t\tAverage price\t\tSample size");
+		
 		for (String reg : ordering) {
 			stat = averagePrice.get(reg);
 			if (stat != null) {
-				LOG.info(String.format("  Reg %s: %d (*%d)", reg, stat.getAveragePrice(), stat.getNumVehicles()));
+				pw.println(String.format("\t%s\t\t%d\t\t%d", reg, stat.getAveragePrice(), stat.getNumVehicles()));
+			}
+		}
+	}
+	
+	private void reportSearchCriteria(SearchAgent agent, PrintWriter pw) {
+		pw.println("\n\n\tParameter\t\tValue");
+		
+		for (SearchParameter p : agent.getCriteria().parseSearchParameters()) {
+			if (! p.getName().equals("sort")) {
+				pw.println(String.format("\t%s\t\t\"%s\"", p.getName(), p.getValue()));
 			}
 		}
 	}
@@ -605,14 +574,5 @@ public class Searcher {
 		}
 		
 		return -1;
-	}
-	
-	@SuppressWarnings("unused")
-	private String getIdFromHref(String href) {
-		Matcher m = HREF_PATTERN.matcher(href);
-		if (m.matches()) {
-			return m.group(1);
-		}
-		return "";
 	}
 }

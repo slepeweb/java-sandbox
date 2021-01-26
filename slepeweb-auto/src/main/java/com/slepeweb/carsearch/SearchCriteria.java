@@ -1,5 +1,10 @@
 package com.slepeweb.carsearch;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class SearchCriteria {
@@ -39,5 +44,27 @@ public class SearchCriteria {
 
 	public void setHeading(String heading) {
 		this.heading = heading;
+	}
+	
+	public List<SearchParameter> parseSearchParameters() {
+		List<SearchParameter> list = new ArrayList<SearchParameter>();
+		SearchParameter p;
+		String[] pair;
+		int cursor = getUrl().indexOf("?");
+		
+		for (String param : getUrl().substring(cursor + 1).split("&")) {
+			pair = param.split("=");
+			p = new SearchParameter().setName(pair[0]);
+			if (pair.length > 1) {
+				try {
+					p.setValue(URLDecoder.decode(pair[1], "utf-8"));
+				} 
+				catch (UnsupportedEncodingException e) {
+				}
+			}
+			list.add(p);
+		}
+		
+		return list;
 	}
 }
