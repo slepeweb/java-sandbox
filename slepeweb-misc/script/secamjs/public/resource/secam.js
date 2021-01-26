@@ -29,68 +29,54 @@ socket.on('flash', (msg, warning) => {
 socket.on('table', (obj) => {
 	var numRows = obj.length
 
-	// Web page received message to render table
-	var markup = '<table id="video-index-table">'
-     
-	obj.forEach((item, index) => {
-		var backupIcon = item.uploaded ? '' : `<i class="fas fa-cloud-upload-alt upload-icon" title="Upload this file" data-filename="${item.filename}"></i>`
-		markup += `
-    	<tr>
-    		<td>${numRows - index}</td>
-    		<td><a class="table-row-data iframe" href="/media/${item.filename}" 
-    			data-id="${numRows - index}" data-filename="${item.filename}" data-size="2kb"
-    			title="filename=${item.filename}, size=${item.size}">${item.type}</a></td>
-    		<td>${item.date}</td>
-    		<td>${item.time}</td>
-    		<td><i class="far fa-trash-alt trash-icon" title="Delete this file" 
-    			data-filename="${item.filename}"></i>${backupIcon}</td>
-     	</tr>`
-	})
-	markup += '</table>'
-  
-  	var table = $('#video-table')
-	table.html(markup);
-	
-	table.find(".iframe").colorbox({
-		iframe : true,
-		opacity : 0.5,
-		closeButton : true,
-		width : "90%",
-		height : "80%",
-		top : "15%",
+	if (numRows > 0) {
+		// Web page received message to render table
+		var markup = '<table id="video-index-table">'
+	     
+		obj.forEach((item, index) => {
+			var backupIcon = item.uploaded ? '' : `<i class="fas fa-cloud-upload-alt upload-icon" title="Upload this file" data-filename="${item.filename}"></i>`
+			markup += `
+	    	<tr>
+	    		<td>${numRows - index}</td>
+	    		<td><a class="table-row-data iframe" href="/media/${item.filename}" 
+	    			data-id="${numRows - index}" data-filename="${item.filename}" data-size="2kb"
+	    			title="filename=${item.filename}, size=${item.size}">${item.type}</a></td>
+	    		<td>${item.date}</td>
+	    		<td>${item.time}</td>
+	    		<td><i class="far fa-trash-alt trash-icon" title="Delete this file" 
+	    			data-filename="${item.filename}"></i>${backupIcon}</td>
+	     	</tr>`
+		})
+		markup += '</table>'
+	  
+	  	var table = $('#video-table')
+		table.html(markup);
 		
-		rel : 'group2',
-		transition : "none",
-		current : 'Media item {current} of {total}'
-	});
-	
-	$('i.trash-icon').click(function() {
-		$('i.filename-placeholder').html($(this).attr('data-filename'))
-		_deleteDialog.dialog("open")
-	})
-	
-	$('i.upload-icon').click(function() {		
-    	socket.emit('upload', $(this).attr('data-filename'))
-	})
-	
-	/*
-	$('.table-row-data').mouseover(() => {
-		var a = $(this)
-		var b = $('#file-info')
-		var markup = `
-			<table>
-				<tr><td>${a.attr('data-filename')}</td></tr>
-				<tr><td>${a.attr('data-size')}</td></tr>
-			</table>
-		`
-		b.html(markup)
-		a.dialog()
-	})
-	
-	$('.table-row-data').mouseout(() => {
-		$('#file-info').dialog('close')
-	})
-	*/
+		table.find(".iframe").colorbox({
+			iframe : true,
+			opacity : 0.5,
+			closeButton : true,
+			width : "90%",
+			height : "80%",
+			top : "15%",
+			
+			rel : 'group2',
+			transition : "none",
+			current : 'Media item {current} of {total}'
+		});
+		
+		$('i.trash-icon').click(function() {
+			$('i.filename-placeholder').html($(this).attr('data-filename'))
+			_deleteDialog.dialog("open")
+		})
+		
+		$('i.upload-icon').click(function() {		
+	    	socket.emit('upload', $(this).attr('data-filename'))
+		})
+	}
+	else {
+		$('#video-table').html('<p>No media to list</p>')
+	}
 })
 
 socket.on('surveillance', (bool) => {
@@ -99,13 +85,21 @@ socket.on('surveillance', (bool) => {
 
 // Update the DOM with new value of a single camera setting
 socket.on('camera-setting', (obj) => {
-	if (obj.name != 'vflip') {
+	if (['brightness', 'contrast', 'mode' /*, 'ISO'*/].includes(obj.name)) {
+		// These are <select> elements
 		var selA = `#${obj.name} option[selected=selected]`
-		var selB = `#${obj.name} option[value=${obj.value}]`
+		var selB = `#${obj.name} option[value=${obj.display}]`
+		var selP = `#${obj.name}`
 		$(selA).removeAttr('selected')
 		$(selB).attr('selected', 'selected')
+		$(selP).val(obj.value)
 	}
-	else {
+	else if (['height', 'width', 'timeout'].includes(obj.name)) {
+		// These are text input elements
+		$(`#${obj.name}`).val(obj.display)
+	}
+	else if (obj.name == 'vflip') {
+		// These are checkbox inputs
 		$(`#${obj.name}`).prop('checked', obj.value == 'true')
 	}
 })
@@ -120,12 +114,12 @@ socket.on('camera-status', (obj) => {
 	_selectOptionByValue('#brightness', obj.brightness)
 	_selectOptionByValue('#contrast', obj.contrast)
 	_selectOptionByValue('#mode', obj.exposure_mode)
-	//_selectOptionByValue('#iso', obj.iso)
+	//_selectOptionByValue('#ISO', obj.ISO)
 	
 	// input elements
 	$('#width').val(obj.width)
 	$('#height').val(obj.height)
-	$('#timeout').val(obj.timeout)
+	$('#timeout').val(obj.timeout / 1000)
 
 	// checkbox	elements
 	$('#vflip').prop('checked', obj.vflip == 'true')
@@ -165,17 +159,25 @@ $(function() {
 	
 	$('#width, #height, #brightness, #contrast, #mode, #timeout').change(function() {
 		var ele = $(this)
+		var name = ele.attr('id')
+		var display = ele.val()
+		var value = name != 'timeout' ? display : display * 1000
+		
     	socket.emit('camera-setting-request', {
-    		name: ele.attr('id'),
-    		value: ele.val()
+    		name: name,
+    		value: value,
+    		display: display,
     	})
 	})
 	
 	$('#vflip').click(function() {
 		var ele = $(this)
+		var value = ele.is(':checked') ? 'true' : 'false'
+		
     	socket.emit('camera-setting-request', {
     		name: ele.attr('id'),
-    		value: ele.is(':checked') ? 'true' : 'false'
+    		value: value,
+    		display: value,
     	})
 	})
 	

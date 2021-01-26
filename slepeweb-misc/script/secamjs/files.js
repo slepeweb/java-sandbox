@@ -1,3 +1,6 @@
+const sc = require('path').basename(__filename)
+const {debug, info, warn, error} = require('./logger.js')
+
 const fs = require('fs')
 const dropboxApi = require('dropbox-v2-api')
 
@@ -109,10 +112,10 @@ const wipe = (filename) => {
 	    try {
 		    fs.rmSync(filepath)
 		    result = true
-	    	console.log(`Deleted file [${filepath}]`)
+	    	info(sc, `Deleted file [${filepath}]`)
 	    }
 	    catch(err) {
-	    	console.log(`Error deleting file [${filepath}]: ${err.message}`)
+	    	error(sc, `Error deleting file [${filepath}]: ${err.message}`)
 	    }
     }
   }
@@ -137,10 +140,12 @@ const upload = (filepath) => {
 		
 		dbx(params, (err, result, response) => {
 		    if (err) {
+		    	error(sc, `Failed to upload ${filename}`)
 		    	reject(err)
 		    }
 		    else {
 		    	flagUploaded(filepath)
+		    	info(sc, `File uploaded ${filename}`)
 		    	resolve('ok')
 		    }
 		})

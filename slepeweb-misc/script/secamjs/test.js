@@ -1,3 +1,4 @@
+/*
 const webModule = require('./webFramework')
 const io = require('socket.io')(webModule.http)
 const Gpio = require('pigpio').Gpio
@@ -14,3 +15,9 @@ pir.on('alert', (value) => {
 			console.log(pir.digitalRead())
 		}, 100)
 })
+*/
+
+module.exports = {
+	a: 10,
+	b: 20,
+	}

@@ -1,8 +1,19 @@
+console.log('Starting secam')
+
 const webModule = require('./webFramework')
 const io = require('socket.io')(webModule.http)
 const Gpio = require('pigpio').Gpio
 const filesModule = require('./files.js')
 const cameraModule = require('./camera.js')
+
+const sc = require('path').basename(__filename)
+const {debug, info, warn, error} = require('./logger.js')
+
+process.on('SIGTERM', () => {
+	webModule.server.close(() => {
+		info(sc, 'Process terminated')
+	})
+})
 
 const pir = new Gpio(4, {
   mode: Gpio.INPUT, 
@@ -27,7 +38,7 @@ const wipe = (filename, quietly) => {
 }
 
 io.on('connection', (socket) => {
-	console.log('A.N. user connected')
+	info(sc, 'A.N. user connected')
   
 	socket.on('photo', () => {
 		cameraModule.snap(io)
@@ -66,14 +77,13 @@ io.on('connection', (socket) => {
 	})
 
 	socket.on('camera-setting-request', (obj) => {
-		cameraModule.setProperty(obj.name, obj.value)
-		io.emit('flash', `${obj.name} set to ${obj.value}`)
+		cameraModule.setProperty(obj.name, obj.value)		
+		io.emit('flash', `${obj.name} set to ${obj.display}`)
 		io.emit('camera-setting', obj)
 	})
 
 	socket.on('camera-status-request', () => {
 		var c = cameraModule.camera
-		debugger
 		
 		// This message should go back to the page that gets refreshed, and
 		// NOT broadcast to other connected clients
@@ -84,7 +94,7 @@ io.on('connection', (socket) => {
 			contrast: c.get('contrast'),
 			mode: c.get('exposure_mode'),
 			vflip: c.get('vflip'),
-			//iso: c.get('iso'),
+			//ISO: c.get('ISO'),
 			surveillance: cameraModule.flags.surveillanceEnabled,
 			timeout: c.get('timeout'),
 		})

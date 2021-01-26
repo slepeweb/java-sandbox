@@ -1,26 +1,32 @@
+const c = require('./constants.js')
+
 const express = require('express')
 const app = express()
 const http = require('http').createServer(app)
-const port = 8080
+
+const session = require('express-session');
+const bodyParser = require('body-parser');
 
 const createError = require('http-errors')
 const path = require('path')
 const cookieParser = require('cookie-parser')
-const logger = require('morgan')
 
 const indexRouter = require('./routes/index')
-const usersRouter = require('./routes/users')
+//const usersRouter = require('./routes/users')
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
-app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
+app.use(session({secret: 'ssshhhhh',saveUninitialized: true,resave: true}));
+app.use(bodyParser.json());      
+app.use(bodyParser.urlencoded({extended: true}));
+
 app.use('/', indexRouter)
-app.use('/users', usersRouter)
+//app.use('/users', usersRouter)
 
 /*
 // catch 404 and forward to error handler
@@ -40,9 +46,10 @@ app.use(function(err, req, res, next) {
 });
 */
 
-http.listen(port, () => {
-  console.log('listening on port ' + port)
+const server = http.listen(c.server.port, () => {
+  console.log('listening on port ' + c.server.port)
 })
 
 exports.framework = app
 exports.http = http
+exports.server = server

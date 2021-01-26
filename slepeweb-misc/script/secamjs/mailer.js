@@ -1,30 +1,32 @@
+const c = require('./constants.js')
 const mailer = require('nodemailer');
 
 const transport = mailer.createTransport({
-  service: 'gmail',
+  service: c.email.service,
   auth: {
-    user: 'george.buttigieg@gmail.com',
-    pass: 'g!g@5Eftg00g6E'
+    user: c.email.username,
+    pass: c.email.password,
   }
 })
 
 const options = {
-  from: 'george.buttigieg@gmail.com',
-  to: 'george@buttigieg.org.uk',
-  subject: 'Security camera alert',
+  from: c.email.from,
+  to: c.email.to,
+  subject: c.email.subject,
   text: ''
 }
 
-
+const sc = require('path').basename(__filename)
+const {debug, info, warn, error} = require('./logger.js')
 
 const alert = (message) => {
 	options.text = message
-	transport.sendMail(options, (error, info) => {	
-		if (error) {
-			console.log(error)
+	transport.sendMail(options, (err, info) => {	
+		if (err) {
+			error(sc, err)
 		} 
 		else {
-			console.log('Email sent: ' + info.response)
+			info(sc, 'Email sent: ' + info.response)
 		}
 	})
 }
