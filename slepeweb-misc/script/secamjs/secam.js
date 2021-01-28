@@ -38,8 +38,7 @@ const wipe = (filename, quietly) => {
 }
 
 io.on('connection', (socket) => {
-	info(sc, 'A.N. user connected')
-  
+
 	socket.on('photo', () => {
 		cameraModule.snap(io)
 	})  

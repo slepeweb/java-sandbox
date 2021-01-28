@@ -1,0 +1,15 @@
+extends layout
+
+block content
+	h1 Secam
+	h3 Login
+	p Please provide your pin to gain access to this site
+	
+	if err
+		p(class="error")
+			strong Invalid pin
+  
+	form(action="", method="post")
+		span PIN:&nbsp;
+		input(type="password" name="pin")
+		input(type="submit", value="Submit")

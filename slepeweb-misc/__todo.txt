@@ -1,0 +1,2 @@
+- Produce notes on a) deployment, and b) debugging nodejs apps
+- Need another gmail account purely for sending emails

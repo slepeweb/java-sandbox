@@ -1,41 +1,23 @@
-var express = require('express');
-var router = express.Router();
-var sess
+const express = require('express')
+const router = express.Router()
+const sc = require('path').basename(__filename)
+const {debug, info, warn, error} = require('../logger.js')
 
-router.get('/', (req,res) => {
-    sess = req.session
-    if(! sess.email) {
-        return res.redirect('/login')
-    }
-  	res.render('index', { title: 'Express' });
-});
+router.get('/login', (req, res) => {
+    res.render('login', {title: 'Login', err: req.query.err})
+})
 
-router.post('/login',(req,res) => {
-    sess = req.session;
-    sess.email = req.body.email;
-    res.end('done');
-});
-
-router.get('/admin',(req,res) => {
-    sess = req.session;
-    if(sess.email) {
-        res.write(`<h1>Hello ${sess.email} </h1><br>`);
-        res.end('<a href='+'/logout'+'>Logout</a>');
-    }
-    else {
-        res.write('<h1>Please login first.</h1>');
-        res.end('<a href='+'/'+'>Login</a>');
-    }
-});
-
-router.get('/logout',(req,res) => {
-    req.session.destroy((err) => {
-        if(err) {
-            return console.log(err);
-        }
-        res.redirect('/');
-    });
-
-});
+router.post('/login', (req, res) => {
+	var pin = req.body.pin
+	if (['5ecam', '8uttybear', 'tr1gger'].includes(pin)) {
+		info(sc, `User ${pin} logged in`)
+    	req.session.pin = pin
+    	res.redirect('/')
+	}
+	else {
+		warn(sc, `Failed login attempt [${pin}]`)
+		res.redirect('/users/login?err=Invalid%20pin')
+	}
+})
 
 module.exports = router;
