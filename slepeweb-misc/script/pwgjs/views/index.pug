@@ -1,0 +1,43 @@
+extends layout
+
+block content
+  #heading
+    h1 Password Manager
+    if loggedIn
+      p#logout
+        a(href="/users/logout") Logout
+      
+  p#instruction a
+  
+  table#main-table
+    tbody
+      tr.field
+        td.label Company
+        td
+          input(id="company", type="text")
+          span.submit(title="Click to lookup password for this company")
+            i(class="fas fa-arrow-circle-right")
+          span.reset(class="hide", title="Click to clear the last result and perform another lookup")
+            i(class="fas fa-undo-alt")
+    tbody(id="result", class="hide")
+      tr
+        td.label Login
+        td
+          input(id="username", type="text")
+          input(id="key", type="hidden" value="" + user.key)
+      tr     
+        td.label Password
+        td
+          input(id="password", type="text")
+      tr      
+        td.label Chunked
+        td
+          input(id="password2", type="text")
+      tr
+        td.label Notes
+        td
+          textarea(id="notes" rows="4", cols="40")
+
+  #flash
+    p.red &nbsp;
+    

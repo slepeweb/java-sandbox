@@ -27,9 +27,9 @@ module.exports = {
 	},
 	email: {
 		service: 'gmail',
-		username: 'george.buttigieg',
-		password: 'g!g@5Eftg00g6E',
-		from: 'george.buttigieg@gmail.com',
+		username: 'george.buttigieg56',
+		password: 'g1gaL0ftgma15L',
+		from: 'george.buttigieg56@gmail.com',
 		to: 'george@buttigieg.org.uk',
 		subject: 'Security camera alert',
 	},
