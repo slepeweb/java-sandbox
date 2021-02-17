@@ -20,10 +20,8 @@ socket.on('flash', (msg, warn) => {
 })
 
 socket.on('document', (d) => {
-	if (d) {
-		_setFields(d)
-		_toggleForm()
-	}
+	_setFields(d)
+	_toggleDisplay()
 })
 
 const _setFields = (d) => {
@@ -38,46 +36,39 @@ const _setFields = (d) => {
 	}
 }
 
-const _toggleForm = () => {
-	var a = $('span.submit')
-	var b = $('span.reset')
-	var tbody = $('tbody#result')
-	var h = 'hide'
+const _toggleDisplay = () => {
+	var company = $('#company')
+	var displayModeA = company.val()
 	var hl = 'highlight'
-	var calculationDisplayed = a.hasClass(h)
 	
-	if (/* current status is */ calculationDisplayed) {
-		// Switch form to make another choice of company
-		a.removeClass(h)
-		b.addClass(h)
-		$('#company').removeAttr('disabled')
-		$('#company').autocomplete('enable')
-		$('#company').focus()
+	if (! displayModeA) {
+		// Switch to initial display mode (A)
+		$('p#instructionA').show()
+		$('p#instructionB').hide()
+		company.removeAttr('disabled')
+		company.autocomplete('enable')
+		company.focus()
 		$('#main-table').removeClass(hl)
-		$('#instruction').html(_startInstruction)
-		tbody.hide()
+		$('tbody#result').hide()
+		$('tbody#submit-button').show()
 	}
 	else {
-		// Switch form to show calculation
-		b.removeClass(h)
-		a.addClass(h)
-		$('#company').autocomplete('disable')
-		$('#company').attr('disabled', 'true')
+		// Display lookup results (B)
+		$('#instructionA').hide()
+		$('#instructionB').show()
+		company.attr('disabled', 'true')
+		company.autocomplete('disable')
 		$('#main-table').addClass(hl)
-		$('#instruction').html(_continueInstruction)
-		tbody.show()
+		$('tbody#result').show()
+		$('tbody#submit-button').hide()
 	}
 }
 
 var _companies = null
-const _startInstruction = 'Start typing the company name, then click on the arrow'
-const _continueInstruction = 'Click on the reset icon to start again'
 
 // After page is fully loaded ...
 $(function() {
 	socket.emit('company-list-request')
-	$('#instruction').html(_startInstruction)
-	$('#company').focus()
 	 
 	socket.on('company-list', (list) => {
 		_companies = []
@@ -86,10 +77,12 @@ $(function() {
 		})
 		
 		$('#company').autocomplete({
-			source: _companies,
-		});	
+			source: _companies
+		})
 		
-		$('span.submit').click(() => {
+		$('#company').focus()
+
+		$('#lookup').click(() => {
 			var company = $('#company').val()
 			if (company) {
 				socket.emit('lookup', {
@@ -97,15 +90,13 @@ $(function() {
 					key: $('#key').val()
 				})
 			}
-			else {
-				// Flash a warning?
-			}
-		})	
+		});	
 			
+		// Add reset behaviour to newly added span
 		$('span.reset').click(() => {
 			_setFields()
-			_toggleForm()
+			_toggleDisplay()
 		})		
+		
 	})
-
 });

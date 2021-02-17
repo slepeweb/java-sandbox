@@ -6,8 +6,9 @@ block content
     if loggedIn
       p#logout
         a(href="/users/logout") Logout
-      
-  p#instruction a
+  #instructions
+    p#instructionA Start typing the company name, select one of the available options, then click on the Lookup button
+    p#instructionB(class="hide") Click <span class="reset"><i class="fas fa-undo-alt"></i></span> to choose another company
   
   table#main-table
     tbody
@@ -15,10 +16,12 @@ block content
         td.label Company
         td
           input(id="company", type="text")
-          span.submit(title="Click to lookup password for this company")
-            i(class="fas fa-arrow-circle-right")
-          span.reset(class="hide", title="Click to clear the last result and perform another lookup")
-            i(class="fas fa-undo-alt")
+    
+    tbody(id="submit-button")
+      tr
+        td
+          button(type="button" id="lookup") Lookup
+    
     tbody(id="result", class="hide")
       tr
         td.label Login
@@ -36,7 +39,7 @@ block content
       tr
         td.label Notes
         td
-          textarea(id="notes" rows="4", cols="40")
+          textarea(id="notes" rows="4")
 
   #flash
     p.red &nbsp;

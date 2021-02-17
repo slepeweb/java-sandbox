@@ -1,5 +1,5 @@
 @charset "UTF-8";
-@media screen {
+@media screen and (max-width:400px) {
   @-ms-viewport{
     width: device-width;
   }
@@ -31,6 +31,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1em;
   margin: 0 0 1em 0;
 }
+
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
   color: inherit;
   text-decoration: none;
@@ -61,54 +62,18 @@ h6 {
   line-height: 1.5em;
 }
 
-sub {
-  font-size: 0.8em;
-  position: relative;
-  top: 0.5em;
-}
-
-sup {
-  font-size: 0.8em;
-  position: relative;
-  top: -0.5em;
-}
-
 hr {
   border: 0;
   border-bottom: solid 1px rgba(144, 144, 144, 0.25);
   margin: 2em 0;
 }
 
-blockquote {
-  border-left: solid 4px rgba(144, 144, 144, 0.25);
-  font-style: italic;
-  margin: 0 0 2em 0;
-  padding: 0.5em 0 0.5em 2em;
-}
-
-code {
-  background: rgba(144, 144, 144, 0.075);
-  border-radius: 4px;
-  border: solid 1px rgba(144, 144, 144, 0.25);
-  font-family: "Courier New", monospace;
-  font-size: 0.9em;
-  margin: 0 0.25em;
-  padding: 0.25em 0.65em;
-}
-
-pre {
-  -webkit-overflow-scrolling: touch;
-  font-family: "Courier New", monospace;
-  font-size: 0.9em;
-  margin: 0 0 2em 0;
-}
-
-/* List */
 ol {
   list-style: decimal;
   margin: 0 0 2em 0;
   padding-left: 1.25em;
 }
+
 ol li {
   padding-left: 0.25em;
 }
@@ -118,35 +83,39 @@ ul {
   margin: 0 0 2em 0;
   padding-left: 1em;
 }
+
 ul li {
   padding-left: 0.5em;
 }
-
 
 table {
   margin: 0 0 2em 0;
   width: 100%;
 }
+
 table tbody tr {
   border: solid 1px rgba(144, 144, 144, 0.25);
   border-left: 0;
   border-right: 0;
 }
+
 table td {
   padding: 0.3em;
   vertical-align: middle;
 }
+
 table th {
   color: #666;
   font-size: 0.9em;
   font-weight: bold;
   padding: 0 0 0 0.5em;
   text-align: left;
-  /*width: 25%;*/
 }
+
 table thead {
   border-bottom: solid 2px rgba(144, 144, 144, 0.25);
 }
+
 table tfoot {
   border-top: solid 2px rgba(144, 144, 144, 0.25);
 }
@@ -154,6 +123,7 @@ table tfoot {
 #heading {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
+	width: 100%;
 }
 
 p#logout {
@@ -171,26 +141,16 @@ table#main-table.highlight td:nth-child(2) {
 table#main-table td.label {
 	width: 20%;
 	font-weight: bold;
+	text-align: right;
 }
 
 table#main-table input, table#main-table textarea {
 	font-family: courier, monospace;
-}
-
-table#main-table input {
-	width: 70%;
+	width: 95%;
 }
 
 .red {
   color: red;
-}
-
-.green {
-  color: green;
-}
-
-.orange {
-  color: orange;
 }
 
 .hide {
@@ -202,12 +162,40 @@ div#flash p {
 	font-weight: bold;
 }
 
-div#main-wrapper {
+body {
 	margin: auto;
-	width: 400px;
+	padding: 12px;
 }
 
-span.submit, span.reset {
-	margin-left: 1em;
+span.reset {
+	margin: 0 0.4em 0 0.4em;
 	cursor: pointer;
+}
+
+button#lookup {
+	background-color: #6eac2c;
+	border: 1px solid #acdd4a;
+	border-radius: 6px;
+	color: #fff;
+	padding: 6px;
+	margin-top: 1.5em;
+	cursor: pointer;
+}
+
+div#main-wrapper {
+	width: 100%;
+	margin: auto;
+}	
+
+div#instructions {
+	height: 3em;
+	line-height: 1.4em;
+	padding-bottom: 1.5em;
+	
+}
+
+@media (min-width: 600px) {
+	div#main-wrapper {
+		width: 600px;
+	}	
 }
