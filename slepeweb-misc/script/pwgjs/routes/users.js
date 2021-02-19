@@ -23,11 +23,13 @@ router.post('/login', (req, res) => {
 	var password = req.body.password
 	var key = req.body.key
 	
-	if (username && password && key) {
+	if (username && key) {
 		userdb.find(username).then(
 			(u) => {
 				if (u) {
-					if (cryptor.compare(password, u.password)) {
+					// Allow user to login if no password set in the database.
+					// (This is the case for the temp user)
+					if (! u.password || cryptor.compare(password, u.password)) {
 						log.info(sc, `User ${username} logged in`)
 				    	req.session.user = u
 				    	u.key = key
@@ -61,6 +63,14 @@ router.get('/add', (req, res) => {
 			username: req.query.username, 
 			password: req.query.password
 		})
+	}
+	res.redirect('/')
+})
+
+router.get('/remove', (req, res) => {
+	var u = req.session.user
+	if (u) {
+		userdb.remove(req.query.username)
 	}
 	res.redirect('/')
 })

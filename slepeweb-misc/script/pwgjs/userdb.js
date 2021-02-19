@@ -19,6 +19,8 @@ class UserDatabase {
 			fieldName: 'username',
 			unique: true
 		})
+		
+		this.tempUser = 'temp'
 	}
 	
 	find(name) {
@@ -30,13 +32,18 @@ class UserDatabase {
 	}
 	
 	save(u) {
-		if (u.username && u.password) {
+		if (u.username) {
 			this.find(u.username).then(
 				(user) => {
 					if (! user) {
-						u.password = crypt.encrypt(u.password)
+						if (u.password) {
+							u.password = crypt.encrypt(u.password)
+						}
 						this.ds.insert(u)
 						log.info(sc, `User ${u.username} added`)
+						
+						// Remove temporary user, if it's still there
+						this.remove(this.tempUser)
 					}
 					else {
 						log.warn(sc, `User ${u.username} already exists`)
@@ -47,6 +54,27 @@ class UserDatabase {
 					}
 				)
 		}
+	}
+	
+	count(callback, params) {
+		this.ds.count({}, function (err, count) {
+			log.info(sc, `There are ${count} entries in the user database`)
+			if (callback && params) {
+				callback(count, params.a, params.b)
+			}
+		})
+	}
+	
+	remove(name) {
+		var callback = (count, paramA, paramB) => {
+			if (count > 1) {
+				this.ds.remove({username: name}, {}, function (err, numRemoved) {
+				  log.info(sc, `User ${name} removed`)
+				})
+			}
+		}
+		
+		this.count(callback, {a: null, b: null})
 	}
 }
 
