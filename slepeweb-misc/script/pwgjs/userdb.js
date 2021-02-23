@@ -23,7 +23,7 @@ class UserDatabase {
 		this.tempUser = 'temp'
 	}
 	
-	find(name) {
+	findByName(name) {
 		return new Promise((resolve, reject) => {		
 			this.ds.findOne({username: name}, (err, u) => {
 				err ? reject(err) : resolve(u)
@@ -31,9 +31,17 @@ class UserDatabase {
 		})
 	}
 	
+	findById(id) {
+		return new Promise((resolve, reject) => {		
+			this.ds.findOne({_id: id}, (err, u) => {
+				err ? reject(err) : resolve(u)
+			})
+		})
+	}
+	
 	save(u) {
 		if (u.username) {
-			this.find(u.username).then(
+			this.findByName(u.username).then(
 				(user) => {
 					if (! user) {
 						if (u.password) {

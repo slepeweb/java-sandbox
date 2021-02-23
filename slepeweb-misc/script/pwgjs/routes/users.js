@@ -24,7 +24,7 @@ router.post('/login', (req, res) => {
 	var key = req.body.key
 	
 	if (username && key) {
-		userdb.find(username).then(
+		userdb.findByName(username).then(
 			(u) => {
 				if (u) {
 					// Allow user to login if no password set in the database.
@@ -73,6 +73,20 @@ router.get('/remove', (req, res) => {
 		userdb.remove(req.query.username)
 	}
 	res.redirect('/')
+})
+
+router.get('/whoami', (req, res) => {
+	var u = req.session.user
+	var obj = {}
+	
+	if (u) {
+		obj.id = u._id
+		obj.key = u.key
+	}
+	else {
+		obj.id = 'none'
+	}
+	res.json(obj)
 })
 
 module.exports = router;

@@ -19,6 +19,10 @@ socket.on('flash', (msg, warn) => {
 	}, 5000)
 })
 
+socket.on('relogin', () => {
+	window.location = '/users/login?err=User%20timed%20out%20-%20Please%20re-login'
+})
+
 socket.on('document', (d) => {
 	_setFields(d)
 	_toggleDisplay()
@@ -64,6 +68,26 @@ const _toggleDisplay = () => {
 	}
 }
 
+const _whoami = (onSuccess) => {
+	$.ajax("/users/whoami", {
+		type: "GET",
+		cache: false,
+		dataType: "json",
+		success: function(obj, status, z) {
+			onSuccess(obj)
+		},
+		error: function(obj, status, z) {
+			console.error(obj, status, z)
+		}
+	})
+}
+
+var _progressValue = 101
+const _progress = () => {
+	_progressValue -= 1
+	$('#progressbar').progressbar({value: _progressValue})
+}
+
 var _companies = null
 
 // After page is fully loaded ...
@@ -85,12 +109,15 @@ $(function() {
 		$('#lookup').click(() => {
 			var company = $('#company').val()
 			if (company) {
-				socket.emit('lookup', {
-					company: company,
-					key: $('#key').val()
+				_whoami((res) => { 
+					socket.emit('lookup', {
+						company: company,
+						id: res.id,
+						key: res.key
+					})
 				})
 			}
-		});	
+		})
 			
 		// Add reset behaviour to newly added span
 		$('span.reset').click(() => {
@@ -99,4 +126,15 @@ $(function() {
 		})		
 		
 	})
+	
+	setInterval(() => {
+		$('p#logout i').effect('bounce', {}, 1000)
+	}, 30000)
+	
+	
+	_progress()
+	
+	setInterval(() => {
+		_progress()
+	}, 6000)
 });

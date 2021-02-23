@@ -122,12 +122,29 @@ table tfoot {
 
 #heading {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
+	grid-template-columns: repeat(3, 1fr);
 	width: 100%;
+	align-items: center;
+	margin-bottom: 2em;
+}
+
+h1.lookup {
+	margin: 0;
+}
+
+div#progressbar {
+	justify-self: right;
+	width: 70%;
+	height: 1em;
+}
+
+div.ui-progressbar-value {
+	background-color: #b6e60b;
 }
 
 p#logout {
 	text-align: right;
+	margin: 0;
 }
 
 table#main-table td:nth-child(2) {

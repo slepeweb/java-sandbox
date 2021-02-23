@@ -2,10 +2,13 @@ extends layout
 
 block content
   #heading
-    h1 Password Manager
-    if loggedIn
+    h1.lookup Password Manager
+    if user
+      div#progressbar
       p#logout
-        a(href="/users/logout") Logout
+        a(href="/users/logout")
+          i(class="fas fa-sign-out-alt fa-2x" title="Logout")
+
   #instructions
     p#instructionA Start typing the company name, select one of the available options, then click on the Lookup button
     p#instructionB(class="hide") Click <span class="reset"><i class="fas fa-undo-alt"></i></span> to choose another company
@@ -27,7 +30,6 @@ block content
         td.label Login
         td
           input(id="username", type="text")
-          input(id="key", type="hidden" value="" + user.key)
       tr     
         td.label Password
         td
