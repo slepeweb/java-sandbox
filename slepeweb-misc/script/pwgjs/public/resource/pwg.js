@@ -134,7 +134,9 @@ $(function() {
 	
 	_progress()
 	
+	// Progress bar loses 1% every 3 seconds, reaching zero in 300 secs,
+	// which matches the session timeout
 	setInterval(() => {
 		_progress()
-	}, 6000)
+	}, 3 * 1000)
 });

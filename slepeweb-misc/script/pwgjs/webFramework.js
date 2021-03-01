@@ -24,7 +24,7 @@ app.use(session({
 	saveUninitialized: true, 
 	resave: true,
 	cookie: {
-		maxAge: 600000
+		maxAge: 300000
 	}}))
 	
 app.use(bodyParser.json());      
