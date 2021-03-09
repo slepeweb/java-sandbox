@@ -4,7 +4,7 @@ block content
   #heading
     h1.lookup Password Manager
     if user
-      div#progressbar
+      div#progressbar(data-progress=progress)
       p#logout
         a(href="/users/logout")
           i(class="fas fa-sign-out-alt fa-2x" title="Logout")
@@ -26,15 +26,15 @@ block content
           button(type="button" id="lookup") Lookup
     
     tbody(id="result", class="hide")
-      tr
+      tr.hideif
         td.label Login
         td
           input(id="username", type="text")
-      tr     
+      tr.hideif     
         td.label Password
         td
           input(id="password", type="text")
-      tr      
+      tr.hideif      
         td.label Chunked
         td
           input(id="password2", type="text")

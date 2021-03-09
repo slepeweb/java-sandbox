@@ -37,6 +37,13 @@ const _setFields = (d) => {
 		$('#password').val(d.password)
 		$('#password2').val(d.chunked)
 		$('#notes').val(d.notes)
+		
+		if (d.partyid == 'none') {
+			$('#result tr.hideif').hide()
+		}
+		else {
+			$('#result tr.hideif').show()
+		}
 	}
 }
 
@@ -82,16 +89,25 @@ const _whoami = (onSuccess) => {
 	})
 }
 
-var _progressValue = 101
+var _progressValue = 0
+
 const _progress = () => {
 	_progressValue -= 1
-	$('#progressbar').progressbar({value: _progressValue})
+	if (_progressValue >= 0) {
+		$('#progressbar').progressbar({value: _progressValue})
+	}
+	else {
+		window.location='/users/login?err=User%20session%20timed%20out'
+	}
 }
 
 var _companies = null
 
 // After page is fully loaded ...
 $(function() {
+	// Initialise prgress bar value
+	_progressValue = parseInt($('#progressbar').attr('data-progress'))
+	
 	socket.emit('company-list-request')
 	 
 	socket.on('company-list', (list) => {
@@ -113,7 +129,6 @@ $(function() {
 					socket.emit('lookup', {
 						company: company,
 						id: res.id,
-						key: res.key
 					})
 				})
 			}

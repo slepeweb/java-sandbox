@@ -64,6 +64,12 @@ class UserDatabase {
 		}
 	}
 	
+	updateKey(id, key) {
+		this.ds.update({_id: id}, {key: key}, {}, (err, numReplaced) => {
+			log.error(sc, `Failed to store key for user ${id}`, err)
+		})
+	}
+	
 	count(callback, params) {
 		this.ds.count({}, function (err, count) {
 			log.info(sc, `There are ${count} entries in the user database`)

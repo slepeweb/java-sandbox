@@ -9,6 +9,7 @@ const io = require('socket.io')(webModule.http)
 
 const sc = require('path').basename(__filename)
 const log = require('./logger.js')
+const usersMod = require('./routes/users')
 
 process.on('SIGTERM', () => {
 	webModule.server.close(() => {
@@ -32,9 +33,11 @@ io.on('connection', (socket) => {
 				log.info(sc, `Looking up [${obj.company}]`)
 				
 				pwdb.findOne(obj.company).then((doc) => {
+	debugger
 					if (doc) {
-						if (! doc.password) {
-							[doc.password, doc.chunked] = calculator.calc(obj.key, doc.partyid, doc.mask, doc.maxchars)
+						if (! doc.password && doc.partyid != 'none') {
+							[doc.password, doc.chunked] = 
+								calculator.calc(usersMod.keys[u.password], doc.partyid, doc.mask, doc.maxchars)
 						}		
 						socket.emit('document', doc)
 					}
@@ -52,5 +55,9 @@ io.on('connection', (socket) => {
 			log.info(sc, 'User not logged in; lookup request ignored')
 			socket.emit('relogin')
 		}
-	}) 
+	})
+	
+	socket.on('disconnect', (reason) => {
+		log.info(sc, `User disconnected: ${reason}`)
+	})
 })

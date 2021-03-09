@@ -6,7 +6,10 @@ router.get('/', function(req, res, next) {
 	if (! u) {
        return res.redirect('/users/login')
 	}
-	res.render('index', {title: 'Passwords', user: u, loggedIn: true})	
+		
+	// Session timeout is 300000 millis
+	var maxAge = req.session.cookie.maxAge
+	res.render('index', {user: u, progress: Math.floor((maxAge * 100) / 300000)})	
 })
 
 module.exports = router;

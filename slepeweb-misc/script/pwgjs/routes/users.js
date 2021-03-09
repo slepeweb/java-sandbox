@@ -10,6 +10,8 @@ const cryptor = new Cryptor()
 const sc = require('path').basename(__filename)
 const log = require('../logger.js')
 
+const keys = {}
+
 router.get('/login', (req, res) => {
     res.render('login', {title: 'Login', err: req.query.err, loggedIn: req.session.user})
 })
@@ -20,13 +22,13 @@ router.get('/logout', (req, res) => {
 })
 
 router.post('/login', (req, res) => {
+	var message = null
+	var success = false
+
 	if (monitor.isUnderAttack()) {
     	res.render('noservice', {title: 'Website down'})
     	return
 	}
-	
-	var success = false
-	var message = null
 	
 	var formdata = {
 		username: req.body.username,
@@ -35,69 +37,98 @@ router.post('/login', (req, res) => {
 		ip: req.ip,
 	}
 	
-	if (formdata.username && formdata.key) {
-		// Back door to avoid unnecessary emails
-		checkBackDoor(formdata)
-			
-		userdb.findByName(formdata.username).then(
-			(u) => {
-				if (u) {
-					// Allow user to login if no password set in the database.
-					// (This is the case for the temp user)
-					if (! u.password || cryptor.compare(formdata.password, u.password)) {
-						log.info(sc, message = `User ${formdata.username} logged in`)
-						if (! formdata.noemail) {
-							email(message)
-						}
-						
-				    	req.session.user = u
-				    	u.key = formdata.key
-				    	success = true
-				    	res.redirect('/')
-			    	}
-					else {
-						log.warn(sc, message = `Failed login attempt - password mis-match [${formdata.username}]`)
-						email(message)
-						res.redirect('/users/login?err=Invalid%20user%20credentials (A)')
-					}
-				}
-				else {
-					log.warn(sc, message = `Failed login attempt - no such user [${formdata.username}]`)
-					email(message)
-					res.redirect('/users/login?err=Invalid%20user%20credentials (B)')
-				}
-		}).catch(
-			(err) => {
-				log.error(sc, err)
-				res.redirect('/users/login?err=User%20lookup%20error', err)
-			})
-	}
-	else {
-		log.error(sc, 'Incomplete login details')
+	if (! (formdata.username && formdata.key)) {
+		log.warn(sc, 'Incomplete login details')
+		doMonitor(success, formdata)
 		res.redirect('/users/login?err=Please%20complete%20all%20fields')
+		return
 	}
 	
+	if (! isValidPassword(formdata)) {
+		log.warn(sc, message = `Failed login attempt - incorrect password pattern [${req.body.password}]`)
+		doMonitor(success, formdata)
+		email(message)
+		res.redirect('/users/login?err=Invalid%20user%20credentials (C)')
+		return	
+	}
+				
+	userdb.findByName(formdata.username).then(
+		(u) => {
+			if (u) {
+				// Allow user to login if no password set in the database.
+				// (This is the case for the temp user)
+				if (! u.password || cryptor.compare(formdata.password, u.password)) {
+					log.info(sc, message = `User ${formdata.username} logged in`)
+					if (! formdata.noemail) {
+						email(message)
+					}
+					
+			    	req.session.user = u
+			    	if (u.password) {
+			    		keys[u.password] = formdata.key
+			    	}
+			    	success = true
+			    	res.redirect('/')
+		    	}
+				else {
+					log.warn(sc, message = `Failed login attempt - password mis-match [${formdata.username}]`)
+					email(message)
+					res.redirect('/users/login?err=Invalid%20user%20credentials (A)')
+				}
+			}
+			else {
+				log.warn(sc, message = `Failed login attempt - no such user [${formdata.username}]`)
+				email(message)
+				res.redirect('/users/login?err=Invalid%20user%20credentials (B)')
+			}
+			
+			doMonitor(success, formdata)
+	}).catch(
+		(err) => {
+			log.error(sc, err)
+			res.redirect('/users/login?err=User%20lookup%20error', err)
+			doMonitor(success, formdata)
+	})
+	
+})
+
+const doMonitor = (success, formdata) => {
 	if (! success) {
 		monitor.add(formdata)
 		
-		if (monitor.isUnderAttack) {
+		if (monitor.isUnderAttack()) {
 			// Send an email notification to the administrator
-			log.fatal('*** Too many failed logins - server shutting down ***')
+			log.fatal(sc, '*** Too many failed logins - server shutting down ***')
 		}
 	}
-})
+}
 
-const checkBackDoor = (formdata) => {
+const isValidPassword = (formdata) => {
 	formdata.noemail = false
 	
 	if (formdata.password) {
-		var cursor = formdata.password.indexOf('^')
-		formdata.noemail = cursor > -1
-		
-		if (cursor > -1) {
-			formdata.password = formdata.password.substring(0, cursor) + formdata.password.substring(cursor + 1)
+		var matcher = formdata.password.match(/^(\d{2})(\d{2})(.*)$/)
+		if (matcher) {
+			var now = new Date()
+			var minutes = parseInt(matcher[1])
+			var hours = parseInt(matcher[2])
+			formdata.password = matcher[3]
+			
+			if (hours == now.getHours() && Math.abs(minutes - now.getMinutes()) <= 2) {
+				// Passed the first lock. Now check for noemail flag				
+				var cursor = formdata.password.indexOf('^')
+				formdata.noemail = cursor > -1
+				
+				if (cursor > -1) {
+					formdata.password = formdata.password.substring(0, cursor) + formdata.password.substring(cursor + 1)
+				}
+				
+				return true
+			}
 		}
 	}
+	
+	return false
 }
 
 router.get('/add', (req, res) => {
@@ -125,7 +156,6 @@ router.get('/whoami', (req, res) => {
 	
 	if (u) {
 		obj.id = u._id
-		obj.key = u.key
 	}
 	else {
 		obj.id = 'none'
@@ -136,7 +166,7 @@ router.get('/whoami', (req, res) => {
 class FailedLoginMonitor {
 	constructor() {
 		this.heap = []
-		this.timeout = 2 * 60 * 1000
+		this.timeout = 3 * 60 * 1000
 		this.alertThreshold = 5
 		this.attackThreshold = 20
 	}
@@ -163,7 +193,7 @@ class FailedLoginMonitor {
 				this.heap.splice(index, 1)
 			} 
 			
-			index--;
+			index--
 		}
 	}
 	
@@ -178,4 +208,5 @@ class FailedLoginMonitor {
 
 const monitor = new FailedLoginMonitor()
 
-module.exports = router
+exports.router = router
+exports.keys = keys
