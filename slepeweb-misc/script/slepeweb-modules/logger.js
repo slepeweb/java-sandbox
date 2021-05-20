@@ -1,10 +1,11 @@
 const snl = require('simple-node-logger')
 
 class Logger {
-	constructor(filenamePrefix) {
+	constructor(filenamePrefix, logsDir) {
 		this.logger = snl.createRollingFileLogger( 
 			{
-				logDirectory: __dirname + '/logs',
+				//logDirectory: __dirname + '/logs',
+				logDirectory: logsDir,
 				fileNamePattern: filenamePrefix + '-<date>.log',
 				dateFormat:'YYYY.MM.DD-HHa'
 			}
@@ -23,4 +24,6 @@ class Logger {
 	fatal(category, msg) {this.logger.fatal(this.format(category, msg))}
 }
 
-module.exports = new Logger('pwg')
+Logger.instance = null
+
+module.exports = Logger

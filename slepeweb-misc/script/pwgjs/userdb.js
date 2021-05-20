@@ -2,7 +2,7 @@ const Datastore = require('nedb')
 const Cryptor = require('./crypt')
 const crypt = new Cryptor()
 const sc = require('path').basename(__filename)
-const log = require('./logger.js')
+const log = require('./slepeweb-modules/logger').instance
 
 const notNull = (s) => {
 	return s == null ? '' : s
@@ -21,6 +21,11 @@ class UserDatabase {
 		})
 		
 		this.tempUser = 'temp'
+		this.id = 1
+	}
+	
+	incId() {
+		this.id += 1
 	}
 	
 	findByName(name) {
@@ -64,9 +69,9 @@ class UserDatabase {
 		}
 	}
 	
-	updateKey(id, key) {
-		this.ds.update({_id: id}, {key: key}, {}, (err, numReplaced) => {
-			log.error(sc, `Failed to store key for user ${id}`, err)
+	update(u) {
+		this.ds.update({username: u.username}, {$set: {password: crypt.encrypt(u.password)}}, {}, (err) => {
+			log.error(sc, `Failed to update password for user ${u.username}`, err)
 		})
 	}
 	

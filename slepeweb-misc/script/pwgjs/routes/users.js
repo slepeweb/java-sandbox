@@ -1,14 +1,24 @@
 const express = require('express')
 const router = express.Router()
+const moment = require('moment')
 
 const userdb = require('../userdb')
-const email = require('../mailer')
+
+const Mailer = require('../slepeweb-modules/mailer')
+const emailer = new Mailer({
+	service: 'gmail',
+	user: 'george.buttigieg56',
+	password: 'g1gaL0ftgma15L',
+	from: 'george.buttigieg56',
+	to: 'george@buttigieg.org.uk',
+	subject: 'Password Generator',
+})
 
 const Cryptor = require('../crypt')
 const cryptor = new Cryptor()
 
 const sc = require('path').basename(__filename)
-const log = require('../logger.js')
+const log = require('../slepeweb-modules/logger.js').instance
 
 const keys = {}
 
@@ -47,7 +57,7 @@ router.post('/login', (req, res) => {
 	if (! isValidPassword(formdata)) {
 		log.warn(sc, message = `Failed login attempt - incorrect password pattern [${req.body.password}]`)
 		doMonitor(success, formdata)
-		email(message)
+		emailer.send(message)
 		res.redirect('/users/login?err=Invalid%20user%20credentials (C)')
 		return	
 	}
@@ -60,7 +70,7 @@ router.post('/login', (req, res) => {
 				if (! u.password || cryptor.compare(formdata.password, u.password)) {
 					log.info(sc, message = `User ${formdata.username} logged in`)
 					if (! formdata.noemail) {
-						email(message)
+						emailer.send(message)
 					}
 					
 			    	req.session.user = u
@@ -72,13 +82,13 @@ router.post('/login', (req, res) => {
 		    	}
 				else {
 					log.warn(sc, message = `Failed login attempt - password mis-match [${formdata.username}]`)
-					email(message)
+					emailer.send(message)
 					res.redirect('/users/login?err=Invalid%20user%20credentials (A)')
 				}
 			}
 			else {
 				log.warn(sc, message = `Failed login attempt - no such user [${formdata.username}]`)
-				email(message)
+				emailer.send(message)
 				res.redirect('/users/login?err=Invalid%20user%20credentials (B)')
 			}
 			
@@ -109,12 +119,12 @@ const isValidPassword = (formdata) => {
 	if (formdata.password) {
 		var matcher = formdata.password.match(/^(\d{2})(\d{2})(.*)$/)
 		if (matcher) {
-			var now = new Date()
+			var now = moment()
 			var minutes = parseInt(matcher[1])
 			var hours = parseInt(matcher[2])
 			formdata.password = matcher[3]
 			
-			if (hours == now.getHours() && Math.abs(minutes - now.getMinutes()) <= 2) {
+			if (hours == now.hours() && Math.abs(minutes - now.minutes()) <= 2) {
 				// Passed the first lock. Now check for noemail flag				
 				var cursor = formdata.password.indexOf('^')
 				formdata.noemail = cursor > -1
@@ -135,6 +145,17 @@ router.get('/add', (req, res) => {
 	var u = req.session.user
 	if (u) {
 		userdb.save({
+			username: req.query.username, 
+			password: req.query.password
+		})
+	}
+	res.redirect('/')
+})
+
+router.get('/update', (req, res) => {
+	var u = req.session.user
+	if (u) {
+		userdb.update({
 			username: req.query.username, 
 			password: req.query.password
 		})

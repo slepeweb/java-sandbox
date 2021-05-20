@@ -208,7 +208,16 @@ div#instructions {
 	height: 3em;
 	line-height: 1.4em;
 	padding-bottom: 1.5em;
-	
+}
+
+div#login-header {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	width: 100%;
+}
+
+div#login-header span {
+	text-align: right;
 }
 
 @media (min-width: 600px) {
