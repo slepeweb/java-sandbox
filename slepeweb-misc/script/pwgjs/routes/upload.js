@@ -18,12 +18,18 @@ router.get('/form', (req, res) => {
 })
 
 router.post('/action', (req, res) => {
-	var form = new formidable.IncomingForm()
-	form.parse(req, function (err, fields, files) {
-		var filepath = files.xslx.path		
-		pwdb.upload(filepath)
-		res.redirect('/')
-    })
+	var u = req.session.user
+	if (u) {
+		var form = new formidable.IncomingForm()
+		form.parse(req, function (err, fields, files) {
+			var filepath = files.xslx.path		
+			pwdb.upload(u.username, filepath)
+			res.redirect('/')
+	    })
+	}
+	else {
+		res.redirect('/users/login')
+	}
 })
 
 exports.router = router

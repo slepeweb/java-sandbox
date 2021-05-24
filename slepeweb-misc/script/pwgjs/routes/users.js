@@ -173,15 +173,17 @@ router.get('/remove', (req, res) => {
 
 router.get('/whoami', (req, res) => {
 	var u = req.session.user
-	var obj = {}
+	var iam = {}
 	
 	if (u) {
-		obj.id = u._id
+		iam.id = u._id
+		iam.name = u.username
 	}
 	else {
-		obj.id = 'none'
+		iam.id = 'none'
+		iam.name = 'unknown'
 	}
-	res.json(obj)
+	res.json(iam)
 })
 
 class FailedLoginMonitor {

@@ -24,20 +24,20 @@ process.on('SIGTERM', () => {
 
 io.on('connection', (socket) => {
 
-	socket.on('company-list-request', () => {
-		pwdb.findAll().then((list) => {
+	socket.on('company-list-request', (owner) => {
+		pwdb.findAll(owner.name).then((list) => {
 			socket.emit('company-list', list)
 		}).catch((err) => {
 			log.error(sc, err)
 		})
 	})
 	
-	socket.on('lookup', (obj) => {
-		if (obj.id != 'none') {
-			userdb.findById(obj.id).then((u) => {
-				log.info(sc, `Looking up [${obj.company}]`)
+	socket.on('lookup', (res) => {
+		if (res.owner.id != 'none') {
+			userdb.findById(res.owner.id).then((u) => {
+				log.info(sc, `Looking up [${res.company}] for user [${res.owner.name}]`)
 				
-				pwdb.findOne(obj.company).then((doc) => {
+				pwdb.findOne(res.owner.name, res.company).then((doc) => {
 					if (doc) {
 						if (! doc.password && doc.partyid != 'none') {
 							[doc.password, doc.chunked] = 
@@ -46,13 +46,13 @@ io.on('connection', (socket) => {
 						socket.emit('document', doc)
 					}
 					else {
-						socket.emit('flash', `Company [${obj.company}] not found`, true)
+						socket.emit('flash', `Company [${res.company}] not found`, true)
 					}			
 				}).catch((err) => {
 					log.error(sc, err)
 				})
 			}).catch((err) => {
-				log.error(sc, `No such user ${obj.id}`)
+				log.error(sc, `No such user ${res.owner.id}`)
 			})
 		}
 		else {

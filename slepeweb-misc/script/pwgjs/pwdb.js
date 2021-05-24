@@ -27,7 +27,7 @@ class PwdDatabase {
 		})
 		
 		this.ds.ensureIndex({
-			fieldName: 'company',
+			fieldName: 'key',
 			unique: true
 		})
 		
@@ -40,7 +40,11 @@ class PwdDatabase {
 		})
 	}
 	
-	upload(fpath) {
+	toKey(owner, partyid) {
+		return `${owner}-${partyid}`
+	}
+	
+	upload(owner, fpath) {
 		var pwdb = this
 		
 		// First clear out existing records from the db
@@ -57,6 +61,7 @@ class PwdDatabase {
 					if (index > 1) {
 						i = 1
 						doc = {
+							owner: owner,
 							company: trim(row.getCell(i++).value),
 							partyid: trim(row.getCell(i++).value),
 							mask: trim(row.getCell(i++).value),
@@ -69,11 +74,14 @@ class PwdDatabase {
 						}
 						
 						if (doc.company) {
+							// This is a unique key, for indexing
+							doc.key = pwdb.toKey(owner, doc.company)						
+							
 							if (! doc.partyid) {
 								doc.partyid = doc.company
 							}
 							doc.partyid = preparePartyId(doc.partyid)
-							
+
 							if (! doc.username) {
 								doc.username = 'george@buttigieg.org.uk'
 							}
@@ -107,25 +115,27 @@ class PwdDatabase {
 		})
 	}
 	
-	findOne(company) {
+	findOne(owner, company) {
+		var pwdb = this
 		return new Promise((resolve, reject) => {		
-			this.ds.findOne({company: company}, (err, doc) => {
+			this.ds.findOne({key: pwdb.toKey(owner, company)}, (err, doc) => {
 				err ? reject(err) : resolve(doc)
 			})
 		})
 	}
 
-	find(company) {
+	find(owner, company) {
+		var pwdb = this
 		return new Promise((resolve, reject) => {		
-			this.ds.find({company: company}).sort({company: 1}).exec((err, docs) => {
+			this.ds.find({key: pwdb.toKey(owner, company)}).sort({company: 1}).exec((err, docs) => {
 				err ? reject(err) : resolve(docs)
 			})
 		})
 	}
 	
-	findAll() {
+	findAll(owner) {
 		return new Promise((resolve, reject) => {		
-			this.ds.find({}).projection({company:1, _id:0}).sort({company: 1}).exec((err, docs) => {
+			this.ds.find({owner: owner}).projection({company:1, _id:0}).sort({company: 1}).exec((err, docs) => {
 				err ? reject(err) : resolve(docs)
 			})
 		})

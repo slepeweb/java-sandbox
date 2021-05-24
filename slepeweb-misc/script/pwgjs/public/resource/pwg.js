@@ -80,11 +80,11 @@ const _whoami = (onSuccess) => {
 		type: "GET",
 		cache: false,
 		dataType: "json",
-		success: function(obj, status, z) {
-			onSuccess(obj)
+		success: function(iam, status, z) {
+			onSuccess(iam)
 		},
-		error: function(obj, status, z) {
-			console.error(obj, status, z)
+		error: function(iam, status, z) {
+			console.error(iam, status, z)
 		}
 	})
 }
@@ -108,7 +108,9 @@ $(function() {
 	// Initialise prgress bar value
 	_progressValue = parseInt($('#progressbar').attr('data-progress'))
 	
-	socket.emit('company-list-request')
+	_whoami((iam) => { 
+		socket.emit('company-list-request', iam)
+	})
 	 
 	socket.on('company-list', (list) => {
 		_companies = []
@@ -125,10 +127,10 @@ $(function() {
 		$('#lookup').click(() => {
 			var company = $('#company').val()
 			if (company) {
-				_whoami((res) => { 
+				_whoami((iam) => { 
 					socket.emit('lookup', {
 						company: company,
-						id: res.id,
+						owner: iam,
 					})
 				})
 			}
