@@ -133,9 +133,10 @@ h1.lookup {
 }
 
 div#progressbar {
-	justify-self: right;
-	width: 70%;
+	display: inline-block;
+	width: 65%;
 	height: 1em;
+	margin-right: 1em;
 }
 
 div.ui-progressbar-value {
@@ -143,8 +144,15 @@ div.ui-progressbar-value {
 }
 
 p#logout {
+	display: inline-block;
 	text-align: right;
 	margin: 0;
+}
+
+p#upload-icon {
+	font-size: 1.5em;
+	margin: 0;
+	color: #f57900;
 }
 
 table#main-table td:nth-child(2) {
@@ -174,9 +182,14 @@ table#main-table input, table#main-table textarea {
 	display: none;
 }
 
-div#flash p {
-	color: red;
+p#flash {
+	background-color: green;
+	color: white;
 	font-weight: bold;
+}
+
+p#flash.error {
+	background-color: red;
 }
 
 body {
@@ -218,6 +231,10 @@ div#login-header {
 
 div#login-header span {
 	text-align: right;
+}
+
+.upload-icon {
+	padding-right: 1em;
 }
 
 @media (min-width: 600px) {

@@ -2,16 +2,25 @@ extends layout
 
 block content
   #heading
-    h1.lookup Password Manager
+    h1.lookup
+      a(href='/') Password Manager
     if user
-      div#progressbar(data-progress=progress)
-      p#logout
-        a(href="/users/logout")
-          i(class="fas fa-sign-out-alt fa-2x" title="Logout")
+      p#upload-icon
+        i(class="fas fa-file-import upload-icon" title="Upload")
+    
+      div
+        div#progressbar(data-progress=progress, data-progress-decrement=progressDecrement, data-progress-interval=progressInterval)
+        p#logout
+          a(href="/users/logout")
+            i(class="fas fa-sign-out-alt fa-2x" title="Logout")
 
+  p#flash
+  script.
+    var _flashMsg = '!{flash}', _flashClazz = '!{clazz}';
+  		
   #instructions
-    p#instructionA Start typing the company name, select one of the available options, then click on the Lookup button
-    p#instructionB(class="hide") Click <span class="reset"><i class="fas fa-undo-alt"></i></span> to choose another company
+    p#instructionA Start typing the company name, select one of the available options, then click on the Lookup button.
+    p#instructionB(class="hide") Click <span class="reset"><i class="fas fa-undo-alt"></i></span> to choose another account.
   
   table#main-table
     tbody
@@ -43,6 +52,11 @@ block content
         td
           textarea(id="notes" rows="4")
 
-  #flash
-    p.red &nbsp;
+  #upload-dialog
+    p Please identify the .xslx spreadsheet containing your password data.
+	
+    form(action="/upload/action" method="post" enctype="multipart/form-data")
+      input(type="file" name="xlsx")
+      
+
     

@@ -1,33 +1,43 @@
+/*
+	This code is ONLY used on the home page.
+	
+	The home page has 2 different display modes. An autocompleting text input
+	is provided in mode A, to identify the company/website of interest. Mode B
+	displays the result of the password lookup.
+*/
 var socket = io()
 
-socket.on('flash', (msg, warn) => {
-	var ele = $('div#flash p')
-	if (warn) {
-		ele.addClass('warning')
-	}
-	ele.html(msg);
-	
-	// Log the message
+const flashMessage = (msg, error) => {
+	var id = 'p#flash'
+	$(id).html(msg).css('padding', '0.5em')
 	console.log(msg)
 	
-	// If after 5 seconds the flash message is unchanged, then clear it out
+	if (error) {
+		$(id).addClass('error')
+		console.log(error)
+	}
+	
 	setTimeout(() => {
-		if (ele.html() == msg) {
-			ele.html('')
-			ele.removeClass('warning')
-		}
-	}, 5000)
+		$(id).html('').removeClass('error').css('padding', '0em')
+	}, 3000)
+}
+	
+socket.on('flash', (msg, error) => {
+	flashMessage(msg, error)
 })
-
+	
+// Action triggered by message from server when user session times out ... go to login page
 socket.on('relogin', () => {
 	window.location = '/users/login?err=User%20timed%20out%20-%20Please%20re-login'
 })
 
+// Action triggered by message from server to update the page (mode B)
 socket.on('document', (d) => {
 	_setFields(d)
 	_toggleDisplay()
 })
 
+// Function to set the values on the page in mode B
 const _setFields = (d) => {
 	$('#company, #username, #password, #password2, #notes').val('')
 	
@@ -47,6 +57,7 @@ const _setFields = (d) => {
 	}
 }
 
+// This function switches display mode
 const _toggleDisplay = () => {
 	var company = $('#company')
 	var displayModeA = company.val()
@@ -75,6 +86,7 @@ const _toggleDisplay = () => {
 	}
 }
 
+// Make an ajax request to the server to identify the logged-in user
 const _whoami = (onSuccess) => {
 	$.ajax("/users/whoami", {
 		type: "GET",
@@ -89,29 +101,35 @@ const _whoami = (onSuccess) => {
 	})
 }
 
-var _progressValue = 0
+var _progressValue = 100, _progressDecrement = 1, _progressInterval = 3000
 
+// Function to update the progress bar, according to time left in session
 const _progress = () => {
-	_progressValue -= 1
+	_progressValue -= _progressDecrement
 	if (_progressValue >= 0) {
 		$('#progressbar').progressbar({value: _progressValue})
 	}
+	/*
+	 * Not necessary, since server side knows when session has expired, and
+	 * can send a message back to client to re-login
+	 *
 	else {
 		window.location='/users/login?err=User%20session%20timed%20out'
 	}
+	*/
 }
 
 var _companies = null
+var _uploadDialog = null, _uploadForm = null
 
 // After page is fully loaded ...
 $(function() {
-	// Initialise prgress bar value
-	_progressValue = parseInt($('#progressbar').attr('data-progress'))
-	
+	// Get the server to identify the logged-in user (from session data)
 	_whoami((iam) => { 
 		socket.emit('company-list-request', iam)
 	})
-	 
+	
+	// Act upon message from server to render list of registered companies/websites
 	socket.on('company-list', (list) => {
 		_companies = []
 		list.forEach((item, c) => {
@@ -124,9 +142,11 @@ $(function() {
 		
 		$('#company').focus()
 
+		// Action code for when user submits 'lookup' form
 		$('#lookup').click(() => {
 			var company = $('#company').val()
 			if (company) {
+				// Proceed with db lookup for this user 
 				_whoami((iam) => { 
 					socket.emit('lookup', {
 						company: company,
@@ -142,18 +162,57 @@ $(function() {
 			_toggleDisplay()
 		})		
 		
+		// Initialise the progress bar
+		_progressValue = parseInt($('#progressbar').attr('data-progress'))	
+		_progressDecrement = parseInt($('#progressbar').attr('data-progress-decrement'))	
+		_progressInterval = parseInt($('#progressbar').attr('data-progress-interval'))	
+		_progress()
+		
+		setInterval(() => {
+			_progress()
+		}, _progressInterval)
+	
 	})
 	
+	// Animate the logout button/icon, to remind user NOT 
+	// to leave the browser unattended.
 	setInterval(() => {
 		$('p#logout i').effect('bounce', {}, 1000)
 	}, 30000)
 	
+	_uploadDialog = $('#upload-dialog').dialog({
+		autoOpen: false,
+		height: 400,
+		width: 350,
+		modal: true,
+		title: 'Upload spreadsheet',
+		buttons: {
+			Submit: function() {
+				var input = $('input[name=xlsx]')
+				if (input.val()) {
+					_uploadForm.submit()
+				}
+				else {
+					input.effect('bounce', {}, 1000)
+				}
+			},
+			Cancel: function() {
+				_uploadDialog.dialog('close')
+			}
+		},
+		close: function() {
+			_uploadForm.reset()
+		},
+	})
 	
-	_progress()
+	_uploadForm = _uploadDialog.find('form')[0]
 	
-	// Progress bar loses 1% every 3 seconds, reaching zero in 300 secs,
-	// which matches the session timeout
-	setInterval(() => {
-		_progress()
-	}, 3 * 1000)
+	$('#upload-icon i').click((e) => {
+		_uploadDialog.dialog('open')
+	})
+	
+	// Flash message, if present
+	if (_flashMsg) {
+		flashMessage(_flashMsg, _flashClazz != 'none')
+	}
 });

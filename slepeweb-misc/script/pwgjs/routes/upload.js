@@ -1,3 +1,9 @@
+/*
+	These routes deal with requests to
+	a) Display upload form
+	b) Action the upload
+*/
+
 const express = require('express')
 const router = express.Router()
 
@@ -7,28 +13,45 @@ const log = require('../slepeweb-modules/logger.js').instance
 const pwdb = require('../pwdb')
 const formidable = require('formidable')
 
-router.get('/form', (req, res) => {
-	var u = req.session.user
-	if (u) {
-		res.render('upload', {title: 'Upload', err: req.query.err, loggedIn: req.session.user})
-	}
-	else {
-		res.redirect('/users/login')
-	}
-})
+/*
+ * Not required any more, but retain as example of accessing the io object
+ *
+const flashMessage = (req, message, isError) => {
+	var io = req.app.get('socketio')
+	io.emit('flash', message, isError)
+}
+*/
+
+const closeFd = (fd) => {
+  fs.close(fd, (err) => {
+    if (err) throw err
+  })
+}
+
+const redirect = (res, path, msg, isErr) => {
+	res.redirect(`${path}?flash=${msg.replace(/\s/g, '%20')}&clazz=${isErr ? 'error' : 'none'}`)
+}
 
 router.post('/action', (req, res) => {
 	var u = req.session.user
 	if (u) {
 		var form = new formidable.IncomingForm()
+
 		form.parse(req, function (err, fields, files) {
-			var filepath = files.xslx.path		
-			pwdb.upload(u.username, filepath)
-			res.redirect('/')
+			// The name of the input field specifying the spreadsheet file path is 'xlsx'.
+			// filepath on Linux is a file in /tmp, which might be empty if the user
+			// submitted the form withouth chosing a file.
+			var filepath = files.xlsx.path
+			
+			pwdb.upload(u.username, filepath).then((numLoaded) => {
+				redirect(res, '/', `Successfully uploaded ${numLoaded} records`)
+			}).catch((msg) => {
+				redirect(res, '/', msg, true)
+			})
 	    })
 	}
 	else {
-		res.redirect('/users/login')
+		redirect(res, '/users/login', 'User session timed out', true)
 	}
 })
 

@@ -13,6 +13,12 @@ const calculator = new PwCalculator()
 const webModule = require('./webFramework')
 const io = require('socket.io')(webModule.http)
 
+/*
+ * This makes the io object available in every request, and accessible
+ * from route code. See routes/upload.js as example.
+ */
+webModule.framework.set('socketio', io)
+
 const usersMod = require('./routes/users')
 const uploadMod = require('./routes/upload')
 
@@ -31,7 +37,7 @@ io.on('connection', (socket) => {
 			log.error(sc, err)
 		})
 	})
-	
+		
 	socket.on('lookup', (res) => {
 		if (res.owner.id != 'none') {
 			userdb.findById(res.owner.id).then((u) => {
@@ -47,7 +53,7 @@ io.on('connection', (socket) => {
 					}
 					else {
 						socket.emit('flash', `Company [${res.company}] not found`, true)
-					}			
+					}
 				}).catch((err) => {
 					log.error(sc, err)
 				})

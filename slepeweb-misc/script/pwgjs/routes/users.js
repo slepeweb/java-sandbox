@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const moment = require('moment')
+const config = require('../config')
 
 const userdb = require('../userdb')
 
@@ -74,6 +75,10 @@ router.post('/login', (req, res) => {
 					}
 					
 			    	req.session.user = u
+			    	var now = new Date()
+			    	u.sessionStart = now.getTime()
+			    	u.sessionTimeout = config.sessionTimeout
+			    	
 			    	if (u.password) {
 			    		keys[u.password] = formdata.key
 			    	}

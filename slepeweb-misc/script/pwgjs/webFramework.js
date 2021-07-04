@@ -12,6 +12,7 @@ const cookieParser = require('cookie-parser')
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const uploadRouter = require('./routes/upload')
+const config = require('./config')
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
@@ -25,7 +26,7 @@ app.use(session({
 	saveUninitialized: true, 
 	resave: true,
 	cookie: {
-		maxAge: 300000
+		maxAge: config.sessionTimeout * 1000 // milliseconds
 	}}))
 	
 app.use(bodyParser.json());      
