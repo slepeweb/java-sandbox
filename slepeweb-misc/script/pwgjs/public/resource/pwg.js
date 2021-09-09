@@ -19,7 +19,7 @@ const flashMessage = (msg, error) => {
 	
 	setTimeout(() => {
 		$(id).html('').removeClass('error').css('padding', '0em')
-	}, 3000)
+	}, 7000)
 }
 	
 socket.on('flash', (msg, error) => {
@@ -153,6 +153,9 @@ $(function() {
 						owner: iam,
 					})
 				})
+			}
+			else {
+				$('#company').parent().effect('bounce', {}, 1000)
 			}
 		})
 			

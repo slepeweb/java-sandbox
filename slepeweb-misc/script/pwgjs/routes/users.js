@@ -23,6 +23,17 @@ const log = require('../slepeweb-modules/logger.js').instance
 
 const keys = {}
 
+const redirect = (res, path, msg, isErr) => {
+	res.redirect(`${path}?flash=${msg.replace(/\s/g, '%20')}&clazz=${isErr ? 'error' : 'none'}`)
+}
+
+const notAuthorised = (res, msg) => {
+	if (! msg) {
+		msg = 'Not Authorised!'
+	}
+	redirect(res, '/', msg, true)
+}
+
 router.get('/login', (req, res) => {
     res.render('login', {title: 'Login', err: req.query.err, loggedIn: req.session.user})
 })
@@ -71,7 +82,7 @@ router.post('/login', (req, res) => {
 				if (! u.password || cryptor.compare(formdata.password, u.password)) {
 					log.info(sc, message = `User ${formdata.username} logged in`)
 					if (! formdata.noemail) {
-						emailer.send(message)
+						emailer.send(message, {to: u.email})
 					}
 					
 			    	req.session.user = u
@@ -88,6 +99,7 @@ router.post('/login', (req, res) => {
 				else {
 					log.warn(sc, message = `Failed login attempt - password mis-match [${formdata.username}]`)
 					emailer.send(message)
+					emailer.send(message, {to: u.email})
 					res.redirect('/users/login?err=Invalid%20user%20credentials (A)')
 				}
 			}
@@ -146,34 +158,102 @@ const isValidPassword = (formdata) => {
 	return false
 }
 
+/*
+ * Routes add and update take the following query parameters:
+ * - username (mandatory)
+ * - password
+ * - email address
+ * - defaultlogin
+ * - admin
+ * 
+ * 'add' requires all these parameters.
+ * 'update' only requires username, and one or more of the other parameters.
+ * 'remove' only requires username.
+ *
+ * Only administrators can add users UNLESS it's the first user, who automatically
+ * becomes an administrator.
+ *
+ * General users can update their own properties (except admin status), but only
+ * an administrator can update another user's properties.
+ *
+ * The 'admin' parameter can only be used by administrators.
+ */
+ 
+/*
+ * Only an administrator can add another user, UNLESS the userdb is empty.
+ */
 router.get('/add', (req, res) => {
 	var u = req.session.user
-	if (u) {
-		userdb.save({
-			username: req.query.username, 
-			password: req.query.password
+	
+	// Only an administrator can assign admin status to a new user
+	var params = {
+		username: req.query.username, 
+		password: req.query.password,
+		email: req.query.email, 
+		defaultlogin: req.query.defaultlogin,
+		admin: userdb.empty || (u && u.admin && req.query.admin == 'true')
+	}
+	
+	if (userdb.empty || (u && u.admin)) {
+		userdb.save(params).then((message) => {
+			redirect(res, '/', message, false)		
+		}).catch((err) => {
+			redirect(res, '/', err, true)
 		})
 	}
-	res.redirect('/')
+	else if (! (u && u.admin)) {
+		notAuthorised(res, 'Only an admin user can add other users!')
+	}
+	else {
+		notAuthorised(res)
+	}
 })
 
+/*
+ * Any user can update his OWN profile, except for his admin status.
+ * Only an admin user can update another user's profile.
+*/
 router.get('/update', (req, res) => {
 	var u = req.session.user
 	if (u) {
-		userdb.update({
+		var params = {
 			username: req.query.username, 
-			password: req.query.password
-		})
+			password: req.query.password,
+			email: req.query.email, 
+			defaultlogin: req.query.defaultlogin,
+		}
+		
+		// Only an administrator can assign admin status to another user
+		params.admin = u.admin ? req.query.admin : ''
+	
+		if (u.admin || u.username == params.username) {
+			userdb.update(params).then((message) => {
+				redirect(res, '/', message, false)
+			}).catch((result) => {
+				redirect(res, '/', message, true)
+			})
+		}
 	}
-	res.redirect('/')
+	else {
+		notAuthorised(res)
+	}
 })
 
+/*
+ * Only an admin user can remove another user profile from the database
+ */
 router.get('/remove', (req, res) => {
 	var u = req.session.user
-	if (u) {
-		userdb.remove(req.query.username)
+	if (u && u.admin) {
+		userdb.remove(req.query.username).then((msg) => {
+			redirect(res, '/', msg, false)
+		}).catch((msg) => {
+			redirect(res, '/', msg, true)
+		})
 	}
-	res.redirect('/')
+	else {
+		notAuthorised(res)
+	}
 })
 
 router.get('/whoami', (req, res) => {

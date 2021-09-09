@@ -20,12 +20,12 @@ class UserDatabase {
 			unique: true
 		})
 		
-		this.tempUser = 'temp'
-		this.id = 1
-	}
-	
-	incId() {
-		this.id += 1
+		this.count(this)
+		
+		// Give count callback some time to execute
+		setTimeout(() => {
+			log.info(sc, `Empty flag is ${this.empty}`)
+		}, 1000)		
 	}
 	
 	findByName(name) {
@@ -45,55 +45,98 @@ class UserDatabase {
 	}
 	
 	save(u) {
-		if (u.username) {
-			this.findByName(u.username).then(
-				(user) => {
-					if (! user) {
-						if (u.password) {
-							u.password = crypt.encrypt(u.password)
+		return new Promise((resolve, reject) => {		
+			var msg
+			
+			if (u.username) {
+				this.findByName(u.username).then(
+					(user) => {						
+						if (! user) {
+							if (u.password) {
+								u.password = crypt.encrypt(u.password)
+							}
+							this.ds.insert(u)
+							log.info(sc, msg = `User ${u.username} added`)
+							resolve(msg)						
 						}
-						this.ds.insert(u)
-						log.info(sc, `User ${u.username} added`)
-						
-						// Remove temporary user, if it's still there
-						this.remove(this.tempUser)
-					}
-					else {
-						log.warn(sc, `User ${u.username} already exists`)
-					}
-				}).catch(
-					(e) => {
-						log.error(sc, 'Database save error', e)
-					}
-				)
-		}
+						else {
+							log.warn(sc, msg = `User ${u.username} already exists`)
+							reject(msg)				
+						}
+					}).catch(
+						(e) => {
+							log.error(sc, msg = 'Database save error', e)
+							reject(msg)						
+						}
+					)
+			}
+			else {
+				reject('Data error: missing user name')						
+			}
+		})
 	}
-	
+
 	update(u) {
-		this.ds.update({username: u.username}, {$set: {password: crypt.encrypt(u.password)}}, {}, (err) => {
-			log.error(sc, `Failed to update password for user ${u.username}`, err)
+		var changes = {}
+		var msg
+		
+		if (u.password) {
+			changes.password = crypt.encrypt(u.password)
+		}
+		
+		if (u.email) {
+			changes.email = u.email
+		}
+		
+		if (u.defaultlogin) {
+			changes.defaultlogin = u.defaultlogin
+		}
+		
+		if (u.admin) {
+			changes.admin = u.admin == 'true'
+		}
+		
+		return new Promise((resolve, reject) => {
+			this.ds.update({username: u.username}, {$set: changes}, {}, (err) => {
+				if (err) {
+					log.error(sc, msg = `Failed to update user ${u.username}`, err)
+					reject(msg)
+				}
+				else {
+					resolve(`User record updated (${u.username})`)
+				}
+			})
 		})
 	}
 	
-	count(callback, params) {
+	count(db) {
+		var msg
 		this.ds.count({}, function (err, count) {
-			log.info(sc, `There are ${count} entries in the user database`)
-			if (callback && params) {
-				callback(count, params.a, params.b)
+			if (err) {
+				log.info(sc, msg = `Failed to count users in database; assume non-zero`)
+				db.empty = false
+			}
+			else {
+				log.info(sc, msg = `There are ${count} entries in the user database`)
+				db.empty = (count == 0)
 			}
 		})
 	}
 	
 	remove(name) {
-		var callback = (count, paramA, paramB) => {
-			if (count > 1) {
-				this.ds.remove({username: name}, {}, function (err, numRemoved) {
-				  log.info(sc, `User ${name} removed`)
-				})
-			}
-		}
-		
-		this.count(callback, {a: null, b: null})
+		return new Promise((resolve, reject) => {
+			this.ds.remove({username: name}, {}, function (err, numRemoved) {
+				var msg = 'none'
+			
+				if (err) {
+					reject(`Failed to remove user [${name}]`)
+				}
+				else {
+			  		log.info(sc, msg = `User ${name} removed`)
+			  		resolve(msg)
+			  	}
+			})
+		})
 	}
 }
 

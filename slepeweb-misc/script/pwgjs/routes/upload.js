@@ -43,7 +43,7 @@ router.post('/action', (req, res) => {
 			// submitted the form withouth chosing a file.
 			var filepath = files.xlsx.path
 			
-			pwdb.upload(u.username, filepath).then((numLoaded) => {
+			pwdb.upload(u, filepath).then((numLoaded) => {
 				redirect(res, '/', `Successfully uploaded ${numLoaded} records`)
 			}).catch((msg) => {
 				redirect(res, '/', msg, true)

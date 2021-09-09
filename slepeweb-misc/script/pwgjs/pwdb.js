@@ -46,22 +46,24 @@ class PwdDatabase {
 	}
 	
 	// Function to upload data from the specified spreadsheet
-	upload(owner, fpath) {
+	upload(u, fpath) {
+		var owner = u.username
+		
 		// Beware!! 'this' does NOT represent an instance of PwdDatabase object
 		// when you are in the body of a callback function.
 		var pwdb = this
 		
 		var promise = new Promise((resolve, reject) => {
 			/* 
-				First clear out existing records from the db.
+				First clear out existing records FOR THIS USER from the db.
 				NOTE that if the user uploads an invalid file (ie an xlsx spreadsheet,
 				with the data correctly laid out on the first worksheet), then this
 				operation will leave the user with no records in the database. However,
 				since the xlsx document is the 'master', it's up to the user to maintain
 				its validity.
 			*/
-			this.ds.remove({}, {multi: true}, function(err, num) {
-				log.info(sc, `Removed ${num} entries from the password database`)
+			this.ds.remove({owner: owner}, {multi: true}, function(err, num) {
+				log.info(sc, `Removed ${num} entries from the password database for user ${owner}`)
 			
 				// Now load the contents from the xlsx file
 				var wb = new excel.Workbook()
@@ -95,8 +97,8 @@ class PwdDatabase {
 								}
 								doc.partyid = preparePartyId(doc.partyid)
 	
-								if (! doc.username) {
-									doc.username = 'george@buttigieg.org.uk'
+								if (! doc.username || doc.username == '') {
+									doc.username = u.defaultlogin
 								}
 								
 								if (doc.memorable) {
