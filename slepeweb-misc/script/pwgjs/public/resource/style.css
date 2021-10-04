@@ -120,16 +120,25 @@ table tfoot {
   border-top: solid 2px rgba(144, 144, 144, 0.25);
 }
 
+div#main-wrapper {
+	position: relative;
+}
+
 #heading {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	width: 100%;
 	align-items: center;
-	margin-bottom: 2em;
+	margin-bottom: 1em;
 }
 
-h1.lookup {
+h1 {
 	margin: 0;
+}
+
+#heading p.timer {
+	margin: 0;
+	font-size: 0.8em;
 }
 
 div#progressbar {
@@ -143,16 +152,36 @@ div.ui-progressbar-value {
 	background-color: #b6e60b;
 }
 
-p#logout {
+p.welcome {
+	margin: 0em;
+	font-size: 0.8em;
+}
+
+p#logout-icon {
 	display: inline-block;
 	text-align: right;
 	margin: 0;
+}
+
+p#logout-icon i {
+	color: #6f306b;
+	cursor: pointer;
 }
 
 p#upload-icon {
 	font-size: 1.5em;
 	margin: 0;
 	color: #f57900;
+}
+
+.upload-icon {
+	padding-right: 1em;
+}
+
+p#user-list-icon {
+	font-size: 1.5em;
+	margin: 0;
+	color: #ed00f5;
 }
 
 table#main-table td:nth-child(2) {
@@ -183,13 +212,22 @@ table#main-table input, table#main-table textarea {
 }
 
 p#flash {
-	background-color: green;
+	background-color: rgb(82, 139, 200);
 	color: white;
 	font-weight: bold;
+	position: absolute;
+	left: 0;
+	right: 0;
+	width: 70%;
+	max-width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	box-shadow: 5px 10px;
 }
 
 p#flash.error {
-	background-color: red;
+	background-color: rgb(183, 52, 52);
 }
 
 body {
@@ -233,9 +271,19 @@ div#login-header span {
 	text-align: right;
 }
 
-.upload-icon {
-	padding-right: 1em;
+#user-list-dialog tr:first-child {
+	background-color: pink;
 }
+
+#user-list-dialog .fa-trash-alt {
+	margin-left: 1em;
+	color: #c80000;
+}
+
+#user-list-dialog .fa-edit {
+	color: #66f;
+}
+
 
 @media (min-width: 600px) {
 	div#main-wrapper {

@@ -29,7 +29,7 @@ class Mailer {
 		
 		// p provides ability to override default mail options
 		if (p) {
-			p.keys().forEach((k) => {
+			Object.keys(p).forEach((k) => {
 				cloned[k] = p[k]
 			})
 		}

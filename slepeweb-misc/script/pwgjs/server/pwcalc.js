@@ -99,18 +99,6 @@ class PwCalculator {
 		
 		return result
 	}
-	
-	test(mask) {
-		var pwd, chunked
-		var key = 'Password1'
-		var list = ['apple', 'halifax', 'microsoft', 'telegraph', 'amazon', 
-			'eastdevondistrictcouncil', 'bostonseeds', '123reg']
-		
-		list.forEach((company, i) => {
-			[pwd, chunked] = this.calc(key, company, mask)
-			console.log(`${company}: ${pwd} (${chunked})`)
-		})
-	}
 }
 
-module.exports = PwCalculator
+module.exports = new PwCalculator()

@@ -1,21 +1,23 @@
 doctype html
 html
   head
-    title Password Generator
+    title !{title}
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
     link(rel="stylesheet", href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css", type="text/css")
-    link(rel="stylesheet", href="/resource/style.css")
     link(rel="stylesheet", href="https://use.fontawesome.com/releases/v5.4.2/css/all.css", integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns", crossorigin="anonymous")
+    link(rel="stylesheet", href="/resource/style.css")
     script(src="http://code.jquery.com/jquery-1.12.4.min.js")
     script(src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js")
     script(src="/socket.io/socket.io.js")
-    if user
-      script(src="/resource/pwg.js")
-    else
-      script(src="/resource/login.js")
+    script(src="/resource/dialog.js")
+    script(src="/resource/users.js")
+    script(src="/resource/index.js")
+    script(src="/resource/listener.js")
+    script(src="/resource/behaviour.js")
     
-    style .error {color: red;} input[type=submit] {margin-left: 1em; background-color: #c8c8c8;}
+    script var _actor = '!{username}', _flashMsg = '!{flashMsg}', _flashErr = '!{flashErr}'
+    
   body
     #main-wrapper
       div#main-content

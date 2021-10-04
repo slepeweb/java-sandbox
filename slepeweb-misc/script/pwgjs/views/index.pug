@@ -2,22 +2,25 @@ extends layout
 
 block content
   #heading
-    h1.lookup
-      a(href='/') Password Manager
-    if user
+    div
+      h1 Password Manager
+      p.timer Time and date goes here
+    
+    div
       p#upload-icon
         i(class="fas fa-file-import upload-icon" title="Upload")
     
-      div
-        div#progressbar(data-progress=progress, data-progress-decrement=progressDecrement, data-progress-interval=progressInterval)
-        p#logout
-          a(href="/users/logout")
-            i(class="fas fa-sign-out-alt fa-2x" title="Logout")
+      p#user-list-icon
+        i(class="fas fa-users user-list-icon" title="Users")
+    
+    div.heading-rhs
+      p.welcome &nbsp;
+      div#progressbar
+      p#logout-icon
+        i(class="fas fa-sign-out-alt fa-2x" title="Logout")
 
   p#flash
-  script.
-    var _flashMsg = '!{flash}', _flashClazz = '!{clazz}';
-  		
+    		
   #instructions
     p#instructionA Start typing the company name, select one of the available options, then click on the Lookup button.
     p#instructionB(class="hide") Click <span class="reset"><i class="fas fa-undo-alt"></i></span> to choose another account.
@@ -52,11 +55,54 @@ block content
         td
           textarea(id="notes" rows="4")
 
+  #login-dialog
+    p Please identify yourself
+  	
+    form(action="", method="post")
+      table#main-table
+        tr
+          td.label Username
+          td
+            input(type="text" name="username")
+        tr
+          td.label Password
+          td
+            input(type="password" name="password")
+        tr
+          td.label Key
+          td
+            input(type="password" name="key")
+
   #upload-dialog
     p Please identify the .xslx spreadsheet containing your password data.
 	
-    form(action="/upload/action" method="post" enctype="multipart/form-data")
+    form(action="" method="post" enctype="multipart/form-data")
       input(type="file" name="xlsx")
       
+  #user-list-dialog
+    table
 
-    
+  #user-upsert-dialog
+    form(action="none" method="post" enctype="multipart/form-data")
+      table
+        tr
+          td Name
+          td
+            input(type="text" name="username")
+            input(type="hidden" name="mode" value="")
+        tr
+          td Password
+          td
+            input(type="password" name="password")
+        tr
+          td Email
+          td
+            input(type="text" name="email")
+        tr
+          td Default login
+          td
+            input(type="text" name="defaultlogin")
+        tr
+          td Admin?
+          td
+            input(type="checkbox" name="admin")

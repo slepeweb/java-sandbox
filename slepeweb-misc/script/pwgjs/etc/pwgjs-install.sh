@@ -1,5 +1,7 @@
 #!/bin/bash
 #
-GIT_FOLDER=/home/george/git-repos/slepeweb-misc/script/pwgjs
-scp -P 223 $GIT_FOLDER/*.js pi@rpi-raspbian:~/pwgjs
-scp -P 223 -r $GIT_FOLDER/public $GIT_FOLDER/routes $GIT_FOLDER/views pi@rpi-raspbian:~/pwgjs
+SCRIPTS=/home/george/git-repos/slepeweb-misc/script
+PROJ_FOLDER=$SCRIPTS/pwgjs
+DEST=pi@rpi-raspbian
+scp -P 223 -r $PROJ_FOLDER/server $DEST:~/pwgjs
+scp -P 223 -r $PROJ_FOLDER/public $PROJ_FOLDER/routes $PROJ_FOLDER/views $SCRIPTS/slepeweb-modules $DEST:~/pwgjs

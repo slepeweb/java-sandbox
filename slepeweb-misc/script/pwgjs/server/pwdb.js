@@ -1,8 +1,9 @@
 const excel = require('exceljs')
 const Datastore = require('nedb')
+const userdb = require('./userdb')
 
 const sc = require('path').basename(__filename)
-const log = require('./slepeweb-modules/logger').instance
+const log = require('../slepeweb-modules/logger').instance
 
 
 const trim = (s) => {
@@ -22,7 +23,7 @@ const preparePartyId = (s) => {
 class PwdDatabase {
 	constructor() {
 		this.ds = new Datastore({
-			filename: './data.db', 
+			filename: './db/data.db', 
 			autoload: true 
 		})
 		
@@ -62,9 +63,7 @@ class PwdDatabase {
 				since the xlsx document is the 'master', it's up to the user to maintain
 				its validity.
 			*/
-			this.ds.remove({owner: owner}, {multi: true}, function(err, num) {
-				log.info(sc, `Removed ${num} entries from the password database for user ${owner}`)
-			
+			this.remove(owner).then((msg) => {
 				// Now load the contents from the xlsx file
 				var wb = new excel.Workbook()
 				var doc, i
@@ -140,6 +139,8 @@ class PwdDatabase {
 					reject('No records added - check file is correct type, and formatted correctly')
 				}
 				*/
+			}).catch((err) => {
+				reject(err)
 			})
 		})
 		
@@ -168,6 +169,16 @@ class PwdDatabase {
 		return new Promise((resolve, reject) => {		
 			this.ds.find({owner: owner}).projection({company:1, _id:0}).sort({company: 1}).exec((err, docs) => {
 				err ? reject(err) : resolve(docs)
+			})
+		})
+	}
+	
+	remove(owner) {
+		return new Promise((resolve, reject) => {		
+			this.ds.remove({owner: owner}, {multi: true}, function(err, num) {
+				var msg = ''
+				log.info(sc, msg = `Removed ${num} entries from the password database for user ${owner}`)
+				err ? reject(err) : resolve(msg)
 			})
 		})
 	}
