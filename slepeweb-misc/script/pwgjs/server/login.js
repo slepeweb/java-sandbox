@@ -47,7 +47,7 @@ class LoginService {
 			}
 		
 			if (! this.isValidPasswordFormat(formdata)) {
-				log.warn(sc, message = `Failed login attempt - incorrect password pattern [${formdata.password}]`)
+				log.warn(sc, message = `Failed login attempt - incorrect password construction [${formdata.username}]`)
 				this.doMonitor(success, formdata)
 				emailer.send(message)
 				reject('Invalid user credentials (C)')

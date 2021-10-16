@@ -1,5 +1,6 @@
 const sessionService = require('./session').sessionService
 const userdb = require('./userdb')
+const pwdb = require('./pwdb')
 const Cryptor = require('./crypt')
 const cryptor = new Cryptor()
 
@@ -94,6 +95,13 @@ class UserService {
 		return new Promise((resolve, reject) => {
 			if (actor && actor.admin) {
 				userdb.remove(subject).then((msg) => {
+					// Also delete associated data
+					pwdb.remove(subject).then((s) => {
+						// TODO? Nothing interesting to feed back
+					}).catch((e) => {
+						// TODO? No big deal if op fails
+					})
+					
 					resolve(msg)
 				}).catch((msg) => {
 					reject(msg)

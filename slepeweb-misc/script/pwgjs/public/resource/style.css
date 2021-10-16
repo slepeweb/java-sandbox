@@ -223,7 +223,8 @@ p#flash {
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
-	box-shadow: 5px 10px;
+/* 	box-shadow: 5px 10px; */
+	z-index: 200;
 }
 
 p#flash.error {
@@ -284,6 +285,9 @@ div#login-header span {
 	color: #66f;
 }
 
+.ui-widget-overlay {
+	opacity: 0.6;
+}
 
 @media (min-width: 600px) {
 	div#main-wrapper {

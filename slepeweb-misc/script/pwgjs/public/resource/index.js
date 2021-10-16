@@ -116,6 +116,22 @@ const _progressBarUpdater = (u) => {
 	}
 }
 
+const _submitLoginForm = () => {
+	var form = $('#login-dialog')
+	var u = {
+		username: form.find('input[name=username]').val().trim(),
+		password: form.find('input[name=password]').val().trim(),
+		'key': form.find('input[name=key]').val().trim(),
+	}
+	
+	if (u.username && u.password && u.key) {
+		socket.emit('login-request', u)
+	}
+	else {
+		form.effect('bounce', {}, 1000)
+	}
+}
+
 var _progressScheduler = null
 
 // After page is fully loaded ...
@@ -143,6 +159,9 @@ $(function() {
 	// If user not logged in, open dialog
 	if (! _actor) {
 		_loginDialog.dialog('open')
+	}
+	else {
+		socket.emit('company-list-request', _actor)
 	}
 })
 

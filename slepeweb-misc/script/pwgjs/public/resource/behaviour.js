@@ -39,4 +39,11 @@ $(function() {
 	$('#user-list-icon i').click((e) => {
 		_userListDialog.dialog('open')
 	})
+	
+	$('#login-dialog').keydown((e) => {
+		if (e.which == 13) {
+			e.preventDefault()
+			_submitLoginForm()
+		}
+	})
 })

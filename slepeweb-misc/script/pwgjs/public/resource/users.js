@@ -32,7 +32,7 @@ const _openUpsertDialog = (formMode, uw) => {
 }
 
 const _rwUpsertDialog = (inputElement, property, ur, uw) => {
-	var valueRead = inputElement.val()
+	var valueRead = inputElement.val().trim()
 	ur[property] = valueRead
 	
 	if (uw) {

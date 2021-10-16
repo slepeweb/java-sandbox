@@ -55,28 +55,13 @@ $(function() {
 	
 	_loginDialog = $('#login-dialog').dialog({
 		autoOpen: false,
-		height: 350,
+		height: 400,
 		width: 350,
 		modal: true,
 		title: 'Login',
 		open: function() {$('input[name=username]').focus()},	
 		buttons: {
-			Submit: function() {
-				var form = $('#login-dialog')
-				var u = {
-					username: form.find('input[name=username]').val(),
-					password: form.find('input[name=password]').val(),
-					'key': form.find('input[name=key]').val(),
-					'socketid': socket.id
-				}
-				
-				if (u.username && u.password && u.key) {
-					socket.emit('login-request', u)
-				}
-				else {
-					form.effect('bounce', {}, 1000)
-				}
-			},
+			Submit: _submitLoginForm,
 		},
 		close: function() {
 			$('#login-dialog form')[0].reset()
