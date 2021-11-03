@@ -39,6 +39,12 @@ public class AncestryPageController extends BaseController {
 	public static final String GALLERY_VIEW = "gallery";
 	public static final String RECORD_VIEW = "record";
 	
+	public static final String PERSON = "_person";
+	public static final String MENU = "_menu";
+	public static final String SUBMENU = "_subMenu";
+	public static final String BREADCRUMBS = "_breadcrumbs";
+	public static final String HISTORY = "_history";
+	
 	@Autowired private ItemService itemService;
 	@Autowired private SolrService4Ancestry solrService4Ancestry;
 	@Autowired private AncCookieService ancCookieService;
@@ -60,7 +66,7 @@ public class AncestryPageController extends BaseController {
 		return StringUtils.isNotBlank(req.getHeader("X-Static-Delivery"));
 	}
 
-	@ModelAttribute(value="_history")
+	@ModelAttribute(value=HISTORY)
 	public List<ItemIdentifier> breadcrumbTrail(HttpServletRequest req) {
 		Item i = (Item) req.getAttribute(ITEM);
 		List<ItemIdentifier> list = this.ancCookieService.getBreadcrumbsCookieValue(i.getSite(), req);
@@ -69,9 +75,9 @@ public class AncestryPageController extends BaseController {
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			@ModelAttribute("_site") Site site, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			@ModelAttribute(SITE) Site site, 
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "homepage", model);
@@ -84,15 +90,15 @@ public class AncestryPageController extends BaseController {
 		}
 		
 		model.addAttribute("_rootEntries", tops);
-		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));		
+		model.addAttribute(BREADCRUMBS, personBreadcrumbs(page));		
 		return page.getView();
 	}
 
 	@RequestMapping(value="/notfound")	
 	public String notfound(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			@ModelAttribute("_site") Site site, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			@ModelAttribute(SITE) Site site, 
 			ModelMap model) {	
 		
 		return error(i, shortSitename, site, model);
@@ -100,9 +106,9 @@ public class AncestryPageController extends BaseController {
 
 	@RequestMapping(value="/error")	
 	public String error(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
-			@ModelAttribute("_site") Site site, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			@ModelAttribute(SITE) Site site, 
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "error", model);
@@ -111,8 +117,8 @@ public class AncestryPageController extends BaseController {
 
 	@RequestMapping(value="/boy")	
 	public String boy(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
@@ -121,7 +127,7 @@ public class AncestryPageController extends BaseController {
 		page.setTitle(i.getName());
 		
 		Person subject = new Person(i);
-		model.addAttribute("_person", subject);
+		model.addAttribute(PERSON, subject);
 		
 		List<SvgSupport> svgs = new ArrayList<SvgSupport>();
 		svgs.add(new SvgSupport(subject, 0));
@@ -133,22 +139,22 @@ public class AncestryPageController extends BaseController {
 		}
 		
 		model.addAttribute("_svgList", svgs);		
-		model.addAttribute("_menu", createPersonMenu(i, subject, null));	
+		model.addAttribute(MENU, createPersonMenu(i, subject, null));	
 		
 		// Confusing - these _breadcrumbs form the hierarchy of ancestor boy/girl items
-		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));
+		model.addAttribute(BREADCRUMBS, personBreadcrumbs(page));
 		
 		// Whereas these 'proper' breadcrumbs identify the boy/girl click history !!!
 		// See also breadcrumbTrail() method, which sets the _history attribute for all other pages.
-		model.addAttribute("_history", this.ancCookieService.updateBreadcrumbsCookie(i, req, res));
+		model.addAttribute(HISTORY, this.ancCookieService.updateBreadcrumbsCookie(i, req, res));
 		
 		return page.getView();
 	}
 	
 	@RequestMapping(value="/girl")	
 	public String girl(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
@@ -158,44 +164,44 @@ public class AncestryPageController extends BaseController {
 	
 	@RequestMapping(value="/document")	
 	public String history(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "personHistory", model);
 		page.setTitle(i.getFieldValue("heading"));
 		
 		Person subject = new Person(i.getParent());
-		model.addAttribute("_person", subject);
-		model.addAttribute("_menu", createPersonMenu(i, subject, null));
-		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, subject.getDocuments(), null, null));
+		model.addAttribute(PERSON, subject);
+		model.addAttribute(MENU, createPersonMenu(i, subject, null));
+		model.addAttribute(SUBMENU, createPersonSubMenu(i, subject, subject.getDocuments(), null, null));
 		
-		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));
+		model.addAttribute(BREADCRUMBS, personBreadcrumbs(page));
 		return page.getView();
 	}	
 
 	@RequestMapping(value="/boy/gallery/{targetId}")	
 	public String boyGallery(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
 		
 		Person subject = new Person(i);
 		Page page = getStandardPage(i, shortSitename, GALLERY_VIEW, model);
 		
-		model.addAttribute("_person", subject);
-		model.addAttribute("_menu", createPersonMenu(i, subject, GALLERY_VIEW));
+		model.addAttribute(PERSON, subject);
+		model.addAttribute(MENU, createPersonMenu(i, subject, GALLERY_VIEW));
 		model.addAttribute("_gallery", subject.getGallery());
 		
-		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));
+		model.addAttribute(BREADCRUMBS, personBreadcrumbs(page));
 		return page.getView();
 	}	
 
 	@RequestMapping(value="/boy/record/{targetId}")	
 	public String boyRecord(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
 		
@@ -206,8 +212,8 @@ public class AncestryPageController extends BaseController {
 	
 	@RequestMapping(value="/girl/gallery/{targetId}")	
 	public String girlGallery(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
 		
@@ -216,8 +222,8 @@ public class AncestryPageController extends BaseController {
 
 	@RequestMapping(value="/girl/record/{targetId}")	
 	public String girlRecord(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
 		
@@ -226,8 +232,8 @@ public class AncestryPageController extends BaseController {
 	
 	@RequestMapping(value="/search", method=RequestMethod.POST)	
 	public String search(
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest request,
 			ModelMap model) {	
 				
@@ -248,7 +254,7 @@ public class AncestryPageController extends BaseController {
 	@RequestMapping(value="/homepage/diagram/{id}", method=RequestMethod.GET)	
 	public String diagram(
 			@PathVariable long id, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			ModelMap model) {	
 				
 		Item i = this.itemService.getItem(id);
@@ -269,12 +275,12 @@ public class AncestryPageController extends BaseController {
 		
 		Page page = getStandardPage(i, shortSitename, jspName, model);
 		
-		model.addAttribute("_person", subject);
-		model.addAttribute("_menu", createPersonMenu(i, subject, menuName));
-		model.addAttribute("_subMenu", createPersonSubMenu(i, subject, items, menuName, targetId));
+		model.addAttribute(PERSON, subject);
+		model.addAttribute(MENU, createPersonMenu(i, subject, menuName));
+		model.addAttribute(SUBMENU, createPersonSubMenu(i, subject, items, menuName, targetId));
 		model.addAttribute("_target", this.itemService.getItem(targetId).setLanguage(i.getLanguage()));
 		
-		model.addAttribute("_breadcrumbs", personBreadcrumbs(page));
+		model.addAttribute(BREADCRUMBS, personBreadcrumbs(page));
 		return page.getView();
 	}
 

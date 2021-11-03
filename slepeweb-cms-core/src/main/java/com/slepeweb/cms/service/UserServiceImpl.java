@@ -122,7 +122,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 
 	public List<Role> getRoles(Long userId) {
 		return this.jdbcTemplate.query(
-				"select r.id as roleid, r.name from user u, role r, user_role ur " +
+				"select r.id, r.name from user u, role r, user_role ur " +
 				"where ur.userid = u.id and ur.roleid = r.id and u.id = ? ", 
 				new Object[]{userId},
 				new RowMapperUtil.RoleMapper());

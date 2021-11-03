@@ -45,7 +45,7 @@ public class RoleServiceImpl extends BaseServiceImpl implements RoleService {
 			dbRecord.assimilate(r);
 			
 			this.jdbcTemplate.update(
-					"update role set name=? where role_id=?", 
+					"update role set name=? where id=?", 
 					dbRecord.getName(), dbRecord.getId());
 			
 			LOG.info(compose("Updated role", r));
@@ -57,7 +57,7 @@ public class RoleServiceImpl extends BaseServiceImpl implements RoleService {
 	}
 
 	public void delete(Long id) {
-		if (this.jdbcTemplate.update("delete from role where role_id = ?", id) > 0) {
+		if (this.jdbcTemplate.update("delete from role where id = ?", id) > 0) {
 			LOG.warn(compose("Deleted role", id));
 			//this.cacheEvictor.evict(h);
 		}
@@ -72,6 +72,6 @@ public class RoleServiceImpl extends BaseServiceImpl implements RoleService {
 	@Override
 	public Role get(Long id) {
 		return (Role) getFirstInList(this.jdbcTemplate.query(
-				"select * from role where role_id = ?", new Object[]{id}, new RowMapperUtil.RoleMapper()));
+				"select * from role where id = ?", new Object[]{id}, new RowMapperUtil.RoleMapper()));
 	}
 }

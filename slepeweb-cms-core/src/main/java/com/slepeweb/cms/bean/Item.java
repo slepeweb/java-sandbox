@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -36,6 +37,7 @@ public class Item extends CmsBean {
 	
 	// These properties pertain to access control
 	private boolean writeAccess, readAccess;
+	private User user;
 	
 	private Long id = -1L, origId;
 	private List<Link> links, parentLinks;
@@ -570,6 +572,15 @@ public class Item extends CmsBean {
 		if (this.links == null) {
 			this.links = getLinkService().getLinks(getId());
 			
+			/*
+			 * In CMSe and CMSd, you need read access to be able to see an item.
+			 * In CMSe, you additionally need write access to update an item.
+			 * Accessibility can only be determined given user details.
+			 */
+			if (getUser() != null) {
+				filterReadableLinks(this.links);
+			}
+			
 			// Set the language on each linked item
 			setLinkLanguage(this.links, getLanguage());
 		}
@@ -847,7 +858,7 @@ public class Item extends CmsBean {
 		return writeAccess;
 	}
 
-	public Item grantWriteAccess(boolean b) {
+	public Item setWriteAccess(boolean b) {
 		this.writeAccess = b;
 		return this;
 	}
@@ -856,9 +867,58 @@ public class Item extends CmsBean {
 		return readAccess;
 	}
 
-	public Item grantReadAccess(boolean b) {
+	public Item setReadAccess(boolean b) {
 		this.readAccess = b;
 		return this;
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public Item setUser(User user) {
+		this.user = user;
+		return this;
+	}
+
+	
+	/*
+	 * This method will filter out any child items in a list of links should the user
+	 * not have read access to them. This method would be used on sites where it was
+	 * known that not all items would be visible to all users.
+	 */
+	private List<Link> filterReadableLinks(List<Link> links) {
+		if (links != null && links.size() > 0) {
+			Iterator<Link> iter = links.iterator();
+			Link l;
+			
+			while (iter.hasNext()) {
+				l = iter.next();
+				l.getChild().setUser(getUser());
+				if (! getCmsService().getSiteAccessService().hasReadAccess(l.getChild())) {
+					iter.remove();
+				}
+			}
+		}
+		
+		return links;
+	}
+	
+	/*
+	private List<Item> filterReadableItems(List<Item> items, User u) {
+		if (items != null && items.size() > 0) {
+			Iterator<Item> iter = items.iterator();
+			Item i;
+			
+			while (iter.hasNext()) {
+				i = iter.next();
+				if (! getCmsService().getSiteAccessService().hasReadAccess(i, u)) {
+					iter.remove();
+				}
+			}
+		}
+		
+		return items;
+	}
+	*/
 }

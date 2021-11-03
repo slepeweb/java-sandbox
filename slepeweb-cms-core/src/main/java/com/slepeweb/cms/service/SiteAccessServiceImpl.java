@@ -23,31 +23,36 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	private Map<String, List<AccessRule>> readRules = new HashMap<String, List<AccessRule>>();
 	private Map<String, List<AccessRule>> writeRules = new HashMap<String, List<AccessRule>>();
 	
-	public boolean hasReadAccess(Item i, String springTemplatePath, User u) {
-		return hasAccess(i, springTemplatePath, u, getReadRules(i.getSite().getShortname()));
+	public boolean hasReadAccess(Item i) {
+		// Not all items have templates, particular images and the like
+		return hasReadAccess(i, i.getTemplate() != null ? i.getTemplate().getController() : null);
 	}
 
-	public boolean hasWriteAccess(Item i, User u) {
+	public boolean hasReadAccess(Item i, String springTemplatePath) {
+		return hasAccess(i, springTemplatePath, getReadRules(i.getSite().getShortname()));
+	}
+
+	public boolean hasWriteAccess(Item i) {
 		if (i != null) {
-			return hasAccess(i, u, getWriteRules(i.getSite().getShortname()));
+			return hasAccess(i, getWriteRules(i.getSite().getShortname()));
 		}
 		return false;
 	}
 
-	private boolean hasAccess(Item i, User u, List<AccessRule> rules) {
+	private boolean hasAccess(Item i, List<AccessRule> rules) {
 		return hasAccess(i, 
 				i.getTemplate() == null ? null : i.getTemplate().getController(), 
-				u, rules);
+				rules);
 	}
 	
-	private boolean hasAccess(Item i, String springTemplatePath, User u, List<AccessRule> rules) {
+	private boolean hasAccess(Item i, String springTemplatePath, List<AccessRule> rules) {
 		
 		// The first matching rule applies - rules should be ordered from most specific to least.
 		for (AccessRule rule : rules) {
 			if (itemMatchesRule(i, springTemplatePath, rule)) {
 				if (! rule.givesAccess()) {
 					// User does not have access UNLESS he has specified roles
-					return userRolesMatchRule(u, rule);
+					return userRolesMatchRule(i.getUser(), rule);
 				}
 				
 				return true;

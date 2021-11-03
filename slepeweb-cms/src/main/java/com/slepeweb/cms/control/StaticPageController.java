@@ -144,6 +144,8 @@ public class StaticPageController extends BaseController {
 		BufferedInputStream is = null;
 		
 		if (i != null) {
+			i.setUser(u);
+			
 			// This url corresponds to a CMS item. What is it's mime type?
 			String mimetype = i.getType().getMimeType();
 			si = new StaticItem(sourceUrl, mimetype, i.getBindings().size() > 0);

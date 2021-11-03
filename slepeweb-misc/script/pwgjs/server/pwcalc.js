@@ -2,12 +2,12 @@ class PwCalculator {
 	constructor() {
 	}
 	
-	overwriteKey(key, mask) {
+	overwriteKey(secretKey, mask) {
 		if (mask) {
-			var k = [... key]
+			var k = [... secretKey]
 			var m = [... mask]
 			for (var i = 0; i < m.length; i++) {
-				if (i >= key.length) {
+				if (i >= secretKey.length) {
 					break
 				}
 				
@@ -19,41 +19,34 @@ class PwCalculator {
 			return k.join('')
 		}
 		
-		return key
+		return secretKey
 	}
 	
-	// Example parameters: partyid=hmrc, key=abcdefgh, maxChars=10
-	calc(key, partyid, mask, maxChars) {
-		// Apply mask to key, if mask present
-		var maskedKey = this.overwriteKey(key, mask)
+	// Example parameters: accountName=hmrc, secretKey=abcdefgh, maxChars=10
+	calc(secretKey, accountName, mask, maxChars) {
+		// Overlay mask onto the secretKey, if mask not empty
+		var maskedKey = this.overwriteKey(secretKey, mask)
 		
-		var strlen = partyid.length
-		var lastChar = partyid.substring(strlen - 1).toUpperCase()
-		var alen = 4
+		var accountNameLength = accountName.length
+		var accountSliceLength = 4		
+		var remainder = accountNameLength % maskedKey.length
 		
-		var rem = strlen % maskedKey.length
+		// Numeric value to insert into result
+		var numericChar = remainder.toString()
 		
-		// index is the position where we substitute the uppercased character
-		var index
+		// Uppercase the last character in the account name
+		var uppercasedChar = accountName.substring(accountNameLength - 1).toUpperCase()
 		
-		// Is the partyid length string longer than the maskedKey ...?
-		if (strlen < maskedKey.length) {
-		    // ... No - it is less
-			index = strlen
-		}
-		else if (strlen > maskedKey.length) {
-			index = rem
-		}
-		else {
-			index = 0
-		}
-		
+		// This is the index where we overlay the uppercased character onto the account name
+		var uppercasedCharIndex = remainder == 0 ? maskedKey.length - 1 : remainder - 1
+
+		// partA is the processed account name
 		var partA = null
-		if (strlen > alen) {
-			partA = partyid.substring(0, alen)
+		if (accountNameLength > accountSliceLength) {
+			partA = accountName.substring(0, accountSliceLength)
 		}
 		else {
-			partA = partyid
+			partA = accountName
 		}
 		
 		var charmap = {
@@ -69,12 +62,13 @@ class PwCalculator {
 			partA = partA.replace(regex, charmap[item])
 		})
 		
-		partA = partA + rem.toString() + lastChar
-		var cursor = index == 0 ? 1 : index
-		var partB = maskedKey.substring(0, cursor - 1) + lastChar + maskedKey.substring(cursor)
+		partA = partA + numericChar + uppercasedChar
+		
+		// partB is the processed key
+		var partB = maskedKey.substring(0, uppercasedCharIndex) + uppercasedChar + maskedKey.substring(uppercasedCharIndex + 1)
 		
 		var result = partA + partB
-		if (partyid >= maskedKey) {
+		if (accountName >= maskedKey) {
 			result = partB + partA
 		}
 		

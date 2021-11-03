@@ -324,7 +324,7 @@ public class RowMapperUtil {
 	public static final class RoleMapper implements RowMapper<Role> {
 		public Role mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return CmsBeanFactory.makeRole().
-					setId(rs.getLong("roleid")).
+					setId(rs.getLong("id")).
 					setName(rs.getString("name"));
 		}
 	}

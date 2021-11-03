@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.component.Navigation;
 import com.slepeweb.cms.component.Navigation.Node;
 
@@ -32,12 +33,13 @@ public class NavigationController extends BaseController {
 			HttpServletRequest req) {	
 		
 		List<Navigation.Node> level0 = new ArrayList<Navigation.Node>();
+		User u = getUser(req);
 		
 		if (origId == null) {
 			Site site = this.cmsService.getSiteService().getSite(siteId);
-			if (site != null) {				
-				level0.add(dive(site.getItem("/")));
-				level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH)));
+			if (site != null) {
+				level0.add(dive(site.getItem("/").setUser(u)));
+				level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH).setUser(u)));
 				return level0;
 			}
 			else {
@@ -61,7 +63,8 @@ public class NavigationController extends BaseController {
 			return doLazyNavOneLevel(origId, siteId, req);
 		}
 		
-		Item item = this.getEditableVersion(origId, getUser(req));
+		User u = getUser(req);
+		Item item = this.getEditableVersion(origId, u);
 		String[] parts = item.getPath().substring(1).split("/");
 		final Vector<String> pathComponents = new Vector<String>(parts.length);
 		for (String s : parts) {
@@ -72,7 +75,7 @@ public class NavigationController extends BaseController {
 		Site site = item.getSite();
 		
 		// pathComponents is relative to the pseudo root item, which in this case is '/'
-		level0.add(dive(site.getItem("/"), pathComponents));
+		level0.add(dive(site.getItem("/").setUser(u), pathComponents));
 		
 		// The pseudo root for items in the 'Content' section is /content, so this
 		// component should NOT be in the pathComponents list, otherwise the main navigation
@@ -81,7 +84,7 @@ public class NavigationController extends BaseController {
 			pathComponents.remove(0);
 		}
 		
-		level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH), pathComponents));
+		level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH).setUser(u), pathComponents));
 		
 		return level0;		
 	}

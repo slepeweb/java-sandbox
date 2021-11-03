@@ -13,6 +13,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StringWrapper;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.LoglevelUpdateService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.ComponentService;
@@ -21,9 +22,10 @@ import com.slepeweb.site.service.NavigationService;
 @Controller
 public class BaseController {
 	public static Logger LOG = Logger.getLogger(BaseController.class);
-	public static final String USER = "_userOld";
+	public static final String USER = "_user";
 	public static final String ITEM = "_item";
 	public static final String SITE = "_site";
+	public static final String SHORT_SITENAME = "_shortSitename";
 	
 	@Autowired private ComponentService componentService;
 	@Autowired private LoglevelUpdateService loglevelUpdateService;
@@ -54,18 +56,18 @@ public class BaseController {
 		return s;
 	}
 	
-	@ModelAttribute(value="_shortSitename")
+	@ModelAttribute(value=SHORT_SITENAME)
 	protected String getShortSitename(HttpServletRequest req) {
 		Site s = (Site) req.getAttribute(SITE);
 		String shortName = s != null ? s.getShortname() : "";
-		LOG.trace(String.format("Model attribute (_shortSitename): [%s]", shortName));
+		LOG.trace(String.format("Model attribute (%s): [%s]", SHORT_SITENAME, shortName));
 		return shortName;
 	}
 	
-	@ModelAttribute(value="_user")
-	protected com.slepeweb.cms.bean.User getUser(HttpServletRequest req) {
-		com.slepeweb.cms.bean.User u = (com.slepeweb.cms.bean.User) req.getSession().getAttribute("_user");
-		LOG.trace(String.format("Model attribute (_user): [%s]", u));
+	@ModelAttribute(value=USER)
+	protected User getUser(HttpServletRequest req) {
+		User u = (User) req.getSession().getAttribute(USER);
+		LOG.trace(String.format("Model attribute (%s): [%s]", USER, u));
 		return u;
 	}
 	

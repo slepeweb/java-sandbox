@@ -84,9 +84,8 @@ public class CmsDeliveryServlet {
 				LOG.info(LogUtil.compose("Requesting", item));
 				String springTemplatePath = getTemplatePath(item, view);
 				item.setLanguage(language);
-				
-				User u = identifyUser(req);
-				redirector = accessibilityChecker(item, u, springTemplatePath);
+				item.setUser(identifyUser(req));
+				redirector = accessibilityChecker(item);
 				
 				if (redirector.isRequired()) {
 					res.sendRedirect(redirector.getPath());
@@ -453,11 +452,11 @@ public class CmsDeliveryServlet {
 	}
 	
 	// Returns true if resource is accessible
-	private Redirector accessibilityChecker(Item i, User u, String springTemplatePath) {
+	private Redirector accessibilityChecker(Item i) {
 		
 		Redirector r = new Redirector();
 
-		if (! this.siteAccessService.hasReadAccess(i, springTemplatePath, u)) {
+		if (! this.siteAccessService.hasReadAccess(i)) {
 			if (! i.getPath().equals(SiteAccessService.NOT_AUTHORISED_PATH)) {
 				// Redirect to not-authorised page
 				r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccessService.NOT_AUTHORISED_PATH));

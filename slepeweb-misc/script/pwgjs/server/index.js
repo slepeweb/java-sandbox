@@ -67,7 +67,12 @@ io.on('connection', (socket) => {
 						
 						pwdb.findOne(arg.owner, arg.company).then((doc) => {
 							if (doc) {
-								[doc.password, doc.chunked] = pwCalculatorService.calc(sesh.key, doc.partyid, doc.mask, doc.maxchars)
+								if (! doc.password) {
+									[doc.password, doc.chunked] = pwCalculatorService.calc(sesh.key, doc.partyid, doc.mask, doc.maxchars)
+								}
+								else {
+									doc.chunked = ''
+								}
 								socket.emit('company-lookup-response', doc)
 							}
 							else {

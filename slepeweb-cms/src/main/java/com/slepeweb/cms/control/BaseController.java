@@ -123,7 +123,8 @@ public class BaseController {
 	
 	protected Item getEditableVersion(Long origId, User u, boolean throwable) throws RuntimeException {
 		Item i = this.cmsService.getItemService().getEditableVersion(origId);
-		checkWriteAccess(i, u, throwable);
+		i.setUser(u);
+		checkWriteAccess(i, throwable);
 		return i;
 	}
 	
@@ -133,12 +134,13 @@ public class BaseController {
 	
 	protected Item getEditableVersion(Site s, String path, User u, boolean throwable) throws RuntimeException {
 		Item i = this.cmsService.getItemService().getEditableVersion(s.getId(), path);
-		checkWriteAccess(i, u, throwable);
+		i.setUser(u);
+		checkWriteAccess(i, throwable);
 		return i;
 	}
 	
-	protected boolean checkWriteAccess(Item i, User u, boolean throwable) throws RuntimeException {
-		i.grantWriteAccess(this.cmsService.getSiteAccessService().hasWriteAccess(i, u));	
+	protected boolean checkWriteAccess(Item i, boolean throwable) throws RuntimeException {
+		i.setWriteAccess(this.cmsService.getSiteAccessService().hasWriteAccess(i));	
 		
 		if (throwable && ! i.isWriteAccessGranted()) {
 			throw new RuntimeException("No write access");
@@ -147,8 +149,8 @@ public class BaseController {
 		return i.isWriteAccessGranted();
 	}
 	
-	protected boolean checkReadAccess(Item i, User u, boolean throwable) throws RuntimeException {
-		i.grantReadAccess(this.cmsService.getSiteAccessService().hasReadAccess(i, null, u));	
+	protected boolean checkReadAccess(Item i, boolean throwable) throws RuntimeException {
+		i.setReadAccess(this.cmsService.getSiteAccessService().hasReadAccess(i, null));	
 		
 		if (throwable && ! i.isReadAccessGranted()) {
 			throw new RuntimeException("No read access");

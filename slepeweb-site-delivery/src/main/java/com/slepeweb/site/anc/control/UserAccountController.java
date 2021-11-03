@@ -50,8 +50,8 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/login")
 	public String login (
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) throws IOException {	
@@ -96,8 +96,8 @@ public class UserAccountController extends BaseController {
 	 */
 	@RequestMapping(value="/register/form")	
 	public String registerForm (
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	
 				
@@ -171,8 +171,8 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/profile")	
 	public String profileUpdate (
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	
 				
@@ -218,8 +218,8 @@ public class UserAccountController extends BaseController {
 	 */
 	@RequestMapping(value="/register/approve/{userId}")	
 	public String registerApprove (
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable Long userId,
 			HttpServletResponse res,
 			ModelMap model) throws IOException {	
@@ -279,8 +279,8 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/password/reset/{secret}")	
 	public String forgottenReset (
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable String secret,
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	
@@ -291,8 +291,8 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/register/password/{secret}")	
 	public String registerPassword (
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable String secret,
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	
@@ -339,8 +339,8 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/password/forgotten")	
 	public String forgottenPassword (
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	
 				
@@ -408,8 +408,8 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/changepwd")	
 	public String changePasswordForm (
-			@ModelAttribute("_item") Item i, 
-			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	
 				

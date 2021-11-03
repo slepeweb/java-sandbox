@@ -19,6 +19,7 @@ import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.LoginService;
 
@@ -74,14 +75,18 @@ public class PageController extends BaseController {
 		}
 
 		Item i = null;
+		User u = getUser(req);
 		List<ItemIdentifier> history = this.cookieService.getBreadcrumbsCookieValue(site, req);
 		if (history.size() > 0) {
-			i = this.cmsService.getItemService().getItem(history.get(0).getItemId());
+			i = getEditableVersion(history.get(0).getItemId(), u);
 		}
 		else {
 			i = site.getItem("/");
+			if (i != null) {
+				i.setUser(getUser(req));
+			}
 		}
-
+		
 		// Get a history of visited items
 		model.addAttribute("_history", history);
 		model.addAttribute("editingItem", i);
