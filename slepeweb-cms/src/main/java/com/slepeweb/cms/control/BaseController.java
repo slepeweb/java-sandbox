@@ -19,7 +19,6 @@ import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
-import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
@@ -124,10 +123,11 @@ public class BaseController {
 	protected Item getEditableVersion(Long origId, User u, boolean throwable) throws RuntimeException {
 		Item i = this.cmsService.getItemService().getEditableVersion(origId);
 		i.setUser(u);
-		checkWriteAccess(i, throwable);
+		checkAccess(i, throwable);
 		return i;
 	}
 	
+	/*
 	protected Item getEditableVersion(Site s, String path, User u) throws RuntimeException {
 		return getEditableVersion(s, path, u, false);
 	}
@@ -135,28 +135,19 @@ public class BaseController {
 	protected Item getEditableVersion(Site s, String path, User u, boolean throwable) throws RuntimeException {
 		Item i = this.cmsService.getItemService().getEditableVersion(s.getId(), path);
 		i.setUser(u);
-		checkWriteAccess(i, throwable);
+		checkAccess(i, throwable);
 		return i;
 	}
+	*/
 	
-	protected boolean checkWriteAccess(Item i, boolean throwable) throws RuntimeException {
-		i.setWriteAccess(this.cmsService.getSiteAccessService().hasWriteAccess(i));	
+	protected boolean checkAccess(Item i, boolean throwable) throws RuntimeException {
+		boolean access = i.isAccessible();	
 		
-		if (throwable && ! i.isWriteAccessGranted()) {
-			throw new RuntimeException("No write access");
+		if (throwable && ! access) {
+			throw new RuntimeException("No access to item");
 		}
 		
-		return i.isWriteAccessGranted();
-	}
-	
-	protected boolean checkReadAccess(Item i, boolean throwable) throws RuntimeException {
-		i.setReadAccess(this.cmsService.getSiteAccessService().hasReadAccess(i, null));	
-		
-		if (throwable && ! i.isReadAccessGranted()) {
-			throw new RuntimeException("No read access");
-		}
-		
-		return i.isReadAccessGranted();
-	}
+		return access;
+	}	
 }
 

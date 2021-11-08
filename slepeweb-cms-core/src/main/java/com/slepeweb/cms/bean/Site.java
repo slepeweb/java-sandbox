@@ -13,6 +13,7 @@ public class Site extends CmsBean {
 	private String name, shortname, language, extraLanguages;
 	private String[] extraLanguagesArray;
 	private Long id;
+	private boolean secured = true;
 		
 	public void assimilate(Object obj) {
 		if (obj instanceof Site) {
@@ -20,7 +21,8 @@ public class Site extends CmsBean {
 			setName(s.getName());
 			setShortname(s.getShortname()).
 			setLanguage(s.getLanguage()).
-			setExtraLanguages(s.getExtraLanguages());
+			setExtraLanguages(s.getExtraLanguages()).
+			setSecured(s.isSecured());
 		}
 	}
 	
@@ -159,6 +161,15 @@ public class Site extends CmsBean {
 		}
 	}
 
+	public boolean isSecured() {
+		return secured;
+	}
+
+	public Site setSecured(boolean secured) {
+		this.secured = secured;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -166,6 +177,7 @@ public class Site extends CmsBean {
 		result = prime * result + ((extraLanguages == null) ? 0 : extraLanguages.hashCode());
 		result = prime * result + ((language == null) ? 0 : language.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + (secured ? 1231 : 1237);
 		result = prime * result + ((shortname == null) ? 0 : shortname.hashCode());
 		return result;
 	}
@@ -193,6 +205,8 @@ public class Site extends CmsBean {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (secured != other.secured)
 			return false;
 		if (shortname == null) {
 			if (other.shortname != null)

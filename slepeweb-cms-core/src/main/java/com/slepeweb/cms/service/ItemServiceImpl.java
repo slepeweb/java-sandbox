@@ -37,7 +37,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private static final String MOVE_OVER = "over";
 
 	private final static String SELECT_TEMPLATE = 
-			"select i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, " +
+			"select i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, s.secured, " +
 			"it.id as typeid, it.name as typename, it.mimetype, it.privatecache, it.publiccache, " +
 			"t.id as templateid, t.name as templatename, t.forward " +
 			"from item i " +

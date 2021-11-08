@@ -7,7 +7,7 @@ public class AccessRule extends CmsBean {
 	private static final long serialVersionUID = 3525217730680353953L;
 	private Long id;
 	private String name, mode, siteShortname, itemTypePattern, templatePattern, itemPathPattern, rolePattern;
-	private boolean access;
+	private boolean access, enabled;
 
 	@Override
 	public String toString() {
@@ -137,6 +137,15 @@ public class AccessRule extends CmsBean {
 
 	public AccessRule setAccess(boolean access) {
 		this.access = access;
+		return this;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public AccessRule setEnabled(boolean enabled) {
+		this.enabled = enabled;
 		return this;
 	}
 

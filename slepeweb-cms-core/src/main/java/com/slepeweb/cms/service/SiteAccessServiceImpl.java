@@ -18,44 +18,51 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	
 //	private static Logger LOG = Logger.getLogger(HostServiceImpl.class);	
 	
+	@Autowired private CmsService cmsService;
 	@Autowired private AccessService accessService;
 
 	private Map<String, List<AccessRule>> readRules = new HashMap<String, List<AccessRule>>();
 	private Map<String, List<AccessRule>> writeRules = new HashMap<String, List<AccessRule>>();
 	
-	public boolean hasReadAccess(Item i) {
-		// Not all items have templates, particular images and the like
-		return hasReadAccess(i, i.getTemplate() != null ? i.getTemplate().getController() : null);
-	}
-
-	public boolean hasReadAccess(Item i, String springTemplatePath) {
-		return hasAccess(i, springTemplatePath, getReadRules(i.getSite().getShortname()));
-	}
-
-	public boolean hasWriteAccess(Item i) {
-		if (i != null) {
-			return hasAccess(i, getWriteRules(i.getSite().getShortname()));
-		}
-		return false;
-	}
-
-	private boolean hasAccess(Item i, List<AccessRule> rules) {
-		return hasAccess(i, 
-				i.getTemplate() == null ? null : i.getTemplate().getController(), 
-				rules);
+	public boolean isAccessible(Item i) {
+		String springTemplatePath = i.getTemplate() != null ? i.getTemplate().getController() : null;
+		return isAccessible(i, springTemplatePath);
 	}
 	
-	private boolean hasAccess(Item i, String springTemplatePath, List<AccessRule> rules) {
-		
+	public boolean isAccessible(Item i, String springTemplatePath) {
+		if (this.cmsService.isEditorialContext()) {
+			return isAccessible(i, null, getWriteRules(i.getSite().getShortname()));
+		}
+		else {
+			if (i.getSite().isSecured()) {
+				return isAccessible(i, springTemplatePath, getReadRules(i.getSite().getShortname()));
+			}
+			else {
+				return true;
+			}
+		}
+	}
+	
+	private boolean isAccessible(Item i, String springTemplatePath, List<AccessRule> rules) {		
 		// The first matching rule applies - rules should be ordered from most specific to least.
 		for (AccessRule rule : rules) {
 			if (itemMatchesRule(i, springTemplatePath, rule)) {
-				if (! rule.givesAccess()) {
-					// User does not have access UNLESS he has specified roles
-					return userRolesMatchRule(i.getUser(), rule);
+				
+				// This rule matches. All later rules in the list are ignored.
+				if (rule.givesAccess()) {
+					/*
+					 * ie. the 'access' column in db has value 'true', which means
+					 * the rule is satisfied, and we don't need to consult the 'role' column.
+					 */
+					return true;
 				}
 				
-				return true;
+				/*
+				 * So, the 'access' column in db has value 'false', which means
+				 * we must now test whether the user has the role specified in the 'role' column.
+				 * User does NOT get access by this rule UNLESS he has specified role.
+				 */
+				return userRolesMatchRule(i.getUser(), rule);
 			}
 		}
 			

@@ -53,13 +53,16 @@ public class RowMapperUtil {
 		}
 	}
 	
-	private static Site mapSite(ResultSet rs, String id, String name, String shortname) throws SQLException {
+	private static Site mapSite(ResultSet rs, String id, String name, String shortname) 
+			throws SQLException {
+		
 		return CmsBeanFactory.makeSite().
 				setId(rs.getLong(id)).
 				setName(rs.getString(name)).
 				setShortname(rs.getString(shortname)).
 				setLanguage(rs.getString("language")).
-				setExtraLanguages(rs.getString("xlanguages"));
+				setExtraLanguages(rs.getString("xlanguages")).
+				setSecured(rs.getBoolean("secured"));
 	}
 	
 	public static final class ItemTypeMapper implements RowMapper<ItemType> {
@@ -303,7 +306,8 @@ public class RowMapperUtil {
 					setItemTypePattern(rs.getString("itemtype")).
 					setTemplatePattern(rs.getString("template")).
 					setItemPathPattern(rs.getString("path")).
-					setAccess(rs.getBoolean("access"));
+					setAccess(rs.getBoolean("access")).
+					setEnabled(rs.getBoolean("enabled"));
 		}
 	}
 	

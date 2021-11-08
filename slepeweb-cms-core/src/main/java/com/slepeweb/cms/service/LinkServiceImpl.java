@@ -24,7 +24,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	private static List<Link> EMPTY_LIST = new ArrayList<Link>();
 	
 	private static String CHILD_SELECT_TEMPLATE = 
-			"select i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, " +
+			"select i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, s.secured, " +
 			"it.id as typeid, it.name as typename, it.mimetype, it.privatecache, it.publiccache, " +
 			"l.parentid, lt.name as linktype, ln.name as linkname, l.ordering, l.data, " +
 			"t.id as templateid, t.name as templatename, t.forward " +

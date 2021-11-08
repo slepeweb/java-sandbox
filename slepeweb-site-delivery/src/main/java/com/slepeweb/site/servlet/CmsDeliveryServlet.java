@@ -42,7 +42,6 @@ import com.slepeweb.common.util.ImageUtil;
 @Component
 public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
-	@Autowired private SiteAccessService siteAccessService;
 	
 	private final Object buffPoolLock = new Object();
 	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
@@ -456,7 +455,7 @@ public class CmsDeliveryServlet {
 		
 		Redirector r = new Redirector();
 
-		if (! this.siteAccessService.hasReadAccess(i)) {
+		if (! i.isAccessible()) {
 			if (! i.getPath().equals(SiteAccessService.NOT_AUTHORISED_PATH)) {
 				// Redirect to not-authorised page
 				r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccessService.NOT_AUTHORISED_PATH));

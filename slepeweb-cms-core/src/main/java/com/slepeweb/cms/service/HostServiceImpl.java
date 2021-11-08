@@ -16,7 +16,7 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	private static Logger LOG = Logger.getLogger(HostServiceImpl.class);
 	
 	private final static String SELECT_TEMPLATE = 
-			"select h.id, h.name, h.protocol, h.port, h.type, s.id as siteid, s.name as sitename, s.shortname, s.language, s.xlanguages " +
+			"select h.id, h.name, h.protocol, h.port, h.type, s.id as siteid, s.name as sitename, s.shortname, s.language, s.xlanguages, s.secured " +
 			"from host h " +
 			"join site s on h.siteid = s.id " +
 			"where %s";

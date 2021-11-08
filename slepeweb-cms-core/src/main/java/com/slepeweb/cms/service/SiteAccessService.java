@@ -6,7 +6,6 @@ public interface SiteAccessService {
 	final static String LOGIN_PATH = "/login";
 	final static String NOT_AUTHORISED_PATH = "/login/notauthorised";
 	
-	boolean hasReadAccess(Item i);
-	boolean hasReadAccess(Item i, String springTemplatePath);
-	boolean hasWriteAccess(Item i);
+	boolean isAccessible(Item i);
+	boolean isAccessible(Item i, String springTemplatePath);
 }

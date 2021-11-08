@@ -83,8 +83,8 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 	
 	private List<AccessRule> getList(String siteShortname, String mode) {
 		return this.jdbcTemplate.query(
-				String.format("select * from access where site=? and mode=? order by name"), 
-				new Object[] {siteShortname, mode}, new RowMapperUtil.AccessMapper());
+				String.format("select * from access where site=? and mode=? and enabled=? order by name"), 
+				new Object[] {siteShortname, mode, true}, new RowMapperUtil.AccessMapper());
 	}
 	
 	@Cacheable(value="serviceCache")

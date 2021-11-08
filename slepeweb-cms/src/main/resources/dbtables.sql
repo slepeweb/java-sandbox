@@ -34,6 +34,7 @@ create table site
 	shortname varchar(8),
 	language varchar(2),
 	xlanguages varchar(16),
+	secured boolean default true,
 	primary key (id),
 	unique key idx_site_name (name),
 	unique key idx_site_shortname (shortname),
@@ -285,8 +286,10 @@ create table access
 	path varchar(64),
 	role varchar(64),
 	access boolean,
+	enabled boolean,
 	primary key (id),
-	unique key idx_access_site_mode_name (site, mode, name)
+	unique key idx_access_site_mode_name (site, mode, name),
+	index idx_enabled (site, mode, enabled)
 ) ENGINE=InnoDB;
 
 create table role

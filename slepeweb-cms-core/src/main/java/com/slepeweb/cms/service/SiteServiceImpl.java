@@ -43,8 +43,8 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	
 	private Site insertSite(Site s) throws ResourceException {
 		this.jdbcTemplate.update(
-				"insert into site (name, shortname, language, xlanguages) values (?, ?, ?, ?)", 
-				s.getName(), s.getShortname(), s.getLanguage(), s.getExtraLanguages());
+				"insert into site (name, shortname, language, xlanguages, secured) values (?, ?, ?, ?, ?)", 
+				s.getName(), s.getShortname(), s.getLanguage(), s.getExtraLanguages(), s.isSecured());
 		
 		s.setId(getLastInsertId());	
 		
@@ -69,8 +69,9 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 			dbRecord.assimilate(site);
 			
 			this.jdbcTemplate.update(
-					"update site set name = ?, shortname = ?, language = ?, xlanguages = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getShortname(), dbRecord.getLanguage(), dbRecord.getExtraLanguages(), dbRecord.getId());
+					"update site set name = ?, shortname = ?, language = ?, xlanguages = ?, secured = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getShortname(), dbRecord.getLanguage(), 
+					dbRecord.getExtraLanguages(), dbRecord.isSecured(), dbRecord.getId());
 			
 			LOG.info(compose("Updated site", site));
 		}
@@ -86,12 +87,6 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 			this.cacheEvictor.evict(s);
 		}
 	}
-
-//	public void deleteSite(String name) {
-//		if (this.jdbcTemplate.update("delete from site where name = ?", name) > 0) {
-//			LOG.warn(compose("Deleted site", name));
-//		}
-//	}
 
 	@Cacheable(value="serviceCache")
 	public Site getSite(String name) {
