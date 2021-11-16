@@ -6,6 +6,7 @@ _cms.dialog = {
 	confirmFieldUpdate: {obj: null},
 	confirmTrash: {obj: null},
 	addLink: {obj: null},
+	linkGuidance: {obj: null},
 	searchresults: {obj: null},
 	sel: {
 		LINK_NOT_DEFINED: "#link-not-defined-dialog",
@@ -17,12 +18,12 @@ _cms.dialog = {
 	}
 }
 
-_cms.dialog.define = function(title, selector, width, height, buttons, close) {
+_cms.dialog.define = function(title, selector, width, height, buttons, close, isModal = true) {
 	var obj = $(selector).dialog({
 		  autoOpen: false,
 		  minHeight: height,
 		  minWidth: width,
-		  modal: true,
+		  modal: isModal,
 		  title: title,
 		  buttons: buttons,
 		  close: close,
@@ -111,6 +112,21 @@ _cms.dialog.searchresults.define = function() {
 			"Search results", "#searchresults-container", 300, 600, buttons, close);
 }
 
+_cms.dialog.linkGuidance.define = function() {	
+	var close = function() {
+		_cms.dialog.close(_cms.dialog.linkGuidance);
+	}
+	
+	var buttons = {
+		Close: function() {
+			close();
+		}
+	}
+	
+	_cms.dialog.linkGuidance.obj = _cms.dialog.define(
+			"Link data guidance", "#link-guidance", 300, 600, buttons, close, false);
+}
+
 _cms.dialog.warning = function(title, d, selector) {
 	  var close = function() {
 		  _cms.dialog.close(d);
@@ -130,6 +146,7 @@ _cms.dialog.onpageload = function() {
 	_cms.dialog.confirmFieldUpdate.define();
 	_cms.dialog.addLink.define();
 	_cms.dialog.searchresults.define();
+	_cms.dialog.linkGuidance.define();
 	_cms.dialog.warning("Link not adequately defined", _cms.dialog.linkNotDefined, _cms.dialog.sel.LINK_NOT_DEFINED);
 	_cms.dialog.warning("Duplicate link target", _cms.dialog.duplicateTarget, _cms.dialog.sel.DUPLICATE_TARGET);
 	_cms.dialog.warning("Illegal target", _cms.dialog.illegalTarget, _cms.dialog.sel.ILLEGAL_TARGET);

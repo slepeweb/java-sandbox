@@ -45,6 +45,7 @@ import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkNameOption;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.RestResponse;
@@ -909,22 +910,22 @@ public class RestController extends BaseController {
 	
 	@RequestMapping(value="/linknames/{siteId}/{linkType}", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public List<String> getLinkNameOptions(
+	public List<LinkNameOption> getLinkNameOptions(
 			@PathVariable long siteId, @PathVariable String linkType, ModelMap model) {	
 		
-		List<String> names = new ArrayList<String>();
+		List<LinkNameOption> options = new ArrayList<LinkNameOption>();
 		
 		if (! linkType.equals("unknown")) {
 			LinkType lt = this.cmsService.getLinkTypeService().getLinkType(linkType);
 			
 			if (lt != null) {
 				for (LinkName ln : this.cmsService.getLinkNameService().getLinkNames(siteId, lt.getId())) {
-					names.add(ln.getName());
+					options.add(new LinkNameOption(ln.getName(), ln.getGuidance()));
 				}
 			}
 		}
 		
-		return names;
+		return options;
 	}
 	
 	@RequestMapping(value="/item/{origId}/name", method=RequestMethod.POST, produces="application/json")

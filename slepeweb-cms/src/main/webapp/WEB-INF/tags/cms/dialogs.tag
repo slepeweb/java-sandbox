@@ -25,7 +25,7 @@
 <div id="link-data-format-dialog" class="hide cms-dialog">
   <p>
     <span class="ui-icon ui-icon-circle-check cms-icon"></span>
-    The link data format looks incorrect - please refer to documentation.
+    The link data format is incorrect - please click on help icon for guidance.
   </p>
 </div>
 
@@ -48,6 +48,7 @@
 	<div id="leftnav"></div>
 </div>
 
+<%-- This more complicated dialog deserves its own tag --%>
 <edit:links-addlink />
 
 <div id="searchresults-container" class="hide">

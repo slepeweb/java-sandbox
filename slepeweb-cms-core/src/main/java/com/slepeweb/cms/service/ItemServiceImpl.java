@@ -79,12 +79,15 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			saveLinks(i, dbRecord);
 		}
 		
-		// Update the Solr index if item is searchable, otherwise, remove it from the index
-		boolean isIndexable = i.isSearchable() && i.isPage() && i.isPublished();
-		
-		if (isIndexable) {
+		/* Update the Solr index if item is searchable, published, and NOT an inline.
+		 * Otherwise, remove it from the index.
+		 * This means that the editorial app will only search published content. 
+		 * That is, it will not see un-published content in the solr database.
+		 */
+		if (i.isSearchable() && i.isPage() && i.isPublished()) {
 			this.solrService4Cms.save(i);
 		}
+		
 		/* 
 		 * We might have created a new item as a result of versioning,
 		 * in which case we wouldn't want to remove any Solr documents for previous

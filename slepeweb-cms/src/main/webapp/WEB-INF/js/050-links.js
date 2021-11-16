@@ -200,6 +200,18 @@ _cms.links.behaviour.navigate = function() {
 	});
 }
 
+_cms.links.behaviour.linkguidanceicon = function() {
+	$("#link-guidance-icon").click(function(e){
+		_cms.dialog.open(_cms.dialog.linkGuidance);
+	});
+}
+
+_cms.links.behaviour.linknamechange = function() {
+	$(_cms.links.selrel.LINKNAME_SELECT).change(function(e){
+		_cms.links.repopulateGuidance($(this).val());
+	});
+}
+
 _cms.links.identifyHiddenLinkDataList = function(sortableLinks) {
 	var links = [];
 	var span;
@@ -340,27 +352,71 @@ _cms.links.setLinkForm = function(data) {
 };
 
 _cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
-	var selector = $(_cms.links.sel.LINKNAME_SELECT);
-	
-	// currentLinkname is not set for new links
-	if (! currentLinkname) {
-		currentLinkname = "std";
-	}
-	
 	$.ajax(_cms.ctx + "/rest/linknames/" + _cms.siteId + "/" + linkType, {
 		type: "POST",
 		cache: false,
 		dataType: "json",
-		success: function(result, status, z) {
+		success: function(options, status, z) {
+			var selector = $(_cms.links.sel.LINKNAME_SELECT);
+			var guidanceListDiv = $("#link-guidance-list");
+			var guidance, guidanceObj;
+	
+			// currentLinkname is not set for new links
+			if (! currentLinkname) {
+				currentLinkname = "std";
+			}
+				
 			selector.empty();
+			guidanceListDiv.empty();
+			
 			selector.append("<option value='unknown'>Choose ...</option>");
-			for (var i = 0; i < result.length; i++) {
-				selector.append("<option value='" + result[i] + "'>" + result[i] + "</option>");
+			for (var i = 0; i < options.length; i++) {
+				selector.append(`<option value="${options[i].name}">${options[i].name}</option>`);
+				if (options[i].guidance) {
+					guidanceObj = JSON.parse(options[i].guidance)
+					guidance = "";
+					
+					if (guidanceObj.heading) {
+						guidance += `<h2>${guidanceObj.heading}</h2>`;
+					}
+					
+					if (guidanceObj.teaser) {
+						guidance += `<p>${guidanceObj.teaser}</p>`;
+					}
+					
+					if (guidanceObj.format) {
+						guidance += `<h3>Format</h3><p>${guidanceObj.format}</p>`;
+					}
+					
+					if (guidanceObj.examples && guidanceObj.examples.length > 0) {
+						guidance += `<h3>Examples</h3><table border="2">`;
+						for (var j = 0; j < guidanceObj.examples.length; j++) {
+							guidance += `<tr><td>${guidanceObj.examples[j].eg}</td><td>${guidanceObj.examples[j].explain}</td></tr>`;
+						}
+						guidance += "</table>";
+					}
+					
+					if (guidanceObj.details && guidanceObj.details.length > 0) {
+						guidance += `<h3>Details</h3><ul>`;
+						for (var j = 0; j < guidanceObj.details.length; j++) {
+							guidance += `<li>${guidanceObj.details[j]}</li>`;
+						}
+						guidance += `</ul>`;
+					}
+					
+					if (guidanceObj.regexp) {
+						guidance += `<p class="regexp hide">${guidanceObj.regexp}</p>`;
+					}
+				}
+				else {
+					guidance = "";
+				}
+				
+				guidanceListDiv.append(`<div id="link-guidance-${options[i].name}">${guidance}</div>`);
 			}
 			
-			if (currentLinkname) {
-				selector.val(currentLinkname);
-			}
+			selector.val(currentLinkname);
+			_cms.links.repopulateGuidance(currentLinkname);
 		}
 	});
 };
@@ -368,6 +424,39 @@ _cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
 _cms.links.behaviour.sortable = function() { 
 	$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).sortable();
 	$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).disableSelection();
+}
+
+_cms.links.getLinkGuidance = function(linkname) {
+	return $(`#link-guidance-${linkname}`).html();
+}
+
+_cms.links.getCurrentGuidance = function() {
+	return $('#link-guidance').html();
+}
+
+_cms.links.getCurrentGuidanceRegexp = function() {
+	return $('#link-guidance .regexp').html();
+}
+
+_cms.links.getLinkData = function() {
+	return $(_cms.links.selrel.LINKDATA_INPUT).val();
+}
+
+_cms.links.repopulateGuidance = function(linkName) {
+	var linkDataInput = $(_cms.links.selrel.LINKDATA_INPUT);
+	var guidance = _cms.links.getLinkGuidance(linkName);
+	
+	if (guidance) {
+		linkDataInput.removeAttr("disabled");
+	}
+	else {
+		linkDataInput.attr("disabled", "disabled");
+		guidance = "Link data ignored for this link type/subtype";
+	}
+	
+	$("#link-guidance").html(guidance);
+	// p=/^[mp]\.\s*(\d{1,2}\/)?(\d{1,2}\/)?(\d{4})?(,?\s*)?.*?$/i
+	$("#link-guidance-regexp").html(_cms.links.getCurrentGuidanceRegexp());
 }
 
 _cms.links.activateSaveButton = function(activate) {
@@ -409,11 +498,15 @@ _cms.links.check_for_use = function() {
 		error = true;
 	}
 	
+			
 	if (! error) {
-		var fn = eval("_cms.links.validate.linkdata." + _cms.siteShortname);
-		if (fn) {
-			var result = fn(linkType, linkName, linkData);
-			if (! result.ok) {
+		// Check link data is formatted correctly
+		var regexpStr = _cms.links.getCurrentGuidanceRegexp();
+		var linkData = _cms.links.getLinkData();
+		
+		if (regexpStr && linkData) {
+			var regexp = new RegExp(regexpStr, "i");
+			if (! regexp.test(linkData)) {
 				_cms.dialog.open(_cms.dialog.badLinkDataFormat);
 				error = true;
 			}
@@ -580,6 +673,8 @@ _cms.links.shortcut.settings = function() {
 _cms.links.onpageload = function() {
 	_cms.links.behaviour.changetype();
 	_cms.links.behaviour.itempicker();
+	_cms.links.behaviour.linkguidanceicon();
+	_cms.links.behaviour.linknamechange();
 }
 
 // Behaviours to apply once html is loaded/reloaded

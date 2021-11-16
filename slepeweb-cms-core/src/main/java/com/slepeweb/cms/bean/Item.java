@@ -873,7 +873,7 @@ public class Item extends CmsBean {
 	 * known that not all items would be visible to all users.
 	 */
 	private List<Link> filterReadableLinks(List<Link> links) {
-		if (this.getSite().isSecured()) {
+		if (getCmsService().isEditorialContext() || getSite().isSecured()) {
 			if (links != null && links.size() > 0) {
 				Iterator<Link> iter = links.iterator();
 				Link l;

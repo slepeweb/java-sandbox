@@ -42,6 +42,7 @@
 		<div class="ff">
 			<label>Data: </label>
 			<input name="linkdata" value="" />
+			<span id="link-guidance-icon"><i class="far fa-question-circle"></i></span>
 		</div>
 					
 		<div class="ff">
@@ -54,8 +55,10 @@
 		<input type="hidden" name="state" value="0" />
 		<input type="hidden" name="childId" value="-1" />
 	</div>	
-		
 </div>
+	
+<div id="link-guidance-list" class="hide"></div>
+<div id="link-guidance"></div>
 
 <div id="link-template" class="hide">
 	<div class="sortable-link changed-link ui-state-default">
