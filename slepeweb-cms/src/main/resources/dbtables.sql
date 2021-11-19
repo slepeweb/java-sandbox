@@ -48,7 +48,7 @@ create table host
 	port int,
 	type enum ('staging', 'live', 'publicstaging', 'publiclive'),
 	primary key (id),
-	unique key idx_host_name (name),
+	unique key idx_host_name_port_type (name, port, type),
 	constraint foreign key (siteid) references site(id) on delete cascade
 ) ENGINE=InnoDB;
 

@@ -25,7 +25,7 @@
 <div id="link-data-format-dialog" class="hide cms-dialog">
   <p>
     <span class="ui-icon ui-icon-circle-check cms-icon"></span>
-    The link data format is incorrect - please click on help icon for guidance.
+    The link data format is incorrect - please close this dialog and click on help icon for guidance.
   </p>
 </div>
 

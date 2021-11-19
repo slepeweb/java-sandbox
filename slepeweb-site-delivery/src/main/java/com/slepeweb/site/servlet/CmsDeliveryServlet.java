@@ -1,19 +1,13 @@
 package com.slepeweb.site.servlet;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,7 +20,6 @@ import org.springframework.ui.ModelMap;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Redirector;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StringWrapper;
@@ -34,21 +27,20 @@ import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.cms.service.MediaDeliveryService;
 import com.slepeweb.cms.service.SiteAccessService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
-import com.slepeweb.common.util.ImageUtil;
 
 @Component
 public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
 	
-	private final Object buffPoolLock = new Object();
-	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
 	private long defaultPrivateCacheTime, defaultPublicCacheTime;
 	private Map<Long, Long> lastDeliveryTable = new HashMap<Long, Long>(127);
 	
 	@Autowired private CmsService cmsService;
+	@Autowired private MediaDeliveryService mediaDeliveryService;
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		doGet(req, res, model);
@@ -104,7 +96,7 @@ public class CmsDeliveryServlet {
 					
 					if (item.getType().isMedia()) {
 						LOG.debug(LogUtil.compose("Streaming binary content ...", item));
-						stream(item, req, res, requestTime);
+						this.mediaDeliveryService.stream(item, req, res);
 					}
 					else {
 						res.setContentType("text/html;charset=utf-8");
@@ -291,110 +283,6 @@ public class CmsDeliveryServlet {
 		pathInfo = pathInfo != null ? servletPath + pathInfo : servletPath;
 		return pathInfo;
 	}
-	
-	
-	/**
-	 * Get a buffer from pool, creating if necessary.
-	 */
-	private byte[] getBuff() {
-		synchronized (this.buffPoolLock) {
-			if (this.buffPool != null) {
-				List<byte[]> list = this.buffPool.get();
-				if (list != null && ! list.isEmpty()) {
-					return list.remove(list.size() - 1);
-				}
-			}
-			return new byte[4096];
-		}
-	}
-
-	/**
-	 * Put buffer back into pool.
-	 */
-	private void putBuff(byte[] buff) {
-		if (buff == null) {
-			return;
-		}
-		synchronized (this.buffPoolLock) {
-			List<byte[]> list = (this.buffPool == null ? null : this.buffPool.get());
-			if (list == null) {
-				list = new java.util.ArrayList<byte[]>();
-				this.buffPool = new java.lang.ref.WeakReference<List<byte[]>>(list);
-			}
-			list.add(buff);
-		}
-	}
-
-	private void stream(Item item, HttpServletRequest req, HttpServletResponse res, long requestTime)
-			throws ServletException, IOException {
-
-		String viewParam = req.getParameter("view");
-		boolean thumbnailRequired = false;
-		if (StringUtils.isNotBlank(viewParam)) {
-			thumbnailRequired = viewParam.equals("thumbnail");
-		}
-		
-		Media media = item.getMedia(thumbnailRequired);
-		if (media == null) {
-			LOG.error(String.format("No media found for item", item));
-			return;
-		}
-		
-		res.setContentType(item.getType().getMimeType());
-		
-		if (media.getBlob() != null) {
-			InputStream in = null;
-			
-			try {
-				in = media.getBlob().getBinaryStream();
-				
-				// Disabled image scaling functionality - too much load on the app.
-				int width = -1; //getImageSizeParam(req.getParameter("width"));
-				int height = -1; //getImageSizeParam(req.getParameter("height"));
-				if (width == -1 && height == -1) {
-					res.setHeader("Content-Length", String.valueOf(media.getSize()));
-					streamOldSchool(in, res.getOutputStream());
-				}
-				else {
-					ImageUtil.streamScaled(in, res.getOutputStream(), width, height, item.getType().getMimeType());
-				}
-			}
-			catch (SQLException e) {
-				LOG.error(String.format("Error getting media", item), e);
-			}
-			finally {
-				if (in != null) {
-					in.close();
-				}
-			}
-		}
-	}
-	
-	@SuppressWarnings("unused")
-	private int getImageSizeParam(String value) {
-		if (value == null) {
-			return -1;
-		}
-		return Integer.parseInt(value); 
-	}
-	
-	private void streamOldSchool(InputStream in, ServletOutputStream out) throws ServletException, IOException {
-		// Get a pooled buffer
-		byte[] buff = getBuff();
-		try {
-			for (;;) {
-				int len = in.read(buff);
-				if (len == -1) {
-					break;
-				}
-				out.write(buff, 0, len);
-			}
-		} finally {
-			// Return buffer to the pool
-			putBuff(buff);
-		}
-	}
-	
 	private boolean isCacheable(Item i) {
 		return 
 				this.cmsService.isViewableContentRequired() &&

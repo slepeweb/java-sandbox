@@ -127,19 +127,6 @@ public class BaseController {
 		return i;
 	}
 	
-	/*
-	protected Item getEditableVersion(Site s, String path, User u) throws RuntimeException {
-		return getEditableVersion(s, path, u, false);
-	}
-	
-	protected Item getEditableVersion(Site s, String path, User u, boolean throwable) throws RuntimeException {
-		Item i = this.cmsService.getItemService().getEditableVersion(s.getId(), path);
-		i.setUser(u);
-		checkAccess(i, throwable);
-		return i;
-	}
-	*/
-	
 	protected boolean checkAccess(Item i, boolean throwable) throws RuntimeException {
 		boolean access = i.isAccessible();	
 		

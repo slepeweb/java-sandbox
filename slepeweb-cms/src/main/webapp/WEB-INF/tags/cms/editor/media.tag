@@ -8,8 +8,8 @@
 		<label>Current media</label>
 		<c:choose><c:when test="${editingItem.mediaLoaded}">
 			<c:choose><c:when test="${editingItem.type.image}">
-				<%-- TODO: Store port info on db? What about server type, ie staging vs. live ? --%>
-				<img src="http://${host.name}:8080${editingItem.url}" width="200" />
+				<c:set var="_host" value="${editingItem.site.stagingHost}" />
+				<img src="${_host.protocol}://${_host.name}:${_host.port}/cms/media${editingItem.path}" width="200" />
 			</c:when><c:otherwise>
 				Loaded (${editingItem.type.mimeType})
 			</c:otherwise></c:choose>
