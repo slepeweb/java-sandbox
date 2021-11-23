@@ -9,8 +9,6 @@ import com.slepeweb.commerce.service.VariantService;
 public interface CmsService {
 	boolean isEditorialContext();
 	boolean isDeliveryContext();
-	boolean isViewableContentRequired();
-	boolean isEditableContentRequired();
 	boolean isCommerceEnabled();
 	String getStaticSiteRoot();
 	

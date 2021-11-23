@@ -27,7 +27,6 @@
 		
 	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl">
 		<property name="editorialContext" value="false" />
-		<property name="editableContentRequired" value="false" />
 		<property name="commerceEnabled" value="false" />
 	</bean>
 	

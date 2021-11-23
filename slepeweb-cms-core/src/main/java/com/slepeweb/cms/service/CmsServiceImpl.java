@@ -43,6 +43,9 @@ public class CmsServiceImpl implements CmsService {
 	/* 
 	 * In editorial context:
 	 * 
+	 * 0)	Editable versions of items are retrieved from the database. Otherwise, it
+	 * 		would be viewable versions.
+	 * 
 	 * 1) 	Shortcuts are seen as separate items to the items they reference.
 	 * 		This is essential to allow the content editor to relate a Shortcut to its reference.
 	 * 		In (the opposite) site delivery context, a Shortcut item is effectively merged with its 
@@ -66,25 +69,7 @@ public class CmsServiceImpl implements CmsService {
 	}
 	
 	/*
-	 * In staging delivery context, the editable versions of items are delivered to web pages,
-	 * as opposed to live delivery context.
-	 */
-	private boolean editableContentRequired = true;
-	
-	public void setEditableContentRequired(boolean b) {
-		this.editableContentRequired = b;
-	}
-
-	public boolean isEditableContentRequired() {
-		return editableContentRequired;
-	}
-
-	public boolean isViewableContentRequired() {
-		return ! isEditableContentRequired();
-	}
-	
-	/*
-	 * This is the storefron context. WARNING: this code has had very little usage or testing for
+	 * This is the storefront context. WARNING: this code has had very little usage or testing for
 	 * too long.
 	 */
 	private boolean commerceEnabled = false;

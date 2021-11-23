@@ -9,12 +9,10 @@ import org.springframework.stereotype.Component;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Redirector;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.MediaDeliveryService;
-import com.slepeweb.cms.service.SiteAccessService;
 import com.slepeweb.cms.utils.LogUtil;
 
 @Component
@@ -34,14 +32,13 @@ public class MediaDeliveryServlet {
 			
 			if (item != null && item.getType().isMedia()) {
 				item.setUser(identifyUser(req));
-				Redirector redirector = accessibilityChecker(item);
 				
-				if (redirector.isRequired()) {
-					res.sendRedirect(redirector.getPath());
-					return;
+				if (! item.isAccessible()) {
+					res.sendError(HttpServletResponse.SC_FORBIDDEN);
 				}
-				
-				this.mediaDeliveryService.stream(item, req, res);
+				else {
+					this.mediaDeliveryService.stream(item, req, res);
+				}
 			}
 			else {
 				notFound(res, "Item not found", path);
@@ -80,21 +77,5 @@ public class MediaDeliveryServlet {
 		pathInfo = pathInfo != null ? servletPath + pathInfo : servletPath;
 		String prefix = "/media";
 		return pathInfo.substring(prefix.length());
-	}
-		
-	// Returns true if resource is accessible
-	private Redirector accessibilityChecker(Item i) {
-		
-		Redirector r = new Redirector();
-
-		if (! i.isAccessible()) {
-			if (! i.getPath().equals(SiteAccessService.NOT_AUTHORISED_PATH)) {
-				// Redirect to not-authorised page
-				r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccessService.NOT_AUTHORISED_PATH));
-				r.setRequired(true);
-			}
-		}
-		
-		return r;
 	}
 }

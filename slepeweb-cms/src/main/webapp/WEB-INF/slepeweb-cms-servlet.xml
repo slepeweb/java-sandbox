@@ -31,7 +31,6 @@
 		
 	<bean id="cmsService" class="com.slepeweb.cms.service.CmsServiceImpl">
 		<property name="editorialContext" value="true" />
-		<property name="editableContentRequired" value="true" />
 		<property name="commerceEnabled" value="false" />
 		<property name="staticSiteRoot" value="/var/www/html" />
 	</bean>

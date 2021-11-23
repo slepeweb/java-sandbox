@@ -285,7 +285,7 @@ public class CmsDeliveryServlet {
 	}
 	private boolean isCacheable(Item i) {
 		return 
-				this.cmsService.isViewableContentRequired() &&
+				this.cmsService.isDeliveryContext() &&
 				i.isPublished() && 
 				! i.getFieldValue(FieldName.CACHEABLE, new StringWrapper("yes")).equalsIgnoreCase("no");
 	}
