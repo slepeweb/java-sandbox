@@ -2,7 +2,7 @@ package com.slepeweb.cms.service;
 
 import java.util.List;
 
-import com.slepeweb.cms.bean.Role;
+import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 
 
@@ -12,8 +12,8 @@ public interface UserService {
 	User getBySecret(String secret);
 	User get(Long id);
 	User save(User u);
-	User save(User u, boolean doRoles);
-	void saveRoles(User u);
-	List<Role> getRoles(Long userId);
+	User save(User u, Site s, boolean doRoles);
+	void saveRoles(User u, Site s);
+	List<String> getRoles(Long userId, Long siteId);
 	User partialUpdate(User u);
 }

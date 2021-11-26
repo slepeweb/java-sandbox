@@ -1,6 +1,7 @@
 package com.slepeweb.cms.control;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -22,6 +22,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.LoginService;
+import com.slepeweb.cms.service.SiteService;
 
 @Controller
 @RequestMapping("/page")
@@ -30,9 +31,11 @@ public class PageController extends BaseController {
 	//private static Logger LOG = Logger.getLogger(PageController.class);
 	@Autowired private CookieService cookieService;
 	@Autowired private LoginService loginService;
+	@Autowired private SiteService siteService;
 	
 	@RequestMapping(value="/editor")	
-	public String doMain(ModelMap model) {		
+	public String doMain(HttpServletRequest req, ModelMap model) {		
+		getAllEditableSites(req, model);
 		return "cms.editor";
 	}
 	
@@ -62,6 +65,7 @@ public class PageController extends BaseController {
 			model.addAttribute("_flashMessage", status);
 		}
 		
+		getAllEditableSites(req, model);
 		return "cms.editor";
 	}
 	
@@ -91,6 +95,7 @@ public class PageController extends BaseController {
 		model.addAttribute("_history", history);
 		model.addAttribute("editingItem", i);
 		
+		getAllEditableSites(req, model);
 		return "cms.editor";
 	}
 	
@@ -113,7 +118,19 @@ public class PageController extends BaseController {
 				model.addAttribute("error", supp.getErrorMessage());
 			}
 			else {
-				res.sendRedirect(req.getContextPath() + "/page/editor");
+				List<Site> allEditableSites = this.siteService.getAllSites(supp.getUser(), "editor");
+				if (allEditableSites.size() > 0) {
+					if (allEditableSites.size() > 1) {
+						res.sendRedirect(req.getContextPath() + "/page/editor");
+					}
+					else {
+						res.sendRedirect(req.getContextPath() + "/page/site/select/" + allEditableSites.get(0).getId());
+					}
+				}
+				else {
+					model.addAttribute("error", "User not authorised to edit any sites");
+					req.getSession().removeAttribute("_user");
+				}
 			}
 		}
 		else if (req.getMethod().equalsIgnoreCase("get")) {
@@ -125,8 +142,17 @@ public class PageController extends BaseController {
 		return "cms.login"; 
 	}
 	
-	@ModelAttribute("allSites")
-	public List<Site> getAllSites() {
-		return this.cmsService.getSiteService().getAllSites();
+	private void getAllEditableSites(HttpServletRequest req, ModelMap m) {
+		User u = getUser(req);
+		List<Site> sites;
+		
+		if (u != null) {
+			sites = this.siteService.getAllSites(u, "editor");
+		}
+		else {
+			sites = new ArrayList<Site>();
+		}
+		
+		m.addAttribute("_allEditableSites", sites);
 	}
 }

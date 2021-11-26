@@ -1,6 +1,8 @@
 package com.slepeweb.cms.bean;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,7 +14,7 @@ public class User extends CmsBean {
 	private Long id;
 	private String firstName, lastName, email, phone, password, secret;
 	private boolean enabled, loggedIn;
-	private List<Role> roles;
+	private Map<Long, List<String>> roles;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof User) {
@@ -101,20 +103,27 @@ public class User extends CmsBean {
 		return this;
 	}
 
-	public List<Role> getRoles() {
+	public List<String> getRoles(Site s) {
 		if (this.roles == null) {
-			this.roles = getCmsService().getUserService().getRoles(getId());
+			this.roles = new HashMap<Long, List<String>>();
 		}
-		return this.roles;
+		
+		List<String> r = this.roles.get(s.getId());
+		if (r == null) {
+			r = getCmsService().getUserService().getRoles(getId(), s.getId());
+			this.roles.put(s.getId(), r);
+		}
+		
+		return r;
 	}
 
-	public User setRoles(List<Role> roles) {
-		this.roles = roles;
-		return this;
+	public boolean hasRole(Site s, String role) {
+		List<String> roles = getRoles(s);
+		return roles != null && roles.contains(role);
 	}
 
-	public User addRole(Role r) {
-		getRoles().add(r);
+	public User addRole(Site s, String r) {
+		getRoles(s).add(r);
 		return this;
 	}
 	

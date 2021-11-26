@@ -24,10 +24,8 @@ import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.LoginSupport;
-import com.slepeweb.cms.bean.Role;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.LoginService;
-import com.slepeweb.cms.service.RoleService;
 import com.slepeweb.cms.service.UserService;
 import com.slepeweb.common.service.SendMailService;
 import com.slepeweb.common.util.HttpUtil;
@@ -43,7 +41,6 @@ public class UserAccountController extends BaseController {
 	public static final String ADMIN_EMAIL = "admin@buttigieg.org.uk";
 	
 	@Autowired private UserService userService;
-	@Autowired private RoleService roleService;
 	@Autowired private SendMailService sendMailService;
 	@Autowired private LoginService loginService;
 	@Autowired private AncCookieService ancCookieService;
@@ -111,19 +108,14 @@ public class UserAccountController extends BaseController {
 					setFirstName(req.getParameter("firstname")).
 					setLastName(req.getParameter("lastname")).
 					setEmail(req.getParameter("email")).
-					setPhone(req.getParameter("phone"));
-			
-			// Assign basic visitor role
-			Role r = this.roleService.get("ANC_VISITOR");
-			if (r != null) {
-				u.addRole(r);
-			}
+					setPhone(req.getParameter("phone")).
+					addRole(i.getSite(), "visitor");
 			
 			// Does this user already exist?
 			User check = this.userService.get(u.getEmail());
 			
 			if (check == null) {				
-				u = this.userService.save(u, true);
+				u = this.userService.save(u, i.getSite(), true);
 				
 				model.addAttribute("_u", u);
 				String msg = composeNewRegistrationEmail(u);

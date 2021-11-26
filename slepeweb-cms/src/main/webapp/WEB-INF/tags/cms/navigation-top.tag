@@ -1,6 +1,7 @@
 <%@ tag %><%@ 
 	taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%><%@ 
-  taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%>
+  taglib prefix="cms" tagdir="/WEB-INF/tags/cms"%><%@ 
+  taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <header>
 		<div class="ha">
@@ -14,7 +15,7 @@
 			<span>Site selection: </span>
 			<select id="site-selector">
 				<option value="0">Choose site ...</option>
-				<c:forEach items="${allSites}" var="_site">
+				<c:forEach items="${_allEditableSites}" var="_site">
 					<option value="${_site.id}"<c:if 
 						test="${not empty editingItem and editingItem.site.id eq _site.id}"> selected</c:if>>${_site.name}</option>
 				</c:forEach>

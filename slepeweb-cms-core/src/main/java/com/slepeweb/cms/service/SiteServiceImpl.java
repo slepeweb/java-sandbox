@@ -1,5 +1,6 @@
 package com.slepeweb.cms.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
@@ -111,6 +113,19 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	public List<Site> getAllSites() {
 		return this.jdbcTemplate.query(
 			"select * from site", new RowMapperUtil.SiteMapper());
+	}
+
+	@Cacheable(value="serviceCache")
+	public List<Site> getAllSites(User u, String role) {
+		List<Site> list = new ArrayList<Site>();
+		
+		for (Site s : getAllSites()) {
+			if (u.hasRole(s, role)) {
+				list.add(s);
+			}
+		}
+			
+		return list;
 	}
 
 }

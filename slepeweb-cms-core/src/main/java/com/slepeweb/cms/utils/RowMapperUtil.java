@@ -21,7 +21,6 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.LoggerBean;
 import com.slepeweb.cms.bean.Media;
-import com.slepeweb.cms.bean.Role;
 import com.slepeweb.cms.bean.Shortcut;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
@@ -326,11 +325,9 @@ public class RowMapperUtil {
 		}
 	}
 	
-	public static final class RoleMapper implements RowMapper<Role> {
-		public Role mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return CmsBeanFactory.makeRole().
-					setId(rs.getLong("id")).
-					setName(rs.getString("name"));
+	public static final class RoleMapper implements RowMapper<String> {
+		public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return rs.getString("role");
 		}
 	}
 	

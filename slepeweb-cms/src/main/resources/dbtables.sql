@@ -22,7 +22,6 @@ drop table if exists itemtype;
 drop table if exists host;
 drop table if exists site;
 
-drop table if exists user_role;
 drop table if exists role;
 drop table if exists user;
 
@@ -293,12 +292,14 @@ create table access
 	index idx_enabled (site, mode, enabled)
 ) ENGINE=InnoDB;
 
+/*
 create table role
 (
 	id int not null auto_increment,
 	name varchar(64) not null,
 	primary key (id)
 ) ENGINE=InnoDB;
+*/
 
 create table user
 (
@@ -315,13 +316,14 @@ create table user
 	primary key (id)
 ) ENGINE=InnoDB;
 
-create table user_role
+create table role
 (
 	userid int not null,
-	roleid int not null,
-	primary key (userid, roleid),
+	siteid int not null,
+	role varchar(64),
+	primary key (userid, siteid, role),
 	constraint foreign key (userid) references user(id) on delete cascade,
-	constraint foreign key (roleid) references role(id) on delete cascade
+	constraint foreign key (siteid) references site(id) on delete cascade
 ) ENGINE=InnoDB;
 
 

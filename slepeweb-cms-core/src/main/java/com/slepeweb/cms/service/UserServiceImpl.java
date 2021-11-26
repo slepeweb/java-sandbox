@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
-import com.slepeweb.cms.bean.Role;
+import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
@@ -20,10 +20,10 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 			"where %s";
 	
 	public User save(User u) {
-		return save(u, false);
+		return save(u, null, false);
 	}
 	
-	public User save(User u, boolean doRoles) {
+	public User save(User u, Site s, boolean doRoles) {
 		if (u.isDefined4Insert()) {
 			User dbRecord = get(u.getEmail());		
 			if (dbRecord != null) {
@@ -35,7 +35,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 			}
 			
 			if (doRoles) {
-				saveRoles(u);
+				saveRoles(u, s);
 			}
 		}
 		else {
@@ -45,21 +45,21 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 		return u;
 	}
 	
-	public void saveRoles(User u) {
-		deleteUserRoles(u);
-		for (Role role : u.getRoles()) {
-			insertUserRole(u, role);
+	public void saveRoles(User u, Site s) {
+		deleteUserRoles(u, s);
+		for (String role : u.getRoles(s)) {
+			insertUserRole(u, s, role);
 		}
 	}
 	
-	private void insertUserRole(User u, Role r) {
-		this.jdbcTemplate.update( "insert into user_role (userid, roleid) values (?,?)", 
-				u.getId(), r.getId());	
+	private void insertUserRole(User u, Site s, String r) {
+		this.jdbcTemplate.update( "insert into role (userid, siteid, role) values (?,?,?)", 
+				u.getId(), s.getId(), r);	
 	}
 	
-	private void deleteUserRoles(User u) {
-		if (this.jdbcTemplate.update("delete from user_role where userid = ?", u.getId()) > 0) {
-			LOG.warn(compose("Deleted user roles", u.getId()));
+	private void deleteUserRoles(User u, Site s) {
+		if (this.jdbcTemplate.update("delete from role where userid = ? and siteid = ?", u.getId(), s.getId()) > 0) {
+			LOG.warn(compose("Deleted user roles", u.getId(), s.getId()));
 		}
 	}
 	
@@ -120,11 +120,10 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 			sql, params, new RowMapperUtil.UserMapper()));
 	}
 
-	public List<Role> getRoles(Long userId) {
+	public List<String> getRoles(Long userId, Long siteId) {
 		return this.jdbcTemplate.query(
-				"select r.id, r.name from user u, role r, user_role ur " +
-				"where ur.userid = u.id and ur.roleid = r.id and u.id = ? ", 
-				new Object[]{userId},
+				"select role from role where userid = ? and siteid = ? ", 
+				new Object[]{userId, siteId},
 				new RowMapperUtil.RoleMapper());
 	}	
 }

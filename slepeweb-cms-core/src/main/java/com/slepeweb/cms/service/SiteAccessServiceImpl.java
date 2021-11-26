@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.AccessRule;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Role;
+import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 
 @Repository
@@ -62,7 +62,7 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 				 * we must now test whether the user has the role specified in the 'role' column.
 				 * User does NOT get access by this rule UNLESS he has specified role.
 				 */
-				return userRolesMatchRule(i.getUser(), rule);
+				return userRolesMatchRule(i.getUser(), i.getSite(), rule);
 			}
 		}
 			
@@ -122,12 +122,12 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 		return true;
 	}
 	
-	public boolean userRolesMatchRule(User u, AccessRule rule) {
+	public boolean userRolesMatchRule(User u, Site s, AccessRule rule) {
 		
 		if (u != null) {
 			// Must match ANY of the user's roles
-			for (Role r : u.getRoles()) {
-				if (r.getName().matches(rule.getRolePattern())) {
+			for (String r : u.getRoles(s)) {
+				if (r.matches(rule.getRolePattern())) {
 					return true;
 				}
 			}
