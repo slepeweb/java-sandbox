@@ -310,7 +310,7 @@ public class RestController extends BaseController {
 		
 		RestResponse resp = new RestResponse();
 		Item i = getEditableVersion(origId, getUser(request), true);
-		String param, stringValue, dateValueStr = null, timeValueStr = null;
+		String variable, stringValue, dateValueStr = null, timeValueStr = null;
 		FieldType ft;
 		FieldValue fv;
 		SimpleDateFormat sdf;
@@ -347,22 +347,28 @@ public class RestController extends BaseController {
 			}
 			
 			// For this field, see if there is a matching query parameter
-			param = fft.getField().getVariable();
+			variable = fft.getField().getVariable();
 			ft = fft.getField().getType();
-			fv = fvs.getFieldValueObj(param, language);
-			stringValue = request.getParameter(param);
 			
-			if ((ft == FieldType.date || ft == FieldType.datetime) && StringUtils.isNotBlank(stringValue)) {
+			// Current FieldValue for this field/language
+			fv = fvs.getFieldValueObj(variable, language);
+			
+			// Form input value, as a string.
+			stringValue = request.getParameter(variable);
+			
+			// If field type is date/datetime, then stringvalue is calculated 
+			// from 2 separate form input fields:
+			if (ft == FieldType.date || ft == FieldType.datetime) {
 				/* 
 				 * For a datetime field, there will be 2 query parameters, eg. for a field 
 				 * named 'datepublished', param 'datepublished_d' will hold the date value,
 				 * and param 'datepublished_t' will hold the time.
 				 */
-				dateValueStr = request.getParameter(String.format("%s_d", param));
+				dateValueStr = request.getParameter(String.format("%s_d", variable));
 				timeValueStr = null;
 				
 				if (ft == FieldType.datetime) {
-					timeValueStr = request.getParameter(String.format("%s_t", param));
+					timeValueStr = request.getParameter(String.format("%s_t", variable));
 					if (timeValueStr != null) {
 						// Validate time
 						int hours = Integer.parseInt(timeValueStr.substring(0, 2));
@@ -447,9 +453,6 @@ public class RestController extends BaseController {
 		
 		resp.setError(isErrors);
 		
-		// Update dateUpdated for the item
-		i.resetDateUpdated();
-		
 		if (isErrors) {
 			for (String s : errors) {
 				resp.addMessage(s);		
@@ -457,6 +460,8 @@ public class RestController extends BaseController {
 		}
 		else {
 			try {
+				// Update dateUpdated for the item
+				i.resetDateUpdated();				
 				i.save();
 				resp.addMessage(String.format("%d fields updated", c));
 			}
@@ -516,6 +521,12 @@ public class RestController extends BaseController {
 				setDeleted(false);
 		
 		i.setDateUpdated(i.getDateCreated());
+		
+		// There should only ever be one version of a Shortcut item, and that needs to
+		// be published in order for it to be 'visible' by the delivery server.
+		if (i.isShortcut()) {
+			i.setPublished(true);
+		}
 		
 		Product p = null;
 		

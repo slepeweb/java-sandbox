@@ -181,7 +181,7 @@ create table fieldvalue
    language varchar(2),
    stringvalue text,
    integervalue int,
-   datevalue timestamp default 0,
+   datevalue timestamp,
    primary key (itemid, fieldid, language),
 	 constraint foreign key (fieldid) references field(id) on delete cascade,
 	 constraint foreign key (itemid) references item(id) on delete cascade

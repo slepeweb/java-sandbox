@@ -122,7 +122,7 @@ public class RowMapperUtil {
 			item.setTemplate(t);
 		}
 		
-		updateIfShortcut(item);
+		identifyTargetIfShortcut(item);
 		return item;
 	}
 	
@@ -135,7 +135,7 @@ public class RowMapperUtil {
 			setPublicCache(rs.getLong("publiccache"));
 	}
 	
-	private static void updateIfShortcut(Item i) {
+	private static void identifyTargetIfShortcut(Item i) {
 		if (i.isShortcut()) {
 			List<Link> links = i.getCmsService().getLinkService().getLinks(i.getId(), LinkType.shortcut);
 			if (links.size() > 0) {
@@ -156,7 +156,7 @@ public class RowMapperUtil {
 					setData(rs.getString("data"));
 			
 			// This will already have been executed in the call to mapItem(rs)
-			// updateIfShortcut(l.getChild());
+			// identifyTargetIfShortcut(l.getChild());
 			
 			return l;
 		}
