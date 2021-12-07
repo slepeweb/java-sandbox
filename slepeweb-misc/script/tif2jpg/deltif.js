@@ -28,18 +28,17 @@ const crawl = async (parentPath) => {
 				jpgPath = tif2jpg(childPath)
 				isTif = jpgPath != null
 				
-				if (jpgPath) {
-					if (existsSync(jpgPath)) {
-						console.log('Exists', jpgPath)
+				if (isTif) {
+					if (! existsSync(jpgPath)) {
+						console.log('JPG missing', jpgPath)
 					}
 					else {
 						try {
-							let img = await Jimp.read(childPath)
-							img.write(jpgPath)
-							console.log('Written', jpgPath)
+							fs.rm(childPath)
+							console.log('Deleted', childPath)
 						}
 						catch(e) {
-							console.error('Failed to convert', childPath)
+							console.error('Failed to delete', childPath)
 						}
 					}
 				}
