@@ -33,8 +33,8 @@
 		<div id="leftnav-hider"><i class="fas fa-bars fa-2x"></i></div>
 		
 		<div class="hf">
-			<span id="currently-editing" class="current-item-name"></span>						
-			<span id="status-block"></span>
+			<p id="currently-editing" class="current-item-name"></p>						
+			<p id="status-block"></p>
 		</div>
 </header>
 

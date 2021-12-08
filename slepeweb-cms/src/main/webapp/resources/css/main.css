@@ -58,15 +58,18 @@ div.hf {
 }
 
 #status-block {
-	margin-left: 3em;
+	padding-left: 0.5em;
 	font-size: 1.6em;
 	text-decoration: underline;
+	width: 60%;
+	display: table-cell;
 }
 
 #currently-editing {
 	color: #0093ba;
 	font-size: 1.5em;
-	align-self: center;
+	width: 40%;
+	display: table-cell;
 }
 
 #search-bar {

@@ -4,8 +4,14 @@ _cms.leftnav = {
 	dialog: {}
 };
 
-// Other modes are "link" and "move"
-_cms.leftnav.mode = "navigate";
+/* 
+	Modes are "navigate", "link" and "move".
+	
+	Initially set to "", otherwise the 'activate' function would get
+	triggered, and in turn, make a second request to /cms/rest/item/editor
+	by executing _cms.support.renderItemForms().
+*/
+_cms.leftnav.mode = "";
 
 _cms.leftnav.define.fancytree = function() {
 	

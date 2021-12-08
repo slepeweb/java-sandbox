@@ -47,6 +47,8 @@
 
 		
 	$(function() {
+		console.log('Inside init.tag')
+		
 		$("body").click(function() {
 			$("#status-block").empty();
 		});

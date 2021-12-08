@@ -215,6 +215,8 @@ _cms.support.disableFormsIfReadonly = function() {
 }
 
 _cms.support.renderItemForms = function(nodeKey, activeTab) {
+		console.log('inside _cms.support.renderItemForms')
+
 	$.ajax(_cms.ctx + "/rest/item/editor", {
 		cache: false,
 		data: {key: nodeKey}, 
@@ -223,6 +225,7 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 		
 		// On successful loading of forms 
 		success: function(html, status, z) {
+		console.log('inside success callback of _cms.support.renderItemForms')
 			_cms.init(nodeKey, html, activeTab);
 			_cms.support.refreshHistory(_cms.siteId);
 			_cms.core.onrefresh(nodeKey);
