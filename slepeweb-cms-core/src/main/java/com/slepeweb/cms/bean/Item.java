@@ -49,7 +49,12 @@ public class Item extends CmsBean {
 	private String language = "en";
 	
 	public String getDefaultSimplename() {
-		return String.valueOf(new Date().getTime());
+		if (StringUtils.isNotBlank(getName())) {
+			return getName().toLowerCase().replaceAll("[\\s\\W]", "");
+		}
+		else {
+			return String.valueOf(new Date().getTime());
+		}
 	}
 
 	public boolean isProduct() {
