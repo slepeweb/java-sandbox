@@ -9,16 +9,17 @@ public class SavedSearch extends DbEntity {
 	
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd @ HH:mm");
 	
-	private String name, type, json;
+	private String name, type, description, json;
 	private Timestamp saved;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof SavedSearch) {
-			SavedSearch a = (SavedSearch) obj;
-			setType(a.getType()).
-				setName(a.getName()).
-				setJson(a.getJson()).
-				setSaved(a.getSaved());
+			SavedSearch ss = (SavedSearch) obj;
+			setType(ss.getType()).
+				setName(ss.getName()).
+				setJson(ss.getJson()).
+				setSaved(ss.getSaved()).
+				setDescription(ss.getDescription());
 		}
 	}
 		
@@ -73,6 +74,7 @@ public class SavedSearch extends DbEntity {
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((saved == null) ? 0 : saved.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		return result;
 	}
 
@@ -106,6 +108,12 @@ public class SavedSearch extends DbEntity {
 				return false;
 		} else if (!type.equals(other.type))
 			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			
+			return false;
 		return true;
 	}
 
@@ -114,6 +122,17 @@ public class SavedSearch extends DbEntity {
 		this.type = type;
 		return this;
 	}
+
+	public String getDescription() {
+		return description;
+	}
+
+
+	public SavedSearch setDescription(String description) {
+		this.description = description;
+		return this;
+	}
+
 
 	public Timestamp getSaved() {
 		return saved;

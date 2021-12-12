@@ -18,6 +18,13 @@
 	        </td>
 	    </tr>
 	    <tr>
+	        <td class="heading width25"><label for="description">Description</label></td>
+	        <td>
+		        	<textarea id="description" name="description" rows="3" cols="40"
+	    					placeholder="Provide description to help reader understand content">${_ss.description}</textarea>	        	
+	        </td>
+	    </tr>
+	    <tr>
 	        <td class="heading width25"><label for="from">From year</label></td>
 	        <td>
 	        	<select id="from" name="from">

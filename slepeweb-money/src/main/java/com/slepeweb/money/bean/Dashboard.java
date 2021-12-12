@@ -28,4 +28,13 @@ public class Dashboard {
 	public List<DashboardAccountGroup> getGroups() {
 		return groups;
 	}
+	
+	public long getTotal() {
+		long t = 0;
+		for (DashboardAccountGroup g : this.groups) {
+			t += g.getTotal();
+		}
+		return t;
+	}
+	
 }

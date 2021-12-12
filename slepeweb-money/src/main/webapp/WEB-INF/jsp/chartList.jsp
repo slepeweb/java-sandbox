@@ -14,8 +14,8 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Date created</th>
 					<th>Name</th>
+					<th>Date created</th>
 					<th>Execute</th>
 				</tr>
 			</thead>
@@ -24,8 +24,8 @@
 				<c:forEach items="${_charts}" var="_ss">
 					<tr>
 						<td><a href="${_ctxPath}/chart/edit/${_ss.id}" 
-							title="Update the search parameters for this chart">${_ss.savedWithMinutes}</a></td>
-						<td>${_ss.name}</td>
+							title="${mon:renderEither(_ss.description, 'Update the search parameters for this chart')}">${_ss.name}</a></td>
+						<td>${_ss.savedWithMinutes}</td>
 						<td><i class="far fa-caret-square-right" title="Execute the search and plot the results"
 							data-id="${_ss.id}"></i></td>
 					</tr>

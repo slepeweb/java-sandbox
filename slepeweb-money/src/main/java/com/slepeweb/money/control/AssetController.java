@@ -44,6 +44,11 @@ public class AssetController extends BaseController {
 	public static final String EXPENSE_LABEL = "Expense";
 	public static final String BALANCE_LABEL = "Balance";
 	
+	/*
+	 * The 'history' methods retrieve transaction records directly from the
+	 * database, and not from solr. They determine whether the transaction is
+	 * income or an expense by the category.
+	 */
 	@RequestMapping(value="/history")	
 	public String history(ModelMap model) { 
 		int thisYear = Util.getYear(new Date());

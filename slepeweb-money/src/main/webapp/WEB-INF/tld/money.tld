@@ -45,6 +45,12 @@
 	</function>
 	
 	<function>
+		<name>renderEither</name>
+		<function-class>com.slepeweb.money.Util</function-class>
+		<function-signature>java.lang.String renderDefaultIfBlank(java.lang.Object, java.lang.Object)</function-signature>
+	</function>
+	
+	<function>
 		<name>buildChartCategoryInputMarkup</name>
 		<function-class>com.slepeweb.money.Util</function-class>
 		<function-signature>java.lang.String buildChartCategoryInputMarkup(com.slepeweb.money.bean.ChartProperties, 

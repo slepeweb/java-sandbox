@@ -40,7 +40,7 @@
 				<tr>
 					<td><h3>Summary</h3></td>
 					<td><h3>Total</h3></td>
-					<td class="currency amount"><strong>${mon:displayAmountWS(_grandTotal)}</strong></td>
+					<td class="currency amount"><strong>${mon:displayAmountWS(_dash.total)}</strong></td>
 				</tr>
 			</table>
 		</div>

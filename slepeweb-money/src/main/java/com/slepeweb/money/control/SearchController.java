@@ -50,10 +50,16 @@ public class SearchController extends BaseController {
 	
 	private static final int ADHOC_ID = -1;
 	
-	private SavedSearch setSavedSearch(SavedSearch ss, String name, SolrParams params) {
+	/*
+	 * 'Charts' and 'searches' use solr to query data, so the solr
+	 * index needs to be up to date for results to be accurate.
+	 */
+	
+	private SavedSearch setSavedSearch(SavedSearch ss, String name, String description, SolrParams params) {
 		return ss.
 			setType(ADVANCED_TYPE).
 			setName(name).
+			setDescription(description).
 			setJson(toJson(params)).
 			setSaved(new Timestamp(new Date().getTime()));
 	}
@@ -153,6 +159,7 @@ public class SearchController extends BaseController {
 		ss = setSavedSearch(
 				ss,
 				req.getParameter("name"),
+				req.getParameter("description"),
 				params);
 		
 		SavedSearchSupport sss = new SavedSearchSupport().

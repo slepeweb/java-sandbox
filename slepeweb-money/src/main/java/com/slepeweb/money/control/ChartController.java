@@ -55,6 +55,11 @@ public class ChartController extends BaseController {
 	
 	@Autowired private CategoryController categoryController;
 	
+	/*
+	 * 'Charts' and 'searches' use solr to query data, so the solr
+	 * index needs to be up to date for results to be accurate.
+	 */
+	
 	// Empty chart definition form, for adding a new chart
 	@RequestMapping(value="/create", method=RequestMethod.GET)
 	public String create(HttpServletRequest req, ModelMap model) {
@@ -200,6 +205,7 @@ public class ChartController extends BaseController {
 		ss.
 				setType(CHART_TYPE).
 				setName(req.getParameter("name")).
+				setDescription(req.getParameter("description")).
 				setJson(toJson(props)).
 				setSaved(new Timestamp(new Date().getTime()));
 		
@@ -323,7 +329,7 @@ public class ChartController extends BaseController {
 		}
 	 
 		JFreeChart chart = ChartFactory.createBarChart(
-		         props.getTitle(), "Years", "Spend (£)",
+		         props.getTitle(), "Years", "Amounts (£)",
 		         ds,
 		         PlotOrientation.VERTICAL, true, true, false);
 		

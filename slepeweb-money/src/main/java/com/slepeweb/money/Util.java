@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.money.bean.CategoryGroup;
@@ -188,6 +189,13 @@ public class Util {
 
 	public static Object tertiaryOp(boolean test, Object trueResult, Object falseResult) {
 		return test ? trueResult : falseResult;
+	}
+	
+	public static String renderDefaultIfBlank(Object preferred, Object dflt) {
+		if (preferred != null && StringUtils.isNotBlank(preferred.toString())) {
+			return StringEscapeUtils.escapeHtml4(preferred.toString());
+		}
+		return StringEscapeUtils.escapeHtml4(dflt.toString());
 	}
 	
 	public static Long toLong(String s) {

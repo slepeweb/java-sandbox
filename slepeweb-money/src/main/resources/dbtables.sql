@@ -160,9 +160,10 @@ create table userrole
 create table search
 (
 	id int not null auto_increment,
-	saved timestamp default 0,
+	saved timestamp,
 	name varchar(255) NOT NULL,
 	type enum ('advanced', 'chart'),
+	description varchar(2047),
 	json varchar(4095) NOT NULL,
 	primary key (id),
 	index idx_search (saved desc, name)

@@ -111,7 +111,8 @@ public class RowMapperUtil {
 					setSaved(rs.getTimestamp("saved")).
 					setName(rs.getString("name")).
 					setType(rs.getString("type")).
-					setJson(rs.getString("json"));
+					setJson(rs.getString("json")).
+					setDescription(rs.getString("description"));
 		}
 	}
 	

@@ -40,12 +40,12 @@ public class SavedSearchServiceImpl extends BaseServiceImpl implements SavedSear
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into search (name, type, saved, json) values (?, ?, ?, ?)", 
-					ss.getName(), ss.getType(), ss.getSaved(), ss.getJson());
+					"insert into search (name, type, description, saved, json) values (?, ?, ?, ?)", 
+					ss.getName(), ss.getType(), ss.getDescription(), ss.getSaved(), ss.getJson());
 			
 			ss.setId(getLastInsertId());	
 			
-			LOG.info(compose("Added new saved search", ss));		
+			LOG.info(compose("Added new saved search", ss));
 			return ss;
 		}
 		catch (DuplicateKeyException e) {
@@ -58,8 +58,8 @@ public class SavedSearchServiceImpl extends BaseServiceImpl implements SavedSear
 			dbRecord.assimilate(ss);
 			
 			this.jdbcTemplate.update(
-					"update search set name = ?, type = ?, saved = ?, json = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getType(), dbRecord.getSaved(), dbRecord.getJson(), 
+					"update search set name = ?, type = ?, description = ?, saved = ?, json = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getType(), dbRecord.getDescription(), dbRecord.getSaved(), dbRecord.getJson(), 
 					dbRecord.getId());
 			
 			LOG.info(compose("Updated saved search", ss));
