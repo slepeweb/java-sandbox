@@ -24,7 +24,7 @@
 				<c:forEach items="${_charts}" var="_ss">
 					<tr>
 						<td><a href="${_ctxPath}/chart/edit/${_ss.id}" 
-							title="${mon:renderEither(_ss.description, 'Update the search parameters for this chart')}">${_ss.name}</a></td>
+							title="${mon:renderEither(_ss.description, 'Click to update the search parameters for this chart')}">${_ss.name}</a></td>
 						<td>${_ss.savedWithMinutes}</td>
 						<td><i class="far fa-caret-square-right" title="Execute the search and plot the results"
 							data-id="${_ss.id}"></i></td>

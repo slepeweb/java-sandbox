@@ -15,7 +15,7 @@
 </c:when></c:choose>
 
 <mny:standardLayout>
-
+	
 	<h2 class="inline-block">${_pageHeading} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
 			

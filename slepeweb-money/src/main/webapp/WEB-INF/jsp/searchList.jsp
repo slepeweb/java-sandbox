@@ -26,7 +26,7 @@
 			<tbody>
 				<c:forEach items="${_searches}" var="_ss">
 					<tr>
-						<td><a href="${_ctxPath}/search/edit/${_ss.id}" title="${mon:renderEither(_ss.description, 'Update parameters for this search')}">${_ss.name}</a></td>
+						<td><a href="${_ctxPath}/search/edit/${_ss.id}" title="${mon:renderEither(_ss.description, 'Click to update parameters for this search')}">${_ss.name}</a></td>
 						<td>${_ss.savedWithMinutes}</td>
 						<td><i class="far fa-caret-square-right" title="Execute this search" data-id="${_ss.id}"></i></td>
 					</tr>

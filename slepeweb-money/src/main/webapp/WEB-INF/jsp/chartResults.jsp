@@ -26,7 +26,12 @@
 
 <mny:standardLayout>
 
-	<h2 class="inline-block">Chart results <c:if test="${not empty param.flash}"><span 
+	<c:set var="_help" value="" />
+	<c:if test="${not empty _ss.description}">
+		<c:set var="_help"><span>&nbsp;<i class="far fa-question-circle" title="${_ss.description}"></i></span></c:set>
+	</c:if>
+	
+	<h2 class="inline-block">Chart results ${_help} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
 			
 	<div id="tabs">
