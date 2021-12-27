@@ -2,14 +2,16 @@ package com.slepeweb.cms.service;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.slepeweb.cms.bean.FileMetadata;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
+import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
@@ -18,6 +20,10 @@ import com.slepeweb.cms.utils.RowMapperUtil;
 public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	
 	private static Logger LOG = Logger.getLogger(MediaServiceImpl.class);
+	
+	@Autowired private MediaFileService mediaFileService;
+	@Autowired private SiteConfigService siteConfigService;
+	@Autowired private ItemService itemService;
 	
 	public Media save(Media m) throws ResourceException {
 		if (m.isDefined4Insert()) {
@@ -32,22 +38,43 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 		else {
 			String s = "Media not saved - insufficient data";
 			LOG.error(compose(s, m));
+			close(m.getUploadStream());
 			throw new MissingDataException(s);
 		}
-		
+						
+		close(m.getUploadStream());
 		return m;
 	}
 	
 	private void insertMedia(Media m) {
-		byte[] bytes = getBytesFromStream(m.getInputStream());
-		if (bytes.length > 0) {
-			this.jdbcTemplate.update(
-					"insert into media (itemid, data, size, thumbnail) values (?, ?, ?, ?)", 
-					m.getItemId(), bytes, bytes.length, m.isThumbnail());
+		String storageMode = getStorageMode(m);
+		
+		// Where is the binary data for the media stored, the database or file store?
+		if (storageMode == null || storageMode.equals("db")) {
+			// This call consumes the input stream then closes it.
+			byte[] bytes = getBytesFromStream(m.getUploadStream());
 			
-			this.cacheEvictor.evict(m);
-			LOG.info(compose("Added new media", m.getItemId()));
+			this.jdbcTemplate.update(
+					"insert into media (itemid, data, size, folder, thumbnail) values (?, ?, ?, ?, ?)", 
+					m.getItemId(), bytes, bytes.length, null, m.isThumbnail());
+			
+			LOG.info(compose("Added new media (data stored in db)", m.getItemId()));
 		}
+		else {
+			// Similarly, this call consumes the input stream then closes it.
+			FileMetadata meta = writeMediaToRepository(m);
+			
+			if (meta != null) {
+				this.jdbcTemplate.update(
+						"insert into media (itemid, data, size, folder, thumbnail) values (?, ?, ?, ?, ?)", 
+						m.getItemId(), null, meta.getSize(), meta.getBin(), m.isThumbnail());
+				
+				LOG.info(compose("Added new media (data stored in file repository)", m.getItemId(), meta.getBin()));
+			}
+		}
+		
+		this.cacheEvictor.evict(m);
+		close(m.getUploadStream());
 	}
 
 	private void updateMedia(Media dbRecord, Media m) {
@@ -55,17 +82,55 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(m);
 			
-			byte[] bytes = getBytesFromStream(m.getInputStream());
-			if (bytes.length > 0) {
+			String storageMode = getStorageMode(m);
+			
+			// Where is the binary data for the media stored, the database or file store?
+			if (storageMode == null || storageMode.equals("db")) {
+				byte[] bytes = getBytesFromStream(m.getUploadStream());
 				this.jdbcTemplate.update(
-						"update media set data = ?, size = ? where itemid = ? and thumbnail = ?", 
+						"update media set data = ?, size = ? folder = null where itemid = ? and thumbnail = ?", 
 						bytes, bytes.length, m.getItemId(), m.isThumbnail());
 				
-				LOG.info(compose("Updated media", m.getItemId()));
+				LOG.info(compose("Updated media (data stored in db)", m.getItemId()));
+			}
+			else {
+				FileMetadata meta = writeMediaToRepository(m);
+				
+				if (meta != null) {
+					this.jdbcTemplate.update(
+							"update media set data = null, size = ?, folder = ? where itemid = ? and thumbnail = ?", 
+							meta.getSize(), meta.getBin(), m.getItemId(), m.isThumbnail());
+					
+					LOG.info(compose("Updated media (data stored in file repository)", m.getItemId(), meta.getBin()));
+				}
 			}
 		}
 		else {
 			LOG.debug(compose("Media not changed", m));
+		}
+		
+		close(m.getUploadStream());
+	}
+	
+	private FileMetadata writeMediaToRepository(Media m) {
+		BufferedInputStream is = new BufferedInputStream(m.getUploadStream());
+		FileMetadata meta = this.mediaFileService.writeMediaToRepository(is, m.getRepositoryFileName());
+		close(is);
+		return meta;
+	}
+	
+	private String getStorageMode(Media m) {
+		Item i = this.itemService.getItem(m.getItemId());
+		SiteConfig mode = this.siteConfigService.getSiteConfig(i.getSite().getId(), "media_storage_mode");
+		return mode.getValue();
+	}
+	
+	private void close(InputStream is) {
+		if (is != null) {
+			try {
+				is.close();
+			}
+			catch (Exception e) {}
 		}
 	}
 	
@@ -81,36 +146,22 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 
 	}
 
-	public void writeMedia(Long id, String outputFilePath) {
-		Media media = getMedia(id);
+	// TODO: Currently, only used by MediaTest.java - review.
+	public void writeMedia(Long itemId, String outputFilePath) {
+		Media media = getMedia(itemId);
 		
 		if (media != null) {
-			BufferedInputStream is = null;
-			FileOutputStream fos = null;
-			
-			try {
-				is = new BufferedInputStream(media.getBlob().getBinaryStream());
-				fos = new FileOutputStream(outputFilePath);
-				int bufflen = 1000;
-				byte[] buffer = new byte[bufflen];
-				int numBytes;
-				while ((numBytes = is.read(buffer, 0, bufflen)) > -1) {
-					fos.write(buffer, 0, numBytes);
-				}
+			InputStream is = media.getDownloadStream();
+			if (is != null) {
+				BufferedInputStream bis = new BufferedInputStream(is);
+				this.mediaFileService.writeMedia(bis, outputFilePath);
 			}
-			catch (Exception e) {
-				LOG.warn(compose("Error writing media out to file", outputFilePath), e);
-			}
-			finally {
-				try {
-					if (fos != null) fos.close();
-					if (is != null) is.close();
-				}
-				catch (Exception e) {}
+			else {
+				LOG.error(compose("No data stream for media", itemId));
 			}
 		}
 		else {
-			LOG.warn(compose("No media for item", id));
+			LOG.warn(compose("No media for item", itemId));
 		}
 	}
 	
@@ -120,7 +171,7 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	
 	public Media getMedia(Long id, boolean thumbnail) {
 		return (Media) getFirstInList(
-			this.jdbcTemplate.query("select itemid, data, size, thumbnail from media where itemid = ? and thumbnail = ?", 
+			this.jdbcTemplate.query("select itemid, data, size, folder, thumbnail from media where itemid = ? and thumbnail = ?", 
 				new Object[]{id, thumbnail},
 				new RowMapperUtil.MediaMapper()));
 	}
@@ -158,5 +209,4 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 			catch (Exception e) {}
 		}
 	}
-
 }

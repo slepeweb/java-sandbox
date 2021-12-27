@@ -83,7 +83,7 @@
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 	
 	<import resource="webflow-beans.xml" />
-	<import resource="ws-beans.xml" />
+<!-- 	<import resource="ws-beans.xml" /> -->
 	
 	<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>

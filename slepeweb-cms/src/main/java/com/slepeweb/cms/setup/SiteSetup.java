@@ -203,7 +203,6 @@ public class SiteSetup {
 							
 							if (itype != null) {
 								st = CmsBeanFactory.makeSiteType().setSiteId(s.getId()).setType(itype).save();
-								LOG.info(LogUtil.compose("Sitetype saved", st));
 							}
 						}
 					}
@@ -329,7 +328,6 @@ public class SiteSetup {
 									setOrdering(count++).
 									save();
 							
-							LOG.info(String.format("Added field '%s' to type '%s'", variable, name));
 						}
 					}
 				}

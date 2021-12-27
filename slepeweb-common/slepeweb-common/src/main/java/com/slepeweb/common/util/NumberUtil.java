@@ -1,11 +1,15 @@
 package com.slepeweb.common.util;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 import org.apache.commons.lang3.StringUtils;
 
+
 public class NumberUtil {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
+	public static DecimalFormat DF0 = new DecimalFormat("#.#");
+	public static DecimalFormat DF1 = new DecimalFormat("#.0");
 	
 	public static long decimal2long(BigDecimal d) {
 		return  d != null ? d.multiply(ONE_HUNDRED).longValue() : -1L;
@@ -75,4 +79,45 @@ public class NumberUtil {
 		return pence / 100;
 	}
 	
+	public static String formatBytes(Long n) {
+		if (n != null) {
+			long divisor = 1024 * 1024;
+			
+			if (n > (100 * divisor)) {
+				return formatBytes(DF0, n, divisor, "Mb");
+			}
+			else if (n > (divisor)) {
+				return formatBytes(DF1, n, divisor, "Mb");
+			}
+			else {
+				divisor = 1024;
+				
+				if (n > (100 * divisor)) {
+					return formatBytes(DF0, n, divisor, "kb");
+				}
+				else if (n > (divisor)) {
+					return formatBytes(DF1, n, divisor, "kb");
+				}
+				else {
+					return formatBytes(DF0, n, 1L, "bytes");
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public static String formatBytes(DecimalFormat df, long size, long denominator, String units) {
+		return String.format("%s %s", df.format((float) size / (float) denominator), units);
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(formatBytes(12345678L));
+		System.out.println(formatBytes(1234567L));
+		System.out.println(formatBytes(123456L));
+		System.out.println(formatBytes(12345L));
+		System.out.println(formatBytes(1234L));
+		System.out.println(formatBytes(123L));
+		System.out.println(formatBytes(12L));
+	}
 }

@@ -53,8 +53,11 @@
 			$("#status-block").empty();
 		});
 	
-		$("#site-selector").change(function(e){
-			window.location = _cms.ctx + "/page/site/select/" + $(this).val();
+		$("#site-selector").change(function(e) {
+			let id = $(this).val();
+			if (id > 0) {
+				window.location = _cms.ctx + "/page/site/select/" + id;
+			}
 		});
 	
 		/* 

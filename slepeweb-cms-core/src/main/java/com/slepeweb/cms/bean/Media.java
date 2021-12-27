@@ -3,31 +3,42 @@ package com.slepeweb.cms.bean;
 import java.io.InputStream;
 import java.sql.Blob;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.cms.except.ResourceException;
 
 
 public class Media extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private Long itemId, size;
-	private InputStream inputStream;
-	private Blob blob;
 	private boolean thumbnail;
-	
+	private Blob blob;
+	private String folder;
+
+	/* 
+	 * This property is only used when file data has been submitted via an html form.
+	 * It is ignored when media items are retrieved from the db. Instead, the media
+	 * data is represented by the blob property.
+	 * 
+	 * When the media item is saved by MediaServiceImpl, the stream is closed at that
+	 * point.
+	 */
+	private InputStream uploadStream;
+
 	public void assimilate(Object obj) {
 		if (obj instanceof Media) {
 			Media m = (Media) obj;
 			setItemId(m.getItemId());
 			setSize(m.getSize());
-			setInputStream(m.getInputStream());
-			setBlob(m.getBlob());
+			setBlob(m.getBlob()).
+			setFolder(m.getFolder());
 		}
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
 			getItemId() != null &&
-			//getSize() != null && 
-			getInputStream() != null;
+			getUploadStream() != null;
 	}
 	
 	public Long getId() {
@@ -68,12 +79,12 @@ public class Media extends CmsBean {
 		return this;
 	}
 
-	public InputStream getInputStream() {
-		return inputStream;
+	public InputStream getUploadStream() {
+		return uploadStream;
 	}
 
-	public Media setInputStream(InputStream inputStream) {
-		this.inputStream = inputStream;
+	public Media setUploadStream(InputStream inputStream) {
+		this.uploadStream = inputStream;
 		return this;
 	}
 
@@ -85,6 +96,22 @@ public class Media extends CmsBean {
 		this.blob = blob;
 		return this;
 	}
+	
+	public InputStream getDownloadStream() {
+		try {
+			if (this.blob != null) {
+				return this.blob.getBinaryStream();
+			}
+			else if (StringUtils.isNotBlank(this.folder)) {
+				return getMediaFileService().getInputStream(getFolder(), getRepositoryFileName());
+			}
+		}
+		catch (Exception e) {
+			
+		}
+		
+		return null;
+	}
 
 	public boolean isThumbnail() {
 		return thumbnail;
@@ -95,6 +122,19 @@ public class Media extends CmsBean {
 		return this;
 	}
 
+	public String getFolder() {
+		return folder;
+	}
+
+	public Media setFolder(String s) {
+		this.folder = s;
+		return this;
+	}
+	
+	public String getRepositoryFileName() {
+		return String.format("%d%s", getItemId(), isThumbnail() ? "t" : "");
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -102,6 +142,7 @@ public class Media extends CmsBean {
 		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
 		result = prime * result + ((size == null) ? 0 : size.hashCode());
 		result = prime * result + (thumbnail ? 1231 : 1237);
+		result = prime * result + ((folder == null) ? 0 : folder.hashCode());
 		return result;
 	}
 
@@ -126,6 +167,12 @@ public class Media extends CmsBean {
 				return false;
 		} else if (!size.equals(other.size))
 			return false;
+		if (folder == null) {
+			if (other.folder != null)
+				return false;
+		} else if (!folder.equals(other.folder))
+			return false;
+		
 		return true;
 	}
 

@@ -250,7 +250,7 @@ public class RowMapperUtil {
 					setItemId(rs.getLong("itemid")).
 					setSize(rs.getLong("size")).
 					setBlob(rs.getBlob("data")).
-					setThumbnail(rs.getBoolean("thumbnail"));
+					setFolder(rs.getString("folder"));
 		}
 	}
 	

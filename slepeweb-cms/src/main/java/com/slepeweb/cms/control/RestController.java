@@ -246,7 +246,7 @@ public class RestController extends BaseController {
 				if (i != null) {
 					Media m = CmsBeanFactory.makeMedia().
 							setItemId(i.getId()).
-							setInputStream(is);
+							setUploadStream(is);
 					
 					// Save the media item
 					try {
@@ -265,7 +265,7 @@ public class RestController extends BaseController {
 									-1, 
 									i.getType().getMimeType());
 							
-							m.setInputStream(ImageUtil.pipe(baos));
+							m.setUploadStream(ImageUtil.pipe(baos));
 							this.cmsService.getMediaService().save(m);
 						}
 					}
@@ -971,8 +971,6 @@ public class RestController extends BaseController {
 		List<File> jsfiles = Arrays.asList(folder.listFiles());
 		
 		Collections.sort(jsfiles, new Comparator<File>() {
-
-			@Override
 			public int compare(File f1, File f2) {
 				return f1.getName().compareTo(f2.getName());
 			}});

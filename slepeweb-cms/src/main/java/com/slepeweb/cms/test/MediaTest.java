@@ -36,7 +36,7 @@ public class MediaTest extends BaseTest {
 					try { 
 						Media m = CmsBeanFactory.makeMedia().
 								setItemId(imageItem.getId()).
-								setInputStream(new FileInputStream(sourceImageFilename)).
+								setUploadStream(new FileInputStream(sourceImageFilename)).
 								setSize(fileSize);
 						this.cmsService.getMediaService().save(m);
 					}

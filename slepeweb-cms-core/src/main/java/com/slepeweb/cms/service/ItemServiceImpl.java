@@ -1,6 +1,5 @@
 package com.slepeweb.cms.service;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -794,12 +793,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			nm = CmsBeanFactory.makeMedia();
 			nm.assimilate(m);
 			nm.setItemId(ni.getId());
-			try {
-				nm.setInputStream(m.getBlob().getBinaryStream());
-			}
-			catch (SQLException e) {
-				LOG.error("Failed to copy media", e);
-			}
+			nm.setUploadStream(m.getDownloadStream());
 			this.mediaService.save(nm);
 		}
 		

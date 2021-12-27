@@ -7,8 +7,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -306,12 +306,18 @@ public class StaticPageController extends BaseController {
 	private BufferedInputStream getMediaStream(Item i, boolean thumbnailReqd) {
 		Media m = i.getMedia(thumbnailReqd);
 		if (m != null) {
-			try {
-				return new BufferedInputStream(m.getBlob().getBinaryStream());
-			} catch (SQLException e) {
-				LOG.error("Failed to get input stream for Media item");
+			InputStream is = m.getDownloadStream();
+			
+			if (is != null) {
+				try {					
+					return new BufferedInputStream(is);
+				} catch (Exception e) {
+					LOG.error("Failed to get input stream for Media item", e);
+				}
 			}
 		}
+		
+		LOG.error("Failed to get input stream for Media item");
 		return null;
 	}
 	

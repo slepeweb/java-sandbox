@@ -23,6 +23,7 @@ public interface CmsService {
 	FieldForTypeService getFieldForTypeService();
 	FieldValueService getFieldValueService();	
 	MediaService getMediaService();	
+	MediaFileService getMediaFileService();	
 	TemplateService getTemplateService();
 	SiteConfigService getSiteConfigService();
 	LoglevelService getLoglevelService();

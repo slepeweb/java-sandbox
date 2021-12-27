@@ -25,6 +25,7 @@ public class CmsServiceImpl implements CmsService {
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected FieldValueService fieldValueService;
 	@Autowired protected MediaService mediaService;
+	@Autowired protected MediaFileService mediaFileService;
 	@Autowired protected TemplateService templateService;
 	@Autowired protected SiteConfigService siteConfigService;
 	@Autowired protected LoglevelService loglevelService;
@@ -143,6 +144,10 @@ public class CmsServiceImpl implements CmsService {
 
 	public MediaService getMediaService() {
 		return mediaService;
+	}
+
+	public MediaFileService getMediaFileService() {
+		return mediaFileService;
 	}
 
 	public void setMediaService(MediaService mediaService) {

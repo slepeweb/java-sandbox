@@ -1,6 +1,7 @@
 TODO: This is the main todo file:
 
 HIGH
+- site selection on login should be based upon hostname
 - re-test registration process
 
 MEDIUM

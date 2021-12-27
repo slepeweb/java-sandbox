@@ -83,7 +83,6 @@ public class TwitterServiceImpl implements TwitterService {
 			}
 				
 			Collections.sort(allTweets, new Comparator<Tweet>() {
-				@Override
 				public int compare(Tweet o1, Tweet o2) {
 					return o2.getCreatedAt().compareTo(o1.getCreatedAt());
 				}

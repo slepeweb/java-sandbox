@@ -77,7 +77,6 @@ public class QuickTest {
 		}
 			
 		Collections.sort(tweets, new Comparator<Tweet>() {
-			@Override
 			public int compare(Tweet o1, Tweet o2) {
 				return o2.getCreatedAt().compareTo(o1.getCreatedAt());
 			}

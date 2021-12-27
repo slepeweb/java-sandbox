@@ -52,7 +52,7 @@ _cms.core.behaviour.update = function(nodeKey) {
 			dataType: "json",
 			success: function(resp, status, z) {
 				if (! resp.error) {
-					_cms.support.flashMessage(_cms.support.toStatus(false, "Core data updated"));
+					_cms.support.flashMessage(_cms.support.toStatus(false, resp.message));
 					
 					// Name may have changed, so navigation tree will need updating, and 
 					// many of the tabs will need refreshing

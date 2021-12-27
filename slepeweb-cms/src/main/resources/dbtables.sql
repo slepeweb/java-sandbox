@@ -192,6 +192,7 @@ create table media
 (
    itemid int,
    data mediumblob,
+   folder varchar(4),
    thumbnail boolean,
    size int,
    primary key (itemid, thumbnail),
@@ -291,15 +292,6 @@ create table access
 	unique key idx_access_site_mode_name (site, mode, name),
 	index idx_enabled (site, mode, enabled)
 ) ENGINE=InnoDB;
-
-/*
-create table role
-(
-	id int not null auto_increment,
-	name varchar(64) not null,
-	primary key (id)
-) ENGINE=InnoDB;
-*/
 
 create table user
 (

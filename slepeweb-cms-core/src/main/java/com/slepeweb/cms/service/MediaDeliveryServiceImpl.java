@@ -2,7 +2,6 @@ package com.slepeweb.cms.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -72,23 +71,24 @@ public class MediaDeliveryServiceImpl extends BaseServiceImpl implements MediaDe
 		}
 		
 		res.setContentType(item.getType().getMimeType());
+		InputStream in = media.getDownloadStream();
 		
-		if (media.getBlob() != null) {
-			InputStream in = null;
-			
+		if (in != null) {			
 			try {
-				in = media.getBlob().getBinaryStream();
 				res.setHeader("Content-Length", String.valueOf(media.getSize()));
 				stream(in, res.getOutputStream());
 			}
-			catch (SQLException e) {
-				LOG.error(String.format("Error getting media", item), e);
+			catch (Exception e) {
+				LOG.error(String.format("Error streaming media", item), e);
 			}
 			finally {
 				if (in != null) {
 					in.close();
 				}
 			}
+		}
+		else {
+			LOG.error(String.format("Error getting media", item));
 		}
 	}
 	
