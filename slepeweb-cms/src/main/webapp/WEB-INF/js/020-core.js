@@ -63,12 +63,8 @@ _cms.core.behaviour.update = function(nodeKey) {
 						}
 						
 						_cms.support.updateItemName(resp.data[0]);
-						//$(_cms.core.sel.CURRENTLY_EDITING_HEADER).html(resp.data[0]);
-						// TODO: implement: _cms.add.refresh.tab(nodeKey);
 						_cms.copy.refresh.tab(nodeKey);
 						_cms.support.refreshHistory(_cms.siteId);
-						// TODO:_cms.move.refresh.tab(nodeKey);
-						// TODO: implement: _cms.misc.refresh.tab(nodeKey);
 					}
 					
 					_cms.core.refresh.tab(nodeKey);
@@ -139,6 +135,33 @@ _cms.core.behaviour.formchange = function() {
 	}
 }
 
+_cms.core.behaviour.tags = function() {
+	$("#tag-options li").click(function() {
+		let tagInput = $("#item-core-editor input[name=tags]");
+		let existing = tagInput.val().trim();
+		let newTag = $(this).html();
+		
+		if (! existing.includes(newTag)) {
+			if (existing.length > 0) {
+				existing += ", ";
+			}
+			existing += newTag;
+		}
+		
+		tagInput.val(existing);
+	});
+	
+	$("#tags-menu-icon").click(function() {
+		let ele = $("#tag-options");
+		if (ele.hasClass("hide")) {
+			ele.removeClass("hide");
+		}
+		else {
+			ele.addClass("hide");
+		}
+	});
+}
+
 _cms.core.refresh.tab = function(nodeKey) {
 	_cms.support.refreshtab("core", nodeKey, _cms.core.onrefresh);
 };
@@ -147,5 +170,6 @@ _cms.core.onrefresh = function(nodeKey) {
 	_cms.core.behaviour.formchange();
 	_cms.core.behaviour.update(nodeKey);
 	_cms.core.behaviour.reset(nodeKey);
+	_cms.core.behaviour.tags();
 	_cms.core.originalFormState = $(_cms.core.sel.FORM).serialize();
 }

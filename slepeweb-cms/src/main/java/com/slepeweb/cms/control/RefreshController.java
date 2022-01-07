@@ -33,7 +33,10 @@ public class RefreshController extends BaseController {
 		if (i.isProduct()) {
 			model.addAttribute("availableAxes", this.cmsService.getAxisService().get());
 		}
-
+				
+		// Get recently-used tags, and full list of tags for the site
+		model.addAttribute(TAG_INPUT_SUPPORT_ATTR, getTagInfo(i.getSite().getId(), req));
+		
 		return "cms.refresh.core";		
 	}
 	

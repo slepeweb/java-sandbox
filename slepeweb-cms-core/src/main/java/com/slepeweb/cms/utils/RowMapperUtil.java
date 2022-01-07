@@ -291,8 +291,15 @@ public class RowMapperUtil {
 	public static final class TagMapper implements RowMapper<Tag> {
 		public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return CmsBeanFactory.makeTag().
-					setItem(mapItem(rs)).
-					setValue(rs.getString("tagvalue"));
+					setSiteId(rs.getLong("siteid")).
+					setItemId(rs.getLong("itemid")).
+					setValue(rs.getString("value"));
+		}
+	}
+	
+	public static final class TagValueMapper implements RowMapper<String> {
+		public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return rs.getString("value");
 		}
 	}
 	

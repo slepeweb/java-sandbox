@@ -11,6 +11,7 @@ import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.utils.LogUtil;
 
@@ -276,8 +277,8 @@ public class ItemTest extends BaseTest {
 				this.tagService.deleteTags(newsItem.getId());
 				
 				tagsIn = Arrays.asList("football", "cricket");
-				this.tagService.save(newsItem, tagsIn);
-				tagsOut = newsItem.getTags();
+				this.tagService.save(newsItem.getSite().getId(), newsItem.getId(), tagsIn);
+				tagsOut = Tag.toValues(newsItem.getTags());
 				if (tagsOut.size() != 2 || ! tagsOut.containsAll(tagsIn)) {
 					r.fail().setNotes(String.format("Item incorrectly tagged [%s]", newsItem));
 				}
@@ -292,8 +293,8 @@ public class ItemTest extends BaseTest {
 				this.tagService.deleteTags(newsItem.getId());
 				
 				tagsIn = Arrays.asList(tennis);
-				this.tagService.save(newsItem, tagsIn);
-				tagsOut = newsItem.getTags();
+				this.tagService.save(newsItem.getSite().getId(), newsItem.getId(), tagsIn);
+				tagsOut = Tag.toValues(newsItem.getTags());
 				if (tagsOut.size() != 1 || ! tagsOut.containsAll(tagsIn)) {
 					r.fail().setNotes(String.format("Item incorrectly tagged [%s]", newsItem));
 				}
@@ -303,13 +304,10 @@ public class ItemTest extends BaseTest {
 			newsItem = site.getItem("/news/101");
 			if (newsItem != null) {
 				r = trs.execute(4160);
-				Item taggedItem = this.tagService.getTaggedItem(site.getId(), tennis);
+				Tag t = this.tagService.getTag4ItemWithValue(newsItem.getId(), tennis);
 				
-				if (taggedItem == null) {
-					r.fail().setNotes(String.format("Item not found with tag [%s]", tennis));
-				}
-				else if (! taggedItem.getPath().equals("/news/101")) {
-					r.fail().setNotes(String.format("Item found has different path [%s]", taggedItem.getPath()));
+				if (t == null) {
+					r.fail().setNotes(String.format("Tag not found [%s]", tennis));
 				}
 			}	
 		}

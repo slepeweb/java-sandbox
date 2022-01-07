@@ -1,26 +1,29 @@
 package com.slepeweb.cms.bean;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 public class Tag extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private String value;
-	private Item item;
+	private Long itemId, siteId;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Tag) {
 			Tag t = (Tag) obj;
-			setItem(t.getItem());
+			setItemId(t.getItemId());
+			setSiteId(t.getSiteId());
 			setValue(t.getValue());
 		}
 	}
 	
 	public boolean isDefined4Insert() {
 		return 
-			getItem() != null &&
-			getItem().getId() != null &&
+			getSiteId() != null &&
+			getItemId() != null &&
 			StringUtils.isNotBlank(getValue());
 	}
 	
@@ -30,13 +33,14 @@ public class Tag extends CmsBean {
 	
 	@Override
 	public String toString() {
-		return String.format("Tags for itemId %d: '%s'", getItem().getId(), getValue());
+		return String.format("Tags for itemId %d: '%s'", getItemId(), getValue());
 	}
 
 	@Override
+	// Saves a list of tags, and returns one, in order to satisfy the CmsBean interface
 	protected CmsBean save() {
-		getTagService().save(getItem(), Arrays.asList(getValue()));
-		return getTagService().getTag(getItem().getId(), getValue());
+		getTagService().save(getSiteId(), getItemId(), Arrays.asList(getValue()));
+		return getTagService().getTag4ItemWithValue(getItemId(), getValue());
 	}
 
 	@Override
@@ -44,13 +48,31 @@ public class Tag extends CmsBean {
 		// TODO Auto-generated method stub
 		
 	}
-
-	public Item getItem() {
-		return item;
+	
+	public static List<String> toValues(List<Tag> tags) {
+		List<String> result = new ArrayList<String>(tags.size());
+		
+		for (Tag t : tags) {
+			result.add(t.getValue());
+		}
+		return result;
 	}
 
-	public Tag setItem(Item item) {
-		this.item = item;
+	public Long getSiteId() {
+		return siteId;
+	}
+
+	public Tag setSiteId(Long l) {
+		this.siteId = l;
+		return this;
+	}
+
+	public Long getItemId() {
+		return itemId;
+	}
+
+	public Tag setItemId(Long l) {
+		this.itemId = l;
 		return this;
 	}
 

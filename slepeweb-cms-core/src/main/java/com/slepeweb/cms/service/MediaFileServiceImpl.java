@@ -39,7 +39,7 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 		// Count the number of files in each bin
 		for (File child : root.listFiles()) {
 			this.fileCount.put(child.getName(), child.list().length);
-			LOG.info(String.format("File storage bin %s has %d entires", child.getName(), child.list().length));
+			LOG.info(String.format("File storage bin %s has %d entries", child.getName(), child.list().length));
 		}
 		
 		// Is the repository empty?
@@ -87,9 +87,10 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 		return null;
 	}	
 
-	// TODO: NOT USED !!!
-	public InputStream readMediaFromRepository(Media m) {		
-		return getInputStream(m.getFolder(), m.getRepositoryFileName());		
+	public boolean deleteRepositoryFile(Media m) {
+		String filePath = getRepositoryFilePath(m.getFolder(), m.getRepositoryFileName());
+		File f = new File(filePath);		
+		return f.delete();
 	}	
 
 	/*

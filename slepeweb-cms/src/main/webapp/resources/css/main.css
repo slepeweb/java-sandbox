@@ -442,6 +442,38 @@ button[disabled=disabled] {
 	padding-right: 1em;
 }
 
+#item-core-editor {
+	position: relative;
+}
+
+#tag-options {
+	padding: 1em;
+	border: #d2a54a solid 5px;
+	z-index: 1000;
+	background-color: #f2d9a7;
+	position: absolute;
+	right: 10em;
+	width: 300px;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	max-height: 150px;
+	overflow: scroll;
+}
+
+#tag-options h3 {
+	margin-top: 0px;
+}
+
+#tag-options ul {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+#tag-options.hide {
+	display: none;
+}
+
 /* Probably used in search results dialog */
 div.cms-icon-boy { background-position: -33px 0px; }
 div.cms-icon-girl { background-position: -48px 0px; }

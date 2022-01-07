@@ -1,6 +1,7 @@
 TODO: This is the main todo file:
 
 HIGH
+- when media item is deleted, file in repository should also be deleted
 - site selection on login should be based upon hostname
 - re-test registration process
 

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteService;
@@ -74,7 +75,9 @@ public class SiteRestController extends BaseController {
 		set.remove("/");
 		
 		// Remove any pages tagged with 'nocrawl'
-		for (Item i : this.tagService.getTaggedItems(s.getId(), NOCRAWL)) {
+		Item i;
+		for (Tag t : this.tagService.getTags4SiteWithValue(s.getId(), NOCRAWL)) {
+			i = s.getItem(t.getItemId());
 			set.remove(i.getPath());
 		}
 		
@@ -105,7 +108,9 @@ public class SiteRestController extends BaseController {
 		sb.append("User-agent: *\n");
 		sb.append("Disallow: /proxy\n");
 		
-		for (Item i : this.tagService.getTaggedItems(s.getId(), NOCRAWL)) {
+		Item i;
+		for (Tag t : this.tagService.getTags4SiteWithValue(s.getId(), NOCRAWL)) {
+			i = s.getItem(t.getItemId());
 			sb.append(String.format("Disallow: %s\n", i.getPath()));
 		}
 		

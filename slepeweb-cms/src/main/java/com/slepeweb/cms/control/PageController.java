@@ -54,7 +54,7 @@ public class PageController extends BaseController {
 			}
 			
 			// Get a history of visited items
-			model.addAttribute("_history", this.cookieService.getBreadcrumbsCookieValue(i.getSite(), req));
+			model.addAttribute("_history", this.cookieService.getBreadcrumbsCookieValue(i.getSite(), req));			
 		}
 			
 		String flash = req.getParameter("status");

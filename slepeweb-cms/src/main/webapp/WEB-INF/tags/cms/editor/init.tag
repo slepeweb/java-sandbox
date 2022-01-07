@@ -1,7 +1,7 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
         
-<cms:debug><!-- tags/cms/editor/mainjs.tag --></cms:debug>
+<cms:debug><!-- tags/cms/editor/init.tag --></cms:debug>
 
 <script type="text/javascript">
 
@@ -47,7 +47,6 @@
 
 		
 	$(function() {
-		console.log('Inside init.tag')
 		
 		$("body").click(function() {
 			$("#status-block").empty();

@@ -19,12 +19,17 @@ import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.Tag;
+import com.slepeweb.cms.bean.TagInputSupport;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
 
 @Controller
 public class BaseController {
+	
+	public static final String TAG_INPUT_SUPPORT_ATTR = "_tis";
+	public static final String RECENT_TAGS_ATTR = "_recentTags";
 	
 	@Autowired protected CmsService cmsService;
 	
@@ -136,5 +141,21 @@ public class BaseController {
 		
 		return access;
 	}	
+	
+	@SuppressWarnings("unchecked")
+	protected TagInputSupport getTagInfo(Long siteId, HttpServletRequest req) {
+		TagInputSupport tis = new TagInputSupport();
+		tis.setAll(this.cmsService.getTagService().getTagValues4Site(siteId));		
+		
+		// Recently added tags are stored in the session
+		Object recent = req.getSession().getAttribute(RECENT_TAGS_ATTR);
+		if (recent == null) {
+			recent = new ArrayList<Tag>();
+			req.getSession().setAttribute(RECENT_TAGS_ATTR, recent);
+		}
+		
+		tis.setRecent((List<String>) recent);
+		return tis;
+	}
 }
 

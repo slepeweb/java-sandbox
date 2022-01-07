@@ -113,6 +113,9 @@ public class RestController extends BaseController {
 			
 			// Total number of editable items in this section
 			model.addAttribute("_numItemsInSection", this.cmsService.getItemService().getCountByPath(i));
+			
+			// Get recently-used tags, and full list of tags for the site
+			model.addAttribute(TAG_INPUT_SUPPORT_ATTR, getTagInfo(i.getSite().getId(), req));
 		}
 		
 		return "cms.item.editor";		
@@ -195,18 +198,47 @@ public class RestController extends BaseController {
 				return resp.setError(true).addMessage(e.getMessage());		
 			}
 			
-			List<String> existingTags = i.getTags();
-			String tagStr = getParam(req, "tags");
-			List<String> latestTags = Arrays.asList(tagStr.split("[ ,]+"));
-			if (existingTags.size() != latestTags.size() || ! existingTags.containsAll(latestTags)) {
-				this.cmsService.getTagService().save(i, tagStr);
-				resp.addMessage("Tags updated");
-			}
+			// Save item tags, if changes have been made
+			saveTags(i, req, resp);
 			
 			return resp;
 		}
 				
 		return resp.setError(true).addMessage(String.format("No item found with id %d", origId));		
+	}
+	
+	private void saveTags(Item i, HttpServletRequest req, RestResponse resp) {
+		List<String> existingTagValues = i.getTagValues();
+		String tagStr = getParam(req, "tags");
+		List<String> latestTagValues = Arrays.asList(tagStr.split("[ ,]+"));
+		if (existingTagValues.size() != latestTagValues.size() || ! existingTagValues.containsAll(latestTagValues)) {
+			this.cmsService.getTagService().save(i.getSite().getId(), i.getId(), tagStr);
+			resp.addMessage("Tags updated");
+			
+			// Identify recently-applied tags - remove existing tags from latest, and see what's left.
+			List<String> freshTagValues = new ArrayList<String>();
+			for (String v : latestTagValues) {
+				if (! existingTagValues.contains(v)) {
+					freshTagValues.add(v);
+				}
+			}
+			
+			// latestTagValues now contains new selections
+			if (freshTagValues.size() > 0) {
+				@SuppressWarnings("unchecked")
+				List<String> storedTagValues = (List<String>) req.getSession().getAttribute(RECENT_TAGS_ATTR);
+				
+				// Filter out duplicates
+				for (String v : storedTagValues) {
+					if (! freshTagValues.contains(v)) {
+						freshTagValues.add(v);
+					}
+				}
+				
+				// And store result
+				req.getSession().setAttribute(RECENT_TAGS_ATTR, freshTagValues);
+			}
+		}
 	}
 	
 	private String getParam(HttpServletRequest req, String name) {

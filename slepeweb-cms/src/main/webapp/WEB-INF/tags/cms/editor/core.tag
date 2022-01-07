@@ -3,7 +3,7 @@
         
 <cms:debug><!-- tags/cms/editor/core.tag --></cms:debug>
 	
-<form>
+<form id="item-core-editor">
 	<%-- Javascript looks for this input element --%>
 	<input id="itemIsProductFlag" type="hidden" value="${editingItem.product}" />
 	
@@ -35,7 +35,7 @@
 	</div>
 	<div class="ff">
 		<label for="type">Template: </label>
-		<select name="template">
+		<select name="template" <c:if test="${not editingItem.page}">disabled</c:if>>
 			<option value="0">Choose ...</option>
 			<c:forEach items="${availableTemplatesForType}" var="template">
 				<option value="${template.id}"<c:if 
@@ -99,6 +99,26 @@
 	
 	<div class="ff">
 		<label for="tags">Tags: </label><input type="text" name="tags" value="${editingItem.tagsAsString}" />
+		<span><i id="tags-menu-icon" class="fas fa-bars"></i></span>
+		<div id="tag-options" class="hide">
+			<div>
+				<h3>Recent</h3>
+				<ul>
+					<c:forEach items="${_tis.recent}" var="_tagval">
+						<li>${_tagval}</li>
+					</c:forEach>
+				</ul>
+			</div>
+			
+			<div>
+				<h3>All</h3>
+				<ul>
+					<c:forEach items="${_tis.all}" var="_tagval">
+						<li>${_tagval}</li>
+					</c:forEach>
+				</ul>
+			</div>
+		</div>
 	</div>
 	
 	<c:set var="_disabled"></c:set>
