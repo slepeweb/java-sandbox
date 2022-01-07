@@ -40,7 +40,7 @@ public class Item extends CmsBean {
 	
 	private Long id = -1L, origId;
 	private List<Link> links, parentLinks;
-	private List<String> tags;
+	private List<Tag> tags;
 	private Item parent;
 	private List<Item> relatedParents;
 	private int version = 1;
@@ -789,15 +789,26 @@ public class Item extends CmsBean {
 		return this;
 	}
 
-	public List<String> getTags() {
+	public List<Tag> getTags() {
 		if (this.tags == null) {
-			this.tags = getTagService().getTagValues(getId());
+			this.tags = getTagService().getTags4Item(getId());
 		}
 		return this.tags;
 	}
 
+	public List<String> getTagValues() {
+		return Tag.toValues(getTags());
+	}
+
 	public String getTagsAsString() {
-		return StringUtils.join(getTags(), ",").replaceAll(",", ", ");
+		StringBuilder sb = new StringBuilder();
+		for (Tag t : getTags()) {
+			if (sb.length() > 0) {
+				sb.append(", ");
+			}
+			sb.append(t.getValue());
+		}
+		return sb.toString();
 	}
 
 	public Item setParent(Item parent) {
@@ -833,7 +844,7 @@ public class Item extends CmsBean {
 	}
 	
 	public boolean isPage() {
-		return getTemplate() != null;
+		return ! getType().isMedia();
 	}
 
 	public boolean isSearchable() {
