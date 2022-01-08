@@ -134,6 +134,11 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 		}
 	}
 	
+	/*
+	 * This method isn't currently being called. Note that ordinarily, rows will be deleted from
+	 * the media table automatically due to foreign key constraints on the item table.
+	 * Might be useful for test purposes some time, so leaving in place.
+	 */
 	public void delete(Long id) {
 		if (this.jdbcTemplate.update("delete from media where itemid = ?", id) > 0) {
 			LOG.warn(compose("Deleted media", String.valueOf(id)));

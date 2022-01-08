@@ -49,6 +49,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected FieldValueService fieldValueService;
 	@Autowired protected FieldForTypeService fieldForTypeService;
 	@Autowired protected MediaService mediaService;
+	@Autowired protected MediaFileService mediaFileService;
 	@Autowired protected SolrService4Cms solrService4Cms;
 	@Autowired protected CmsService cmsService;
 	
@@ -261,6 +262,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		LOG.info(String.format("%d older versions now uneditable", num));
 	}
 	
+	// TODO: This is flawed, because item path could change between versions.
+	// TODO: Also, any associated media files on the file system should be deleted. In
+	//       the meanwhile, note that redundant media files for old versions will
+	//       remain in the file system.
 	private void deleteOlderVersions(Item i, int max) {
 		this.jdbcTemplate.update(
 				"delete from item where siteid = ? and path = ? and version <= ?",
@@ -389,6 +394,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				 * method in Product gets executed.
 				 */
 				i.delete();
+				
+				if (i.getType().isMedia()) {
+					this.mediaFileService.delete(i);
+				}
+				
 				num++;
 			}
 		}
@@ -398,6 +408,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				Item i = getItemFromBin(id);
 				if (i != null) {
 					i.delete();
+					this.mediaFileService.delete(i);
 					num++;
 				}
 			}

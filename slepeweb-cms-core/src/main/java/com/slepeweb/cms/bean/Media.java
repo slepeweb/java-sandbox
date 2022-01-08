@@ -131,6 +131,10 @@ public class Media extends CmsBean {
 		return this;
 	}
 	
+	public boolean isFileStored() {
+		return StringUtils.isNotBlank(getFolder());
+	}
+	
 	public String getRepositoryFileName() {
 		return String.format("%d%s", getItemId(), isThumbnail() ? "t" : "");
 	}

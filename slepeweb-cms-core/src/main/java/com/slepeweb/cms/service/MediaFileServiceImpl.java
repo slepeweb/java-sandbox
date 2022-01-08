@@ -11,9 +11,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FileMetadata;
+import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.common.util.NumberUtil;
 
@@ -23,6 +25,7 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 	private static Logger LOG = Logger.getLogger(MediaFileServiceImpl.class);
 	public static final int BIN_CAPACITY = 200;
 	
+	@Autowired private MediaService mediaService;
 	private String repository = "/var/www/slepeweb_cms_repository";
 	private Map<String, Integer> fileCount = new HashMap<String, Integer>();
 	private String currentBin;
@@ -87,10 +90,17 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 		return null;
 	}	
 
-	public boolean deleteRepositoryFile(Media m) {
-		String filePath = getRepositoryFilePath(m.getFolder(), m.getRepositoryFileName());
-		File f = new File(filePath);		
-		return f.delete();
+	public boolean delete(Item i) {
+		if (i.getType().isMedia()) {
+			Media m = this.mediaService.getMedia(i.getId());
+			
+			if (m != null && m.isFileStored()) {
+				String filePath = getRepositoryFilePath(m.getFolder(), m.getRepositoryFileName());
+				File f = new File(filePath);		
+				return f.delete();
+			}
+		}
+		return false;
 	}	
 
 	/*
