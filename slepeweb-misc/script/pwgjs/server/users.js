@@ -132,6 +132,9 @@ class Response {
 	}
 }
 
+/*
+	DUPLICATE CODE
+	
 class FailedLoginMonitor {
 	constructor() {
 		this.heap = []
@@ -176,5 +179,6 @@ class FailedLoginMonitor {
 }
 
 const monitor = new FailedLoginMonitor()
+*/
 
 module.exports = new UserService()

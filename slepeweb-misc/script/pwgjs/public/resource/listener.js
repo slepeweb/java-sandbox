@@ -35,7 +35,6 @@ socket.on('login-response', (msg, err, username) => {
 		// Clear out the form
 		form.find('input[name=username]').val('')
 		form.find('input[name=password]').val('')
-		form.find('input[name=key]').val('')
 		
 		// Retrieve data for this user
 		socket.emit('company-list-request', _actor)
@@ -47,7 +46,6 @@ socket.on('login-response', (msg, err, username) => {
 	}
 	else {
 		form.find('input[name=password]').val('')
-		form.find('input[name=key]').val('')
 	}
 })
 

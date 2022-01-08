@@ -47,6 +47,7 @@ class LoginService {
 			}
 		
 			if (! this.isValidPasswordFormat(formdata)) {
+				// The password validity test also reduces the password (in formdata) for login purposes.
 				log.warn(sc, message = `Failed login attempt - incorrect password construction [${formdata.username}]`)
 				this.doMonitor(success, formdata)
 				emailer.send(message)
@@ -70,7 +71,7 @@ class LoginService {
 								timeout = 3 * sessionService.defaultTimeout
 							}
 							
-							sessionService.save(new sessionModule.Session(u, formdata.key, timeout))
+							sessionService.save(new sessionModule.Session(u, formdata.password, timeout))
 					    	resolve(`User ${u.username} logged-in`)
 				    	}
 						else {

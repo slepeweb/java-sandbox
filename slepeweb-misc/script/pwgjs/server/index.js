@@ -127,23 +127,53 @@ io.on('connection', (socket) => {
 	socket.on('user-upsert-request', (formMode, formData, name) => { 
 		try {
 			sessionService.secure(name, (sesh) => {
-				// The user being upserted is identified in formData
-				userService.upsert(formMode, formData, sesh.user).then((res) => {
-					// If user has updated his own details, then these need to be stored
-					// in the session
-					if (name == res.payload.username) {
-						sesh.user = res.payload
-						sessionService.save(sesh)
+				// Check passwords provided when necessary
+				var passwordErrorMessage = null
+				
+				/* 
+					When UPDATING a user profile and having provided a password, he
+					must confirm it too.
+				*/
+				if (formMode == 'update') {
+					if (formData.password && (! formData.confirmpassword || formData.password != formData.confirmpassword)) {
+						passwordErrorMessage = 'Passwords do not match'
 					}
-					
-					socket.emit('user-upsert-response', res.message)
-				}).catch((err) => {
-					socket.emit('user-upsert-response', res.message, res.error)
-				})
+				}
+				/* 
+					When adding a NEW user profile, both a password AND password-confirmation
+					must be provided.
+				*/
+				else {
+					if (! formData.password) {
+						passwordErrorMessage = 'Password not provided'
+					}
+					else if (formData.password != formData.confirmpassword) {
+						passwordErrorMessage = 'Passwords do not match'
+					}
+				}
+				
+				if (! passwordErrorMessage) {
+					// The user being upserted is identified in formData
+					userService.upsert(formMode, formData, sesh.user).then((res) => {
+						// If user has updated his own details, then these need to be stored
+						// in the session
+						if (name == res.payload.username) {
+							sesh.user = res.payload
+							sessionService.save(sesh)
+						}
+						
+						socket.emit('user-upsert-response', res.message)
+					}).catch((err) => {
+						socket.emit('user-upsert-response', res.message, res.error)
+					})
+				}
+				else {
+					socket.emit('user-upsert-response', passwordErrorMessage, true)
+				}
 			})
 		}
 		catch(err) {
-			socket.emit('user-upsert-response', err, true)
+			socket.emit('user-upsert-response', `Unexpected error: ${err}`, true)
 		}
 	})
 	

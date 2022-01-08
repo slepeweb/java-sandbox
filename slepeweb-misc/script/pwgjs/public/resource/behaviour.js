@@ -29,6 +29,8 @@ $(function() {
 		socket.emit('retire-session', _actor)
 		socket.emit('progress-request', _actor)	
 		_actor = null
+		_setFields()
+		_toggleDisplay()
 		_loginDialog.dialog('open')
 	})
 	

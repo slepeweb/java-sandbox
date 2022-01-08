@@ -121,10 +121,9 @@ const _submitLoginForm = () => {
 	var u = {
 		username: form.find('input[name=username]').val().trim(),
 		password: form.find('input[name=password]').val().trim(),
-		'key': form.find('input[name=key]').val().trim(),
 	}
 	
-	if (u.username && u.password && u.key) {
+	if (u.username && u.password) {
 		socket.emit('login-request', u)
 	}
 	else {

@@ -41,17 +41,18 @@ const _rwUpsertDialog = (inputElement, property, ur, uw) => {
 }
 
 /*
- * This function always returns the data in the user upsert form. If
+ * This function always returns the data in the user upsert form, as ur. If
  * argument uw exists, then the form fields are populated with the
- * contents of uw, that is AFTER reading the existing value. The
- * isAdmin argument is only relevant if uw provided.
+ * contents of uw, that is AFTER reading the existing value into ur. The
+ * isAdmin argument is only relevant if uw is provided.
  
  * NOTE: When this function is used to read the form data only, then 
  * arg uw will not be present, which is why formMode (which is sometimes 
  * buried within the uw object) needs to exist as a separate argument.
  */
 const _readAndPrepareUserUpsertDialog = (formMode, uw, isAdmin) => {
-	var ur = {}
+	var ur = {mode: formMode}
+	var confirm
 	
 	var form = $('#user-upsert-dialog form')
 	var input = form.find('input[name=mode]')
@@ -76,12 +77,17 @@ const _readAndPrepareUserUpsertDialog = (formMode, uw, isAdmin) => {
 	input = form.find('input[name=password]')
 	_rwUpsertDialog(input, 'password', ur, uw)
 	
+	confirm = form.find('input[name=confirmpassword]')
+	_rwUpsertDialog(confirm, 'confirmpassword', ur, uw)
+	
 	if (uw) {
 		if (formMode == 'update') {
-			input.attr('placeholder', 'Leave empty if no change here')
+			input.attr('placeholder', 'Leave empty if no change here ...')
+			confirm.attr('placeholder', '... and here')
 		}
 		else {
 			input.removeAttr('placeholder')
+			confirm.removeAttr('placeholder')
 		}
 	}
 	
