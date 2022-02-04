@@ -56,6 +56,7 @@ socket.on('progress-response', (percent) => {
 		if (_actor) {
 			if (! _loginDialog.dialog('isOpen')) {
 				_flashMessage('Session expired', true)
+				_setFields()
 			}
 			
 			_actor = null
