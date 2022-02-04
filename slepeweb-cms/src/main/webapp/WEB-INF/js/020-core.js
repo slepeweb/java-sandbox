@@ -20,9 +20,9 @@ _cms.core.sel.PARTNUM_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.PRICE_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.STOCK_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "");
 _cms.core.sel.FORM = "".concat(_cms.core.sel.CORE_TAB, " form");
-_cms.core.sel.UPDATE_BUTTON = _cms.core.sel.CORE_TAB + " button.action",
-_cms.core.sel.RESET_BUTTON = _cms.core.sel.CORE_TAB + " button.reset",
-
+_cms.core.sel.UPDATE_BUTTON = _cms.core.sel.CORE_TAB + " button.action";
+_cms.core.sel.RESET_BUTTON = _cms.core.sel.CORE_TAB + " button.reset";
+_cms.core.sel.TAG_OPTIONS = "#tag-options";
 
 _cms.support.setTabIds(_cms.core, "core");
 
@@ -136,7 +136,7 @@ _cms.core.behaviour.formchange = function() {
 }
 
 _cms.core.behaviour.tags = function() {
-	$("#tag-options li").click(function() {
+	$(_cms.core.sel.TAG_OPTIONS + " li").click(function() {
 		let tagInput = $("#item-core-editor input[name=tags]");
 		let existing = tagInput.val().trim();
 		let newTag = $(this).html();
@@ -152,11 +152,15 @@ _cms.core.behaviour.tags = function() {
 	});
 	
 	$("#tags-menu-icon").click(function() {
-		let ele = $("#tag-options");
+		let ele = $(_cms.core.sel.TAG_OPTIONS);
 		if (ele.hasClass("hide")) {
 			ele.removeClass("hide");
 		}
-		else {
+	});
+	
+	$(_cms.core.sel.TAG_OPTIONS).mouseleave(function() {
+		let ele = $(this);
+		if (! ele.hasClass("hide")) {
 			ele.addClass("hide");
 		}
 	});

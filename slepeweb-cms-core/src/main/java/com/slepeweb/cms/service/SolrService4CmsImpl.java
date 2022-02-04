@@ -19,6 +19,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.SolrParams4Cms;
 import com.slepeweb.cms.constant.FieldName;
+import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.common.solr.bean.SolrPager;
 import com.slepeweb.common.solr.bean.SolrResponse;
 import com.slepeweb.common.solr.service.SolrService4CmsBase;
@@ -40,7 +41,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 	}
 	
 	public boolean remove(Item i) {
-		return super.removeItemByOrigId(i.getOrigId());
+		return super.removeItem(i.getSolrKey());
 	}
 	
 	public boolean remove(Site s) {
@@ -96,23 +97,40 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 			Item i = (Item) item;
 			List<Object> docs = new ArrayList<Object>();
 			SolrDocument4Cms doc;
+			String s;
 			
 			for (String language : i.getSite().getAllLanguages()) {
 				
 				// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				// Standard approach
 				doc = new SolrDocument4Cms().
-					setKey(String.valueOf(i.getOrigId()), language).
+					/* 
+					 * 10/1/2022: The document key used to be based upon the item original id, but
+					 * has now been changed to the id. This means that the solr index will store
+					 * multiple versions of the same item, and queries need to choose whether
+					 * editable or viewable items are required.
+					 */
+					setKey(String.valueOf(i.getId()), language).
 					setSiteId(String.valueOf(i.getSite().getId())).
 					setType(i.getType().getName()).
 					setTitle(getFieldValue(i, FieldName.TITLE, language, false, null)).
 					setTeaser(getFieldValue(i, FieldName.TEASER, language, false, null)).
+					setTags(i.getTagsAsString()).
 					setPath(i.getPath()).
 					setEditable(i.isEditable()).
 					setViewable(i.isPublished());
 				
 				if (i.getSite().isMultilingual()) {
 					doc.setPath(String.format("/%s%s", language, i.getPath()));
+				}
+				
+				if (i.getType().getName().startsWith("Image")) {
+					doc.setTitle(getFieldValue(i, FieldName.ALT_TEXT, language, false, null));
+					doc.setTeaser(getFieldValue(i, FieldName.CAPTION, language, false, null));
+				}
+				
+				if (StringUtils.isBlank(doc.getTitle())) {
+					doc.setTitle(i.getName());
 				}
 				// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 				
@@ -165,7 +183,19 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 					}
 				}
 				// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-			
+							
+				// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+				// For photos site
+				if (i.getSite().getShortname().equals("pho")) {
+					if (i.getType().getName().startsWith(ItemTypeName.PHOTO_PREFIX)) {
+						s = getFieldValue(i, FieldName.YEAR, false, null);
+						if (StringUtils.isNumeric(s)) {
+							doc.setYear(Integer.valueOf(s));
+						}
+					}
+				}
+				// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+				
 				docs.add(doc);
 			}
 			
@@ -173,6 +203,10 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 		}
 		
 		return null;
+	}
+	
+	private String getFieldValue(Item i, String variable, boolean resolve, String dflt) {
+		return getFieldValue(i, variable, i.getSite().getLanguage(), resolve, dflt);
 	}
 	
 	private String getFieldValue(Item i, String variable, String language, boolean resolve, String dflt) {
@@ -234,14 +268,11 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				q.add("qf", "title^10 subtitle^4 bodytext");
 				q.setStart(params.getStart());
 				q.setRows(params.getPageSize());
-				//LOG.info(String.format("Solr query: [%s]", q.getQuery()));
 				
 				try {
 					QueryResponse qr = getClient().query(q);
 					response.setResults(qr.getBeans(SolrDocument4Cms.class));
 					response.setTotalHits(qr.getResults().getNumFound());
-//					LOG.debug(String.format("Query returned %d results out of %s", 
-//							response.getResults().size(), qr.getHeader().toString()));
 					
 					response.setPager(new SolrPager<SolrDocument4Cms>(
 							response.getTotalHits(), 

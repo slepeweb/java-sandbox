@@ -79,4 +79,10 @@
 		<function-signature>com.slepeweb.cms.bean.Item resolveOrderItemThumbnail(com.slepeweb.commerce.bean.Product, java.lang.String)</function-signature>
 	</function>
 	
+	<function>
+		<name>tertiaryOp</name>
+		<function-class>com.slepeweb.common.util.StringUtil</function-class>
+		<function-signature>java.lang.Object tertiaryOp(java.lang.Boolean, java.lang.Object, java.lang.Object)</function-signature>
+	</function>
+	
 </taglib>

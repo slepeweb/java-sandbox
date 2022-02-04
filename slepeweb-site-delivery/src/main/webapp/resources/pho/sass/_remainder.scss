@@ -1,0 +1,110 @@
+body {
+  max-width: $max-page-width;
+  /* This centres the page horizontally */
+  margin: auto;
+}
+
+footer {
+	grid-area: ftr;
+	text-align: center;
+	font-size: 0.85em;
+	opacity: 0.6;
+	line-height: 1.3em;
+	@include std-container-padding{}
+}
+
+.main {
+	grid-area: main;
+	@include std-container-padding{}
+}
+
+.leftside {
+	grid-area: side;
+	@include std-container-padding{}
+}
+
+div#image-gallery {
+	display: grid;
+	grid-gap: 6px;
+}
+
+div.search-result {
+	position: relative;
+	
+	img {
+		width: 100px;
+	}
+	
+	.search-result-info {
+		padding: 1em;
+		position: absolute;
+		background-color: #e4ddd0;
+		top: 100px;
+		z-index: 100;
+		min-width: 200px;
+		
+		p.heading{
+			font-size: 1.1em;
+			font-weight: bold;
+			margin: 0;
+		}
+		
+		p.caption{
+			font-size: 0.9em;
+			line-height: normal;
+			margin: 0;
+		}
+	}
+}
+
+p#search-results-pager {
+	margin-top: 2em;
+	cursor: normal;
+	
+	span.choose-page {
+			font-weight: bold;
+	}
+	
+	span.pagelink {
+		margin-right: 2em;
+		cursor: pointer;
+		
+		&.selected {
+			font-weight: bold;
+			cursor: default;
+		}
+	}
+}
+
+.hide {
+	display: none;
+}	
+
+
+@media (min-width: 300px) {
+	div#image-gallery {
+			grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 480px) {
+	div#image-gallery {
+			grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+@media (min-width: 800px) {
+	div#image-gallery {
+			grid-template-columns: repeat(6, 1fr);
+	}
+}
+
+@media (min-width: 1000px) {
+	div#image-gallery {
+			grid-template-columns: repeat(8, 1fr);
+	}
+}
+
+.fa-angle-double-right {
+	color: $color-accent-bg;
+}

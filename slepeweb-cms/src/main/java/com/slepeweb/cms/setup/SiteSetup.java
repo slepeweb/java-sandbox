@@ -332,7 +332,7 @@ public class SiteSetup {
 					}
 				}
 				else {
-					LOG.debug(LogUtil.compose("Item type is not updateable", it));
+					LOG.debug(LogUtil.compose("Item type not saved", it));
 				}
 			}
 		}

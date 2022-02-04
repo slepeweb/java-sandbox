@@ -10,6 +10,10 @@
   <field name="teaser" type="text_general" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="title" type="text_general" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="type" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="tags" type="text_general" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="editable" type="boolean" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="viewable" type="boolean" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="extra1" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
+  <field name="extra2" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
+  <field name="extra3" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
 	<copyField source="title" dest="_text_"/>

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 
 public abstract class SolrService4CmsBase extends SolrServiceBase {
 	
@@ -30,9 +31,9 @@ public abstract class SolrService4CmsBase extends SolrServiceBase {
 	protected boolean saveItem(Object i) {
 		List<Object> docs = makeDocuments(i);
 		try {
-			/*UpdateResponse resp = */ getBatchingClient().addBeans(docs);
-			getClient().commit();
-			LOG.debug("Item successfully indexed by Solr");
+			getBatchingClient().addBeans(docs);
+			UpdateResponse resp = getBatchingClient().commit();
+			LOG.info(String.format("Item successfully indexed by Solr, status [%d]", resp.getStatus()));
 			return true;
 		}
 		catch (Exception e) {
@@ -41,9 +42,9 @@ public abstract class SolrService4CmsBase extends SolrServiceBase {
 		}
 	}
 	
-	protected boolean removeItemByOrigId(long origId) {
+	protected boolean removeItem(String key) {
 		try {
-			/*UpdateResponse resp = */ getClient().deleteById(String.valueOf(origId));
+			/*UpdateResponse resp = */ getClient().deleteById(key);
 			getClient().commit();
 			LOG.debug("Item successfully removed from Solr index");
 			return true;

@@ -3,6 +3,7 @@ package com.slepeweb.cms.service;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,6 +180,12 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 			this.jdbcTemplate.query("select itemid, data, size, folder, thumbnail from media where itemid = ? and thumbnail = ?", 
 				new Object[]{id, thumbnail},
 				new RowMapperUtil.MediaMapper()));
+	}
+	
+	public List<Media> getAllMedia(Long id) {
+		return this.jdbcTemplate.query("select itemid, data, size, folder, thumbnail from media where itemid = ?", 
+				new Object[]{id},
+				new RowMapperUtil.MediaMapper());
 	}
 	
 	public long getSize(Long id, boolean thumbnail) {

@@ -3,8 +3,10 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
@@ -16,22 +18,28 @@ public class TagServiceImpl extends BaseServiceImpl implements TagService {
 			"select * from tag " +
 			"where %s ";
 	
+	@Autowired private SolrService4Cms solrService4Cms;
+	
 	// Saves tags represented by a comma-delimited string
-	public void save(Long siteId, Long itemId, String valueStr) {
-		deleteTags(itemId);
+	public void save(Item i, String valueStr) {
+		deleteTags(i.getId());
 		
 		for (String value : valueStr.split("[ ,]+")) {
-			insert(siteId, itemId, value);
+			insert(i.getSite().getId(), i.getId(), value);
 		}
+		
+		this.solrService4Cms.save(i.setTags(null));
 	}
 	
 	// Saves tags in a string collection
-	public void save(Long siteId, Long itemId, List<String> values) {
-		deleteTags(itemId);
+	public void save(Item i, List<String> values) {
+		deleteTags(i.getId());
 		
 		for (String value : values) {
-			insert(siteId, itemId, value);
+			insert(i.getSite().getId(), i.getId(), value);
 		}
+		 
+		this.solrService4Cms.save(i.setTags(null));
 	}
 	
 	private void insert(Long siteId, Long itemId, String value) {

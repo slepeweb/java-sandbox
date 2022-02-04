@@ -1,7 +1,6 @@
 package com.slepeweb.cms.bean;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,11 +35,10 @@ public class Tag extends CmsBean {
 		return String.format("Tags for itemId %d: '%s'", getItemId(), getValue());
 	}
 
-	@Override
-	// Saves a list of tags, and returns one, in order to satisfy the CmsBean interface
+	@Deprecated
+	// NEVER USED
 	protected CmsBean save() {
-		getTagService().save(getSiteId(), getItemId(), Arrays.asList(getValue()));
-		return getTagService().getTag4ItemWithValue(getItemId(), getValue());
+		return null;
 	}
 
 	@Override

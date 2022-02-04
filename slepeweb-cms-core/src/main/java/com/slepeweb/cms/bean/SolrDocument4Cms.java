@@ -13,9 +13,13 @@ public class SolrDocument4Cms {
 	@Field("subtitle") private String subtitle;
 	@Field("teaser") private String teaser;
 	@Field("bodytext") private String bodytext;
+	@Field("tags") private String tags;
 	@Field("path") private String path;
 	@Field("editable") private boolean editable;
 	@Field("viewable") private boolean viewable;
+	@Field("year") private Integer year;
+	@Field("extra2") private String extra2;
+	@Field("extra3") private String extra3;
 	
 	public SolrDocument4Cms() {}
 	
@@ -127,6 +131,15 @@ public class SolrDocument4Cms {
 		return key;
 	}
 
+	public String getTags() {
+		return tags;
+	}
+
+	public SolrDocument4Cms setTags(String tags) {
+		this.tags = tags;
+		return this;
+	}
+
 	public SolrDocument4Cms setKey(String key) {
 		this.key = key;
 		String[] parts = key.split("-");
@@ -137,10 +150,37 @@ public class SolrDocument4Cms {
 		return this;
 	}
 	
-	public SolrDocument4Cms setKey(String origId, String language) {
-		this.key = String.format("%s-%s", origId, language);
-		this.id = origId;
+	public SolrDocument4Cms setKey(String id, String language) {
+		this.key = String.format("%s-%s", id, language);
+		this.id = id;
 		this.language = language;
+		return this;
+	}
+
+	public Integer getYear() {
+		return year;
+	}
+
+	public SolrDocument4Cms setYear(Integer year) {
+		this.year = year;
+		return this;
+	}
+
+	public String getExtra2() {
+		return extra2;
+	}
+
+	public SolrDocument4Cms setExtra2(String extra2) {
+		this.extra2 = extra2;
+		return this;
+	}
+
+	public String getExtra3() {
+		return extra3;
+	}
+
+	public SolrDocument4Cms setExtra3(String extra3) {
+		this.extra3 = extra3;
 		return this;
 	}
 }

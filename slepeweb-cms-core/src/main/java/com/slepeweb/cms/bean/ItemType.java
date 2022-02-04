@@ -12,6 +12,8 @@ public class ItemType extends CmsBean {
 	public static final String CONTENT_FOLDER_TYPE_NAME = "Content Folder";
 	public static final String PAGE_MIMETYPE = "application/cms";
 	public static final String JS_MIMETYPE = "text/javascript";
+	public static final String IMAGE_MIMETYPE_PREFIX = "image";
+	public static final String VIDEO_MIMETYPE_PREFIX = "video";
 	
 	private Long id, privateCache = 0L, publicCache = 0L;
 	private String name, mimeType = PAGE_MIMETYPE;
@@ -153,12 +155,17 @@ public class ItemType extends CmsBean {
 	// TODO: This would be better handled by adding a media column to the itemtype table
 	public boolean isMedia() {
 		return 
-			! getMimeType().equals(PAGE_MIMETYPE) &&
-			! getMimeType().equals(JS_MIMETYPE);
+			isImage() ||
+			! (getMimeType().equals(PAGE_MIMETYPE) ||
+					getMimeType().equals(JS_MIMETYPE));
 	}
 
 	public boolean isImage() {
-		return getMimeType().startsWith("image");
+		return getMimeType().startsWith(IMAGE_MIMETYPE_PREFIX);
+	}
+
+	public boolean isVideo() {
+		return getMimeType().startsWith(VIDEO_MIMETYPE_PREFIX);
 	}
 
 	public String getMimeType() {

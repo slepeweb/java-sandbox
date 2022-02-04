@@ -46,7 +46,7 @@ _cms.field.getFieldsFormInputData = function() {
 	var result = {};
 	var language = $(_cms.field.sel.LANGUAGE_SELECT).val();
 	if (! language) {
-		language = _siteDefaultLanguage;
+		language = _cms.siteDefaultLanguage;
 	}
 	
 	result["language"] = language;

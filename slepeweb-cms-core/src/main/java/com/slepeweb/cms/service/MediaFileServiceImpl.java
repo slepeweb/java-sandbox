@@ -11,7 +11,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FileMetadata;
@@ -25,8 +24,7 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 	private static Logger LOG = Logger.getLogger(MediaFileServiceImpl.class);
 	public static final int BIN_CAPACITY = 200;
 	
-	@Autowired private MediaService mediaService;
-	private String repository = "/var/www/slepeweb_cms_repository";
+	private String repository = "/home/photos";
 	private Map<String, Integer> fileCount = new HashMap<String, Integer>();
 	private String currentBin;
 	
@@ -66,38 +64,44 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 	 */
 	public FileMetadata writeMediaToRepository(BufferedInputStream is, String filename) {
 		
-		String binUsed = this.currentBin;
-		String outputFilePath = getRepositoryFilePath(binUsed, filename);
+		this.currentBin = identifyBinWithSpace(this.currentBin);
+		String outputFilePath = getRepositoryFilePath(this.currentBin, filename);
 		Long bytesWritten = writeMedia(is, outputFilePath);
 		
 		if (bytesWritten != null) {
 			// Increment file count for this bin.
-			Integer count = this.fileCount.get(this.currentBin);
-			this.fileCount.put(this.currentBin, count + 1);
-			
-			// Pick another bin for next file write IF current bin is full.
-			while (count >= BIN_CAPACITY) {
-				this.currentBin = identifyBinWithSpace(this.currentBin);
-			}
+			increment();
 			
 			return new FileMetadata().
 					setName(filename).
-					setBin(binUsed).
+					setBin(this.currentBin).
 					setPath(outputFilePath).
 					setSize(bytesWritten);
 		}
 
 		return null;
 	}	
+	
+	private int increment() {
+		int n = this.fileCount.get(this.currentBin) + 1;
+		this.fileCount.put(this.currentBin, n);
+		return n;
+	}
 
 	public boolean delete(Item i) {
 		if (i.getType().isMedia()) {
-			Media m = this.mediaService.getMedia(i.getId());
-			
-			if (m != null && m.isFileStored()) {
-				String filePath = getRepositoryFilePath(m.getFolder(), m.getRepositoryFileName());
-				File f = new File(filePath);		
-				return f.delete();
+			for (Media m : i.getAllMedia()) {
+				if (m.isFileStored()) {
+					String filePath = getRepositoryFilePath(m.getFolder(), m.getRepositoryFileName());
+					File f = new File(filePath);
+					
+					if (f.delete()) {
+						LOG.info(String.format("Successfully deleted media from file system [%s]", filePath));
+					}
+					else {
+						LOG.warn(String.format("Failed to delete media from file system [%s]", filePath));
+					}
+				}
 			}
 		}
 		return false;
@@ -155,7 +159,7 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 			return identifyBinWithSpace(nextBin(testCase));
 		}
 		else {			
-			LOG.info(String.format("Using bin %s, which has %d files", testCase, this.fileCount.get(testCase)));
+			LOG.info(String.format("Using bin %s, which has %d files", testCase, count));
 			return testCase;
 		}
 	}
@@ -172,13 +176,14 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 		else {
 			if (chars[0] < 'z') {
 				chars[0] += 1; 
+				chars[1] = 'a';
 			}
 			else {
 				// LOG IT
 			}
 		}
 		
-		return chars.toString();
+		return new String(chars);
 	}
 	
 	public void setRepository(String repository) {
@@ -215,5 +220,32 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 		}
 		
 		return false;
+	}
+	
+	private static String nextBinStat(String current) {
+		char[] chars = current.toCharArray();
+		
+		if (chars[1] < 'z') {
+			chars[1] += 1; 
+		}
+		else {
+			if (chars[0] < 'z') {
+				chars[0] += 1; 
+				chars[1] = 'a';
+			}
+			else {
+				// LOG IT
+			}
+		}
+		
+		return new String(chars);
+	}
+	
+	public static void main(String[] args) {
+		String bin = "aa";
+		for (int i = 0; i < 200; i++) {
+			bin = nextBinStat(bin);
+			System.out.print(", " + bin);
+		}
 	}
 }

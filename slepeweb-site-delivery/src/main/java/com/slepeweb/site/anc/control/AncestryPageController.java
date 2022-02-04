@@ -385,20 +385,5 @@ public class AncestryPageController extends BaseController {
 		}
 		
 		return trail;
-	}
-	
-	/*
-	 * I can't see a way to make the server process the form data as utf-8. All attempts to set the
-	 * character encoding for dealing with non-english search terms as utf-8 have failed.
-	 */
-	private String iso2utf8(String s) {
-		if (StringUtils.isNotBlank(s)) {
-			try {
-				return new String(s.getBytes("ISO-8859-1"));
-			}
-			catch (Exception e) {
-			}
-		}
-		return s;
-	}
+	}	
 }

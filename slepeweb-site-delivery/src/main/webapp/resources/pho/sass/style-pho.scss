@@ -1,0 +1,14 @@
+@media screen and (max-width:400px) {
+  @-ms-viewport{
+    width: device-width;
+  }
+}
+
+@import 'vars';
+@import 'mixins';
+@import '../../css/font-awesome.min.css';
+@import 'skel-mod2';
+@import 'list';
+@import 'layout';
+@import 'header';
+@import 'remainder';

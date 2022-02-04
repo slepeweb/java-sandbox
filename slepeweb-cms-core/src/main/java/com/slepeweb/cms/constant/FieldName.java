@@ -21,4 +21,7 @@ public class FieldName {
 	public static final String BLURB = "blurb";
 	public static final String HEADING = "heading";
 	public static final String OVERVIEW = "overview";
+	public static final String CAPTION = "caption";
+	public static final String ALT_TEXT = "alt";
+	public static final String YEAR = "year";
 }

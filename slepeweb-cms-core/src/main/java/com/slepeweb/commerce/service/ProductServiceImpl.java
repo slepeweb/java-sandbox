@@ -25,12 +25,8 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	@Autowired ItemService itemService;
 	
 	public Product save(Product p) throws ResourceException {
-		return save(p, false);
-	}
-	
-	public Product save(Product p, boolean extendedSave) throws ResourceException {
 		// First save the item data, ie insert/update row in Item
-		Item i = super.save(p, extendedSave);
+		Item i = super.save(p);
 		
 		// Now save the insert/update row in Product
 		Product dbRecord = get(p.getOrigId());		

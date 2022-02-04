@@ -1,11 +1,14 @@
 TODO: This is the main todo file:
 
 HIGH
-- when media item is deleted, file in repository should also be deleted
+- force media items to have appropriate simplename extensions, esp. video, pdf, etc.
+- show bin - takes 2 clicks (perhaps not first time)
+- implement cron job to backup cms db on desktop
 - site selection on login should be based upon hostname
-- re-test registration process
 
 MEDIUM
+- re-test registration process
+- app to remove redundant media files from file store
 - check sws (search) still working
 - PDFs not viewable on my android phone (chrome)
 - PDFs not rendered with scrollbars on iPad

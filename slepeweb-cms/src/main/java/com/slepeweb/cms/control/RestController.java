@@ -212,7 +212,7 @@ public class RestController extends BaseController {
 		String tagStr = getParam(req, "tags");
 		List<String> latestTagValues = Arrays.asList(tagStr.split("[ ,]+"));
 		if (existingTagValues.size() != latestTagValues.size() || ! existingTagValues.containsAll(latestTagValues)) {
-			this.cmsService.getTagService().save(i.getSite().getId(), i.getId(), tagStr);
+			this.cmsService.getTagService().save(i, tagStr);
 			resp.addMessage("Tags updated");
 			
 			// Identify recently-applied tags - remove existing tags from latest, and see what's left.
@@ -425,7 +425,7 @@ public class RestController extends BaseController {
 							setLanguage(language);
 				}
 				
-				if (ft == FieldType.integer) {
+				if (ft == FieldType.integer && StringUtils.isNotBlank(stringValue)) {
 					fv.setValue(Integer.parseInt(stringValue));
 				}
 				else if (ft == FieldType.date || ft == FieldType.datetime) {
@@ -492,9 +492,13 @@ public class RestController extends BaseController {
 		}
 		else {
 			try {
-				// Update dateUpdated for the item
-				i.resetDateUpdated();				
-				i.save();
+				// Update dateUpdated for the item, and save the core data
+				i.resetDateUpdated();	
+				i = i.save();
+				
+				// Now save the item's field values
+				i.saveFieldValues();
+				
 				resp.addMessage(String.format("%d fields updated", c));
 			}
 			catch (ResourceException e) {

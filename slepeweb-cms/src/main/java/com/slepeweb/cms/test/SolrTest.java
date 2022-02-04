@@ -95,8 +95,10 @@ public class SolrTest extends BaseTest {
 			
 			// Version the item
 			r = trs.execute(8060);
-			Item originalVersion = testItem.setFieldValue(TITLE_FIELD_NAME, BEFORE_TEXT).save(true);
-			Item newVersion = this.itemService.version(originalVersion).setFieldValue(TITLE_FIELD_NAME, AFTER_TEXT).save(true);
+			Item originalVersion = testItem;
+			originalVersion.setFieldValue(TITLE_FIELD_NAME, BEFORE_TEXT).saveFieldValues();
+			Item newVersion = this.itemService.version(originalVersion);
+			newVersion.setFieldValue(TITLE_FIELD_NAME, AFTER_TEXT).saveFieldValues();;
 			// The new version should be un-published, so not indexable. So the document we get
 			// should match the original version
 			doc = getDocument(newVersion);

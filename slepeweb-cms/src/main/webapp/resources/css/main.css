@@ -453,6 +453,7 @@ button[disabled=disabled] {
 	background-color: #f2d9a7;
 	position: absolute;
 	right: 10em;
+	bottom: 1em;
 	width: 300px;
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);

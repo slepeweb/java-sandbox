@@ -1,0 +1,9 @@
+.layout-std {
+	display: grid;
+  grid-template-columns: 1fr;
+	grid-template-areas: 
+		"hdr"
+		"main"
+		"ftr";
+}
+

@@ -51,4 +51,7 @@ public class StringUtil {
 		return false;
 	}
 	
+	public static Object tertiaryOp(boolean test, Object trueResult, Object falseResult) {
+		return test ? trueResult : falseResult;
+	}
 }

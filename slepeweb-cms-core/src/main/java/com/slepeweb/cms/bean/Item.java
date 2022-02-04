@@ -202,12 +202,8 @@ public class Item extends CmsBean {
 		return getItemService().save(this);
 	}
 	
-	public Item save(boolean extended) throws ResourceException {
-		return getItemService().save(this, extended);
-	}
-	
 	public void saveFieldValues() throws ResourceException {
-		getItemService().saveFieldValues(getFieldValueSet());
+		getItemService().saveFieldValues(this);
 	}
 	
 	public void saveLinks() throws ResourceException {
@@ -644,6 +640,10 @@ public class Item extends CmsBean {
 		return this.cmsService.getMediaService().getMedia(getId(), thumbnailRequired);
 	}
 
+	public List<Media> getAllMedia() {
+		return this.cmsService.getMediaService().getAllMedia(getId());
+	}
+
 	public List<Link> getRelations() {
 		return filterLinks(new String[] {LinkType.relation});
 	}
@@ -795,6 +795,11 @@ public class Item extends CmsBean {
 		}
 		return this.tags;
 	}
+	
+	public Item setTags(List<Tag> l) {
+		this.tags = l;
+		return this;
+	}
 
 	public List<String> getTagValues() {
 		return Tag.toValues(getTags());
@@ -880,6 +885,10 @@ public class Item extends CmsBean {
 
 	public boolean isAccessible() {
 		return getCmsService().getSiteAccessService().isAccessible(this);
+	}
+	
+	public String getSolrKey() {
+		return String.format("%s-%s", getId(), getLanguage());
 	}
 	
 	/*

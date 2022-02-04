@@ -16,7 +16,7 @@ public class ImageUtil {
 	public static void streamScaled(InputStream in, OutputStream out, int width, int height, String mediaType) 
 			throws IOException {
 		
-		// Create the tumbnail
+		// Create the thumbnail
 		BufferedImage src = ImageIO.read(in);
 		Image img = src.getScaledInstance(width, height, Image.SCALE_SMOOTH);		
 		BufferedImage thumb = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);

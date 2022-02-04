@@ -92,7 +92,7 @@ public class FieldValueSet {
 		if (fv != null) {
 			return fv.getIntegerValue();
 		}
-		return new Integer(0);
+		return 0;
 	}
 	
 	/*

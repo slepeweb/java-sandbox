@@ -54,12 +54,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	@Autowired protected CmsService cmsService;
 	
 	public Item save(Item i) throws ResourceException {
-		return save(i, false);
-	}
-	
-	public Item save(Item i, boolean extendedSave) throws ResourceException {
-		boolean updated = false;
-		
 		if (! i.isDefined4Insert()) {
 			throw new MissingDataException("Item data not sufficient for db insert");
 		}
@@ -68,44 +62,24 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		
 		if (dbRecord != null) {
 			update(dbRecord, i);
-			updated = true;
+			this.solrService4Cms.save(dbRecord);
+			
+			/* 
+			 * Return the updated item instance with nullified field values, links and tags,
+			 * forcing these data to be re-calculated on demand.
+			 */
+			return dbRecord.setLinks(null).setFieldValues(null).setTags(null);
 		}
 		else {
 			insert(i);
-		}
-		
-		if (extendedSave) {
-			saveFieldValues(i.getFieldValueSet());
-			saveLinks(i, dbRecord);
-		}
-		
-		/* Update the Solr index if item is searchable, published, and NOT an inline.
-		 * Otherwise, remove it from the index.
-		 * This means that the editorial app will only search published content. 
-		 * That is, it will not see un-published content in the solr database.
-		 */
-		if (i.isSearchable() && i.isPage() && i.isPublished()) {
 			this.solrService4Cms.save(i);
+			
+			/* 
+			 * Return the inserted item instance with nullified field values, links and tags,
+			 * forcing these data to be re-calculated on demand.
+			 */
+			return i.setLinks(null).setFieldValues(null).setTags(null);
 		}
-		
-		/* 
-		 * We might have created a new item as a result of versioning,
-		 * in which case we wouldn't want to remove any Solr documents for previous
-		 * published versions.
-		 */
-		else if (i.getVersion() == 1){
-			this.solrService4Cms.remove(i);
-		}
-		
-		if (updated) {
-			return dbRecord.setLinks(null).setFieldValues(null);
-		}
-		
-		/* 
-		 * Return the item instance with nullified field values and links,
-		 * forcing these data to be re-calculated on demand.
-		 */
-		return i.setLinks(null).setFieldValues(null);
 	}
 	
 	private void insert(Item i) throws ResourceException {
@@ -274,12 +248,14 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		LOG.info(compose("Older versions deleted", i));
 	}
 	
-	public void saveFieldValues(FieldValueSet fieldValues) throws ResourceException {
-		if (fieldValues != null) {
-			for (FieldValue fv : fieldValues.getAllValues()) {
+	public void saveFieldValues(Item i) throws ResourceException {
+		if (i != null && i.getFieldValueSet() != null) {
+			for (FieldValue fv : i.getFieldValueSet().getAllValues()) {
 				fv.save();
 			}
 		}
+		
+		this.solrService4Cms.save(i);
 	}
 	
 	@SuppressWarnings("unused")
@@ -388,16 +364,19 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		int num = 0;
 		if (origIds == null) {
 			for (Item i : getTrashedItems()) {
+				// First of all delete associated files from the file store. This MUST be the first step.
+				// (Remember that media and item tables are linked by a foreign key constraint 'on delete cascade')
+				if (i.getType().isMedia()) {
+					this.mediaFileService.delete(i);
+				}
+				
+				
 				/* 
-				 * Call the delete() method of Item, instead of the deleteItem() method of this service.
+				 * THEN call the delete() method of Item, instead of the deleteItem() method of this service.
 				 * This ensures that if the Item is in fact a Product, then the overriden delete()
 				 * method in Product gets executed.
 				 */
 				i.delete();
-				
-				if (i.getType().isMedia()) {
-					this.mediaFileService.delete(i);
-				}
 				
 				num++;
 			}
@@ -407,8 +386,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				// Above comment applies here too.
 				Item i = getItemFromBin(id);
 				if (i != null) {
-					i.delete();
 					this.mediaFileService.delete(i);
+					i.delete();
 					num++;
 				}
 			}
@@ -446,7 +425,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	// The 'delete' methods permanently delete items from the db that have their 'deleted' flag set.
 	// The 'trash' methods perform soft-deletes, by setting/un-setting the 'deleted' flag.
-	
+	// This method is recursive - it also trashes ALL descendant items
 	public int trashItemAndDirectChildren(Item i) {
 		// Delete all versions of this item
 		int count = this.jdbcTemplate.update("update item set deleted = 1 where origid = ?", i.getOrigId());
@@ -775,7 +754,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			nfv.setItemId(ni.getId());
 			fvs.addFieldValue(nfv);
 		}
+		
 		ni.setFieldValues(fvs);
+		saveFieldValues(ni);
 		
 		// Links
 		List<Link> nll = new ArrayList<Link>(origLinks.size());
@@ -793,9 +774,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				nll.add(nl);
 			}
 		}
-		ni.setLinks(nll);
 		
-		ni = save(ni, true);
+		ni.setLinks(nll);		
+		saveLinks(ni);
 		
 		// Does this item have media?
 		Media m = this.mediaService.getMedia(sourceId);

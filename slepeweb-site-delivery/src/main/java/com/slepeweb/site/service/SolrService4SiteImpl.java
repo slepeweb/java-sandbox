@@ -39,7 +39,7 @@ public class SolrService4SiteImpl extends SolrService4SiteBase implements SolrSe
 				SolrQuery q = new SolrQuery();
 				q.setQuery(params.getSearchText());
 				q.add("defType", "dismax");
-				q.add("qf", "title^10 subtitle^4 bodytext");
+				q.add("qf", "title^10 tags^10 teaser^4 bodytext");
 				q.setStart(params.getStart());
 				q.setRows(params.getPageSize());
 				LOG.info(String.format("Solr query: [%s]", q.getQuery()));

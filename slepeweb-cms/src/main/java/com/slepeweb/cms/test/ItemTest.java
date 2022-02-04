@@ -277,7 +277,7 @@ public class ItemTest extends BaseTest {
 				this.tagService.deleteTags(newsItem.getId());
 				
 				tagsIn = Arrays.asList("football", "cricket");
-				this.tagService.save(newsItem.getSite().getId(), newsItem.getId(), tagsIn);
+				this.tagService.save(newsItem, tagsIn);
 				tagsOut = Tag.toValues(newsItem.getTags());
 				if (tagsOut.size() != 2 || ! tagsOut.containsAll(tagsIn)) {
 					r.fail().setNotes(String.format("Item incorrectly tagged [%s]", newsItem));
@@ -293,7 +293,7 @@ public class ItemTest extends BaseTest {
 				this.tagService.deleteTags(newsItem.getId());
 				
 				tagsIn = Arrays.asList(tennis);
-				this.tagService.save(newsItem.getSite().getId(), newsItem.getId(), tagsIn);
+				this.tagService.save(newsItem, tagsIn);
 				tagsOut = Tag.toValues(newsItem.getTags());
 				if (tagsOut.size() != 1 || ! tagsOut.containsAll(tagsIn)) {
 					r.fail().setNotes(String.format("Item incorrectly tagged [%s]", newsItem));

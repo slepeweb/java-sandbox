@@ -1,0 +1,71 @@
+@mixin extra-small-only {
+    @media only screen and (max-width : $transition-xsmall-to-small - 0.0625) {
+        @content;
+    }
+}
+
+@mixin extra-small-and-above {
+    @media only screen and (min-width : $transition-xsmall-to-small) {
+        @content;
+    }
+}
+
+@mixin small-only {
+    @media only screen and (max-width : $transition-small-to-medium - 0.0625) {
+        @content;
+    }
+}
+@mixin small-and-above {
+    @media only screen and (min-width : $transition-small-to-medium) {
+        @content;
+    }
+}
+
+@mixin nav-transition {
+    @media only screen and (max-width : $transition-nav) {
+        @content;
+    }
+}
+
+@mixin std-container-padding {
+  padding-left: $std-container-padding;
+  padding-right: $std-container-padding;
+  padding-bottom: $std-container-padding;  
+}
+
+
+@mixin vendor-property($property, $value) { 
+    @each $vendor in ('-moz-', '-webkit-', '-o-', '-ms-', '') {
+        #{$vendor}#{$property}: #{$value};
+    }
+}
+
+@mixin vendor-value($property, $value) { 
+    @each $vendor in ('-moz-', '-webkit-', '-o-', '-ms-', '') {
+        #{$property}: #{$vendor}#{$value};
+    }
+}
+
+@mixin vendor-keyframes($name) {
+	@-moz-keyframes #{$name} { @content; }
+	@-webkit-keyframes #{$name} { @content; }
+	@-o-keyframes #{$name} { @content; }
+	@-ms-keyframes #{$name} { @content; }
+	@keyframes #{$name} { @content; }
+}
+
+@mixin icon($content: false) {
+	text-decoration: none;
+
+	&:before {
+		@if $content {
+			content: $content;
+		}
+		-moz-osx-font-smoothing: grayscale;
+		-webkit-font-smoothing: antialiased;
+		font-family: FontAwesome;
+		font-style: normal;
+		font-weight: normal;
+		text-transform: none !important;
+	}
+}

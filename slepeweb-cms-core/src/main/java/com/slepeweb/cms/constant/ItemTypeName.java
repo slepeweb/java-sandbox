@@ -13,4 +13,6 @@ public class ItemTypeName {
 	public static final String PDF = "PDF";
 	public static final String PRODUCT = "Product";
 	public static final String SHORTCUT = "Shortcut";
+	public static final String PHOTO_PREFIX = "Photo ";
+	public static final String PHOTO_JPG = PHOTO_PREFIX + "JPG";
 }

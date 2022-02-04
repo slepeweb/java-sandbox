@@ -2,6 +2,7 @@ package com.slepeweb.site.control;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -92,5 +93,20 @@ public class BaseController {
 		
 		model.addAttribute("_page", p);
 		return p;
+	}
+	
+	/*
+	 * I can't see a way to make the server process form data as utf-8. All attempts to set the
+	 * character encoding for dealing with non-english search terms as utf-8 have failed.
+	 */
+	protected String iso2utf8(String s) {
+		if (StringUtils.isNotBlank(s)) {
+			try {
+				return new String(s.getBytes("ISO-8859-1"));
+			}
+			catch (Exception e) {
+			}
+		}
+		return s;
 	}
 }

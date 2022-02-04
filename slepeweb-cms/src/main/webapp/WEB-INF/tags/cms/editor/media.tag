@@ -5,8 +5,8 @@
 	
 <form id="media-form" enctype="multipart/form-data">
 	<div class="ff">
-		<label>Current media</label>
 		<c:choose><c:when test="${editingItem.mediaLoaded}">
+			<label>Current media (${cmsf:formatBytes(editingItem.media.size)})</label>
 			<c:choose><c:when test="${editingItem.type.image}">
 				<c:set var="_host" value="${editingItem.site.stagingHost}" />
 				<img src="${_host.protocol}://${_host.name}:${_host.port}/cms/media${editingItem.path}" width="200" />
@@ -14,7 +14,7 @@
 				Loaded (${editingItem.type.mimeType})
 			</c:otherwise></c:choose>
 		</c:when><c:otherwise>
-			None
+			<label>No media loaded</label>
 		</c:otherwise></c:choose>
 	</div>
 	
