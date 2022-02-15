@@ -2,7 +2,6 @@ package com.slepeweb.cms.control;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,6 +17,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.bean.Dateish;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
@@ -258,53 +260,34 @@ public class RestController extends BaseController {
 	public RestResponse updateItemMedia(
 			@PathVariable Long origId, 
 			@RequestParam("media") MultipartFile file, 
-			@RequestParam(value="thumbnail", required=false) Boolean thumbnailRequired, 
+			@RequestParam(value="thumbnail", required=false) String thumbnailAction, 
 			@RequestParam(value="width", required=false) Integer thumbnailWidth, 
 			HttpServletRequest req,
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		InputStream is = null;
-		ByteArrayOutputStream baos = null;
+		String msg;
 		
-		if (thumbnailRequired == null) {
-			thumbnailRequired = false;
+		if (thumbnailAction == null) {
+			thumbnailAction = "none";
 		}
 		
 		if (file != null) {
-			try {
-				is = file.getInputStream();
-				Item i = getEditableVersion(origId, getUser(req), true);
-				if (i != null) {
-					Media m = CmsBeanFactory.makeMedia().
-							setItemId(i.getId()).
-							setUploadStream(is);
-					
-					// Save the media item
-					try {
-						this.cmsService.getMediaService().save(m);
-						
-						if (thumbnailRequired) {
-							is.close();
-
-							m.setThumbnail(true);
-							is = file.getInputStream();							
-							baos = new ByteArrayOutputStream();
-							
-							ImageUtil.streamScaled(
-									is, baos, 
-									thumbnailWidth, 
-									-1, 
-									i.getType().getMimeType());
-							
-							m.setUploadStream(ImageUtil.pipe(baos));
-							this.cmsService.getMediaService().save(m);
-						}
+			Item i = getEditableVersion(origId, getUser(req), true);
+			
+			if (i != null) {
+				try {
+					if (thumbnailAction.equals("onlythumb")) {
+						InputStream is = ImageUtil.scaleImage(file.getInputStream(), thumbnailWidth, -1, "jpg");
+						saveMedia(i.getId(), is, true);
 					}
-					catch (ResourceException e) {
-						String s = "Failed to save Media data";
-						LOG.error(s, e);
-						return resp.setError(true).addMessage(s);		
+					else {
+						saveMedia(i.getId(), file.getInputStream(), false);
+						
+						if (thumbnailAction.equals("autoscale") && i.getType().isImage()) {
+							InputStream is = ImageUtil.scaleImage(file.getInputStream(), thumbnailWidth, -1, "jpg");
+							saveMedia(i.getId(), is, true);
+						}
 					}
 					
 					// Update the timestamp on the owning item
@@ -313,27 +296,45 @@ public class RestController extends BaseController {
 						i.save();
 					}
 					catch (ResourceException e) {
-						String s = "Missing item data ??? - not saved";
-						LOG.error(s, e);
-						return resp.setError(true).addMessage(s);		
+						LOG.error(msg = "Missing item data ??? - not saved", e);
+						return resp.setError(true).addMessage(msg);		
 					}
 					
-					return resp.setError(false).addMessage("Media successfully uploaded");
+					LOG.info(msg = "Media successfully uploaded");
+					return resp.setError(false).addMessage(msg);
 				}
-				
-				return resp.setError(true).addMessage(String.format("No item found with id %d", origId));		
-			}
-			catch (IOException e) {
-				String s = "Failed to get input stream for media upload";
-				LOG.error(s, e);
-				return resp.setError(true).addMessage(s);		
-			}		
+				catch (Exception e) {
+					LOG.error(msg = "Problem with input streams", e);
+					return resp.setError(true).addMessage(msg);		
+				}
+			}			
 		}
 		else {
-			String s = "No file specified";
-			LOG.error(s);
-			return resp.setError(true).addMessage(s);
+			LOG.error(msg = "No file specified");
+			return resp.setError(true).addMessage(msg);
 		}
+		
+		LOG.error(msg = "No media upload undertaken");
+		return resp.setError(true).addMessage(msg);
+	}
+	
+	private boolean saveMedia(Long itemId, InputStream is, boolean isThumbnail) {
+		try {
+			Media m = CmsBeanFactory.makeMedia().
+					setItemId(itemId).
+					setUploadStream(is).
+					setThumbnail(isThumbnail);
+			
+			this.cmsService.getMediaService().save(m);
+			is.close();
+			
+			return true;
+		}
+		catch (Exception e) {
+			LOG.error("Failed to save media", e);
+		}
+		
+		return false;
 	}
 	
 	@RequestMapping(value="/item/{origId}/update/fields", method=RequestMethod.POST, produces="application/json")
@@ -371,7 +372,7 @@ public class RestController extends BaseController {
 		
 		// Loop through fields for this item type
 		for (FieldForType fft : i.getType().getFieldsForType()) {
-			// Only interested in multilingual fields for additional languages
+			// Only interested in multilingual fields for additional languages IFF site is multilingual
 			if (i.getSite().isMultilingual() && 
 					! (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual())) {
 				
@@ -458,6 +459,22 @@ public class RestController extends BaseController {
 				}
 				else {
 					fv.setValue(stringValue);
+				}
+				
+				// Does this field value require validation?
+				if (StringUtils.isNotBlank(fv.getField().getValidationRegExp())) {
+					Pattern p = Pattern.compile(fv.getField().getValidationRegExp(), Pattern.CASE_INSENSITIVE);
+					Matcher m = p.matcher(fv.getStringValue());
+					if (! m.matches()) {
+						errors.add(String.format("Field value '%s' fails validation", stringValue));
+						continue;
+					}
+				}
+				
+				// Re-format dateish fields
+				if (ft == FieldType.dateish) {
+					Dateish dish = new Dateish(fv.getStringValue());
+					fv.setStringValue(dish.toString());
 				}
 				
 				/* 

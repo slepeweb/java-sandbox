@@ -17,7 +17,8 @@
                       
 	<c:forEach items="${_search.results}" var="_result" varStatus="_stat">
 		<c:set var="_teaser" value="${_result.teaser}" />
-		<c:if test="${_result.year > 1900}"><c:set var="_teaser">${_result.teaser} (${_result.year})</c:set></c:if>
+		<c:set var="_dateish" value="${site:toDateish(_result.extraStr1)}" />		
+		<c:if test="${not empty _dateish.year}"><c:set var="_teaser">${_result.teaser} (${_dateish.deliveryString})</c:set></c:if>
 		
 		<div class="search-result" data-id="${_stat.count - 1}">
 		
@@ -50,7 +51,8 @@
 
 		<c:forEach items="${_search.results}" var="_result" varStatus="_stat">
 			<c:set var="_teaser" value="${_result.teaser}" />
-			<c:if test="${_result.year > 1900}"><c:set var="_teaser">${_result.teaser} (${_result.year})</c:set></c:if>
+			<c:set var="_dateish" value="${site:toDateish(_result.extraStr1)}" />		
+			<c:if test="${not empty _dateish.year}"><c:set var="_teaser">${_result.teaser} (${_dateish.deliveryString})</c:set></c:if>
 			
 			<div class="slide-wrapper" data-type="${_result.type}" data-id="${_stat.count - 1}">
 			

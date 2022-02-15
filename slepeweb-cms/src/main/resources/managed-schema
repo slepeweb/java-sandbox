@@ -1,19 +1,16 @@
-  <field name="key" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="language" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="bodytext" type="text_general" multiValued="false" indexed="true" required="false" stored="false"/>
+  <field name="editable" type="boolean" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="extraStr1" type="lowercase" multiValued="false" indexed="true" required="false" stored="true"/>
+  <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="key" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="language" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="path" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="path_tokens" type="descendent_path" multiValued="true" indexed="true" required="true" stored="false"/>
-	<copyField source="path" dest="path_tokens" />
   <field name="siteid" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="subtitle" type="text_general" multiValued="false" indexed="true" required="false" stored="false"/>
+  <field name="tags" type="text_general" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="teaser" type="text_general" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="title" type="text_general" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="type" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="tags" type="text_general" multiValued="false" indexed="true" required="false" stored="true"/>
-  <field name="editable" type="boolean" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="viewable" type="boolean" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="extra1" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
-  <field name="extra2" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
-  <field name="extra3" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
-	<copyField source="title" dest="_text_"/>
+  <copyField source="path" dest="path_tokens"/>

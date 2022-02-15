@@ -64,12 +64,14 @@ _cms.media.behaviour.upload = function(nodeKey) {
 _cms.media.behaviour.thumbnailRequired = function() {
 	$(_cms.media.sel.THUMBNAIL_CHECKBOX).click(function () {
 		var ele = $(_cms.media.sel.WIDTH_INPUT_CONTAINER);
+		var mimeType = $(this).attr("data-mimetype");
+		var choice = $(_cms.media.sel.THUMBNAIL_CHECKBOX + ":checked").val()
 
-		if ($(this).is(':checked')) {
-			ele.show();
+		if (choice == "none") {
+			ele.hide();
 		}
 		else {
-			ele.hide();
+			ele.show();
 		}
 		
 		_cms.media.check_data_is_complete();

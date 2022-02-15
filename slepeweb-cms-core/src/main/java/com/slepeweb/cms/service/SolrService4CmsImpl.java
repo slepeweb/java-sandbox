@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.cms.bean.Dateish;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
@@ -187,10 +188,12 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				// For photos site
 				if (i.getSite().getShortname().equals("pho")) {
-					if (i.getType().getName().startsWith(ItemTypeName.PHOTO_PREFIX)) {
-						s = getFieldValue(i, FieldName.YEAR, false, null);
-						if (StringUtils.isNumeric(s)) {
-							doc.setYear(Integer.valueOf(s));
+					String name = doc.getType();
+					if (name.startsWith(ItemTypeName.PHOTO_PREFIX) || name.startsWith(ItemTypeName.MOVIE_PREFIX)) {
+						s = getFieldValue(i, FieldName.DATEISH, false, null);
+						if (s != null) {	
+							Dateish ish = new Dateish(s);
+							doc.setExtraStr1(ish.toSortableString());
 						}
 					}
 				}

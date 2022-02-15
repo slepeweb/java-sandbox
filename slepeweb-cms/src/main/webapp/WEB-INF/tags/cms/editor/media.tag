@@ -6,10 +6,16 @@
 <form id="media-form" enctype="multipart/form-data">
 	<div class="ff">
 		<c:choose><c:when test="${editingItem.mediaLoaded}">
-			<label>Current media (${cmsf:formatBytes(editingItem.media.size)})</label>
-			<c:choose><c:when test="${editingItem.type.image}">
+			<label>Current media (${editingItem.type.mimeType}, ${cmsf:formatBytes(editingItem.media.size)})</label>
+			<c:choose><c:when test="${editingItem.type.image or editingItem.type.video}">
 				<c:set var="_host" value="${editingItem.site.stagingHost}" />
-				<img src="${_host.protocol}://${_host.name}:${_host.port}/cms/media${editingItem.path}" width="200" />
+				<c:choose><c:when test="${editingItem.thumbnailLoaded}">
+					<img src="${_host.protocol}://${_host.name}:${_host.port}/cms/media${editingItem.path}?view=thumbnail" />
+				</c:when><c:otherwise>
+					<c:if test="${editingItem.type.image}">
+						<img src="${_host.protocol}://${_host.name}:${_host.port}/cms/media${editingItem.path}" width="200" />
+					</c:if>
+				</c:otherwise></c:choose>
 			</c:when><c:otherwise>
 				Loaded (${editingItem.type.mimeType})
 			</c:otherwise></c:choose>
@@ -23,10 +29,17 @@
 		<input name="media" type="file" />
 	</div>
 	
-	<c:if test="${editingItem.type.image}">
+	<c:if test="${editingItem.type.image or editingItem.type.video}">
 		<div class="ff">
-			<label>Thumbnail required?</label>
-			<input name="thumbnail" type="checkbox" />
+			<label>Thumbnail?</label>
+			<span>
+				None<input name="thumbnail" type="radio" value="none" data-mimetype="${editingItem.type.mimeType}" checked="checked" />
+				File IS thumbnail<input name="thumbnail" type="radio" value="onlythumb" data-mimetype="${editingItem.type.mimeType}" />
+				
+				<c:if test="${editingItem.type.image}">
+					Autoscale<input name="thumbnail" type="radio" value="autoscale" data-mimetype="${editingItem.type.mimeType}" />
+				</c:if>
+			</span>
 		</div>
 		
 		<div class="ff hide thumbnail-option">

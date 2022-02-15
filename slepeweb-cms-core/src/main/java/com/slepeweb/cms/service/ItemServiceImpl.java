@@ -679,6 +679,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		// Force newParent links to be re-calculated, since they have now changed
 		newParent.setLinks(null);
 		
+		// Update solr; normally, this is done by save()
+		this.solrService4Cms.save(mover);
+		
 		return true;
 	}
 	

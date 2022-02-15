@@ -17,9 +17,7 @@ public class SolrDocument4Cms {
 	@Field("path") private String path;
 	@Field("editable") private boolean editable;
 	@Field("viewable") private boolean viewable;
-	@Field("year") private Integer year;
-	@Field("extra2") private String extra2;
-	@Field("extra3") private String extra3;
+	@Field("extraStr1") private String extraStr1;
 	
 	public SolrDocument4Cms() {}
 	
@@ -157,30 +155,12 @@ public class SolrDocument4Cms {
 		return this;
 	}
 
-	public Integer getYear() {
-		return year;
+	public String getExtraStr1() {
+		return extraStr1;
 	}
 
-	public SolrDocument4Cms setYear(Integer year) {
-		this.year = year;
-		return this;
-	}
-
-	public String getExtra2() {
-		return extra2;
-	}
-
-	public SolrDocument4Cms setExtra2(String extra2) {
-		this.extra2 = extra2;
-		return this;
-	}
-
-	public String getExtra3() {
-		return extra3;
-	}
-
-	public SolrDocument4Cms setExtra3(String extra3) {
-		this.extra3 = extra3;
+	public SolrDocument4Cms setExtraStr1(String s) {
+		this.extraStr1 = s;
 		return this;
 	}
 }

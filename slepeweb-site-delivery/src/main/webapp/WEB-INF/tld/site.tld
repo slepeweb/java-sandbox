@@ -85,4 +85,10 @@
 		<function-signature>java.lang.Object tertiaryOp(java.lang.Boolean, java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 	
+	<function>
+		<name>toDateish</name>
+		<function-class>com.slepeweb.site.util.TldFunction</function-class>
+		<function-signature>com.slepeweb.cms.bean.Dateish toDateish(java.lang.String)</function-signature>
+	</function>
+	
 </taglib>

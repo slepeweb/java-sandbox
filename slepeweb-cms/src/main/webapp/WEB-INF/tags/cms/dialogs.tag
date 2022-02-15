@@ -29,6 +29,13 @@
   </p>
 </div>
 
+<div id="field-value-format-dialog" class="hide cms-dialog">
+  <p>
+    <span class="ui-icon ui-icon-circle-check cms-icon"></span>
+    Text input field value has failed validation. Consult user manual, and try again.
+  </p>
+</div>
+
 <div id="confirm-field-update-dialog" class="hide cms-dialog">
 	<p>
 		<span class="ui-icon ui-icon-alert cms-icon"></span>

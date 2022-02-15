@@ -152,10 +152,10 @@ public class ItemType extends CmsBean {
 		return true;
 	}
 
-	// TODO: This would be better handled by adding a media column to the itemtype table
 	public boolean isMedia() {
 		return 
 			isImage() ||
+			isVideo() ||
 			! (getMimeType().equals(PAGE_MIMETYPE) ||
 					getMimeType().equals(JS_MIMETYPE));
 	}

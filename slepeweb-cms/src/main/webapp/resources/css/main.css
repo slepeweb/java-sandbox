@@ -475,6 +475,14 @@ button[disabled=disabled] {
 	display: none;
 }
 
+#media-form input[name=thumbnail] {
+	margin-right: 2em;
+}
+
+input.highlight {
+	border: purple solid 5px;
+}
+
 /* Probably used in search results dialog */
 div.cms-icon-boy { background-position: -33px 0px; }
 div.cms-icon-girl { background-position: -48px 0px; }

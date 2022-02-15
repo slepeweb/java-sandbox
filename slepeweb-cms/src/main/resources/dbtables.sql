@@ -154,11 +154,12 @@ create table field
    name varchar(64) not null,
    variable varchar(32) not null,
    multilingual boolean default false,
-   fieldtype enum ('text', 'markup', 'integer', 'date', 'url', 'radio', 'checkbox', 'select', 'datetime', 'layout'),
+   fieldtype enum ('text', 'markup', 'integer', 'date', 'url', 'radio', 'checkbox', 'select', 'datetime', 'dateish', 'layout'),
    size int not null,
    helptext varchar(512),
    dflt varchar(64),
-   valid varchar(512),
+   valid varchar(512), -- valid field values, for radio and select inputs, etc.
+   validation varchar(128), -- validation regexp for the field value
    primary key (id),
    unique key idx_field_variable (variable)
 ) ENGINE=InnoDB;

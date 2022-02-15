@@ -330,8 +330,17 @@ public class Item extends CmsBean {
 		return hasMedia();
 	}
 	
+	// Need a getter to simplify jsp functionality
+	public boolean isThumbnailLoaded() {
+		return hasThumbnail();
+	}
+
 	public boolean hasMedia() {
 		return getCmsService().getMediaService().hasMedia(this);
+	}
+	
+	public boolean hasThumbnail() {
+		return getCmsService().getMediaService().hasThumbnail(this);
 	}
 	
 	public boolean isSiteRoot() {

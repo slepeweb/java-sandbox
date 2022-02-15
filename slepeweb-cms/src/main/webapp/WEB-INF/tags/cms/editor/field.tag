@@ -20,7 +20,6 @@
 	<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
 		<div id="form-fields-${_lang}" class="hideable">
 			<c:forEach items="${_fieldSupport[_lang]}" var="fes">
-			<!-- fes.field.type == [${fes.field.type}] -->
 				<c:choose><c:when test="${fes.field.type == 'layout'}">
 					<hr />
 				</c:when><c:otherwise>

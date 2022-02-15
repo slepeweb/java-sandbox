@@ -18,16 +18,29 @@ _cms.support.setTabIds(_cms.field, "field");
 _cms.field.behaviour.update = function(nodeKey) {	
 	// Add behaviour to submit item field updates 
 	$(_cms.field.sel.UPDATE_BUTTON).click(function () {
-		//_cms.dialog.open(_cms.dialog.confirmFieldUpdate);
-		_cms.field.update(nodeKey)
+		var formData = _cms.field.getFieldsFormInputData();
+		var error = false;
+		$.each(formData, function(name, value) {
+			if (value == "VALIDATION_ERROR") {
+				error = true;
+				return false;
+			}
+		});
+		
+		if (! error) {
+			_cms.field.update(nodeKey, formData);
+		}
+		else {
+			_cms.dialog.open(_cms.dialog.badFieldValueFormat);
+		}
 	});
 }
 
-_cms.field.update = function(nodeKey) {
+_cms.field.update = function(nodeKey, formData) {
 	$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/update/fields", {
 		type: "POST",
 		cache: false,
-		data: _cms.field.getFieldsFormInputData(), 
+		data: formData, 
 		dataType: "json",
 		success: function(obj, status, z) {
 			_cms.dialog.close(_cms.dialog.confirmFieldUpdate);
@@ -77,7 +90,24 @@ _cms.field.getFieldsFormInputData = function() {
 			}
 		}
 		else {
-			result[param] = ctrl.val();
+			// Check field value respects validation constraints
+			var regexpStr = ctrl.attr("data-validation");
+			var fieldValue = ctrl.val();
+			ctrl.removeClass("highlight");
+			
+			if (regexpStr && fieldValue) {
+				var regexp = new RegExp(regexpStr, "i");
+				if (! regexp.test(fieldValue)) {
+					result[param] = "VALIDATION_ERROR";
+					ctrl.addClass("highlight");
+				}
+				else {
+					result[param] = fieldValue;
+				}
+			}
+			else {
+				result[param] = fieldValue;
+			}
 		}
 	});
 	return result;

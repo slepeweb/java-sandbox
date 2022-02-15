@@ -23,5 +23,5 @@ public class FieldName {
 	public static final String OVERVIEW = "overview";
 	public static final String CAPTION = "caption";
 	public static final String ALT_TEXT = "alt";
-	public static final String YEAR = "year";
+	public static final String DATEISH = "dateish";
 }

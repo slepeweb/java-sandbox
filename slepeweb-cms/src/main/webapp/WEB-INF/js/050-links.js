@@ -455,7 +455,6 @@ _cms.links.repopulateGuidance = function(linkName) {
 	}
 	
 	$("#link-guidance").html(guidance);
-	// p=/^[mp]\.\s*(\d{1,2}\/)?(\d{1,2}\/)?(\d{4})?(,?\s*)?.*?$/i
 	$("#link-guidance-regexp").html(_cms.links.getCurrentGuidanceRegexp());
 }
 

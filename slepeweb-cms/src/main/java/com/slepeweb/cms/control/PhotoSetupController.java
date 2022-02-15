@@ -154,15 +154,8 @@ public class PhotoSetupController extends BaseController {
 				close(is);
 				m.setThumbnail(true);
 				is = new FileInputStream(f);							
-				baos = new ByteArrayOutputStream();
 				
-				ImageUtil.streamScaled(
-						is, baos, 
-						200, 
-						-1, 
-						item.getType().getMimeType());
-				
-				m.setUploadStream(ImageUtil.pipe(baos));
+				m.setUploadStream(ImageUtil.scaleImage(is, 200, -1, item.getType().getMimeType()));
 				this.mediaService.save(m);
 				LOG.info(String.format("Saved thumbnail for '%s'", item.getName()));
 				

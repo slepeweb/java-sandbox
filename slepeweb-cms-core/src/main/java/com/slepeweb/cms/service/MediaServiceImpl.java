@@ -152,6 +152,12 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 
 	}
 
+	@SuppressWarnings("deprecation")
+	public boolean hasThumbnail(Item i) {
+		return this.jdbcTemplate.queryForInt("select count(*) from media where itemid = ? and thumbnail = true", i.getId()) > 0;
+
+	}
+
 	// TODO: Currently, only used by MediaTest.java - review.
 	public void writeMedia(Long itemId, String outputFilePath) {
 		Media media = getMedia(itemId);

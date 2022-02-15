@@ -28,11 +28,11 @@ public class Field extends CmsBean {
 	private FieldType type;
 	private int size;
 	private String defaultValue;
-	private String validValues; 
+	private String validValues, validationRegExp; 
 	private boolean multilingual;
 	
 	public enum FieldType {
-		text, markup, integer, date, datetime, url, radio, checkbox, select, layout;
+		text, markup, integer, date, datetime, dateish, url, radio, checkbox, select, layout;
 	}
 
 	public void assimilate(Object obj) {
@@ -46,6 +46,7 @@ public class Field extends CmsBean {
 			setDefaultValue(f.getDefaultValue());
 			setValidValues(f.getValidValues());
 			setMultilingual(f.isMultilingual());
+			setValidationRegExp(f.getValidationRegExp());
 		}
 	}
 
@@ -78,11 +79,21 @@ public class Field extends CmsBean {
 		String tag = null, inputType = "";
 		String rows = null, cols = null;
 		
-		if (getType() == FieldType.integer || getType() == FieldType.url || 
-				getType() == FieldType.date|| getType() == FieldType.datetime) {
+		if (
+				getType() == FieldType.integer || 
+				getType() == FieldType.url || 
+				getType() == FieldType.date|| 
+				getType() == FieldType.datetime || 
+				getType() == FieldType.dateish) {
+			
 			tag = INPUT_TAG;
 			rows = cols = null;
-			if (getType() == FieldType.date || getType() == FieldType.datetime) {
+			
+			if (
+					getType() == FieldType.date || 
+					getType() == FieldType.datetime || 
+					getType() == FieldType.dateish) {
+						
 				inputType = getType().name();
 			}
 		}
@@ -151,8 +162,18 @@ public class Field extends CmsBean {
 				}
 				else {
 					// This is a plain text input field, and NOT a date/datetime one
-					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s />", 
+					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s ", 
 							inputType, getVariable(), notNullStringValue, getTooltip()));
+					
+					// Is this type of input field is subject to validation?
+					if (getType() == FieldType.dateish) {
+						setValidation(sb, Dateish.REGEXP);
+					}
+					else if (StringUtils.isNotBlank(getValidationRegExp())) {
+						setValidation(sb, getValidationRegExp());
+					}
+					
+					sb.append(" />");
 				}
 			}
 		}
@@ -172,6 +193,10 @@ public class Field extends CmsBean {
 		}
 		
 		return sb.toString();
+	}
+	
+	private void setValidation(StringBuilder sb, String regexp) {
+		sb.append(String.format("data-validation=\"%s\" ", regexp));
 	}
 	
 	public Long getId() {
@@ -279,6 +304,7 @@ public class Field extends CmsBean {
 		int result = 1;
 		result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
 		result = prime * result + ((validValues == null) ? 0 : validValues.hashCode());
+		result = prime * result + ((validationRegExp == null) ? 0 : validationRegExp.hashCode());
 		result = prime * result + ((help == null) ? 0 : help.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + size;
@@ -306,6 +332,11 @@ public class Field extends CmsBean {
 			if (other.validValues != null)
 				return false;
 		} else if (!validValues.equals(other.validValues))
+			return false;
+		if (validationRegExp == null) {
+			if (other.validationRegExp != null)
+				return false;
+		} else if (!validationRegExp.equals(other.validationRegExp))
 			return false;
 		if (help == null) {
 			if (other.help != null)
@@ -367,6 +398,15 @@ public class Field extends CmsBean {
 
 	public Field setMultilingual(boolean multilingual) {
 		this.multilingual = multilingual;
+		return this;
+	}
+
+	public String getValidationRegExp() {
+		return validationRegExp;
+	}
+
+	public Field setValidationRegExp(String validationRegExp) {
+		this.validationRegExp = validationRegExp;
 		return this;
 	}
 }

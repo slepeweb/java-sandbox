@@ -15,4 +15,6 @@ public class ItemTypeName {
 	public static final String SHORTCUT = "Shortcut";
 	public static final String PHOTO_PREFIX = "Photo ";
 	public static final String PHOTO_JPG = PHOTO_PREFIX + "JPG";
+	public static final String MOVIE_PREFIX = "Movie ";
+	public static final String MOVIE_MP4 = MOVIE_PREFIX + "MP4";
 }

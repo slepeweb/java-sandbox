@@ -15,5 +15,6 @@ public interface MediaService {
 	void writeMedia(Long id, String outputFilePath);
 	Media save(Media m) throws ResourceException;
 	boolean hasMedia(Item i);
+	boolean hasThumbnail(Item i);
 	int getCount();
 }

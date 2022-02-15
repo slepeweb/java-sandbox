@@ -209,7 +209,8 @@ public class RowMapperUtil {
 				setType(FieldType.valueOf(rs.getString("fieldtype"))).
 				setSize(rs.getInt("size")).
 				setDefaultValue(rs.getString("dflt")).
-				setValidValues(rs.getString("valid"));
+				setValidValues(rs.getString("valid")).
+				setValidationRegExp(rs.getString("validation"));
 	}
 	
 	@SuppressWarnings("unused")

@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import com.slepeweb.cms.bean.Dateish;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.commerce.bean.Product;
@@ -30,4 +31,9 @@ public class TldFunction {
 	public static void main(String[] args) {
 		System.out.println(formatUKDate(new Date(), "MMMM d, HH:mm z"));
 	}
+	
+	public static Dateish toDateish(String s) {
+		return new Dateish(s);
+	}
+	
 }

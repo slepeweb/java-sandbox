@@ -3,6 +3,7 @@ _cms.dialog = {
 	duplicateTarget: {obj: null},
 	illegalTarget: {obj: null},
 	badLinkDataFormat: {obj: null},
+	badFieldValueFormat: {obj: null},
 	confirmFieldUpdate: {obj: null},
 	confirmTrash: {obj: null},
 	addLink: {obj: null},
@@ -11,6 +12,7 @@ _cms.dialog = {
 	sel: {
 		LINK_NOT_DEFINED: "#link-not-defined-dialog",
 		LINK_DATA_FORMAT: "#link-data-format-dialog",
+		FIELD_VALUE_FORMAT: "#field-value-format-dialog",
 		DUPLICATE_TARGET: "#duplicate-link-target-dialog",
 		ILLEGAL_TARGET: "#illegal-link-target-dialog",
 		CONFIRM_FIELD_UPDATE: "#confirm-field-update-dialog",
@@ -151,4 +153,5 @@ _cms.dialog.onpageload = function() {
 	_cms.dialog.warning("Duplicate link target", _cms.dialog.duplicateTarget, _cms.dialog.sel.DUPLICATE_TARGET);
 	_cms.dialog.warning("Illegal target", _cms.dialog.illegalTarget, _cms.dialog.sel.ILLEGAL_TARGET);
 	_cms.dialog.warning("Link data badly formatted", _cms.dialog.badLinkDataFormat, _cms.dialog.sel.LINK_DATA_FORMAT);
+	_cms.dialog.warning("Field value badly formatted", _cms.dialog.badFieldValueFormat, _cms.dialog.sel.FIELD_VALUE_FORMAT);
 }
