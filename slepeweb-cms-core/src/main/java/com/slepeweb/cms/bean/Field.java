@@ -9,6 +9,7 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.slepeweb.cms.bean.guidance.IValidator;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.DateUtil;
 
@@ -28,7 +29,7 @@ public class Field extends CmsBean {
 	private FieldType type;
 	private int size;
 	private String defaultValue;
-	private String validValues, validationRegExp; 
+	private String validValues, validatorClass; 
 	private boolean multilingual;
 	
 	public enum FieldType {
@@ -46,7 +47,7 @@ public class Field extends CmsBean {
 			setDefaultValue(f.getDefaultValue());
 			setValidValues(f.getValidValues());
 			setMultilingual(f.isMultilingual());
-			setValidationRegExp(f.getValidationRegExp());
+			setValidatorClass(f.getValidatorClass());
 		}
 	}
 
@@ -83,21 +84,23 @@ public class Field extends CmsBean {
 				getType() == FieldType.integer || 
 				getType() == FieldType.url || 
 				getType() == FieldType.date|| 
-				getType() == FieldType.datetime || 
-				getType() == FieldType.dateish) {
+				getType() == FieldType.datetime) {
 			
 			tag = INPUT_TAG;
 			rows = cols = null;
 			
 			if (
 					getType() == FieldType.date || 
-					getType() == FieldType.datetime || 
-					getType() == FieldType.dateish) {
+					getType() == FieldType.datetime) {
 						
 				inputType = getType().name();
 			}
 		}
-		else if (getType() == FieldType.text || getType() == FieldType.markup) {
+		else if (
+				getType() == FieldType.text || 
+				getType() == FieldType.markup || 
+				getType() == FieldType.dateish) {
+			
 			if (getSize() > 0 && getSize() <= 120) {
 				tag = INPUT_TAG;
 				inputType = TEXT;
@@ -166,11 +169,12 @@ public class Field extends CmsBean {
 							inputType, getVariable(), notNullStringValue, getTooltip()));
 					
 					// Is this type of input field is subject to validation?
-					if (getType() == FieldType.dateish) {
-						setValidation(sb, Dateish.REGEXP);
-					}
-					else if (StringUtils.isNotBlank(getValidationRegExp())) {
-						setValidation(sb, getValidationRegExp());
+					if (isValidateable()) {
+						IValidator iv = getCmsService().getValidationService().get(getValidatorClass());
+						if (iv != null) {
+							sb.append(String.format("data-validation=\"%s\" ", iv.getRegExp()));
+							sb.append(String.format("data-variable=\"%s\" ", getVariable()));
+						}
 					}
 					
 					sb.append(" />");
@@ -193,10 +197,6 @@ public class Field extends CmsBean {
 		}
 		
 		return sb.toString();
-	}
-	
-	private void setValidation(StringBuilder sb, String regexp) {
-		sb.append(String.format("data-validation=\"%s\" ", regexp));
 	}
 	
 	public Long getId() {
@@ -304,7 +304,7 @@ public class Field extends CmsBean {
 		int result = 1;
 		result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
 		result = prime * result + ((validValues == null) ? 0 : validValues.hashCode());
-		result = prime * result + ((validationRegExp == null) ? 0 : validationRegExp.hashCode());
+		result = prime * result + ((validatorClass == null) ? 0 : validatorClass.hashCode());
 		result = prime * result + ((help == null) ? 0 : help.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + size;
@@ -333,10 +333,10 @@ public class Field extends CmsBean {
 				return false;
 		} else if (!validValues.equals(other.validValues))
 			return false;
-		if (validationRegExp == null) {
-			if (other.validationRegExp != null)
+		if (validatorClass == null) {
+			if (other.validatorClass != null)
 				return false;
-		} else if (!validationRegExp.equals(other.validationRegExp))
+		} else if (!validatorClass.equals(other.validatorClass))
 			return false;
 		if (help == null) {
 			if (other.help != null)
@@ -401,12 +401,16 @@ public class Field extends CmsBean {
 		return this;
 	}
 
-	public String getValidationRegExp() {
-		return validationRegExp;
+	public String getValidatorClass() {
+		return validatorClass;
 	}
 
-	public Field setValidationRegExp(String validationRegExp) {
-		this.validationRegExp = validationRegExp;
+	public Field setValidatorClass(String s) {
+		this.validatorClass = s;
 		return this;
+	}
+
+	public boolean isValidateable() {
+		return StringUtils.isNotBlank(this.validatorClass);
 	}
 }

@@ -17,8 +17,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,7 +35,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
-import com.slepeweb.cms.bean.Dateish;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
@@ -55,12 +52,14 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrParams4Cms;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.bean.guidance.IValidator;
 import com.slepeweb.cms.component.Navigation.Node;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.SolrService4Cms;
+import com.slepeweb.cms.service.ValidationService;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.util.DateUtil;
@@ -76,6 +75,7 @@ public class RestController extends BaseController {
 	@Autowired private CookieService cookieService;
 	@Autowired private SolrService4Cms solrService4Cms;
 	@Autowired private NavigationController navigationController;
+	@Autowired private ValidationService validationService;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -462,19 +462,8 @@ public class RestController extends BaseController {
 				}
 				
 				// Does this field value require validation?
-				if (StringUtils.isNotBlank(fv.getField().getValidationRegExp())) {
-					Pattern p = Pattern.compile(fv.getField().getValidationRegExp(), Pattern.CASE_INSENSITIVE);
-					Matcher m = p.matcher(fv.getStringValue());
-					if (! m.matches()) {
-						errors.add(String.format("Field value '%s' fails validation", stringValue));
-						continue;
-					}
-				}
-				
-				// Re-format dateish fields
-				if (ft == FieldType.dateish) {
-					Dateish dish = new Dateish(fv.getStringValue());
-					fv.setStringValue(dish.toString());
+				if (! validateFieldValue(fv, errors)) {
+					continue;
 				}
 				
 				/* 
@@ -525,6 +514,22 @@ public class RestController extends BaseController {
 		
 		return resp;
 	}	
+	
+	private boolean validateFieldValue(FieldValue fv, List<String> errors) {
+		IValidator iv = this.validationService.get(fv.getField().getValidatorClass());
+		
+		if (iv != null) {
+			if (! iv.validate(fv.getStringValue())) {
+				errors.add(String.format("Field value '%s' fails validation", fv.getStringValue()));
+				return false;
+			}
+			
+			// Clean up input, if necessary
+			fv.setStringValue(iv.clean(fv.getStringValue()));
+		}
+		
+		return true;
+	}
 	
 	@RequestMapping(value="/item/{parentOrigId}/add", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody

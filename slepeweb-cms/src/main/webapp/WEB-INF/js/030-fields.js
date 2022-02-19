@@ -71,6 +71,7 @@ _cms.field.getFieldsFormInputData = function() {
 		var type = ctrl.attr("type");
 		var param = ctrl.attr("name");
 		var str;
+		
 		if (type == "radio") {
 			if (ctrl.is(':checked')) {
 				result[param] = ctrl.val();
@@ -167,11 +168,27 @@ _cms.field.behaviour.formchange = function() {
 	}
 }
 
+_cms.field.behaviour.guidanceIcon = function() {
+	$("span.field-guidance-icon").click(function(e){
+		let guidanceDiv = $(this).parent().next();
+		let dialog = $("#field-guidance");
+		if (dialog.attr("data-variable") != guidanceDiv.attr("data-variable")) {
+			dialog.html(guidanceDiv.html());
+			dialog.attr("data-variable", guidanceDiv.attr("data-variable"));
+		}
+		
+		_cms.dialog.open(_cms.dialog.fieldGuidance);
+	});
+}
+
+
+
 _cms.field.onrefresh = function(nodeKey) {
 	_cms.field.behaviour.update(nodeKey);
 	_cms.field.behaviour.cancel(nodeKey);
 	_cms.field.behaviour.changelanguage();
 	_cms.field.behaviour.formchange();
+	_cms.field.behaviour.guidanceIcon();
 	
 	// Not really a behaviour, but required after the tab has been refreshed
 	_cms.field.setlanguage();

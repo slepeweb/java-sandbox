@@ -8,6 +8,7 @@ _cms.dialog = {
 	confirmTrash: {obj: null},
 	addLink: {obj: null},
 	linkGuidance: {obj: null},
+	fieldGuidance: {obj: null},
 	searchresults: {obj: null},
 	sel: {
 		LINK_NOT_DEFINED: "#link-not-defined-dialog",
@@ -129,6 +130,28 @@ _cms.dialog.linkGuidance.define = function() {
 			"Link data guidance", "#link-guidance", 300, 600, buttons, close, false);
 }
 
+_cms.dialog.fieldGuidance.define = function() {	
+	var close = function() {
+		_cms.dialog.close(_cms.dialog.fieldGuidance);
+	}
+	
+	var buttons = {
+		Close: function() {
+			close();
+		}
+	}
+	
+	_cms.dialog.fieldGuidance.obj = $("#field-guidance").dialog({
+		autoOpen: false,
+		minHeight: 600,
+		minWidth: 300,
+		modal: false,
+		title: "Field value guidance",
+		buttons: buttons,
+		close: close,
+	});
+}
+
 _cms.dialog.warning = function(title, d, selector) {
 	  var close = function() {
 		  _cms.dialog.close(d);
@@ -149,6 +172,7 @@ _cms.dialog.onpageload = function() {
 	_cms.dialog.addLink.define();
 	_cms.dialog.searchresults.define();
 	_cms.dialog.linkGuidance.define();
+	_cms.dialog.fieldGuidance.define();
 	_cms.dialog.warning("Link not adequately defined", _cms.dialog.linkNotDefined, _cms.dialog.sel.LINK_NOT_DEFINED);
 	_cms.dialog.warning("Duplicate link target", _cms.dialog.duplicateTarget, _cms.dialog.sel.DUPLICATE_TARGET);
 	_cms.dialog.warning("Illegal target", _cms.dialog.illegalTarget, _cms.dialog.sel.ILLEGAL_TARGET);

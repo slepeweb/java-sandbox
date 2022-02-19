@@ -1,10 +1,13 @@
 package com.slepeweb.cms.bean;
 
+import com.slepeweb.cms.bean.guidance.IValidator;
+
 public class FieldEditorSupport {
 
 	private Field field;
 	private FieldValue fieldValue;
-	private String label, inputTag, validationRegexp;
+	private String label, inputTag;
+	private IValidator validator;
 	
 	public Field getField() {
 		return field;
@@ -42,12 +45,12 @@ public class FieldEditorSupport {
 		return this;
 	}
 
-	public String getValidationRegexp() {
-		return validationRegexp;
+	public IValidator getValidator() {
+		return validator;
 	}
 
-	public FieldEditorSupport setValidationRegexp(String validationRegexp) {
-		this.validationRegexp = validationRegexp;
+	public FieldEditorSupport setValidator(IValidator validator) {
+		this.validator = validator;
 		return this;
 	}
 }

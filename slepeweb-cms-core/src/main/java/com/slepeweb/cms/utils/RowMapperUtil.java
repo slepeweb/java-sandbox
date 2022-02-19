@@ -210,7 +210,7 @@ public class RowMapperUtil {
 				setSize(rs.getInt("size")).
 				setDefaultValue(rs.getString("dflt")).
 				setValidValues(rs.getString("valid")).
-				setValidationRegExp(rs.getString("validation"));
+				setValidatorClass(rs.getString("validation"));
 	}
 	
 	@SuppressWarnings("unused")

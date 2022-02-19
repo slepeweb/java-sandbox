@@ -24,6 +24,7 @@ import com.slepeweb.cms.bean.TagInputSupport;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.cms.service.ValidationService;
 
 @Controller
 public class BaseController {
@@ -32,6 +33,7 @@ public class BaseController {
 	public static final String RECENT_TAGS_ATTR = "_recentTags";
 	
 	@Autowired protected CmsService cmsService;
+	@Autowired private ValidationService validationService;
 	
 	private String contextPath;
 
@@ -109,6 +111,10 @@ public class BaseController {
 							fes.setFieldValue(fv);
 							fes.setInputTag(fv.getInputTag());
 						}
+					}
+					
+					if (fft.getField().isValidateable()) {
+						fes.setValidator(this.validationService.get(fft.getField().getValidatorClass()));
 					}
 					
 					list.add(fes);

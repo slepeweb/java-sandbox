@@ -483,6 +483,16 @@ input.highlight {
 	border: purple solid 5px;
 }
 
+div#field-guidance table {
+	border: 1px solid;
+	border-collapse: collapse;
+}
+
+div#field-guidance td {
+	border: 1px dashed;
+	padding: 5px;
+}
+
 /* Probably used in search results dialog */
 div.cms-icon-boy { background-position: -33px 0px; }
 div.cms-icon-girl { background-position: -48px 0px; }

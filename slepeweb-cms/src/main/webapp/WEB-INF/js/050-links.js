@@ -542,6 +542,8 @@ _cms.links.check_not_binding = function(childId) {
 	return true;
 }
 
+// TODO: Function never called! No validation taking place! Just guidance!
+//
 // This validation only applies to partner links
 _cms.links.validate.linkdata.anc = function(linkType, linkName, linkData) {
 	/* 

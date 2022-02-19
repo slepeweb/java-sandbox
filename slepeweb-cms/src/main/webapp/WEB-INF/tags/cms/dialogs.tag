@@ -32,7 +32,7 @@
 <div id="field-value-format-dialog" class="hide cms-dialog">
   <p>
     <span class="ui-icon ui-icon-circle-check cms-icon"></span>
-    Text input field value has failed validation. Consult user manual, and try again.
+    Text input field value has failed validation. Click the ? icon for guidance.
   </p>
 </div>
 
@@ -62,6 +62,8 @@
 	<p>Pick an item in the list</p>
 	<div id="searchresults"></div>
 </div>
+
+<div id="field-guidance" data-variable="" class="hide cms-dialog"></div>
 
 <audio id="bell" src="${applicationContextPath}/resources/pin-dropping.wav" preload="auto"></audio>
 

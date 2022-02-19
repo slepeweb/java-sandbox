@@ -34,7 +34,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 		this.jdbcTemplate.update(
 				"insert into field (name, variable, multilingual, fieldtype, helptext, size, dflt, valid, validation) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 				f.getName(), f.getVariable(), f.isMultilingual(), f.getType().name(), f.getHelp(), f.getSize(), 
-				f.getDefaultValue(), f.getValidValues(), f.getValidationRegExp());				
+				f.getDefaultValue(), f.getValidValues(), f.getValidatorClass());				
 		
 		f.setId(getLastInsertId());
 		this.cacheEvictor.evict(f);
@@ -49,7 +49,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 			this.jdbcTemplate.update(
 					"update field set name = ?, variable = ?, multilingual = ?, fieldtype = ?, helptext = ?, size = ?, dflt = ?, valid = ?, validation = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getVariable(), dbRecord.isMultilingual(), dbRecord.getType().name(), 
-					dbRecord.getHelp(), dbRecord.getSize(), dbRecord.getDefaultValue(), dbRecord.getValidValues(), dbRecord.getValidationRegExp(), dbRecord.getId());
+					dbRecord.getHelp(), dbRecord.getSize(), dbRecord.getDefaultValue(), dbRecord.getValidValues(), dbRecord.getValidatorClass(), dbRecord.getId());
 			
 			LOG.info(compose("Updated field", field));
 		}
