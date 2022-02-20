@@ -483,12 +483,12 @@ input.highlight {
 	border: purple solid 5px;
 }
 
-div#field-guidance table {
+div#field-guidance table, div#link-guidance table {
 	border: 1px solid;
 	border-collapse: collapse;
 }
 
-div#field-guidance td {
+div#field-guidance td, div#link-guidance td {
 	border: 1px dashed;
 	padding: 5px;
 }

@@ -12,6 +12,45 @@
  * 
  */
 
+/*
+ * Index of functions:
+ *		_cms.links.behaviour.add
+ *		_cms.links.behaviour.changetype					Triggered when user selects a new link type (eg. relation)
+ *		_cms.links.behaviour.edit
+ *		_cms.links.behaviour.itempicker
+ *		_cms.links.behaviour.linkguidanceicon
+ *		_cms.links.behaviour.linknamechange				Triggered when user selects a different linkname (eg. std)
+ *		_cms.links.behaviour.navigate
+ *		_cms.links.behaviour.remove
+ *		_cms.links.behaviour.reset
+ *		_cms.links.behaviour.save
+ *		_cms.links.behaviour.sortable
+ *		_cms.links.activateSaveButton
+ *		_cms.links.check_duplicate_link
+ *		_cms.links.check_for_use
+ *		_cms.links.check_not_binding
+ *		_cms.links.formatHiddenLinkData
+ *		_cms.links.formatLinkIdentifier
+ *		_cms.links.getCurrentGuidance
+ *		_cms.links.getItemNameAnd
+ *		_cms.links.getLinkData
+ *		_cms.links.getLinkGuidance
+ *		_cms.links.getNextSortableLinkId
+ *		_cms.links.identifyHiddenLinkData4Span
+ *		_cms.links.identifyHiddenLinkDataList
+ *		_cms.links.insertClonedLink
+ *		_cms.links.onpageload
+ *		_cms.links.onrefresh
+ *		_cms.links.refresh.tab
+ *		_cms.links.repopulateGuidance					Re-populates guidance dialog given a new linkname selected by the user
+ *		_cms.links.repopulateLinkNameDropdown
+ *		_cms.links.setLinkForm
+ *		_cms.links.shortcut.settings
+ *		_cms.links.show_addlink_form
+ *		_cms.links.updateLink
+ *		_cms.links.use_form_data
+ *		_cms.links.useLink
+*/
 
 _cms.links = {
 	behaviour: {},
@@ -34,9 +73,6 @@ _cms.links = {
 		REMOVE_LINK_BUTTONS: ".remove-link",
 		LINKTO_BUTTONS: ".link-linker",
 		LINK_TARGET_IDENTIFIER: "#link-target-identifier",
-	},
-	validate: {
-		linkdata: {},
 	},
 	shortcut: {},
 };
@@ -359,7 +395,7 @@ _cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
 		success: function(options, status, z) {
 			var selector = $(_cms.links.sel.LINKNAME_SELECT);
 			var guidanceListDiv = $("#link-guidance-list");
-			var guidance, guidanceObj;
+			var validator, validatorObj;
 	
 			// currentLinkname is not set for new links
 			if (! currentLinkname) {
@@ -372,47 +408,47 @@ _cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
 			selector.append("<option value='unknown'>Choose ...</option>");
 			for (var i = 0; i < options.length; i++) {
 				selector.append(`<option value="${options[i].name}">${options[i].name}</option>`);
-				if (options[i].guidance) {
-					guidanceObj = JSON.parse(options[i].guidance)
-					guidance = "";
+				if (options[i].validator) {
+					validatorObj = JSON.parse(options[i].validator)
+					validator = "";
 					
-					if (guidanceObj.heading) {
-						guidance += `<h2>${guidanceObj.heading}</h2>`;
+					if (validatorObj.heading) {
+						validator += `<h2>${validatorObj.heading}</h2>`;
 					}
 					
-					if (guidanceObj.teaser) {
-						guidance += `<p>${guidanceObj.teaser}</p>`;
+					if (validatorObj.teaser) {
+						validator += `<p>${validatorObj.teaser}</p>`;
 					}
 					
-					if (guidanceObj.format) {
-						guidance += `<h3>Format</h3><p>${guidanceObj.format}</p>`;
+					if (validatorObj.format) {
+						validator += `<h3>Format</h3><p>${validatorObj.format}</p>`;
 					}
 					
-					if (guidanceObj.examples && guidanceObj.examples.length > 0) {
-						guidance += `<h3>Examples</h3><table border="2">`;
-						for (var j = 0; j < guidanceObj.examples.length; j++) {
-							guidance += `<tr><td>${guidanceObj.examples[j].eg}</td><td>${guidanceObj.examples[j].explain}</td></tr>`;
+					if (validatorObj.examples && validatorObj.examples.length > 0) {
+						validator += `<h3>Examples</h3><table>`;
+						for (var j = 0; j < validatorObj.examples.length; j++) {
+							validator += `<tr><td>${validatorObj.examples[j].example}</td><td>${validatorObj.examples[j].explanation}</td></tr>`;
 						}
-						guidance += "</table>";
+						validator += "</table>";
 					}
 					
-					if (guidanceObj.details && guidanceObj.details.length > 0) {
-						guidance += `<h3>Details</h3><ul>`;
-						for (var j = 0; j < guidanceObj.details.length; j++) {
-							guidance += `<li>${guidanceObj.details[j]}</li>`;
+					if (validatorObj.details && validatorObj.details.length > 0) {
+						validator += `<h3>Details</h3><ul>`;
+						for (var j = 0; j < validatorObj.details.length; j++) {
+							validator += `<li>${validatorObj.details[j]}</li>`;
 						}
-						guidance += `</ul>`;
+						validator += `</ul>`;
 					}
 					
-					if (guidanceObj.regexp) {
-						guidance += `<p class="regexp hide">${guidanceObj.regexp}</p>`;
+					if (validatorObj.regExp) {
+						validator += `<p class="regexp hide">${validatorObj.regExp}</p>`;
 					}
 				}
 				else {
-					guidance = "";
+					validator = "";
 				}
 				
-				guidanceListDiv.append(`<div id="link-guidance-${options[i].name}">${guidance}</div>`);
+				guidanceListDiv.append(`<div id="link-guidance-${options[i].name}">${validator}</div>`);
 			}
 			
 			selector.val(currentLinkname);
@@ -434,10 +470,6 @@ _cms.links.getCurrentGuidance = function() {
 	return $('#link-guidance').html();
 }
 
-_cms.links.getCurrentGuidanceRegexp = function() {
-	return $('#link-guidance .regexp').html();
-}
-
 _cms.links.getLinkData = function() {
 	return $(_cms.links.selrel.LINKDATA_INPUT).val();
 }
@@ -455,7 +487,6 @@ _cms.links.repopulateGuidance = function(linkName) {
 	}
 	
 	$("#link-guidance").html(guidance);
-	$("#link-guidance-regexp").html(_cms.links.getCurrentGuidanceRegexp());
 }
 
 _cms.links.activateSaveButton = function(activate) {
@@ -479,6 +510,7 @@ _cms.links.check_for_use = function() {
 	var linkType = $(_cms.links.sel.LINKTYPE_SELECT).val();
 	var linkName = $(_cms.links.sel.LINKNAME_SELECT).val();
 	var linkData = $(_cms.links.sel.LINKDATA_INPUT).val();
+	var linkDataRegexpStr = $("#link-guidance p.regexp").html();
 	var linkId = $(_cms.links.sel.LINKID_INPUT).val();
 	
 	if (linkType == 'unknown' || linkName == 'unknown' || childId == -1) {
@@ -500,11 +532,10 @@ _cms.links.check_for_use = function() {
 			
 	if (! error) {
 		// Check link data is formatted correctly
-		var regexpStr = _cms.links.getCurrentGuidanceRegexp();
 		var linkData = _cms.links.getLinkData();
 		
-		if (regexpStr && linkData) {
-			var regexp = new RegExp(regexpStr, "i");
+		if (linkDataRegexpStr && linkData) {
+			var regexp = new RegExp(linkDataRegexpStr, "i");
 			if (! regexp.test(linkData)) {
 				_cms.dialog.open(_cms.dialog.badLinkDataFormat);
 				error = true;
@@ -542,112 +573,6 @@ _cms.links.check_not_binding = function(childId) {
 	return true;
 }
 
-// TODO: Function never called! No validation taking place! Just guidance!
-//
-// This validation only applies to partner links
-_cms.links.validate.linkdata.anc = function(linkType, linkName, linkData) {
-	/* 
-	 * Link data on the Ancestry site provides the date and location the relationship
-	 * was established, and must be formatted as follows:
-	 * 
-	 * 	<type>. <date>[, <location>]
-	 * 
-	 * <type> and <date> are mandatory, <location> is optional.
-	 * 
-	 * <type> can have 2 possible values, followed by a period:
-	 * a) m (married)
-	 * b) p (partner)
-	 * 
-	 * <date> can take one of four possible forms:
-	 * a) 01/02/1956 (all components present), or
-	 * b)    02/1956 (month and year only), or
-	 * c)       1956 (year only)
-	 * d)          ? (don't know)
-	 * 
-	 * <location> can be any text string, and if present, must be separated from <type> and
-	 * <date> by a comma.
-	 */
-	var error = false;
-	var dateStr = "", location = "";
-	var day = -1, month = -1, year = -1;
-	var debug = "";
-	var type = "unspecified";
-	
-	if (linkType == 'relation' && linkName == 'partner') {
-		if (linkData) {
-			linkData = linkData.trim();
-			
-			if (linkData.match(/^[mp]\. [\d\?]/)) {
-				type = linkData.substring(0, 1);
-				linkData = linkData.substring(2).trim();
-				
-				var firstCommaIndex = linkData.indexOf(",");
-			
-				if (firstCommaIndex > -1) {
-					// Only interested in checking date part
-					dateStr = linkData.substring(0, firstCommaIndex).trim();
-					location = linkData.substring(firstCommaIndex + 1).trim();
-				}
-				else {
-					dateStr = linkData;
-					location = "";
-				}
-				
-				if (! dateStr.startsWith("?")) {
-					var dateParts = dateStr.split("/");
-					var len = dateParts.length;
-					
-					if (len == 1) {
-						year = parseInt(dateParts[0]);
-					}
-					
-					if (len == 2) {
-						month = parseInt(dateParts[0]);
-						year = parseInt(dateParts[1]);
-					}
-					
-					if (len == 3) {
-						day = parseInt(dateParts[0]);
-						month = parseInt(dateParts[1]);
-						year = parseInt(dateParts[2]);
-					}
-					
-					if (len > 3) {
-						error = true;
-					}
-					
-					error = 
-						error || 
-						! _cms.support.isBlankOrInRange(year, 1000, 2020) || 
-						! _cms.support.isBlankOrInRange(month, 1, 12) || 
-						! _cms.support.isBlankOrInRange(day, 1, 31);
-				}
-			}
-			else {
-				debug = "linkdata starting format should be, eg, 'm. ?' or 'm. 1956', etc";
-				error = true;
-			}
-		}
-		else {
-			debug = "linkdata field is empty";
-		}
-	}
-	else {
-		debug = "linkdata is not recognised for " + linkType + "/" + linkName;
-	}
-	
-	var result = {
-		ok: ! error,
-		type: type,
-		day: day,
-		month: month,
-		year: year,
-		location: location,
-		debug: debug,
-	};
-	
-	return result;
-}
 
 _cms.links.shortcut.settings = function() {
 	if (_cms.editingItemIsShortcut) {

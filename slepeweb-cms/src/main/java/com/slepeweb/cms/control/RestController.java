@@ -986,10 +986,12 @@ public class RestController extends BaseController {
 		
 		if (! linkType.equals("unknown")) {
 			LinkType lt = this.cmsService.getLinkTypeService().getLinkType(linkType);
+			IValidator iv;
 			
 			if (lt != null) {
 				for (LinkName ln : this.cmsService.getLinkNameService().getLinkNames(siteId, lt.getId())) {
-					options.add(new LinkNameOption(ln.getName(), ln.getGuidance()));
+					iv = this.validationService.get(ln.getValidatorClass());
+					options.add(new LinkNameOption(ln.getName(), iv != null ? iv.getJson() : null));
 				}
 			}
 		}

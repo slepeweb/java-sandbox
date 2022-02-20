@@ -189,7 +189,7 @@ public class RowMapperUtil {
 					setSiteId(rs.getLong("siteid")).
 					setLinkTypeId(rs.getLong("linktypeid")).
 					setName(rs.getString("name")).
-					setGuidance(rs.getString("guidance"));
+					setValidatorClass(rs.getString("validation"));
 		}
 	}
 	

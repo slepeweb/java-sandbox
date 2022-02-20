@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.cms.bean.Dateish;
 
@@ -78,8 +77,13 @@ public class DateishFieldValidator implements IValidator {
 	}
 	
 	@JsonIgnore
-	public String getJson() throws JsonProcessingException {
-		return new ObjectMapper().writeValueAsString(this);
+	public String getJson() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 
 	@JsonIgnore

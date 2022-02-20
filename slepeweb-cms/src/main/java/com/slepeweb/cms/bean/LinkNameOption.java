@@ -1,18 +1,18 @@
 package com.slepeweb.cms.bean;
 
 public class LinkNameOption {
-	private String name, guidance;
+	private String name, validator;
 	
 	public LinkNameOption(String a, String b) {
 		this.name = a;
-		this.guidance = b;
+		this.validator = b;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public String getGuidance() {
-		return guidance;
+	public String getValidator() {
+		return validator;
 	}
 }

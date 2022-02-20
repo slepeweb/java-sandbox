@@ -125,7 +125,7 @@ create table linkname
 	siteid int,
 	linktypeid int,
 	name varchar(64),
-	guidance text,
+	validation varchar(128),
 	primary key (id),
 	unique key idx_linkname_site_type_name (siteid, linktypeid, name),
 	constraint foreign key (siteid) references site(id) on delete cascade,
