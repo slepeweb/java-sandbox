@@ -36,4 +36,6 @@
 	<definition name="cms.refresh.copy" template="/WEB-INF/jsp/cms/refresh/copy.jsp" />
 	<definition name="cms.searchresults" template="/WEB-INF/jsp/cms/searchresults.jsp" />
 	<definition name="cms.crawl" template="/WEB-INF/jsp/cms/crawlresults.jsp" />
+	<definition name="cms.linknameOptions" template="/WEB-INF/jsp/cms/linknameOptions.jsp" />
+	
 </tiles-definitions>

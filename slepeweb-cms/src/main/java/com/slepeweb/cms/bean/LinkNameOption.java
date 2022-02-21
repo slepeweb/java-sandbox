@@ -1,9 +1,12 @@
 package com.slepeweb.cms.bean;
 
+import com.slepeweb.cms.bean.guidance.IValidator;
+
 public class LinkNameOption {
-	private String name, validator;
+	private String name;
+	private IValidator validator;
 	
-	public LinkNameOption(String a, String b) {
+	public LinkNameOption(String a, IValidator b) {
 		this.name = a;
 		this.validator = b;
 	}
@@ -12,7 +15,7 @@ public class LinkNameOption {
 		return name;
 	}
 
-	public String getValidator() {
+	public IValidator getValidator() {
 		return validator;
 	}
 }

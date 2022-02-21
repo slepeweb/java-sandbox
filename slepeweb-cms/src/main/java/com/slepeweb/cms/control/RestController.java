@@ -977,9 +977,8 @@ public class RestController extends BaseController {
 		return resp;
 	}
 	
-	@RequestMapping(value="/linknames/{siteId}/{linkType}", method=RequestMethod.POST, produces="application/json")
-	@ResponseBody
-	public List<LinkNameOption> getLinkNameOptions(
+	@RequestMapping(value="/linknames/{siteId}/{linkType}", method=RequestMethod.POST)
+	public String getLinkNameOptions(
 			@PathVariable long siteId, @PathVariable String linkType, ModelMap model) {	
 		
 		List<LinkNameOption> options = new ArrayList<LinkNameOption>();
@@ -991,12 +990,13 @@ public class RestController extends BaseController {
 			if (lt != null) {
 				for (LinkName ln : this.cmsService.getLinkNameService().getLinkNames(siteId, lt.getId())) {
 					iv = this.validationService.get(ln.getValidatorClass());
-					options.add(new LinkNameOption(ln.getName(), iv != null ? iv.getJson() : null));
+					options.add(new LinkNameOption(ln.getName(), iv));
 				}
 			}
 		}
 		
-		return options;
+		model.addAttribute("_linknameOptions", options);
+		return "cms.linknameOptions";
 	}
 	
 	@RequestMapping(value="/item/{origId}/name", method=RequestMethod.POST, produces="application/json")

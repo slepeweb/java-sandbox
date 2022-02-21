@@ -387,76 +387,6 @@ _cms.links.setLinkForm = function(data) {
 	}
 };
 
-_cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
-	$.ajax(_cms.ctx + "/rest/linknames/" + _cms.siteId + "/" + linkType, {
-		type: "POST",
-		cache: false,
-		dataType: "json",
-		success: function(options, status, z) {
-			var selector = $(_cms.links.sel.LINKNAME_SELECT);
-			var guidanceListDiv = $("#link-guidance-list");
-			var validator, validatorObj;
-	
-			// currentLinkname is not set for new links
-			if (! currentLinkname) {
-				currentLinkname = "std";
-			}
-				
-			selector.empty();
-			guidanceListDiv.empty();
-			
-			selector.append("<option value='unknown'>Choose ...</option>");
-			for (var i = 0; i < options.length; i++) {
-				selector.append(`<option value="${options[i].name}">${options[i].name}</option>`);
-				if (options[i].validator) {
-					validatorObj = JSON.parse(options[i].validator)
-					validator = "";
-					
-					if (validatorObj.heading) {
-						validator += `<h2>${validatorObj.heading}</h2>`;
-					}
-					
-					if (validatorObj.teaser) {
-						validator += `<p>${validatorObj.teaser}</p>`;
-					}
-					
-					if (validatorObj.format) {
-						validator += `<h3>Format</h3><p>${validatorObj.format}</p>`;
-					}
-					
-					if (validatorObj.examples && validatorObj.examples.length > 0) {
-						validator += `<h3>Examples</h3><table>`;
-						for (var j = 0; j < validatorObj.examples.length; j++) {
-							validator += `<tr><td>${validatorObj.examples[j].example}</td><td>${validatorObj.examples[j].explanation}</td></tr>`;
-						}
-						validator += "</table>";
-					}
-					
-					if (validatorObj.details && validatorObj.details.length > 0) {
-						validator += `<h3>Details</h3><ul>`;
-						for (var j = 0; j < validatorObj.details.length; j++) {
-							validator += `<li>${validatorObj.details[j]}</li>`;
-						}
-						validator += `</ul>`;
-					}
-					
-					if (validatorObj.regExp) {
-						validator += `<p class="regexp hide">${validatorObj.regExp}</p>`;
-					}
-				}
-				else {
-					validator = "";
-				}
-				
-				guidanceListDiv.append(`<div id="link-guidance-${options[i].name}">${validator}</div>`);
-			}
-			
-			selector.val(currentLinkname);
-			_cms.links.repopulateGuidance(currentLinkname);
-		}
-	});
-};
-
 _cms.links.behaviour.sortable = function() { 
 	$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).sortable();
 	$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).disableSelection();
@@ -594,6 +524,33 @@ _cms.links.shortcut.settings = function() {
 				'<option value="component">component</option>');
 	}
 }
+
+_cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
+
+	$.ajax(_cms.ctx + "/rest/linknames/" + _cms.siteId + "/" + linkType, {
+		type: "POST",
+		cache: false,
+		dataType: "html",
+		mimeType: "text/html",
+		success: function(html, status, z) {
+			var divs = $(html).children();
+			var selector = $(_cms.links.sel.LINKNAME_SELECT);
+			var guidanceListDiv = $("#link-guidance-list");
+	
+			// currentLinkname is not set for new links
+			if (! currentLinkname) {
+				currentLinkname = "std";
+			}
+				
+			selector.html($(divs[0]).html());
+			guidanceListDiv.html($(divs[1]).html());
+								
+			selector.val(currentLinkname);
+			_cms.links.repopulateGuidance(currentLinkname);
+		}
+	});
+};
+
 
 // Things to do once-only on page load
 _cms.links.onpageload = function() {
