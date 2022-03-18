@@ -1,0 +1,90 @@
+extends layout
+
+block content
+  .main-wrapper
+    .heading
+      h1 !{content.club}
+      h2 !{content.heading}
+      h3 !{content.subheading}
+
+    p.
+    | Dear !{content.firstname},
+    | this is a record of your completed subscription renewal.
+
+    p.
+    | <strong>Please note: </strong> Once an annual subscription has
+    | been paid this cannot be refunded, under any circumstances.
+
+    h3 Contact details
+    table
+      tr
+        td Name
+        td !{content.fullName}
+      tr
+        td Address
+        td !{content.oneLineAddress}
+      tr
+        td Home phone
+        td !{content.homephone}
+      tr
+        td Mobile
+        td !{content.mobile}
+      tr
+        td Email
+        td !{content.email}
+
+    h3 Membership details
+    table
+      tr
+        td Membership option
+        td !{content.membershipCategory}
+      tr
+        td County member?
+        td !{content.countyMemberYesno}
+
+      each val, index in content.childMembers
+        tr
+          td= 'Child #' + (index + 1)
+          td= val
+
+    h3 Payment
+    p.
+    | The total fee is !{content.fees.totalStr}, and is now payable online
+    | (or by cheque if preferred) to the account given below.
+
+    table
+      tr
+        td Payee
+        td !{content.club}
+      tr
+        td Sort code
+        td !{content.sortcode}
+      tr
+        td Account no.
+        td !{content.accountno}
+
+    if content.fees.extras
+      h3 Fee breakdown
+      table
+        tr
+          td !{content.fees.membership.label}
+          td !{content.fees.membership.valueStr}
+
+        if content.fees.countyMemberDiscount
+          tr
+            td !{content.fees.countyMemberDiscount.label}
+            td !{content.fees.countyMemberDiscount.valueStr}
+
+        if content.fees.extraJuniors
+          tr
+            td !{content.fees.extraJuniors.label}
+            td !{content.fees.extraJuniors.valueStr}
+
+        tr
+          td Total
+          td !{content.fees.totalStr}
+
+    p Cheques should be handed to Marlene Maynard, the membership secretary.
+
+    div.logo
+      img(src="/resource/subs/cwm.png")
