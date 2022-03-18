@@ -22,7 +22,7 @@ function displayMedia(n) {
 	i = cycle(n - 1)
 	sourceAndDisplay(i, false);
   
-	// Populate and hide previous slide
+	// Populate and hide next slide
 	i = cycle(n + 1)
 	sourceAndDisplay(i, false)
 }

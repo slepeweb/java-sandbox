@@ -1,7 +1,7 @@
 const mailer = require('nodemailer');
 const clone = require('clone');
 const sc = require('path').basename(__filename)
-const log = require('./logger.js')
+const log = require('./logger.js').instance
 
 class Mailer {
 	constructor(p) {
@@ -36,7 +36,7 @@ class Mailer {
 		
 		this.transport.sendMail(cloned, (err, info) => {	
 			if (err) {
-				error(sc, err)
+				log.error(sc, err)
 			} 
 			else {
 				log.info(sc, 'Email sent: ' + info.response)

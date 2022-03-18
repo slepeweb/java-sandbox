@@ -56,7 +56,7 @@ public class DateishFieldValidator implements IValidator {
 
 
 		list.add(new ExampleInput(
-				"1960s",
+				"1960a",
 				"Year is best approximation. Useful for sorting purposes."));
 
 		return list;
@@ -66,11 +66,8 @@ public class DateishFieldValidator implements IValidator {
 	public List<String> getDetails() {
 		List<String> list = new ArrayList<String>();
 		
-		list.add("In all cases, an 's' can be appended to the date, to indicate that it is a best approximation, " +
-				"and is provided mainly for sorting purposes");
-		
-		list.add("Date must lie within the range 1100 to 2100");
-				
+		list.add("In all cases, an 'a' can be appended to the date, to indicate that it is a best approximation");		
+		list.add("Date must lie within the range 1100 to 2100");				
 		list.add("If no clue about the date, then leave field blank.");
 		
 		return list;
@@ -87,34 +84,12 @@ public class DateishFieldValidator implements IValidator {
 	}
 
 	@JsonIgnore
-	public boolean validate(String value) {
-		boolean ok = true;
-		
-		if (StringUtils.isBlank(value)) {
+	public boolean validate(String s) {		
+		if (StringUtils.isBlank(s)) {
 			return true;
 		}
-		
-		if (Dateish.PATTERN.matcher(value).matches()) {
-			// Check values are within specific ranges
-			Dateish d = new Dateish(value);
-			
-			if (d.getYear() != null) {
-				ok = ok && d.getYear() > 1100 && d.getYear() < 2100;
-				
-				if (ok && d.getMonth() != null) {
-					ok = ok && d.getMonth() > 0 && d.getMonth() <= 12;
-					
-					if (ok && d.getDay() != null) {
-						ok = ok && d.getDay() > 0 && d.getDay() <= 31;
-					}
-				}
-			}
-		}
-		else {
-			ok = false;
-		}
-		
-		return ok;
+						
+		return new Dateish(s).isValid();
 	}
 	
 	@JsonIgnore
@@ -123,14 +98,29 @@ public class DateishFieldValidator implements IValidator {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		IValidator ig = null;
 		try {
 			Class<?> clazz = Class.forName("com.slepeweb.cms.bean.guidance.DateishFieldValidator");
-			IValidator ig = (IValidator) clazz.getDeclaredConstructor().newInstance();
-			System.out.println(ig.getJson());
+			ig = (IValidator) clazz.getDeclaredConstructor().newInstance();			
 		}
 		catch (Exception e) {
 			System.out.println("Failed to identify guidance: " + e.getMessage());
+			return;
 		}
+		
+		test("1956", ig);
+		test("1956/6", ig);
+		test("1956/6s", ig);
+		test("1956/6/20", ig);
+		test("1956/6/20a", ig);
+		test("1956/6/20/a", ig);
+		test("", ig);
+		test("1956/2/31", ig);
 
+	}
+	
+	private static void test(String s, IValidator ig) {
+		Dateish d = new Dateish(s);
+		System.out.println(String.format("Input [%s] produces [%s] : %s", s, d.toString(), ig.validate(s) ? "ok" : "fail"));
 	}
 }

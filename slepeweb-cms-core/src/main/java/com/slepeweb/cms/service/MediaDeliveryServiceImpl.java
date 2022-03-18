@@ -70,7 +70,8 @@ public class MediaDeliveryServiceImpl extends BaseServiceImpl implements MediaDe
 			return;
 		}
 		
-		res.setContentType(item.getType().getMimeType());
+		// TODO: Temporary hack - this assumes all thumbnails are jpeg's
+		res.setContentType(thumbnailRequired ? "image/jpeg" : item.getType().getMimeType());
 		InputStream in = media.getDownloadStream();
 		
 		if (in != null) {			

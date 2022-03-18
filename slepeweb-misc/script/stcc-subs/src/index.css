@@ -1,0 +1,182 @@
+@charset "UTF-8";
+@media screen and (max-width:400px) {
+  @-ms-viewport{
+    width: device-width;
+  }
+}
+
+:root {
+  --error-color: #ce0202;
+  --heading-color: navy;
+  --user-input-color: blue;
+}
+
+body {
+  font: 14px "Century Gothic", Futura, sans-serif;
+  margin: 20px;
+}
+
+h1, h2, h3 {
+  color: var(--heading-color);
+}
+
+.emphasize {
+  color: var(--user-input-color);
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+input, .user-data {
+  color: var(--user-input-color);
+  font-weight: bold;
+  font-size: 1em;
+}
+
+label, input {
+  display: inline-block;
+}
+
+input.error {
+  border: var(--error-color) 2px solid;
+}
+
+span.error {
+  color: var(--error-color);
+}
+
+label, span.price {
+  font-weight: bold;
+}
+
+div.row {
+  margin-top: 1em;
+  padding: 5px;
+}
+
+div.row > label {
+  width: 35%;
+}
+
+div.row input {
+  width: 60%;
+}
+
+div.row input[type=number] {
+  width: 20%;
+}
+
+div.row input[type=checkbox] {
+  width: auto;
+}
+
+div.radio-group {
+  display: grid;
+  grid-template-columns: 75% 25%;
+}
+
+div.radio-group > label {
+  width: 100%;
+}
+
+div.radio-group > div {
+  display: inline-block;
+}
+
+div.radio-group div.radio > label {
+  width: 75%;
+}
+
+div.radio-group input {
+  width: 1.5em;
+}
+
+div#form {
+  width: 400px;
+  margin: auto;
+}
+
+div.heading {
+  margin-top: 1em;
+  font-weight: bold;
+  font-size: 1.2em;
+  color: var(--heading-color);
+}
+
+div.guidance {
+  padding: 5px;
+}
+
+div.guidance ul {
+  padding-left: 1em;
+}
+
+div.spacer {
+  margin-top: 1em;
+}
+
+div.navigation {
+  margin: 2em 1em 0em 1em;
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+div.navigation button {
+  width: 40%;
+  padding: 6px;
+  background-color: pink;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+div.navigation button.fwd-button, div.navigation button.submit-button {
+  justify-self: right;
+}
+
+div.navigation button.submit-button {
+  background-color: #0ebd0e;
+}
+
+div.child-details {
+  display: grid;
+  grid-template-columns: 12% 55% 10% 23%;
+  /* width: 100%; */
+  /* grid-template-areas:  */
+}
+
+div.child-details input {
+  width: 90%;
+}
+
+div.child-details-wrapper h3 {
+  margin-top: 0em;
+  margin-bottom: 0.5em;
+}
+
+table td {
+  padding: 3px;
+}
+
+table td:first-child {
+  font-weight: bold;
+}
+
+span.total-fee {
+  font-weight: bold;
+  font-size: 1.3em;
+  color: var(--heading-color);
+}
+
+#backdoor {
+  position: fixed;
+  bottom: 0px;
+}
+
+@media (min-width: 760px) {
+  div#form {
+    width: 700px;
+  }
+
+  div.radio-group {
+    grid-template-columns: 55% 25%;
+  }
+}

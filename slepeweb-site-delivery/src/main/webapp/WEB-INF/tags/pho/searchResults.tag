@@ -58,7 +58,7 @@
 			
 				<c:choose><c:when test="${_result.type eq 'Photo JPG'}">
 		    	<img class="slide image" data-id="${_stat.count - 1}" />
-		    </c:when><c:when test="${_result.type eq 'Video MP4'}">
+		    </c:when><c:when test="${_result.type eq 'Movie MP4'}">
 		    	<video class="slide video" data-id="${_stat.count - 1}" controls>
 		    	</video>
 		    </c:when></c:choose>
@@ -81,8 +81,8 @@
 
 <script>
 	$(function() {
-		_thumbnails = $(".search-result img")
-		_slides = $(".slide-set .slide")
+		_thumbnails = $("div.search-result img")
+		_slides = $("div.slide-set .slide")
 		assignUIBehaviours()
 	});
 </script>

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 public class Dateish {
-	public static final String REGEXP = "^(\\d{4})\\/(\\d{1,2})\\/(\\d{1,2})(\\s*s)?$|^(\\d{4})\\/(\\d{1,2})(\\s*s)?$|^(\\d{4})(\\s*s)?$";
+	public static final String REGEXP = "^(\\d{4})\\/(\\d{1,2})\\/(\\d{1,2})(\\s*[sa])?$|^(\\d{4})\\/(\\d{1,2})(\\s*[sa])?$|^(\\d{4})(\\s*[sa])?$";
 	public static final Pattern PATTERN = Pattern.compile(REGEXP, Pattern.CASE_INSENSITIVE);
 	
 	private static String[] MONTHS = new String[] {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
@@ -16,7 +16,8 @@ public class Dateish {
 
 	private Integer day, month, year;
 	private Date date;
-	private boolean isForSorting;
+	private boolean isApproximate;
+	private boolean valid = true;
 	
 	public Dateish(String s) {
 		if (StringUtils.isNotBlank(s)) {
@@ -24,35 +25,36 @@ public class Dateish {
 			if (m.matches()) {
 				if (m.group(8) != null) {
 					this.year = Integer.valueOf(m.group(8));
-					this.isForSorting = StringUtils.contains(m.group(9), "s");
+					this.isApproximate = StringUtils.isNotBlank(m.group(9));
 				}
 				else if (m.group(6) != null) {
 					this.year = Integer.valueOf(m.group(5));
 					this.month = Integer.valueOf(m.group(6));
-					this.isForSorting = StringUtils.contains(m.group(7), "s");
+					this.isApproximate = StringUtils.isNotBlank(m.group(7));
 				}
 				else {
 					this.year = Integer.valueOf(m.group(1));
 					this.month = Integer.valueOf(m.group(2));
 					this.day = Integer.valueOf(m.group(3));
-					this.isForSorting = StringUtils.contains(m.group(4), "s");
+					this.isApproximate = StringUtils.isNotBlank(m.group(4));
 				}
 				
-				this.month = checkBounds(this.month, 12);
-				this.day = checkBounds(this.day, 31);
+				this.valid = 
+						inRange(this.year, 1000, 3000) &&
+						inRange(this.month, 1, 12) &&
+						inRange(this.day, 1, 31);
 				
-				if (this.day != null && this.month != null && this.year != null) {
+				if (this.valid && isComplete()) {
 					Calendar cal = Calendar.getInstance();
 					cal.set(this.year, this.month - 1, this.day);
 					
-					if (cal.get(Calendar.MONTH) > this.month - 1) {
-						this.day = cal.get(Calendar.DATE);
-						this.month = cal.get(Calendar.MONTH) + 1;
-						cal.set(this.year, this.month - 1, this.day);
+					if (cal.get(Calendar.MONTH) != this.month - 1) {
+						this.valid = false;
 					}
-					
-					this.date = cal.getTime();
 				}
+			}
+			else {
+				this.valid = false;
 			}
 		}
 	}
@@ -60,8 +62,8 @@ public class Dateish {
 	@Override
 	public String toString() {
 		String partA = toStringA();
-		if (partA != null && this.isForSorting) {
-			return partA + "s";
+		if (partA != null && this.isApproximate) {
+			return partA + "a";
 		}
 		
 		return partA;
@@ -69,14 +71,14 @@ public class Dateish {
 	
 	public String toSortableString() {
 		String partA = StringUtils.rightPad(toStringA(), 10);
-		if (partA != null && this.isForSorting) {
-			return partA + "s";
+		if (partA != null && this.isApproximate) {
+			return partA + "a";
 		}
 		return partA;
 	}
 	
 	public String getDeliveryString() {
-		if (this.isForSorting) {
+		if (this.isApproximate) {
 			// This date is approximate, and provided mainly for sorting purposes.
 			// Only use the year part.
 			return "~" + this.getYear();
@@ -130,12 +132,24 @@ public class Dateish {
 		return String.valueOf(n);
 	}
 	
-	private Integer checkBounds(Integer i, int max) {
-		if (i == null || i <= max) {
-			return i;
+	private boolean inRange(Integer value, Integer min, Integer max) {
+		if (value == null) {
+			return true;
 		}
-
-		return max;
+		
+		if (min == null && max != null) {
+			return value <= max;
+		}
+		
+		if (max == null && min != null) {
+			return value >= min;
+		}
+		
+		if (min != null && max != null) {
+			return value >= min && value <= max;
+		}
+		
+		return false;
 	}
 	
 	public Integer getDay() {
@@ -154,8 +168,8 @@ public class Dateish {
 		return date;
 	}
 
-	public boolean isForSorting() {
-		return isForSorting;
+	public boolean isApproximate() {
+		return isApproximate;
 	}
 
 	public boolean isBlank() {
@@ -163,7 +177,11 @@ public class Dateish {
 	}
 	
 	public boolean isComplete() {
-		return this.date != null;
+		return this.year != null && this.month != null && this.day != null;
+	}
+	
+	public boolean isValid() {
+		return this.valid;
 	}
 	
 	public static void main(String[] args) {
@@ -172,6 +190,7 @@ public class Dateish {
 		test("2010s");
 		test("2010/1");
 		test("2010/01   s");
+		test("2010/01a");
 		test("2010/13");
 		test("2010/01s");
 		test("2010/10/1");
