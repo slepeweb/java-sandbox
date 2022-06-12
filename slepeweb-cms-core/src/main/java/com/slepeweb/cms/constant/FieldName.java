@@ -24,4 +24,7 @@ public class FieldName {
 	public static final String CAPTION = "caption";
 	public static final String ALT_TEXT = "alt";
 	public static final String DATEISH = "dateish";
+	public static final String FIRSTNAME = "firstname";
+	public static final String LASTNAME = "lastname";
+	public static final String MIDDLENAMES = "middlenames";
 }

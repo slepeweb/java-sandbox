@@ -810,9 +810,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public int getCountByPath(Item i) {
+	public int getCountByPath(Long siteId, String path) {
 		return this.jdbcTemplate.queryForInt(
-				"select count(*) from item where siteid=? and path like ?", new Object[] {i.getSite().getId(), i.getPath() + "%"});
+				"select count(*) from item where siteid=? and path like ?", new Object[] {siteId, path + "%"});
 	}
 	
 	public boolean updatePublished(Long id, boolean option) {

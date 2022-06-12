@@ -53,6 +53,8 @@ import com.slepeweb.cms.bean.SolrParams4Cms;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.bean.guidance.IValidator;
+import com.slepeweb.cms.component.CmsHooker;
+import com.slepeweb.cms.component.ICmsHook;
 import com.slepeweb.cms.component.Navigation.Node;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
@@ -76,6 +78,7 @@ public class RestController extends BaseController {
 	@Autowired private SolrService4Cms solrService4Cms;
 	@Autowired private NavigationController navigationController;
 	@Autowired private ValidationService validationService;
+	@Autowired private CmsHooker cmsHooker;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -114,7 +117,8 @@ public class RestController extends BaseController {
 			model.addAttribute("_lastRelativePosition", this.cookieService.getRelativePositionCookieValue(req));
 			
 			// Total number of editable items in this section
-			model.addAttribute("_numItemsInSection", this.cmsService.getItemService().getCountByPath(i));
+			model.addAttribute("_numItemsInSection", 
+					1 + this.cmsService.getItemService().getCountByPath(i.getSite().getId(), i.getPath() + "/"));
 			
 			// Get recently-used tags, and full list of tags for the site
 			model.addAttribute(TAG_INPUT_SUPPORT_ATTR, getTagInfo(i.getSite().getId(), req));
@@ -600,13 +604,19 @@ public class RestController extends BaseController {
 		
 		try {
 			if (i.isProduct()) {
-				p.save();
+				p = p.save();
 			}
 			else {
-				i.save();
+				i = i.save();
 			}
 			
 			LOG.info(userLog(u, "saved item", i));
+			
+			// Site-specific actions on adding a new item
+			ICmsHook h = this.cmsHooker.getHook(i.getSite().getShortname());
+			if (h != null) {
+				h.addItem(i);
+			}
 			
 			Object[] o = new Object[]{Node.toNode(i), i.isShortcut(), i.getType().isMedia()};		
 			resp.addMessage("Item added").setData(o);

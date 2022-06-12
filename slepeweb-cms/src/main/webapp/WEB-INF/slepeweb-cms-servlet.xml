@@ -102,4 +102,13 @@
 			</list>
 		</property>
 	</bean>
+	
+	<bean id="cmsHooker" class="com.slepeweb.cms.component.CmsHooker">
+		<constructor-arg name="classes">
+			<map>
+				<entry key="anc" value="com.slepeweb.cms.component.AncHook" />
+			</map>
+		</constructor-arg>
+	</bean>
+	
 </beans>

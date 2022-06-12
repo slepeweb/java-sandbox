@@ -37,7 +37,7 @@ public interface ItemService {
 	Item copy(Item source, String name, String simplename) throws ResourceException;
 	Item version(Item source) throws ResourceException;
 	Item revert(Item source) throws ResourceException;
-	int getCountByPath(Item i);
+	int getCountByPath(Long siteId, String path);
 	boolean updatePublished(Long id, boolean b);
 	boolean updateSearchable(Long id, boolean b);
 }
