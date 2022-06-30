@@ -40,7 +40,6 @@ public class CmsServiceImpl implements CmsService {
 	@Autowired protected SiteAccessService siteAccessService;
 	@Autowired protected SiteTypeService siteTypeService;
 	@Autowired protected SiteConfiguration siteConfiguration;
-	@Autowired protected ValidationService validationService;
 	
 	/* 
 	 * In editorial context:
@@ -213,9 +212,5 @@ public class CmsServiceImpl implements CmsService {
 
 	public SiteTypeService getSiteTypeService() {
 		return siteTypeService;
-	}
-
-	public ValidationService getValidationService() {
-		return validationService;
 	}
 }

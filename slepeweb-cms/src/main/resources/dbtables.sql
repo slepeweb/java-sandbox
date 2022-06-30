@@ -125,7 +125,6 @@ create table linkname
 	siteid int,
 	linktypeid int,
 	name varchar(64),
-	validation varchar(128),
 	primary key (id),
 	unique key idx_linkname_site_type_name (siteid, linktypeid, name),
 	constraint foreign key (siteid) references site(id) on delete cascade,
@@ -159,7 +158,6 @@ create table field
    helptext varchar(512),
    dflt varchar(64),
    valid varchar(512), -- valid field values, for radio and select inputs, etc.
-   validation varchar(128), -- validation regexp for the field value
    primary key (id),
    unique key idx_field_variable (variable)
 ) ENGINE=InnoDB;

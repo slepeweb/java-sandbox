@@ -33,8 +33,8 @@ public class LinkNameServiceImpl extends BaseServiceImpl implements LinkNameServ
 	}
 	
 	private void insertLinkName(LinkName ln) {
-		this.jdbcTemplate.update("insert into linkname (siteid, linktypeid, name, validation) values (?, ?, ?, ?)",
-				ln.getSiteId(), ln.getLinkTypeId(), ln.getName(), ln.getValidatorClass());
+		this.jdbcTemplate.update("insert into linkname (siteid, linktypeid, name, validation) values (?, ?, ?)",
+				ln.getSiteId(), ln.getLinkTypeId(), ln.getName());
 		
 		ln.setId(getLastInsertId());
 		this.cacheEvictor.evict(ln);
@@ -46,8 +46,8 @@ public class LinkNameServiceImpl extends BaseServiceImpl implements LinkNameServ
 			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(ln);
 			
-			this.jdbcTemplate.update("update linkname set name = ?, validation = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getValidatorClass(), dbRecord.getId());
+			this.jdbcTemplate.update("update linkname set name = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getId());
 			
 			LOG.info(compose("Updated linkname", ln));
 		}

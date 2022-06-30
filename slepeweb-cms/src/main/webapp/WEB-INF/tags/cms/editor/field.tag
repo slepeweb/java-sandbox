@@ -26,15 +26,15 @@
 					<div class="ff">
 						<label for="${fes.field.variable}">${fes.label} : </label>
 						${fes.inputTag}
-						<c:if test="${not empty fes.validator}">
+						<c:if test="${not empty fes.guidance}">
 							<span class="field-guidance-icon"><i class="far fa-question-circle"></i></span>
 						</c:if>
 						
 					</div>
 					
-					<c:if test="${not empty fes.validator and _lang eq editingItem.language}">
+					<c:if test="${not empty fes.guidance and _lang eq editingItem.language}">
 						<div class="hide" data-variable="${fes.field.variable}">
-							<edit:guidance validator="${fes.validator}" />
+							<edit:guidance guidance="${fes.guidance}" />
 						</div>
 					</c:if>
 				</c:otherwise></c:choose>

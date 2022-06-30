@@ -1,33 +1,33 @@
 <%@ tag %><%@ 
-	attribute name="validator" required="true" rtexprvalue="true" type="com.slepeweb.cms.bean.guidance.IValidator" %><%@ 
+	attribute name="guidance" required="true" rtexprvalue="true" type="com.slepeweb.cms.bean.guidance.IGuidance" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
         
 <cms:debug><!-- tags/cms/editor/guidance.tag --></cms:debug>
 	
-<c:if test="${not empty validator.heading}">
-	<h2>${validator.heading}</h2></c:if>
-<c:if test="${not empty validator.teaser}">
-	<p>${validator.teaser}</p></c:if>
-<c:if test="${not empty validator.format}">
-	<h3>Format</h3><p>${validator.format}</p></c:if>
+<c:if test="${not empty guidance.heading}">
+	<h2>${guidance.heading}</h2></c:if>
+<c:if test="${not empty guidance.teaser}">
+	<p>${guidance.teaser}</p></c:if>
+<c:if test="${not empty guidance.format}">
+	<h3>Format</h3><p>${guidance.format}</p></c:if>
 
-<c:if test="${not empty validator.examples}">
+<c:if test="${not empty guidance.examples}">
 	<h3>Examples</h3><table>
-	<c:forEach items="${validator.examples}" var="_ex">
+	<c:forEach items="${guidance.examples}" var="_ex">
 		<tr><td>${_ex.example}</td><td>${_ex.explanation}</td></tr>
 	</c:forEach>
 	</table>
 </c:if>
 
-<c:if test="${not empty validator.details}">
+<c:if test="${not empty guidance.details}">
 	<h3>Details</h3><ul>
-	<c:forEach items="${validator.details}" var="_detail">
+	<c:forEach items="${guidance.details}" var="_detail">
 		<li>${_detail}</li>
 	</c:forEach>
 	</ul>
 </c:if>
 
-<c:if test="${not empty validator.regExp}">
-	<p class="regexp hide">${validator.regExp}</p>
+<c:if test="${not empty guidance.regExp}">
+	<p class="regexp hide">${guidance.regExp}</p>
 </c:if>
 	

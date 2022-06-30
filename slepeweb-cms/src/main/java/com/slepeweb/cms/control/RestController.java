@@ -52,7 +52,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrParams4Cms;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
-import com.slepeweb.cms.bean.guidance.IValidator;
+import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.component.CmsHooker;
 import com.slepeweb.cms.component.ICmsHook;
 import com.slepeweb.cms.component.Navigation.Node;
@@ -61,7 +61,6 @@ import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.SolrService4Cms;
-import com.slepeweb.cms.service.ValidationService;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.util.DateUtil;
@@ -77,7 +76,6 @@ public class RestController extends BaseController {
 	@Autowired private CookieService cookieService;
 	@Autowired private SolrService4Cms solrService4Cms;
 	@Autowired private NavigationController navigationController;
-	@Autowired private ValidationService validationService;
 	@Autowired private CmsHooker cmsHooker;
 	
 	/* 
@@ -466,7 +464,8 @@ public class RestController extends BaseController {
 				}
 				
 				// Does this field value require validation?
-				if (! validateFieldValue(fv, errors)) {
+				ICmsHook hook = this.cmsHooker.getHook(i.getSite().getShortname());
+				if (! validateFieldValue(fv, hook.getFieldGuidance(fv.getField().getVariable()), errors)) {
 					continue;
 				}
 				
@@ -519,17 +518,15 @@ public class RestController extends BaseController {
 		return resp;
 	}	
 	
-	private boolean validateFieldValue(FieldValue fv, List<String> errors) {
-		IValidator iv = this.validationService.get(fv.getField().getValidatorClass());
-		
-		if (iv != null) {
-			if (! iv.validate(fv.getStringValue())) {
+	private boolean validateFieldValue(FieldValue fv, IGuidance guidance, List<String> errors) {		
+		if (guidance != null) {
+			if (! guidance.validate(fv.getStringValue())) {
 				errors.add(String.format("Field value '%s' fails validation", fv.getStringValue()));
 				return false;
 			}
 			
 			// Clean up input, if necessary
-			fv.setStringValue(iv.clean(fv.getStringValue()));
+			fv.setStringValue(guidance.clean(fv.getStringValue()));
 		}
 		
 		return true;
@@ -995,12 +992,13 @@ public class RestController extends BaseController {
 		
 		if (! linkType.equals("unknown")) {
 			LinkType lt = this.cmsService.getLinkTypeService().getLinkType(linkType);
-			IValidator iv;
+			ICmsHook hook = this.cmsHooker.getHook(siteId);
+			IGuidance guidance;
 			
 			if (lt != null) {
 				for (LinkName ln : this.cmsService.getLinkNameService().getLinkNames(siteId, lt.getId())) {
-					iv = this.validationService.get(ln.getValidatorClass());
-					options.add(new LinkNameOption(ln.getName(), iv));
+					guidance = hook != null ? hook.getLinknameGuidance(ln.getName()) : null;
+					options.add(new LinkNameOption(ln.getName(), guidance));
 				}
 			}
 		}

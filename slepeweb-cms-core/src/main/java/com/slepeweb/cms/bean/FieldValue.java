@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.common.util.StringUtil;
 
@@ -73,8 +74,8 @@ public class FieldValue extends CmsBean {
 		getFieldValueService().deleteFieldValue(getField().getId(), getItemId(), getLanguage());
 	}
 	
-	public String getInputTag() {
-		return getField().getInputTag(this);
+	public String getInputTag(IGuidance guidance) {
+		return getField().getInputTag(this, guidance);
 	}
 	
 	public Field getField() {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,7 +17,8 @@ import com.slepeweb.cms.bean.Dateish;
  * At some point in the future, the jackson annotations might be removed ...
  */
 
-public class DateishFieldValidator implements IValidator {
+@Component
+public class DateishFieldGuidance implements IGuidance {
 
 	@JsonGetter
 	public String getHeading() {
@@ -98,10 +100,10 @@ public class DateishFieldValidator implements IValidator {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		IValidator ig = null;
+		IGuidance ig = null;
 		try {
 			Class<?> clazz = Class.forName("com.slepeweb.cms.bean.guidance.DateishFieldValidator");
-			ig = (IValidator) clazz.getDeclaredConstructor().newInstance();			
+			ig = (IGuidance) clazz.getDeclaredConstructor().newInstance();			
 		}
 		catch (Exception e) {
 			System.out.println("Failed to identify guidance: " + e.getMessage());
@@ -119,7 +121,7 @@ public class DateishFieldValidator implements IValidator {
 
 	}
 	
-	private static void test(String s, IValidator ig) {
+	private static void test(String s, IGuidance ig) {
 		Dateish d = new Dateish(s);
 		System.out.println(String.format("Input [%s] produces [%s] : %s", s, d.toString(), ig.validate(s) ? "ok" : "fail"));
 	}

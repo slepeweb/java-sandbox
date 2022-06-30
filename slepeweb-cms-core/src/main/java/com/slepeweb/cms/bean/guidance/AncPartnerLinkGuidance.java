@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class AncPartnerLinkValidator implements IValidator {
+@Component
+public class AncPartnerLinkGuidance implements IGuidance {
 	public static final String REGEXP = "^[mp]\\.\\s*(\\d{1,2}\\/)?(\\d{1,2}\\/)?(\\d{4})?(,?\\s*)?.*?$";
 	public static final Pattern PATTERN = Pattern.compile(REGEXP, Pattern.CASE_INSENSITIVE);
 
@@ -84,7 +86,7 @@ public class AncPartnerLinkValidator implements IValidator {
 	}
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(new AncPartnerLinkValidator().getJson());
+		System.out.println(new AncPartnerLinkGuidance().getJson());
 	}
 }
 

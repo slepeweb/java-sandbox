@@ -188,8 +188,7 @@ public class RowMapperUtil {
 					setId(rs.getLong("id")).
 					setSiteId(rs.getLong("siteid")).
 					setLinkTypeId(rs.getLong("linktypeid")).
-					setName(rs.getString("name")).
-					setValidatorClass(rs.getString("validation"));
+					setName(rs.getString("name"));
 		}
 	}
 	
@@ -209,8 +208,7 @@ public class RowMapperUtil {
 				setType(FieldType.valueOf(rs.getString("fieldtype"))).
 				setSize(rs.getInt("size")).
 				setDefaultValue(rs.getString("dflt")).
-				setValidValues(rs.getString("valid")).
-				setValidatorClass(rs.getString("validation"));
+				setValidValues(rs.getString("valid"));
 	}
 	
 	@SuppressWarnings("unused")

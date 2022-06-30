@@ -2,7 +2,7 @@ package com.slepeweb.cms.bean.guidance;
 
 import java.util.List;
 
-public interface IValidator {
+public interface IGuidance {
 
 	String getHeading();
 	String getTeaser();

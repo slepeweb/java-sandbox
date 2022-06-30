@@ -1,9 +1,14 @@
 package com.slepeweb.cms.component;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.constant.FieldName;
 
 public class AncHook implements ICmsHook {
+	
+	@Autowired private IGuidance ancPartnerLinkGuidance;
 
 	@Override
 	public void addItem(Item i) {
@@ -41,7 +46,26 @@ public class AncHook implements ICmsHook {
 
 	@Override
 	public void updateFields(Item i) {
-		System.out.println("Manipulating item field data here ...");
+		//System.out.println("Manipulating item field data here ...");
+	}
+
+	@Override
+	public IGuidance getFieldGuidance(String variable) {
+		return null;
+	}
+
+	@Override
+	public IGuidance getLinknameGuidance(String linkname) {
+		if (linkname.equals("partner")) {
+			return this.ancPartnerLinkGuidance;
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getSitename() {
+		return "anc";
 	}
 
 }

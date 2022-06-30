@@ -9,7 +9,7 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.slepeweb.cms.bean.guidance.IValidator;
+import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.DateUtil;
 
@@ -29,7 +29,7 @@ public class Field extends CmsBean {
 	private FieldType type;
 	private int size;
 	private String defaultValue;
-	private String validValues, validatorClass; 
+	private String validValues; 
 	private boolean multilingual;
 	
 	public enum FieldType {
@@ -47,7 +47,6 @@ public class Field extends CmsBean {
 			setDefaultValue(f.getDefaultValue());
 			setValidValues(f.getValidValues());
 			setMultilingual(f.isMultilingual());
-			setValidatorClass(f.getValidatorClass());
 		}
 	}
 
@@ -71,11 +70,11 @@ public class Field extends CmsBean {
 		getFieldService().deleteField(this);
 	}
 	
-	public String getInputTag() {
-		return getInputTag(null);
+	public String getInputTag(IGuidance guidance) {
+		return getInputTag(null, guidance);
 	}
 	
-	public String getInputTag(FieldValue fv) {
+	public String getInputTag(FieldValue fv, IGuidance guidance) {
 		StringBuilder sb = new StringBuilder();
 		String tag = null, inputType = "";
 		String rows = null, cols = null;
@@ -168,13 +167,10 @@ public class Field extends CmsBean {
 					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s ", 
 							inputType, getVariable(), notNullStringValue, getTooltip()));
 					
-					// Is this type of input field is subject to validation?
-					if (isValidateable()) {
-						IValidator iv = getCmsService().getValidationService().get(getValidatorClass());
-						if (iv != null) {
-							sb.append(String.format("data-validation=\"%s\" ", iv.getRegExp()));
-							sb.append(String.format("data-variable=\"%s\" ", getVariable()));
-						}
+					// Is there guidance for this field?
+					if (guidance != null) {
+						sb.append(String.format("data-validation=\"%s\" ", guidance.getRegExp()));
+						sb.append(String.format("data-variable=\"%s\" ", getVariable()));
 					}
 					
 					sb.append(" />");
@@ -304,7 +300,6 @@ public class Field extends CmsBean {
 		int result = 1;
 		result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
 		result = prime * result + ((validValues == null) ? 0 : validValues.hashCode());
-		result = prime * result + ((validatorClass == null) ? 0 : validatorClass.hashCode());
 		result = prime * result + ((help == null) ? 0 : help.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + size;
@@ -332,11 +327,6 @@ public class Field extends CmsBean {
 			if (other.validValues != null)
 				return false;
 		} else if (!validValues.equals(other.validValues))
-			return false;
-		if (validatorClass == null) {
-			if (other.validatorClass != null)
-				return false;
-		} else if (!validatorClass.equals(other.validatorClass))
 			return false;
 		if (help == null) {
 			if (other.help != null)
@@ -401,16 +391,4 @@ public class Field extends CmsBean {
 		return this;
 	}
 
-	public String getValidatorClass() {
-		return validatorClass;
-	}
-
-	public Field setValidatorClass(String s) {
-		this.validatorClass = s;
-		return this;
-	}
-
-	public boolean isValidateable() {
-		return StringUtils.isNotBlank(this.validatorClass);
-	}
 }

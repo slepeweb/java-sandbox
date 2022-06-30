@@ -22,9 +22,11 @@ import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.TagInputSupport;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.bean.guidance.IGuidance;
+import com.slepeweb.cms.component.CmsHooker;
+import com.slepeweb.cms.component.ICmsHook;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
-import com.slepeweb.cms.service.ValidationService;
 
 @Controller
 public class BaseController {
@@ -33,7 +35,7 @@ public class BaseController {
 	public static final String RECENT_TAGS_ATTR = "_recentTags";
 	
 	@Autowired protected CmsService cmsService;
-	@Autowired private ValidationService validationService;
+	@Autowired protected CmsHooker cmsHooker;
 	
 	private String contextPath;
 
@@ -89,6 +91,9 @@ public class BaseController {
 		FieldEditorSupport fes;
 		String variable;
 		
+		ICmsHook hook = this.cmsHooker.getHook(i.getSite().getShortname());
+		IGuidance guidance = null;
+		
 		for (String language : i.getSite().getAllLanguages()) {
 			languageValuesMap = i.getFieldValueSet().getFieldValues(language);
 			list = new ArrayList<FieldEditorSupport>();
@@ -96,25 +101,23 @@ public class BaseController {
 			for (FieldForType fft : i.getType().getFieldsForType(false)) {
 				if (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual()) {
 					variable = fft.getField().getVariable();
+					guidance = hook != null ? hook.getFieldGuidance(variable) : null;
 					
 					fes = new FieldEditorSupport().
 							setField(fft.getField()).
-							setLabel(fft.getField().getName());
+							setLabel(fft.getField().getName()).
+							setGuidance(guidance);
 					
 					fv = languageValuesMap == null ? null : languageValuesMap.get(variable);
 					
 					if (fft.getField().getType() != FieldType.layout) {
 						if (fv == null) {
-							fes.setInputTag(fft.getField().getInputTag());
+							fes.setInputTag(fft.getField().getInputTag(guidance));
 						}
 						else {
 							fes.setFieldValue(fv);
-							fes.setInputTag(fv.getInputTag());
+							fes.setInputTag(fv.getInputTag(guidance));
 						}
-					}
-					
-					if (fft.getField().isValidateable()) {
-						fes.setValidator(this.validationService.get(fft.getField().getValidatorClass()));
 					}
 					
 					list.add(fes);

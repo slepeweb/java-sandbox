@@ -1,30 +1,42 @@
 package com.slepeweb.cms.component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.service.SiteService;
 
 public class CmsHooker {
-	private Map<String, ICmsHook> hooks = new HashMap<String, ICmsHook>();
+	@Autowired private SiteService siteService;
 	
-	@SuppressWarnings({ "deprecation", "rawtypes" })
-	public CmsHooker(Map<String, String> classes) {
-		String className;
-		Class c;
-		ICmsHook h;
-		
-		for (String siteName : classes.keySet()) {
-			className = classes.get(siteName);
-			try {
-				c = Class.forName(className);
-				h = (ICmsHook) c.newInstance();
-				this.hooks.put(siteName, h);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+	private List<ICmsHook> hooks = new ArrayList<ICmsHook>();
+	
+	public void setHooks(List<ICmsHook> list) {
+		this.hooks = list;
 	}
 	
+	/* 
+	 * Not expecting there to be too many sites (ie < 10), so leaving collection as list,
+	 * instead of converting to a map.
+	 */
 	public ICmsHook getHook(String siteName) {
-		return this.hooks.get(siteName);
+		for (ICmsHook h : this.hooks) {
+			if (h.getSitename().equals(siteName)) {
+				return h;
+			}
+		}
+		return null;
+	}
+
+	public ICmsHook getHook(Long siteId) {
+		Site s = this.siteService.getSite(siteId);
+		for (ICmsHook h : this.hooks) {
+			if (h.getSitename().equals(s.getShortname())) {
+				return h;
+			}
+		}
+		return null;
 	}
 }

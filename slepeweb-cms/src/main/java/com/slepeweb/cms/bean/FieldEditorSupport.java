@@ -1,13 +1,13 @@
 package com.slepeweb.cms.bean;
 
-import com.slepeweb.cms.bean.guidance.IValidator;
+import com.slepeweb.cms.bean.guidance.IGuidance;
 
 public class FieldEditorSupport {
 
 	private Field field;
 	private FieldValue fieldValue;
 	private String label, inputTag;
-	private IValidator validator;
+	private IGuidance guidance;
 	
 	public Field getField() {
 		return field;
@@ -45,12 +45,12 @@ public class FieldEditorSupport {
 		return this;
 	}
 
-	public IValidator getValidator() {
-		return validator;
+	public IGuidance getGuidance() {
+		return guidance;
 	}
 
-	public FieldEditorSupport setValidator(IValidator validator) {
-		this.validator = validator;
+	public FieldEditorSupport setGuidance(IGuidance guidance) {
+		this.guidance = guidance;
 		return this;
 	}
 }

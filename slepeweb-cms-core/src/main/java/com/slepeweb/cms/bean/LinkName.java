@@ -12,15 +12,14 @@ public class LinkName extends CmsBean {
 	private Long id;
 	private Long siteId;
 	private Long linkTypeId;
-	private String name, validatorClass;
+	private String name;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof LinkName) {
 			LinkName ln = (LinkName) obj;
 			setSiteId(ln.getSiteId());
 			setLinkTypeId(ln.getLinkTypeId());
-			setName(ln.getName()).
-			setValidatorClass(ln.getValidatorClass());
+			setName(ln.getName());
 		}
 	}
 	
@@ -68,15 +67,6 @@ public class LinkName extends CmsBean {
 
 	public LinkName setLinkTypeId(Long id) {
 		this.linkTypeId = id;
-		return this;
-	}
-
-	public String getValidatorClass() {
-		return validatorClass;
-	}
-
-	public LinkName setValidatorClass(String c) {
-		this.validatorClass = c;
 		return this;
 	}
 

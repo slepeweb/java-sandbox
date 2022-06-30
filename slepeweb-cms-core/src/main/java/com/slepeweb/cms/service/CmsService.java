@@ -38,5 +38,4 @@ public interface CmsService {
 	AccessService getAccessService();
 	SiteAccessService getSiteAccessService();
 	SiteTypeService getSiteTypeService();
-	ValidationService getValidationService();
 }

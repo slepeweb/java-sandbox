@@ -1,21 +1,21 @@
 package com.slepeweb.cms.bean;
 
-import com.slepeweb.cms.bean.guidance.IValidator;
+import com.slepeweb.cms.bean.guidance.IGuidance;
 
 public class LinkNameOption {
 	private String name;
-	private IValidator validator;
+	private IGuidance guidance;
 	
-	public LinkNameOption(String a, IValidator b) {
+	public LinkNameOption(String a, IGuidance b) {
 		this.name = a;
-		this.validator = b;
+		this.guidance = b;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public IValidator getValidator() {
-		return validator;
+	public IGuidance getGuidance() {
+		return guidance;
 	}
 }

@@ -12,9 +12,9 @@
 	
 	<div>
 		<c:forEach items="${_linknameOptions}" var="_option">
-			<c:if test="${not empty _option.validator}">
+			<c:if test="${not empty _option.guidance}">
 				<div id="link-guidance-${_option.name}">
-					<edit:guidance validator="${_option.validator}" />
+					<edit:guidance guidance="${_option.guidance}" />
 				</div>
 			</c:if>
 		</c:forEach>
