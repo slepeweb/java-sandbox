@@ -108,10 +108,10 @@
 	
 	<bean id="cmsHooker" class="com.slepeweb.cms.component.CmsHooker">
 		<property name="hooks">
-			<list>
-				<ref bean="ancHook" />
-				<ref bean="phoHook" />
-			</list>
+			<map>
+				<entry key="anc" value-ref="ancHook" />
+				<entry key="pho" value-ref="phoHook" />
+			</map>
 		</property>
 	</bean>
 	

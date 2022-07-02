@@ -101,7 +101,7 @@ public class BaseController {
 			for (FieldForType fft : i.getType().getFieldsForType(false)) {
 				if (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual()) {
 					variable = fft.getField().getVariable();
-					guidance = hook != null ? hook.getFieldGuidance(variable) : null;
+					guidance = hook.getFieldGuidance(variable);
 					
 					fes = new FieldEditorSupport().
 							setField(fft.getField()).

@@ -6,10 +6,10 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.constant.FieldName;
 
-public class AncHook implements ICmsHook {
+public class AncHook extends NoHook {
 	
 	@Autowired private IGuidance ancPartnerLinkGuidance;
-
+	
 	@Override
 	public void addItem(Item i) {
 		// Set surname to be the same as that of the parent
@@ -45,16 +45,6 @@ public class AncHook implements ICmsHook {
 	}
 
 	@Override
-	public void updateFields(Item i) {
-		//System.out.println("Manipulating item field data here ...");
-	}
-
-	@Override
-	public IGuidance getFieldGuidance(String variable) {
-		return null;
-	}
-
-	@Override
 	public IGuidance getLinknameGuidance(String linkname) {
 		if (linkname.equals("partner")) {
 			return this.ancPartnerLinkGuidance;
@@ -62,10 +52,4 @@ public class AncHook implements ICmsHook {
 
 		return null;
 	}
-
-	@Override
-	public String getSitename() {
-		return "anc";
-	}
-
 }

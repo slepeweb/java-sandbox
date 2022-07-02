@@ -611,9 +611,7 @@ public class RestController extends BaseController {
 			
 			// Site-specific actions on adding a new item
 			ICmsHook h = this.cmsHooker.getHook(i.getSite().getShortname());
-			if (h != null) {
-				h.addItem(i);
-			}
+			h.addItem(i);
 			
 			Object[] o = new Object[]{Node.toNode(i), i.isShortcut(), i.getType().isMedia()};		
 			resp.addMessage("Item added").setData(o);
@@ -997,7 +995,7 @@ public class RestController extends BaseController {
 			
 			if (lt != null) {
 				for (LinkName ln : this.cmsService.getLinkNameService().getLinkNames(siteId, lt.getId())) {
-					guidance = hook != null ? hook.getLinknameGuidance(ln.getName()) : null;
+					guidance = hook.getLinknameGuidance(ln.getName());
 					options.add(new LinkNameOption(ln.getName(), guidance));
 				}
 			}
