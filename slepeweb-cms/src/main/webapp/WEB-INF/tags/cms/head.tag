@@ -22,10 +22,12 @@
 <link href="${applicationContextPath}/resources/fancytree/skin-win8/ui.fancytree.min.css" rel="stylesheet" type="text/css">
 <script src="${applicationContextPath}/resources/fancytree/jquery.fancytree.min.js" type="text/javascript"></script>
 
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" 
-	integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" 
-	crossorigin="anonymous">
+<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css"  -->
+<!-- 	integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"  -->
+<!-- 	crossorigin="anonymous"> -->
 	
+<script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>
+
 <link rel="stylesheet" href="${applicationContextPath}/resources/css/main.css" type="text/css">
 
 <c:if test="${loadjs}">

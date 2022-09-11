@@ -44,6 +44,20 @@
 		};
 	}
 	
+	_cms.siblingNav = (dirn) => {
+		let linkSelector = 'div#leftnav-hider i.fa-angle-' + dirn;
+		let prefix = dirn === 'left' ? 'previous' : 'next';
+		let keySelector = 'div#' + prefix + '-sibling-key';
+		
+		$(linkSelector).click(() => {
+			let key = $(keySelector).html()
+			if (key > -1) {
+				let node = _cms.leftnav.tree.getNodeByKey(key);
+				node.setActive();
+			}
+		})
+	}
+	
 
 		
 	$(function() {
@@ -79,6 +93,24 @@
 		
 		// Render flash message when page is first loaded
 		_cms.support.flashMessage(_cms.flashMessage);
+		
+		// Back & forward sibling navigation
+		_cms.siblingNav("left");
+		_cms.siblingNav("right");
+		
+		/*
+		$("div#leftnav-hider i.fa-angle-left").click(() => {
+			let key = $("#previous-sibling-key").html()
+			let node = _cms.leftnav.tree.getNodeByKey(key);
+			node.setActive();
+		})
+		
+		$("div#leftnav-hider i.fa-angle-right").click(() => {
+			let key = $("#next-sibling-key").html()
+			let node = _cms.leftnav.tree.getNodeByKey(key);
+			node.setActive();
+		})
+		*/
 	});
 </script>
 

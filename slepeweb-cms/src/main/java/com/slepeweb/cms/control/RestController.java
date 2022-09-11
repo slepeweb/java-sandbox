@@ -120,6 +120,27 @@ public class RestController extends BaseController {
 			
 			// Get recently-used tags, and full list of tags for the site
 			model.addAttribute(TAG_INPUT_SUPPORT_ATTR, getTagInfo(i.getSite().getId(), req));
+			
+			// Back and forward navigational links
+			List<Item> siblings = i.getParent().getBoundItems();
+			Long next = -1L, previous = -1L;
+			
+			for (int j = 0; j < siblings.size(); j++ ) {
+				if (siblings.get(j).getId().longValue() == i.getId().longValue()) {
+					if (j < (siblings.size() - 1)) {
+						next = siblings.get(j + 1).getOrigId();
+					}
+					
+					if (j > 0) {
+						previous = siblings.get(j - 1).getOrigId();
+					}
+					
+					break;
+				}
+			}
+			
+			model.addAttribute("_nextKey", next);
+			model.addAttribute("_previousKey", previous);			
 		}
 		
 		return "cms.item.editor";		

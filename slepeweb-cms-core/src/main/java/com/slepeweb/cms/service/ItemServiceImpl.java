@@ -61,8 +61,15 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		Item dbRecord = getItem(i.getId());
 		
 		if (dbRecord != null) {
+			String oldSimpleName = dbRecord.getSimpleName();
 			update(dbRecord, i);
-			this.solrService4Cms.save(dbRecord);
+			
+			if (dbRecord.getSimpleName().equals(oldSimpleName)) {
+				this.solrService4Cms.save(dbRecord);
+			}
+			else {
+				this.solrService4Cms.indexSection(dbRecord);
+			}
 			
 			/* 
 			 * Return the updated item instance with nullified field values, links and tags,

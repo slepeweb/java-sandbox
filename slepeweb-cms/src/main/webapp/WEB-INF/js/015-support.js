@@ -203,6 +203,13 @@ _cms.support.updateItemName = function(name) {
 	$(".current-item-name").empty().html(name);
 }
 
+_cms.support.updateBackAndForwardLinks = function() {
+	let previous = $("#previous-sibling-key").html();
+	let next = $("#next-sibling-key").html();
+	$("#leftnav-hider i.fa-angle-left").attr("data-previous", previous);
+	$("#leftnav-hider i.fa-angle-right").attr("data-next", next);
+}
+
 _cms.support.disableFormsIfReadonly = function() {
 	if (! _cms.editingItemIsWriteable) {
 		$("#item-editor input, #item-editor textarea, #item-editor select, #item-editor button").attr("disabled", "disabled");

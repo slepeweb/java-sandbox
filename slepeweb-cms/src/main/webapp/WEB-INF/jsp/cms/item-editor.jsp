@@ -3,6 +3,8 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div id="current-item-name" class="hide">${editingItem.name}</div>
+<div id="next-sibling-key" class="hide">${_nextKey}</div>
+<div id="previous-sibling-key" class="hide">${_previousKey}</div>
 <div id="num-deletable-items" class="hide">${_numItemsInSection}</div>
 <div id="editingItem-is-shortcut" class="hide">${editingItem.shortcut}</div>
 <div id="editingItem-is-writeable" class="hide">${editingItem.accessible}</div>

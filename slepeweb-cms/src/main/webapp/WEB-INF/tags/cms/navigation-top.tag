@@ -30,7 +30,11 @@
 		
 		<cms:searchBar />
 		
-		<div id="leftnav-hider"><i class="fas fa-bars fa-2x"></i></div>
+		<div id="leftnav-hider">
+			<i class="fa-solid fa-angle-left fa-2x"></i>
+			<i class="fas fa-bars fa-2x"></i>
+			<i class="fa-solid fa-angle-right fa-2x"></i>
+		</div>
 		
 		<div class="hf">
 			<p id="currently-editing" class="current-item-name"></p>						
