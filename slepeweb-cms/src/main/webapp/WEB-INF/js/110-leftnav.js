@@ -117,7 +117,7 @@ _cms.leftnav.refreshShortcut = function(nodeKey, action, type) {
 }
 
 _cms.leftnav.behaviour.click = function() {
-	$("#leftnav-hider i.fa-bars").click(function(event) {
+	$("#leftnav-hider i.fa-sitemap").click(function(event) {
 		_cms.leftnav.mode = "navigate";
 		_cms.leftnav.dialog.open();
 	});

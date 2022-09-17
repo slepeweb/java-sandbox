@@ -6,7 +6,13 @@
 <form id="media-form" enctype="multipart/form-data">
 	<div class="ff">
 		<c:choose><c:when test="${editingItem.mediaLoaded}">
-			<label>Current media (${editingItem.type.mimeType}, ${cmsf:formatBytes(editingItem.media.size)})</label>
+			<label>Current media (${editingItem.type.mimeType}, ${cmsf:formatBytes(editingItem.media.size)})
+			<c:if test="${editingItem.media.fileStored}">
+				<c:set var="_filePath" value="${editingItem.media.folder}/${editingItem.media.repositoryFileName}" />
+				<br /><br />File stored @ ${_filePath}
+			</c:if>
+			</label>
+
 			<c:choose><c:when test="${editingItem.type.image or editingItem.type.video}">
 				<c:set var="_host" value="${editingItem.site.stagingHost}" />
 				<c:choose><c:when test="${editingItem.thumbnailLoaded}">

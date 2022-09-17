@@ -32,7 +32,7 @@
 		
 		<div id="leftnav-hider">
 			<i class="fa-solid fa-angle-left fa-2x"></i>
-			<i class="fas fa-bars fa-2x"></i>
+			<i class="fa-solid fa-sitemap fa-2x"></i>
 			<i class="fa-solid fa-angle-right fa-2x"></i>
 		</div>
 		

@@ -47,7 +47,7 @@
 					
 		<div class="ff">
 			<label>Target: </label>
-			<span><i class="fas fa-bars itempicker"></i></span>
+			<span><i class="fa-solid fa-sitemap itempicker"></i></span>
 			<span id="link-target-identifier"></span>
 		</div>
 

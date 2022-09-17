@@ -20,7 +20,7 @@
 				<option value="over">Below</option>
 				<option value="after">After</option>
 			</select></span>
-		<i class="fas fa-bars itempicker" title="Pick a target from the content structure"></i>
+		<i class="fa-solid fa-sitemap itempicker" title="Pick a target from the content structure"></i>
 		<span id="move-target-identifier">your chosen target</span> 
 	</div>
 	
