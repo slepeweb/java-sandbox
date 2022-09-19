@@ -10,6 +10,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class HttpUtil {
 
 	public static void setCacheHeaders(long requestTime, long lastModified, 
@@ -76,4 +78,16 @@ public class HttpUtil {
 		}
 		return null;
 	}	
+	
+	public static String iso2utf8(String s) {
+		if (StringUtils.isNotBlank(s)) {
+			try {
+				return new String(s.getBytes("ISO-8859-1"));
+			}
+			catch (Exception e) {
+			}
+		}
+		return s;
+	}
+
 }

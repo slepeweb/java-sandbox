@@ -15,7 +15,7 @@ import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.common.solr.bean.SolrPager;
 import com.slepeweb.common.solr.bean.SolrResponse;
 import com.slepeweb.common.solr.service.SolrService4SiteBase;
-import com.slepeweb.site.bean.SolrParams4Site;
+import com.slepeweb.site.pho.bean.SolrParams4Pho;
 
 @Service
 public class SolrService4PhotosImpl extends SolrService4SiteBase implements SolrService4Photos {
@@ -29,8 +29,8 @@ public class SolrService4PhotosImpl extends SolrService4SiteBase implements Solr
 	
 	public SolrResponse<SolrDocument4Cms> query(Object p) {
 		
-		if (p instanceof SolrParams4Site) {
-			SolrParams4Site params = (SolrParams4Site) p;
+		if (p instanceof SolrParams4Pho) {
+			SolrParams4Pho params = (SolrParams4Pho) p;
 			SolrResponse<SolrDocument4Cms> response = new SolrResponse<SolrDocument4Cms>();
 			
 			if (StringUtils.isBlank(params.getSearchText())) {
@@ -42,6 +42,17 @@ public class SolrService4PhotosImpl extends SolrService4SiteBase implements Solr
 				q.setQuery(params.getSearchText());
 				q.addFilterQuery(String.format("siteid:\"%d\"", params.getSiteId()));
 				q.addFilterQuery(String.format("viewable:\"%s\"", "true"));
+				
+				if (StringUtils.isNotBlank(params.getFrom()) && StringUtils.isNotBlank(params.getTo())) {					
+					q.addFilterQuery(String.format("extraStr1:[%s TO %s]", params.getFrom(), params.getTo()));
+				}				
+				else if (StringUtils.isNotBlank(params.getFrom())) {
+					q.addFilterQuery(String.format("extraStr1:[%s TO NOW]", params.getFrom()));
+				}
+				else if (StringUtils.isNotBlank(params.getTo())) {
+					q.addFilterQuery(String.format("extraStr1:[1970 TO %s]", params.getTo()));
+				}
+				
 				q.add("defType", "dismax");
 				q.add("qf", "title^10 tags^8 teaser^4 bodytext");
 				
@@ -52,7 +63,7 @@ public class SolrService4PhotosImpl extends SolrService4SiteBase implements Solr
 				
 				q.setStart(params.getStart());
 				q.setRows(params.getPageSize());
-				LOG.info(String.format("Solr query: [%s]", q.getQuery()));
+				LOG.info(String.format("Solr query: [%s]", q.toQueryString()));
 				
 				try {
 					QueryResponse qr = getClient().query(q);

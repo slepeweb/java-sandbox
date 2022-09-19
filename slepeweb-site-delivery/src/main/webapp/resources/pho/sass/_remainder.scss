@@ -23,7 +23,7 @@ footer {
 	@include std-container-padding{}
 }
 
-div#image-gallery {
+div#thumbnail-gallery {
 	display: grid;
 	grid-gap: 6px;
 }
@@ -80,31 +80,48 @@ p#search-results-pager {
 	display: none;
 }	
 
+div#search-area {
+	width: 400px;
+	margin: auto;
+}
+
+div#search-area p {
+	margin: auto;
+	text-align: center;
+}
+
+div#search-form label {
+	margin-top: 1em;
+}
+
+div#search-form input {
+	width: 90%;
+}
+
+div#search-form input[type=submit] {
+	margin-top: 1em;
+}
 
 @media (min-width: 300px) {
-	div#image-gallery {
+	div#thumbnail-gallery {
 			grid-template-columns: repeat(2, 1fr);
 	}
 }
 
 @media (min-width: 480px) {
-	div#image-gallery {
+	div#thumbnail-gallery {
 			grid-template-columns: repeat(4, 1fr);
 	}
 }
 
 @media (min-width: 800px) {
-	div#image-gallery {
+	div#thumbnail-gallery {
 			grid-template-columns: repeat(6, 1fr);
 	}
 }
 
 @media (min-width: 1000px) {
-	div#image-gallery {
+	div#thumbnail-gallery {
 			grid-template-columns: repeat(8, 1fr);
 	}
-}
-
-.fa-angle-double-right {
-	color: $color-accent-bg;
 }

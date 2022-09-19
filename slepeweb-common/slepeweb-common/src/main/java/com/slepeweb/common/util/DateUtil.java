@@ -15,6 +15,14 @@ public class DateUtil {
 	public static final SimpleDateFormat SOLR_SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	public static final Pattern LOOSE_DATE_PATTERN = Pattern.compile("^.*?(\\d{1,2}/)?(\\d{1,2}/)?(\\d{4}).*$");
 	
+	public static String formatDate(Date d, String pattern) {
+		if (d != null) {
+			SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			return sdf.format(d);
+		}
+		return "";
+	}
+	
 	public static String formatTimestamp(Date d) {
 		if (d != null) {
 			return DATE_PATTERN_A.format(d);

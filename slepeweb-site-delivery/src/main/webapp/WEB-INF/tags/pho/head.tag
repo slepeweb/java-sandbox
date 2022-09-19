@@ -20,9 +20,8 @@
 	integrity="sha256-eTyxS0rkjpLEo16uXTS0uVCS4815lc40K2iVpWDvdSY="
 	crossorigin="anonymous"></script>
 	
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" 
-	integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" 
-	crossorigin="anonymous">
+<script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>
+<script src="/resources/pho/js/site.js"></script>
 	
 <gen:extraCSS />
 <gen:extraInpageCSS />
