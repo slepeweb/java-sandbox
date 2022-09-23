@@ -4,13 +4,6 @@
 
 <c:set var="_extraInpageJs" scope="request">
 	$(function() {
-		// Homepage item type is cached; this js ensures form displays most recent values,
-		// as stored in cookies.
-		
-		$('input[name=searchtext]').val($('input[name=hiddentext]').val());
-		$('input[name=from]').val($('input[name=hiddenfrom]').val());
-		$('input[name=to]').val($('input[name=hiddento]').val());
-
 		$('#from-date, #to-date').datepicker({
 			dateFormat: 'yy/mm/dd',
 			changeMonth: true,
@@ -32,18 +25,11 @@
 				<form action="/searchresults" method="post" 
 						enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
 						
-					<label>Search terms</label><input name="searchtext" type="text" value="${_lastSearchText}" />
-					<label>From date</label><input id="from-date" name="from" type="text" value="${_lastFromDate}" />
-					<label>To date</label><input id="to-date" name="to" type="text" value="${_lastToDate}" />
+					<label>Search terms</label><input name="searchtext" type="text" value="${_latestCookieValues.text}" />
+					<label>From date</label><input id="from-date" name="from" type="text" value="${_latestCookieValues.from}" />
+					<label>To date</label><input id="to-date" name="to" type="text" value="${_latestCookieValues.to}" />
 					
 					<input type="hidden" name="page" value="1" />
-
-					<c:if test="${not empty _latestCookieValues}">
-						<input type="hidden" name="hiddentext" value="${_latestCookieValues.text}" />
-						<input type="hidden" name="hiddenfrom" value="${_latestCookieValues.from}" />
-						<input type="hidden" name="hiddento" value="${_latestCookieValues.to}" />
-					</c:if>
-	
 					<input type="submit" value="Search" />
 				</form>
 			</div>

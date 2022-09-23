@@ -5,8 +5,8 @@
 <gen:debug><!-- tags/pho/searchResultsPager.tag --></gen:debug>
 
 <c:if test="${_search.pager.visible}">
-	<p id="search-results-pager">
-		<span class="choose-page">Choose another page: <br /></span>
+	<p id="search-results-pager" class="right">
+		<span class="choose-page">Choose page: </span>
 		
 		<c:if test="${_search.pager.previous}">
 			<c:if test="${_search.pager.selectedPage gt 2}">
@@ -14,7 +14,7 @@
 					class="fas fa-angle-double-left"></i></span>
 			</c:if>
 			<span class="pagelink arrow left" data-page="${_search.pager.previousSelection}" title="Previous page"><i 
-					class="fas fa-angle-left"></i>&nbsp;Previous page</span>
+					class="fas fa-angle-left"></i>&nbsp;Previous</span>
 		</c:if>
 					
 		<c:forEach items="${_search.pager.navigation}" var="_pagenum">
@@ -41,6 +41,8 @@
 	
 	<form id="page-selector" class="hidden" action="${urlPrefix}" method="post">
 		<input type="hidden" name="searchtext" value="${_params.searchText}" />
+		<input type="hidden" name="from" value="${_params.from}" />
+		<input type="hidden" name="to" value="${_params.to}" />
 		<input type="hidden" name="page" value="1" />
 	</form>
 	

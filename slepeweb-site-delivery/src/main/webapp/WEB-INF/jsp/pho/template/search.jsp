@@ -14,12 +14,14 @@
 	<gen:debug><!-- jsp/pho/template/search.jsp --></gen:debug>
 	
 	<div class="main">	
-		<h2>${_item.fields.heading}</h2>
+		<h2>${_item.fields.title}</h2>
 	
 		<c:choose><c:when test="${fn:length(_search.results) > 0}">
 			<pho:searchResults urlPrefix="${_item.url}" />			
 		</c:when><c:otherwise>
-			<p>No results found for your search terms &quot;${_params.searchText}&quot;. <br /> Please try again.</p>
+			<p>No results found for your search terms &quot;${_params.searchText}&quot;. 
+			<br /> 
+			<a href="/">Please try again <i class="fa-solid fa-magnifying-glass"></i></a></p>
 		</c:otherwise></c:choose>
 	</div>
 			

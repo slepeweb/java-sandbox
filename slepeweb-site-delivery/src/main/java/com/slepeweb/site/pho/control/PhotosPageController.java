@@ -61,7 +61,10 @@ public class PhotosPageController extends BaseController {
 			setFrom(formData.getFrom()).
 			setTo(formData.getTo());
 		
-		params.setPageSize(20).setPageNum(request.getParameter("page"));
+		params.
+			setPageSize(20).
+			setPageNum(request.getParameter("page"));
+		
 		model.addAttribute("_params", params);
 		model.addAttribute("_search", this.solrService4Photos.query(params));
 		

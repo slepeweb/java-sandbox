@@ -97,20 +97,6 @@
 		// Back & forward sibling navigation
 		_cms.siblingNav("left");
 		_cms.siblingNav("right");
-		
-		/*
-		$("div#leftnav-hider i.fa-angle-left").click(() => {
-			let key = $("#previous-sibling-key").html()
-			let node = _cms.leftnav.tree.getNodeByKey(key);
-			node.setActive();
-		})
-		
-		$("div#leftnav-hider i.fa-angle-right").click(() => {
-			let key = $("#next-sibling-key").html()
-			let node = _cms.leftnav.tree.getNodeByKey(key);
-			node.setActive();
-		})
-		*/
 	});
 </script>
 

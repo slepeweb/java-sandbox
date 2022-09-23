@@ -122,38 +122,42 @@ public class RestController extends BaseController {
 			model.addAttribute(TAG_INPUT_SUPPORT_ATTR, getTagInfo(i.getSite().getId(), req));
 			
 			// Back and forward navigational links
-			List<Item> siblings = i.getParent().getBoundItems();
-			Long next = -1L, previous = -1L;
+			Item parent = i.getParent();
 			
-			for (int j = 0; j < siblings.size(); j++ ) {
-				if (siblings.get(j).getId().longValue() == i.getId().longValue()) {
-					
-					// The 'next link will take you ...
-					if (j < (siblings.size() - 1)) {
-						// ... to the next sibling
-						next = siblings.get(j + 1).getOrigId();
+			if (parent != null) {
+				List<Item> siblings = parent.getBoundItems();
+				Long next = -1L, previous = -1L;
+				
+				for (int j = 0; j < siblings.size(); j++ ) {
+					if (siblings.get(j).getId().longValue() == i.getId().longValue()) {
+						
+						// The 'next link will take you ...
+						if (j < (siblings.size() - 1)) {
+							// ... to the next sibling
+							next = siblings.get(j + 1).getOrigId();
+						}
+						else if (siblings.get(j).getBoundItems().size() > 0) {
+							// ... down the tree to the first child
+							next = siblings.get(j).getBoundItems().get(0).getOrigId();
+						}
+						
+						// The previous link will take you to ...
+						if (j > 0) {
+							// ... the previous sibling
+							previous = siblings.get(j - 1).getOrigId();
+						}
+						else {
+							// ... up the tree to the parent item
+							previous = parent.getOrigId();
+						}
+						
+						break;
 					}
-					else if (siblings.get(j).getBoundItems().size() > 0) {
-						// ... down the tree to the first child
-						next = siblings.get(j).getBoundItems().get(0).getOrigId();
-					}
-					
-					// The previous link will take you to ...
-					if (j > 0) {
-						// ... the previous sibling
-						previous = siblings.get(j - 1).getOrigId();
-					}
-					else {
-						// ... up the tree to the parent item
-						previous = siblings.get(j).getParent().getOrigId();
-					}
-					
-					break;
 				}
+				
+				model.addAttribute("_nextKey", next);
+				model.addAttribute("_previousKey", previous);
 			}
-			
-			model.addAttribute("_nextKey", next);
-			model.addAttribute("_previousKey", previous);			
 		}
 		
 		return "cms.item.editor";		

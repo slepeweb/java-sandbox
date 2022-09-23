@@ -4,14 +4,17 @@
 
 <gen:debug><!-- tags/pho/searchResults.tag --></gen:debug>
 
-<p>
-	<strong>Found ${_search.totalHits} results for your search terms &quot;${_params.searchText}&quot;</strong>
-	
+<div id="search-results">
+	<p><strong>Found ${_search.totalHits} results for your search terms &quot;${_params.searchText}&quot;</strong></p>
+	<p class="right"><a href="/">Search again <i class="fa-solid fa-magnifying-glass"></i></a></p>
+		
 	<c:if test="${_search.pager.maxPages gt 1}">
-		<br />
-		Showing page ${_search.pager.selectedPage} of ${_search.pager.maxPages} pages:
+		<p>Showing page ${_search.pager.selectedPage} of ${_search.pager.maxPages} pages:</p>
 	</c:if>
-</p>
+	
+	<pho:searchResultsPager urlPrefix="${urlPrefix}" />
+</div>
+
 
 <div id="thumbnail-gallery">
                       
@@ -40,8 +43,6 @@
 	</c:forEach>
 	
 </div>
-
-<pho:searchResultsPager urlPrefix="${urlPrefix}" />
 
 <div id="modal">
   <span class="open-slide-info cursor"><i class="fas fa-info"></i></span>

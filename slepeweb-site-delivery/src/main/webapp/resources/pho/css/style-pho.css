@@ -803,14 +803,14 @@ div.search-result .search-result-info p.caption {
 }
 
 p#search-results-pager {
-  margin-top: 2em;
   cursor: normal;
 }
 p#search-results-pager span.choose-page {
   font-weight: bold;
+  margin-right: 1em;
 }
 p#search-results-pager span.pagelink {
-  margin-right: 2em;
+  margin-right: 1em;
   cursor: pointer;
 }
 p#search-results-pager span.pagelink.selected {
@@ -842,6 +842,18 @@ div#search-form input {
 
 div#search-form input[type=submit] {
   margin-top: 1em;
+}
+
+div#search-results {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: center;
+}
+div#search-results p {
+  margin-bottom: 0.5em;
+}
+div#search-results p.right {
+  text-align: right;
 }
 
 @media (min-width: 300px) {
