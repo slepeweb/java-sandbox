@@ -3,11 +3,14 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div id="current-item-name" class="hide">${editingItem.name}</div>
-<div id="next-sibling-key" class="hide">${_nextKey}</div>
-<div id="previous-sibling-key" class="hide">${_previousKey}</div>
 <div id="num-deletable-items" class="hide">${_numItemsInSection}</div>
 <div id="editingItem-is-shortcut" class="hide">${editingItem.shortcut}</div>
 <div id="editingItem-is-writeable" class="hide">${editingItem.accessible}</div>
+
+<div id="right-nav-key" class="hide">${_navkeys.right}</div>
+<div id="left-nav-key" class="hide">${_navkeys.left}</div>
+<div id="up-nav-key" class="hide">${_navkeys.up}</div>
+<div id="down-nav-key" class="hide">${_navkeys.down}</div>
 
 <ul id="editor-tabs">
 	<li><a href="#core-tab">Core</a></li>

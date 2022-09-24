@@ -16,7 +16,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -121,46 +123,63 @@ public class RestController extends BaseController {
 			// Get recently-used tags, and full list of tags for the site
 			model.addAttribute(TAG_INPUT_SUPPORT_ATTR, getTagInfo(i.getSite().getId(), req));
 			
-			// Back and forward navigational links
-			Item parent = i.getParent();
-			
-			if (parent != null) {
-				List<Item> siblings = parent.getBoundItems();
-				Long next = -1L, previous = -1L;
-				
-				for (int j = 0; j < siblings.size(); j++ ) {
-					if (siblings.get(j).getId().longValue() == i.getId().longValue()) {
-						
-						// The 'next link will take you ...
-						if (j < (siblings.size() - 1)) {
-							// ... to the next sibling
-							next = siblings.get(j + 1).getOrigId();
-						}
-						else if (siblings.get(j).getBoundItems().size() > 0) {
-							// ... down the tree to the first child
-							next = siblings.get(j).getBoundItems().get(0).getOrigId();
-						}
-						
-						// The previous link will take you to ...
-						if (j > 0) {
-							// ... the previous sibling
-							previous = siblings.get(j - 1).getOrigId();
-						}
-						else {
-							// ... up the tree to the parent item
-							previous = parent.getOrigId();
-						}
-						
-						break;
-					}
-				}
-				
-				model.addAttribute("_nextKey", next);
-				model.addAttribute("_previousKey", previous);
-			}
-		}
+			// Get up, down, next, previous navigation links
+			model.addAttribute("_navkeys", getNavigationLinks(i));
+		}		
 		
 		return "cms.item.editor";		
+	}
+	
+	private Map<String, Long> getNavigationLinks(Item i) {
+		Map<String, Long> map = new HashMap<String, Long>(5);
+		Item parentItem = i.getParent();
+		
+		if (parentItem != null) {			
+			List<Item> siblings = parentItem.getBoundItems();
+			Long next = -1L, previous = -1L, parent = -1L, firstChild = -1L;
+			if (! parentItem.isRoot()) {
+				parent = parentItem.getOrigId();
+			}
+			
+			for (int j = 0; j < siblings.size(); j++ ) {
+				if (siblings.get(j).getId().longValue() == i.getId().longValue()) {
+					
+					if (siblings.get(j).getBoundItems().size() > 0) {
+						firstChild = siblings.get(j).getBoundItems().get(0).getOrigId();
+					}
+					
+					// The 'next link will take you ...
+					if (j < (siblings.size() - 1)) {
+						// ... to the next sibling
+						next = siblings.get(j + 1).getOrigId();
+					}
+					else {
+						// ... down the tree to the first child
+						next = firstChild;
+					}
+					
+					
+					// The previous link will take you to ...
+					if (j > 0) {
+						// ... the previous sibling
+						previous = siblings.get(j - 1).getOrigId();
+					}
+					else {
+						// ... up the tree to the parent item
+						previous = parent;
+					}
+					
+					map.put("up", parent);
+					map.put("left", previous);
+					map.put("right", next);
+					map.put("down", firstChild);
+					
+					break;
+				}
+			}
+		}
+
+		return map;
 	}
 	
 	private String chooseLanguage(boolean isMultilingualSite, String requested, String siteDefault) {

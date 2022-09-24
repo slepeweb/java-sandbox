@@ -18,7 +18,7 @@ _cms.init = function(nodeKey, html, activeTab) {
 	_cms.support.updateItemName($("#current-item-name").html());
 	
 	// Update the next/previous links
-	_cms.support.updateBackAndForwardLinks();
+	_cms.support.updateSitemapNavigationLinks();
 
 	// Required for delete confirmation dialog
 	_cms.numDeletableItems = $("#num-deletable-items").html();

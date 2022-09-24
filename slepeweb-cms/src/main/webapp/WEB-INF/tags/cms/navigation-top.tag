@@ -31,9 +31,15 @@
 		<cms:searchBar />
 		
 		<div id="leftnav-hider">
+			<i></i>
+			<i class="fa-solid fa-angle-up fa-2x"></i>
+			<i></i>
 			<i class="fa-solid fa-angle-left fa-2x"></i>
 			<i class="fa-solid fa-sitemap fa-2x"></i>
 			<i class="fa-solid fa-angle-right fa-2x"></i>
+			<i></i>
+			<i class="fa-solid fa-angle-down fa-2x"></i>
+			<i></i>
 		</div>
 		
 		<div class="hf">

@@ -203,11 +203,18 @@ _cms.support.updateItemName = function(name) {
 	$(".current-item-name").empty().html(name);
 }
 
-_cms.support.updateBackAndForwardLinks = function() {
-	let previous = $("#previous-sibling-key").html();
-	let next = $("#next-sibling-key").html();
-	$("#leftnav-hider i.fa-angle-left").attr("data-previous", previous);
-	$("#leftnav-hider i.fa-angle-right").attr("data-next", next);
+_cms.support.updateSitemapNavigationLinks = () => {
+	['left', 'right', 'up', 'down'].forEach((dirn) => {
+		let linkSelector = 'div#leftnav-hider i.fa-angle-' + dirn;
+		let keySelector = 'div#' + dirn + '-nav-key';
+		
+		$(linkSelector).off().click(() => {
+			let key = $(keySelector).html()
+			if (key > -1) {
+				_cms.leftnav.activateKey(key);
+			}
+		})
+	})		
 }
 
 _cms.support.disableFormsIfReadonly = function() {
