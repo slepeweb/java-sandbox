@@ -29,6 +29,11 @@ header select {
 	width: 100%;
 }
 
+header div#trash-item-flag {
+	margin-top: 1.0em;
+	font-size: 1.5em;
+}
+
 div.ha {
 	grid-area: ha;
 }
@@ -222,6 +227,10 @@ details {
 	display: none;
 }
 
+.invisible {
+	visibility: hidden;
+}
+
 .spacer10 {
 	margin-top: 10px;
 }
@@ -345,8 +354,14 @@ div.action-reset-combo {
 								cursor: pointer;
 							}
 							
-							#item-editor #trash-button {
+							#item-editor #trash-button, #item-editor #trash-flagged-button {
 								background: red;
+								font-weight: bold;
+							}
+							
+							#item-editor #trash-flagged-button-wrapper {
+								display: grid;
+								grid-template-columns: repeat(3, 1fr);
 							}
 							
 							#version-tab button {
@@ -355,6 +370,7 @@ div.action-reset-combo {
 							}
 							
 						/* <<<<< Buttons */
+
 
 #trash-table {
 	margin-top: 1em;
@@ -498,6 +514,10 @@ div#field-guidance table, div#link-guidance table {
 div#field-guidance td, div#link-guidance td {
 	border: 1px dashed;
 	padding: 5px;
+}
+
+div#trash-item-flag i.flagged {
+	color: red;
 }
 
 /* Probably used in search results dialog */

@@ -14,6 +14,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.LoginSupport;
@@ -34,8 +35,19 @@ public class PageController extends BaseController {
 	@Autowired private SiteService siteService;
 	
 	@RequestMapping(value="/editor")	
-	public String doMain(HttpServletRequest req, ModelMap model) {		
-		getAllEditableSites(req, model);
+	public String doMain(HttpServletRequest req, HttpServletResponse res, ModelMap model) 
+		throws IOException {
+		
+		String hostname = req.getServerName();
+		Host h = this.cmsService.getHostService().getHost(hostname);
+		if (h != null) {
+			Site s = h.getSite();
+			res.sendRedirect(req.getContextPath() + "/page/site/select/" + s.getId());
+			return null;
+		}
+		else {
+			getAllEditableSites(req, model);
+		}
 		return "cms.editor";
 	}
 	
@@ -47,6 +59,7 @@ public class PageController extends BaseController {
 		if (i != null) {
 			model.addAttribute("editingItem", i);
 			model.addAttribute("site", i.getSite());
+			model.addAttribute("rootItem", i.getSite().getItem("/"));
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
 			
 			if (i.isProduct()) {
@@ -71,12 +84,15 @@ public class PageController extends BaseController {
 	
 	@RequestMapping(value="/site/select/{siteId}")	
 	public String chooseSite(@PathVariable long siteId, 
-			HttpServletRequest req, HttpServletResponse res, ModelMap model) {	
+			HttpServletRequest req, HttpServletResponse res, ModelMap model) throws IOException {	
 		
 		Site site = this.cmsService.getSiteService().getSite(siteId);
-		if (site != null) {
-			model.addAttribute("site", site);
+		if (site == null) {
+			res.sendRedirect(req.getContextPath() + "/page/editor");
 		}
+
+		model.addAttribute("site", site);
+		model.addAttribute("rootItem", site.getItem("/"));
 
 		Item i = null;
 		User u = getUser(req);

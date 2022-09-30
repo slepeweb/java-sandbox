@@ -129,7 +129,7 @@ _cms.misc.behaviour.trash.showOrHide = function() {
 		else {
 			$(_cms.misc.sel.TRASH_CONTAINER).empty();
 			_cms.misc.trash.visible = false;
-			$(_cms.misc.sel.SHOW_TRASH_BUTTON).empty().append("Show bin ...");
+			$(_cms.misc.sel.SHOW_TRASH_BUTTON).empty().append("Show trash bin ...");
 		}	
 	});	
 }
@@ -228,6 +228,41 @@ _cms.misc.updateProgressbar = function(bar, value) {
 	}
 }
 
+_cms.misc.trashflags = {}
+_cms.misc.trashflags.behaviour = {}
+
+_cms.misc.trashflags.refresh = function(nodeKey) {
+	_cms.misc.trashflags.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/refresh/trashflags");
+}
+
+_cms.misc.trashflags.behaviour.unflagAll = function() {
+	$('div#trashflag-section button#unflag-button').click(function() {
+		_cms.misc.trashflags.ajax(_cms.ctx + "/rest/trashflags/unflag/all");
+		$('i.trash-item-flag').removeClass('flagged');
+	});
+}
+
+_cms.misc.trashflags.behaviour.trashAll = function() {
+	$('div#trashflag-section button#trash-button').click(function() {
+		_cms.support.ajax('GET', _cms.ctx + "/rest/trashflags/trash/all", {}, function(a,b,c) {
+			window.location = _cms.ctx + '/page/editor/' + _cms.rootItemOrigId +'?status=success&msg=Flagged items trashed - now on Homepage'; 
+		});
+	});
+}
+
+_cms.misc.trashflags.ajax = function(url) {
+	_cms.support.ajax('GET', url, {datatype: 'html', mimetype: 'text/html'}, function(html, status, z) {
+		var div$ = $("div#trashflag-section");
+		div$.empty();
+		div$.append(html);
+
+		_cms.misc.trashflags.behaviour.unflagAll();
+		_cms.misc.trashflags.behaviour.trashAll();
+		_cms.support.flashMessage({error: false, message: $('div#trashflags-message').html()});
+	})
+}
+
+
 // Behaviours to apply once html is loaded/reloaded
 _cms.misc.onrefresh = function(nodeKey) {
 	_cms.misc.behaviour.section_ops(nodeKey);
@@ -240,4 +275,5 @@ _cms.misc.onrefresh = function(nodeKey) {
 	 */
 	_cms.misc.behaviour.trash.showOrHide();
 	_cms.misc.behaviour.trash.trash(nodeKey);
+	_cms.misc.trashflags.refresh(nodeKey);
 }

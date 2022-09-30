@@ -1,6 +1,7 @@
 package com.slepeweb.cms.control;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.service.CookieService;
 
 @Controller
@@ -119,6 +121,16 @@ public class RefreshController extends BaseController {
 		Item i = getEditableVersion(origId, getUser(req));
 		model.addAttribute("editingItem", i);
 		return "cms.refresh.copy";		
+	}
+		
+	@RequestMapping(value="/item/{origId}/refresh/trashflags", method=RequestMethod.GET)
+	public String refreshTrashFlags(
+			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
+		
+		Map<Long, ItemGist> trashFlags = getTrashFlags(req);			
+		model.addAttribute("_trashFlagList", getSortedTrashFlags(trashFlags));
+		model.addAttribute("_flagged4Trash", trashFlags.get(origId) != null);
+		return "cms.refresh.trashflags";		
 	}
 		
 }

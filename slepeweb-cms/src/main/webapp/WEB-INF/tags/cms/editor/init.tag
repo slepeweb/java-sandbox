@@ -12,6 +12,7 @@
 	_cms.ctx = "${applicationContextPath}";
 	_cms.pageEditorUrlPrefix = _cms.ctx + "/page/editor/";
 	_cms.siteId = <c:choose><c:when test="${not empty site}">${site.id}</c:when><c:otherwise>0</c:otherwise></c:choose>;
+	_cms.rootItemOrigId = ${rootItem.origId};
 	_cms.editingItemId = null;
 	_cms.siteDefaultLanguage = "en";
 	_cms.editingItemIsShortcut = false;

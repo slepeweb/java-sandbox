@@ -205,15 +205,20 @@ _cms.support.updateItemName = function(name) {
 
 _cms.support.updateSitemapNavigationLinks = () => {
 	['left', 'right', 'up', 'down'].forEach((dirn) => {
-		let linkSelector = 'div#leftnav-hider i.fa-angle-' + dirn;
-		let keySelector = 'div#' + dirn + '-nav-key';
+		let link$ = $('div#leftnav-hider i.fa-angle-' + dirn);
+		let key = $('div#' + dirn + '-nav-key').html();
+		link$.off();
 		
-		$(linkSelector).off().click(() => {
-			let key = $(keySelector).html()
-			if (key > -1) {
+		if (key > -1) {
+			link$.click(() => {
 				_cms.leftnav.activateKey(key);
-			}
-		})
+			})
+			
+			link$.removeClass('invisible');
+		}
+		else {
+			link$.addClass('invisible');
+		}
 	})		
 }
 
@@ -227,6 +232,77 @@ _cms.support.disableFormsIfReadonly = function() {
 		$(".readonly-layer").css("z-index", "-1").css("opacity", "0");
 	}
 }
+
+_cms.support.displayTrashFlag = function(isFlagged) {
+	var i$ = $('div#trash-item-flag i');
+	
+	if (! isFlagged) {
+		i$.removeClass('flagged').attr('title', 'Flag this item for deletion');
+	}
+	else {
+		i$.addClass('flagged').attr('title', 'Undo deletion flag');
+	}
+}
+
+_cms.support.trashFlagger = function() {
+	var isFlagged = $('div#current-item-flagged4trash').html() === 'yes';
+	_cms.support.displayTrashFlag(isFlagged);
+	
+	$('div#trash-item-flag i').off().click(function() {
+		var i$ = $(this);
+		var isFlagged = i$.hasClass('flagged');
+		var url = _cms.ctx + "/rest/item/" + _cms.editingItemId + "/flag/" + (isFlagged ? 'un' : '') + "trash"
+			
+		$.ajax(url, {
+			type: "GET",
+			cache: false,
+			dataType: "json",
+			
+			success: function(flagged, status, z) {
+				_cms.support.displayTrashFlag(flagged);
+				_cms.misc.trashflags.refresh(_cms.editingItemId);
+			},
+			error: function(resp, status, z) {
+				console.log("Error: " + resp);
+			}
+		});
+	});
+}
+
+_cms.support.ajax = function(method, url, data, success, fail) {
+	let params = {
+		type: method,
+		cache: false
+	}
+	
+	if (data.data) {
+		params.data = data.data;
+	}
+	
+	if (data.datatype) {
+		params.dataType = data.datatype;
+	}
+	
+	if (data.mimetype) {
+		params.mimeType = data.mimetype;
+	}
+	
+	if (success) {
+		params.success = success;
+	}
+	
+	if (fail) {
+		params.error = fail;
+	}
+	else {
+		params.error = function(resp, status, z) {
+			console.log("Error: " + resp);
+		}
+	}
+	
+	$.ajax(url, params);
+}
+
 
 _cms.support.renderItemForms = function(nodeKey, activeTab) {
 
@@ -250,6 +326,7 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 			_cms.misc.onrefresh(nodeKey);
 			_cms.move.onrefresh(nodeKey);			
 			_cms.support.disableFormsIfReadonly();
+			_cms.support.trashFlagger();
 		}
 	});
 };

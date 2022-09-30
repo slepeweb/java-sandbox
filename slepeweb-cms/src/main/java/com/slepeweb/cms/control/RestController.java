@@ -16,7 +16,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +44,7 @@ import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.FieldValueSet;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
@@ -62,6 +65,7 @@ import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.CookieService;
+import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.common.solr.bean.SolrConfig;
@@ -75,6 +79,7 @@ public class RestController extends BaseController {
 	private static Logger LOG = Logger.getLogger(RestController.class);
 	public static final String THUMBNAIL_EXT = "-thumb";
 	
+	@Autowired private ItemService itemService;
 	@Autowired private CookieService cookieService;
 	@Autowired private SolrService4Cms solrService4Cms;
 	@Autowired private NavigationController navigationController;
@@ -125,6 +130,10 @@ public class RestController extends BaseController {
 			
 			// Get up, down, next, previous navigation links
 			model.addAttribute("_navkeys", getNavigationLinks(i));
+			
+			Map<Long, ItemGist> trashFlags = getTrashFlags(req);			
+			model.addAttribute("_trashFlagList", getSortedTrashFlags(trashFlags));
+			model.addAttribute("_flagged4Trash", trashFlags.get(i.getOrigId()) != null);
 		}		
 		
 		return "cms.item.editor";		
@@ -132,53 +141,65 @@ public class RestController extends BaseController {
 	
 	private Map<String, Long> getNavigationLinks(Item i) {
 		Map<String, Long> map = new HashMap<String, Long>(5);
-		Item parentItem = i.getParent();
+		Long next = -1L, previous = -1L, parent = -1L, firstChild = -1L;
 		
-		if (parentItem != null) {			
-			List<Item> siblings = parentItem.getBoundItems();
-			Long next = -1L, previous = -1L, parent = -1L, firstChild = -1L;
-			if (! parentItem.isRoot()) {
-				parent = parentItem.getOrigId();
+		if (i.getBoundItems().size() > 0) {
+			firstChild = i.getBoundItems().get(0).getOrigId();
+		}
+		
+		if (i.isSiteRoot()) {
+			Item contentRoot = i.getSite().getContentItem("");
+			if (contentRoot != null) {
+				next = contentRoot.getOrigId();
 			}
+		}
+		else if (i.isContentRoot()) {
+			Item siteRoot = i.getSite().getItem("/");
+			if (siteRoot != null) {
+				previous = siteRoot.getOrigId();
+			}
+		}
+		else {
+			Item parentItem = i.getParent();
 			
-			for (int j = 0; j < siblings.size(); j++ ) {
-				if (siblings.get(j).getId().longValue() == i.getId().longValue()) {
-					
-					if (siblings.get(j).getBoundItems().size() > 0) {
-						firstChild = siblings.get(j).getBoundItems().get(0).getOrigId();
+			if (parentItem != null) {			
+				parent = parentItem.getOrigId();
+				List<Item> siblings = parentItem.getBoundItems();
+				
+				for (int j = 0; j < siblings.size(); j++ ) {
+					if (siblings.get(j).getId().longValue() == i.getId().longValue()) {						
+						// The 'next link will take you ...
+						if (j < (siblings.size() - 1)) {
+							// ... to the next sibling
+							next = siblings.get(j + 1).getOrigId();
+						}
+						else {
+							// ... down the tree to the first child
+							next = firstChild;
+						}
+						
+						
+						// The previous link will take you to ...
+						if (j > 0) {
+							// ... the previous sibling
+							previous = siblings.get(j - 1).getOrigId();
+						}
+						else {
+							// ... up the tree to the parent item
+							previous = parent;
+						}
+						
+						break;
 					}
-					
-					// The 'next link will take you ...
-					if (j < (siblings.size() - 1)) {
-						// ... to the next sibling
-						next = siblings.get(j + 1).getOrigId();
-					}
-					else {
-						// ... down the tree to the first child
-						next = firstChild;
-					}
-					
-					
-					// The previous link will take you to ...
-					if (j > 0) {
-						// ... the previous sibling
-						previous = siblings.get(j - 1).getOrigId();
-					}
-					else {
-						// ... up the tree to the parent item
-						previous = parent;
-					}
-					
-					map.put("up", parent);
-					map.put("left", previous);
-					map.put("right", next);
-					map.put("down", firstChild);
-					
-					break;
 				}
 			}
 		}
 
+		map.put("up", parent);
+		map.put("left", previous);
+		map.put("right", next);
+		map.put("down", firstChild);
+		
 		return map;
 	}
 	
@@ -1153,6 +1174,71 @@ public class RestController extends BaseController {
 		}
 		
 		return "cms.searchresults";		
+	}
+	
+	@RequestMapping(value="/item/{origId}/flag/trash", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public boolean flagTrash(@PathVariable long origId, HttpServletRequest request) {
+		return setTrashFlag(origId, request, false);
+	}
+	
+	@RequestMapping(value="/item/{origId}/flag/untrash", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public boolean unflagTrash(@PathVariable long origId, HttpServletRequest request) {
+		return setTrashFlag(origId, request, true);
+	}
+	
+	@RequestMapping(value="/trashflags/unflag/all", method=RequestMethod.GET)
+	public String unflagAllTrashFlagged(HttpServletRequest request, ModelMap model) {
+		Map<Long, ItemGist> trashFlags = getTrashFlags(request);
+		trashFlags.clear();
+		model.addAttribute("_trashFlagList", trashFlags);
+		model.addAttribute("_flagged4Trash", false);
+		model.addAttribute("_trashFlagsMessage", "All flags have been removed");
+		return "cms.refresh.trashflags";		
+	}
+	
+	@RequestMapping(value="/trashflags/trash/all", method=RequestMethod.GET)
+	public String trashAllTrashFlagged(HttpServletRequest request, ModelMap model) {
+		Map<Long, ItemGist> trashFlags = getTrashFlags(request);
+		Iterator<Long> iter = trashFlags.keySet().iterator();
+		Long origId;
+		Item i;
+		int count = 0;
+		
+		while (iter.hasNext()) {
+			origId = iter.next();
+			i = getEditableVersion(origId, getUser(request));
+			if (i != null) {
+				count += this.itemService.trashItemAndDirectChildren(i);
+			}
+		}
+		
+		trashFlags.clear();
+		model.addAttribute("_trashFlagList", trashFlags);
+		model.addAttribute("_flagged4Trash", false);
+		model.addAttribute("_trashFlagsMessage", String.format("%d items have been moved to the trash bin", count));
+		return "cms.refresh.trashflags";		
+	}
+	
+	private boolean setTrashFlag(long origId, HttpServletRequest request, boolean reverse) {
+		Item i = this.getEditableVersion(origId, getUser(request));
+		Map<Long, ItemGist> flags = getTrashFlags(request);
+		ItemGist ig = flags.get(i.getOrigId());
+		Date now = new Date();
+		
+		if (! reverse) {
+			if (ig == null) {
+				flags.put(i.getOrigId(), new ItemGist(i).setDate(now));
+			}
+		}
+		else {
+			if (ig != null) {
+				flags.remove(i.getOrigId());
+			}
+		}
+		
+		return ! reverse;
 	}
 	
 }

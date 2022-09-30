@@ -1,6 +1,7 @@
 package com.slepeweb.cms.control;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import com.slepeweb.cms.bean.FieldEditorSupport;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.TagInputSupport;
@@ -165,6 +167,30 @@ public class BaseController {
 		
 		tis.setRecent((List<String>) recent);
 		return tis;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected Map<Long, ItemGist> getTrashFlags(HttpServletRequest request) {
+		String name = "_trashFlags";
+		Map<Long, ItemGist> flags = (Map<Long, ItemGist>) request.getSession().getAttribute(name);
+		if (flags == null) {
+			flags = new HashMap<Long, ItemGist>();
+			request.getSession().setAttribute(name, flags);
+		}
+		return flags;
+	}
+	
+	protected List<ItemGist>  getSortedTrashFlags(Map<Long, ItemGist> trashFlags) {
+		List<ItemGist> trashFlagList = new ArrayList<ItemGist>(trashFlags.size());
+		trashFlagList.addAll(trashFlags.values());
+		trashFlagList.sort(new Comparator<ItemGist>() {
+			@Override
+			public int compare(ItemGist o1, ItemGist o2) {
+				return o1.getDate().compareTo(o2.getDate());
+			}
+		});
+		
+		return trashFlagList;
 	}
 }
 

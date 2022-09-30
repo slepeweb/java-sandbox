@@ -3,6 +3,7 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div id="current-item-name" class="hide">${editingItem.name}</div>
+<div id="current-item-flagged4trash" class="hide">${_flagged4Trash ? 'yes' : 'no'}</div>
 <div id="num-deletable-items" class="hide">${_numItemsInSection}</div>
 <div id="editingItem-is-shortcut" class="hide">${editingItem.shortcut}</div>
 <div id="editingItem-is-writeable" class="hide">${editingItem.accessible}</div>

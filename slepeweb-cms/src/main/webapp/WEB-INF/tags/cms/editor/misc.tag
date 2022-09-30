@@ -30,20 +30,26 @@
 	
 	<div class="section-ops delete">
 		<div>
-			<p>Clicking the 'Delete' button will delete <strong>'<span class="current-item-name">${editingItem.name}</span>'</strong> and <strong>ALL</strong> its descendants, 
-				making a total of <strong>${_numItemsInSection}</strong> deletions.</p>
+			<p>Clicking the 'Trash' button will move <strong>'<span class="current-item-name">${editingItem.name}</span>'</strong> and 
+			<strong>ALL</strong> its descendants into the trash bin, 
+				moving a total of <strong>${_numItemsInSection}</strong> items.</p>
 		</div>
-		<div><button id="trash-button" type="button">Delete</button></div>
+		<div><button id="trash-button" type="button">Trash</button></div>
 		<div></div>
 	</div>
 	
 	<hr />
-	<br />
+
+<div id="trashflag-section">
+	<edit:trashflags />
+</div>
+
+<hr />
 
 <h2>Miscellaneous operations</h2>
 
 <div>
 	<button id="trash-show-button" type="button"
-		title="Reveal the contents of the trash bin">Show bin ...</button>
+		title="Reveal the contents of the trash bin">Show trash bin ...</button>
 	<div id="trash-container"></div>
 </div>

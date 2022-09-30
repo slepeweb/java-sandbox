@@ -6,6 +6,10 @@
 		<input type="text" name="searchtext" value="${_params.searchText}" placeholder="Enter search terms" />
 		<button type="button"><span><i class="fa fa-search"></i></span></button>	
 	</div>			
+		
+	<div id="trash-item-flag" title="Flag item for deletion">
+		<i class="far fa-trash-alt trash-item-flag <c:if test='${_flagged4Trash}'>flagged</c:if>"></i>
+	</div>
 </div>
 
 <script>
