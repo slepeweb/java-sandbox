@@ -233,25 +233,25 @@ _cms.support.disableFormsIfReadonly = function() {
 	}
 }
 
-_cms.support.displayTrashFlag = function(isFlagged) {
-	var i$ = $('div#trash-item-flag i');
+_cms.support.displayItemFlag = function(isFlagged) {
+	var i$ = $('div#item-flag i');
 	
 	if (! isFlagged) {
-		i$.removeClass('flagged').attr('title', 'Flag this item for deletion');
+		i$.removeClass('flagged').attr('title', 'Flag this item');
 	}
 	else {
-		i$.addClass('flagged').attr('title', 'Undo deletion flag');
+		i$.addClass('flagged').attr('title', 'Un-flag this item');
 	}
 }
 
-_cms.support.trashFlagger = function() {
-	var isFlagged = $('div#current-item-flagged4trash').html() === 'yes';
-	_cms.support.displayTrashFlag(isFlagged);
+_cms.support.itemFlagger = function() {
+	var isFlagged = $('div#current-item-flagged').html() === 'yes';
+	_cms.support.displayItemFlag(isFlagged);
 	
-	$('div#trash-item-flag i').off().click(function() {
+	$('div#item-flag i').off().click(function() {
 		var i$ = $(this);
 		var isFlagged = i$.hasClass('flagged');
-		var url = _cms.ctx + "/rest/item/" + _cms.editingItemId + "/flag/" + (isFlagged ? 'un' : '') + "trash"
+		var url = _cms.ctx + "/rest/item/" + _cms.editingItemId + "/" + (isFlagged ? 'un' : '') + "flag";
 			
 		$.ajax(url, {
 			type: "GET",
@@ -259,8 +259,8 @@ _cms.support.trashFlagger = function() {
 			dataType: "json",
 			
 			success: function(flagged, status, z) {
-				_cms.support.displayTrashFlag(flagged);
-				_cms.misc.trashflags.refresh(_cms.editingItemId);
+				_cms.support.displayItemFlag(flagged);
+				_cms.misc.flaggedItems.refresh(_cms.editingItemId);
 			},
 			error: function(resp, status, z) {
 				console.log("Error: " + resp);
@@ -280,11 +280,11 @@ _cms.support.ajax = function(method, url, data, success, fail) {
 	}
 	
 	if (data.datatype) {
-		params.dataType = data.datatype;
+		params.dataType = data.dataType;
 	}
 	
 	if (data.mimetype) {
-		params.mimeType = data.mimetype;
+		params.mimeType = data.mimeType;
 	}
 	
 	if (success) {
@@ -326,7 +326,7 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 			_cms.misc.onrefresh(nodeKey);
 			_cms.move.onrefresh(nodeKey);			
 			_cms.support.disableFormsIfReadonly();
-			_cms.support.trashFlagger();
+			_cms.support.itemFlagger();
 		}
 	});
 };

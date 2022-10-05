@@ -228,37 +228,95 @@ _cms.misc.updateProgressbar = function(bar, value) {
 	}
 }
 
-_cms.misc.trashflags = {}
-_cms.misc.trashflags.behaviour = {}
+_cms.misc.flaggedItems = {}
+_cms.misc.flaggedItems.behaviour = {}
 
-_cms.misc.trashflags.refresh = function(nodeKey) {
-	_cms.misc.trashflags.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/refresh/trashflags");
+_cms.misc.flaggedItems.refresh = function(nodeKey) {
+	_cms.misc.flaggedItems.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/refresh/flaggedItems");
 }
 
-_cms.misc.trashflags.behaviour.unflagAll = function() {
-	$('div#trashflag-section button#unflag-button').click(function() {
-		_cms.misc.trashflags.ajax(_cms.ctx + "/rest/trashflags/unflag/all");
-		$('i.trash-item-flag').removeClass('flagged');
+_cms.misc.flaggedItems.behaviour.unflagAll = function() {
+	$('div#flagged-items-section button#unflag-button').click(function() {
+		_cms.misc.flaggedItems.ajax(_cms.ctx + "/rest/flaggedItems/unflag/all");
+		$('i.item-flag').removeClass('flagged');
 	});
 }
 
-_cms.misc.trashflags.behaviour.trashAll = function() {
-	$('div#trashflag-section button#trash-button').click(function() {
-		_cms.support.ajax('GET', _cms.ctx + "/rest/trashflags/trash/all", {}, function(a,b,c) {
+_cms.misc.flaggedItems.behaviour.trashAll = function() {
+	$('div#flagged-items-section button#trash-button').click(function() {
+		_cms.support.ajax('GET', _cms.ctx + "/rest/flaggedItems/trash/all", {}, function(a,b,c) {
 			window.location = _cms.ctx + '/page/editor/' + _cms.rootItemOrigId +'?status=success&msg=Flagged items trashed - now on Homepage'; 
 		});
 	});
 }
 
-_cms.misc.trashflags.ajax = function(url) {
-	_cms.support.ajax('GET', url, {datatype: 'html', mimetype: 'text/html'}, function(html, status, z) {
-		var div$ = $("div#trashflag-section");
+_cms.misc.flaggedItems.collateFormData = function(clazz, type, params) {
+	$(`div#copy-data-section input.${clazz}:checked`).each(function(index, ele) {
+		var checkbox$ = $(ele);
+		var input$ = checkbox$.next().next();
+		var name = type + '$' + checkbox$.attr('data-name');
+		var value;
+					
+		if (input$.attr('type') === 'text' || input$[0].tagName === 'TEXTAREA') {
+			value = input$.val();
+		}
+		else if (input$.attr('type') === 'checkbox') {
+			value = input$.prop('checked') ? 'checked' : 'unchecked';
+		}
+		
+		params.data[name] = value;
+	});
+}
+
+_cms.misc.flaggedItems.behaviour.copyAll = function() {
+	$('div#flagged-items-section button#copy-data-button').click(function() {
+		var params = {
+			dataType: 'json',
+			mimeType: 'application/json',
+			data: {},
+		};
+		
+		_cms.misc.flaggedItems.collateFormData('copy-core-data', '0', params);
+		_cms.misc.flaggedItems.collateFormData('copy-fieldvalue', '1', params);
+				
+		_cms.support.ajax('POST', _cms.ctx + "/rest/flaggedItems/copy/all", params, function(resp, status, z) {
+			_cms.support.flashMessage(_cms.support.toStatus(resp.error, resp.message));
+		});
+	});
+}
+
+_cms.misc.flaggedItems.behaviour.linkToItem = function() {
+	$('div#flagged-items-section a.link-to-item').click(function(e) {
+		e.preventDefault();
+		let nodeKey = $(this).attr('data-id');
+		_cms.support.renderItemForms(nodeKey, 'core-tab');
+	});
+}
+
+_cms.misc.flaggedItems.ajax = function(url) {
+	_cms.support.ajax('GET', url, {dataType: 'html', mimeType: 'text/html'}, function(html, status, z) {
+		var div$ = $("div#flagged-items-section");
 		div$.empty();
 		div$.append(html);
 
-		_cms.misc.trashflags.behaviour.unflagAll();
-		_cms.misc.trashflags.behaviour.trashAll();
-		_cms.support.flashMessage({error: false, message: $('div#trashflags-message').html()});
+		_cms.misc.flaggedItems.behaviour.unflagAll();
+		_cms.misc.flaggedItems.behaviour.trashAll();
+		_cms.misc.flaggedItems.behaviour.copyAll();
+		_cms.misc.flaggedItems.behaviour.linkToItem();
+		
+		_cms.support.flashMessage({error: false, message: $('div#flagged-items-message').html()});
+		
+		$('p#copy-data-downarrow').click(function() {
+			var div$ = $('div#copy-data-section');
+			var c = 'hide';
+			
+			if (div$.hasClass(c)) {
+				div$.removeClass(c);
+			}
+			else {
+				div$.addClass(c);
+			}
+		});	
 	})
 }
 
@@ -275,5 +333,22 @@ _cms.misc.onrefresh = function(nodeKey) {
 	 */
 	_cms.misc.behaviour.trash.showOrHide();
 	_cms.misc.behaviour.trash.trash(nodeKey);
-	_cms.misc.trashflags.refresh(nodeKey);
+	_cms.misc.flaggedItems.refresh(nodeKey);
+	
+	$('p#copy-data-downarrow').click(function() {
+		var div$ = $('div#copy-data-section');
+		var c = 'hide';
+		
+		if (div$.hasClass(c)) {
+			div$.removeClass(c);
+		}
+		else {
+			div$.addClass(c);
+		}
+	});
+	
+	$('#misc-accordion').accordion({
+		heightStyle: "content"
+	});
+	
 }

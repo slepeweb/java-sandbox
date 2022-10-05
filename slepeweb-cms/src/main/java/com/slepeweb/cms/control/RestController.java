@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.bean.Field;
 import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
@@ -65,8 +67,11 @@ import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.CookieService;
+import com.slepeweb.cms.service.FieldForTypeService;
+import com.slepeweb.cms.service.FieldService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SolrService4Cms;
+import com.slepeweb.cms.service.TagService;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.util.DateUtil;
@@ -80,6 +85,9 @@ public class RestController extends BaseController {
 	public static final String THUMBNAIL_EXT = "-thumb";
 	
 	@Autowired private ItemService itemService;
+	@Autowired private FieldService fieldService;
+	@Autowired private FieldForTypeService fieldForTypeService;
+	@Autowired private TagService tagService;
 	@Autowired private CookieService cookieService;
 	@Autowired private SolrService4Cms solrService4Cms;
 	@Autowired private NavigationController navigationController;
@@ -131,9 +139,9 @@ public class RestController extends BaseController {
 			// Get up, down, next, previous navigation links
 			model.addAttribute("_navkeys", getNavigationLinks(i));
 			
-			Map<Long, ItemGist> trashFlags = getTrashFlags(req);			
-			model.addAttribute("_trashFlagList", getSortedTrashFlags(trashFlags));
-			model.addAttribute("_flagged4Trash", trashFlags.get(i.getOrigId()) != null);
+			Map<Long, ItemGist> trashFlags = getFlaggedItems(req);			
+			model.addAttribute("_flaggedItems", getSortedFlaggedItems(trashFlags));
+			model.addAttribute("_itemIsFlagged", trashFlags.get(i.getOrigId()) != null);
 		}		
 		
 		return "cms.item.editor";		
@@ -1176,31 +1184,31 @@ public class RestController extends BaseController {
 		return "cms.searchresults";		
 	}
 	
-	@RequestMapping(value="/item/{origId}/flag/trash", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value="/item/{origId}/flag", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
-	public boolean flagTrash(@PathVariable long origId, HttpServletRequest request) {
-		return setTrashFlag(origId, request, false);
+	public boolean flagItem(@PathVariable long origId, HttpServletRequest request) {
+		return flagItem(origId, request, false);
 	}
 	
-	@RequestMapping(value="/item/{origId}/flag/untrash", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value="/item/{origId}/unflag", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
-	public boolean unflagTrash(@PathVariable long origId, HttpServletRequest request) {
-		return setTrashFlag(origId, request, true);
+	public boolean unflagItem(@PathVariable long origId, HttpServletRequest request) {
+		return flagItem(origId, request, true);
 	}
 	
-	@RequestMapping(value="/trashflags/unflag/all", method=RequestMethod.GET)
-	public String unflagAllTrashFlagged(HttpServletRequest request, ModelMap model) {
-		Map<Long, ItemGist> trashFlags = getTrashFlags(request);
+	@RequestMapping(value="/flaggedItems/unflag/all", method=RequestMethod.GET)
+	public String unflagAllFlaggedItems(HttpServletRequest request, ModelMap model) {
+		Map<Long, ItemGist> trashFlags = getFlaggedItems(request);
 		trashFlags.clear();
-		model.addAttribute("_trashFlagList", trashFlags);
-		model.addAttribute("_flagged4Trash", false);
-		model.addAttribute("_trashFlagsMessage", "All flags have been removed");
-		return "cms.refresh.trashflags";		
+		model.addAttribute("_flaggedItems", trashFlags);
+		model.addAttribute("_itemIsFlagged", false);
+		model.addAttribute("_flaggedItemsMessage", "All flags have been removed");
+		return "cms.refresh.flaggedItems";		
 	}
 	
-	@RequestMapping(value="/trashflags/trash/all", method=RequestMethod.GET)
-	public String trashAllTrashFlagged(HttpServletRequest request, ModelMap model) {
-		Map<Long, ItemGist> trashFlags = getTrashFlags(request);
+	@RequestMapping(value="/flaggedItems/trash/all", method=RequestMethod.GET)
+	public String trashAllFlaggedItems(HttpServletRequest request, ModelMap model) {
+		Map<Long, ItemGist> trashFlags = getFlaggedItems(request);
 		Iterator<Long> iter = trashFlags.keySet().iterator();
 		Long origId;
 		Item i;
@@ -1215,15 +1223,106 @@ public class RestController extends BaseController {
 		}
 		
 		trashFlags.clear();
-		model.addAttribute("_trashFlagList", trashFlags);
-		model.addAttribute("_flagged4Trash", false);
-		model.addAttribute("_trashFlagsMessage", String.format("%d items have been moved to the trash bin", count));
-		return "cms.refresh.trashflags";		
+		model.addAttribute("_flaggedItems", trashFlags);
+		model.addAttribute("_itemIsFlagged", false);
+		model.addAttribute("_flaggedItemsMessage", String.format("%d items have been moved to the trash bin", count));
+		return "cms.refresh.flaggedItems";		
 	}
 	
-	private boolean setTrashFlag(long origId, HttpServletRequest request, boolean reverse) {
+	@RequestMapping(value="/flaggedItems/copy/all", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public RestResponse copyAllFlaggedItems(HttpServletRequest request, ModelMap model) throws ResourceException {
+		RestResponse resp = new RestResponse();
+		Map<Long, ItemGist> trashFlags = getFlaggedItems(request);
+		Iterator<Long> itemIter = trashFlags.keySet().iterator();
+		
+		Item i;
+		String identifier, type, key, strValue;
+		Object value = null;
+		Map<String, Object> coreData = new HashMap<String, Object>();
+		Map<String, Object> fieldValues = new HashMap<String, Object>();
+		long origId;
+		Field field;
+
+		Enumeration<String> enumer = request.getParameterNames();
+		while (enumer.hasMoreElements()) {
+			identifier = enumer.nextElement();
+			type = identifier.substring(0, 1);
+			key = identifier.substring(2);
+			strValue = request.getParameter(identifier);
+			value = strValue;
+			
+			// Core data
+			if (type.equals("0")) {
+				if (key.equals("published") || key.equals("searchable")) {
+					value = strValue.equals("checked") ? true : false;
+				}
+				coreData.put(key, value);
+			}
+			// Field values
+			else if (type.equals("1")) {
+				field = this.fieldService.getField(key);
+				if (field.getType() == FieldType.integer) {
+					value = Integer.valueOf(strValue);
+				}
+				fieldValues.put(key, value);
+			}
+		}
+		
+		boolean isCoreData = coreData.size() > 0;
+		boolean isFieldValues = fieldValues.size() > 0;
+		Iterator<String> keyIter;
+		
+		while (itemIter.hasNext()) {
+			origId = itemIter.next();
+			i = getEditableVersion(origId, getUser(request));
+			if (i != null) {
+				if (isCoreData) {
+					keyIter = coreData.keySet().iterator();
+					while (keyIter.hasNext()) {
+						key = keyIter.next();
+						value = coreData.get(key);
+						
+						if (key.equals("tags")) {
+							this.tagService.save(i, (String) value);
+						}
+						else if (key.equals("published")) {
+							i.setPublished((Boolean) value);
+						}
+						else if (key.equals("searchable")) {
+							i.setSearchable((Boolean) value);
+						}
+					}
+					
+					i.save();
+				}
+				
+				if (isFieldValues) {
+					keyIter = fieldValues.keySet().iterator();
+					while (keyIter.hasNext()) {
+						key = keyIter.next();
+						value = fieldValues.get(key);
+						
+						for (FieldForType fft : this.fieldForTypeService.getFieldsForType(i.getType().getId())) {
+							if (fft.getField().getVariable().equals(key)) {
+								i.setFieldValue(key, value);
+								break;
+							}
+						}
+					}
+					
+					i.saveFieldValues();
+				}
+			}
+		}
+		
+		resp.addMessage("Copy ALL process completed");
+		return resp;		
+	}
+	
+	private boolean flagItem(long origId, HttpServletRequest request, boolean reverse) {
 		Item i = this.getEditableVersion(origId, getUser(request));
-		Map<Long, ItemGist> flags = getTrashFlags(request);
+		Map<Long, ItemGist> flags = getFlaggedItems(request);
 		ItemGist ig = flags.get(i.getOrigId());
 		Date now = new Date();
 		

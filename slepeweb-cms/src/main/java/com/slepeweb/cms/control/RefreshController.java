@@ -123,14 +123,18 @@ public class RefreshController extends BaseController {
 		return "cms.refresh.copy";		
 	}
 		
-	@RequestMapping(value="/item/{origId}/refresh/trashflags", method=RequestMethod.GET)
-	public String refreshTrashFlags(
+	@RequestMapping(value="/item/{origId}/refresh/flaggedItems", method=RequestMethod.GET)
+	public String refreshFlaggedItems(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Map<Long, ItemGist> trashFlags = getTrashFlags(req);			
-		model.addAttribute("_trashFlagList", getSortedTrashFlags(trashFlags));
-		model.addAttribute("_flagged4Trash", trashFlags.get(origId) != null);
-		return "cms.refresh.trashflags";		
+		Item i = getEditableVersion(origId, getUser(req));
+		Map<Long, ItemGist> flaggedItems = getFlaggedItems(req);
+		
+		model.put("editingItem", i);
+		model.addAttribute("_flaggedItems", getSortedFlaggedItems(flaggedItems));
+		model.addAttribute("_itemIsFlagged", flaggedItems.get(origId) != null);
+		model.addAttribute("_fieldSupport", fieldEditorSupport(i));
+		return "cms.refresh.flaggedItems";		
 	}
 		
 }

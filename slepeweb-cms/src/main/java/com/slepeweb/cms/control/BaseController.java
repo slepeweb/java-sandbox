@@ -170,8 +170,8 @@ public class BaseController {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Map<Long, ItemGist> getTrashFlags(HttpServletRequest request) {
-		String name = "_trashFlags";
+	protected Map<Long, ItemGist> getFlaggedItems(HttpServletRequest request) {
+		String name = "_flaggedItems";
 		Map<Long, ItemGist> flags = (Map<Long, ItemGist>) request.getSession().getAttribute(name);
 		if (flags == null) {
 			flags = new HashMap<Long, ItemGist>();
@@ -180,17 +180,17 @@ public class BaseController {
 		return flags;
 	}
 	
-	protected List<ItemGist>  getSortedTrashFlags(Map<Long, ItemGist> trashFlags) {
-		List<ItemGist> trashFlagList = new ArrayList<ItemGist>(trashFlags.size());
-		trashFlagList.addAll(trashFlags.values());
-		trashFlagList.sort(new Comparator<ItemGist>() {
+	protected List<ItemGist>  getSortedFlaggedItems(Map<Long, ItemGist> flaggedItems) {
+		List<ItemGist> gists = new ArrayList<ItemGist>(flaggedItems.size());
+		gists.addAll(flaggedItems.values());
+		gists.sort(new Comparator<ItemGist>() {
 			@Override
 			public int compare(ItemGist o1, ItemGist o2) {
 				return o1.getDate().compareTo(o2.getDate());
 			}
 		});
 		
-		return trashFlagList;
+		return gists;
 	}
 }
 

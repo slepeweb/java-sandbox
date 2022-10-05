@@ -46,6 +46,7 @@ _cms.field.update = function(nodeKey, formData) {
 			_cms.dialog.close(_cms.dialog.confirmFieldUpdate);
 			_cms.support.flashMessage(obj);
 			_cms.field.refresh.tab(nodeKey);
+			_cms.misc.flaggedItems.refresh(nodeKey);
 		},
 		error: function(obj, status, z) {
 			_cms.dialog.close(_cms.dialog.confirmFieldUpdate);

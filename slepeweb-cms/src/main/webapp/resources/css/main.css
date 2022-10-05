@@ -29,7 +29,7 @@ header select {
 	width: 100%;
 }
 
-header div#trash-item-flag {
+header div#item-flag {
 	margin-top: 1.0em;
 	font-size: 1.5em;
 }
@@ -403,26 +403,25 @@ div.action-reset-combo {
 	margin-left: 1em;
 }
 
-.section-ops {
+div.section-ops {
 	display: grid;
 	grid-template-columns: 4fr 1fr 2fr;
-	margin-top: 1.0em;
 }
 
-.section-ops.delete {
-	margin-top: 2.0em;
+div.section-ops.delete {
+	align-items: center;
 }
 
-.section-ops span.radio-label {
+div.section-ops span.radio-label {
 	margin-left: -0.5em
 }
 
-.section-ops input[type=radio] {
+div.section-ops input[type=radio] {
 	margin-left: 1.0em
 }
 
-.section-ops .radio-pair {
-	display: block;
+div.section-ops.space-top {
+	margin-top: 1em;
 }
 
 #item-editor .section-ops button {
@@ -516,7 +515,7 @@ div#field-guidance td, div#link-guidance td {
 	padding: 5px;
 }
 
-div#trash-item-flag i.flagged {
+div#item-flag i.flagged {
 	color: red;
 }
 
