@@ -10,6 +10,7 @@ _cms.dialog = {
 	linkGuidance: {obj: null},
 	fieldGuidance: {obj: null},
 	searchresults: {obj: null},
+	eggTimer: {obj: null},
 	sel: {
 		LINK_NOT_DEFINED: "#link-not-defined-dialog",
 		LINK_DATA_FORMAT: "#link-data-format-dialog",
@@ -152,6 +153,19 @@ _cms.dialog.fieldGuidance.define = function() {
 	});
 }
 
+_cms.dialog.eggTimer.define = function() {	
+	_cms.dialog.eggTimer.obj = $("div#egg-timer").dialog({
+		autoOpen: false,
+		minHeight: 400,
+		minWidth: 300,
+		modal: true,
+		title: "Please be patient ...",
+		close: function() {
+			_cms.dialog.close(_cms.dialog.eggTimer);
+		},
+	});
+}
+
 _cms.dialog.warning = function(title, d, selector) {
 	  var close = function() {
 		  _cms.dialog.close(d);
@@ -173,6 +187,7 @@ _cms.dialog.onpageload = function() {
 	_cms.dialog.searchresults.define();
 	_cms.dialog.linkGuidance.define();
 	_cms.dialog.fieldGuidance.define();
+	_cms.dialog.eggTimer.define();
 	_cms.dialog.warning("Link not adequately defined", _cms.dialog.linkNotDefined, _cms.dialog.sel.LINK_NOT_DEFINED);
 	_cms.dialog.warning("Duplicate link target", _cms.dialog.duplicateTarget, _cms.dialog.sel.DUPLICATE_TARGET);
 	_cms.dialog.warning("Illegal target", _cms.dialog.illegalTarget, _cms.dialog.sel.ILLEGAL_TARGET);

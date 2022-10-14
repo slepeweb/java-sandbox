@@ -519,6 +519,14 @@ div#item-flag i.flagged {
 	color: red;
 }
 
+div#flagged-items-section button {
+	width: 10em;
+}
+
+img.egg-timer-gif {
+	width: 100%;
+}
+
 /* Probably used in search results dialog */
 div.cms-icon-boy { background-position: -33px 0px; }
 div.cms-icon-girl { background-position: -48px 0px; }

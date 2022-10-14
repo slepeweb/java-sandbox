@@ -1190,6 +1190,26 @@ public class RestController extends BaseController {
 		return flagItem(origId, request, false);
 	}
 	
+	@RequestMapping(value="/item/{origId}/flag/children", method=RequestMethod.GET, produces="application/json")
+	public String flagChildItems(@PathVariable long origId, HttpServletRequest request, ModelMap model) {
+		Item i = this.getEditableVersion(origId, getUser(request));
+		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
+		Date now = new Date();
+		int count = 0;
+		
+		for (Item child : i.getBoundItems()) {
+			if (! flaggedItems.containsKey(child.getOrigId())) {
+				flaggedItems.put(child.getOrigId(), new ItemGist(child).setDate(now));
+				count++;
+			}
+		}
+		
+		model.addAttribute("_flaggedItems", getSortedFlaggedItems(flaggedItems));
+		model.addAttribute("_itemIsFlagged", flaggedItems.containsKey(origId));
+		model.addAttribute("_flaggedItemsMessage", String.format("%d children have been flagged", count));
+		return "cms.refresh.flaggedItems";		
+	}
+	
 	@RequestMapping(value="/item/{origId}/unflag", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public boolean unflagItem(@PathVariable long origId, HttpServletRequest request) {
@@ -1198,9 +1218,9 @@ public class RestController extends BaseController {
 	
 	@RequestMapping(value="/flaggedItems/unflag/all", method=RequestMethod.GET)
 	public String unflagAllFlaggedItems(HttpServletRequest request, ModelMap model) {
-		Map<Long, ItemGist> trashFlags = getFlaggedItems(request);
-		trashFlags.clear();
-		model.addAttribute("_flaggedItems", trashFlags);
+		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
+		flaggedItems.clear();
+		model.addAttribute("_flaggedItems", flaggedItems);
 		model.addAttribute("_itemIsFlagged", false);
 		model.addAttribute("_flaggedItemsMessage", "All flags have been removed");
 		return "cms.refresh.flaggedItems";		
@@ -1208,8 +1228,8 @@ public class RestController extends BaseController {
 	
 	@RequestMapping(value="/flaggedItems/trash/all", method=RequestMethod.GET)
 	public String trashAllFlaggedItems(HttpServletRequest request, ModelMap model) {
-		Map<Long, ItemGist> trashFlags = getFlaggedItems(request);
-		Iterator<Long> iter = trashFlags.keySet().iterator();
+		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
+		Iterator<Long> iter = flaggedItems.keySet().iterator();
 		Long origId;
 		Item i;
 		int count = 0;
@@ -1222,8 +1242,8 @@ public class RestController extends BaseController {
 			}
 		}
 		
-		trashFlags.clear();
-		model.addAttribute("_flaggedItems", trashFlags);
+		flaggedItems.clear();
+		model.addAttribute("_flaggedItems", flaggedItems);
 		model.addAttribute("_itemIsFlagged", false);
 		model.addAttribute("_flaggedItemsMessage", String.format("%d items have been moved to the trash bin", count));
 		return "cms.refresh.flaggedItems";		
@@ -1233,8 +1253,8 @@ public class RestController extends BaseController {
 	@ResponseBody
 	public RestResponse copyAllFlaggedItems(HttpServletRequest request, ModelMap model) throws ResourceException {
 		RestResponse resp = new RestResponse();
-		Map<Long, ItemGist> trashFlags = getFlaggedItems(request);
-		Iterator<Long> itemIter = trashFlags.keySet().iterator();
+		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
+		Iterator<Long> itemIter = flaggedItems.keySet().iterator();
 		
 		Item i;
 		String identifier, type, key, strValue;
@@ -1322,18 +1342,18 @@ public class RestController extends BaseController {
 	
 	private boolean flagItem(long origId, HttpServletRequest request, boolean reverse) {
 		Item i = this.getEditableVersion(origId, getUser(request));
-		Map<Long, ItemGist> flags = getFlaggedItems(request);
-		ItemGist ig = flags.get(i.getOrigId());
+		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
+		ItemGist ig = flaggedItems.get(i.getOrigId());
 		Date now = new Date();
 		
 		if (! reverse) {
 			if (ig == null) {
-				flags.put(i.getOrigId(), new ItemGist(i).setDate(now));
+				flaggedItems.put(i.getOrigId(), new ItemGist(i).setDate(now));
 			}
 		}
 		else {
 			if (ig != null) {
-				flags.remove(i.getOrigId());
+				flaggedItems.remove(i.getOrigId());
 			}
 		}
 		

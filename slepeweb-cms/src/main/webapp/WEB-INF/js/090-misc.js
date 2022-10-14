@@ -235,6 +235,12 @@ _cms.misc.flaggedItems.refresh = function(nodeKey) {
 	_cms.misc.flaggedItems.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/refresh/flaggedItems");
 }
 
+_cms.misc.flaggedItems.behaviour.flagChildren = function() {
+	$('div#flagged-items-section button#flag-children-button').click(function() {
+		_cms.misc.flaggedItems.ajax(_cms.ctx + "/rest/item/" + _cms.editingItemId + "/flag/children");
+	});
+}
+
 _cms.misc.flaggedItems.behaviour.unflagAll = function() {
 	$('div#flagged-items-section button#unflag-button').click(function() {
 		_cms.misc.flaggedItems.ajax(_cms.ctx + "/rest/flaggedItems/unflag/all");
@@ -244,7 +250,9 @@ _cms.misc.flaggedItems.behaviour.unflagAll = function() {
 
 _cms.misc.flaggedItems.behaviour.trashAll = function() {
 	$('div#flagged-items-section button#trash-button').click(function() {
+		_cms.dialog.open(_cms.dialog.eggTimer);
 		_cms.support.ajax('GET', _cms.ctx + "/rest/flaggedItems/trash/all", {}, function(a,b,c) {
+			_cms.dialog.close(_cms.dialog.eggTimer);
 			window.location = _cms.ctx + '/page/editor/' + _cms.rootItemOrigId +'?status=success&msg=Flagged items trashed - now on Homepage'; 
 		});
 	});
@@ -270,6 +278,8 @@ _cms.misc.flaggedItems.collateFormData = function(clazz, type, params) {
 
 _cms.misc.flaggedItems.behaviour.copyAll = function() {
 	$('div#flagged-items-section button#copy-data-button').click(function() {
+		_cms.dialog.open(_cms.dialog.eggTimer);
+		
 		var params = {
 			dataType: 'json',
 			mimeType: 'application/json',
@@ -280,6 +290,7 @@ _cms.misc.flaggedItems.behaviour.copyAll = function() {
 		_cms.misc.flaggedItems.collateFormData('copy-fieldvalue', '1', params);
 				
 		_cms.support.ajax('POST', _cms.ctx + "/rest/flaggedItems/copy/all", params, function(resp, status, z) {
+			_cms.dialog.close(_cms.dialog.eggTimer);
 			_cms.support.flashMessage(_cms.support.toStatus(resp.error, resp.message));
 		});
 	});
@@ -303,18 +314,26 @@ _cms.misc.flaggedItems.ajax = function(url) {
 		_cms.misc.flaggedItems.behaviour.trashAll();
 		_cms.misc.flaggedItems.behaviour.copyAll();
 		_cms.misc.flaggedItems.behaviour.linkToItem();
+		_cms.misc.flaggedItems.behaviour.flagChildren();
 		
 		_cms.support.flashMessage({error: false, message: $('div#flagged-items-message').html()});
 		
 		$('p#copy-data-downarrow').click(function() {
 			var div$ = $('div#copy-data-section');
-			var c = 'hide';
+			var i$ = $(this).find('i');
+			var hide = 'hide';
+			var uparrow = 'fa-angle-up';
+			var downarrow = 'fa-angle-down';
 			
-			if (div$.hasClass(c)) {
-				div$.removeClass(c);
+			if (div$.hasClass(hide)) {
+				div$.removeClass(hide);
+				i$.removeClass(downarrow);
+				i$.addClass(uparrow);
 			}
 			else {
-				div$.addClass(c);
+				div$.addClass(hide);
+				i$.removeClass(uparrow);
+				i$.addClass(downarrow);
 			}
 		});	
 	})

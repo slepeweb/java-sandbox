@@ -6,15 +6,22 @@
 <div>
 	<div id="flagged-items-message" class="hide">${_flaggedItemsMessage}</div>
 	<h3>You have flagged ${fn:length(_flaggedItems)} item(s):</h3>
-	
+
 	<c:if test="${fn:length(_flaggedItems) > 0}">
-	
 		<ul>
 			<c:forEach items="${_flaggedItems}" var="_gist">
 				<li><a href="#" class="link-to-item" data-id="${_gist.itemId}">${_gist.name}</a> (${_gist.path})</li>
 			</c:forEach>
 		</ul>
+	</c:if>
 		
+	<div class="section-ops">
+		<p><strong>Flag ALL CHILD</strong> items:</p>
+		<div><button id="flag-children-button" type="button">Flag CHILDREN</button></div>
+	</div>
+		
+	<c:if test="${fn:length(_flaggedItems) > 0}">
+	
 		<div class="section-ops">
 			<p><strong>Unflag ALL</strong> currently flagged items:</p>
 			<div><button id="unflag-button" type="button">Unflag ALL</button></div>

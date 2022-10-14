@@ -65,5 +65,12 @@
 
 <div id="field-guidance" data-variable="" class="hide cms-dialog"></div>
 
+<div id="egg-timer" class="hide cms-dialog">
+	<p>
+		Please wait a sec for this operation to complete.
+		<img class="egg-timer-gif" src="https://media.giphy.com/media/NAy2FD8xWrH4jUIBrq/giphy-downsized-large.gif" />
+	</p>
+</div>
+
 <audio id="bell" src="${applicationContextPath}/resources/pin-dropping.wav" preload="auto"></audio>
 
