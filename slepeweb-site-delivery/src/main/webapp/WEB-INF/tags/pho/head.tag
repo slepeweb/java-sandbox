@@ -21,7 +21,7 @@
 	crossorigin="anonymous"></script>
 	
 <script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>
-<script src="/resources/pho/js/site.js"></script>
+<!-- <script src="/resources/pho/js/site.js"></script> -->
 	
 <gen:extraCSS />
 <gen:extraInpageCSS />

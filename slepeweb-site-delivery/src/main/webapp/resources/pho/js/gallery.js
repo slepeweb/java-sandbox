@@ -161,3 +161,11 @@ function updateMediaDimensions(){
 		}
 	})
 }
+
+
+$(function() {
+	_thumbnails = $("div.search-result img")
+	_slides = $("div.slide-set .slide")
+	assignUIBehaviours()
+});
+

@@ -13,7 +13,7 @@
 <pho:pageLayout type="std">
 	<gen:debug><!-- jsp/pho/template/search.jsp --></gen:debug>
 	
-	<div class="main">	
+	<div class="main search">	
 		<h2>${_item.fields.title}</h2>
 	
 		<c:choose><c:when test="${fn:length(_search.results) > 0}">

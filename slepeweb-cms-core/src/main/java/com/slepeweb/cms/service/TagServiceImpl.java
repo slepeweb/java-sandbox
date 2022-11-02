@@ -2,12 +2,16 @@ package com.slepeweb.cms.service;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Tag;
+import com.slepeweb.cms.bean.TagCount;
+import com.slepeweb.cms.bean.TagList;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
 @Repository
@@ -25,7 +29,9 @@ public class TagServiceImpl extends BaseServiceImpl implements TagService {
 		deleteTags(i.getId());
 		
 		for (String value : valueStr.split("[ ,]+")) {
-			insert(i.getSite().getId(), i.getId(), value);
+			if (StringUtils.isNotBlank(value)) {
+				insert(i.getSite().getId(), i.getId(), value);
+			}
 		}
 		
 		this.solrService4Cms.save(i.setTags(null));
@@ -74,10 +80,26 @@ public class TagServiceImpl extends BaseServiceImpl implements TagService {
 				new RowMapperUtil.TagMapper());
 	}
 	
-	public List<String> getTagValues4Site(Long siteId) {
+	@Cacheable(value="serviceCache")
+	public List<String> getDistinctTagValues4Site(Long siteId) {
 		return this.jdbcTemplate.query("select distinct(value) from tag where siteid = ? order by value", 
 				new Object[]{siteId},
 				new RowMapperUtil.TagValueMapper());
+	}
+	
+	@Cacheable(value="serviceCache")
+	public TagList getTagCount4Site(Long siteId, int max) {
+		List<TagCount> rawList = this.jdbcTemplate.query("select value from tag where siteid = ?", 
+				new Object[]{siteId},
+				new RowMapperUtil.TagCountMapper());
+		
+		TagList tags = new TagList(max);
+		
+		for (TagCount next : rawList) {
+			tags.inc(next);
+		}
+		
+		return tags;
 	}
 	
 	public List<Tag> getTags4SiteWithValue(Long siteId, String value) {

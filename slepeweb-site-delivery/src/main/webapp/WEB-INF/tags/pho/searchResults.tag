@@ -36,6 +36,7 @@
 	    <div class="search-result-info hide">
 				<p class="heading">${_result.title}</p>
 				<p class="caption">${_teaser}</p>
+				<pho:captionTagList list="${_result.tags}" />
 			</div>
     
     </div>
@@ -67,6 +68,7 @@
 		    <div class="slide-info">
 					<p class="heading">${_result.title} <span class="close-slide-info cursor">&times;</span></p>
 					<p class="caption">${_teaser}</p>
+					<pho:captionTagList list="${_result.tags}" />
 				</div>
 	    
 	    </div>
@@ -79,11 +81,3 @@
 	<a class="next cursor" data-inc="1">&#10095;</a>
 
 </div>
-
-<script>
-	$(function() {
-		_thumbnails = $("div.search-result img")
-		_slides = $("div.slide-set .slide")
-		assignUIBehaviours()
-	});
-</script>

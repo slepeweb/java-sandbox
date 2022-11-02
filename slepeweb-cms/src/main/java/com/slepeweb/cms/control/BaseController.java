@@ -156,7 +156,7 @@ public class BaseController {
 	@SuppressWarnings("unchecked")
 	protected TagInputSupport getTagInfo(Long siteId, HttpServletRequest req) {
 		TagInputSupport tis = new TagInputSupport();
-		tis.setAll(this.cmsService.getTagService().getTagValues4Site(siteId));		
+		tis.setAll(this.cmsService.getTagService().getDistinctTagValues4Site(siteId));		
 		
 		// Recently added tags are stored in the session
 		Object recent = req.getSession().getAttribute(RECENT_TAGS_ATTR);

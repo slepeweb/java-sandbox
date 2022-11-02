@@ -1,10 +1,11 @@
 TODO: This is the main todo file:
 
 HIGH
+- do not add tag record when value is empty
+- refactor code to use _cms.support.ajax wrapper function
 - force media items to have appropriate simplename extensions, esp. video, pdf, etc. (???)
 - show bin - takes 2 clicks (perhaps not first time)
 - implement cron job to backup cms db on desktop
-- site selection on login should be based upon hostname
 
 MEDIUM
 - re-test registration process

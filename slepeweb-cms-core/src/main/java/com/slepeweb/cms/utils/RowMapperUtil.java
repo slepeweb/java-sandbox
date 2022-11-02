@@ -26,6 +26,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfig;
 import com.slepeweb.cms.bean.SiteType;
 import com.slepeweb.cms.bean.Tag;
+import com.slepeweb.cms.bean.TagCount;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
 
@@ -343,6 +344,12 @@ public class RowMapperUtil {
 			return CmsBeanFactory.makeSiteType().
 					setSiteId(rs.getLong("siteid")).
 					setType(mapItemType(rs));
+		}
+	}
+	
+	public static final class TagCountMapper implements RowMapper<TagCount> {
+		public TagCount mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new TagCount(rs.getString("value"));
 		}
 	}
 	
