@@ -1,9 +1,15 @@
+function yearInRange(year) {
+	return year >= 1700 && year <= new Date().getFullYear();
+}
+
 $(function() {
+	/*
 	$('#from-date, #to-date').datepicker({
 		dateFormat: 'yy/mm/dd',
 		changeMonth: true,
 		changeYear: true,
 	});
+	*/
 
 	$('div#tag-cloud div.tag-link').each(function(i, ele) {
 		let div$ = $(this);
@@ -28,4 +34,34 @@ $(function() {
 		window.location = '/searchresults?view=get&searchtext=' + tagValue
 	});
 	
+	$('div#search-button-container input').click(function(e){
+		let div$ = $('div#search-form');
+		let text = div$.find('input[name=searchtext]').val();
+		let year;
+		let now = new Date().getFullYear();
+		let error = false;
+		
+		if (text.trim() === '') {
+			window.alert('You need to specify search terms');
+			error = true;
+		}
+		else {
+			year = parseInt(div$.find('input[name=from]').val());
+			if (! isNaN(year) && ! yearInRange(year))  {
+				window.alert("'From' year is out of range");
+				error = true;
+			}
+			else {
+				year = parseInt(div$.find('input[name=to]').val());
+				if (! isNaN(year) && ! yearInRange(year))  {
+					window.alert("'To' year is out of range");
+					error = true;
+				}
+			}
+		}
+		
+		if (error) {
+			e.preventDefault();
+		}
+	});
 });	

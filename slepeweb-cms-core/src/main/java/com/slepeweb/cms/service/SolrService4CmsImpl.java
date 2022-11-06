@@ -268,7 +268,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				q.addFilterQuery(String.format("language:\"%s\"", params.getLanguage()));
 				q.addFilterQuery(String.format("editable:\"%s\"", "true"));
 				q.add("defType", "dismax");
-				q.add("qf", "title^10 subtitle^4 bodytext");
+				q.add("qf", "title^10 tags^8 teaser^4 bodytext");
 				q.setStart(params.getStart());
 				q.setRows(params.getPageSize());
 				

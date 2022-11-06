@@ -1,5 +1,7 @@
 package com.slepeweb.site.pho.control;
 
+import java.util.Calendar;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,6 +46,7 @@ public class PhotosPageController extends BaseController {
 		TagList tagList = this.tagService.getTagCount4Site(i.getSite().getId(), 50);
 		tagList.analyze();
 		model.addAttribute("_toptags", tagList);
+		model.addAttribute("_nowYear", Calendar.getInstance().get(Calendar.YEAR));
 
 		return page.getView();
 	}

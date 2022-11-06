@@ -57,8 +57,6 @@ public class SolrService4PhotosImpl extends SolrService4SiteBase implements Solr
 				q.add("qf", "title^10 tags^8 teaser^4 bodytext");
 				
 				// The photo date (year) is stored in the extra1 field
-				//q.clearSorts();
-				//q.addSort("year", ORDER.desc);
 				q.addSort("extraStr1", ORDER.desc);
 				
 				q.setStart(params.getStart());

@@ -138,8 +138,11 @@ public class BaseController {
 	
 	protected Item getEditableVersion(Long origId, User u, boolean throwable) throws RuntimeException {
 		Item i = this.cmsService.getItemService().getEditableVersion(origId);
-		i.setUser(u);
-		checkAccess(i, throwable);
+		
+		if (i != null) {
+			i.setUser(u);
+			checkAccess(i, throwable);
+		}
 		return i;
 	}
 	

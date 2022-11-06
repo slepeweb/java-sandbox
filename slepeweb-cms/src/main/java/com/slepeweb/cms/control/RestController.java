@@ -797,8 +797,13 @@ public class RestController extends BaseController {
 		RestResponse resp = new RestResponse();
 		Item i = getEditableVersion(origId, getUser(req), true);
 		Item parent = i.getParent();
-		i.trash();
+		
+		// First, remove item from flagged list, if present
+		flagItem(i.getOrigId(), req, true);
 			
+		// Now trash it
+		i.trash();
+		
 		return resp.addMessage("Item trashed").addMessage("PARENT ITEM IS NOW CURRENT").setData(parent.getOrigId());
 	}
 	

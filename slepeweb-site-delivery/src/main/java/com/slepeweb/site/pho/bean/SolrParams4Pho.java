@@ -1,5 +1,7 @@
 package com.slepeweb.site.pho.bean;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.site.bean.SolrParams4Site;
@@ -15,8 +17,10 @@ public class SolrParams4Pho extends SolrParams4Site {
 		return from;
 	}
 
-	public SolrParams4Pho setFrom(String from) {
-		this.from = from;
+	public SolrParams4Pho setFrom(String year) {
+		if (StringUtils.isNotBlank(year)) {
+			this.from = String.format("%s/01/01", year);
+		}
 		return this;
 	}
 
@@ -24,8 +28,10 @@ public class SolrParams4Pho extends SolrParams4Site {
 		return to;
 	}
 
-	public SolrParams4Pho setTo(String to) {
-		this.to = to;
+	public SolrParams4Pho setTo(String year) {
+		if (StringUtils.isNotBlank(year)) {
+			this.to = String.format("%s/12/31", year);
+		}
 		return this;
 	}
 }
