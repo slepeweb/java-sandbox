@@ -1,16 +1,15 @@
 TODO: This is the main todo file:
 
 HIGH
-- do not add tag record when value is empty
 - refactor code to use _cms.support.ajax wrapper function
 - force media items to have appropriate simplename extensions, esp. video, pdf, etc. (???)
-- show bin - takes 2 clicks (perhaps not first time)
 - implement cron job to backup cms db on desktop
 
 MEDIUM
+- new: move flagged items to the same location
+- show bin - takes 2 clicks (perhaps not first time)
 - re-test registration process
 - app to remove redundant media files from file store
-- check sws (search) still working
 - PDFs not viewable on my android phone (chrome)
 - PDFs not rendered with scrollbars on iPad
 - need to protect against injection attacks

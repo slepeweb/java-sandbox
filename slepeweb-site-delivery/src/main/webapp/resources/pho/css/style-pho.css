@@ -784,8 +784,17 @@ div#thumbnail-gallery {
 div.search-result {
   position: relative;
 }
-div.search-result img {
+div.search-result img.thumbnail {
   width: 100px;
+}
+div.search-result p.video-icon {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background-color: #fff;
+  opacity: 0.7;
+  padding: 4px;
+  margin: 0;
 }
 div.search-result .search-result-info {
   padding: 1em;
@@ -799,6 +808,7 @@ div.search-result .search-result-info p.heading {
   font-size: 1.1em;
   font-weight: bold;
   margin: 0;
+  line-height: 1.25em;
 }
 div.search-result .search-result-info p.caption {
   font-size: 0.9em;

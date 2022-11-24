@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SolrPager<T> {
 
-	private static int BLOCK = 7;
+	private static int BLOCK = 5;
 	private int selectedPage, pageSize, maxPages;
 	private long totalHits;
 	
@@ -29,9 +29,12 @@ public class SolrPager<T> {
 	public List<Integer> getNavigation() {
 		List<Integer> pageNumbers = new ArrayList<Integer>();
 		int p = getSelectedPage() - Integer.valueOf(BLOCK / 2);
+		if (p < 1) {
+			p = 1;
+		}
 		
 		for (int i = 0; i < BLOCK; i++) {
-			if (p >= 1 && p <= getMaxPages()) {
+			if (p <= getMaxPages()) {
 				pageNumbers.add(p);
 			}
 			

@@ -35,8 +35,18 @@ div#thumbnail-gallery {
 div.search-result {
 	position: relative;
 	
-	img {
+	img.thumbnail {
 		width: 100px;
+	}
+	
+	p.video-icon {
+		position: absolute;
+		top: 6px;
+		left: 6px;
+		background-color: #fff;
+		opacity: 0.7;
+		padding: 4px;
+		margin: 0;
 	}
 	
 	.search-result-info {
@@ -47,10 +57,11 @@ div.search-result {
 		z-index: 100;
 		min-width: 200px;
 		
-		p.heading{
+		p.heading {
 			font-size: 1.1em;
 			font-weight: bold;
 			margin: 0;
+			line-height: 1.25em;
 		}
 		
 		p.caption{

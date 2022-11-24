@@ -18,13 +18,15 @@ function displayMedia(n) {
 	// Populate and display given slide
 	sourceAndDisplay(i, true)
   
-	// Populate and hide previous slide
-	i = cycle(n - 1)
-	sourceAndDisplay(i, false);
-  
-	// Populate and hide next slide
-	i = cycle(n + 1)
-	sourceAndDisplay(i, false)
+  	if (_slides.length > 1) {
+		// Populate and hide previous slide
+		i = cycle(n - 1)
+		sourceAndDisplay(i, false);
+	  
+		// Populate and hide next slide
+		i = cycle(n + 1)
+		sourceAndDisplay(i, false)
+	}
 }
 
 function cycle(i) {
@@ -113,7 +115,7 @@ function assignUIBehaviours() {
 		$(this).find(".search-result-info").addClass("hide")
 	});
 		
-	$(".search-result img").click(function(){
+	$(".search-result").click(function(){
 		var indexStr = $(this).attr("data-id")
 		
 		if (indexStr) {

@@ -528,11 +528,15 @@ img.egg-timer-gif {
 }
 
 /* Probably used in search results dialog */
-div.cms-icon-boy { background-position: -33px 0px; }
-div.cms-icon-girl { background-position: -48px 0px; }
-div.cms-icon-pdf { background-position: -64px 0px; }
-div.cms-icon-document { background-position: -80px 0px; }
-div.cms-icon-image { background-position: -96px 0px; }
+div.cms-icon-boy {background-position: -33px 0px; background-image: url("fancytree-cms-icons.gif");}
+div.cms-icon-girl {background-position: -48px 0px; background-image: url("fancytree-cms-icons.gif");}
+div.cms-icon-pdf {background-position: -64px 0px; background-image: url("fancytree-cms-icons.gif");}
+div.cms-icon-document {background-position: -80px 0px; background-image: url("fancytree-cms-icons.gif");}
+div.cms-icon-image {background-position: -96px 0px; background-image: url("fancytree-cms-icons.gif");}
+div.cms-icon-homepage {background-position: -16px 0px; background-image: url("fancytree-cms-icons.gif");}
+div.cms-icon-movie {background-position: 0px -32px; background-image: url("fancytree-cms-icons.gif");}
+div.cms-icon-photo {background-position: -16px -32px; background-image: url("fancytree-cms-icons.gif");}
+div.cms-icon-content {background-position: 0px -16px; background-image: url("fancytree-cms-icons.gif");}
 
 
 @media (min-width: 700px) {

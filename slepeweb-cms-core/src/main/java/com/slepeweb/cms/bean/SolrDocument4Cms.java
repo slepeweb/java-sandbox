@@ -6,6 +6,7 @@ public class SolrDocument4Cms {
 
 	@Field("key") private String key;
 	@Field("id") private String id;
+	@Field("origId") private String origId;
 	@Field("language") private String language = "en";
 	@Field("siteid") private String siteId;
 	@Field("type") private String type;
@@ -32,6 +33,15 @@ public class SolrDocument4Cms {
 	
 	public SolrDocument4Cms setId(String id) {
 		this.id = id;
+		return this;
+	}
+	
+	public String getOrigId() {
+		return origId;
+	}
+	
+	public SolrDocument4Cms setOrigId(String id) {
+		this.origId = id;
 		return this;
 	}
 	

@@ -33,6 +33,10 @@
 	    	data-id="${_stat.count - 1}"
 	    	/>
 	    
+	    <c:if test="${_result.type eq 'Movie MP4'}">
+	    	<p class="video-icon"><i class="fa-solid fa-film"></i></p>
+	    </c:if>
+	    
 	    <div class="search-result-info hide">
 				<p class="heading">${_result.title}</p>
 				<p class="caption">${_teaser}</p>

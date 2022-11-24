@@ -112,6 +112,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 					 * editable or viewable items are required.
 					 */
 					setKey(String.valueOf(i.getId()), language).
+					setOrigId(String.valueOf(i.getOrigId())).
 					setSiteId(String.valueOf(i.getSite().getId())).
 					setType(i.getType().getName()).
 					setTitle(getFieldValue(i, FieldName.TITLE, language, false, null)).

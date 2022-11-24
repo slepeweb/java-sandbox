@@ -52,6 +52,18 @@ span.fancytree-node.cms-icon-image>span.fancytree-icon:hover {
 	background-image: url("fancytree-cms-icons.gif");
 }
 
+span.fancytree-node.cms-icon-movie>span.fancytree-icon,
+span.fancytree-node.cms-icon-movie>span.fancytree-icon:hover {
+	background-position: 0px -32px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-photo>span.fancytree-icon,
+span.fancytree-node.cms-icon-photo>span.fancytree-icon:hover {
+	background-position: -16px -32px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
 span.fancytree-node.cms-icon-shortcut-boy>span.fancytree-icon,
 span.fancytree-node.cms-icon-shortcut-boy>span.fancytree-icon:hover {
 	background-position: -32px -16px;
@@ -85,6 +97,18 @@ span.fancytree-node.cms-icon-shortcut-image>span.fancytree-icon:hover {
 span.fancytree-node.cms-icon-shortcut-error>span.fancytree-icon,
 span.fancytree-node.cms-icon-shortcut-error>span.fancytree-icon:hover {
 	background-position: -16px -32px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-shortcut-movie>span.fancytree-icon,
+span.fancytree-node.cms-icon-shortcut-movie>span.fancytree-icon:hover {
+	background-position: 0px -48px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
+span.fancytree-node.cms-icon-shortcut-photo>span.fancytree-icon,
+span.fancytree-node.cms-icon-shortcut-photo>span.fancytree-icon:hover {
+	background-position: -16px -48px;
 	background-image: url("fancytree-cms-icons.gif");
 }
 
