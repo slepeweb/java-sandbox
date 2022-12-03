@@ -49,6 +49,8 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.ItemUpdateHistory;
+import com.slepeweb.cms.bean.ItemUpdateRecord.Action;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkNameOption;
@@ -58,11 +60,13 @@ import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrParams4Cms;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.bean.UndoRedoStatus;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.component.CmsHooker;
 import com.slepeweb.cms.component.ICmsHook;
 import com.slepeweb.cms.component.Navigation.Node;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.json.LinkParams;
@@ -70,6 +74,7 @@ import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.FieldForTypeService;
 import com.slepeweb.cms.service.FieldService;
 import com.slepeweb.cms.service.ItemService;
+import com.slepeweb.cms.service.ItemUpdateUndoService;
 import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.commerce.bean.Product;
@@ -92,6 +97,7 @@ public class RestController extends BaseController {
 	@Autowired private SolrService4Cms solrService4Cms;
 	@Autowired private NavigationController navigationController;
 	@Autowired private CmsHooker cmsHooker;
+	@Autowired private ItemUpdateUndoService itemUpdateUndoService;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -134,14 +140,18 @@ public class RestController extends BaseController {
 					1 + this.cmsService.getItemService().getCountByPath(i.getSite().getId(), i.getPath() + "/"));
 			
 			// Get recently-used tags, and full list of tags for the site
-			model.addAttribute(TAG_INPUT_SUPPORT_ATTR, getTagInfo(i.getSite().getId(), req));
+			model.addAttribute(AttrName.TAG_INPUT_SUPPORT, getTagInfo(i.getSite().getId(), req));
 			
 			// Get up, down, next, previous navigation links
 			model.addAttribute("_navkeys", getNavigationLinks(i));
 			
+			// Flagged items
 			Map<Long, ItemGist> trashFlags = getFlaggedItems(req);			
-			model.addAttribute("_flaggedItems", getSortedFlaggedItems(trashFlags));
-			model.addAttribute("_itemIsFlagged", trashFlags.get(i.getOrigId()) != null);
+			model.addAttribute(AttrName.FLAGGED_ITEMS, getSortedFlaggedItems(trashFlags));
+			model.addAttribute(AttrName.ITEM_IS_FLAGGED, trashFlags.get(i.getOrigId()) != null);
+			
+			// Item update history - supporting undo/redo functionality
+			model.addAttribute(AttrName.UNDO_REDO_STATUS, new UndoRedoStatus(this.getItemUpdateHistory(req)));
 		}		
 		
 		return "cms.item.editor";		
@@ -227,74 +237,82 @@ public class RestController extends BaseController {
 	@ResponseBody
 	public RestResponse updateItemCore(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
+				
+		// Keep a copy of the item being edited 
+		User u = getUser(req);
+		Item before = getEditableVersion(origId, u, true);
+		before.getTags();
+
+		// Get the item again, and update this instance
+		Item i = getEditableVersion(origId, u, true);	
 		
 		RestResponse resp = new RestResponse();
-		User u = getUser(req);
-		Item i = getEditableVersion(origId, u, true);
 		Template t = this.cmsService.getTemplateService().getTemplate(getLongParam(req, "template"));
-		Object[] data = new Object[3];
+		Object[] data = new Object[4];
 		
-		if (i != null) {
-			boolean wasPublished = i.isPublished();
-			String oldName = i.getName();
-			
-			i = i.setName(getParam(req, "name")).
-				setSimpleName(getParam(req, "simplename")).
-				setDateUpdated(new Timestamp(System.currentTimeMillis())).
-				setSearchable(getBooleanParam(req, "searchable")).
-				setPublished(getBooleanParam(req, "published")).
-				setTemplate(t);
-			
-			if (i.isShortcut()) {
-				// Whilst the corresponding form fields are disabled ...
-				i.setPublished(true);
-				i.setSearchable(false);
-			}
-			
-			Product p = null;
-			
+		boolean wasPublished = i.isPublished();
+		String oldName = i.getName();
+		
+		i = i.setName(getParam(req, "name")).
+			setSimpleName(getParam(req, "simplename")).
+			setDateUpdated(new Timestamp(System.currentTimeMillis())).
+			setSearchable(getBooleanParam(req, "searchable")).
+			setPublished(getBooleanParam(req, "published")).
+			setTemplate(t);
+		
+		if (i.isShortcut()) {
+			// Whilst the corresponding form fields are disabled ...
+			i.setPublished(true);
+			i.setSearchable(false);
+		}
+		
+		Product p = null;
+		
+		if (i.isProduct()) {
+			p = (Product) i;
+			p.
+				setPartNum(getParam(req, "partNum")).
+				setStock(getLongParam(req, "stock")).
+				setPrice(getLongParam(req, "price"));					
+		}
+		
+		try {
 			if (i.isProduct()) {
-				p = (Product) i;
-				p.
-					setPartNum(getParam(req, "partNum")).
-					setStock(getLongParam(req, "stock")).
-					setPrice(getLongParam(req, "price"));					
+				p.save();
+				resp.addMessage("Core product data successfully updated");
 			}
-			
-			try {
-				if (i.isProduct()) {
-					p.save();
-					resp.addMessage("Core product data successfully updated");
-				}
-				else {
-					i.save();
-					resp.addMessage("Core item data successfully updated");
-				}
-				
-				LOG.info(userLog(u, "updated core data for", i));
-				
-				// Navigation node with title assigned to saved item name IF changed
-				data[0] = i.getName().equals(oldName) ? null : i.getName();
-				
-				// Boolean value assigned IF version 1 has been published
-				data[1] = i.getVersion() == 1 && ! wasPublished && i.isPublished();
-				
-				// Boolean value assigned IF published status has changed
-				data[2] = wasPublished ^ i.isPublished();
-				
-				resp.setData(data);
-			}
-			catch (Exception e) {
-				return resp.setError(true).addMessage(e.getMessage());		
+			else {
+				i.save();
+				resp.addMessage("Core item data successfully updated");
 			}
 			
 			// Save item tags, if changes have been made
 			saveTags(i, req, resp);
 			
-			return resp;
+			// Save previous revision in user's undo history
+			ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
+			itemUpdateHistory.push(before, i, Action.core);
+			
+			LOG.info(userLog(u, "updated core data for", i));
+			
+			// Navigation node with title assigned to saved item name IF changed
+			data[0] = i.getName().equals(oldName) ? null : i.getName();
+			
+			// Boolean value assigned IF version 1 has been published
+			data[1] = i.getVersion() == 1 && ! wasPublished && i.isPublished();
+			
+			// Boolean value assigned IF published status has changed
+			data[2] = wasPublished ^ i.isPublished();
+			
+			data[3] = new UndoRedoStatus(itemUpdateHistory);
+			
+			resp.setData(data);
 		}
-				
-		return resp.setError(true).addMessage(String.format("No item found with id %d", origId));		
+		catch (Exception e) {
+			return resp.setError(true).addMessage(e.getMessage());		
+		}
+		
+		return resp;
 	}
 	
 	private void saveTags(Item i, HttpServletRequest req, RestResponse resp) {
@@ -316,7 +334,7 @@ public class RestController extends BaseController {
 			// latestTagValues now contains new selections
 			if (freshTagValues.size() > 0) {
 				@SuppressWarnings("unchecked")
-				List<String> storedTagValues = (List<String>) req.getSession().getAttribute(RECENT_TAGS_ATTR);
+				List<String> storedTagValues = (List<String>) req.getSession().getAttribute(AttrName.RECENT_TAGS);
 				
 				// Filter out duplicates
 				for (String v : storedTagValues) {
@@ -326,7 +344,7 @@ public class RestController extends BaseController {
 				}
 				
 				// And store result
-				req.getSession().setAttribute(RECENT_TAGS_ATTR, freshTagValues);
+				req.getSession().setAttribute(AttrName.RECENT_TAGS, freshTagValues);
 			}
 		}
 	}
@@ -430,7 +448,17 @@ public class RestController extends BaseController {
 	public RestResponse updateFields(@PathVariable long origId, HttpServletRequest request, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getEditableVersion(origId, getUser(request), true);
+		
+		// Keep a copy of the item being edited
+		User u = getUser(request);
+		Item before = getEditableVersion(origId, u, true);
+		
+		// Populate 'before' with field values
+		before.getFieldValueSet();
+
+		// Get the item again, and update this instance
+		Item i = getEditableVersion(origId, u, true);		
+
 		String variable, stringValue, dateValueStr = null, timeValueStr = null;
 		FieldType ft;
 		FieldValue fv;
@@ -594,6 +622,10 @@ public class RestController extends BaseController {
 				// Now save the item's field values
 				i.saveFieldValues();
 				
+				// Save previous revision in user's undo history
+				ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(request);
+				itemUpdateHistory.push(before, i, Action.field);				
+				resp.setData(new UndoRedoStatus(itemUpdateHistory));
 				resp.addMessage(String.format("%d fields updated", c));
 			}
 			catch (ResourceException e) {
@@ -976,13 +1008,25 @@ public class RestController extends BaseController {
 			return resp.setError(true).setData(mover.getId()).addMessage("Cannot move the root item");
 		}
 		
+		// Keep a record of the mover item, to store in ItemUpdateHistory
+		// TODO: Item before = getEditableVersion(moverId, u, true);
+		
 		Item target = getEditableVersion(targetId, u, true);
 		Item currentParent = getEditableVersion(moverParentId, u, true);
 		Item targetParent = getEditableVersion(targetParentId, u, true);
 		
 		try {
 			mover.move(currentParent, targetParent, target, mode);		
-			return resp.setError(false).setData(mover.getId()).addMessage("Item moved");
+			
+			/*
+			// Save previous revision of mover in user's undo history
+			ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
+			itemUpdateHistory.push(before, mover, Action.move);
+			*/
+						
+			return resp.setError(false).
+					// TODO: setData(new UndoRedoStatus(itemUpdateHistory)).
+					addMessage("Item moved");
 		}
 		catch (MissingDataException e) {
 			return resp.setError(true).setData(mover.getId()).addMessage(e.getMessage());
@@ -1001,7 +1045,13 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 
 		RestResponse resp = new RestResponse();
+		
+		// Keep a copy of the item being edited 
 		User u = getUser(req);
+		Item before = getEditableVersion(parentId, u, true);
+		before.getLinks();
+
+		// Get the item again, and update this instance
 		Item parent = getEditableVersion(parentId, u, true);
 		Item child;
 		List<Link> links = new ArrayList<Link>();
@@ -1055,13 +1105,19 @@ public class RestController extends BaseController {
 		}
 		
 		try {
-			parent.saveLinks();		
+			parent.saveLinks();
+			
+			// Save previous revision in user's undo history
+			ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
+			itemUpdateHistory.push(before, parent, Action.links);
+			
 			resp.addMessage(String.format("%d links saved", links.size()));
 			
 			Object[] response = new Object[] {
 					this.navigationController.doLazyNavOneLevel(parent.getOrigId(), parent.getSite().getId(), req),
 					shortcutAction,
-					shortCutTargetType == null ? null : shortCutTargetType.toLowerCase()
+					shortCutTargetType == null ? null : shortCutTargetType.toLowerCase(),
+					new UndoRedoStatus(itemUpdateHistory)
 			};
 			// Return a list of shortcuts as response data, so that leftnav tree can be refreshed
 			resp.setData(response);
@@ -1344,6 +1400,35 @@ public class RestController extends BaseController {
 		resp.addMessage("Copy ALL process completed");
 		return resp;		
 	}
+	
+	@RequestMapping(value="/item/update/undo", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse undoItemUpdate(HttpServletRequest req, ModelMap model) {	
+		
+		ItemUpdateHistory history = getItemUpdateHistory(req);
+		return this.itemUpdateUndoService.undo(history);
+	}
+
+	
+	@RequestMapping(value="/item/update/redo", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse redoItemUpdate(HttpServletRequest req, ModelMap model) {	
+		
+		ItemUpdateHistory history = getItemUpdateHistory(req);
+		return this.itemUpdateUndoService.redo(history);
+	}
+
+	
+	@RequestMapping(value="/item/update/clear", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse clearItemUpdate(HttpServletRequest req, ModelMap model) {	
+		
+		ItemUpdateHistory history = getItemUpdateHistory(req);
+		history.clear();
+		return new RestResponse().addMessage("Item update history cleared").
+				setData(new Object[] {new UndoRedoStatus(history), null, 0});
+	}
+
 	
 	private boolean flagItem(long origId, HttpServletRequest request, boolean reverse) {
 		Item i = this.getEditableVersion(origId, getUser(request));

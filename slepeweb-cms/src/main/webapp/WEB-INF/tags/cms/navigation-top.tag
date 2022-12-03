@@ -28,6 +28,7 @@
 			<cms:navigation-history />
 		</div>
 		
+		<!-- Search bar INCLUDES icon to flag current item -->
 		<cms:searchBar />
 		
 		<div id="leftnav-hider">

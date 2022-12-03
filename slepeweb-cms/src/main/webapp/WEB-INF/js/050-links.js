@@ -163,16 +163,17 @@ _cms.links.behaviour.save = function(nodeKey) {
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			processData: false,
-			success: function(obj, status, z) {
-				_cms.support.flashMessage(obj);
+			success: function(resp, status, z) {
+				_cms.support.flashMessage(resp);
 				_cms.links.refresh.tab(nodeKey);
 				_cms.links.activateSaveButton(false);
+				_cms.undoRedo.displayAll(resp.data[3]);				
 				
-				if (! obj.error && obj.data) {
+				if (! resp.error && resp.data) {
 					// Need to refresh the FancyTree,
 					// since one or more shortcuts have been added/removed
-					//_cms.leftnav.refreshShortcuts("" + _cms.editingItemId, obj.data[0]);
-					_cms.leftnav.refreshShortcut("" + nodeKey, obj.data[1], obj.data[2]);
+					//_cms.leftnav.refreshShortcuts("" + _cms.editingItemId, resp.data[0]);
+					_cms.leftnav.refreshShortcut("" + nodeKey, resp.data[1], resp.data[2]);
 				}
 			},
 			error: function(obj, status, z) {

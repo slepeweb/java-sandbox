@@ -17,6 +17,10 @@
 	_cms.siteDefaultLanguage = "en";
 	_cms.editingItemIsShortcut = false;
 	
+	_cms.undoRedo = {
+			status: ${_undoRedoStatus}
+	};
+
 	<c:if test="${not empty editingItem}">
 		_cms.editingItemId = ${editingItem.origId};
 		_cms.siteId = ${editingItem.site.id};
@@ -81,3 +85,4 @@
 	});
 </script>
 
+<script src="${applicationContextPath}/resources/js/undoRedo.js" type="text/javascript"></script>

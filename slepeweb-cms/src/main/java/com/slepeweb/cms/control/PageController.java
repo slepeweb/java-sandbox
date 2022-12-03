@@ -14,13 +14,16 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.UndoRedoStatus;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.LoginService;
 import com.slepeweb.cms.service.SiteService;
@@ -47,6 +50,9 @@ public class PageController extends BaseController {
 		}
 		else {
 			getAllEditableSites(req, model);
+			
+			// undo/redo status
+			getUndoRedoStatus(req, model);
 		}
 		return "cms.editor";
 	}
@@ -79,6 +85,10 @@ public class PageController extends BaseController {
 		}
 		
 		getAllEditableSites(req, model);
+		
+		// undo/redo status
+		getUndoRedoStatus(req, model);
+		
 		return "cms.editor";
 	}
 	
@@ -112,6 +122,10 @@ public class PageController extends BaseController {
 		model.addAttribute("editingItem", i);
 		
 		getAllEditableSites(req, model);
+		
+		// undo/redo status
+		getUndoRedoStatus(req, model);
+
 		return "cms.editor";
 	}
 	
@@ -171,4 +185,16 @@ public class PageController extends BaseController {
 		
 		m.addAttribute("_allEditableSites", sites);
 	}
+	
+	private void getUndoRedoStatus(HttpServletRequest req, ModelMap m) {
+		UndoRedoStatus status = new UndoRedoStatus(getItemUpdateHistory(req));
+		
+		try {
+			m.addAttribute(AttrName.UNDO_REDO_STATUS, new ObjectMapper().writeValueAsString(status));
+		}
+		catch (Exception e) {
+			// Log error
+		}
+	}
+
 }

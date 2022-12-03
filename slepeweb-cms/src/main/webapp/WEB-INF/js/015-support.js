@@ -8,20 +8,21 @@ _cms.support.refreshAllTabs = function(html, activeTab) {
 	}
 	
 	// Focus on same tab as previous render
-	var tabName;
-	var tabNum = 0;
-	var activeTabId = 0;
+	_cms.support.activateTab(activeTab);
+}
+
+_cms.support.activateTab = function(name) {
+	let activeTabId = 0;
+	let tabNum = 0;
 	
-	if (activeTab) {
-		$("#editor-tabs a").each(function() {
-			tabName = $(this).attr("href").substring(1);
-			if (activeTab == tabName) {
-				activeTabId = tabNum;
-				return false;
-			}
-			tabNum++;
-		});
-	}
+	$("#editor-tabs a").each(function() {
+		let tabName = $(this).attr("href").substring(1);
+		if (tabName === name) {
+			activeTabId = tabNum;
+			return false;
+		}
+		tabNum++;
+	});
 	
 	$("#item-editor").tabs({active: activeTabId});
 }
@@ -299,12 +300,12 @@ _cms.support.ajax = function(method, url, data, success, fail) {
 			console.log("Error: " + resp);
 		}
 	}
-	
 	$.ajax(url, params);
+	
 }
 
 
-_cms.support.renderItemForms = function(nodeKey, activeTab) {
+_cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 
 	$.ajax(_cms.ctx + "/rest/item/editor", {
 		cache: false,
@@ -327,6 +328,10 @@ _cms.support.renderItemForms = function(nodeKey, activeTab) {
 			_cms.move.onrefresh(nodeKey);			
 			_cms.support.disableFormsIfReadonly();
 			_cms.support.itemFlagger();
+			
+			if (callback) {
+				callback(args);
+			}
 		}
 	});
 };

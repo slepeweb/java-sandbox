@@ -21,20 +21,20 @@ import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.ItemUpdateHistory;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.TagInputSupport;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.component.CmsHooker;
 import com.slepeweb.cms.component.ICmsHook;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
 
 @Controller
 public class BaseController {
 	
-	public static final String TAG_INPUT_SUPPORT_ATTR = "_tis";
-	public static final String RECENT_TAGS_ATTR = "_recentTags";
 	
 	@Autowired protected CmsService cmsService;
 	@Autowired protected CmsHooker cmsHooker;
@@ -162,10 +162,10 @@ public class BaseController {
 		tis.setAll(this.cmsService.getTagService().getDistinctTagValues4Site(siteId));		
 		
 		// Recently added tags are stored in the session
-		Object recent = req.getSession().getAttribute(RECENT_TAGS_ATTR);
+		Object recent = req.getSession().getAttribute(AttrName.RECENT_TAGS);
 		if (recent == null) {
 			recent = new ArrayList<Tag>();
-			req.getSession().setAttribute(RECENT_TAGS_ATTR, recent);
+			req.getSession().setAttribute(AttrName.RECENT_TAGS, recent);
 		}
 		
 		tis.setRecent((List<String>) recent);
@@ -174,11 +174,10 @@ public class BaseController {
 
 	@SuppressWarnings("unchecked")
 	protected Map<Long, ItemGist> getFlaggedItems(HttpServletRequest request) {
-		String name = "_flaggedItems";
-		Map<Long, ItemGist> flags = (Map<Long, ItemGist>) request.getSession().getAttribute(name);
+		Map<Long, ItemGist> flags = (Map<Long, ItemGist>) request.getSession().getAttribute(AttrName.FLAGGED_ITEMS);
 		if (flags == null) {
 			flags = new HashMap<Long, ItemGist>();
-			request.getSession().setAttribute(name, flags);
+			request.getSession().setAttribute(AttrName.FLAGGED_ITEMS, flags);
 		}
 		return flags;
 	}
@@ -195,5 +194,16 @@ public class BaseController {
 		
 		return gists;
 	}
+	
+	protected ItemUpdateHistory getItemUpdateHistory(HttpServletRequest request) {
+		ItemUpdateHistory h = (ItemUpdateHistory) request.getSession().getAttribute(AttrName.UNDO_REDO_STATUS);
+		if (h == null) {
+			h = new ItemUpdateHistory();
+			request.getSession().setAttribute(AttrName.UNDO_REDO_STATUS, h);
+		}
+		
+		return h;
+	}
+	
 }
 

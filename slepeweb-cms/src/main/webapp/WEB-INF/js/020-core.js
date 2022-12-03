@@ -56,30 +56,26 @@ _cms.core.behaviour.update = function(nodeKey) {
 					
 					// Name may have changed, so navigation tree will need updating, and 
 					// many of the tabs will need refreshing
-					if (resp.data[0]) {
-						var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
-						if (node) {
-							node.setTitle(resp.data[0]);
-						}
-						
-						_cms.support.updateItemName(resp.data[0]);
-						_cms.copy.refresh.tab(nodeKey);
-						_cms.support.refreshHistory(_cms.siteId);
+					var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
+					if (node) {
+						node.setTitle(resp.data[0]);
 					}
+					
+					_cms.support.updateItemName(resp.data[0]);
+					_cms.copy.refresh.tab(nodeKey);
+					_cms.support.refreshHistory(_cms.siteId);
 					
 					_cms.core.refresh.tab(nodeKey);
 					
-					if (resp.data[2]) {
-						// The published status of the item has changed
-						_cms.version.refresh.tab(nodeKey);
-					}
+					// The published status of the item has changed
+					_cms.version.refresh.tab(nodeKey);
+
+					// The first version has reached published status
+					// TODO: This is NOT needed on a staging server
+					// TODO: Why refresh the media tab?
+					_cms.media.refresh.tab(nodeKey);
 					
-					if (resp.data[1]) {
-						// The first version has reached published status
-						// TODO: This is NOT needed on a staging server
-						// TODO: Why refresh the media tab?
-						_cms.media.refresh.tab(nodeKey);
-					}
+					_cms.undoRedo.displayAll(resp.data[3]);
 				}				
 			},
 			error: function(json, status, z) {

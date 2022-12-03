@@ -30,7 +30,7 @@ header select {
 }
 
 header div#item-flag {
-	margin-top: 1.0em;
+/* 	margin-top: 1.0em; */
 	font-size: 1.5em;
 }
 
@@ -525,6 +525,17 @@ div#flagged-items-section button {
 
 img.egg-timer-gif {
 	width: 100%;
+}
+
+div#undo-icon, div#redo-icon {
+	visibility: hidden;
+	cursor: pointer;
+}
+
+div#specials {
+	margin-top: 1.0em;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);	
 }
 
 /* Probably used in search results dialog */

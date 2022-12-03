@@ -42,11 +42,12 @@ _cms.field.update = function(nodeKey, formData) {
 		cache: false,
 		data: formData, 
 		dataType: "json",
-		success: function(obj, status, z) {
+		success: function(resp, status, z) {
 			_cms.dialog.close(_cms.dialog.confirmFieldUpdate);
-			_cms.support.flashMessage(obj);
+			_cms.support.flashMessage(resp);
 			_cms.field.refresh.tab(nodeKey);
 			_cms.misc.flaggedItems.refresh(nodeKey);
+			_cms.undoRedo.displayAll(resp.data);
 		},
 		error: function(obj, status, z) {
 			_cms.dialog.close(_cms.dialog.confirmFieldUpdate);

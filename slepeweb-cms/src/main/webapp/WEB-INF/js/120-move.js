@@ -40,6 +40,7 @@ _cms.move.action = function(nodeKey) {
 						targetNode.setActive(false);
 						_cms.move.refresh.tab(nodeKey);
 						_cms.core.refresh.tab(nodeKey);
+						// TODO: _cms.undoRedo.displayAll(obj.data);
 					}
 					_cms.support.flashMessage(obj);
 				},

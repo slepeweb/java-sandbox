@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemGist;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.CookieService;
 
 @Controller
@@ -37,7 +38,7 @@ public class RefreshController extends BaseController {
 		}
 				
 		// Get recently-used tags, and full list of tags for the site
-		model.addAttribute(TAG_INPUT_SUPPORT_ATTR, getTagInfo(i.getSite().getId(), req));
+		model.addAttribute(AttrName.TAG_INPUT_SUPPORT, getTagInfo(i.getSite().getId(), req));
 		
 		return "cms.refresh.core";		
 	}

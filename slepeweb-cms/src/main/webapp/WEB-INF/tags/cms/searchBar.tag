@@ -7,8 +7,22 @@
 		<button type="button"><span><i class="fa fa-search"></i></span></button>	
 	</div>			
 		
-	<div id="item-flag" title="Flag item for deletion">
-		<i class="fa-solid fa-flag item-flag <c:if test='${_itemIsFlagged}'>flagged</c:if>"></i>
+	<div id="specials">
+		<div id="item-flag" title="Flag item for bulk operations">
+			<i class="fa-solid fa-flag item-flag <c:if test='${_itemIsFlagged}'>flagged</c:if>"></i>
+		</div>
+		
+		<div id="undo-icon" title="">
+			<i class="fa-solid fa-rotate-left fa-2x"></i>
+		</div>
+		
+		<div id="redo-icon" title="">
+			<i class="fa-solid fa-rotate-right fa-2x"></i>
+		</div>
+		
+		<div id="kill-icon" title="Clear item update history">
+			<i class="fa-solid fa-xmark fa-2x"></i>
+		</div>
 	</div>
 </div>
 
