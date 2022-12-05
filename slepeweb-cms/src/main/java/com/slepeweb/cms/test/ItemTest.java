@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.bean.MoverItem;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Tag;
+import com.slepeweb.cms.service.ItemWorkerService;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.cms.utils.LogUtil;
 
@@ -21,6 +23,7 @@ public class ItemTest extends BaseTest {
 	private static Logger LOG = Logger.getLogger(ItemTest.class);
 	
 	@Autowired TagService tagService;
+	@Autowired ItemWorkerService itemWorkerService;
 		
 	public TestResultSet execute() {
 		
@@ -63,68 +66,66 @@ public class ItemTest extends BaseTest {
 			}
 			else {	
 				// Move the 'about' article item to the 'news' section
-				if (aboutSectionItem.move(rootItem, newsSectionItem, newsSectionItem)) {				
-					// 4010: Assert news section now has 3 children
-					int count = newsSectionItem.getBoundItems().size();
-					r = trs.execute(4010);
-					r.setNotes("News section has " + count + " children");
-					r.test(count == 3);
-					
-					// 4020: Check path of article item has been updated
-					String articlePath = "/news/about/about-us";
-					aboutSectionItem = site.getItem("/news/about");
-					Item article = null;
-					
-					if (aboutSectionItem != null) {
-						for (Item child : aboutSectionItem.getBoundItems()) {
-							if (child.getPath().equals(articlePath)) {
-								article = child;
-								break;
-							}
-						}
-						
-						r = trs.execute(4020);
-						if (article != null) {
-							r.setNotes(LogUtil.compose("Path is", articlePath));
-							r.test(articlePath.equals("/news/about/about-us"));
-						}
-						else {
-							r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
+				this.itemWorkerService.move(new MoverItem(aboutSectionItem, newsSectionItem, MoverItem.MOVE_OVER));			
+				// 4010: Assert news section now has 3 children
+				int count = newsSectionItem.getBoundItems().size();
+				r = trs.execute(4010);
+				r.setNotes("News section has " + count + " children");
+				r.test(count == 3);
+				
+				// 4020: Check path of article item has been updated
+				String articlePath = "/news/about/about-us";
+				aboutSectionItem = site.getItem("/news/about");
+				Item article = null;
+				
+				if (aboutSectionItem != null) {
+					for (Item child : aboutSectionItem.getBoundItems()) {
+						if (child.getPath().equals(articlePath)) {
+							article = child;
+							break;
 						}
 					}
-				
-					// Restore the links
-					if (aboutSectionItem != null && rootItem != null) {
-						
-						// Move the 'about' article item back to its original location
-						if (aboutSectionItem.move(newsSectionItem, rootItem, rootItem)) {						
-							// 4030: Assert news section has original 2 children
-							newsSectionItem = site.getItem("/news");
-							count = newsSectionItem.getBoundItems().size();
-							r = trs.execute(4030);
-							r.setNotes("News section has " + count + " children");
-							r.test(count == 2);
-							
-							// 4040: Re-check path of article item
-							aboutSectionItem = site.getItem("/about");
-							articlePath = "/about/about-us";
-							article = null;
-							for (Item child : aboutSectionItem.getBoundItems()) {
-								if (child.getPath().equals(articlePath)) {
-									article = child;
-									break;
-								}
-							}
-							
-							r = trs.execute(4040);
-							if (article != null) {
-								r.setNotes(LogUtil.compose("Path is", articlePath));
-								r.test(articlePath.equals("/about/about-us"));
-							}
-							else {
-								r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
-							}
+					
+					r = trs.execute(4020);
+					if (article != null) {
+						r.setNotes(LogUtil.compose("Path is", articlePath));
+						r.test(articlePath.equals("/news/about/about-us"));
+					}
+					else {
+						r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
+					}
+				}
+			
+				// Restore the links
+				if (aboutSectionItem != null && rootItem != null) {
+					
+					// Move the 'about' article item back to its original location
+					this.itemWorkerService.move(new MoverItem(aboutSectionItem, rootItem, MoverItem.MOVE_OVER));			
+					// 4030: Assert news section has original 2 children
+					newsSectionItem = site.getItem("/news");
+					count = newsSectionItem.getBoundItems().size();
+					r = trs.execute(4030);
+					r.setNotes("News section has " + count + " children");
+					r.test(count == 2);
+					
+					// 4040: Re-check path of article item
+					aboutSectionItem = site.getItem("/about");
+					articlePath = "/about/about-us";
+					article = null;
+					for (Item child : aboutSectionItem.getBoundItems()) {
+						if (child.getPath().equals(articlePath)) {
+							article = child;
+							break;
 						}
+					}
+					
+					r = trs.execute(4040);
+					if (article != null) {
+						r.setNotes(LogUtil.compose("Path is", articlePath));
+						r.test(articlePath.equals("/about/about-us"));
+					}
+					else {
+						r.setNotes(LogUtil.compose("No item found with path", articlePath)).fail();
 					}
 				}
 				
@@ -227,7 +228,7 @@ public class ItemTest extends BaseTest {
 					r.test(diff == 1);
 					
 					// Restore the trashed section
-					newsSectionItem = this.cmsService.getItemService().restoreItem(newsSectionItem.getOrigId());
+					newsSectionItem = this.cmsService.getItemWorkerService().restoreItem(newsSectionItem.getOrigId());
 					
 					// 4110: Assert bin size back to original
 					int finalBinCount = this.cmsService.getItemService().getBinCount();
@@ -239,8 +240,8 @@ public class ItemTest extends BaseTest {
 			
 			// 4120
 			// Restore 2 news items trashed earlier when parent folder was trashed
-			Item newsItem = this.cmsService.getItemService().restoreItem(newsItemOrigId_101);
-			this.cmsService.getItemService().restoreItem(newsItemOrigId_102);
+			Item newsItem = this.cmsService.getItemWorkerService().restoreItem(newsItemOrigId_101);
+			this.cmsService.getItemWorkerService().restoreItem(newsItemOrigId_102);
 			
 			if (newsItem != null) {
 				r = trs.execute(4120);

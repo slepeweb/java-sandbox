@@ -3,6 +3,9 @@
         
 <cms:debug><!-- tags/cms/editor/misc.tag --></cms:debug>
 
+<p class="in-your-face-text">NOTE that the bulk operations in this section can NOT be reversed using the undo/redo functionality,
+	which only works for one item at a time.</p>
+
 <div id="misc-accordion">
 	<h3>Trash current item</h3>
 	<div class="section-ops delete">

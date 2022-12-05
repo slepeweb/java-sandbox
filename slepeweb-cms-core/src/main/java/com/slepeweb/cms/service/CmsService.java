@@ -17,6 +17,7 @@ public interface CmsService {
 	ItemTypeService getItemTypeService();
 	FieldService getFieldService();
 	ItemService getItemService();
+	ItemWorkerService getItemWorkerService();
 	LinkService getLinkService();
 	LinkNameService getLinkNameService();
 	LinkTypeService getLinkTypeService();

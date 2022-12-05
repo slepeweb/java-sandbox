@@ -1,7 +1,6 @@
 package com.slepeweb.cms.service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,18 +10,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
-import com.slepeweb.cms.bean.FieldForType;
-import com.slepeweb.cms.bean.FieldValue;
-import com.slepeweb.cms.bean.FieldValueSet;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.bean.LinkType;
-import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
-import com.slepeweb.cms.except.NotRevertableException;
-import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.RowMapperUtil;
 import com.slepeweb.commerce.bean.Product;
@@ -31,9 +22,6 @@ import com.slepeweb.commerce.bean.Product;
 public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	private static Logger LOG = Logger.getLogger(ItemServiceImpl.class);
-	private static final String MOVE_BEFORE = "before";
-	private static final String MOVE_AFTER = "after";
-	private static final String MOVE_OVER = "over";
 
 	private final static String SELECT_TEMPLATE = 
 			"select i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, s.secured, " +
@@ -211,7 +199,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		
 	}
 	
-	private void updateOrigId(Item i) {
+	public void updateOrigId(Item i) {
 		this.jdbcTemplate.update(
 				"update item set origid = ? where id = ?",
 				i.getOrigId(), i.getId());
@@ -219,7 +207,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		LOG.info(compose("Updated original id", i));			
 	}
 	
-	private void updateEditable(Item i) {
+	public void updateEditable(Item i) {
 		this.jdbcTemplate.update(
 				"update item set editable = ? where id = ?",
 				i.isEditable(), i.getId());
@@ -253,95 +241,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				i.getSite().getId(), i.getPath(), i.getVersion() - max);
 		
 		LOG.info(compose("Older versions deleted", i));
-	}
-	
-	public void saveFieldValues(Item i) throws ResourceException {
-		if (i != null && i.getFieldValueSet() != null) {
-			for (FieldValue fv : i.getFieldValueSet().getAllValues()) {
-				fv.save();
-			}
-		}
-		
-		this.solrService4Cms.save(i);
-	}
-	
-	@SuppressWarnings("unused")
-	private void saveDefaultFieldValues(Item i) throws ResourceException {
-		FieldValueSet fvs = i.getFieldValueSet();
-		String defaultLanguage = i.getSite().getLanguage();
-		String[] additionalLanguages = i.getSite().getExtraLanguagesArray();
-		
-		if (fvs == null || fvs.getAllValues().size() == 0) {
-			fvs = new FieldValueSet(i.getSite());
-			i.setFieldValues(fvs);
-			
-			for (FieldForType fft : this.fieldForTypeService.getFieldsForType(i.getType().getId())) {
-				saveDefaultFieldValue(i, fft, defaultLanguage, fvs);
-				for (String lang : additionalLanguages) {
-					saveDefaultFieldValue(i, fft, lang, fvs);
-				}
-			}
-		}
-	}
-	
-	private void saveDefaultFieldValue(Item i, FieldForType fft, String language, FieldValueSet fvs) throws ResourceException {
-		FieldValue fv = CmsBeanFactory.makeFieldValue().
-			setField(fft.getField()).
-			setItemId(i.getId()).
-			setValue(fft.getField().getDefaultValueObject()).
-			setLanguage(language);
-		
-		fv.save();
-		fvs.addFieldValue(fv);
-	}
-
-	public void saveLinks(Item i) throws ResourceException, DuplicateItemException {
-		saveLinks(i, null);
-	}
-	
-	private void saveLinks(Item i, Item dbRecord) throws ResourceException, DuplicateItemException {
-		if (i.getLinks() != null) {
-			if (duplicateLinks(i.getLinks())) {
-				throw new DuplicateItemException("Items can only be linked once, regardless of link type or name");
-			}
-			
-			if (dbRecord == null) {
-				dbRecord = getItem(i.getId());
-			}
-			
-			removeStaleLinks(dbRecord.getLinks(), i.getLinks());
-			
-			for (Link l : i.getLinks()) {
-				l.save();
-			}
-		}
-	}
-	
-	private boolean duplicateLinks(List<Link> links) {
-		Link a, b;
-		
-		for (int i = 0; i < links.size(); i++) {
-			a = links.get(i);
-			for (int j = i + 1; j < links.size(); j++) {
-				b = links.get(j);
-				if (a.getChild().getId() == b.getChild().getId()) {
-					return true;
-				}
-			}
-		}
-		
-		return false;
-	}
-	
-	private void removeStaleLinks(List<Link> dbRecordLinks, List<Link> updatedLinks) {
-		if (dbRecordLinks != null && updatedLinks != null) {
-			for (Link dbLink : dbRecordLinks) {
-				if (! updatedLinks.contains(dbLink) && ! dbLink.getType().equals("binding")) {
-					dbLink.delete();
-					LOG.info(compose("Deleted old inline/relation link", dbLink));
-				}
-			}
-		}
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -453,30 +352,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return count;
 	}
 	
-	public Item restoreItem(Long origId) {
-		restoreSelectedItems(new long[] {origId});
-		return getItemByOriginalId(origId);
-	}
-
-	public Item revert(Item i) throws ResourceException {
-		if (i.getVersion() > 1) {
-			deleteItem(i.getOrigId(), i.getVersion());
-			Item r = getItem(i.getOrigId(), i.getVersion() - 1);
-			if (r != null) {
-				r.setEditable(true);
-				updateEditable(r);
-				this.solrService4Cms.save(r);
-				return r;
-			}
-			else {
-				throw new NotRevertableException(String.format("Item not found with original id %d", i.getOrigId()));				
-			}
-		}
-		else {		
-			throw new NotRevertableException("Cannot revert from existing version 1");
-		}
-	}
-
 	public void deleteAllVersions(Long origId) {
 		if (this.jdbcTemplate.update("delete from item where origid = ?", origId) > 0) {
 			LOG.warn(compose("Deleted item and all its versions", String.valueOf(origId)));
@@ -582,240 +457,6 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
 	}
 	
-	public boolean move(Item mover, Item currentParent, Item targetParent, Item target) throws ResourceException {
-		
-		return move(mover, currentParent, targetParent, target, "over");
-	}
-	
-	/*
-	 * This provides a relative move, ie before/after target.
-	 * If mode == "over", then target is effectively a new parent.
-	 */
-	public boolean move(Item mover, Item currentParent, Item targetParent, Item target, 
-			String mode) throws ResourceException {
-		
-		if (mover == null || target == null || currentParent == null || mode == null) {
-			throw new ResourceException("Missing item data for move");
-		}
-		
-		LOG.debug(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mode.toUpperCase(), target));			
-		LOG.debug(compose("  Old parent", currentParent));		
-		Item newParent = mode.equals(MOVE_OVER) ? target : targetParent;
-		LOG.debug(compose("  New parent", newParent));		
-		
-		// Cannot move an item to one of its descendants
-		if (newParent.getPath().startsWith(mover.getPath())) {
-			throw new ResourceException("Cannot move an item to one of its descendants");
-		}
-		
-		// Cannot create a binding to a parent when the same item is already linked
-		// to the parent as an inline/relation/shortcut.
-		for (Link l : newParent.getAllLinksBarBindings()) {
-			if (l.getChild().equalsId(mover)) {
-				throw new ResourceException("This item is already linked to the new parent as a relation/inline/shortcut");
-			}
-		}
-		
-		// Break the parent link for the mover, EVEN IF old-parent = new-parent
-		this.linkService.deleteLinks(currentParent.getId(), mover.getId());
-		LOG.debug("  Removed links between mover and old parent");		
-		
-		// Bind to new parent - we'll save() the mover link later
-		Link moverLink = CmsBeanFactory.makeLink().
-				setParentId(newParent.getId()).
-				setChild(mover).
-				setType(LinkType.binding).
-				setName("std");
-		
-		// Add mover to new parent's bindings
-		List<Link> bindings = newParent.getBindings();
-		
-		if (mode.equals(MOVE_OVER)) {
-			bindings.add(moverLink);
-			LOG.debug("  Added mover to end of new parent's existing bindings");	
-		}
-		else {
-			// If mode is 'before' or 'after', identify insertions point and re-order all siblings
-			int cursor = -1;
-			for (Link l : bindings) {
-				if (l.getChild().getId().equals(target.getId())) {
-					cursor = bindings.indexOf(l);
-					break;
-				}
-			}
-			
-			// Now insert the mover into the bindings list
-			if (cursor > -1) {
-				if (mode.equals(MOVE_BEFORE)) {
-					bindings.add(cursor, moverLink);
-				}
-				else if (mode.equals(MOVE_AFTER)) {
-					if (cursor < bindings.size()) {
-						bindings.add(cursor + 1, moverLink);
-					}
-					else {
-						bindings.add(moverLink);
-					}
-				}
-				LOG.debug("  Inserted mover into new parent's existing bindings");	
-			}
-			else {
-				bindings.add(moverLink);
-				LOG.warn("  Failed to determine point of insertion - placed at end");	
-			}
-		}
-		
-		// Re-order bindings from 0, then save
-		int cursor = 0;
-		for (Link l : bindings) {
-			if (l.equals(moverLink) || l.getOrdering() != cursor) {
-				l.setOrdering(cursor);
-				l.save();
-			}
-			cursor++;
-		}
-		
-		// Update paths of descendant items
-		String divider = newParent.isRoot() ? "" : "/";
-		String newChildPath = newParent.getPath() + divider + mover.getSimpleName();
-		updateDescendantPaths(mover.getPath(), newChildPath);
-		
-		// Update child item path
-		updateItemPath(mover.getId(), newChildPath);
-		
-		// Force newParent links to be re-calculated, since they have now changed
-		newParent.setLinks(null);
-		
-		// Update solr; normally, this is done by save()
-		this.solrService4Cms.save(mover);
-		
-		return true;
-	}
-	
-	public Item copy(Item source, String name, String simplename) throws ResourceException {
-		return copy(false, source, name, simplename);
-	}
-	
-	private Item copy(boolean isNewVersion, Item source, String name, String simplename)
-			 throws ResourceException {
-
-		/*
-		 *  The source instance will change subtly after new version is created (eg editable property),
-		 *  so keep record of required data before the new version is created.
-		 */
-		int origVersion = source.getVersion();
-		Item parent = source.getParent();
-		int origOrdering = this.linkService.getLink(parent.getId(), source.getId()).getOrdering();
-		long sourceId = source.getId();
-		long sourceOrigId = source.getOrigId();
-		FieldValueSet origFieldValues = source.getFieldValueSet();
-		List<Link> origLinks = source.getLinks();
-		
-		// Core data
-		Item ni = CmsBeanFactory.makeItem(source.getType().getName());
-		ni.assimilate(source);
-		ni.
-			setParent(parent).
-			setDateCreated(new Timestamp(System.currentTimeMillis()));
-		
-		if (isNewVersion) {
-			ni.
-				setDeleted(false).
-				setEditable(true).
-				setPublished(false).
-				setVersion(origVersion + 1);
-		}
-		else {
-			ni.
-				setName(name).
-				setSimpleName(simplename).
-				setVersion(1);
-		}
-		
-		ni.setDateUpdated(ni.getDateCreated());
-		ni = save(ni);
-		
-		/*
-		 * The copy is assigned a new unique id after it is saved, and the same
-		 * value is reflected in the origid field. 
-		 * 
-		 * The copy is also bound to the same
-		 * parent item, but at the end of its list. We need to override that at 
-		 * this point, so that it appears in the same position as the original was.
-		 */		
-		if (isNewVersion) {
-			// Overwrite the 'origid' field, to be the same as the source
-			ni.setOrigId(sourceOrigId);
-			updateOrigId(ni);
-		}
-		
-		// Overwrite the ordering of the parent link
-		Link parentLink2NewVersion = this.linkService.getLink(parent.getId(), ni.getId());
-		parentLink2NewVersion.setOrdering(origOrdering);
-		parentLink2NewVersion.save();
-		
-		// Field data
-		FieldValueSet fvs = new FieldValueSet(source.getSite());
-		FieldValue nfv;
-		
-		for (FieldValue fv : origFieldValues.getAllValues()) {
-			nfv = CmsBeanFactory.makeFieldValue();
-			nfv.assimilate(fv);
-			nfv.setItemId(ni.getId());
-			fvs.addFieldValue(nfv);
-		}
-		
-		ni.setFieldValues(fvs);
-		saveFieldValues(ni);
-		
-		// Links
-		List<Link> nll = new ArrayList<Link>(origLinks.size());
-		Link nl;
-		for (Link l : origLinks) {
-			// DO NOT copy bindings, only relations, inlines and shortcuts UNLESS
-			// this is a new version of an existing item.
-			if (isNewVersion || ! l.getType().equals(LinkType.binding)) {
-				nl = CmsBeanFactory.makeLink();
-				nl.assimilate(l);
-				nl.
-					setParentId(ni.getId()).
-					setChild(l.getChild());
-				
-				nll.add(nl);
-			}
-		}
-		
-		ni.setLinks(nll);		
-		saveLinks(ni);
-		
-		// Does this item have media?
-		Media m = this.mediaService.getMedia(sourceId);
-		Media nm;
-		if (m != null) {
-			nm = CmsBeanFactory.makeMedia();
-			nm.assimilate(m);
-			nm.setItemId(ni.getId());
-			nm.setUploadStream(m.getDownloadStream());
-			this.mediaService.save(nm);
-		}
-		
-		/* 
-		 * Return the item instance with nullified field values and links,
-		 * forcing these data to be re-calculated on demand.
-		 */
-		return ni.setLinks(null).setFieldValues(null);
-	}
-	
-	public Item version(Item source) throws ResourceException {
-		if (source.getType().getName().equals(ItemType.CONTENT_FOLDER_TYPE_NAME)) {
-			throw new NotVersionableException(String.format("%s [%s]", "Cannot version item type", ItemType.CONTENT_FOLDER_TYPE_NAME));
-		}
-		else if (! source.isPublished()) {
-			throw new NotVersionableException("Cannot version un-published item");
-		}
-		return copy(true, source, null, null);
-	}
-	
 	@SuppressWarnings("deprecation")
 	public int getCountByPath(Long siteId, String path) {
 		return this.jdbcTemplate.queryForInt(
@@ -861,13 +502,13 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 * TODO: This approach fails if (for some reason like coding error) an descendant item's path
 	 *       has become corrupted - it will get ignored.
 	 */
-	private void updateDescendantPaths(String oldPath, String newPath) {
+	public void updateDescendantPaths(String oldPath, String newPath) {
 		if (! oldPath.endsWith("/")) oldPath += "/";
 		if (! newPath.endsWith("/")) newPath += "/";
 		this.jdbcTemplate.update("update item set path = replace(path, ?, ?) where path like ?", oldPath, newPath, oldPath + "%");
 	}
 	
-	private void updateItemPath(Long itemId, String newPath) {
+	public void updateItemPath(Long itemId, String newPath) {
 		this.jdbcTemplate.update("update item set path = ? where id = ?", newPath, itemId);
 	}
 }

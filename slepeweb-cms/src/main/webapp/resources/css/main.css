@@ -538,6 +538,11 @@ div#specials {
 	grid-template-columns: repeat(5, 1fr);	
 }
 
+.in-your-face-text {
+	font-size: 1.3em;
+	font-weight: bold;
+}
+
 /* Probably used in search results dialog */
 div.cms-icon-boy {background-position: -33px 0px; background-image: url("fancytree-cms-icons.gif");}
 div.cms-icon-girl {background-position: -48px 0px; background-image: url("fancytree-cms-icons.gif");}

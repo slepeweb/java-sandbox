@@ -24,6 +24,7 @@ _cms.undoRedo.behaviour = function(selector, option) {
 				let undoRedoStatus = resp.data[0];
 				let editorTabName = resp.data[1];
 				let targetItemOrigId = resp.data[2];
+				let moverData = resp.data[3];
 				
 				// Re-render the undo/redo icons on the page, according to the new status
 				_cms.undoRedo.displayAll(undoRedoStatus);
@@ -41,6 +42,16 @@ _cms.undoRedo.behaviour = function(selector, option) {
 						_cms[editorTabName].refresh.tab(targetItemOrigId);
 						_cms.support.activateTab(editorTabName + '-tab');
 						_cms.support.flashMessage({error: resp.error, message: resp.message});
+					}
+					
+					if (editorTabName === 'move') {
+						var position = moverData[0];
+						var moverNode = _cms.leftnav.tree.getNodeByKey(targetItemOrigId);
+						var targetNode = _cms.leftnav.tree.getNodeByKey(moverData[1]);
+	
+						moverNode.moveTo(targetNode, position);
+						moverNode.setActive(true);
+						_cms.core.refresh.tab(targetItemOrigId);
 					}
 				}
 				else {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
+import com.slepeweb.cms.service.ItemWorkerService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.cms.service.TemplateService;
@@ -20,6 +21,7 @@ public class SolrTest extends BaseTest {
 	private static String AFTER_TEXT = "After";
 
 	@Autowired private ItemService itemService;
+	@Autowired private ItemWorkerService itemMiddlewareService;
 	@Autowired private SolrService4Cms solrService;
 	@Autowired private TemplateService templateService;
 
@@ -82,7 +84,7 @@ public class SolrTest extends BaseTest {
 			
 			// Restore the item
 			r = trs.execute(8040);
-			testItem = this.itemService.restoreItem(testItem.getId());
+			testItem = this.itemMiddlewareService.restoreItem(testItem.getId());
 			doc = getDocument(testItem);
 			r.test(doc == null);
 
@@ -97,7 +99,7 @@ public class SolrTest extends BaseTest {
 			r = trs.execute(8060);
 			Item originalVersion = testItem;
 			originalVersion.setFieldValue(TITLE_FIELD_NAME, BEFORE_TEXT).saveFieldValues();
-			Item newVersion = this.itemService.version(originalVersion);
+			Item newVersion = this.itemMiddlewareService.version(originalVersion);
 			newVersion.setFieldValue(TITLE_FIELD_NAME, AFTER_TEXT).saveFieldValues();;
 			// The new version should be un-published, so not indexable. So the document we get
 			// should match the original version
@@ -114,7 +116,7 @@ public class SolrTest extends BaseTest {
 			
 			// Revert to the previous version
 			r = trs.execute(8080);
-			testItem = this.itemService.revert(newVersion);
+			testItem = this.itemMiddlewareService.revert(newVersion);
 			doc = getDocument(testItem);
 			r.test(doc.getTitle().equals(BEFORE_TEXT));
 			r.setNotes(String.format("Document title = '%s'", doc.getTitle()));

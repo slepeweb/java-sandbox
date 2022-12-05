@@ -20,7 +20,6 @@ _cms.move.action = function(nodeKey) {
 	var position = $(_cms.move.sel.POSITION_SELECTOR).val();
 	var moverNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
 	var targetNode = _cms.leftnav.tree.activeNode;
-	var targetKey = targetNode.key;
 	
 	if (position != 'none' && moverNode && targetNode) {			
 		if (! moverNode.parent.key.startsWith("root")) {
@@ -37,10 +36,10 @@ _cms.move.action = function(nodeKey) {
 				success: function(obj, status, z) {
 					if (! obj.error) {
 						moverNode.moveTo(targetNode, position);
-						targetNode.setActive(false);
+						moverNode.setActive(true);
 						_cms.move.refresh.tab(nodeKey);
 						_cms.core.refresh.tab(nodeKey);
-						// TODO: _cms.undoRedo.displayAll(obj.data);
+						_cms.undoRedo.displayAll(obj.data);
 					}
 					_cms.support.flashMessage(obj);
 				},

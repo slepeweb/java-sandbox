@@ -10,6 +10,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.except.ResourceException;
+import com.slepeweb.cms.service.ItemWorkerService;
 import com.slepeweb.cms.service.ItemService;
 
 @Service
@@ -18,8 +19,9 @@ public class VersionTest extends BaseTest {
 	private static Logger LOG = Logger.getLogger(VersionTest.class);
 	private static String NEWS_SECTION_PATH = "/news";
 
-	@Autowired
-	private ItemService itemService;
+	@Autowired private ItemService itemService;
+	@Autowired private ItemWorkerService itemMiddlewareService;
+	
 
 	public TestResultSet execute() {
 
@@ -143,7 +145,7 @@ public class VersionTest extends BaseTest {
 						
 				// Restore the trashed section, and it's older version.
 				// NOTE: it will NOT restore the original children - these would have to be restored separately.
-				newVersionOfNewsSection = this.itemService.restoreItem(newVersionOfNewsSection.getOrigId());
+				newVersionOfNewsSection = this.itemMiddlewareService.restoreItem(newVersionOfNewsSection.getOrigId());
 				
 				// 7080: Assert bin size is 2 less
 				int finalBinCount = this.cmsService.getItemService().getBinCount();
@@ -153,7 +155,7 @@ public class VersionTest extends BaseTest {
 				
 				// 7090: Revert the new item
 				r = trs.execute(7090);
-				Item revertedItem = this.itemService.revert(newVersionOfNewsSection);
+				Item revertedItem = this.itemMiddlewareService.revert(newVersionOfNewsSection);
 				r.setNotes(String.format("Reverted version is %d", revertedItem.getVersion()));
 				r.test(revertedItem.getVersion() == newsSectionItem.getVersion());
 				
@@ -187,7 +189,7 @@ public class VersionTest extends BaseTest {
 	private Item versionItem(TestResult r, Item item) {
 		Item neu = null;
 		try {
-			neu = this.itemService.version(item);
+			neu = this.itemMiddlewareService.version(item);
 			r.setNotes(String.format("New version is: %d", neu.getVersion()));
 			r.failIf(neu.getId() <= item.getId());
 		}

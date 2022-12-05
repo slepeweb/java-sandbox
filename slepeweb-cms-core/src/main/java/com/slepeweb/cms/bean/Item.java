@@ -203,11 +203,11 @@ public class Item extends CmsBean {
 	}
 	
 	public void saveFieldValues() throws ResourceException {
-		getItemService().saveFieldValues(this);
+		getItemWorkerService().saveFieldValues(this);
 	}
 	
 	public void saveLinks() throws ResourceException {
-		 getItemService().saveLinks(this);
+		 getItemWorkerService().saveLinks(this);
 	}
 	
 	public void delete() {
@@ -250,19 +250,14 @@ public class Item extends CmsBean {
 		return getLinks().remove(CmsBeanFactory.toChildLink(this, relation, LinkType.relation));
 	}
 	
-	/*
-	 * Shortcut items must be treated differently when subject to move. In 
-	 * particular, need to know which of possibly many parents is affected.
-	 */
-	public boolean move(Item currentParent, Item targetParent, Item target) throws ResourceException {
+	public Item move(Item target) throws ResourceException {
 		
-		return move(currentParent, targetParent, target, "over");
+		return move(target, "over");
 	}
 	
-	public boolean move(Item currentParent, Item targetParent, Item target, String mode) throws ResourceException {
+	public Item move(Item target, String mode) throws ResourceException {
 		
-		return getCmsService().getItemService().
-				move(this, currentParent, targetParent, target, mode);
+		return getCmsService().getItemWorkerService().move(new MoverItem(this, target, mode));
 	}
 	
 	public Object[] getCopyDetails() {

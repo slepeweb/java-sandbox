@@ -19,6 +19,7 @@ public class CmsServiceImpl implements CmsService {
 	@Autowired protected ItemTypeService itemTypeService;
 	@Autowired protected FieldService fieldService;
 	@Autowired protected ItemService itemService;
+	@Autowired protected ItemWorkerService itemWorkerService;
 	@Autowired protected LinkService linkService;
 	@Autowired protected LinkNameService linkNameService;
 	@Autowired protected LinkTypeService linkTypeService;
@@ -116,6 +117,10 @@ public class CmsServiceImpl implements CmsService {
 	
 	public ItemService getItemService() {
 		return itemService;
+	}
+	
+	public ItemWorkerService getItemWorkerService() {
+		return itemWorkerService;
 	}
 	
 	public LinkService getLinkService() {

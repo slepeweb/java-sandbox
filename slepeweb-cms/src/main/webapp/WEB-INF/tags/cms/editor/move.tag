@@ -12,8 +12,11 @@
 		you can action the move by clicking the corresponding button.</p>
 	</details>	
 
+	<p class="in-your-face-text">Item '<span class="current-item-name">${editingItem.name}</span>' is currently 
+		located at '${editingItem.path}'.</p>
+	
 	<div>
-		<span class="space-after">Move current item '<span class="current-item-name">${editingItem.name}</span>', placing it </span>
+		<span class="space-after">Move item '<span class="current-item-name">${editingItem.name}</span>', placing it </span>
 		<span class="space-after"><select name="position">
 				<option value="none">Choose ...</option>
 				<option value="before">Before</option>

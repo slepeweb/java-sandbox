@@ -7,6 +7,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemUpdateHistory;
 import com.slepeweb.cms.bean.ItemUpdateRecord;
 import com.slepeweb.cms.bean.ItemUpdateRecord.Action;
+import com.slepeweb.cms.bean.MoverItem;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.UndoRedoStatus;
 
@@ -53,6 +54,7 @@ public class ItemUpdateUndoServiceImpl implements ItemUpdateUndoService {
 		
 		Long origId = sourceItem.getOrigId();
 		Item dbRecord = this.itemService.getItemByOriginalId(origId);
+		Object[] moveParams = null;
 		
 		if (dbRecord != null) {
 			try {			
@@ -79,7 +81,23 @@ public class ItemUpdateUndoServiceImpl implements ItemUpdateUndoService {
 					dbRecord.setLinks(sourceItem.getLinks());
 					dbRecord.saveLinks();
 				}
-				
+				// move
+				else if (targetUpdateRecord.getAction() == Action.move) {
+					if (! (sourceItem instanceof MoverItem)) {
+						resp.setError(true).addMessage("Undo move failure");
+					}
+					
+					MoverItem mover = (MoverItem) sourceItem;
+					
+					// For ajax caller ... so that left navigation can be updated
+					moveParams = new Object[] {
+							mover.getMode(),
+							mover.getTarget().getOrigId()
+					};
+					
+					mover.move();
+				}
+								
 				if (option == Option.undo) {
 					history.undoCompleted();
 					resp.addMessage("Undo completed");
@@ -92,7 +110,8 @@ public class ItemUpdateUndoServiceImpl implements ItemUpdateUndoService {
 				resp.setData(new Object[] {
 						new UndoRedoStatus(history),
 						targetUpdateRecord.getAction().name(),
-						dbRecord.getOrigId()
+						dbRecord.getOrigId(),
+						moveParams
 					});
 			}
 			catch (Exception e) {

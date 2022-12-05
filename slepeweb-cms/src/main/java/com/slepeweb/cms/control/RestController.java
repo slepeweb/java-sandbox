@@ -56,6 +56,7 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkNameOption;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
+import com.slepeweb.cms.bean.MoverItem;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrParams4Cms;
@@ -761,7 +762,7 @@ public class RestController extends BaseController {
 		Item i = getEditableVersion(origId, getUser(req));
 		
 		try {
-			Item c = this.cmsService.getItemService().copy(i, name, simplename);	
+			Item c = this.cmsService.getItemWorkerService().copy(i, name, simplename);	
 			if (c != null) {
 				Node n = Node.toNode(c);
 				resp.addMessage("Item copied").setData(n);
@@ -788,7 +789,7 @@ public class RestController extends BaseController {
 		Item i = getEditableVersion(origId, getUser(req), true);
 		
 		try {
-			Item c = this.cmsService.getItemService().version(i);			
+			Item c = this.cmsService.getItemWorkerService().version(i);			
 			return resp.
 					setError(false).
 					setData(Node.toNode(c)).
@@ -811,7 +812,7 @@ public class RestController extends BaseController {
 		
 		if (i != null) {
 			try {
-				Item r = this.cmsService.getItemService().revert(i);
+				Item r = this.cmsService.getItemWorkerService().revert(i);
 				return resp.setError(false).addMessage("Item reverted to previous version").setData(r.getId());
 			}
 			catch (ResourceException e) {
@@ -1003,36 +1004,32 @@ public class RestController extends BaseController {
 		
 		RestResponse resp = new RestResponse();
 		User u = getUser(req);
-		Item mover = getEditableVersion(moverId, u, true);
-		if (mover.isRoot()) {
-			return resp.setError(true).setData(mover.getId()).addMessage("Cannot move the root item");
+		Item i = getEditableVersion(moverId, u, true);
+		if (i.isRoot()) {
+			return resp.setError(true).setData(i.getId()).addMessage("Cannot move the root item");
 		}
 		
-		// Keep a record of the mover item, to store in ItemUpdateHistory
-		// TODO: Item before = getEditableVersion(moverId, u, true);
-		
 		Item target = getEditableVersion(targetId, u, true);
-		Item currentParent = getEditableVersion(moverParentId, u, true);
-		Item targetParent = getEditableVersion(targetParentId, u, true);
+		
+		// Keep a record of the mover item, to store in ItemUpdateHistory
+		MoverItem before = new MoverItem(i, target, mode);
 		
 		try {
-			mover.move(currentParent, targetParent, target, mode);		
+			MoverItem after = before.move();
 			
-			/*
 			// Save previous revision of mover in user's undo history
 			ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
-			itemUpdateHistory.push(before, mover, Action.move);
-			*/
+			itemUpdateHistory.push(before, after, Action.move);
 						
 			return resp.setError(false).
-					// TODO: setData(new UndoRedoStatus(itemUpdateHistory)).
+					setData(new UndoRedoStatus(itemUpdateHistory)).
 					addMessage("Item moved");
 		}
 		catch (MissingDataException e) {
-			return resp.setError(true).setData(mover.getId()).addMessage(e.getMessage());
+			return resp.setError(true).setData(before.getId()).addMessage(e.getMessage());
 		}
 		catch (ResourceException e) {
-			return resp.setError(true).setData(mover.getId()).addMessage(e.getMessage());
+			return resp.setError(true).setData(before.getId()).addMessage(e.getMessage());
 		}
 	}
 	

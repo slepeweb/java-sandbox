@@ -261,7 +261,7 @@ public class Product extends Item {
 	
 	public Long getStockForVariants() {
 		if (getVariants() != null && getVariants().size() > 0) {
-			Long count = new Long(0);
+			Long count = 0L;
 			for (Variant v : getVariants()) {
 				count += v.getStock();
 			}
