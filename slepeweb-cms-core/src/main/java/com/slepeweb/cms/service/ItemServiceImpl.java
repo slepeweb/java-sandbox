@@ -438,18 +438,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	@Deprecated
-	public int getCount() {
-		return getCount(null);
-	}
-	
-	@Deprecated
-	public int getCount(String path) {
-		if (StringUtils.isNotBlank(path)) {
-			return this.jdbcTemplate.queryForInt("select count(*) from item where path like ?", path + "%");
-		}
-		else {
-			return this.jdbcTemplate.queryForInt("select count(*) from item");
-		}
+	public int getCount(long siteId) {
+		return getCountByPath(siteId, null);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -458,9 +448,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public int getCountByPath(Long siteId, String path) {
+	public int getCountByPath(long siteId, String path) {
 		return this.jdbcTemplate.queryForInt(
-				"select count(*) from item where siteid=? and path like ?", new Object[] {siteId, path + "%"});
+				"select count(*) from item where siteid=? and path like ? and deleted=0", new Object[] {siteId, path + "%"});
 	}
 	
 	public boolean updatePublished(Long id, boolean option) {

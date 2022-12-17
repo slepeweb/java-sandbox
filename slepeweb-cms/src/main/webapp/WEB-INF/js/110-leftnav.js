@@ -45,8 +45,7 @@ _cms.leftnav.define.fancytree = function() {
 		activate: function(event, data) {
 			if (_cms.leftnav.mode == "navigate") {
 				// Update the item forms
-				var tabName = $("li.ui-tabs-active").attr("aria-controls");
-				_cms.support.renderItemForms(data.node.key, tabName);
+				_cms.support.renderItemForms(data.node.key, _cms.activateTab);
 			}
 			else if (_cms.leftnav.mode == "link") {
 				$("#link-target-identifier").html("'" + _cms.leftnav.tree.activeNode.title + "'");
@@ -64,14 +63,27 @@ _cms.leftnav.define.fancytree = function() {
 	});	
 }
 
-_cms.leftnav.activateKey = function(key, fn, args) {
+// Navigate to a new item. 
+_cms.leftnav.navigate = function(key, tab, fn, args) {
+	// TODO: Need a better way to provide the preferred editor tab name to the 'activate'
+	//       function in FancyTree. This way will have to do for now.
+	if (! tab) {
+		tab = _cms.support.getActiveTab();
+	}
+	_cms.activateTab = tab.endsWith('-tab') ? tab : tab + '-tab';
+	
+	// Is the item of interest already visible in the tree?
 	var node = _cms.leftnav.tree.getNodeByKey(key);
 	
 	if (node) {
-		_cms.leftnav.tree.activateKey(node.key);
+		// This triggers the 'activate' function of the FancyTree object,
+		// which in turn triggers '_cms.support.renderItemForms'.
+		//_cms.leftnav.tree.activateKey(node.key);
+		node.setActive(true);
 	}
 	else {
-		// The 'real' item hasn't been loaded yet - ask the server for the breadcrumb trail
+		// This item hasn't been loaded into the fancytree yet 
+		// - ask the server for the breadcrumb trail
 		if (! _cms.leftnav.loadBreadcrumbs(key, fn, args)) {
 			_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
 		}
@@ -79,26 +91,30 @@ _cms.leftnav.activateKey = function(key, fn, args) {
 }
 
 _cms.leftnav.loadBreadcrumbs = function(key, fn, args) {
+	let success = false;
+	
 	$.ajax(_cms.ctx + "/rest/breadcrumbs/" + key, {
 		cache: false,
 		dataType: "json",
 		mimeType: "application/json",
 		success: function(json, status, z) {
-			_cms.leftnav.tree.loadKeyPath(json, function(node, stats) {
-				if (fn) {
-					fn(args);
-				}
-				
-				if (stats === "ok") {
+			_cms.leftnav.tree.loadKeyPath(json, function(node, status) {
+				if (status === "ok") {
 				    node.setActive();
-				    return true;
+				    
+					if (fn) {
+						fn(args);
+					}
+					
+				    success = true;
 				}
 			});
 		},
 		error: function(json, status, z) {
-			return false;
 		}
 	});
+	
+	return success;
 }
 
 _cms.leftnav.refreshShortcut = function(nodeKey, action, type) {

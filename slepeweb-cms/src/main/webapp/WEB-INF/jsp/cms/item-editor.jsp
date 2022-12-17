@@ -2,16 +2,17 @@
 	page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
-<div id="current-item-name" class="hide">${editingItem.name}</div>
-<div id="current-item-flagged" class="hide">${_itemIsFlagged ? 'yes' : 'no'}</div>
-<div id="num-deletable-items" class="hide">${_numItemsInSection}</div>
-<div id="editingItem-is-shortcut" class="hide">${editingItem.shortcut}</div>
-<div id="editingItem-is-writeable" class="hide">${editingItem.accessible}</div>
-
-<div id="right-nav-key" class="hide">${_navkeys.right}</div>
-<div id="left-nav-key" class="hide">${_navkeys.left}</div>
-<div id="up-nav-key" class="hide">${_navkeys.up}</div>
-<div id="down-nav-key" class="hide">${_navkeys.down}</div>
+<script type="text/javascript">
+	_cms.currentItemName = '${editingItem.name}';
+	_cms.currentItemFlagged = '${_itemIsFlagged ? 'yes' : 'no'}';
+	_cms.numDeletableItems = ${_numItemsInSection};
+	_cms.editingItemIsShortcut = ${editingItem.shortcut};
+	_cms.editingItemIsWriteable = ${editingItem.accessible};
+	_cms.rightNavKey = ${_navkeys.right};
+	_cms.leftNavKey = ${_navkeys.left};
+	_cms.upNavKey = ${_navkeys.up};
+	_cms.downNavKey = ${_navkeys.down};
+</script>
 
 <ul id="editor-tabs">
 	<li><a href="#core-tab">Core</a></li>

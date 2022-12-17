@@ -22,7 +22,7 @@ header {
 	grid-template-areas: 
 		"ha ha ha ha ha ha"
 		"hb hb hb hc hc hc"
-		"hd hf hf hg hg hg"		
+		"hd hf hf hf hf hf"		
 }
 
 header select {
@@ -47,18 +47,18 @@ div.hf {
 }
 
 div.hf {
-	padding-top: 0.5em;
+	padding-top: 1.5em;
 	padding-bottom: 0.5em;
 }
 
 #history-div {
-	grid-area: hc;
-	margin-left: 1em;
+	grid-area: hb;
+	margin-left: 0em;
 }
 
 #leftnav-hider {
 	grid-area: hd;
-	padding-top: 0.5em;
+	padding-top: 1.5em;
 	padding-bottom: 0.5em;
 	cursor: pointer;
 	display: grid;
@@ -70,7 +70,7 @@ div.hf {
 }
 
 #status-block {
-	padding-left: 0.5em;
+	padding-left: 1.5em;
 	font-size: 1.6em;
 	text-decoration: underline;
 	width: 60%;
@@ -85,9 +85,9 @@ div.hf {
 }
 
 #search-bar {
-	grid-area: hg;
+	grid-area: hc;
 	margin-left: 1.0em;
-	margin-top: 0.5em;
+	margin-top: 0em;
 }
 
 #search-bar input {
@@ -532,10 +532,10 @@ div#undo-icon, div#redo-icon {
 	cursor: pointer;
 }
 
-div#specials {
+div#undo-redo, div#misc-controls {
 	margin-top: 1.0em;
 	display: grid;
-	grid-template-columns: repeat(5, 1fr);	
+	grid-template-columns: repeat(4, 1fr);	
 }
 
 .in-your-face-text {
@@ -560,7 +560,7 @@ div.cms-icon-content {background-position: 0px -16px; background-image: url("fan
 		grid-template-columns: repeat(9, 1fr);
 		grid-template-areas: 
 			"ha ha ha ha hb hb hc hc hc"
-			"hd hf hf hf hf hf hg hg hg"
+			"hd hf hf hf hf hf hf hf hf"
 	}
 	
 	body {
@@ -572,7 +572,7 @@ div.cms-icon-content {background-position: 0px -16px; background-image: url("fan
 	}
 	
 	#search-bar {
-		margin-top: 0em;
+		margin-top: 1.5em;
 		width: 100%;
 	}
 	

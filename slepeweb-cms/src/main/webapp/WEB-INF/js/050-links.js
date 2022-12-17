@@ -224,16 +224,7 @@ _cms.links.behaviour.navigate = function() {
 	// Add behaviour for when a link (in the links editor) is clicked 
 	$(_cms.links.sel.LINKTO_BUTTONS).off().click(function(e) {
 		var key = $(this).attr("data-id");
-		var fn = function() {
-			// This attribute setting changes the active tab for when node activation completes
-			$("li.ui-tabs-active").attr("aria-controls", "core-tab");
-		}
-
-		// Make corresponding node current in leftnav
-		_cms.leftnav.activateKey(key, fn);
-		
-		// Render forms for linked item, and show the core tab
-		_cms.support.renderItemForms(key, "core-tab");
+		_cms.leftnav.navigate(key);
 	});
 }
 

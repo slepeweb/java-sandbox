@@ -99,7 +99,7 @@ _cms.core.trashItem = function(nodeKey) {
 				if (node) {
 					var parent = node.getParent();
 					node.remove();
-					_cms.support.renderItemForms(parent.key, "core-tab");
+					_cms.leftnav.navigate(parent.key, "core-tab");
 				}
 			}
 		},

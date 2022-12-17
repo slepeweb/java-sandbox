@@ -2,6 +2,7 @@ package com.slepeweb.cms.service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -39,6 +40,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 	@Autowired private MediaService mediaService;
 	@Autowired private SolrService4Cms solrService4Cms;
 	@Autowired private FieldForTypeService fieldForTypeService;
+	@Autowired private TagService tagService;
 
 	/*
 	 * This provides a relative move, ie before/after target.
@@ -311,6 +313,36 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 
 	public void saveLinks(Item i) throws ResourceException, DuplicateItemException {
 		saveLinks(i, null);
+	}
+	
+	public List<String> saveTags(Item i, String tagStr, List<String> recentTags) {
+		List<String> existingTagValues = i.getTagValues();
+		List<String> latestTagValues = Arrays.asList(tagStr.split("[ ,]+"));
+		List<String> freshTagValues = new ArrayList<String>();
+		
+		if (existingTagValues.size() != latestTagValues.size() || ! existingTagValues.containsAll(latestTagValues)) {
+			this.tagService.save(i, tagStr);
+			
+			// Identify recently-applied tags - remove existing tags from latest, and see what's left.
+			for (String v : latestTagValues) {
+				if (! existingTagValues.contains(v)) {
+					freshTagValues.add(v);
+				}
+			}
+			
+			// latestTagValues now contains new selections
+			if (freshTagValues.size() > 0) {
+				
+				// Filter out duplicates
+				for (String v : recentTags) {
+					if (! freshTagValues.contains(v)) {
+						freshTagValues.add(v);
+					}
+				}
+			}
+		}
+		
+		return freshTagValues;
 	}
 	
 	public Item restoreItem(Long origId) {

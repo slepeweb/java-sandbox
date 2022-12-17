@@ -143,7 +143,7 @@ public class ProductTest extends BaseTest {
 				r = trs.execute(9070);
 				r.failIf(this.cmsService.getVariantService().count() - varCount != avs.size());
 				
-				long itemCount = this.cmsService.getItemService().getCount();
+				long itemCount = this.cmsService.getItemService().getCount(site.getId());
 				prodCount = this.cmsService.getProductService().count();
 				varCount = this.cmsService.getVariantService().count();
 				productItem = site.getItem(path + "-copy-1");
@@ -151,14 +151,14 @@ public class ProductTest extends BaseTest {
 					r = trs.execute(9080);
 					p = (Product) productItem;
 					p.trash();
-					r.failIf(this.cmsService.getItemService().getCount() != itemCount);
+					r.failIf(this.cmsService.getItemService().getCount(site.getId()) != itemCount);
 					
 					r = trs.execute(9090);
 					r.failIf(this.cmsService.getProductService().count() != prodCount);
 					
 					r = trs.execute(9100);
 					p.delete();
-					r.failIf(this.cmsService.getItemService().getCount() - itemCount != -1);
+					r.failIf(this.cmsService.getItemService().getCount(site.getId()) - itemCount != -1);
 					
 					r = trs.execute(9110);
 					r.failIf(this.cmsService.getProductService().count() - prodCount != -1);

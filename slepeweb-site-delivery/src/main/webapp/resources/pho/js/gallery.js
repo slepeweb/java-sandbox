@@ -10,6 +10,24 @@ function closeModal() {
 	$(".slide-wrapper").css("display", "none")
 	$("#thumbnail-gallery").css("display", "grid")
 	$("#modal").css("display", "none")
+	pauseCurrentPlayingVideo()
+}
+
+function pauseCurrentPlayingVideo() {
+		
+	// If current slide is a video, and is not paused, then pause it
+	let slide = _slides.get(_currentSlideId)
+	if (slide.tagName === 'VIDEO' && ! slide.paused) {
+		slide.pause()
+	}
+		
+	/*
+	$('video').each((i, ele) => {
+		if (! ele.paused) {
+			ele.pause()
+		}
+	})
+	*/
 }
 
 function displayMedia(n) {
@@ -125,7 +143,8 @@ function assignUIBehaviours() {
 		}
 	});
 	
-	$("#modal a.prev, #modal a.next").click(function(){
+	$("#modal a.prev, #modal a.next").click(function() {
+		pauseCurrentPlayingVideo()
 		let inc = parseInt($(this).attr("data-inc"))
 		_currentSlideId = cycle(_currentSlideId + inc, _slides.length)
 		displayMedia(_currentSlideId)

@@ -1,5 +1,7 @@
 package com.slepeweb.cms.service;
 
+import java.util.List;
+
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.MoverItem;
 import com.slepeweb.cms.except.DuplicateItemException;
@@ -13,4 +15,5 @@ public interface ItemWorkerService {
 	void saveLinks(Item i) throws ResourceException, DuplicateItemException;
 	Item restoreItem(Long id);
 	Item revert(Item source) throws ResourceException;
+	List<String> saveTags(Item i, String tagStr, List<String> recentTags);
 }

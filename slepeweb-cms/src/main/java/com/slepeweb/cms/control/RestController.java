@@ -76,6 +76,7 @@ import com.slepeweb.cms.service.FieldForTypeService;
 import com.slepeweb.cms.service.FieldService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemUpdateUndoService;
+import com.slepeweb.cms.service.ItemWorkerService;
 import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.commerce.bean.Product;
@@ -91,6 +92,7 @@ public class RestController extends BaseController {
 	public static final String THUMBNAIL_EXT = "-thumb";
 	
 	@Autowired private ItemService itemService;
+	@Autowired private ItemWorkerService itemWorkerService;
 	@Autowired private FieldService fieldService;
 	@Autowired private FieldForTypeService fieldForTypeService;
 	@Autowired private TagService tagService;
@@ -288,7 +290,10 @@ public class RestController extends BaseController {
 			}
 			
 			// Save item tags, if changes have been made
-			saveTags(i, req, resp);
+			@SuppressWarnings("unchecked")
+			List<String> recentTags = (List<String>) req.getSession().getAttribute(AttrName.RECENT_TAGS);
+			req.getSession().setAttribute(AttrName.RECENT_TAGS, 
+					this.itemWorkerService.saveTags(i, getParam(req, "tags"), recentTags));		
 			
 			// Save previous revision in user's undo history
 			ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
@@ -316,6 +321,7 @@ public class RestController extends BaseController {
 		return resp;
 	}
 	
+	/*
 	private void saveTags(Item i, HttpServletRequest req, RestResponse resp) {
 		List<String> existingTagValues = i.getTagValues();
 		String tagStr = getParam(req, "tags");
@@ -349,6 +355,7 @@ public class RestController extends BaseController {
 			}
 		}
 	}
+	*/
 	
 	private String getParam(HttpServletRequest req, String name) {
 		return req.getParameter(name);

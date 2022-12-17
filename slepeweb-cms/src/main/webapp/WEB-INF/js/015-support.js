@@ -11,6 +11,10 @@ _cms.support.refreshAllTabs = function(html, activeTab) {
 	_cms.support.activateTab(activeTab);
 }
 
+_cms.support.getActiveTab = function() {
+	return $("li.ui-tabs-active").attr("aria-controls");
+}
+
 _cms.support.activateTab = function(name) {
 	let activeTabId = 0;
 	let tabNum = 0;
@@ -75,31 +79,10 @@ _cms.support.displayCommerceElements = function(target) {
 	}
 };
 
-/*
- * Tells the browser to get the item editor page for a given item.
- */
-_cms.support.fetchItemEditor = function(nodeKey, status, tabName) {
-	var url = _cms.pageEditorUrlPrefix;
-	if (nodeKey) {
-		url += nodeKey;
-	}
-	
-	if (status) {
-		var param = status.error ? "error" : "success";
-		url += ("?status=" + param + "&msg=" + status.messageEncoded);	
-	}
-	
-	if (tabName) {
-		url += "&tab=" + tabName;
-	}
-	
-	window.location = url; 
-};
-
 _cms.support.addHistoryBehaviour = function(selector) {
 	selector.unbind();
 	selector.change(function() {	
-		_cms.leftnav.activateKey(selector.val());
+		_cms.leftnav.navigate(selector.val());
 	});
 };
 
@@ -207,12 +190,12 @@ _cms.support.updateItemName = function(name) {
 _cms.support.updateSitemapNavigationLinks = () => {
 	['left', 'right', 'up', 'down'].forEach((dirn) => {
 		let link$ = $('div#leftnav-hider i.fa-angle-' + dirn);
-		let key = $('div#' + dirn + '-nav-key').html();
+		let key = eval('_cms.' + dirn + 'NavKey');
 		link$.off();
 		
 		if (key > -1) {
 			link$.click(() => {
-				_cms.leftnav.activateKey(key);
+				_cms.leftnav.navigate(key);
 			})
 			
 			link$.removeClass('invisible');
@@ -246,7 +229,7 @@ _cms.support.displayItemFlag = function(isFlagged) {
 }
 
 _cms.support.itemFlagger = function() {
-	var isFlagged = $('div#current-item-flagged').html() === 'yes';
+	var isFlagged = _cms.currentItemFlagged === 'yes';
 	_cms.support.displayItemFlag(isFlagged);
 	
 	$('div#item-flag i').off().click(function() {
@@ -304,7 +287,11 @@ _cms.support.ajax = function(method, url, data, success, fail) {
 	
 }
 
-
+/*
+	Re-calculates content according to a newly selected item. This applies to
+	both editor tabs, and to page-level controls. (Remember, editor tabs get updated
+	far more with ajax calls compared with page re-loads).
+*/
 _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 
 	$.ajax(_cms.ctx + "/rest/item/editor", {
@@ -315,8 +302,28 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 		
 		// On successful loading of forms 
 		success: function(html, status, z) {
-			_cms.init(nodeKey, html, activeTab);
+			// origId of currently selected item
+			_cms.editingItemId = nodeKey;
+			
+			// Insert the calculated html into the editor tabs
+			_cms.support.refreshAllTabs(html, activeTab);
+			
+			// Update the item identifier in all tabs
+			_cms.support.updateItemName(_cms.currentItemName);
+			
+			// Update the next/previous links
+			_cms.support.updateSitemapNavigationLinks();
+		
+			// Required for delete confirmation dialog
+			$(".num-deletable-items").html(_cms.numDeletableItems);
+			
+			// Update list of recently edited items
 			_cms.support.refreshHistory(_cms.siteId);
+			
+			// Update flag indicating current item is 'flagged'!
+			_cms.support.itemFlagger();
+			
+			// Assign behaviours to new html
 			_cms.core.onrefresh(nodeKey);
 			_cms.field.onrefresh(nodeKey);
 			_cms.add.onrefresh(nodeKey);
@@ -325,10 +332,12 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 			_cms.links.onrefresh(nodeKey);
 			_cms.media.onrefresh(nodeKey);
 			_cms.misc.onrefresh(nodeKey);
-			_cms.move.onrefresh(nodeKey);			
-			_cms.support.disableFormsIfReadonly();
-			_cms.support.itemFlagger();
+			_cms.move.onrefresh(nodeKey);
 			
+			// Disable forms if user doesn't have access to update
+			_cms.support.disableFormsIfReadonly();
+			
+			// Optinal callback function call
 			if (callback) {
 				callback(args);
 			}

@@ -199,9 +199,10 @@ _cms.misc.behaviour.trash.restore = function() {
 				 * Reload the page. Leave the user to
 				 * navigate the tree to confirm the restored items are there.
 				 */ 
-				_cms.support.fetchItemEditor(_cms.editingItemId, 
-						{error: false, messageEncoded: encodeURI("Page reloaded; check leftnav for restored items")}, 
-						_cms.core.TABID);
+				_cms.leftnav.navigate(_cms.editingItemId, _cms.core.TABID, function() {
+					_cms.support.flashMessage(_cms.support.toStatus(false, 
+						encodeURI("Page reloaded; check leftnav for restored items")));
+				});
 			},
 			error: function(json, status, z) {
 				_cms.support.serverError();
@@ -300,7 +301,7 @@ _cms.misc.flaggedItems.behaviour.linkToItem = function() {
 	$('div#flagged-items-section a.link-to-item').click(function(e) {
 		e.preventDefault();
 		let nodeKey = $(this).attr('data-id');
-		_cms.support.renderItemForms(nodeKey, 'core-tab');
+		_cms.leftnav.navigate(nodeKey, 'core-tab');
 	});
 }
 

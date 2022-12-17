@@ -3,6 +3,7 @@ package com.slepeweb.cms.test;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.Site;
 
 @Service
 public class PurgeTest extends BaseTest {
@@ -16,6 +17,8 @@ public class PurgeTest extends BaseTest {
 			register(1030, "Check N field values have been cascade-deleted").
 			register(1040, "Check N fieldfortype records have been cascade-deleted");
 		
+		Site site = this.cmsService.getSiteService().getSite(TEST_SITE_NAME);
+		
 		// Delete the News item type
 		ItemType it = this.cmsService.getItemTypeService().getItemType(NEWS_TYPE_NAME);
 		
@@ -26,7 +29,7 @@ public class PurgeTest extends BaseTest {
 		else {
 			int typeCount = this.cmsService.getItemTypeService().getCount();
 			int newsCount = this.cmsService.getItemService().getCountByType(it.getId());
-			int itemCount = this.cmsService.getItemService().getCount();
+			int itemCount = this.cmsService.getItemService().getCount(site.getId());
 			int fieldValueCount = this.cmsService.getFieldValueService().getCount();
 			int fieldForTypeCount = this.cmsService.getFieldForTypeService().getCount();
 			
@@ -41,7 +44,7 @@ public class PurgeTest extends BaseTest {
 			}
 			
 			// 1020: Check the number of news items that have been deleted
-			diff = itemCount - this.cmsService.getItemService().getCount();
+			diff = itemCount - this.cmsService.getItemService().getCount(site.getId());
 			r = trs.execute(1020).setNotes(diff + " news items have been deleted");
 			if (diff != newsCount) {
 				r.setNotes(diff + " news items have been deleted - should have been " + newsCount).fail();

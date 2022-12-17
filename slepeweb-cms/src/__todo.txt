@@ -1,11 +1,14 @@
 TODO: This is the main todo file:
 
 HIGH
+- Check 'copy' function copies tags.
+- Allow blank simplename for 'copy' function - use full name
 - refactor code to use _cms.support.ajax wrapper function
 - force media items to have appropriate simplename extensions, esp. video, pdf, etc. (???)
 - implement cron job to backup cms db on desktop
 
 MEDIUM
+- after trashing items, could auto navigate to most recently edited & available item
 - new: move flagged items to the same location
 - show bin - takes 2 clicks (perhaps not first time)
 - re-test registration process

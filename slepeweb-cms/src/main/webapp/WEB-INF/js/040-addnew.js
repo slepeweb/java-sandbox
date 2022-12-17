@@ -52,6 +52,8 @@ _cms.add.behaviour.add = function(nodeKey) {
 					var isShortcut = obj.data[1];
 					var isMedia = obj.data[2];
 					
+					//_cms.support.updateItemName(nodeData.title);
+					
 					var parentNode = _cms.leftnav.tree.getNodeByKey(nodeKey.toString());
 					
 					if (position == 'alongside') {
@@ -60,6 +62,8 @@ _cms.add.behaviour.add = function(nodeKey) {
 					
 					if (parentNode != null) {
 						var childNode = parentNode.addNode(nodeData);
+						//childNode.setActive(true);
+						
 						var tab = "core-tab";
 						if (isShortcut) {
 							tab = "links-tab";
@@ -68,7 +72,7 @@ _cms.add.behaviour.add = function(nodeKey) {
 							tab = "media-tab";
 						}
 						
-						_cms.support.renderItemForms(childNode.key, tab);
+						_cms.leftnav.navigate(childNode.key, tab);
 					}
 				}
 			},

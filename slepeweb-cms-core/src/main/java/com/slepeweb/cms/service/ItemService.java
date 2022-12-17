@@ -19,8 +19,8 @@ public interface ItemService {
 	Item getItemByOriginalId(Long id);
 	Item getItem(Long id, int version);
 	Item save(Item i) throws ResourceException;
-	int getCount();
-	int getCount(String path);
+	int getCount(long siteId);
+	int getCountByPath(long siteId, String path);
 	int getCountByType(Long itemTypeId);
 	int getVersionCount(long origid);
 	int trashItemAndDirectChildren(Item i);
@@ -28,7 +28,6 @@ public interface ItemService {
 	int deleteTrashedItems(long[] idArr);
 	int restoreSelectedItems(long[] idArr);
 	int getBinCount();
-	int getCountByPath(Long siteId, String path);
 	boolean updatePublished(Long id, boolean b);
 	boolean updateSearchable(Long id, boolean b);
 	void updateDescendantPaths(String moverPath, String newChildPath);

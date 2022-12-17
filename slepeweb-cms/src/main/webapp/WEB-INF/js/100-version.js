@@ -19,7 +19,7 @@ _cms.version.behaviour.action = function(nodeKey) {
 			success: function(obj, status, z) {
 				_cms.support.flashMessage(obj);
 				// All tabs should be refreshed since the current item has changed
-				_cms.support.renderItemForms(nodeKey, _cms.version.TABID);
+				_cms.leftnav.navigate(nodeKey, _cms.version.TABID);
 			},
 			error: function(json, status, z) {
 				_cms.support.serverError();
@@ -38,7 +38,7 @@ _cms.version.behaviour.revert = function(nodeKey) {
 			success: function(obj, status, z) {
 				_cms.support.flashMessage(obj);
 				// All tabs should be refreshed since the current item has changed
-				_cms.support.renderItemForms(nodeKey, _cms.version.TABID);
+				_cms.leftnav.navigate(nodeKey, _cms.version.TABID);
 			},
 			error: function(json, status, z) {
 				_cms.support.serverError();

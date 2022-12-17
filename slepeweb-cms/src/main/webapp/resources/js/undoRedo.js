@@ -34,7 +34,7 @@ _cms.undoRedo.behaviour = function(selector, option) {
 				// just in case.
 				if (option !== 'clear') {
 					if (targetItemOrigId !== _cms.editingItemId) {
-						_cms.support.renderItemForms(targetItemOrigId, editorTabName, function() {
+						_cms.leftnav.navigate(targetItemOrigId, editorTabName, function() {
 							_cms.support.flashMessage({error: resp.error, message: resp.message});
 						});
 					}

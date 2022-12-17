@@ -11,6 +11,7 @@
 						</c:if>
 		</div>
 		
+		<%--
 		<div class="hb">
 			<span>Site selection: </span>
 			<select id="site-selector">
@@ -20,16 +21,24 @@
 						test="${not empty editingItem and editingItem.site.id eq _site.id}"> selected</c:if>>${_site.name}</option>
 				</c:forEach>
 			</select>
-		</div>		
+		</div>	
+		 --%>	
 		
 		<!-- History -->
 		<div id="history-div">
 			<span>Breadcrumbs: </span>
 			<cms:navigation-history />
+			
+			<!-- Item flag -->
+			<div id="misc-controls">
+				<div id="item-flag" title="Flag item for bulk operations">
+					<i class="fa-solid fa-flag item-flag <c:if test='${_itemIsFlagged}'>flagged</c:if>"></i>
+				</div>
+			</div>		
 		</div>
 		
-		<!-- Search bar INCLUDES icon to flag current item -->
-		<cms:searchBar />
+		<!-- Search bar -->
+		<cms:searchBar />	
 		
 		<div id="leftnav-hider">
 			<i></i>

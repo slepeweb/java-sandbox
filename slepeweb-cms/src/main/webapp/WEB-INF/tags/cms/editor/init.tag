@@ -11,25 +11,33 @@
 	*/
 	_cms.ctx = "${applicationContextPath}";
 	_cms.pageEditorUrlPrefix = _cms.ctx + "/page/editor/";
-	_cms.siteId = <c:choose><c:when test="${not empty site}">${site.id}</c:when><c:otherwise>0</c:otherwise></c:choose>;
+	_cms.siteId = ${editingItem.site.id};
+	_cms.siteDefaultLanguage = "${editingItem.site.language}";
+	_cms.siteShortname = "${editingItem.site.shortname}";
 	_cms.rootItemOrigId = ${rootItem.origId};
-	_cms.editingItemId = null;
-	_cms.siteDefaultLanguage = "en";
-	_cms.editingItemIsShortcut = false;
+
+	/*
+		These variables are item-specific. They get updated by ajax calls
+		when the user picks a new item to navigate to.
+	*/
+	_cms.editingItemId = ${editingItem.origId};
+	_cms.editingItemIsShortcut = ${editingItem.shortcut};
+	_cms.editingItemIsWriteable = ${editingItem.accessible};
 	
 	_cms.undoRedo = {
 			status: ${_undoRedoStatus}
 	};
-
-	<c:if test="${not empty editingItem}">
-		_cms.editingItemId = ${editingItem.origId};
-		_cms.siteId = ${editingItem.site.id};
-		_cms.siteDefaultLanguage = "${editingItem.site.language}";
-		_cms.siteShortname = "${editingItem.site.shortname}";
-		_cms.editingItemIsShortcut = ${editingItem.shortcut};
-		_cms.editingItemIsWriteable = ${editingItem.accessible};
-	</c:if>
 	
+	_cms.currentItemName = 'none';
+	_cms.currentItemFlagged = 'no';
+	_cms.numDeletableItems= 0;
+	_cms.editingItemIsShortcut = false;
+	_cms.editingItemIsWriteable = false;
+	_cms.rightNavKey = 0;
+	_cms.leftNavKey = 0;
+	_cms.upNavKey = 0;
+	_cms.downNavKey = 0;
+
 	// Flash messages passed through when window.location is set 
 	_cms.flashMessage = null;
 	<c:if test="${not empty _flashMessage}">
@@ -55,13 +63,6 @@
 			$("#status-block").empty();
 		});
 	
-		$("#site-selector").change(function(e) {
-			let id = $(this).val();
-			if (id > 0) {
-				window.location = _cms.ctx + "/page/site/select/" + id;
-			}
-		});
-	
 		/* 
 			The leftnav is built once only per page request. Subsequent UI actions
 			that refresh tabs on the item editor will NOT rebuild the tree.
@@ -73,12 +74,8 @@
 		_cms.links.onpageload();
 		_cms.dialog.onpageload();
 		
-		// Render item management forms when page is first loaded
-		if (_cms.editingItemId) {
-			// On first call to renderItemForms, we use _editingItemId.
-			// On subsequent ajax calls driven by selecting items on the left nav, we use nodeKey.
-			_cms.support.renderItemForms(_cms.editingItemId, _cms.activeTab);
-		}
+		// Load the editors
+		_cms.support.renderItemForms(_cms.editingItemId, _cms.activeTab);
 		
 		// Render flash message when page is first loaded
 		_cms.support.flashMessage(_cms.flashMessage);
