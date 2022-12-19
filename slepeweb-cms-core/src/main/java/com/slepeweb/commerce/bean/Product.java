@@ -88,13 +88,12 @@ public class Product extends Item {
 	}
 	
 	public Product copy() {
-		Object[] copyDetails = getCopyDetails();
-		String name = (String) copyDetails[2];
-		String simplename = (String) copyDetails[1];
-		String partNum = getPartNum() + (String) copyDetails[3] + String.valueOf(copyDetails[0]);
+		// TODO: These two lines are short-term hacks - needs further investigation.
+		Integer qualifier = 1; 
+		String partNum = getPartNum() + "-copy-" + String.valueOf(qualifier);
 		
 		try {
-			return getProductService().copy(this, name, simplename, partNum, (Integer) copyDetails[0]);
+			return getProductService().copy(this, getName() + "-COPY", "", partNum, qualifier);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

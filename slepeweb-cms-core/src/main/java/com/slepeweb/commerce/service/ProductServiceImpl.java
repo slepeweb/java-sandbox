@@ -129,7 +129,10 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 		for (Variant v : sourceVariants) {
 			nv = CmsBeanFactory.makeVariant();
 			nv.assimilate(v);
-			nv.setOrigItemId(p.getOrigId()).setQualifier(String.format("%s%s%d", v.getQualifier(), Item.SIMPLENAME_COPY_EXT, copyId)).save();
+			nv.
+				setOrigItemId(p.getOrigId()).
+				setQualifier(String.format("%s%s%d", v.getQualifier(), Item.SIMPLENAME_COPY_EXT, copyId)).
+				save();
 		}
 		
 		return p.setVariants(null);

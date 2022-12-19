@@ -75,12 +75,6 @@ public class Shortcut extends Item {
 	}
 	
 	@Override
-	/* This should not get called for a Shortcut */
-	public Object[] getCopyDetails() {
-		return null;
-	}
-	
-	@Override
 	public FieldValueSet getFieldValueSet() {
 		if (isMergeable()) {
 			return this.referred.getFieldValueSet();
