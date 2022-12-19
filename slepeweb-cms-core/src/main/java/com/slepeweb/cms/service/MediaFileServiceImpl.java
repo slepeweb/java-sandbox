@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
@@ -62,19 +63,28 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 	 * This writes the file to a bin in the repository, and returns the bin identifier.
 	 * Should the write fail, then null is returned.
 	 */
-	public FileMetadata writeMediaToRepository(BufferedInputStream is, String filename) {
+	public FileMetadata writeMediaToRepository(BufferedInputStream is, Media m) {
 		
-		this.currentBin = identifyBinWithSpace(this.currentBin);
-		String outputFilePath = getRepositoryFilePath(this.currentBin, filename);
+		boolean binPreviouslyAllocated = false;
+		String binIdentifier = this.currentBin = identifyBinWithSpace(this.currentBin);
+
+		if (StringUtils.isNotBlank(m.getFolder())) {
+			binIdentifier = m.getFolder();
+			binPreviouslyAllocated = true;
+		}
+		
+		String outputFilePath = getRepositoryFilePath(binIdentifier, m.getRepositoryFileName());
 		Long bytesWritten = writeMedia(is, outputFilePath);
 		
 		if (bytesWritten != null) {
-			// Increment file count for this bin.
-			increment();
+			if (! binPreviouslyAllocated) {
+				// Increment file count for this bin.
+				increment();
+			}
 			
 			return new FileMetadata().
-					setName(filename).
-					setBin(this.currentBin).
+					setName(m.getRepositoryFileName()).
+					setBin(binIdentifier).
 					setPath(outputFilePath).
 					setSize(bytesWritten);
 		}
@@ -146,7 +156,7 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 	}	
 
 	/*
-	 * Identify the next bin insequence that has space.
+	 * Identify the next bin in sequence that has space.
 	 * Create a new bin if necessary.
 	 */
 	private String identifyBinWithSpace(String testCase) {

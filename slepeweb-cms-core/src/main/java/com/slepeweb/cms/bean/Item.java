@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +78,7 @@ public class Item extends CmsBean {
 			setVersion(i.getVersion());
 			setLanguage(i.getLanguage());
 			
-			// Must assimilate fields and links too? 
+			// Must assimilate fields and links too? What about tags?
 			// NO - fields and links are loaded when needed.
 		}
 	}
@@ -88,7 +87,6 @@ public class Item extends CmsBean {
 		boolean b =  
 			StringUtils.isNotBlank(getName()) &&
 			StringUtils.isNotBlank(getPath()) &&
-			//(StringUtils.isNotBlank(getSimpleName()) || isRoot()) &&
 			getSite() != null &&
 			getSite().getId() != null &&
 			getType() != null &&
@@ -260,6 +258,7 @@ public class Item extends CmsBean {
 		return getCmsService().getItemWorkerService().move(new MoverItem(this, target, mode));
 	}
 	
+	/*
 	public Object[] getCopyDetails() {
 		Object[] result = new Object[4];
 		String baseName, baseSimplename;
@@ -315,6 +314,7 @@ public class Item extends CmsBean {
 		result[3] = SIMPLENAME_COPY_EXT;
 		return result;
 	}
+	*/
 	
 	public String getParentPath() {
 		return CmsUtil.getParentPathFromPath(this);

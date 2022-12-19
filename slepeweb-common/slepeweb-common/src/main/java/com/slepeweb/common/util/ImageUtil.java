@@ -15,7 +15,12 @@ import javax.imageio.ImageIO;
 public class ImageUtil {
 	//private static Logger LOG = Logger.getLogger(ImageUtil.class);
 	
-
+	/*
+	 * NOTE TODO: This scaling method sometimes (if not always!) converts a portrait image to landscape.
+	 * One article on the web claims it's because getScaledInstance() doesn't retain EXIF metadata.
+	 * Haven't progressed this further. Current remedy is to use ubuntu's 'Image Viewer' app
+	 * to rotate the image.
+	 */
 	public static InputStream scaleImage(InputStream in, int width, int height, String mimeType) 
 			throws IOException {
 		

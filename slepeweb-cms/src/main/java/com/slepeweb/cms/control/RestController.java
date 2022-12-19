@@ -771,8 +771,9 @@ public class RestController extends BaseController {
 		try {
 			Item c = this.cmsService.getItemWorkerService().copy(i, name, simplename);	
 			if (c != null) {
-				Node n = Node.toNode(c);
-				resp.addMessage("Item copied").setData(n);
+				resp.
+					addMessage("Item copied").
+					setData(Node.toNode(c));
 			}
 			else {
 				resp.setError(true).addMessage("Failed to copy item");

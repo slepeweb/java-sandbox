@@ -1,8 +1,8 @@
 TODO: This is the main todo file:
 
 HIGH
-- Check 'copy' function copies tags.
-- Allow blank simplename for 'copy' function - use full name
+- all forms should copy mouseleave functions to mousenter. Use copy.js as benchmark.
+- Thumbnails sometimes have wrong orientation - will take a lot of work to rectify. See ImageUtil.
 - refactor code to use _cms.support.ajax wrapper function
 - force media items to have appropriate simplename extensions, esp. video, pdf, etc. (???)
 - implement cron job to backup cms db on desktop
@@ -12,7 +12,6 @@ MEDIUM
 - new: move flagged items to the same location
 - show bin - takes 2 clicks (perhaps not first time)
 - re-test registration process
-- app to remove redundant media files from file store
 - PDFs not viewable on my android phone (chrome)
 - PDFs not rendered with scrollbars on iPad
 - need to protect against injection attacks
@@ -22,6 +21,7 @@ MEDIUM
 - also, solr indexing needs to recognise nesting nature
 
 LOW
+- app to remove redundant media files from file store
 - write test: cannot move item to one of it's children, OR descendants
 - write test: cannot move item to one of it's linked parents (ie via relations, inlines, etc)
 - get site working on internet

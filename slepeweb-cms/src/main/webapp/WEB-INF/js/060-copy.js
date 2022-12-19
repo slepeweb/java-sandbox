@@ -9,8 +9,9 @@ _cms.copy = {
 _cms.copy.sel.NAME_INPUT = _cms.support.fi(_cms.copy.sel.COPY_TAB, "name");
 _cms.copy.sel.SIMPLENAME_INPUT = _cms.support.fi(_cms.copy.sel.COPY_TAB, "simplename");
 _cms.copy.sel.ALL_INPUTS = "".concat(_cms.copy.sel.NAME_INPUT, ",", _cms.copy.sel.SIMPLENAME_INPUT);
-_cms.copy.sel.COPY_BUTTON = _cms.copy.sel.COPY_TAB + " button.action",
-_cms.copy.sel.RESET_BUTTON = _cms.copy.sel.COPY_TAB + " button.reset",
+_cms.copy.sel.COPY_BUTTON = _cms.copy.sel.COPY_TAB + " button.action";
+_cms.copy.sel.RESET_BUTTON = _cms.copy.sel.COPY_TAB + " button.reset";
+_cms.copy.sel.FORM = _cms.copy.sel.COPY_TAB + " form";
 
 _cms.support.setTabIds(_cms.copy, "copy");
 
@@ -32,9 +33,7 @@ _cms.copy.behaviour.submit = function(nodeKey) {
 				if (! obj.error) {
 					var sourceNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
 					var newNode = sourceNode.getParent().addNode(obj.data);
-
-					// This triggers a call to loads the editor with the newly created item
-					newNode.setActive();
+					_cms.leftnav.navigate(newNode.key, 'core');
 				}
 			},
 			error: function(json, status, z) {
@@ -44,18 +43,32 @@ _cms.copy.behaviour.submit = function(nodeKey) {
 	});
 }
 
+_cms.copy.setButtonStates = function() {
+	if ($(_cms.copy.sel.FORM).serialize() !== _cms.copy.originalFormState) {
+		_cms.support.enable(_cms.copy.sel.RESET_BUTTON);
+		
+		if ($(_cms.copy.sel.NAME_INPUT).val()) {
+			_cms.support.enable(_cms.copy.sel.COPY_BUTTON);
+		}
+		else {
+			_cms.support.disable(_cms.copy.sel.COPY_BUTTON);
+		}
+	}
+	else {
+		_cms.support.enable(_cms.copy.sel.COPY_BUTTON);
+		_cms.support.disable(_cms.copy.sel.RESET_BUTTON);
+	}			
+}
+
 _cms.copy.behaviour.formchange = function(nodeKey) {
 	if (_cms.editingItemIsWriteable) {
 		$(_cms.copy.sel.ALL_INPUTS).mouseleave(function() {
-			if (_cms.support.enableIf(_cms.copy.sel.COPY_BUTTON,
-					$(_cms.copy.sel.NAME_INPUT).val() && $(_cms.copy.sel.SIMPLENAME_INPUT).val())) {
-				
-				_cms.support.enable(_cms.copy.sel.RESET_BUTTON);
-			}
-			else {
-				_cms.support.disable(_cms.copy.sel.RESET_BUTTON);
-			}
+			_cms.copy.setButtonStates();	
 		});
+		
+		$(_cms.copy.sel.FORM + ' button').mouseenter(function() {
+			_cms.copy.setButtonStates();	
+		});		
 	}
 }
 
@@ -73,4 +86,6 @@ _cms.copy.onrefresh = function(nodeKey) {
 	_cms.copy.behaviour.submit(nodeKey);
 	_cms.copy.behaviour.formchange();
 	_cms.copy.behaviour.reset(nodeKey);
+	_cms.copy.originalFormState = $(_cms.copy.sel.FORM).serialize();
+	
 }

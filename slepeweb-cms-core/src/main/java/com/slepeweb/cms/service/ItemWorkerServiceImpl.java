@@ -163,8 +163,10 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		int origOrdering = this.linkService.getLink(parent.getId(), source.getId()).getOrdering();
 		long sourceId = source.getId();
 		long sourceOrigId = source.getOrigId();
+		
 		FieldValueSet origFieldValues = source.getFieldValueSet();
 		List<Link> origLinks = source.getLinks();
+		String origTagStr = source.getTagsAsString();
 		
 		// Core data
 		Item ni = CmsBeanFactory.makeItem(source.getType().getName());
@@ -203,6 +205,9 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 			ni.setOrigId(sourceOrigId);
 			this.itemService.updateOrigId(ni);
 		}
+		
+		// Tags
+		saveTags(ni, origTagStr, null);
 		
 		// Overwrite the ordering of the parent link
 		Link parentLink2NewVersion = this.linkService.getLink(parent.getId(), ni.getId());
@@ -258,7 +263,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		 * Return the item instance with nullified field values and links,
 		 * forcing these data to be re-calculated on demand.
 		 */
-		return ni.setLinks(null).setFieldValues(null);
+		return ni.setLinks(null).setFieldValues(null).setTags(null);
 	}
 	
 	public Item version(Item source) throws ResourceException {
@@ -331,7 +336,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 			}
 			
 			// latestTagValues now contains new selections
-			if (freshTagValues.size() > 0) {
+			if (freshTagValues.size() > 0 && recentTags != null) {
 				
 				// Filter out duplicates
 				for (String v : recentTags) {

@@ -30,7 +30,7 @@ public class Media extends CmsBean {
 			Media m = (Media) obj;
 			setItemId(m.getItemId());
 			setSize(m.getSize());
-			setBlob(m.getBlob()).
+			setBlob(m.getBlob());
 			setFolder(m.getFolder());
 		}
 	}

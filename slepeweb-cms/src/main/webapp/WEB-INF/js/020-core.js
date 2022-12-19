@@ -54,14 +54,17 @@ _cms.core.behaviour.update = function(nodeKey) {
 				if (! resp.error) {
 					_cms.support.flashMessage(_cms.support.toStatus(false, resp.message));
 					
-					// Name may have changed, so navigation tree will need updating, and 
-					// many of the tabs will need refreshing
-					var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
-					if (node) {
-						node.setTitle(resp.data[0]);
+					// Name may have changed. If so, resp.data[0] will be not null.
+					if (resp.data[0]) {
+						var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
+						
+						if (node) {
+							node.setTitle(resp.data[0]);
+						}
+						
+						_cms.support.updateItemName(resp.data[0]);
 					}
 					
-					_cms.support.updateItemName(resp.data[0]);
 					_cms.copy.refresh.tab(nodeKey);
 					_cms.support.refreshHistory(_cms.siteId);
 					

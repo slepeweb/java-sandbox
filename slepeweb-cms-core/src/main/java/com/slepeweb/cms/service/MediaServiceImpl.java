@@ -99,8 +99,8 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 				
 				if (meta != null) {
 					this.jdbcTemplate.update(
-							"update media set data = null, size = ?, folder = ? where itemid = ? and thumbnail = ?", 
-							meta.getSize(), meta.getBin(), m.getItemId(), m.isThumbnail());
+							"update media set data = null, size = ? where itemid = ? and thumbnail = ?", 
+							meta.getSize(), m.getItemId(), m.isThumbnail());
 					
 					LOG.info(compose("Updated media (data stored in file repository)", m.getItemId(), meta.getBin()));
 				}
@@ -115,7 +115,7 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	
 	private FileMetadata writeMediaToRepository(Media m) {
 		BufferedInputStream is = new BufferedInputStream(m.getUploadStream());
-		FileMetadata meta = this.mediaFileService.writeMediaToRepository(is, m.getRepositoryFileName());
+		FileMetadata meta = this.mediaFileService.writeMediaToRepository(is, m);
 		close(is);
 		return meta;
 	}

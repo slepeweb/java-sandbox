@@ -52,8 +52,6 @@ _cms.add.behaviour.add = function(nodeKey) {
 					var isShortcut = obj.data[1];
 					var isMedia = obj.data[2];
 					
-					//_cms.support.updateItemName(nodeData.title);
-					
 					var parentNode = _cms.leftnav.tree.getNodeByKey(nodeKey.toString());
 					
 					if (position == 'alongside') {
