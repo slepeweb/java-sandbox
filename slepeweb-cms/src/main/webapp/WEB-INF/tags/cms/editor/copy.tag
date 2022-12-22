@@ -21,7 +21,7 @@
 	<div class="button-set">
 		<button class="action" type="button"
 			title="Produce an identical copy of this item, including it's links">Copy</button>
-		<button class="reset" type="button"  disabled="disabled">Reset form</button>
+		<button class="reset" type="button"  disabled="disabled" ${_resetHelp}>Reset form</button>
 	</div>
 </form>
 	

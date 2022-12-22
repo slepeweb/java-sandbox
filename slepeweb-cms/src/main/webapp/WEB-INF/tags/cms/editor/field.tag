@@ -44,7 +44,7 @@
 	
 	<div class="button-set">
 		<button class="action" type="button" disabled="disabled" title="Update the changes to field values">Update</button>
-		<button class="reset" type="button" disabled="disabled">Reset form</button>
+		<button class="reset" type="button" disabled="disabled" ${_resetHelp}>Reset form</button>
 	</div>
 </form>
 	

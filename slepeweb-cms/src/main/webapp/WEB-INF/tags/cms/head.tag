@@ -27,8 +27,8 @@
 <link rel="stylesheet" href="${applicationContextPath}/resources/css/main.css" type="text/css">
 
 <c:if test="${loadjs}">
-	<script src="${applicationContextPath}/rest/js" type="text/javascript"></script>
 	<edit:init />
+	<script src="${applicationContextPath}/rest/js" type="text/javascript"></script>
 </c:if>
 
 <cms:extraCSS />

@@ -46,7 +46,7 @@
 <div id="confirm-trash-dialog" class="hide cms-dialog">
 	<p>
 		<span class="ui-icon ui-icon-alert cms-icon"></span>
-		This will delete the current item <strong>(<span class="current-item-name">${editingItem.name}</span>)</strong> PLUS any shortcuts 
+		This will trash the current item <strong>(<span class="current-item-name">${editingItem.name}</span>)</strong> PLUS any shortcuts 
 		to it <strong>PLUS ALL</strong> descendant items <strong>(total=<span class="num-descendants">_</span>)</strong>. Are you sure you want to do this?
 	</p>
 </div>

@@ -50,7 +50,7 @@ _cms.dialog.confirmTrash.define = function() {
 	}
 	
 	var buttons = {
-		"Delete all items": function() {
+		"Trash ALL items": function() {
 			_cms.core.trashItem(_cms.editingItemId);
 		},
 		Cancel: function() {
@@ -58,7 +58,7 @@ _cms.dialog.confirmTrash.define = function() {
 		}
 	}
 	
-	_cms.dialog.confirmTrash.obj = _cms.dialog.define("Confirm deletion", 
+	_cms.dialog.confirmTrash.obj = _cms.dialog.define("Confirm trashing", 
 			_cms.dialog.sel.CONFIRM_TRASH_ACTION, 200, 200, buttons, close);
 }
 

@@ -12,38 +12,26 @@ _cms.support.setTabIds(_cms.version, "version");
 _cms.version.behaviour.action = function(nodeKey) {
 	// Add behaviour to create a new version 
 	$(_cms.version.sel.VERSION_BUTTON).click(function () {
-		$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/version", {
-			type: "POST",
-			cache: false,
-			dataType: "json",
-			success: function(obj, status, z) {
+		_cms.support.ajax('POST', '/rest/item/' + nodeKey + '/version', {dataType: 'json'},
+			function(obj, status, z) {
 				_cms.support.flashMessage(obj);
 				// All tabs should be refreshed since the current item has changed
 				_cms.leftnav.navigate(nodeKey, _cms.version.TABID);
-			},
-			error: function(json, status, z) {
-				_cms.support.serverError();
-			},
-		});
+			}
+		);
 	});
 }
 
 _cms.version.behaviour.revert = function(nodeKey) {
 	// Add behaviour to revert to a previous version 
 	$(_cms.version.sel.REVERT_BUTTON).click(function () {
-		$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/revert", {
-			type: "POST",
-			cache: false,
-			dataType: "json",
-			success: function(obj, status, z) {
+		_cms.support.ajax('POST', '/rest/item/' + nodeKey + '/revert', {dataType: 'json'},
+			function(obj, status, z) {
 				_cms.support.flashMessage(obj);
 				// All tabs should be refreshed since the current item has changed
 				_cms.leftnav.navigate(nodeKey, _cms.version.TABID);
-			},
-			error: function(json, status, z) {
-				_cms.support.serverError();
-			},
-		});
+			}
+		);
 	});
 }
 

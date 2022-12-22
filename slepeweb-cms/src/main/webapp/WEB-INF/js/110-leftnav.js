@@ -64,7 +64,7 @@ _cms.leftnav.define.fancytree = function() {
 }
 
 // Navigate to a new item. 
-_cms.leftnav.navigate = function(key, tab, fn, args) {
+_cms.leftnav.navigate = function(key, tab, successCallback, args) {
 	// TODO: Need a better way to provide the preferred editor tab name to the 'activate'
 	//       function in FancyTree. This way will have to do for now.
 	if (! tab) {
@@ -72,47 +72,51 @@ _cms.leftnav.navigate = function(key, tab, fn, args) {
 	}
 	_cms.activateTab = tab.endsWith('-tab') ? tab : tab + '-tab';
 	
+	var success = true;
+	
 	// Is the item of interest already visible in the tree?
 	var node = _cms.leftnav.tree.getNodeByKey(key);
 	
 	if (node) {
-		// This triggers the 'activate' function of the FancyTree object,
-		// which in turn triggers '_cms.support.renderItemForms'.
-		//_cms.leftnav.tree.activateKey(node.key);
+		/* 
+			'setActive()' triggers the 'activate' function of the FancyTree object,
+			which in turn triggers '_cms.support.renderItemForms'. 
+			HOWEVER, these events will only take place IFF the node is not
+			already active.
+		*/
+		if (node.isActive()) {
+			node.setActive(false);
+		}
 		node.setActive(true);
 	}
 	else {
 		// This item hasn't been loaded into the fancytree yet 
 		// - ask the server for the breadcrumb trail
-		if (! _cms.leftnav.loadBreadcrumbs(key, fn, args)) {
+		if (! _cms.leftnav.loadBreadcrumbs(key)) {
 			_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
+			success = false;
 		}
+	}
+	
+	if (success && successCallback) {
+		successCallback(args);
 	}
 }
 
-_cms.leftnav.loadBreadcrumbs = function(key, fn, args) {
+_cms.leftnav.loadBreadcrumbs = function(key) {
 	let success = false;
 	
-	$.ajax(_cms.ctx + "/rest/breadcrumbs/" + key, {
-		cache: false,
-		dataType: "json",
-		mimeType: "application/json",
-		success: function(json, status, z) {
+	_cms.support.ajax('GET', '/rest/breadcrumbs/' + key, {dataType: 'json', mimeType: 'application/json'},
+		function(json, status, z) {
 			_cms.leftnav.tree.loadKeyPath(json, function(node, status) {
+				//console.log('_cms.leftnav.tree.loadKeyPath:', node.key, status);
 				if (status === "ok") {
 				    node.setActive();
-				    
-					if (fn) {
-						fn(args);
-					}
-					
 				    success = true;
 				}
 			});
-		},
-		error: function(json, status, z) {
 		}
-	});
+	);
 	
 	return success;
 }

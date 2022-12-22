@@ -15,12 +15,8 @@ _cms.undoRedo.behaviour = function(selector, option) {
 	let icon$ = $(selector + ' i');
 	
 	icon$.off().click(function() {
-		$.ajax(_cms.ctx + "/rest/item/update/" + option, {
-			type: "GET",
-			cache: false,
-			dataType: "json",
-			
-			success: function(resp, status, z) {
+		_cms.support.ajax('GET', '/rest/item/update/' + option, {dataType: 'json'},
+			function(resp, status, z) {
 				let undoRedoStatus = resp.data[0];
 				let editorTabName = resp.data[1];
 				let targetItemOrigId = resp.data[2];
@@ -57,21 +53,7 @@ _cms.undoRedo.behaviour = function(selector, option) {
 				else {
 					_cms.support.flashMessage({error: resp.error, message: resp.message});
 				}	
-			},
-			error: function(resp, status, z) {
-				console.log("Error: " + resp);
 			}
-		});
+		);
 	});
 }
-
-$(function() {
-	// Display the undo/redo/clear buttons
-	_cms.undoRedo.displayAll(_cms.undoRedo.status);
-	
-	// Set the behaviour of the undo/redo/clear buttons, once per page load
-	_cms.undoRedo.behaviour('div#undo-icon', 'undo');
-	_cms.undoRedo.behaviour('div#redo-icon', 'redo');
-	_cms.undoRedo.behaviour('div#kill-icon', 'clear', true);
-	
-});

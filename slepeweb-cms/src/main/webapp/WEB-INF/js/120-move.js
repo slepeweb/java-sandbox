@@ -23,17 +23,17 @@ _cms.move.action = function(nodeKey) {
 	
 	if (position != 'none' && moverNode && targetNode) {			
 		if (! moverNode.parent.key.startsWith("root")) {
-			$.ajax(_cms.ctx + "/rest/item/" + moverNode.key + "/move", {
-				type: "POST",
-				cache: false,
-				data: {
-					targetId: targetNode.key,
-					targetParentId: targetNode.parent.key,
-					moverParentId: moverNode.parent.key,
-					mode: position
-				}, 
-				dataType: "json",
-				success: function(obj, status, z) {
+			_cms.support.ajax('POST', '/rest/item/' + moverNode.key + '/move', 
+				{
+					data: {
+						targetId: targetNode.key,
+						targetParentId: targetNode.parent.key,
+						moverParentId: moverNode.parent.key,
+						mode: position
+					}, 
+					dataType: 'json'
+				},
+				function(obj, status, z) {
 					if (! obj.error) {
 						moverNode.moveTo(targetNode, position);
 						moverNode.setActive(true);
@@ -42,14 +42,11 @@ _cms.move.action = function(nodeKey) {
 						_cms.undoRedo.displayAll(obj.data);
 					}
 					_cms.support.flashMessage(obj);
-				},
-				error: function(json, status, z) {
-					_cms.support.serverError();
 				}
-			});
+			);
 		}
 	}
-};
+}
 
 _cms.move.behaviour.action = function(nodeKey) {
 	$(_cms.move.sel.MOVE_BUTTON).click(function() {
@@ -77,14 +74,16 @@ _cms.move.behaviour.changePosition = function() {
 }
 
 _cms.move.check_data_is_complete = function() {
-	var isComplete = $(_cms.move.sel.POSITION_SELECTOR).val() != "none" && 
-		$(_cms.move.sel.MOVE_TARGET_ID).html().startsWith("'");
-	
-	if (_cms.support.enableIf(_cms.move.sel.MOVE_BUTTON, isComplete)) {
-		_cms.support.enable(_cms.move.sel.RESET_BUTTON);
-	}
-	else {
-		_cms.support.disable(_cms.move.sel.RESET_BUTTON);
+	if (_cms.editingItemIsWriteable) {
+		var isComplete = $(_cms.move.sel.POSITION_SELECTOR).val() != "none" && 
+			$(_cms.move.sel.MOVE_TARGET_ID).html().startsWith("'");
+		
+		if (_cms.support.enableIf(_cms.move.sel.MOVE_BUTTON, isComplete)) {
+			_cms.support.enable(_cms.move.sel.RESET_BUTTON);
+		}
+		else {
+			_cms.support.disable(_cms.move.sel.RESET_BUTTON);
+		}
 	}
 }
 

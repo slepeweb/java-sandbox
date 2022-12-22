@@ -17,8 +17,10 @@ _cms.add.sel.STOCK_INPUT = _cms.support.fi(_cms.add.sel.ADD_TAB, "stock");
 _cms.add.sel.ALPHA_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "alphaaxis");
 _cms.add.sel.BETA_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "betaaxis");
 _cms.add.sel.ALL_FORM_ELEMENTS = "".concat(_cms.add.sel.ADD_TAB, " select,", _cms.add.sel.ADD_TAB, " input");
-_cms.add.sel.ADD_BUTTON = _cms.add.sel.ADD_TAB + " button.action",
-_cms.add.sel.RESET_BUTTON = _cms.add.sel.ADD_TAB + " button.reset",
+_cms.add.sel.ADD_BUTTON = _cms.add.sel.ADD_TAB + " button.action";
+_cms.add.sel.RESET_BUTTON = _cms.add.sel.ADD_TAB + " button.reset";
+_cms.add.sel.FORM = _cms.add.sel.ADD_TAB, " form";
+
 
 _cms.support.setTabIds(_cms.add, "add");
 
@@ -115,15 +117,20 @@ _cms.add.check_data_is_complete = function() {
 	return (template != 0 || itemtype != 0) && name;
 }
 
+_cms.add.setButtonStates = function() {
+	if (_cms.support.enableIf(_cms.add.sel.ADD_BUTTON, _cms.add.check_data_is_complete())) {
+		_cms.support.enable(_cms.add.sel.RESET_BUTTON);
+	}
+	else {
+		_cms.support.disable(_cms.add.sel.RESET_BUTTON);
+	}
+}
+
 _cms.add.behaviour.formchange = function() {
-	$(_cms.add.sel.ALL_FORM_ELEMENTS).mouseleave(function(){
-		if (_cms.support.enableIf(_cms.add.sel.ADD_BUTTON, _cms.add.check_data_is_complete())) {
-			_cms.support.enable(_cms.add.sel.RESET_BUTTON);
-		}
-		else {
-			_cms.support.disable(_cms.add.sel.RESET_BUTTON);
-		}
-	});
+	if (_cms.editingItemIsWriteable) {
+		$(_cms.add.sel.ALL_FORM_ELEMENTS).mouseleave(_cms.add.setButtonStates);
+		$(_cms.add.sel.FORM + ' button').mouseenter(_cms.add.setButtonStates);
+	}
 }
 
 _cms.add.behaviour.reset = function(nodeKey) {

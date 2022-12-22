@@ -83,24 +83,14 @@ _cms.misc.opSection = function(nodeKey, method, url, bar, data, success, error) 
 		}
 	}
 	
-	$.ajax(_cms.ctx + url, {
-		type: method,
-		cache: false,
-		dataType: "json",
-		data: data,
-		success: success,
-		error: error,
-	});
-
+	_cms.support.ajax(method, url, {dataType: "json", data: data},
+		success,
+		error);
 }
 
 _cms.misc.refresh.trash = function(fn) {
-	$.ajax(_cms.ctx + "/rest/trash/get", {
-		cache: false,
-		dataType: "html",
-		mimeType: "text/html",
-		
-		success: function(html, status, z) {
+	_cms.support.ajax('GET', '/rest/trash/get', {dataType: "html", mimeType: "text/html"},
+		function(html, status, z) {
 			var mydiv = $(_cms.misc.sel.TRASH_CONTAINER);
 			mydiv.empty().append(html);
 			
@@ -111,11 +101,8 @@ _cms.misc.refresh.trash = function(fn) {
 			if (fn) {
 				fn();
 			}
-		},
-		error: function(json, status, z) {
-			_cms.support.serverError();
-		},
-	});
+		}
+	);
 }
 
 _cms.misc.behaviour.trash.showOrHide = function() {
@@ -143,19 +130,12 @@ _cms.misc.behaviour.trash.empty = function() {
 		var url = "/rest/trash/empty/" + option;
 		var params = _cms.misc.trash.getIdParams(option);
 		
-		$.ajax(_cms.ctx + url, {
-			cache: false,
-			dataType: "json",
-			data: params,
-			
-			success: function(obj, status, z) {
+		_cms.support.ajax('GET', url, {dataType: "json", data: params},			
+			function(obj, status, z) {
 				_cms.misc.refresh.trash();
 				_cms.support.flashMessage(obj);
-			},
-			error: function(json, status, z) {
-				_cms.support.serverError();
-			},
-		});
+			}
+		);
 	});
 }
 
@@ -189,25 +169,26 @@ _cms.misc.behaviour.trash.restore = function() {
 		var url = "/rest/trash/restore/" + option;
 		var params = _cms.misc.trash.getIdParams(option);
 		
-		$.ajax(_cms.ctx + url, {
-			cache: false,
-			dataType: "json",
-			data: params,
-			
-			success: function(obj, status, z) {
-				/*
-				 * Reload the page. Leave the user to
-				 * navigate the tree to confirm the restored items are there.
-				 */ 
-				_cms.leftnav.navigate(_cms.editingItemId, _cms.core.TABID, function() {
-					_cms.support.flashMessage(_cms.support.toStatus(false, 
-						encodeURI("Page reloaded; check leftnav for restored items")));
-				});
-			},
-			error: function(json, status, z) {
-				_cms.support.serverError();
-			},
-		});	
+		_cms.support.ajax('GET', url, {dataType: "json", data: params},			
+			function(resp, status, z) {
+				if (! resp.error) {
+					// Load restored item into the leftnav
+					var parentNode = _cms.leftnav.tree.getNodeByKey(resp.data[0].key);
+					
+					if (parentNode != null) {
+						parentNode.addNode(resp.data[1]);
+					}
+					
+					// Navigate to the restored item
+					_cms.leftnav.navigate(resp.data[1].key, _cms.core.TABID, function() {
+						_cms.support.flashMessage(resp);
+					});
+				}
+				else {
+					_cms.support.flashMessage(_cms.support.toStatus(true, "Restore failed"));
+				}
+			}
+		);	
 	});
 }
 
@@ -233,18 +214,18 @@ _cms.misc.flaggedItems = {}
 _cms.misc.flaggedItems.behaviour = {}
 
 _cms.misc.flaggedItems.refresh = function(nodeKey) {
-	_cms.misc.flaggedItems.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/refresh/flaggedItems");
+	_cms.misc.flaggedItems.ajax("/rest/item/" + nodeKey + "/refresh/flaggedItems");
 }
 
 _cms.misc.flaggedItems.behaviour.flagChildren = function() {
 	$('div#flagged-items-section button#flag-children-button').click(function() {
-		_cms.misc.flaggedItems.ajax(_cms.ctx + "/rest/item/" + _cms.editingItemId + "/flag/children");
+		_cms.misc.flaggedItems.ajax("/rest/item/" + _cms.editingItemId + "/flag/children");
 	});
 }
 
 _cms.misc.flaggedItems.behaviour.unflagAll = function() {
 	$('div#flagged-items-section button#unflag-button').click(function() {
-		_cms.misc.flaggedItems.ajax(_cms.ctx + "/rest/flaggedItems/unflag/all");
+		_cms.misc.flaggedItems.ajax("/rest/flaggedItems/unflag/all");
 		$('i.item-flag').removeClass('flagged');
 	});
 }
@@ -252,7 +233,7 @@ _cms.misc.flaggedItems.behaviour.unflagAll = function() {
 _cms.misc.flaggedItems.behaviour.trashAll = function() {
 	$('div#flagged-items-section button#trash-button').click(function() {
 		_cms.dialog.open(_cms.dialog.eggTimer);
-		_cms.support.ajax('GET', _cms.ctx + "/rest/flaggedItems/trash/all", {}, function(a,b,c) {
+		_cms.support.ajax('GET', '/rest/flaggedItems/trash/all', {}, function(a,b,c) {
 			_cms.dialog.close(_cms.dialog.eggTimer);
 			window.location = _cms.ctx + '/page/editor/' + _cms.rootItemOrigId +'?status=success&msg=Flagged items trashed - now on Homepage'; 
 		});
@@ -290,7 +271,7 @@ _cms.misc.flaggedItems.behaviour.copyAll = function() {
 		_cms.misc.flaggedItems.collateFormData('copy-core-data', '0', params);
 		_cms.misc.flaggedItems.collateFormData('copy-fieldvalue', '1', params);
 				
-		_cms.support.ajax('POST', _cms.ctx + "/rest/flaggedItems/copy/all", params, function(resp, status, z) {
+		_cms.support.ajax('POST', '/rest/flaggedItems/copy/all', params, function(resp, status, z) {
 			_cms.dialog.close(_cms.dialog.eggTimer);
 			_cms.support.flashMessage(_cms.support.toStatus(resp.error, resp.message));
 		});

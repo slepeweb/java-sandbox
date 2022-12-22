@@ -93,6 +93,6 @@
 	<div class="button-set">
 		<button class="action" type="button" disabled="disabled"
 			title="Add a new item below/alongside the current item">Add</button>
-		<button class="reset" type="button" disabled="disabled">Reset form</button>
+		<button class="reset" type="button" disabled="disabled" ${_resetHelp}>Reset form</button>
 	</div>
 </form>

@@ -75,6 +75,7 @@ _cms.links = {
 		LINK_TARGET_IDENTIFIER: "#link-target-identifier",
 	},
 	shortcut: {},
+	ordering: null,
 };
 
 _cms.links.sel.LINKTYPE_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKTYPE_SELECT;
@@ -156,30 +157,23 @@ _cms.links.behaviour.save = function(nodeKey) {
 		}
 		
 		// Ajax call to save links to db 
-		$.ajax(_cms.ctx + "/rest/links/" + nodeKey + "/save", {
-			type: "POST",
-			cache: false,
-			data: JSON.stringify(links), 
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
-			processData: false,
-			success: function(resp, status, z) {
-				_cms.support.flashMessage(resp);
-				_cms.links.refresh.tab(nodeKey);
-				_cms.links.activateSaveButton(false);
-				_cms.undoRedo.displayAll(resp.data[3]);				
-				
-				if (! resp.error && resp.data) {
-					// Need to refresh the FancyTree,
-					// since one or more shortcuts have been added/removed
-					//_cms.leftnav.refreshShortcuts("" + _cms.editingItemId, resp.data[0]);
-					_cms.leftnav.refreshShortcut("" + nodeKey, resp.data[1], resp.data[2]);
+		_cms.support.ajax('POST', '/rest/links/' + nodeKey + '/save', 
+			{data: JSON.stringify(links), contentType: 'application/json; charset=utf-8', dataType: 'json', processData: false},
+				// On success
+				function(resp, status, z) {
+					_cms.support.flashMessage(resp);
+					_cms.links.refresh.tab(nodeKey);
+					_cms.links.activateSaveButton(false);
+					_cms.undoRedo.displayAll(resp.data[3]);				
+					
+					if (! resp.error && resp.data) {
+						// Need to refresh the FancyTree,
+						// since one or more shortcuts have been added/removed
+						//_cms.leftnav.refreshShortcuts("" + _cms.editingItemId, resp.data[0]);
+						_cms.leftnav.refreshShortcut("" + nodeKey, resp.data[1], resp.data[2]);
+					}
 				}
-			},
-			error: function(obj, status, z) {
-				_cms.support.serverError();
-			},
-		});
+		);
 	});
 }
 
@@ -313,14 +307,12 @@ _cms.links.useLink = function(formData) {
 };
 
 _cms.links.getItemNameAnd = function(childId, fn, param1, param2, param3, param4) {
-	$.ajax(_cms.ctx + "/rest/item/" + childId + "/name", {
-		type: "POST",
-		cache: false,
-		dataType: "text",
-		success: function(itemName, status, z) {
+	_cms.support.ajax('POST', '/rest/item/' + childId + '/name', {dataType: 'text'},
+		// On success
+		function(itemName, status, z) {
 			fn(itemName, param1, param2, param3, param4);
 		}
-	});
+	);
 }
 
 _cms.links.insertClonedLink = function(itemName, sortableLinksContainer, div, formData) {
@@ -333,8 +325,6 @@ _cms.links.insertClonedLink = function(itemName, sortableLinksContainer, div, fo
 	div.find("div.right span.hide").html(_cms.links.formatHiddenLinkData(formData));				
 	div.appendTo(sortableLinksContainer);					
 }
-
-
 
 _cms.links.updateLink = function(itemName, span, identifier, formData) {
 	span.innerHTML = _cms.links.formatHiddenLinkData(formData);
@@ -380,7 +370,13 @@ _cms.links.setLinkForm = function(data) {
 };
 
 _cms.links.behaviour.sortable = function() { 
-	$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).sortable();
+	$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).sortable(
+		{
+			update: function(event, ui) {
+				_cms.links.activateSaveButton(true);
+			}		
+		});
+		
 	$(_cms.links.sel.SORTABLE_LINKS_CONTAINER).disableSelection();
 }
 
@@ -519,12 +515,9 @@ _cms.links.shortcut.settings = function() {
 
 _cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
 
-	$.ajax(_cms.ctx + "/rest/linknames/" + _cms.siteId + "/" + linkType, {
-		type: "POST",
-		cache: false,
-		dataType: "html",
-		mimeType: "text/html",
-		success: function(html, status, z) {
+	_cms.support.ajax('POST', '/rest/linknames/' + _cms.siteId + '/' + linkType, {dataType: 'html', mimeType: 'text/html'},
+		// On success
+		function(html, status, z) {
 			var divs = $(html).children();
 			var selector = $(_cms.links.sel.LINKNAME_SELECT);
 			var guidanceListDiv = $("#link-guidance-list");
@@ -540,8 +533,8 @@ _cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
 			selector.val(currentLinkname);
 			_cms.links.repopulateGuidance(currentLinkname);
 		}
-	});
-};
+	);
+}
 
 
 // Things to do once-only on page load
@@ -562,6 +555,6 @@ _cms.links.onrefresh = function(nodeKey) {
 	_cms.links.behaviour.edit();
 	_cms.links.behaviour.navigate();
 	
-	_cms.links.shortcut.settings();
+	_cms.links.shortcut.settings();	
 }
 

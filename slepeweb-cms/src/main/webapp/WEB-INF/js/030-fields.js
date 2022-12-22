@@ -37,23 +37,21 @@ _cms.field.behaviour.update = function(nodeKey) {
 }
 
 _cms.field.update = function(nodeKey, formData) {
-	$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/update/fields", {
-		type: "POST",
-		cache: false,
-		data: formData, 
-		dataType: "json",
-		success: function(resp, status, z) {
+	_cms.support.ajax('POST', '/rest/item/' + nodeKey + '/update/fields', {data: formData, dataType: 'json'}, 
+		// On success
+		function(resp, status, z) {
 			_cms.dialog.close(_cms.dialog.confirmFieldUpdate);
 			_cms.support.flashMessage(resp);
 			_cms.field.refresh.tab(nodeKey);
 			_cms.misc.flaggedItems.refresh(nodeKey);
 			_cms.undoRedo.displayAll(resp.data);
 		},
-		error: function(obj, status, z) {
+		// On error
+		function(obj, status, z) {
 			_cms.dialog.close(_cms.dialog.confirmFieldUpdate);
 			_cms.support.serverError();
-		},
-	});
+		}
+	);
 }
 
 //Get form field names and values for forms on item-editor 
@@ -153,20 +151,26 @@ _cms.field.behaviour.cancel = function(nodeKey) {
 	});
 }
 
+_cms.field.setButtonStates = function() {
+	if (_cms.support.enableIf(_cms.field.sel.UPDATE_BUTTON, 
+			_cms.field.originalFormState != $(_cms.field.sel.FORM).serialize())) {
+		
+		_cms.support.enable(_cms.field.sel.RESET_BUTTON);
+	}
+	else {
+		_cms.support.disable(_cms.field.sel.RESET_BUTTON);
+	}
+}
+
 _cms.field.behaviour.formchange = function() {
 	if (_cms.editingItemIsWriteable) {
 		$(_cms.field.sel.ALL_FORM_ELEMENTS).mouseleave(function() {
 			if ($(this).attr("name") != "language") {
-				if (_cms.support.enableIf(_cms.field.sel.UPDATE_BUTTON, 
-						_cms.field.originalFormState != $(_cms.field.sel.FORM).serialize())) {
-					
-					_cms.support.enable(_cms.field.sel.RESET_BUTTON);
-				}
-				else {
-					_cms.support.disable(_cms.field.sel.RESET_BUTTON);
-				}
+				_cms.field.setButtonStates();
 			}
 		});
+		
+		$(_cms.field.sel.FORM + ' button').mouseenter(_cms.field.setButtonStates);
 	}
 }
 

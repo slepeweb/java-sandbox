@@ -15,20 +15,22 @@
 	<p class="in-your-face-text">Item '<span class="current-item-name">${editingItem.name}</span>' is currently 
 		located at '${editingItem.path}'.</p>
 	
-	<div>
-		<span class="space-after">Move item '<span class="current-item-name">${editingItem.name}</span>', placing it </span>
-		<span class="space-after"><select name="position">
-				<option value="none">Choose ...</option>
-				<option value="before">Before</option>
-				<option value="over">Below</option>
-				<option value="after">After</option>
-			</select></span>
-		<i class="fa-solid fa-sitemap itempicker" title="Pick a target from the content structure"></i>
-		<span id="move-target-identifier">your chosen target</span> 
-	</div>
-	
-	<div class="button-set spacer20">
-		<button class="action" disabled="disabled" type="button">Move item</button>
-		<button class="reset" disabled="disabled" type="button">Reset form</button>
-	</div>
+	<form>
+		<div>
+			<span class="space-after">Move item '<span class="current-item-name">${editingItem.name}</span>', placing it </span>
+			<span class="space-after"><select name="position">
+					<option value="none">Choose ...</option>
+					<option value="before">Before</option>
+					<option value="over">Below</option>
+					<option value="after">After</option>
+				</select></span>
+			<i class="fa-solid fa-sitemap itempicker" title="Pick a target from the content structure"></i>
+			<span id="move-target-identifier">your chosen target</span> 
+		</div>
+		
+		<div class="button-set spacer20">
+			<button class="action" disabled="disabled" type="button">Move item</button>
+			<button class="reset" disabled="disabled" type="button" ${_resetHelp}>Reset form</button>
+		</div>
+	</form>
 </div>

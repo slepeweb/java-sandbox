@@ -1,17 +1,15 @@
 TODO: This is the main todo file:
 
 HIGH
-- all forms should copy mouseleave functions to mousenter. Use copy.js as benchmark.
-- Thumbnails sometimes have wrong orientation - will take a lot of work to rectify. See ImageUtil.
-- refactor code to use _cms.support.ajax wrapper function
-- force media items to have appropriate simplename extensions, esp. video, pdf, etc. (???)
+- 'flag siblings' 
 - implement cron job to backup cms db on desktop
+- new: move flagged items to the same location
 
 MEDIUM
-- after trashing items, could auto navigate to most recently edited & available item
-- new: move flagged items to the same location
+- Thumbnails sometimes have wrong orientation - will take a lot of work to rectify. See ImageUtil.
 - show bin - takes 2 clicks (perhaps not first time)
 - re-test registration process
+- force media items to have appropriate simplename extensions, esp. video, pdf, etc. (???)
 - PDFs not viewable on my android phone (chrome)
 - PDFs not rendered with scrollbars on iPad
 - need to protect against injection attacks

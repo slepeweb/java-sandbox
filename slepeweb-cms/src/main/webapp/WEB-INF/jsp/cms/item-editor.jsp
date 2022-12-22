@@ -14,6 +14,8 @@
 	_cms.downNavKey = ${_navkeys.down};
 </script>
 
+<c:set var="_resetHelp" scope="request">title="Cancel changes and reset form"</c:set>
+
 <ul id="editor-tabs">
 	<li><a href="#core-tab">Core</a></li>
 	<c:if test="${not editingItem.shortcut}"><li><a href="#field-tab">Fields</a></li></c:if>

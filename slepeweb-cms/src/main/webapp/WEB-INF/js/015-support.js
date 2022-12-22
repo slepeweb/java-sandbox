@@ -256,35 +256,26 @@ _cms.support.itemFlagger = function() {
 _cms.support.ajax = function(method, url, data, success, fail) {
 	let params = {
 		type: method,
-		cache: false
+		cache: false,
+		xhr: data.xhr,
+		data: data.data,
+		contentType: data.contentType,
+		dataType: data.dataType,
+		mimeType: data.mimeType,
+		success: success,
+		processData: data.processData,
+		success: success,
+		error: fail
 	}
 	
-	if (data.data) {
-		params.data = data.data;
-	}
-	
-	if (data.datatype) {
-		params.dataType = data.dataType;
-	}
-	
-	if (data.mimetype) {
-		params.mimeType = data.mimeType;
-	}
-	
-	if (success) {
-		params.success = success;
-	}
-	
-	if (fail) {
-		params.error = fail;
-	}
-	else {
-		params.error = function(resp, status, z) {
-			console.log("Error: " + resp);
+	if (! params.error) {
+		params.error = function(a, b, c) {
+			_cms.support.serverError();
+			console.log("Server error:", '\na:', a, '\nb:', b, '\nc:', c);
 		}
 	}
-	$.ajax(url, params);
 	
+	$.ajax(_cms.ctx + url, params);
 }
 
 /*

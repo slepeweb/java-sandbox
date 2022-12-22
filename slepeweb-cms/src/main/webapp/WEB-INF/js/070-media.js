@@ -30,31 +30,26 @@ _cms.media.behaviour.progressHandlingFunction = function(e) {
 _cms.media.behaviour.upload = function(nodeKey) {
 	$(_cms.media.sel.UPLOAD_BUTTON).click(function () {
 		var formData = new FormData($(_cms.media.sel.FORM)[0]);
-	    $.ajax({
-	        url: _cms.ctx + "/rest/item/" + nodeKey + "/update/media",
-	        type: "POST",
-	        xhr: function() {
-	            var myXhr = $.ajaxSettings.xhr();
-	            if(myXhr.upload) {
-	                myXhr.upload.addEventListener("progress", _cms.media.behaviour.progressHandlingFunction, false);
-	            }
-	            return myXhr;
-	        },
-	        success: function() {
+		
+	    _cms.support.ajax('POST', '/rest/item/' + nodeKey + '/update/media',
+	        {
+		        data: formData,
+		        contentType: false,
+		        processData: false,
+		        xhr: function() {
+		            var myXhr = $.ajaxSettings.xhr();
+		            if(myXhr.upload) {
+		                myXhr.upload.addEventListener("progress", _cms.media.behaviour.progressHandlingFunction, false);
+		            }
+		            return myXhr;
+		        }
+		    },
+	        function() {
 	        	_cms.support.flashMessage(_cms.support.toStatus(false, "Media successfully uploaded"));
 	        	_cms.media.refresh.tab(nodeKey);
-	        	
-	        },
-	        error: function() {
-	        	_cms.support.serverError();
-	        },
-	        data: formData,
-	        cache: false,
-	        contentType: false,
-	        processData: false
-	    });
+	        }
+	    );
 	});
-
 
 	$(_cms.media.sel.FILE_INPUT).click(function () {
 		$(_cms.media.sel.PROGRESS).attr("value", 0);

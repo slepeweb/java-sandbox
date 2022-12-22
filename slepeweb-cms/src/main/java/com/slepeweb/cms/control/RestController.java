@@ -944,21 +944,35 @@ public class RestController extends BaseController {
 			origIdList = origIdList.substring(0, origIdList.length() - 1);
 		}
 		
-		if (StringUtils.isNotBlank(origIdList)) {
-			String[] origIdStr = origIdList.split(",");
-			int len = origIdStr.length;
-		
-			long[] origIds = new long[len];
-			for (int i = 0; i < len; i++) {
-				origIds[i] = Integer.parseInt(origIdStr[i]);
-			}
-			
-			return resp.setError(false).addMessage(
-					String.format("Restored %d items from the trash", this.cmsService.getItemService().restoreSelectedItems(origIds)));
-		}
-		else {
+		if (StringUtils.isBlank(origIdList)) {
 			return resp.setError(true).addMessage("No items selected by user");
 		}
+		
+		String[] origIdStr = origIdList.split(",");
+		int len = origIdStr.length;
+	
+		long[] origIds = new long[len];
+		for (int i = 0; i < len; i++) {
+			origIds[i] = Integer.parseInt(origIdStr[i]);
+		}
+		
+		int numRestored = this.cmsService.getItemService().restoreSelectedItems(origIds);
+		
+		if (numRestored == origIds.length) {
+			// Get the first of the restored items
+			Item i = this.cmsService.getItemService().getEditableVersion(origIds[0]);
+			if (i != null) {
+				Item parent = i.getParent();
+				
+				return resp.
+						setError(false).
+						addMessage(
+						String.format("Restored %d items from the trash", numRestored)).
+						setData(new Object[] {Node.toNode(parent), Node.toNode(i)});
+			}
+		}
+		
+		return resp.setError(true).addMessage("No items restored");
 	}
 	
 	@RequestMapping(value="/trash/restore/all", produces="application/json")
@@ -966,8 +980,21 @@ public class RestController extends BaseController {
 	public RestResponse restoreAllTrashedItems(ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		int num = this.cmsService.getItemService().restoreSelectedItems(null);		
-		return resp.setError(false).addMessage(String.format("Restored %d items from the trash", num));
+		
+		// Identify one of the restored items, so that we can present it to the user
+		List<Item> allTrashedItems = this.cmsService.getItemService().getTrashedItems();
+		
+		if (allTrashedItems.size() > 0) {
+			int numRestored = this.cmsService.getItemService().restoreSelectedItems(null);
+			resp.setError(false).addMessage(String.format("Restored %d items from the trash", numRestored));
+			
+			Node iNode = Node.toNode(allTrashedItems.get(0));
+			Node pNode = Node.toNode(allTrashedItems.get(0).getParent());
+			
+			return resp.setData(new Object[] {pNode, iNode});
+		}
+		
+		return resp.setError(true).addMessage("No items to restore");
 	}
 	
 	@RequestMapping(value="/trash/empty/selected", produces="application/json")
@@ -1157,7 +1184,7 @@ public class RestController extends BaseController {
 		return "cms.linknameOptions";
 	}
 	
-	@RequestMapping(value="/item/{origId}/name", method=RequestMethod.POST, produces="application/json")
+	@RequestMapping(value="/item/{origId}/name", method=RequestMethod.POST, produces="text/text")
 	@ResponseBody
 	public String getItemName(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		Item i = getEditableVersion(origId, getUser(req));

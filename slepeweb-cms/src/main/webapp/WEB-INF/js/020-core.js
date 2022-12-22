@@ -45,55 +45,47 @@ _cms.core.behaviour.update = function(nodeKey) {
 				args.stock = $(_cms.core.sel.STOCK_INPUT).val();
 		}
 		
-		$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/update/core", {
-			type: "POST",
-			cache: false,
-			data: args, 
-			dataType: "json",
-			success: function(resp, status, z) {
-				if (! resp.error) {
-					_cms.support.flashMessage(_cms.support.toStatus(false, resp.message));
+		
+		_cms.support.ajax('POST', '/rest/item/' + nodeKey + '/update/core', 
+				{data: args, dataType: 'json'}, function(resp, status, z) {
+				
+			if (! resp.error) {
+				_cms.support.flashMessage(_cms.support.toStatus(false, resp.message));
+				
+				// Name may have changed. If so, resp.data[0] will be not null.
+				if (resp.data[0]) {
+					var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
 					
-					// Name may have changed. If so, resp.data[0] will be not null.
-					if (resp.data[0]) {
-						var node = _cms.leftnav.tree.getNodeByKey(nodeKey);
-						
-						if (node) {
-							node.setTitle(resp.data[0]);
-						}
-						
-						_cms.support.updateItemName(resp.data[0]);
+					if (node) {
+						node.setTitle(resp.data[0]);
 					}
 					
-					_cms.copy.refresh.tab(nodeKey);
-					_cms.support.refreshHistory(_cms.siteId);
-					
-					_cms.core.refresh.tab(nodeKey);
-					
-					// The published status of the item has changed
-					_cms.version.refresh.tab(nodeKey);
+					_cms.support.updateItemName(resp.data[0]);
+				}
+				
+				_cms.copy.refresh.tab(nodeKey);
+				_cms.support.refreshHistory(_cms.siteId);
+				
+				_cms.core.refresh.tab(nodeKey);
+				
+				// The published status of the item has changed
+				_cms.version.refresh.tab(nodeKey);
 
-					// The first version has reached published status
-					// TODO: This is NOT needed on a staging server
-					// TODO: Why refresh the media tab?
-					_cms.media.refresh.tab(nodeKey);
-					
-					_cms.undoRedo.displayAll(resp.data[3]);
-				}				
-			},
-			error: function(json, status, z) {
-				_cms.support.serverError();
+				// The first version has reached published status
+				// TODO: This is NOT needed on a staging server
+				// TODO: Why refresh the media tab?
+				_cms.media.refresh.tab(nodeKey);
+				
+				_cms.undoRedo.displayAll(resp.data[3]);
 			}
-		});
+		});				
+		
 	});
 }
 
 _cms.core.trashItem = function(nodeKey) {
-	$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/trash", {
-		type: "POST",
-		cache: false,
-		dataType: "json",
-		success: function(obj, status, z) {
+	_cms.support.ajax('POST', '/rest/item/' + nodeKey + '/trash', {dataType: 'json'}, 
+		function(obj, status, z) {
 			_cms.dialog.close(_cms.dialog.confirmTrash);
 			_cms.support.flashMessage(obj);
 			
@@ -106,11 +98,11 @@ _cms.core.trashItem = function(nodeKey) {
 				}
 			}
 		},
-		error: function(json, status, z) {
+		function(json, status, z) {
 			_cms.dialog.close(_cms.dialog.confirmTrash);
 			_cms.support.serverError();
 		}
-	});
+	);
 }
 
 _cms.core.behaviour.reset = function(nodeKey) {
@@ -119,18 +111,21 @@ _cms.core.behaviour.reset = function(nodeKey) {
 	});
 }
 
+_cms.core.setButtonStates = function() {
+	if (_cms.support.enableIf(_cms.core.sel.UPDATE_BUTTON, 
+			$(_cms.core.sel.FORM).serialize() !== _cms.core.originalFormState)) {
+		
+		_cms.support.enable(_cms.core.sel.RESET_BUTTON);
+	}
+	else {
+		_cms.support.disable(_cms.core.sel.RESET_BUTTON);
+	}
+}
+
 _cms.core.behaviour.formchange = function() {
 	if (_cms.editingItemIsWriteable) {
-		$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).mouseleave(function() {
-			if (_cms.support.enableIf(_cms.core.sel.UPDATE_BUTTON, 
-					$(_cms.core.sel.FORM).serialize() !== _cms.core.originalFormState)) {
-				
-				_cms.support.enable(_cms.core.sel.RESET_BUTTON);
-			}
-			else {
-				_cms.support.disable(_cms.core.sel.RESET_BUTTON);
-			}
-		});
+		$(_cms.core.sel.ALL_INPUTS + "," + _cms.core.sel.ALL_SELECTS).mouseleave(_cms.core.setButtonStates);
+		$(_cms.core.sel.FORM + ' button').mouseenter(_cms.core.setButtonStates);
 	}
 }
 

@@ -4,11 +4,25 @@
 <cms:debug><!-- tags/cms/editor/init.tag --></cms:debug>
 
 <script type="text/javascript">
-
 	/*
-		What happens in this file happens once per page load. Subsequent refreshes of the item
-		editor do not execute these instructions again.
+	What happens in this file happens once per page load. Subsequent refreshes of the item
+	editor do not execute these instructions again.
 	*/
+	
+	var _cms = {
+		support: {
+			dialog: {}
+		},
+		leftnav: {
+			behaviour: {}
+		}
+	}
+
+	_cms.init = function(nodeKey, html, activeTab) {
+		// Re-build the item editor tabs, and select the required tab
+		_cms.support.refreshAllTabs(html, activeTab);
+	}
+	
 	_cms.ctx = "${applicationContextPath}";
 	_cms.pageEditorUrlPrefix = _cms.ctx + "/page/editor/";
 	_cms.siteId = ${editingItem.site.id};
@@ -79,7 +93,14 @@
 		
 		// Render flash message when page is first loaded
 		_cms.support.flashMessage(_cms.flashMessage);
-	});
-</script>
 
-<script src="${applicationContextPath}/resources/js/undoRedo.js" type="text/javascript"></script>
+		// Display the undo/redo/clear buttons
+		_cms.undoRedo.displayAll(_cms.undoRedo.status);
+		
+		// Set the behaviour of the undo/redo/clear buttons, once per page load
+		_cms.undoRedo.behaviour('div#undo-icon', 'undo');
+		_cms.undoRedo.behaviour('div#redo-icon', 'redo');
+		_cms.undoRedo.behaviour('div#kill-icon', 'clear', true);
+		
+	});</script>
+

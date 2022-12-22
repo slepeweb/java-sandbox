@@ -19,15 +19,15 @@ _cms.copy.behaviour.submit = function(nodeKey) {
 
 	// Add behaviour to copy an item 
 	$(_cms.copy.sel.COPY_BUTTON).click(function () {
-		$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/copy", {
-			type: "POST",
-			cache: false,
-			data: {
-				name: $(_cms.copy.sel.NAME_INPUT).val(),
-				simplename: $(_cms.copy.sel.SIMPLENAME_INPUT).val()
-			}, 
-			dataType: "json",
-			success: function(obj, status, z) {
+		_cms.support.ajax('POST', '/rest/item/' + nodeKey + '/copy', 
+			{
+				data: {
+					name: $(_cms.copy.sel.NAME_INPUT).val(),
+					simplename: $(_cms.copy.sel.SIMPLENAME_INPUT).val()
+				}, 
+				dataType: 'json'
+			},
+			function(obj, status, z) {
 				_cms.support.flashMessage(obj);
 				
 				if (! obj.error) {
@@ -35,11 +35,8 @@ _cms.copy.behaviour.submit = function(nodeKey) {
 					var newNode = sourceNode.getParent().addNode(obj.data);
 					_cms.leftnav.navigate(newNode.key, 'core');
 				}
-			},
-			error: function(json, status, z) {
-				_cms.support.serverError();
-			},
-		});
+			}
+		);
 	});
 }
 
@@ -62,13 +59,8 @@ _cms.copy.setButtonStates = function() {
 
 _cms.copy.behaviour.formchange = function(nodeKey) {
 	if (_cms.editingItemIsWriteable) {
-		$(_cms.copy.sel.ALL_INPUTS).mouseleave(function() {
-			_cms.copy.setButtonStates();	
-		});
-		
-		$(_cms.copy.sel.FORM + ' button').mouseenter(function() {
-			_cms.copy.setButtonStates();	
-		});		
+		$(_cms.copy.sel.ALL_INPUTS).mouseleave(_cms.copy.setButtonStates);		
+		$(_cms.copy.sel.FORM + ' button').mouseenter(_cms.copy.setButtonStates);		
 	}
 }
 

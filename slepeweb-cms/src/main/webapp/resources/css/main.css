@@ -157,6 +157,10 @@ input, textarea {
 	width: 100%;
 }
 
+#item-editor form .button-set button[disabled=disabled] {
+	cursor: default;
+}
+
 .cms-dialog span.cms-icon {
 	float:left; 
 	margin:0 7px 50px 0;
