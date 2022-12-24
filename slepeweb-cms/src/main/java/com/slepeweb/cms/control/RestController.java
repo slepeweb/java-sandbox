@@ -1283,23 +1283,24 @@ public class RestController extends BaseController {
 		return flagItem(origId, request, false);
 	}
 	
-	@RequestMapping(value="/item/{origId}/flag/children", method=RequestMethod.GET, produces="application/json")
-	public String flagChildItems(@PathVariable long origId, HttpServletRequest request, ModelMap model) {
+	@RequestMapping(value="/item/{origId}/flag/siblings", method=RequestMethod.GET, produces="application/json")
+	public String flagSiblings(@PathVariable long origId, HttpServletRequest request, ModelMap model) {
 		Item i = this.getEditableVersion(origId, getUser(request));
+		Item parent = i.getParent();
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
 		Date now = new Date();
 		int count = 0;
 		
-		for (Item child : i.getBoundItems()) {
-			if (! flaggedItems.containsKey(child.getOrigId())) {
-				flaggedItems.put(child.getOrigId(), new ItemGist(child).setDate(now));
+		for (Item sibling : parent.getBoundItems()) {
+			if (! flaggedItems.containsKey(sibling.getOrigId())) {
+				flaggedItems.put(sibling.getOrigId(), new ItemGist(sibling).setDate(now));
 				count++;
 			}
 		}
 		
 		model.addAttribute("_flaggedItems", getSortedFlaggedItems(flaggedItems));
 		model.addAttribute("_itemIsFlagged", flaggedItems.containsKey(origId));
-		model.addAttribute("_flaggedItemsMessage", String.format("%d children have been flagged", count));
+		model.addAttribute("_flaggedItemsMessage", String.format("%d siblings have been flagged", count));
 		return "cms.refresh.flaggedItems";		
 	}
 	

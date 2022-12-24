@@ -217,9 +217,9 @@ _cms.misc.flaggedItems.refresh = function(nodeKey) {
 	_cms.misc.flaggedItems.ajax("/rest/item/" + nodeKey + "/refresh/flaggedItems");
 }
 
-_cms.misc.flaggedItems.behaviour.flagChildren = function() {
-	$('div#flagged-items-section button#flag-children-button').click(function() {
-		_cms.misc.flaggedItems.ajax("/rest/item/" + _cms.editingItemId + "/flag/children");
+_cms.misc.flaggedItems.behaviour.flagSiblings = function() {
+	$('div#flagged-items-section button#flag-siblings-button').click(function() {
+		_cms.misc.flaggedItems.ajax("/rest/item/" + _cms.editingItemId + "/flag/siblings");
 	});
 }
 
@@ -296,7 +296,7 @@ _cms.misc.flaggedItems.ajax = function(url) {
 		_cms.misc.flaggedItems.behaviour.trashAll();
 		_cms.misc.flaggedItems.behaviour.copyAll();
 		_cms.misc.flaggedItems.behaviour.linkToItem();
-		_cms.misc.flaggedItems.behaviour.flagChildren();
+		_cms.misc.flaggedItems.behaviour.flagSiblings();
 		
 		_cms.support.flashMessage({error: false, message: $('div#flagged-items-message').html()});
 		

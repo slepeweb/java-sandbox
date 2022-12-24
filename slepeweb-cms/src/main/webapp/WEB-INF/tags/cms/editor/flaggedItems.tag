@@ -16,8 +16,8 @@
 	</c:if>
 		
 	<div class="section-ops">
-		<p><strong>Flag ALL CHILD</strong> items:</p>
-		<div><button id="flag-children-button" type="button">Flag CHILDREN</button></div>
+		<p><strong>Flag ALL</strong> sibling items:</p>
+		<div><button id="flag-siblings-button" type="button">Flag Siblings</button></div>
 	</div>
 		
 	<c:if test="${fn:length(_flaggedItems) > 0}">

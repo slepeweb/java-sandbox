@@ -9,6 +9,8 @@ import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.ItemService;
@@ -32,7 +35,8 @@ import com.slepeweb.common.util.ImageUtil;
 @Controller
 public class PhotoSetupController extends BaseController {
 	private static Logger LOG = Logger.getLogger(PhotoSetupController.class);
-	private static Pattern JPG_FILENAME_PATTERN = Pattern.compile("^(.*)?\\.(jpg|jpeg)$", Pattern.CASE_INSENSITIVE);
+	private static Pattern MEDIA_FILENAME_PATTERN = Pattern.compile("^(IMG|VID)[-_](.*)?[-_].*?\\.(jpg|jpeg|mp4)$", Pattern.CASE_INSENSITIVE);
+	private static Pattern DATE_PATTERN = Pattern.compile("^(\\d{4})(\\d{2})(\\d{2})$");
 	
 	@Autowired private SiteService siteService;
 	@Autowired private ItemTypeService itemTypeService;
@@ -41,16 +45,18 @@ public class PhotoSetupController extends BaseController {
 	
 	@RequestMapping(value="/setup/photos/{siteId}", produces="text/text")	
 	@ResponseBody
-	public String setupPhotos(@PathVariable long siteId) {
+	public String setupPhotos(@PathVariable long siteId, HttpServletRequest req) {
 		Site s = this.siteService.getSite(siteId);
 		Item rootItem = s.getItem("/content");
-		String folderPath = "/media/george/Data/Photos";
+		String folderPath = req.getParameter("path");
 		File rootFolder = new File(folderPath);
-		ItemType contentFolder = this.itemTypeService.getItemType(ItemTypeName.CONTENT_FOLDER);
-		ItemType photo = this.itemTypeService.getItemType(ItemTypeName.PHOTO_JPG);
-		Timestamp now = new Timestamp(System.currentTimeMillis());
 		
-		Data data = new Data().setSite(s).setFolderType(contentFolder).setPhotoType(photo).setNow(now);
+		Data data = new Data().
+				setSite(s).
+				setFolderType(this.itemTypeService.getItemType(ItemTypeName.CONTENT_FOLDER)).
+				setPhotoType(this.itemTypeService.getItemType(ItemTypeName.PHOTO_JPG)).
+				setVideoType(this.itemTypeService.getItemType(ItemTypeName.MOVIE_MP4)).
+				setNow(new Timestamp(System.currentTimeMillis()));
 		
 		if (rootFolder.exists()) {
 			try {
@@ -71,7 +77,7 @@ public class PhotoSetupController extends BaseController {
 				throws ResourceException {
 		
 		Item child;
-		String filename;
+		String dateStr, mediaType;
 		Matcher matcher;
 		
 		/*
@@ -82,20 +88,20 @@ public class PhotoSetupController extends BaseController {
 		
 		for (File f : dir.listFiles()) {
 			if (f.isDirectory()) {
-				child = createItemIfNotExists(parent, f.getName(), data.getFolderType(), data);
+				child = createItemIfNotExists(parent, f.getName(), null, "FOLDER", data);
 				
 				if (! crawlFileSystem(f, child, data)) {
 					return false;
 				}
 			}
 			else {
-				filename = f.getName();
-				matcher = JPG_FILENAME_PATTERN.matcher(filename);
+				matcher = MEDIA_FILENAME_PATTERN.matcher(f.getName());
 				
 				if (matcher.matches()) {
-					filename = matcher.group(1);
-					child = createItemIfNotExists(parent, filename, data.getPhotoType(), data);
-					uploadMediaIfNotExists(child, f);
+					mediaType = matcher.group(1);
+					dateStr = matcher.group(2);
+					child = createItemIfNotExists(parent, f.getName(), dateStr, mediaType, data);
+					uploadMediaIfNotExists(child, f, mediaType);
 				}
 			}
 		}
@@ -103,37 +109,66 @@ public class PhotoSetupController extends BaseController {
 		return true;
 	}
 	
-	private Item createItemIfNotExists(Item parent, String name, ItemType it, Data data) 
+	private Item createItemIfNotExists(Item parent, String filename, String dateStr, String mediaType, Data data) 
 		throws ResourceException {
 		
-		String simpleName = name.toLowerCase().replaceAll("\\W", "");
+		ItemType itemType = null;
+		
+		if (mediaType.equals("FOLDER")) {
+			itemType = data.getFolderType();
+		}
+		else if (mediaType.equals("VID")) {
+			itemType = data.getVideoType();
+		}
+		else if (mediaType.equals("IMG")) {
+			itemType = data.getPhotoType();
+		}
+		
+		String simpleName = filename.toLowerCase().replaceAll("\\W", "");
 		String path = parent.getPath() + "/" + simpleName;
 		Item item = this.itemService.getItem(data.getSite().getId(), path);
 		
-		if (item != null) {
-			// Item already exists
-			LOG.info(String.format("Item already exists [%s]", name));
+		if (itemType == null) {
+			LOG.info(String.format("Media type not recognised [%s]", mediaType));
 			return item;
 		}
 		
+		if (item != null) {
+			LOG.info(String.format("Item already exists [%s]", item.getPath()));
+			return item;
+		}
+		
+		Matcher m = DATE_PATTERN.matcher(dateStr);
+		
 		// Item doesn't already exist; create it.
-		item = CmsBeanFactory.makeItem(it.getName()).
-			setName(name).
+		item = CmsBeanFactory.makeItem(itemType.getName()).
+			setName(filename).
 			setSimpleName(simpleName).
 			setPath(path).
 			setDateCreated(data.getNow()).
 			setDateUpdated(data.getNow()).
 			setSite(data.getSite()).
-			setType(it).
+			setType(itemType).
 			setParent(parent);
 		
+		if (m.matches()) {
+			item.setName(dateStr);
+		}
+		
 		item = this.itemService.save(item);
+		
+		if (m.matches()) {
+			item.setFieldValue(FieldName.DATEISH, 
+					String.format("%s/%s/%s", m.group(1), m.group(2), m.group(3)));
+			item.saveFieldValues();
+		}
+		
 		data.incCounter();
 		
 		return item;
 	}
 	
-	private boolean uploadMediaIfNotExists(Item item, File f) {
+	private boolean uploadMediaIfNotExists(Item item, File f, String mediaType) {
 		InputStream is = null;
 		ByteArrayOutputStream baos = null;
 		
@@ -144,20 +179,22 @@ public class PhotoSetupController extends BaseController {
 			m.setItemId(item.getId());
 			
 			try {
-				// Main image ...
+				// Main media ...
 				is = new FileInputStream(f);
 				m.setUploadStream(is);
 				this.mediaService.save(m);
 				LOG.info(String.format("Saved media for '%s'", item.getName()));
 				
 				// ... and its thumbnail
-				close(is);
-				m.setThumbnail(true);
-				is = new FileInputStream(f);							
-				
-				m.setUploadStream(ImageUtil.scaleImage(is, 200, -1, item.getType().getMimeType()));
-				this.mediaService.save(m);
-				LOG.info(String.format("Saved thumbnail for '%s'", item.getName()));
+				if (mediaType.equals("IMG")) {
+					close(is);
+					m.setThumbnail(true);
+					is = new FileInputStream(f); // This will get closed in the finally block							
+					
+					m.setUploadStream(ImageUtil.scaleImage(is, 200, -1, item.getType().getMimeType()));
+					this.mediaService.save(m);
+					LOG.info(String.format("Saved thumbnail for '%s'", item.getName()));
+				}
 				
 				return true;
 			}
@@ -196,7 +233,7 @@ public class PhotoSetupController extends BaseController {
 	
 	static class Data {
 		private Site site;
-		private ItemType folderType, photoType;
+		private ItemType folderType, photoType, videoType;
 		private Timestamp now;
 		private int count;
 		
@@ -222,8 +259,17 @@ public class PhotoSetupController extends BaseController {
 			return photoType;
 		}
 		
-		Data setPhotoType(ItemType photoType) {
-			this.photoType = photoType;
+		Data setPhotoType(ItemType t) {
+			this.photoType = t;
+			return this;
+		}
+		
+		ItemType getVideoType() {
+			return videoType;
+		}
+		
+		Data setVideoType(ItemType t) {
+			this.videoType = t;
 			return this;
 		}
 		
