@@ -1,7 +1,7 @@
 TODO: This is the main todo file:
 
 HIGH
-- 'flag siblings' 
+- Remove 'trash' section on 'misc'?
 - implement cron job to backup cms db on desktop
 - new: move flagged items to the same location
 

@@ -251,7 +251,22 @@ _cms.support.itemFlagger = function() {
 			}
 		});
 	});
+	
+	// Flag siblings button
+	$('div#item-sibling-flag').click(function() {
+		_cms.misc.flaggedItems.ajax("/rest/item/" + _cms.editingItemId + "/flag/siblings", function(args) {
+			_cms.support.displayItemFlag(true);
+		});
+	});
+	
+	// Un-flag button
+	$('div#item-flag-clear').click(function() {
+		_cms.misc.flaggedItems.ajax("/rest/flaggedItems/unflag/all", function(args) {
+			_cms.support.displayItemFlag(false);
+		});
+	});
 }
+
 
 _cms.support.ajax = function(method, url, data, success, fail) {
 	let params = {

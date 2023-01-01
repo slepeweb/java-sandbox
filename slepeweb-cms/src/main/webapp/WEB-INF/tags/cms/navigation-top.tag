@@ -11,30 +11,34 @@
 						</c:if>
 		</div>
 		
-		<%--
-		<div class="hb">
-			<span>Site selection: </span>
-			<select id="site-selector">
-				<option value="0">Choose site ...</option>
-				<c:forEach items="${_allEditableSites}" var="_site">
-					<option value="${_site.id}"<c:if 
-						test="${not empty editingItem and editingItem.site.id eq _site.id}"> selected</c:if>>${_site.name}</option>
-				</c:forEach>
-			</select>
-		</div>	
-		 --%>	
-		
 		<!-- History -->
 		<div id="history-div">
 			<span>Breadcrumbs: </span>
 			<cms:navigation-history />
 			
-			<!-- Item flag -->
+			<!-- Item flagging controls -->
 			<div id="misc-controls">
-				<div id="item-flag" title="Flag item for bulk operations">
+				<!-- Flag the current item -->
+				<div id="item-flag" title="Flag this item">
 					<i class="fa-solid fa-flag item-flag <c:if test='${_itemIsFlagged}'>flagged</c:if>"></i>
 				</div>
-			</div>		
+				
+				<!-- Flag all sibling items -->
+				<div id="item-sibling-flag" title="Flag this and ALL sibling items">
+					<i class="fa-solid fa-flag"></i>
+					<div title="Flag item for bulk operations">
+						<i class="fa-solid fa-flag"></i>
+					</div>
+				</div>
+				
+				<!-- Clear all item flags -->
+				<div id="item-flag-clear" title="Clear all item flags">
+					<i class="fa-solid fa-flag"></i>
+					<div title="Clear all item flags">
+						<i class="fa-solid fa-xmark"></i>
+					</div>
+				</div>
+			</div>			
 		</div>
 		
 		<!-- Search bar -->

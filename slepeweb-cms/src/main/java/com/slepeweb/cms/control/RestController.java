@@ -1301,6 +1301,14 @@ public class RestController extends BaseController {
 		model.addAttribute("_flaggedItems", getSortedFlaggedItems(flaggedItems));
 		model.addAttribute("_itemIsFlagged", flaggedItems.containsKey(origId));
 		model.addAttribute("_flaggedItemsMessage", String.format("%d siblings have been flagged", count));
+		
+		/* 
+		 * These attributes are required to refresh the 'flagged items' dialog IN BETWEEN entire
+		 * editor updates. (The copy-data section needs field values for the current item.)
+		 */
+		model.addAttribute("editingItem", i);
+		model.addAttribute("_fieldSupport", fieldEditorSupport(i));
+		
 		return "cms.refresh.flaggedItems";		
 	}
 	
