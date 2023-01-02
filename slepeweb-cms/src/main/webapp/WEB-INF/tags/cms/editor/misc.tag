@@ -3,25 +3,17 @@
         
 <cms:debug><!-- tags/cms/editor/misc.tag --></cms:debug>
 
-<p class="in-your-face-text">NOTE that the bulk operations in this section can NOT be reversed using the undo/redo functionality,
-	which only works for one item at a time.</p>
+<p><span class="in-your-face-text">NOTE</span> that the bulk operations offered in this section can NOT be reversed using the undo/redo functionality - that facility,
+	only works for changes made to one item at a time.</p>
 
 <div id="misc-accordion">
-	<h3>Trash current item</h3>
-	<div class="section-ops delete">
-		<p>Clicking the 'Trash' button will move <strong>'<span class="current-item-name">${editingItem.name}</span>'</strong> 
-			and <strong>ALL</strong> its descendants into the trash bin, moving a total of 
-			<strong>${_numItemsInSection}</strong> items.</p>
-			
-		<div><button id="trash-button" type="button">Trash</button></div>
-<!-- 		<div></div> -->
-	</div>
 
 	<c:if test="${not editingItem.shortcut}">
 		<h3>Section operations</h3>
 			<div>
 				<p>Use with <strong>caution</strong> because these operations will apply 
-					to '${editingItem.name}' and <strong>ALL</strong> its descendants (total = ${_numItemsInSection} items).</p>
+					to '${editingItem.name}' and <strong>ALL</strong> its descendants 
+					(total = <strong>${_numItemsInSection} items</strong>).</p>
 				
 				<div class="section-ops">
 					<div>

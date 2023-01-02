@@ -326,9 +326,6 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 			// Update list of recently edited items
 			_cms.support.refreshHistory(_cms.siteId);
 			
-			// Update flag indicating current item is 'flagged'!
-			_cms.support.itemFlagger();
-			
 			// Assign behaviours to new html
 			_cms.core.onrefresh(nodeKey);
 			_cms.field.onrefresh(nodeKey);

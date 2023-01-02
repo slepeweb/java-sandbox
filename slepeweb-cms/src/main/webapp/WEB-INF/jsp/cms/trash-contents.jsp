@@ -3,7 +3,7 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <c:choose><c:when test="${fn:length(_trashContents) > 0}">
-	<p>Note that trashed items are displayed in path order. Should you restore an item whose 
+	<p><span class="in-your-face-text">NOTE</span> that trashed items are displayed in path order. Should you restore an item whose 
 		parent is also in the bin, then you won't see that item in the content structure until the parent has also been restored.</p>
 		
 	<table id="trash-table">

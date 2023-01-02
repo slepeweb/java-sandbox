@@ -559,7 +559,16 @@ div#undo-icon, div#redo-icon {
 div#undo-redo, div#misc-controls {
 	margin-top: 1.0em;
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);	
+	grid-template-columns: repeat(4, 1fr);	
+}
+
+div#trash-action {
+	margin-top: 0;
+}
+
+div#trash-action i {
+	justify-self: right;	
+	color: red;
 }
 
 .in-your-face-text {

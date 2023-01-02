@@ -439,7 +439,8 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	@Deprecated
 	public int getCount(long siteId) {
-		return getCountByPath(siteId, null);
+		return this.jdbcTemplate.queryForInt(
+				"select count(*) from item where siteid=? and deleted=0", new Object[] {siteId});
 	}
 	
 	@SuppressWarnings("deprecation")

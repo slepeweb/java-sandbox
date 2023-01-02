@@ -94,13 +94,17 @@
 		// Render flash message when page is first loaded
 		_cms.support.flashMessage(_cms.flashMessage);
 
+		// Update flag indicating current item is 'flagged'!
+		_cms.support.itemFlagger();
+		
 		// Display the undo/redo/clear buttons
 		_cms.undoRedo.displayAll(_cms.undoRedo.status);
 		
 		// Set the behaviour of the undo/redo/clear buttons, once per page load
 		_cms.undoRedo.behaviour('div#undo-icon', 'undo');
 		_cms.undoRedo.behaviour('div#redo-icon', 'redo');
-		_cms.undoRedo.behaviour('div#kill-icon', 'clear', true);
 		
+		// Set the behaviour of the trash button
+		_cms.misc.behaviour.trash.trash(_cms.editingItemId);
 	});</script>
 

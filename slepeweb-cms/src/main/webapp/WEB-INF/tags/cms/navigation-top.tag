@@ -41,7 +41,7 @@
 			</div>			
 		</div>
 		
-		<!-- Search bar -->
+		<!-- Search bar - includes undo/redo and trash controls -->
 		<cms:searchBar />	
 		
 		<div id="leftnav-hider">

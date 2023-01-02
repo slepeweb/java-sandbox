@@ -139,8 +139,9 @@ public class RestController extends BaseController {
 			model.addAttribute("_lastRelativePosition", this.cookieService.getRelativePositionCookieValue(req));
 			
 			// Total number of editable items in this section
+			String path = i.isSiteRoot() ? "/" : i.getPath() + "/";
 			model.addAttribute("_numItemsInSection", 
-					1 + this.cmsService.getItemService().getCountByPath(i.getSite().getId(), i.getPath() + "/"));
+					1 + this.cmsService.getItemService().getCountByPath(i.getSite().getId(), path));
 			
 			// Get recently-used tags, and full list of tags for the site
 			model.addAttribute(AttrName.TAG_INPUT_SUPPORT, getTagInfo(i.getSite().getId(), req));

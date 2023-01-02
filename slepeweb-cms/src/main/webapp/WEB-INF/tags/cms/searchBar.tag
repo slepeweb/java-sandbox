@@ -16,11 +16,11 @@
 			<i class="fa-solid fa-rotate-right fa-2x"></i>
 		</div>
 		
-		<!-- 
-		<div id="kill-icon" title="Clear undo/redo history">
-			<i class="fa-solid fa-xmark fa-2x"></i>
+		<div><!--  Empty div --></div>
+		
+		<div id="trash-action" title="Trash the current item PLUS ALL descendants">
+			<i class="fa-solid fa-trash-can fa-2x"></i>
 		</div>
-		 -->
 	</div>
 </div>
 

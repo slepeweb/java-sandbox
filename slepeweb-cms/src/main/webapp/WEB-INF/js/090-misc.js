@@ -24,7 +24,9 @@ _cms.misc = {
 	}
 };
 
-_cms.misc.sel.DELETE_BUTTON = _cms.misc.sel.MISC_TAB + " #trash-button";
+// The trash icon used to be in the 'misc' editor tab, but has now been moved
+// to the page header.
+_cms.misc.sel.DELETE_BUTTON = "div#trash-action > i";
 
 _cms.support.setTabIds(_cms.misc, "misc");
 
@@ -219,21 +221,6 @@ _cms.misc.flaggedItems.refresh = function(nodeKey) {
 }
 
 _cms.misc.behaviour.flaggedItems = function() {
-	/*
-	// Flag siblings button
-	$('div#flagged-items-section button#flag-siblings-button').click(function() {
-		_cms.misc.flaggedItems.ajax("/rest/item/" + _cms.editingItemId + "/flag/siblings", function(args) {
-			_cms.support.displayItemFlag(true);
-		});
-	});
-	
-	// Un-flag button
-	$('div#flagged-items-section button#unflag-button').click(function() {
-		_cms.misc.flaggedItems.ajax("/rest/flaggedItems/unflag/all");
-		$('i.item-flag').removeClass('flagged');
-	});
-	*/
-
 	// Trash button
 	$('div#flagged-items-section button#trash-button').click(function() {
 		_cms.dialog.open(_cms.dialog.eggTimer);
@@ -347,7 +334,6 @@ _cms.misc.onrefresh = function(nodeKey) {
 	 * _cms.misc.behaviour.trash.restore();
 	 */
 	_cms.misc.behaviour.trash.showOrHide();
-	_cms.misc.behaviour.trash.trash(nodeKey);
 	_cms.misc.behaviour.flaggedItems();
 	
 	$('#misc-accordion').accordion({
