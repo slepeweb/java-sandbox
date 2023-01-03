@@ -228,7 +228,26 @@ _cms.support.displayItemFlag = function(isFlagged) {
 	}
 }
 
-_cms.support.itemFlagger = function() {
+_cms.support.itemFlagger = {}
+
+_cms.support.itemFlagger.onPageLoad = function() {
+	// Flag siblings button
+	$('div#item-sibling-flag').click(function() {
+		_cms.misc.flaggedItems.ajax("/rest/item/" + _cms.editingItemId + "/flag/siblings", function(args) {
+			_cms.support.displayItemFlag(true);
+		});
+	});
+	
+	// Un-flag button
+	$('div#item-flag-clear').click(function() {
+		_cms.misc.flaggedItems.ajax("/rest/flaggedItems/unflag/all", function(args) {
+			_cms.support.displayItemFlag(false);
+		});
+	});
+}
+
+
+_cms.support.itemFlagger.onItemLoad = function() {
 	var isFlagged = _cms.currentItemFlagged === 'yes';
 	_cms.support.displayItemFlag(isFlagged);
 	
@@ -251,22 +270,7 @@ _cms.support.itemFlagger = function() {
 			}
 		});
 	});
-	
-	// Flag siblings button
-	$('div#item-sibling-flag').click(function() {
-		_cms.misc.flaggedItems.ajax("/rest/item/" + _cms.editingItemId + "/flag/siblings", function(args) {
-			_cms.support.displayItemFlag(true);
-		});
-	});
-	
-	// Un-flag button
-	$('div#item-flag-clear').click(function() {
-		_cms.misc.flaggedItems.ajax("/rest/flaggedItems/unflag/all", function(args) {
-			_cms.support.displayItemFlag(false);
-		});
-	});
 }
-
 
 _cms.support.ajax = function(method, url, data, success, fail) {
 	let params = {
@@ -325,6 +329,9 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 			
 			// Update list of recently edited items
 			_cms.support.refreshHistory(_cms.siteId);
+			
+			// Update flag indicating current item is 'flagged'!
+			_cms.support.itemFlagger.onItemLoad();
 			
 			// Assign behaviours to new html
 			_cms.core.onrefresh(nodeKey);

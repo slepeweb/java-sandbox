@@ -95,7 +95,7 @@
 		_cms.support.flashMessage(_cms.flashMessage);
 
 		// Update flag indicating current item is 'flagged'!
-		_cms.support.itemFlagger();
+		_cms.support.itemFlagger.onPageLoad();
 		
 		// Display the undo/redo/clear buttons
 		_cms.undoRedo.displayAll(_cms.undoRedo.status);
