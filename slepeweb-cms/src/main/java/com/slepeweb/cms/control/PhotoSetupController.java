@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,7 +36,7 @@ import com.slepeweb.common.util.ImageUtil;
 @Controller
 public class PhotoSetupController extends BaseController {
 	private static Logger LOG = Logger.getLogger(PhotoSetupController.class);
-	private static Pattern MEDIA_FILENAME_PATTERN = Pattern.compile("^(IMG|VID)[-_](.*)?[-_].*?\\.(jpg|jpeg|mp4)$", Pattern.CASE_INSENSITIVE);
+	private static Pattern MEDIA_FILENAME_PATTERN = Pattern.compile("^(IMG|VID|PXL)[-_](.*)?[-_].*?\\.(jpg|jpeg|mp4)$", Pattern.CASE_INSENSITIVE);
 	private static Pattern DATE_PATTERN = Pattern.compile("^(\\d{4})(\\d{2})(\\d{2})$");
 	
 	@Autowired private SiteService siteService;
@@ -95,11 +96,26 @@ public class PhotoSetupController extends BaseController {
 				}
 			}
 			else {
-				matcher = MEDIA_FILENAME_PATTERN.matcher(f.getName());
+				mediaType = null;
+				dateStr = null;
 				
-				if (matcher.matches()) {
-					mediaType = matcher.group(1);
-					dateStr = matcher.group(2);
+				// Determine media type, ie. image or video
+				if (f.getName().endsWith(".jpg") || f.getName().endsWith(".jpeg")) {
+					mediaType = "IMG";
+				}
+				else if (f.getName().endsWith(".mp4")) {
+					mediaType = "VID";
+				}
+				
+				if (mediaType != null) {
+					// Can we work out the date from the filename?
+					matcher = MEDIA_FILENAME_PATTERN.matcher(f.getName());
+					
+					if (matcher.matches()) {
+						dateStr = matcher.group(2);
+					}
+					
+					// Create the item, and upload the media
 					child = createItemIfNotExists(parent, f.getName(), dateStr, mediaType, data);
 					uploadMediaIfNotExists(child, f, mediaType);
 				}
@@ -138,8 +154,6 @@ public class PhotoSetupController extends BaseController {
 			return item;
 		}
 		
-		Matcher m = DATE_PATTERN.matcher(dateStr);
-		
 		// Item doesn't already exist; create it.
 		item = CmsBeanFactory.makeItem(itemType.getName()).
 			setName(filename).
@@ -151,15 +165,28 @@ public class PhotoSetupController extends BaseController {
 			setType(itemType).
 			setParent(parent);
 		
-		if (m.matches()) {
+		boolean dateSpecified = false;
+		String formattedDate = null;
+		
+		if (StringUtils.isNotBlank(dateStr)) {
+			Matcher m = DATE_PATTERN.matcher(dateStr);
+			dateSpecified = m.matches();
+			
+			if (dateSpecified) {
+				formattedDate = String.format("%s/%s/%s", m.group(1), m.group(2), m.group(3));
+			}
+		}
+		
+		if (dateSpecified) {
 			item.setName(dateStr);
 		}
 		
+		// Save item
 		item = this.itemService.save(item);
 		
-		if (m.matches()) {
-			item.setFieldValue(FieldName.DATEISH, 
-					String.format("%s/%s/%s", m.group(1), m.group(2), m.group(3)));
+		// Save field values
+		if (dateSpecified) {
+			item.setFieldValue(FieldName.DATEISH, formattedDate);
 			item.saveFieldValues();
 		}
 		

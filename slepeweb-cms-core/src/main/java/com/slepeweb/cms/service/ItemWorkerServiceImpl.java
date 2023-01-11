@@ -140,7 +140,10 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		// Force newParent links to be re-calculated, since they have now changed
 		newParent.setLinks(null);
 		
-		// Update solr; normally, this is done by save()
+		// Whilst item path in db has been updated, the 'mover' object hasn't!!
+		mover.setPath(newChildPath);
+		
+		// Update solr
 		this.solrService4Cms.save(mover);
 		
 		// Now work out how to reverse this move, in the form of a MoverItem instance

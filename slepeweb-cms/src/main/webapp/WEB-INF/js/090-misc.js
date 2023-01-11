@@ -242,8 +242,15 @@ _cms.misc.behaviour.flaggedItems = function() {
 		
 		_cms.misc.flaggedItems.collateFormData('copy-core-data', '0', params);
 		_cms.misc.flaggedItems.collateFormData('copy-fieldvalue', '1', params);
+		let url = '/rest/flaggedItems/copy/all/' + _cms.editingItemId;
 				
-		_cms.support.ajax('POST', '/rest/flaggedItems/copy/all', params, function(resp, status, z) {
+		_cms.support.ajax('POST', url, params, function(resp, status, z) {
+			if (resp.data) {
+				// The current item was subject to the copy action, so refresh the respective tabs
+				_cms.core.refresh.tab(_cms.editingItemId);
+				_cms.field.refresh.tab(_cms.editingItemId);
+			}
+			
 			_cms.dialog.close(_cms.dialog.eggTimer);
 			_cms.support.flashMessage(_cms.support.toStatus(resp.error, resp.message));
 		});

@@ -107,13 +107,13 @@ _cms.dialog.searchresults.define = function() {
 	}
 	
 	var buttons = {
-		Cancel: function() {
+		Close: function() {
 			close();
 		}
 	}
 	
 	_cms.dialog.searchresults.obj = _cms.dialog.define(
-			"Search results", "#searchresults-container", 300, 600, buttons, close);
+			"Search results", "#searchresults-container", 300, 600, buttons, close, false);
 }
 
 _cms.dialog.linkGuidance.define = function() {	

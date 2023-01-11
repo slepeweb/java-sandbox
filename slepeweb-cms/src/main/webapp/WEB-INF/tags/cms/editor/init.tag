@@ -5,24 +5,19 @@
 
 <script type="text/javascript">
 	/*
-	What happens in this file happens once per page load. Subsequent refreshes of the item
-	editor do not execute these instructions again.
+		What happens in this file happens once per page load. Subsequent refreshes of the item
+		editor do not execute these instructions again.
 	*/
 	
 	var _cms = {
 		support: {
-			dialog: {}
+			dialog: {},
 		},
 		leftnav: {
-			behaviour: {}
-		}
-	}
+			behaviour: {},
+		},
+	};
 
-	_cms.init = function(nodeKey, html, activeTab) {
-		// Re-build the item editor tabs, and select the required tab
-		_cms.support.refreshAllTabs(html, activeTab);
-	}
-	
 	_cms.ctx = "${applicationContextPath}";
 	_cms.pageEditorUrlPrefix = _cms.ctx + "/page/editor/";
 	_cms.siteId = ${editingItem.site.id};

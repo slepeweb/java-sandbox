@@ -116,6 +116,10 @@ span.close-slide-info {
   background-color: rgba(0, 0, 0, 0.8);
 }
 
+a.disabled {
+	opacity: 0.3;
+}
+
 .cursor {
 	cursor: pointer;
 }

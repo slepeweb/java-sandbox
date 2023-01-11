@@ -1,18 +1,23 @@
 _cms.support.refreshAllTabs = function(html, activeTab) {
 	var tabsdiv = $("#item-editor");
-	tabsdiv.empty().append(html);
+	//tabsdiv.empty().append(html);
+	tabsdiv.html(html);
 	
 	// Re-build tabs 
 	if (tabsdiv.hasClass("ui-tabs")) {
 		tabsdiv.tabs("destroy");
 	}
-	
+
 	// Focus on same tab as previous render
 	_cms.support.activateTab(activeTab);
 }
 
 _cms.support.getActiveTab = function() {
-	return $("li.ui-tabs-active").attr("aria-controls");
+	let tab = $("li.ui-tabs-active").attr("aria-controls");
+	if (! tab) {
+		tab = 'core-tab';
+	}
+	return tab;
 }
 
 _cms.support.activateTab = function(name) {

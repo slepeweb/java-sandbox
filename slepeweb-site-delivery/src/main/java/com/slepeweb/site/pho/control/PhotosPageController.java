@@ -93,7 +93,7 @@ public class PhotosPageController extends BaseController {
 			setTo(formData.getTo());
 		
 		params.
-			setPageSize(20).
+			setPageSize(24).
 			setPageNum(request.getParameter("page"));
 		
 		model.addAttribute("_params", params);

@@ -195,21 +195,24 @@ public class RestController extends BaseController {
 							// ... to the next sibling
 							next = siblings.get(j + 1).getOrigId();
 						}
+						/*
 						else {
 							// ... down the tree to the first child
 							next = firstChild;
 						}
-						
+						*/
 						
 						// The previous link will take you to ...
 						if (j > 0) {
 							// ... the previous sibling
 							previous = siblings.get(j - 1).getOrigId();
 						}
+						/*
 						else {
 							// ... up the tree to the parent item
 							previous = parent;
 						}
+						*/
 						
 						break;
 					}
@@ -1352,9 +1355,12 @@ public class RestController extends BaseController {
 		return "cms.refresh.flaggedItems";		
 	}
 	
-	@RequestMapping(value="/flaggedItems/copy/all", method=RequestMethod.POST, produces="application/json")
+	// @currentItemOrigId is the origId of the current item, which may or may not be included in 
+	// the set of flagged items.
+	@RequestMapping(value="/flaggedItems/copy/all/{currentItemOrigId}", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
-	public RestResponse copyAllFlaggedItems(HttpServletRequest request, ModelMap model) throws ResourceException {
+	public RestResponse copyAllFlaggedItems(@PathVariable long currentItemOrigId, HttpServletRequest request, ModelMap model) 
+			throws ResourceException {
 		RestResponse resp = new RestResponse();
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
 		Iterator<Long> itemIter = flaggedItems.keySet().iterator();
@@ -1366,6 +1372,7 @@ public class RestController extends BaseController {
 		Map<String, Object> fieldValues = new HashMap<String, Object>();
 		long origId;
 		Field field;
+		boolean currentItemAffected = false;
 
 		Enumeration<String> enumer = request.getParameterNames();
 		while (enumer.hasMoreElements()) {
@@ -1398,6 +1405,11 @@ public class RestController extends BaseController {
 		
 		while (itemIter.hasNext()) {
 			origId = itemIter.next();
+			
+			if (origId == currentItemOrigId) {
+				currentItemAffected = true;
+			}
+			
 			i = getEditableVersion(origId, getUser(request));
 			if (i != null) {
 				if (isCoreData) {
@@ -1439,7 +1451,7 @@ public class RestController extends BaseController {
 			}
 		}
 		
-		resp.addMessage("Copy ALL process completed");
+		resp.addMessage("Copy ALL process completed").setData(currentItemAffected);
 		return resp;		
 	}
 	

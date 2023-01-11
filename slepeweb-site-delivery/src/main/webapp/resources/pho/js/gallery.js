@@ -1,5 +1,8 @@
-let _thumbnails, _slides, _currentSlideId = 0, _windowResizeTimer
-let _slidePadding = 45
+let _thumbnails, _slides, _windowResizeTimer;
+let _slidePadding = 45;
+let _cursor;
+let _rightArrowSel = '#modal a.next';
+let _leftArrowSel = '#modal a.prev';
 
 function openModal() {
 	$("#modal").css("display", "grid")
@@ -13,56 +16,39 @@ function closeModal() {
 	pauseCurrentPlayingVideo()
 }
 
-function pauseCurrentPlayingVideo() {
-		
+function pauseCurrentPlayingVideo() {		
 	// If current slide is a video, and is not paused, then pause it
-	let slide = _slides.get(_currentSlideId)
+	let slide = _slides.get(_cursor.currentId)
 	if (slide.tagName === 'VIDEO' && ! slide.paused) {
 		slide.pause()
 	}
-		
-	/*
-	$('video').each((i, ele) => {
-		if (! ele.paused) {
-			ele.pause()
-		}
-	})
-	*/
 }
 
-function displayMedia(n) {
-	let i = cycle(n)
-  
-	// Populate and display given slide
-	sourceAndDisplay(i, true)
-  
-  	if (_slides.length > 1) {
-		// Populate and hide previous slide
-		i = cycle(n - 1)
-		sourceAndDisplay(i, false);
-	  
-		// Populate and hide next slide
-		i = cycle(n + 1)
-		sourceAndDisplay(i, false)
+function displayMedia(id) {  
+	if (id) {
+		_cursor.currentId = id;
 	}
-}
-
-function cycle(i) {
-	let n = _slides.length
-	let rem = i % n
 	
-	if (rem < 0) {
-		return rem + n
+	// Populate and display given slide
+	sourceAndDisplay(_cursor.currentId, true)
+  
+  	if (_cursor.hasPrevious()) {
+		// Populate and hide previous slide
+		sourceAndDisplay(_cursor.currentId - 1, false);
 	}
-	return rem
+	  
+ 	if (_cursor.hasNext()) {
+		// Populate and hide next slide
+		sourceAndDisplay(_cursor.currentId + 1, false)
+	}
 }
 
-function sourceMedia(i) {
-	let slide = $(_slides[i])
+function sourceMedia(id) {
+	let slide = $(_slides[id])
   
   	if (slide.hasClass("image")) {
 		if (! slide.attr("src")) {
-			let src = $(_thumbnails[i]).attr("data-slide-src")
+			let src = $(_thumbnails[id]).attr("data-slide-src")
 			slide.attr("src", src)
 		}
 	}
@@ -70,15 +56,15 @@ function sourceMedia(i) {
 		let sources = slide.find("source")
 		
 		if (sources.length == 0) {
-			let src = $(_thumbnails[i]).attr("data-slide-src")
+			let src = $(_thumbnails[id]).attr("data-slide-src")
 			slide.append(`<source src="${src}" type="video/mp4">`)
 		}
 	}
 }
 
-function sourceAndDisplay(i, display) {
-	sourceMedia(i)
-	let slide = $(_slides[i])
+function sourceAndDisplay(id, display) {
+	sourceMedia(id)
+	let slide = $(_slides[id])
 	slide.parent().css("display", display ? "grid" : "none")
 }
 
@@ -143,11 +129,29 @@ function assignUIBehaviours() {
 		}
 	});
 	
-	$("#modal a.prev, #modal a.next").click(function() {
+	$(_leftArrowSel + ', ' + _rightArrowSel).click(function() {
 		pauseCurrentPlayingVideo()
-		let inc = parseInt($(this).attr("data-inc"))
-		_currentSlideId = cycle(_currentSlideId + inc, _slides.length)
-		displayMedia(_currentSlideId)
+		
+		if (! $(this).hasClass("disabled")) {
+			let inc = parseInt($(this).attr("data-inc"))
+			if (_cursor.increment(inc)) {
+				displayMedia()
+			}
+			
+			if (_cursor.hasNext()) {
+				$(_rightArrowSel).removeClass("disabled");
+			}
+			else {
+				$(_rightArrowSel).addClass("disabled");
+			}
+			
+			if (_cursor.hasPrevious()) {
+				$(_leftArrowSel).removeClass("disabled");
+			}
+			else {
+				$(_leftArrowSel).addClass("disabled");
+			}
+		}
 	})
 	
 	$(window).resize(function() {
@@ -183,10 +187,38 @@ function updateMediaDimensions(){
 	})
 }
 
+class Cursor {
+	constructor(n, size) {
+		this.size = size;
+		this.currentId = n;
+	}
+	
+	hasNext() {
+		return this.currentId < (this.size - 1);
+	}
+	
+	hasPrevious() {
+		return this.currentId > 0;
+	}
+	
+	increment(inc) {
+		if (inc > 0 && this.hasNext()) {
+			this.currentId++;
+			return true;
+		}
+		else if (inc < 0 && this.hasPrevious()) {
+			this.currentId--;
+			return true;
+		}
+		
+		return false;
+	}
+}
 
 $(function() {
 	_thumbnails = $("div.search-result img")
 	_slides = $("div.slide-set .slide")
+	_cursor = new Cursor(0, _slides.length)
 	assignUIBehaviours()
 });
 

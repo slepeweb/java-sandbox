@@ -45,7 +45,7 @@ _cms.leftnav.define.fancytree = function() {
 		activate: function(event, data) {
 			if (_cms.leftnav.mode == "navigate") {
 				// Update the item forms
-				_cms.support.renderItemForms(data.node.key, _cms.activateTab);
+				_cms.support.renderItemForms(data.node.key, _cms.activeTab);
 			}
 			else if (_cms.leftnav.mode == "link") {
 				$("#link-target-identifier").html("'" + _cms.leftnav.tree.activeNode.title + "'");
@@ -70,7 +70,7 @@ _cms.leftnav.navigate = function(key, tab, successCallback, args) {
 	if (! tab) {
 		tab = _cms.support.getActiveTab();
 	}
-	_cms.activateTab = tab.endsWith('-tab') ? tab : tab + '-tab';
+	_cms.activeTab = tab.endsWith('-tab') ? tab : tab + '-tab';
 	
 	var success = true;
 	

@@ -25,31 +25,41 @@
 </div>
 
 <script>
+	let searchAction = function() {
+		$.ajax(_cms.ctx + "/rest/search", {
+			type: "POST",
+			cache: false,
+			data: {
+				key: _cms.editingItemId,
+				searchtext: $("#search-bar input[name=searchtext]").val(),
+			},
+			dataType: "html",
+			success: function(html, status, z) {
+				$("#searchresults").html(html);
+				
+				$("#searchresults .navigate").click(function(event) {
+					var key = $(this).attr("href");
+					_cms.leftnav.navigate(key);
+					event.preventDefault();
+				});
+				
+				_cms.dialog.open(_cms.dialog.searchresults);
+			},
+			error: function(jqxhr, status, message) {
+				console.log(message);
+			},
+		});
+	}
+
 	$(function() {
 		$("#search-bar button").click(function() {
-			$.ajax(_cms.ctx + "/rest/search", {
-				type: "POST",
-				cache: false,
-				data: {
-					key: _cms.editingItemId,
-					searchtext: $("#search-bar input[name=searchtext]").val(),
-				},
-				dataType: "html",
-				success: function(html, status, z) {
-					$("#searchresults").html(html);
-					$("#searchresults .navigate").click(function(event) {
-						var key = $(this).attr("href");
-						_cms.leftnav.activateKey(key);
-						_cms.support.renderItemForms(key);
-						event.preventDefault();
-						_cms.dialog.close(_cms.dialog.searchresults);
-					});
-					_cms.dialog.open(_cms.dialog.searchresults);
-				},
-				error: function(jqxhr, status, message) {
-					console.log(message);
-				},
-			});
+			searchAction();
+		});
+		
+		$("#search-bar input[name=searchtext]").keydown(function(e) {
+			if (e.which == 13) {
+				searchAction();
+			}
 		});
 	});
 </script>

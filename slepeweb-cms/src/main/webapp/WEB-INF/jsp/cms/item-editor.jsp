@@ -3,7 +3,7 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <script type="text/javascript">
-	_cms.currentItemName = '${editingItem.name}';
+	_cms.currentItemName = `${editingItem.name}`; // back-ticks are deliberate!
 	_cms.currentItemFlagged = '${_itemIsFlagged ? 'yes' : 'no'}';
 	_cms.numDeletableItems = ${_numItemsInSection};
 	_cms.editingItemIsShortcut = ${editingItem.shortcut};

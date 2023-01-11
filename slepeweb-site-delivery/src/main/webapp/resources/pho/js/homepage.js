@@ -37,26 +37,19 @@ $(function() {
 	$('div#search-button-container input').click(function(e){
 		let div$ = $('div#search-form');
 		let text = div$.find('input[name=searchtext]').val();
-		let year;
 		let now = new Date().getFullYear();
 		let error = false;
 		
-		if (text.trim() === '') {
-			window.alert('You need to specify search terms');
+		let year = parseInt(div$.find('input[name=from]').val());
+		if (! isNaN(year) && ! yearInRange(year))  {
+			window.alert("'From' year is out of range");
 			error = true;
 		}
 		else {
-			year = parseInt(div$.find('input[name=from]').val());
+			year = parseInt(div$.find('input[name=to]').val());
 			if (! isNaN(year) && ! yearInRange(year))  {
-				window.alert("'From' year is out of range");
+				window.alert("'To' year is out of range");
 				error = true;
-			}
-			else {
-				year = parseInt(div$.find('input[name=to]').val());
-				if (! isNaN(year) && ! yearInRange(year))  {
-					window.alert("'To' year is out of range");
-					error = true;
-				}
 			}
 		}
 		
