@@ -38,6 +38,11 @@
 						<i class="fa-solid fa-xmark"></i>
 					</div>
 				</div>
+				
+				<!-- Show list of flagged items -->
+				<div id="item-flag-show">
+					<i class="fa-solid fa-eye" title="Show list of flagged items"></i>
+				</div>
 			</div>			
 		</div>
 		

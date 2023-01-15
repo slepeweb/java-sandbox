@@ -830,6 +830,9 @@ p#search-results-pager span.pagelink {
 p#search-results-pager span.pagelink.selected {
   font-weight: bold;
   cursor: default;
+  padding: 5px;
+  color: white;
+  background-color: grey;
 }
 
 .hide {

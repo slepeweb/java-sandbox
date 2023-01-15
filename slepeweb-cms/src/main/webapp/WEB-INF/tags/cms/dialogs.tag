@@ -72,5 +72,8 @@
 	</p>
 </div>
 
+<div id="flagged-items-dialog" class="hide">
+</div>
+
 <audio id="bell" src="${applicationContextPath}/resources/pin-dropping.wav" preload="auto"></audio>
 

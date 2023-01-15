@@ -87,6 +87,9 @@ p#search-results-pager {
 		&.selected {
 			font-weight: bold;
 			cursor: default;
+			padding: 5px;
+			color: white;
+			background-color: grey;
 		}
 	}
 }

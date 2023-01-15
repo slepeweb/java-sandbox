@@ -6,7 +6,7 @@
 
 <c:if test="${_search.pager.visible}">
 	<p id="search-results-pager" class="right">
-		<span class="choose-page">Choose page: </span>
+		<span class="choose-page">Page: </span>
 		
 		<c:if test="${_search.pager.previous}">
 			<c:if test="${_search.pager.selectedPage gt 2}">
@@ -14,7 +14,7 @@
 					class="fas fa-angle-double-left"></i></span>
 			</c:if>
 			<span class="pagelink arrow left" data-page="${_search.pager.previousSelection}" title="Previous page"><i 
-					class="fas fa-angle-left"></i>&nbsp;Previous</span>
+					class="fas fa-angle-left"></i></span>
 		</c:if>
 					
 		<c:forEach items="${_search.pager.navigation}" var="_pagenum">
@@ -29,7 +29,7 @@
 		</c:forEach>
 		
 		<c:if test="${_search.pager.next}">
-			<span class="pagelink arrow right" data-page="${_search.pager.nextSelection}" title="Next page">Next&nbsp;<i 
+			<span class="pagelink arrow right" data-page="${_search.pager.nextSelection}" title="Next page"><i 
 				class="fas fa-angle-right"></i></span>
 					
 			<c:if test="${_search.pager.selectedPage lt (_search.pager.maxPages - 2)}">

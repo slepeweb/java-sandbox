@@ -1,7 +1,6 @@
 TODO: This is the main todo file:
 
 HIGH
-- Flag item/all items in search results
 - Moved item B below A; leftnav missing all other children below A. Investigate.
 - implement cron job to backup cms db on desktop
 - new: move flagged items to the same location

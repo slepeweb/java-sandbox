@@ -103,11 +103,11 @@ div.hf {
 	padding: 0;
 }
 
-#searchresults ul {
+#searchresults ul, #flagged-items-dialog ul {
 	list-style-type: none;
 }
 
-#searchresults li {
+#searchresults li, #flagged-items-dialog li {
 	margin-bottom: 0.5em;
 	margin-left: -2em;
 }
@@ -526,7 +526,7 @@ div#flagged-items-section button {
 	width: 10em;
 }
 
-div#item-sibling-flag, div#item-flag-clear {
+div#item-sibling-flag, div#item-flag-clear, div#item-flag-show {
 	position: relative;
 	color: #016b9b;
 	font-size: 1.5em;

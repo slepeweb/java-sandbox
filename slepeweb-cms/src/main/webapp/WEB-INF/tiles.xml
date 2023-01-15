@@ -35,6 +35,7 @@
 	<definition name="cms.refresh.add" template="/WEB-INF/jsp/cms/refresh/add.jsp" />
 	<definition name="cms.refresh.copy" template="/WEB-INF/jsp/cms/refresh/copy.jsp" />
 	<definition name="cms.refresh.flaggedItems" template="/WEB-INF/jsp/cms/refresh/flaggedItems.jsp" />
+	<definition name="cms.refresh.flaggedItemsList" template="/WEB-INF/jsp/cms/refresh/flaggedItemsList.jsp" />
 	<definition name="cms.searchresults" template="/WEB-INF/jsp/cms/searchresults.jsp" />
 	<definition name="cms.crawl" template="/WEB-INF/jsp/cms/crawlresults.jsp" />
 	<definition name="cms.linknameOptions" template="/WEB-INF/jsp/cms/linknameOptions.jsp" />

@@ -9,8 +9,11 @@ public class ItemGist extends ItemIdentifier {
 	
 	public ItemGist(Item i) {
 		super(i.getOrigId());
-		setName(i.getName());
-		setPath(i.getPath());
+		
+		this.
+			setName(i.getName()).
+			setPath(i.getPath()).
+			setType(i.getType().getName());
 	}
 	
 	public Date getDate() {

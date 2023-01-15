@@ -10,6 +10,7 @@ _cms.dialog = {
 	linkGuidance: {obj: null},
 	fieldGuidance: {obj: null},
 	searchresults: {obj: null},
+	flaggedItems: {obj: null, open: false},
 	eggTimer: {obj: null},
 	sel: {
 		LINK_NOT_DEFINED: "#link-not-defined-dialog",
@@ -38,10 +39,12 @@ _cms.dialog.define = function(title, selector, width, height, buttons, close, is
 
 _cms.dialog.open = function(d) {
 	d.obj.dialog("open");
+	d.open = true;
 }
 
 _cms.dialog.close = function(d) {
 	d.obj.dialog("close");
+	d.open = false;
 }
 
 _cms.dialog.confirmTrash.define = function() {
@@ -166,6 +169,23 @@ _cms.dialog.eggTimer.define = function() {
 	});
 }
 
+_cms.dialog.flaggedItems.define = function() {	
+	var close = function() {
+		_cms.dialog.close(_cms.dialog.flaggedItems);
+	}
+	
+	var buttons = {
+		Close: function() {
+			close();
+		}
+	}
+	
+	_cms.dialog.flaggedItems.obj = _cms.dialog.define(
+			"Flagged items", "#flagged-items-dialog", 450, 600, buttons, close, false);
+}
+
+
+
 _cms.dialog.warning = function(title, d, selector) {
 	  var close = function() {
 		  _cms.dialog.close(d);
@@ -187,7 +207,9 @@ _cms.dialog.onpageload = function() {
 	_cms.dialog.searchresults.define();
 	_cms.dialog.linkGuidance.define();
 	_cms.dialog.fieldGuidance.define();
+	_cms.dialog.flaggedItems.define();
 	_cms.dialog.eggTimer.define();
+	
 	_cms.dialog.warning("Link not adequately defined", _cms.dialog.linkNotDefined, _cms.dialog.sel.LINK_NOT_DEFINED);
 	_cms.dialog.warning("Duplicate link target", _cms.dialog.duplicateTarget, _cms.dialog.sel.DUPLICATE_TARGET);
 	_cms.dialog.warning("Illegal target", _cms.dialog.illegalTarget, _cms.dialog.sel.ILLEGAL_TARGET);

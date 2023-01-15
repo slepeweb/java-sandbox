@@ -3,7 +3,7 @@ package com.slepeweb.cms.bean;
 public class ItemIdentifier {
 
 	private long itemId;
-	private String name, path;
+	private String name, path, type;
 	
 	public ItemIdentifier(long i) {
 		this.itemId = i;
@@ -37,6 +37,15 @@ public class ItemIdentifier {
 
 	public ItemIdentifier setPath(String path) {
 		this.path = path;
+		return this;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public ItemIdentifier setType(String type) {
+		this.type = type;
 		return this;
 	}
 

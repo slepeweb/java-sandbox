@@ -36,11 +36,12 @@ _cms.support.activateTab = function(name) {
 	$("#item-editor").tabs({active: activeTabId});
 }
 
-_cms.support.toStatus = function(err, msg) {
-	var obj = {};
-	obj.error = err;
-	obj.message = msg;
-	return obj;
+_cms.support.toStatus = function(err, msg, app) {
+	return {
+		error: err,
+		message: msg,
+		append: app
+	};
 };
 
 /*
@@ -64,7 +65,13 @@ _cms.support.flashMessage = function(status) {
 		msg = "";
 	}
 	
-	$("header #status-block").removeClass("red").removeClass("green").addClass(clazz).append(msg);
+	let container$ = $("header #status-block").removeClass("red").removeClass("green").addClass(clazz);
+	if (status && status.append) {
+		container$.append(msg);
+	}
+	else {
+		container$.html(msg);
+	}
 	
 	var audio = $("#bell");
 	if (audio && audio.get(0)) {
@@ -238,16 +245,23 @@ _cms.support.itemFlagger = {}
 _cms.support.itemFlagger.onPageLoad = function() {
 	// Flag siblings button
 	$('div#item-sibling-flag').click(function() {
-		_cms.misc.flaggedItems.ajax("/rest/item/" + _cms.editingItemId + "/flag/siblings", function(args) {
-			_cms.support.displayItemFlag(true);
+		_cms.flags.ajax("/rest/item/" + _cms.editingItemId + "/flag/siblings", function(args) {
+			_cms.support.displayItemFlag(true);			
+			_cms.flags.refreshDialog();
 		});
 	});
 	
 	// Un-flag button
 	$('div#item-flag-clear').click(function() {
-		_cms.misc.flaggedItems.ajax("/rest/flaggedItems/unflag/all", function(args) {
+		_cms.flags.ajax("/rest/flaggedItems/unflag/all", function(args) {
 			_cms.support.displayItemFlag(false);
+			_cms.flags.refreshDialog();
 		});
+	});
+	
+	// Show list of flagged items
+	$('div#item-flag-show').click(function() {
+		_cms.dialog.open(_cms.dialog.flaggedItems);
 	});
 }
 
@@ -268,7 +282,7 @@ _cms.support.itemFlagger.onItemLoad = function() {
 			
 			success: function(flagged, status, z) {
 				_cms.support.displayItemFlag(flagged);
-				_cms.misc.flaggedItems.refresh(_cms.editingItemId);
+				_cms.flags.refreshDialog();
 			},
 			error: function(resp, status, z) {
 				console.log("Error: " + resp);

@@ -43,7 +43,7 @@ _cms.field.update = function(nodeKey, formData) {
 			_cms.dialog.close(_cms.dialog.confirmFieldUpdate);
 			_cms.support.flashMessage(resp);
 			_cms.field.refresh.tab(nodeKey);
-			_cms.misc.flaggedItems.refresh(nodeKey);
+			_cms.flags.refreshCopyDataForm(nodeKey);
 			_cms.undoRedo.displayAll(resp.data);
 		},
 		// On error

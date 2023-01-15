@@ -1322,6 +1322,12 @@ public class RestController extends BaseController {
 		return flagItem(origId, request, true);
 	}
 	
+	@RequestMapping(value="/flaggedItems/list", method=RequestMethod.GET)
+	public String listFlaggedItems(HttpServletRequest request, ModelMap model) {
+		model.addAttribute("_flaggedItems", getSortedFlaggedItems(getFlaggedItems(request)));
+		return "cms.refresh.flaggedItemsList";		
+	}
+	
 	@RequestMapping(value="/flaggedItems/unflag/all", method=RequestMethod.GET)
 	public String unflagAllFlaggedItems(HttpServletRequest request, ModelMap model) {
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
