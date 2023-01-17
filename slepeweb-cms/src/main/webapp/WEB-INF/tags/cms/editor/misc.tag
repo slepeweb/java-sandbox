@@ -42,9 +42,5 @@
 	</div>
 	
 	<h3>Trash Bin</h3>
-	<div>
-		<button id="trash-show-button" type="button"
-			title="Reveal the contents of the trash bin">Show trash bin ...</button>
-		<div id="trash-container"></div>
-	</div>
+	<div id="trash-container"></div>
 </div>

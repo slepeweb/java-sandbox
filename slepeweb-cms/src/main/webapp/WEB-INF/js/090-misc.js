@@ -94,7 +94,7 @@ _cms.misc.refresh.trash = function(fn) {
 	_cms.support.ajax('GET', '/rest/trash/get', {dataType: "html", mimeType: "text/html"},
 		function(html, status, z) {
 			var mydiv = $(_cms.misc.sel.TRASH_CONTAINER);
-			mydiv.empty().append(html);
+			mydiv.html(html);
 			
 			// Apply behaviour for new/replaced buttons
 			_cms.misc.behaviour.trash.empty();
@@ -201,6 +201,16 @@ _cms.misc.behaviour.trash.trash = function(nodeKey) {
 	});
 }
 
+_cms.misc.accordionListener = function(e, ui) {
+	if (ui.newHeader.text().startsWith('Flagged')) {
+		_cms.flags.refreshDialog();
+		_cms.dialog.open(_cms.dialog.flaggedItems);
+	}
+	else if (ui.newHeader.text().startsWith('Trash')) {
+		_cms.misc.refresh.trash();
+	}
+}
+
 _cms.misc.updateProgressbar = function(bar, value) {
 	if (bar) {
 		if (value == false) {
@@ -224,13 +234,12 @@ _cms.misc.onrefresh = function(nodeKey) {
 	 */
 	_cms.misc.behaviour.trash.showOrHide();
 	_cms.flags.behaviour();
-	_cms.flags.refreshDialog();
 	
 	$('#misc-accordion').accordion({
 		heightStyle: "content",
 		collapsible: true,
 		active: false,
-		activate: _cms.flags.displayDialogGivenAccordionChoice,
+		activate: _cms.misc.accordionListener,
 	});
 	
 }

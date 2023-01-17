@@ -1,11 +1,6 @@
 _cms.flags = {
 };
 
-// This function is called by 'fields' and 'support' modules.
-_cms.flags.refreshCopyDataForm = function(nodeKey) {
-	_cms.flags.ajax("/rest/item/" + nodeKey + "/refresh/copyDataForm");
-}
-
 _cms.flags.exist = function() {
 	let exist = $('div#flagged-items-dialog li').length > 0;
 	if (! exist) {
@@ -17,10 +12,6 @@ _cms.flags.exist = function() {
 _cms.flags.behaviour = function() {
 	// Trash button
 	$('div#flagged-items-section button#trash-button').click(function(e) {
-		// To stop this click reaching the event handler on body, which
-		// clears the flash message container ...
-		e.stopPropagation();
-		
 		if (_cms.flags.exist()) {
 			_cms.dialog.open(_cms.dialog.eggTimer);
 			_cms.support.ajax('GET', '/rest/flaggedItems/trash/all', {}, function(a,b,c) {
@@ -32,10 +23,6 @@ _cms.flags.behaviour = function() {
 	
 	// Copy data button
 	$('div#flagged-items-section button#copy-data-button').click(function(e) {
-		// To stop this click reaching the event handler on body, which
-		// clears the flash message container ...
-		e.stopPropagation();
-
 		if (_cms.flags.exist()) {
 			_cms.dialog.open(_cms.dialog.eggTimer);
 			
@@ -81,6 +68,11 @@ _cms.flags.behaviour = function() {
 			i$.addClass(downarrow);
 		}
 	});	
+	
+	// Refresh data in copy-flagged-items form
+	$('div#copy-data-section i.refresher').click(function() {
+		_cms.flags.refreshCopyForm(_cms.editingItemId);
+	});
 }
 
 _cms.flags.collateFormData = function(clazz, type, params) {
@@ -101,34 +93,6 @@ _cms.flags.collateFormData = function(clazz, type, params) {
 	});
 }
 
-/*
-	This function is used to update the flagged items model (eg. flag/unflag, trash, etc), 
-	then refresh the html on the page.
-	
-	@url will be one of:
-		/rest/item/1234/refresh/flaggedItems
-		/rest/item/1234/flag/siblings
-		/rest/flaggedItems/unflag/all
-		/rest/flaggedItems/trash/all
-		/rest/flaggedItems/copy/all
-*/
-_cms.flags.ajax = function(url, callback, args) {
-	_cms.support.ajax('GET', url, {dataType: 'html', mimeType: 'text/html'}, function(html, status, z) {
-		var div$ = $("div#flagged-items-section");
-		div$.empty();
-		div$.append(html);
-
-		// Apply behaviours to newly created controls
-		//_cms.flags.behaviour();
-		
-		_cms.support.flashMessage({error: false, message: $('div#flagged-items-message').html()});
-		
-		if (callback) {
-			callback(args);
-		}
-	})
-}
-
 _cms.flags.refreshDialog = function() {
 	_cms.support.ajax('GET', '/rest/flaggedItems/list', {dataType: 'html', mimeType: 'text/html'}, 
 		function(html, status, z) {
@@ -137,12 +101,16 @@ _cms.flags.refreshDialog = function() {
 	);
 }
 
-_cms.flags.displayDialogGivenAccordionChoice = function(e, ui) {
-	if (ui.newHeader.text().startsWith('Flagged')) {
-		_cms.dialog.open(_cms.dialog.flaggedItems);
-	}
-	else {
-		_cms.dialog.close(_cms.dialog.flaggedItems);
+_cms.flags.refreshDialogIfOpen = function() {
+	if (_cms.dialog.flaggedItems.open) {
+		_cms.flags.refreshDialog();
 	}
 }
 
+_cms.flags.refreshCopyForm = function(key) {
+	_cms.support.ajax('GET', '/rest/item/' + key + '/refresh/copyFlaggedForm', {dataType: 'html', mimeType: 'text/html'}, 
+		function(html, status, z) {
+			$('div#copy-flagged-data-form').html(html);
+		}
+	);
+}

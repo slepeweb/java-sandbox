@@ -522,6 +522,12 @@ div#item-flag i.flagged {
 	color: red;
 }
 
+div#copy-data-section i.refresher {
+	font-size: 1.2em;
+	cursor: pointer;	
+	padding: 0 1em 0 1em;
+}
+
 div#flagged-items-section button {
 	width: 10em;
 }

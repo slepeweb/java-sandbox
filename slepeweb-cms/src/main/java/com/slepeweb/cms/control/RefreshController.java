@@ -138,4 +138,14 @@ public class RefreshController extends BaseController {
 		return "cms.refresh.flaggedItems";		
 	}
 		
+	@RequestMapping(value="/item/{origId}/refresh/copyFlaggedForm", method=RequestMethod.GET)
+	public String refreshCopyFlaggedForm(
+			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
+		
+		Item i = getEditableVersion(origId, getUser(req));
+		model.put("editingItem", i);
+		model.addAttribute("_fieldSupport", fieldEditorSupport(i));
+		return "cms.refresh.copyFlaggedForm";		
+	}
+		
 }

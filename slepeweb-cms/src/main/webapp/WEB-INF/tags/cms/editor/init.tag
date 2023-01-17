@@ -67,11 +67,6 @@
 	}
 	
 	$(function() {
-		
-		$("body").click(function() {
-			$("#status-block").empty();
-		});
-	
 		/* 
 			The leftnav is built once only per page request. Subsequent UI actions
 			that refresh tabs on the item editor will NOT rebuild the tree.
@@ -101,5 +96,7 @@
 		
 		// Set the behaviour of the trash button
 		_cms.misc.behaviour.trash.trash(_cms.editingItemId);
-	});</script>
+		
+	});
+</script>
 

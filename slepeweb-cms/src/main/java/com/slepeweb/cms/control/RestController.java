@@ -1288,7 +1288,8 @@ public class RestController extends BaseController {
 	}
 	
 	@RequestMapping(value="/item/{origId}/flag/siblings", method=RequestMethod.GET, produces="application/json")
-	public String flagSiblings(@PathVariable long origId, HttpServletRequest request, ModelMap model) {
+	@ResponseBody
+	public int flagSiblings(@PathVariable long origId, HttpServletRequest request) {
 		Item i = this.getEditableVersion(origId, getUser(request));
 		Item parent = i.getParent();
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
@@ -1302,18 +1303,7 @@ public class RestController extends BaseController {
 			}
 		}
 		
-		model.addAttribute("_flaggedItems", getSortedFlaggedItems(flaggedItems));
-		model.addAttribute("_itemIsFlagged", flaggedItems.containsKey(origId));
-		model.addAttribute("_flaggedItemsMessage", String.format("%d siblings have been flagged", count));
-		
-		/* 
-		 * These attributes are required to refresh the 'flagged items' dialog IN BETWEEN entire
-		 * editor updates. (The copy-data section needs field values for the current item.)
-		 */
-		model.addAttribute("editingItem", i);
-		model.addAttribute("_fieldSupport", fieldEditorSupport(i));
-		
-		return "cms.refresh.flaggedItems";		
+		return count;		
 	}
 	
 	@RequestMapping(value="/item/{origId}/unflag", method=RequestMethod.GET, produces="application/json")
@@ -1328,14 +1318,13 @@ public class RestController extends BaseController {
 		return "cms.refresh.flaggedItemsList";		
 	}
 	
-	@RequestMapping(value="/flaggedItems/unflag/all", method=RequestMethod.GET)
-	public String unflagAllFlaggedItems(HttpServletRequest request, ModelMap model) {
+	@RequestMapping(value="/flaggedItems/unflag/all", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public int unflagAllFlaggedItems(HttpServletRequest request, ModelMap model) {
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
+		int count = flaggedItems.size();
 		flaggedItems.clear();
-		model.addAttribute("_flaggedItems", flaggedItems);
-		model.addAttribute("_itemIsFlagged", false);
-		model.addAttribute("_flaggedItemsMessage", "All flags have been removed");
-		return "cms.refresh.flaggedItems";		
+		return count;		
 	}
 	
 	@RequestMapping(value="/flaggedItems/trash/all", method=RequestMethod.GET)

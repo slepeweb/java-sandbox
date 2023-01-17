@@ -51,6 +51,8 @@ _cms.support.serverError = function() {
 	_cms.support.flashMessage(_cms.support.toStatus(true, "Server error"));
 };
 
+_cms.support.flashTimeout = null;
+
 /*
  * Displays a flash message, in red for errors, and green for info messages.
  */
@@ -77,6 +79,9 @@ _cms.support.flashMessage = function(status) {
 	if (audio && audio.get(0)) {
 		audio.get(0).play();
 	}
+	
+	clearTimeout(_cms.support.flashTimeout);
+	_cms.support.flashTimeout = setTimeout(function(){$("header #status-block").empty();}, 8000);
 };
 
 _cms.support.displayCommerceElements = function(target) {
@@ -99,37 +104,24 @@ _cms.support.addHistoryBehaviour = function(selector) {
 };
 
 _cms.support.refreshHistory = function(siteId) {
-	$.ajax(_cms.ctx + "/rest/item/history/" + siteId, {
-		type: "POST",
-		cache: false,
-		//data: {key: nodeKey}, 
-		dataType: "json",
-		mimeType: "application/json",
+	_cms.support.ajax('POST', '/rest/item/history/' + siteId, {dataType: 'json', mimeType: 'application/json'},
 		
 		// On successful loading of forms 
-		success: function(list, status, z) {
-				var selector = $("#history-selector");
-				selector.empty();
-				for (var i = 0; i < list.length; i++) {
-					selector.append("<option value='" + list[i].itemId + "'>" + list[i].name + "</option>");
-				}
+		function(list, status, z) {
+			var selector = $("#history-selector");
+			selector.empty();
+			for (var i = 0; i < list.length; i++) {
+				selector.append("<option value='" + list[i].itemId + "'>" + list[i].name + "</option>");
+			}
 
-				_cms.support.addHistoryBehaviour(selector);					
-		},
-		error: function(list, status, z) {
-			console.log("Error: " + list);
-		}
-	});
+			_cms.support.addHistoryBehaviour(selector);					
+		});
 };
 
 _cms.support.refreshtab = function(tab, nodeKey, behavioursFunction) {
-	$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/refresh/" + tab, {
-		type: "GET",
-		cache: false,
-		dataType: "html",
-		mimeType: "text/html",
+	_cms.support.ajax('GET', '/rest/item/' + nodeKey + '/refresh/' + tab, {dataType: "html", mimeType: "text/html"},
 		
-		success: function(html, status, z) {
+		function(html, status, z) {
 			var ele = $("#" + tab + "-tab");
 			ele.empty();
 			ele.append(html);
@@ -139,11 +131,7 @@ _cms.support.refreshtab = function(tab, nodeKey, behavioursFunction) {
 			}
 			
 			_cms.support.disableFormsIfReadonly();
-		},
-		error: function(html, status, z) {
-			console.log("Error: " + html);
-		}
-	});
+		});
 }
 
 _cms.support.disable = function(selector) {
@@ -244,23 +232,26 @@ _cms.support.itemFlagger = {}
 
 _cms.support.itemFlagger.onPageLoad = function() {
 	// Flag siblings button
-	$('div#item-sibling-flag').click(function() {
-		_cms.flags.ajax("/rest/item/" + _cms.editingItemId + "/flag/siblings", function(args) {
+	$('div#item-sibling-flag').click(function(e) {
+		_cms.support.ajax('GET', '/rest/item/' + _cms.editingItemId + '/flag/siblings', {dataType: 'json'}, function(n) {
 			_cms.support.displayItemFlag(true);			
-			_cms.flags.refreshDialog();
+			_cms.flags.refreshDialogIfOpen();
+			_cms.support.flashMessage(_cms.support.toStatus(false, `${n} sibling items flagged`));
 		});
 	});
 	
 	// Un-flag button
-	$('div#item-flag-clear').click(function() {
-		_cms.flags.ajax("/rest/flaggedItems/unflag/all", function(args) {
+	$('div#item-flag-clear').click(function(e) {
+		_cms.support.ajax('GET', '/rest/flaggedItems/unflag/all', {dataType: 'json'}, function(n) {
 			_cms.support.displayItemFlag(false);
-			_cms.flags.refreshDialog();
+			_cms.flags.refreshDialogIfOpen();
+			_cms.support.flashMessage(_cms.support.toStatus(false, `${n} items un-flagged`));
 		});
 	});
 	
 	// Show list of flagged items
 	$('div#item-flag-show').click(function() {
+		_cms.flags.refreshDialog();
 		_cms.dialog.open(_cms.dialog.flaggedItems);
 	});
 }
@@ -270,23 +261,16 @@ _cms.support.itemFlagger.onItemLoad = function() {
 	var isFlagged = _cms.currentItemFlagged === 'yes';
 	_cms.support.displayItemFlag(isFlagged);
 	
-	$('div#item-flag i').off().click(function() {
+	$('div#item-flag i').click(function() {
 		var i$ = $(this);
 		var isFlagged = i$.hasClass('flagged');
-		var url = _cms.ctx + "/rest/item/" + _cms.editingItemId + "/" + (isFlagged ? 'un' : '') + "flag";
+		var action = (isFlagged ? 'un' : '') + 'flag';
+		var url = '/rest/item/' + _cms.editingItemId + '/' + action;
 			
-		$.ajax(url, {
-			type: "GET",
-			cache: false,
-			dataType: "json",
-			
-			success: function(flagged, status, z) {
-				_cms.support.displayItemFlag(flagged);
-				_cms.flags.refreshDialog();
-			},
-			error: function(resp, status, z) {
-				console.log("Error: " + resp);
-			}
+		_cms.support.ajax('GET', url, {dataType: 'json'}, function(flagged, status, z) {
+			_cms.support.displayItemFlag(flagged);
+			_cms.flags.refreshDialogIfOpen();
+			_cms.support.flashMessage(_cms.support.toStatus(false, `Current item ${action}ged`));
 		});
 	});
 }
@@ -323,14 +307,10 @@ _cms.support.ajax = function(method, url, data, success, fail) {
 */
 _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 
-	$.ajax(_cms.ctx + "/rest/item/editor", {
-		cache: false,
-		data: {key: nodeKey}, 
-		dataType: "html",
-		mimeType: "text/html",
+	_cms.support.ajax('GET', '/rest/item/editor', {data: {key: nodeKey}, dataType: 'html', mimeType: 'text/html'},
 		
 		// On successful loading of forms 
-		success: function(html, status, z) {
+		function(html, status, z) {
 			// origId of currently selected item
 			_cms.editingItemId = nodeKey;
 			
@@ -370,7 +350,6 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 			if (callback) {
 				callback(args);
 			}
-		}
-	});
+		});
 };
 

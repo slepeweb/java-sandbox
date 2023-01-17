@@ -16,38 +16,16 @@
 
 	<div id="copy-data-section" class="hide">
 		<p>The following data is available for copying to flagged items. 
-			Check the boxes corresponding to the data you want to copy, then click the 'Copy' button.</p>
+			Check the boxes corresponding to the data you want to copy, then click the 'Copy ALL' button.
+			If you have just updated the core/field data for the current item, you may need to
+			click this refresh icon 
+			<i class="fa-solid fa-rotate-right refresher" title="Update form if needs be"></i>
+			to reflect those changes in this form.
+		</p>
 		
-		<div class="ff">
-			<input type="checkbox" class="copy-core-data" data-name="tags" />
-			<label>Tags: </label><input type="text" name="copy-tags" value="${editingItem.tagsAsString}" />
+		<div id="copy-flagged-data-form">
+			<edit:copyFlaggedForm />
 		</div>
-						
-		<div class="ff">
-			<input type="checkbox" class="copy-core-data" data-name="published" />
-			<label>Published?: </label><input type="checkbox" name="copy-published" 
-				<c:if test="${editingItem.published}">checked="checked"</c:if> />
-		</div>
-						
-		<div class="ff">
-			<input type="checkbox" class="copy-core-data" data-name="searchable" />
-			<label>Searchable?: </label><input type="checkbox" name="copy-published" 
-				<c:if test="${editingItem.searchable}">checked="checked"</c:if> />
-		</div>
-						
-		<c:forEach items="${_fieldSupport[editingItem.site.language]}" var="fes">
-			<div class="ff">
-				<input type="checkbox" class="copy-fieldvalue" data-name="${fes.field.variable}" />
-				<label>${fes.label} : </label> 
-				${fes.inputTag}
-			</div>					
-		</c:forEach>
-
-		<div class="section-ops">
-			<p>Copy selected data to <strong>ALL</strong> currently flagged items:</p>
-			<div><button id="copy-data-button" type="button">Copy ALL</button></div>
-		</div>
-	
 	</div>
 			
 </div>
