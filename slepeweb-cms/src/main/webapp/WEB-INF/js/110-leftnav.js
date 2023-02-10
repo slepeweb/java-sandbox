@@ -72,7 +72,11 @@ _cms.leftnav.navigate = function(key, tab, successCallback, args) {
 	}
 	_cms.activeTab = tab.endsWith('-tab') ? tab : tab + '-tab';
 	
-	var success = true;
+	let doSuccessCallback = function() {
+		if (successCallback) {
+			successCallback(args);
+		}
+	}
 	
 	// Is the item of interest already visible in the tree?
 	var node = _cms.leftnav.tree.getNodeByKey(key);
@@ -88,37 +92,36 @@ _cms.leftnav.navigate = function(key, tab, successCallback, args) {
 			node.setActive(false);
 		}
 		node.setActive(true);
+		doSuccessCallback();
 	}
 	else {
 		// This item hasn't been loaded into the fancytree yet 
-		// - ask the server for the breadcrumb trail
-		if (! _cms.leftnav.loadBreadcrumbs(key)) {
-			_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to retrieve breadcrumb trail"));
-			success = false;
-		}
-	}
-	
-	if (success && successCallback) {
-		successCallback(args);
-	}
+		// - ask the server for the breadcrumb trail, and update the leftnav accordingly
+		_cms.leftnav.loadBreadcrumbs(
+			key, 
+			function() {
+				doSuccessCallback();
+			},
+			function() {
+				_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to update the leftnav tree"));
+			}
+		);
+	}	
 }
 
-_cms.leftnav.loadBreadcrumbs = function(key) {
-	let success = false;
-	
+_cms.leftnav.loadBreadcrumbs = function(key, successCallback, errorCallback) {
 	_cms.support.ajax('GET', '/rest/breadcrumbs/' + key, {dataType: 'json', mimeType: 'application/json'},
 		function(json, status, z) {
 			_cms.leftnav.tree.loadKeyPath(json, function(node, status) {
 				//console.log('_cms.leftnav.tree.loadKeyPath:', node.key, status);
 				if (status === "ok") {
 				    node.setActive();
-				    success = true;
+				    successCallback
 				}
 			});
-		}
+		},
+		errorCallback
 	);
-	
-	return success;
 }
 
 _cms.leftnav.refreshShortcut = function(nodeKey, action, type) {

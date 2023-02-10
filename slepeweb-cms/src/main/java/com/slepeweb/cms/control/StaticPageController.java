@@ -304,7 +304,7 @@ public class StaticPageController extends BaseController {
 	}
 	
 	private BufferedInputStream getMediaStream(Item i, boolean thumbnailReqd) {
-		Media m = i.getMedia(thumbnailReqd);
+		Media m = thumbnailReqd ? i.getThumbnail() : i.getMedia();
 		if (m != null) {
 			InputStream is = m.getDownloadStream();
 			

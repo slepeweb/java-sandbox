@@ -111,18 +111,17 @@ public class Shortcut extends Item {
 	}
 	
 	@Override
-	public Media getMedia() {
-		return getMedia(false);
-	}
-	
-	@Override
-	public Media getMedia(boolean thumbnailRequired) {
+	public List<Media> getAllMedia() {
 		if (isMergeable()) {
-			return this.cmsService.getMediaService().getMedia(this.referred.getId(), thumbnailRequired);
+			if (this.allMedia == null) {
+				this.allMedia = this.cmsService.getMediaService().getAllMedia(this.referred.getId());
+			}
+			
+			return this.allMedia;
 		}
-		
 		return null;
 	}
+	
 	
 	@Override
 	public boolean isDeleted() {

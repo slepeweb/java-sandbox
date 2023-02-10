@@ -64,7 +64,7 @@ public class MediaDeliveryServiceImpl extends BaseServiceImpl implements MediaDe
 			thumbnailRequired = viewParam.equals("thumbnail");
 		}
 		
-		Media media = item.getMedia(thumbnailRequired);
+		Media media = thumbnailRequired ? item.getThumbnail() : item.getMedia();
 		if (media == null) {
 			LOG.error(String.format("No media found for item", item));
 			return;

@@ -47,6 +47,8 @@ public class Item extends CmsBean {
 	// NOTE: language is not saved in the database; it is assigned on item creation
 	private String language = "en";
 	
+	protected List<Media> allMedia;
+	
 	public String getDefaultSimplename() {
 		if (StringUtils.isNotBlank(getName())) {
 			return getName().toLowerCase().replaceAll("[\\s\\W]", "");
@@ -169,22 +171,9 @@ public class Item extends CmsBean {
 				getName(), getPath());
 	}
 	
-	public Item getImage() {
-		return getImage("std");
-	}
-	
-	// TODO: if no thumbnail, should we scale the main image?
-	public Item getThumbnail() {
-		return getImage("thumb");
-	}
-		
-	public Item getImage(String classification) {
-		LinkFilter f = new LinkFilter().setLinkName(classification);
-		List<Item> images = f.filterItems(getInlines());
-		if (images.size() > 0) {
-			return images.get(0);
-		}
-		return null;
+	public Item getFirstInlineImage() {
+		LinkFilter f = new LinkFilter().setMimeTypePatterns("image/.*");
+		return f.filterFirstItem(getInlines());
 	}
 	
 	public int getLevel() {
@@ -247,74 +236,6 @@ public class Item extends CmsBean {
 	public boolean removeRelation(Item relation) {
 		return getLinks().remove(CmsBeanFactory.toChildLink(this, relation, LinkType.relation));
 	}
-	
-	public Item move(Item target) throws ResourceException {
-		
-		return move(target, "over");
-	}
-	
-	public Item move(Item target, String mode) throws ResourceException {
-		
-		return getCmsService().getItemWorkerService().move(new MoverItem(this, target, mode));
-	}
-	
-	/*
-	public Object[] getCopyDetails() {
-		Object[] result = new Object[4];
-		String baseName, baseSimplename;
-		String test = null;
-		Matcher nameMatcher = NAME_COPY_PATTERN.matcher(getName());
-		Matcher simplenameMatcher = SIMPLENAME_COPY_PATTERN.matcher(getSimpleName());
-		Integer n = -1;
-		
-		if (simplenameMatcher.matches()) {
-			baseSimplename = simplenameMatcher.group(1);
-			n = Integer.parseInt(simplenameMatcher.group(2)) + 1;
-		}
-		else {
-			baseSimplename = getSimpleName() + SIMPLENAME_COPY_EXT;
-			n = 1;
-		}
-		
-		if (nameMatcher.matches()) {
-			baseName = nameMatcher.group(1);
-		}
-		else {
-			baseName = getName() + NAME_COPY_EXT;
-		}
-		
-		String parentPath = getParentPath();
-		
-		// parentPath will be null for root items (ie. site & content)
-		if (parentPath != null) {
-			if (parentPath.equals("/")) {
-				parentPath = "";
-			}
-			
-			while (n < 10) {
-				test = baseSimplename + n;			
-				
-				// Does this item already exist?
-				if (getSite().getItem(parentPath + "/" + test) == null) {
-					result[0] = n;
-					result[1] = test;
-					result[2] = baseName + n;
-					result[3] = SIMPLENAME_COPY_EXT;
-					return result;
-				}
-				n++;
-			}
-		}
-		
-		// Failed to find suitable names
-		n = 99;
-		result[0] = n;
-		result[1] = baseSimplename + n;
-		result[2] = baseName + n;
-		result[3] = SIMPLENAME_COPY_EXT;
-		return result;
-	}
-	*/
 	
 	public String getParentPath() {
 		return CmsUtil.getParentPathFromPath(this);
@@ -637,17 +558,35 @@ public class Item extends CmsBean {
 	}
 	
 	public Media getMedia() {
-		return getMedia(false);
+		return filterMedia(false);
 	}
 	
-	public Media getMedia(boolean thumbnailRequired) {
-		return this.cmsService.getMediaService().getMedia(getId(), thumbnailRequired);
+	public Media getThumbnail() {
+		return filterMedia(true);
+	}
+	
+	protected Media filterMedia(boolean thumbnailRequired) {
+		for (Media m : getAllMedia()) {
+			
+			if (thumbnailRequired && m.isThumbnail()) {
+				return m;
+			}
+			else if (! thumbnailRequired && ! m.isThumbnail()) {
+				return m;
+			}
+		}
+		
+		return null;
 	}
 
 	public List<Media> getAllMedia() {
-		return this.cmsService.getMediaService().getAllMedia(getId());
+		if (this.allMedia == null) {
+			this.allMedia = this.cmsService.getMediaService().getAllMedia(getId());
+		}
+		
+		return this.allMedia;
 	}
-
+	
 	public List<Link> getRelations() {
 		return filterLinks(new String[] {LinkType.relation});
 	}

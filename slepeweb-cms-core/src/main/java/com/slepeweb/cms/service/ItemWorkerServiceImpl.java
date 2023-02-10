@@ -52,10 +52,18 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 			throw new ResourceException("Missing item data for move");
 		}
 		
-		Item newParent = mover.getMode().equals(MoverItem.MOVE_OVER) ? mover.getTarget() : mover.getTargetParent();
-		LOG.info(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mover.getMode().toUpperCase(), mover.getTarget()));			
-		LOG.info(compose("  Old parent", mover.getCurrentParent()));		
-		LOG.info(compose("  New parent", newParent));		
+		String mode = mover.getTo().getMode();
+		Item target = this.itemService.getItemByOriginalId(mover.getTo().getTargetId());
+		if (target == null) {
+			throw new ResourceException("Target of move not found");
+		}
+		
+		Item newParent = mode.equals(MoverItem.MOVE_OVER) ? target : target.getParent();
+		if (newParent == null) {
+			throw new ResourceException("Attempted to move an item to one of its descendants");
+		}
+		
+		LOG.info(String.format("Moving [%s] (mover) %s [%s] (target)", mover, /*to.getMode()*/ mode.toUpperCase(), target));			
 		
 		// Cannot move an item to one of its descendants
 		if (newParent.getPath().startsWith(mover.getPath())) {
@@ -71,7 +79,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		}
 		
 		// Break the parent link for the mover, EVEN IF old-parent = new-parent
-		this.linkService.deleteLinks(mover.getCurrentParent().getId(), mover.getId());
+		this.linkService.deleteLinks(mover.getParent().getId(), mover.getId());
 		LOG.debug("  Removed links between mover and old parent");		
 		
 		// Bind to new parent - we'll save() the mover link later
@@ -84,15 +92,15 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		// Add mover to new parent's bindings
 		List<Link> bindings = newParent.getBindings();
 		
-		if (mover.getMode().equals(MoverItem.MOVE_OVER)) {
+		if (mode.equals(MoverItem.MOVE_OVER)) {
 			bindings.add(moverLink);
-			LOG.debug("  Added mover to end of new parent's existing bindings");	
+			LOG.info("  Added mover to end of new parent's existing bindings");	
 		}
 		else {
 			// If mode is 'before' or 'after', identify insertions point and re-order all siblings
 			int cursor = -1;
 			for (Link l : bindings) {
-				if (l.getChild().getId().equals(mover.getTarget().getId())) {
+				if (l.getChild().getId().equals(target.getId())) {
 					cursor = bindings.indexOf(l);
 					break;
 				}
@@ -100,10 +108,10 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 			
 			// Now insert the mover into the bindings list
 			if (cursor > -1) {
-				if (mover.getMode().equals(MoverItem.MOVE_BEFORE)) {
+				if (mode.equals(MoverItem.MOVE_BEFORE)) {
 					bindings.add(cursor, moverLink);
 				}
-				else if (mover.getMode().equals(MoverItem.MOVE_AFTER)) {
+				else if (mode.equals(MoverItem.MOVE_AFTER)) {
 					if (cursor < bindings.size()) {
 						bindings.add(cursor + 1, moverLink);
 					}
@@ -146,8 +154,9 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		// Update solr
 		this.solrService4Cms.save(mover);
 		
-		// Now work out how to reverse this move, in the form of a MoverItem instance
-		return new MoverItem(this.itemService.getItem(mover.getId()), mover.getUndoTarget(), mover.getUndoMode());
+		// Return an instance of the moved item, even though only the path should have changed.
+		// NOTE that the moved item does not express a move destination.
+		return new MoverItem(this.itemService.getItemByOriginalId(mover.getOrigId()), null);
 	}
 	
 	public Item copy(Item source, String name, String simplename) throws ResourceException {

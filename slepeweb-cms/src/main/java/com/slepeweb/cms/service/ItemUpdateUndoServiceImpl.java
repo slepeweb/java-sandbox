@@ -8,6 +8,7 @@ import com.slepeweb.cms.bean.ItemUpdateHistory;
 import com.slepeweb.cms.bean.ItemUpdateRecord;
 import com.slepeweb.cms.bean.ItemUpdateRecord.Action;
 import com.slepeweb.cms.bean.MoverItem;
+import com.slepeweb.cms.bean.MoverItem.RelativeLocation;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.UndoRedoStatus;
 
@@ -36,66 +37,68 @@ public class ItemUpdateUndoServiceImpl implements ItemUpdateUndoService {
 		ItemUpdateRecord currentUpdateRecord = history.getItemUpdateRecord();
 		ItemUpdateRecord nextUpdateRecord = history.getNextItemUpdateRecord();
 		
-		ItemUpdateRecord targetUpdateRecord = null;
-		Item sourceItem = null;
+		ItemUpdateRecord updateRecord = null;
+		Item i = null;
 		
 		if (option == Option.undo && currentUpdateRecord != null) {
-			targetUpdateRecord = currentUpdateRecord;
-			sourceItem = currentUpdateRecord.getBefore();
+			updateRecord = currentUpdateRecord;
+			i = currentUpdateRecord.getBefore();
 		}
 		else if (option == Option.redo && nextUpdateRecord != null) {
-			targetUpdateRecord = nextUpdateRecord;
-			sourceItem = nextUpdateRecord.getAfter();
+			updateRecord = nextUpdateRecord;
+			i = nextUpdateRecord.getAfter();
 		}
 		
-		if (sourceItem == null) {
+		if (i == null) {
 			return new RestResponse().setError(true).addMessage("No undo/redo available");
 		}
 		
-		Long origId = sourceItem.getOrigId();
+		Long origId = i.getOrigId();
 		Item dbRecord = this.itemService.getItemByOriginalId(origId);
 		Object[] moveParams = null;
 		
 		if (dbRecord != null) {
 			try {			
 				// core data
-				if (targetUpdateRecord.getAction() == Action.core) {							
+				if (updateRecord.getAction() == Action.core) {							
 					dbRecord.
-						setName(sourceItem.getName()).
-						setSimpleName(sourceItem.getSimpleName()).
-						setDateUpdated(sourceItem.getDateUpdated()).
-						setPublished(sourceItem.isPublished()).
-						setSearchable(sourceItem.isSearchable());
+						setName(i.getName()).
+						setSimpleName(i.getSimpleName()).
+						setDateUpdated(i.getDateUpdated()).
+						setPublished(i.isPublished()).
+						setSearchable(i.isSearchable());
 						
 					dbRecord.save();
 					
-					this.tagService.save(dbRecord, sourceItem.getTagsAsString());
+					this.tagService.save(dbRecord, i.getTagsAsString());
 				}
 				// field values
-				else if (targetUpdateRecord.getAction() == Action.field) {
-					dbRecord.setFieldValues(sourceItem.getFieldValueSet());
+				else if (updateRecord.getAction() == Action.field) {
+					dbRecord.setFieldValues(i.getFieldValueSet());
 					dbRecord.saveFieldValues();
 				}
 				// links
-				else if (targetUpdateRecord.getAction() == Action.links) {
-					dbRecord.setLinks(sourceItem.getLinks());
+				else if (updateRecord.getAction() == Action.links) {
+					dbRecord.setLinks(i.getLinks());
 					dbRecord.saveLinks();
 				}
 				// move
-				else if (targetUpdateRecord.getAction() == Action.move) {
-					if (! (sourceItem instanceof MoverItem)) {
+				else if (updateRecord.getAction() == Action.move) {
+					if (! (i instanceof MoverItem)) {
 						resp.setError(true).addMessage("Undo move failure");
 					}
 					
-					MoverItem mover = (MoverItem) sourceItem;
+					MoverItem m = (MoverItem) i;					
+					MoverItem mover = new MoverItem(m, 
+							new RelativeLocation(m.getFrom().getTargetId(), m.getFrom().getMode()));
+
+					mover.move();
 					
 					// For ajax caller ... so that left navigation can be updated
 					moveParams = new Object[] {
-							mover.getMode(),
-							mover.getTarget().getOrigId()
+							mover.getTo().getMode(),
+							mover.getTo().getTargetId()
 					};
-					
-					mover.move();
 				}
 								
 				if (option == Option.undo) {
@@ -109,7 +112,7 @@ public class ItemUpdateUndoServiceImpl implements ItemUpdateUndoService {
 
 				resp.setData(new Object[] {
 						new UndoRedoStatus(history),
-						targetUpdateRecord.getAction().name(),
+						updateRecord.getAction().name(),
 						dbRecord.getOrigId(),
 						moveParams
 					});

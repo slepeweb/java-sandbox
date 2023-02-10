@@ -11,6 +11,7 @@ import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.MoverItem;
+import com.slepeweb.cms.bean.MoverItem.RelativeLocation;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.service.ItemWorkerService;
@@ -66,7 +67,9 @@ public class ItemTest extends BaseTest {
 			}
 			else {	
 				// Move the 'about' article item to the 'news' section
-				this.itemWorkerService.move(new MoverItem(aboutSectionItem, newsSectionItem, MoverItem.MOVE_OVER));			
+				this.itemWorkerService.move(new MoverItem(aboutSectionItem, 
+						new RelativeLocation(newsSectionItem.getOrigId(), MoverItem.MOVE_OVER)));
+				
 				// 4010: Assert news section now has 3 children
 				int count = newsSectionItem.getBoundItems().size();
 				r = trs.execute(4010);
@@ -100,7 +103,9 @@ public class ItemTest extends BaseTest {
 				if (aboutSectionItem != null && rootItem != null) {
 					
 					// Move the 'about' article item back to its original location
-					this.itemWorkerService.move(new MoverItem(aboutSectionItem, rootItem, MoverItem.MOVE_OVER));			
+					this.itemWorkerService.move(new MoverItem(aboutSectionItem, 
+							new RelativeLocation(rootItem.getOrigId(), MoverItem.MOVE_OVER)));
+					
 					// 4030: Assert news section has original 2 children
 					newsSectionItem = site.getItem("/news");
 					count = newsSectionItem.getBoundItems().size();

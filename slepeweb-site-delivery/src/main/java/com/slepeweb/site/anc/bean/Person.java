@@ -295,7 +295,8 @@ public class Person {
 	
 	public Item getPhoto() {
 		if (this.photo == null) {
-			this.photo = this.item.getImage("passport_photo");
+			LinkFilter f = new LinkFilter().setLinkName("passport_photo");
+			this.photo = f.filterFirstItem(this.item.getInlines());
 		}
 		return this.photo;
 	}

@@ -57,6 +57,7 @@ import com.slepeweb.cms.bean.LinkNameOption;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.MoverItem;
+import com.slepeweb.cms.bean.MoverItem.RelativeLocation;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrParams4Cms;
@@ -1048,29 +1049,28 @@ public class RestController extends BaseController {
 			return resp.setError(true).setData(i.getId()).addMessage("Cannot move the root item");
 		}
 		
-		Item target = getEditableVersion(targetId, u, true);
-		
 		// Keep a record of the mover item, to store in ItemUpdateHistory
-		MoverItem before = new MoverItem(i, target, mode);
+		MoverItem mover = new MoverItem(i, new RelativeLocation(targetId, mode));
+		MoverItem moved = null;
 		
 		try {
-			MoverItem after = before.move();
-			
-			// Save previous revision of mover in user's undo history
-			ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
-			itemUpdateHistory.push(before, after, Action.move);
-						
-			return resp.setError(false).
-					setData(new UndoRedoStatus(itemUpdateHistory)).
-					addMessage("Item moved");
+			moved = mover.move();
 		}
 		catch (MissingDataException e) {
-			return resp.setError(true).setData(before.getId()).addMessage(e.getMessage());
+			return resp.setError(true).setData(mover.getId()).addMessage(e.getMessage());
 		}
 		catch (ResourceException e) {
-			return resp.setError(true).setData(before.getId()).addMessage(e.getMessage());
+			return resp.setError(true).setData(mover.getId()).addMessage(e.getMessage());
 		}
-	}
+		
+		// Item moved ok - Save previous revision of mover in user's undo history
+		ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
+		itemUpdateHistory.push(mover, moved, Action.move);
+					
+		return resp.setError(false).
+				setData(new UndoRedoStatus(itemUpdateHistory)).
+				addMessage("Item moved");
+}
 	
 	@RequestMapping(value="/links/{parentId}/save", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody

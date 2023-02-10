@@ -610,6 +610,12 @@ div.cms-icon-content {background-position: 0px -16px; background-image: url("fan
 		margin-top: 1.5em;
 	}
 	
+	div.media-details {
+		display: grid;
+		gap: 30px;
+		grid-template-columns: fit-content(150px) 1fr;
+	}
+	
 	#search-bar {
 		margin-top: 1.5em;
 		width: 100%;

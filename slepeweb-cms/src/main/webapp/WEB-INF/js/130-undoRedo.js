@@ -44,7 +44,7 @@ _cms.undoRedo.behaviour = function(selector, option) {
 						var position = moverData[0];
 						var moverNode = _cms.leftnav.tree.getNodeByKey(targetItemOrigId);
 						var targetNode = _cms.leftnav.tree.getNodeByKey(moverData[1]);
-	
+
 						moverNode.moveTo(targetNode, position);
 						moverNode.setActive(true);
 						_cms.core.refresh.tab(targetItemOrigId);

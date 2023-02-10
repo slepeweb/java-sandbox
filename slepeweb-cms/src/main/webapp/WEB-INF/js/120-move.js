@@ -20,9 +20,15 @@ _cms.move.action = function(nodeKey) {
 	var position = $(_cms.move.sel.POSITION_SELECTOR).val();
 	var moverNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
 	var targetNode = _cms.leftnav.tree.activeNode;
-	
+		
 	if (position != 'none' && moverNode && targetNode) {			
 		if (! moverNode.parent.key.startsWith("root")) {
+		
+			if (targetNode.folder && ! targetNode.isExpanded()) {
+				// targetNode must be expanded for the moveTo function to work as required.
+				/* Ignore returned promise */ targetNode.setExpanded(true);
+			}
+		
 			_cms.support.ajax('POST', '/rest/item/' + moverNode.key + '/move', 
 				{
 					data: {
@@ -33,15 +39,16 @@ _cms.move.action = function(nodeKey) {
 					}, 
 					dataType: 'json'
 				},
-				function(obj, status, z) {
-					if (! obj.error) {
-						moverNode.moveTo(targetNode, position);
+				function(resp, status, z) {
+					if (! resp.error) {
+						moverNode.moveTo(targetNode, position);							
 						moverNode.setActive(true);
+						
 						_cms.move.refresh.tab(nodeKey);
 						_cms.core.refresh.tab(nodeKey);
-						_cms.undoRedo.displayAll(obj.data);
+						_cms.undoRedo.displayAll(resp.data);
 					}
-					_cms.support.flashMessage(obj);
+					_cms.support.flashMessage(resp);
 				}
 			);
 		}

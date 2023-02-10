@@ -163,7 +163,7 @@ public class Product extends Item {
 			this.hifiImages = new ArrayList<Item>();
 			this.variantImages = new ArrayList<Item>();
 			
-			Item mainImage = getImage();
+			Item mainImage = getFirstInlineImage();
 			if (mainImage != null) {
 				Item container = mainImage.getParent();
 				

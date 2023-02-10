@@ -1,13 +1,12 @@
 TODO: This is the main todo file:
 
 HIGH
-- Moved item B below A; leftnav missing all other children below A. Investigate.
+- Move works ok; Undo fails in server code. Also, leftnav doesn't update correctly.
 - implement cron job to backup cms db on desktop
-- new: move flagged items to the same location
+- enhancement: move flagged items to the same location
 
 MEDIUM
 - Thumbnails sometimes have wrong orientation - will take a lot of work to rectify. See ImageUtil.
-- show bin - takes 2 clicks (perhaps not first time)
 - re-test registration process
 - force media items to have appropriate simplename extensions, esp. video, pdf, etc. (???)
 - PDFs not viewable on my android phone (chrome)
@@ -22,5 +21,3 @@ LOW
 - app to remove redundant media files from file store
 - write test: cannot move item to one of it's children, OR descendants
 - write test: cannot move item to one of it's linked parents (ie via relations, inlines, etc)
-- get site working on internet
-- 

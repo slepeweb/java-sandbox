@@ -7,11 +7,12 @@ import com.slepeweb.cms.utils.CmsUtil;
 
 public class LinkFilter {
 
-	private String[] linkTypes, linkNames, itemTypes,
+	private String[] linkTypes, linkNames, itemTypes, mimeTypePatterns,
 		/* Only used currently for identifying images in commerce app */ simpleNamePatterns;
 	
 	private boolean test(Link l) {
-		boolean linkTypeMatch = true, linkNameMatch = true, itemTypeMatch = true, simplenameMatch = true;
+		boolean linkTypeMatch = true, linkNameMatch = true, itemTypeMatch = true, 
+				simplenameMatch = true, mimeTypeMatch = true;
 
 		if (getLinkTypes() != null) {
 			linkTypeMatch = matches(getLinkTypes(), l.getType());
@@ -29,7 +30,11 @@ public class LinkFilter {
 			simplenameMatch = matchesRegex(getSimpleNamePatterns(), l.getChild().getSimpleName());
 		}
 
-		return linkTypeMatch && linkNameMatch && itemTypeMatch && simplenameMatch;
+		if (getMimeTypePatterns() != null) {
+			mimeTypeMatch = matchesRegex(getMimeTypePatterns(), l.getChild().getType().getMimeType());
+		}
+
+		return linkTypeMatch && linkNameMatch && itemTypeMatch && simplenameMatch && mimeTypeMatch;
 	}
 
 	public List<Link> filter(List<Link> list) {
@@ -139,6 +144,20 @@ public class LinkFilter {
 
 	public LinkFilter setSimpleNamePatterns(String[] simpleNames) {
 		this.simpleNamePatterns = simpleNames;
+		return this;
+	}
+
+	public String[] getMimeTypePatterns() {
+		return mimeTypePatterns;
+	}
+
+	public LinkFilter setMimeTypePatterns(String[] pattern) {
+		this.mimeTypePatterns = pattern;
+		return this;
+	}
+	
+	public LinkFilter setMimeTypePatterns(String pattern) {
+		this.mimeTypePatterns = new String[] {pattern};
 		return this;
 	}
 	
