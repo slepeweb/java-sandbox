@@ -37,7 +37,7 @@ _cms.flags.behaviour = function() {
 			let url = '/rest/flaggedItems/copy/all/' + _cms.editingItemId;
 					
 			_cms.support.ajax('POST', url, params, function(resp, status, z) {
-				if (resp.data) {
+				if (resp.data[0]) {
 					// The current item was subject to the copy action, so refresh the respective tabs
 					_cms.core.refresh.tab(_cms.editingItemId);
 					_cms.field.refresh.tab(_cms.editingItemId);
@@ -45,6 +45,7 @@ _cms.flags.behaviour = function() {
 				
 				_cms.dialog.close(_cms.dialog.eggTimer);
 				_cms.support.flashMessage(_cms.support.toStatus(resp.error, resp.message));
+				_cms.undoRedo.displayAll(resp.data[1]);
 			});
 		}
 	});

@@ -18,7 +18,7 @@ _cms.undoRedo.behaviour = function(selector, option) {
 		_cms.support.ajax('GET', '/rest/item/update/' + option, {dataType: 'json'},
 			function(resp, status, z) {
 				let undoRedoStatus = resp.data[0];
-				let editorTabName = resp.data[1];
+				let action = resp.data[1];
 				let targetItemOrigId = resp.data[2];
 				let moverData = resp.data[3];
 				
@@ -29,24 +29,28 @@ _cms.undoRedo.behaviour = function(selector, option) {
 				// currently being edited. Re-render the forms for the item affected, 
 				// just in case.
 				if (option !== 'clear') {
-					if (targetItemOrigId !== _cms.editingItemId) {
-						_cms.leftnav.navigate(targetItemOrigId, editorTabName, function() {
+					if (targetItemOrigId !== parseInt(_cms.editingItemId)) {
+						// The undo/redo operation was not on the current item - navigate to the target item
+						_cms.leftnav.navigate(targetItemOrigId, action, function() {
 							_cms.support.flashMessage({error: resp.error, message: resp.message});
 						});
 					}
-					else if (editorTabName !== null) {
-						_cms[editorTabName].refresh.tab(targetItemOrigId);
-						_cms.support.activateTab(editorTabName + '-tab');
+					else if (action !== null) {
+						// Refresh the tab for the given action (eg core, fields, media, etc)
+						_cms[action].refresh.tab(targetItemOrigId);
+						_cms.support.activateTab(action + '-tab');
 						_cms.support.flashMessage({error: resp.error, message: resp.message});
 					}
 					
-					if (editorTabName === 'move') {
+					if (action === 'move') {
+						// Update the left nav
 						var position = moverData[0];
 						var moverNode = _cms.leftnav.tree.getNodeByKey(targetItemOrigId);
 						var targetNode = _cms.leftnav.tree.getNodeByKey(moverData[1]);
-
 						moverNode.moveTo(targetNode, position);
 						moverNode.setActive(true);
+						
+						// Refresh the core tab, to reflect the change in the item path
 						_cms.core.refresh.tab(targetItemOrigId);
 					}
 				}

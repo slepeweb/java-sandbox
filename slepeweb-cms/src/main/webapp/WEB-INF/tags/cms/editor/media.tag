@@ -6,42 +6,40 @@
 <form id="media-form" enctype="multipart/form-data">
 	<div class="media-details">
 		<div>
-			<p><strong>${editingItem.type.mimeType}, 
-				<c:choose><c:when test="${editingItem.mediaLoaded}">${cmsf:formatBytes(editingItem.media.size)}</c:when>
-					<c:otherwise>NOT LOADED</c:otherwise></c:choose>
-				</strong></p>
-				
-			<c:if test="${editingItem.media.fileStored}">
-				<table>
-					<tr>
-						<td>Media:</td>
-						<td>
-							<c:choose><c:when test="${editingItem.mediaLoaded}">
-								<strong>${editingItem.media.folder}</strong>/${editingItem.media.repositoryFileName}
-							</c:when><c:otherwise>X</c:otherwise></c:choose>
-						</td>
-					</tr>
-								
-					<tr>
-						<td>Thumbnail:</td>
-						<td>
-							<c:choose><c:when test="${editingItem.thumbnailLoaded}">
-								<strong>${editingItem.media.folder}</strong>/${editingItem.thumbnail.repositoryFileName}
-							</c:when><c:otherwise>X</c:otherwise></c:choose>
-						</td>
-					</tr>
-				</table>
-			</c:if>
+			<p><strong>Main media:</strong></p>
+			<p><strong>${editingItem.type.mimeType}, ${cmsf:formatBytes(editingItem.media.size)}</strong></p>
+			
+			<p><u>File locations</u>:</p>
+			
+			<table>
+				<tr>
+					<td>Media:</td>
+					<td>
+						<c:choose><c:when test="${editingItem.mainMediaWithBinaryContent}">
+							<strong>${editingItem.media.folder}</strong>/${editingItem.media.repositoryFileName}
+						</c:when><c:otherwise>n/a</c:otherwise></c:choose>
+					</td>
+				</tr>
+							
+				<tr>
+					<td>Thumbnail:</td>
+					<td>
+						<c:choose><c:when test="${editingItem.thumbnailWithBinaryContent}">
+							<strong>${editingItem.media.folder}</strong>/${editingItem.thumbnail.repositoryFileName}
+						</c:when><c:otherwise>n/a</c:otherwise></c:choose>
+					</td>
+				</tr>
+			</table>
 		</div>
 
 		<div>
-			<c:set var="_host" value="${editingItem.site.stagingHost}" />
-			<c:choose><c:when test="${editingItem.thumbnailLoaded}">
-				<img src="${_host.protocol}://${_host.name}:${_host.port}/cms/media${editingItem.path}?view=thumbnail" />
+			<p><strong>Thumbnail:</strong></p>
+			<c:choose><c:when test="${editingItem.thumbnailWithBinaryContent}">
+				<c:set var="_host" value="${editingItem.site.stagingHost}" />
+				<c:set var="_timestamp" value="${cmsf:now()}" />
+				<img src="${_host.protocol}://${_host.name}:${_host.port}/cms/media${editingItem.path}?view=thumbnail&_=${_timestamp}" />
 			</c:when><c:otherwise>
-				<c:if test="${editingItem.type.image}">
-					<img src="${_host.protocol}://${_host.name}:${_host.port}/cms/media${editingItem.path}" width="200" />
-				</c:if>
+				<p>No thumbnail uploaded.</p>
 			</c:otherwise></c:choose>
 		</div>
 	</div>

@@ -65,8 +65,9 @@ public class MediaDeliveryServiceImpl extends BaseServiceImpl implements MediaDe
 		}
 		
 		Media media = thumbnailRequired ? item.getThumbnail() : item.getMedia();
-		if (media == null) {
-			LOG.error(String.format("No media found for item", item));
+		if (media == null || ! media.isBinaryContentLoaded()) {
+			LOG.error(String.format("No binary content found for media item", item));
+			res.sendError(404);
 			return;
 		}
 		
@@ -89,7 +90,7 @@ public class MediaDeliveryServiceImpl extends BaseServiceImpl implements MediaDe
 			}
 		}
 		else {
-			LOG.error(String.format("Error getting media", item));
+			LOG.warn(String.format("No binary content for this media", item));
 		}
 	}
 	

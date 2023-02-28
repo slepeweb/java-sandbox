@@ -85,11 +85,13 @@ _cms.core.behaviour.update = function(nodeKey) {
 
 _cms.core.trashItem = function(nodeKey) {
 	_cms.support.ajax('POST', '/rest/item/' + nodeKey + '/trash', {dataType: 'json'}, 
-		function(obj, status, z) {
+		function(resp, status, z) {
 			_cms.dialog.close(_cms.dialog.confirmTrash);
-			_cms.support.flashMessage(obj);
+			_cms.support.flashMessage(resp);
+			_cms.undoRedo.displayAll(resp.data);
+
 			
-			if (! obj.error) {
+			if (! resp.error) {
 				var node = _cms.leftnav.tree.getNodeByKey(_cms.editingItemId);
 				if (node) {
 					var parent = node.getParent();

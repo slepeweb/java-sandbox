@@ -46,13 +46,14 @@ _cms.add.behaviour.add = function(nodeKey) {
 				betaaxis: $(_cms.add.sel.BETA_SELECTOR).val()
 			}, 
 			dataType: "json",
-			success: function(obj, status, z) {
-				_cms.support.flashMessage(obj);
+			success: function(resp, status, z) {
+				_cms.support.flashMessage(resp);
+				_cms.undoRedo.displayAll(resp.data[3]);
 				
-				if (! obj.error) {
-					var nodeData = obj.data[0];
-					var isShortcut = obj.data[1];
-					var isMedia = obj.data[2];
+				if (! resp.error) {
+					var nodeData = resp.data[0];
+					var isShortcut = resp.data[1];
+					var isMedia = resp.data[2];
 					
 					var parentNode = _cms.leftnav.tree.getNodeByKey(nodeKey.toString());
 					

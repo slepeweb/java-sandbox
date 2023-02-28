@@ -71,10 +71,11 @@ _cms.misc.opSection = function(nodeKey, method, url, bar, data, success, error) 
 	_cms.misc.updateProgressbar(bar, false);
 	
 	if (! success) {
-		success = function(obj, status, z) {
-			_cms.support.flashMessage(obj);
+		success = function(resp, status, z) {
+			_cms.support.flashMessage(resp);
 			_cms.misc.updateProgressbar(bar, "destroy");
 			_cms.support.refreshtab("core", nodeKey);
+			_cms.undoRedo.displayAll(rep.data);
 		}
 	}
 	

@@ -29,6 +29,6 @@ public class ItemUpdateRecord {
 	}
 
 	public enum Action {
-		core, field, links, move
+		core, field, links, media, move, none
 	}
 }

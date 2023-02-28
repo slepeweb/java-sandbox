@@ -1,7 +1,6 @@
 package com.slepeweb.cms.bean;
 
 import java.io.InputStream;
-import java.sql.Blob;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,7 +11,6 @@ public class Media extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private Long itemId, size;
 	private boolean thumbnail;
-	private Blob blob;
 	private String folder;
 
 	/* 
@@ -30,8 +28,8 @@ public class Media extends CmsBean {
 			Media m = (Media) obj;
 			setItemId(m.getItemId());
 			setSize(m.getSize());
-			setBlob(m.getBlob());
 			setFolder(m.getFolder());
+			setThumbnail(m.isThumbnail());
 		}
 	}
 	
@@ -88,21 +86,9 @@ public class Media extends CmsBean {
 		return this;
 	}
 
-	public Blob getBlob() {
-		return blob;
-	}
-
-	public Media setBlob(Blob blob) {
-		this.blob = blob;
-		return this;
-	}
-	
 	public InputStream getDownloadStream() {
 		try {
-			if (this.blob != null) {
-				return this.blob.getBinaryStream();
-			}
-			else if (StringUtils.isNotBlank(this.folder)) {
+			if (StringUtils.isNotBlank(this.folder)) {
 				return getMediaFileService().getInputStream(getFolder(), getRepositoryFileName());
 			}
 		}
@@ -131,8 +117,8 @@ public class Media extends CmsBean {
 		return this;
 	}
 	
-	public boolean isFileStored() {
-		return StringUtils.isNotBlank(getFolder());
+	public boolean isBinaryContentLoaded() {
+		return StringUtils.isNotBlank(getFolder()) && getSize() != null && getSize().longValue() != 0L;
 	}
 	
 	public String getRepositoryFileName() {

@@ -94,7 +94,7 @@ create table item
 	typeid int,
 	templateid int,
 	datecreated timestamp,
-	dateupdated timestamp,
+	dateupdated timestamp(3),
 	deleted boolean,
 	editable boolean,
 	published boolean,
@@ -190,7 +190,6 @@ create table fieldvalue
 create table media
 (
    itemid int,
-   data mediumblob,
    folder varchar(4),
    thumbnail boolean,
    size int,

@@ -75,7 +75,7 @@ public class PageController extends BaseController {
 		Item i = this.getEditableVersion(origId, getUser(req));
 		
 		if (i == null) {
-			throw new RuntimeException("Bad data");
+			throw new RuntimeException("Item doesn't exist!");
 		}
 		
 		model.addAttribute("editingItem", i);

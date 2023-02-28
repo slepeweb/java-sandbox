@@ -249,7 +249,6 @@ public class RowMapperUtil {
 			return CmsBeanFactory.makeMedia().
 					setItemId(rs.getLong("itemid")).
 					setSize(rs.getLong("size")).
-					setBlob(rs.getBlob("data")).
 					setFolder(rs.getString("folder")).
 					setThumbnail(rs.getBoolean("thumbnail"));
 		}

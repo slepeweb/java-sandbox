@@ -78,6 +78,8 @@ import com.slepeweb.cms.service.FieldService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemUpdateUndoService;
 import com.slepeweb.cms.service.ItemWorkerService;
+import com.slepeweb.cms.service.MediaFileService;
+import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.commerce.bean.Product;
@@ -102,6 +104,8 @@ public class RestController extends BaseController {
 	@Autowired private NavigationController navigationController;
 	@Autowired private CmsHooker cmsHooker;
 	@Autowired private ItemUpdateUndoService itemUpdateUndoService;
+	@Autowired private MediaService mediaService;
+	@Autowired private MediaFileService mediaFileService;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -300,10 +304,6 @@ public class RestController extends BaseController {
 			req.getSession().setAttribute(AttrName.RECENT_TAGS, 
 					this.itemWorkerService.saveTags(i, getParam(req, "tags"), recentTags));		
 			
-			// Save previous revision in user's undo history
-			ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
-			itemUpdateHistory.push(before, i, Action.core);
-			
 			LOG.info(userLog(u, "updated core data for", i));
 			
 			// Navigation node with title assigned to saved item name IF changed
@@ -315,7 +315,7 @@ public class RestController extends BaseController {
 			// Boolean value assigned IF published status has changed
 			data[2] = wasPublished ^ i.isPublished();
 			
-			data[3] = new UndoRedoStatus(itemUpdateHistory);
+			data[3] = pushItemUpdateRecord(req, before, i, Action.core);
 			
 			resp.setData(data);
 		}
@@ -325,42 +325,6 @@ public class RestController extends BaseController {
 		
 		return resp;
 	}
-	
-	/*
-	private void saveTags(Item i, HttpServletRequest req, RestResponse resp) {
-		List<String> existingTagValues = i.getTagValues();
-		String tagStr = getParam(req, "tags");
-		List<String> latestTagValues = Arrays.asList(tagStr.split("[ ,]+"));
-		if (existingTagValues.size() != latestTagValues.size() || ! existingTagValues.containsAll(latestTagValues)) {
-			this.cmsService.getTagService().save(i, tagStr);
-			resp.addMessage("Tags updated");
-			
-			// Identify recently-applied tags - remove existing tags from latest, and see what's left.
-			List<String> freshTagValues = new ArrayList<String>();
-			for (String v : latestTagValues) {
-				if (! existingTagValues.contains(v)) {
-					freshTagValues.add(v);
-				}
-			}
-			
-			// latestTagValues now contains new selections
-			if (freshTagValues.size() > 0) {
-				@SuppressWarnings("unchecked")
-				List<String> storedTagValues = (List<String>) req.getSession().getAttribute(AttrName.RECENT_TAGS);
-				
-				// Filter out duplicates
-				for (String v : storedTagValues) {
-					if (! freshTagValues.contains(v)) {
-						freshTagValues.add(v);
-					}
-				}
-				
-				// And store result
-				req.getSession().setAttribute(AttrName.RECENT_TAGS, freshTagValues);
-			}
-		}
-	}
-	*/
 	
 	private String getParam(HttpServletRequest req, String name) {
 		return req.getParameter(name);
@@ -395,32 +359,35 @@ public class RestController extends BaseController {
 			Item i = getEditableVersion(origId, getUser(req), true);
 			
 			if (i != null) {
+				saveTempMedia(i);
+				
 				try {
+					InputStream is = file.getInputStream();
+					InputStream scaledIs;
+
 					if (thumbnailAction.equals("onlythumb")) {
-						InputStream is = ImageUtil.scaleImage(file.getInputStream(), thumbnailWidth, -1, "jpg");
-						saveMedia(i.getId(), is, true);
+						scaledIs = ImageUtil.scaleImage(is, thumbnailWidth, -1, "jpg");
+						this.mediaService.save(i.getId(), scaledIs, true);
 					}
 					else {
-						saveMedia(i.getId(), file.getInputStream(), false);
+						this.mediaService.save(i.getId(), is, false);
 						
 						if (thumbnailAction.equals("autoscale") && i.getType().isImage()) {
-							InputStream is = ImageUtil.scaleImage(file.getInputStream(), thumbnailWidth, -1, "jpg");
-							saveMedia(i.getId(), is, true);
+							scaledIs = ImageUtil.scaleImage(file.getInputStream(), thumbnailWidth, -1, "jpg");
+							this.mediaService.save(i.getId(), scaledIs, true);
 						}
 					}
 					
-					// Update the timestamp on the owning item
-					try {
-						i.setDateUpdated(new Timestamp(System.currentTimeMillis()));
-						i.save();
-					}
-					catch (ResourceException e) {
-						LOG.error(msg = "Missing item data ??? - not saved", e);
-						return resp.setError(true).addMessage(msg);		
-					}
+					// Set the updatedate for this change in the db, and get a new Item object from the same.
+					Item after = this.itemService.updateDateUpdated(i);
 					
+					saveTempMedia(after);
+										
 					LOG.info(msg = "Media successfully uploaded");
-					return resp.setError(false).addMessage(msg);
+					return resp.
+							setError(false).
+							addMessage(msg).
+							setData(pushItemUpdateRecord(req, i, after, Action.media));
 				}
 				catch (Exception e) {
 					LOG.error(msg = "Problem with input streams", e);
@@ -437,23 +404,12 @@ public class RestController extends BaseController {
 		return resp.setError(true).addMessage(msg);
 	}
 	
-	private boolean saveMedia(Long itemId, InputStream is, boolean isThumbnail) {
-		try {
-			Media m = CmsBeanFactory.makeMedia().
-					setItemId(itemId).
-					setUploadStream(is).
-					setThumbnail(isThumbnail);
-			
-			this.cmsService.getMediaService().save(m);
-			is.close();
-			
-			return true;
+	private void saveTempMedia(Item i) {
+		for (Media m : i.getAllMedia()) {
+			if (m.getSize() > 0) {
+				this.mediaFileService.saveTempFile(i, m);
+			}
 		}
-		catch (Exception e) {
-			LOG.error("Failed to save media", e);
-		}
-		
-		return false;
 	}
 	
 	@RequestMapping(value="/item/{origId}/update/fields", method=RequestMethod.POST, produces="application/json")
@@ -635,10 +591,7 @@ public class RestController extends BaseController {
 				// Now save the item's field values
 				i.saveFieldValues();
 				
-				// Save previous revision in user's undo history
-				ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(request);
-				itemUpdateHistory.push(before, i, Action.field);				
-				resp.setData(new UndoRedoStatus(itemUpdateHistory));
+				resp.setData(pushItemUpdateRecord(request, before, i, Action.field));
 				resp.addMessage(String.format("%d fields updated", c));
 			}
 			catch (ResourceException e) {
@@ -744,7 +697,12 @@ public class RestController extends BaseController {
 			ICmsHook h = this.cmsHooker.getHook(i.getSite().getShortname());
 			h.addItem(i);
 			
-			Object[] o = new Object[]{Node.toNode(i), i.isShortcut(), i.getType().isMedia()};		
+			Object[] o = new Object[]{
+					Node.toNode(i), 
+					i.isShortcut(), 
+					i.getType().isMedia(),
+					pushItemUpdateRecord(req, i, i, Action.none)};	
+			
 			resp.addMessage("Item added").setData(o);
 			
 			if (i.isShortcut()) {
@@ -778,7 +736,9 @@ public class RestController extends BaseController {
 			if (c != null) {
 				resp.
 					addMessage("Item copied").
-					setData(Node.toNode(c));
+					setData(new Object[] {
+							Node.toNode(c),
+							pushItemUpdateRecord(req, i, i, Action.none)});				
 			}
 			else {
 				resp.setError(true).addMessage("Failed to copy item");
@@ -842,7 +802,6 @@ public class RestController extends BaseController {
 		
 		RestResponse resp = new RestResponse();
 		Item i = getEditableVersion(origId, getUser(req), true);
-		Item parent = i.getParent();
 		
 		// First, remove item from flagged list, if present
 		flagItem(i.getOrigId(), req, true);
@@ -850,7 +809,10 @@ public class RestController extends BaseController {
 		// Now trash it
 		i.trash();
 		
-		return resp.addMessage("Item trashed").addMessage("PARENT ITEM IS NOW CURRENT").setData(parent.getOrigId());
+		return resp.
+				addMessage("Item trashed").
+				addMessage("PARENT ITEM IS NOW CURRENT").
+				setData(pushItemUpdateRecord(req, i, i, Action.none));
 	}
 	
 	@RequestMapping(value="/item/{origId}/publish/section", method=RequestMethod.POST, produces="application/json")
@@ -867,7 +829,10 @@ public class RestController extends BaseController {
 		
 		if (i != null) {
 			count = actionSection(i, "published", publishOption.equals("publish"));
-			return resp.addMessage(String.format("Section publication status updated, total %d items", count));
+			
+			return resp.
+					addMessage(String.format("Section publication status updated, total %d items", count)).
+					setData(pushItemUpdateRecord(req, i, i, Action.none));
 		}
 		
 		return resp.addMessage(String.format("Section not identifiable [%d]", origId)).setError(true);
@@ -888,11 +853,15 @@ public class RestController extends BaseController {
 		if (i != null) {
 			if (searchableOption.equals("re-index")) {
 				count = this.solrService4Cms.indexSection(i);
-				return resp.addMessage(String.format("Section re-indexed, total %d items", count));
+				return resp.
+						addMessage(String.format("Section re-indexed, total %d items", count)).
+						setData(pushItemUpdateRecord(req, i, i, Action.none));
 			}
 			else {
 				count = actionSection(i, "searchable", searchableOption.equals("searchable"));
-				return resp.addMessage(String.format("Section searchability actioned, total %d items updated", count));
+				return resp.
+						addMessage(String.format("Section searchability actioned, total %d items updated", count)).
+						setData(pushItemUpdateRecord(req, i, i, Action.none));
 			}
 		}
 		
@@ -1063,14 +1032,10 @@ public class RestController extends BaseController {
 			return resp.setError(true).setData(mover.getId()).addMessage(e.getMessage());
 		}
 		
-		// Item moved ok - Save previous revision of mover in user's undo history
-		ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
-		itemUpdateHistory.push(mover, moved, Action.move);
-					
 		return resp.setError(false).
-				setData(new UndoRedoStatus(itemUpdateHistory)).
+				setData(pushItemUpdateRecord(req, mover, moved, Action.move)).
 				addMessage("Item moved");
-}
+	}
 	
 	@RequestMapping(value="/links/{parentId}/save", method=RequestMethod.POST, produces="application/json")
 	@ResponseBody
@@ -1143,18 +1108,14 @@ public class RestController extends BaseController {
 		try {
 			parent.saveLinks();
 			
-			// Save previous revision in user's undo history
-			ItemUpdateHistory itemUpdateHistory = this.getItemUpdateHistory(req);
-			itemUpdateHistory.push(before, parent, Action.links);
-			
 			resp.addMessage(String.format("%d links saved", links.size()));
 			
 			Object[] response = new Object[] {
 					this.navigationController.doLazyNavOneLevel(parent.getOrigId(), parent.getSite().getId(), req),
 					shortcutAction,
 					shortCutTargetType == null ? null : shortCutTargetType.toLowerCase(),
-					new UndoRedoStatus(itemUpdateHistory)
-			};
+					pushItemUpdateRecord(req, before, parent, Action.links)};
+			
 			// Return a list of shortcuts as response data, so that leftnav tree can be refreshed
 			resp.setData(response);
 		}
@@ -1397,6 +1358,7 @@ public class RestController extends BaseController {
 		boolean isCoreData = coreData.size() > 0;
 		boolean isFieldValues = fieldValues.size() > 0;
 		Iterator<String> keyIter;
+		Item last = null;
 		
 		while (itemIter.hasNext()) {
 			origId = itemIter.next();
@@ -1407,6 +1369,8 @@ public class RestController extends BaseController {
 			
 			i = getEditableVersion(origId, getUser(request));
 			if (i != null) {
+				last = i;
+				
 				if (isCoreData) {
 					keyIter = coreData.keySet().iterator();
 					while (keyIter.hasNext()) {
@@ -1446,25 +1410,26 @@ public class RestController extends BaseController {
 			}
 		}
 		
-		resp.addMessage("Copy ALL process completed").setData(currentItemAffected);
+		resp.
+			addMessage("Copy ALL process completed").
+			setData(new Object[] {
+					currentItemAffected,
+					pushItemUpdateRecord(request, last, last, Action.none)});
+		
 		return resp;		
 	}
 	
 	@RequestMapping(value="/item/update/undo", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public RestResponse undoItemUpdate(HttpServletRequest req, ModelMap model) {	
-		
-		ItemUpdateHistory history = getItemUpdateHistory(req);
-		return this.itemUpdateUndoService.undo(history);
+		return this.itemUpdateUndoService.undo(getItemUpdateHistory(req));
 	}
 
 	
 	@RequestMapping(value="/item/update/redo", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public RestResponse redoItemUpdate(HttpServletRequest req, ModelMap model) {	
-		
-		ItemUpdateHistory history = getItemUpdateHistory(req);
-		return this.itemUpdateUndoService.redo(history);
+		return this.itemUpdateUndoService.redo(getItemUpdateHistory(req));
 	}
 
 	

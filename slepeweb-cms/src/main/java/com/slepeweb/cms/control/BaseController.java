@@ -22,8 +22,10 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.ItemUpdateHistory;
+import com.slepeweb.cms.bean.ItemUpdateRecord.Action;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.TagInputSupport;
+import com.slepeweb.cms.bean.UndoRedoStatus;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.component.CmsHooker;
@@ -205,5 +207,10 @@ public class BaseController {
 		return h;
 	}
 	
+	protected UndoRedoStatus pushItemUpdateRecord(HttpServletRequest request, Item before, Item after, Action a) {
+		ItemUpdateHistory h = getItemUpdateHistory(request);
+		h.push(before, after, a);
+		return new UndoRedoStatus(h);
+	}
 }
 

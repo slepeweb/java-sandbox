@@ -49,6 +49,11 @@ public class Item extends CmsBean {
 	
 	protected List<Media> allMedia;
 	
+	public Item setAllMedia(List<Media> allMedia) {
+		this.allMedia = allMedia;
+		return this;
+	}
+
 	public String getDefaultSimplename() {
 		if (StringUtils.isNotBlank(getName())) {
 			return getName().toLowerCase().replaceAll("[\\s\\W]", "");
@@ -241,14 +246,20 @@ public class Item extends CmsBean {
 		return CmsUtil.getParentPathFromPath(this);
 	}
 
-	// Need a getter to simplify jsp functionality
-	public boolean isMediaLoaded() {
-		return hasMedia();
+	public boolean isMainMediaWithBinaryContent() {
+		return isMediaWithBinaryContent(false);
 	}
 	
-	// Need a getter to simplify jsp functionality
-	public boolean isThumbnailLoaded() {
-		return hasThumbnail();
+	public boolean isThumbnailWithBinaryContent() {
+		return isMediaWithBinaryContent(true);
+	}
+	
+	private boolean isMediaWithBinaryContent(boolean forThumbnail) {
+		if (getType().isMedia()) {
+			Media m = getCmsService().getMediaService().getMedia(getId(), forThumbnail);
+			return m != null && m.isBinaryContentLoaded();
+		}
+		return false;
 	}
 
 	public boolean hasMedia() {
@@ -833,6 +844,11 @@ public class Item extends CmsBean {
 	public String getSolrKey() {
 		return String.format("%s-%s", getId(), getLanguage());
 	}
+	
+	public String getTempMediaFilepath(boolean isThumbnail) {
+		return getCmsService().getMediaFileService().getTempMediaFilepath(this, isThumbnail);
+	}	
+
 	
 	/*
 	 * IFF this site is designated as a secured site ...

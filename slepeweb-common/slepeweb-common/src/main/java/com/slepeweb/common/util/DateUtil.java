@@ -69,6 +69,10 @@ public class DateUtil {
 		return toTimestamp(Calendar.getInstance());
 	}
 	
+	public static Long nowInMillis() {
+		return Calendar.getInstance().getTimeInMillis();
+	}
+	
 	public static void zeroTimeOfDay(Calendar c) {
 		c.set(Calendar.HOUR_OF_DAY, 0);
 		c.set(Calendar.MINUTE, 0);

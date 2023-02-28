@@ -27,12 +27,13 @@ _cms.copy.behaviour.submit = function(nodeKey) {
 				}, 
 				dataType: 'json'
 			},
-			function(obj, status, z) {
-				_cms.support.flashMessage(obj);
+			function(resp, status, z) {
+				_cms.support.flashMessage(resp);
+				_cms.undoRedo.displayAll(resp.data[1]);
 				
-				if (! obj.error) {
+				if (! resp.error) {
 					var sourceNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
-					var newNode = sourceNode.getParent().addNode(obj.data);
+					var newNode = sourceNode.getParent().addNode(resp.data[0]);
 					_cms.leftnav.navigate(newNode.key, 'core');
 				}
 			}

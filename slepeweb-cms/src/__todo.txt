@@ -1,7 +1,10 @@
 TODO: This is the main todo file:
 
 HIGH
-- Move works ok; Undo fails in server code. Also, leftnav doesn't update correctly.
+- MediaFileService contains canned data + explicit references to 'pho' !!!
+- isolate trash can - too close to search control.
+- restoring the entire trash bin does not update the left nav - refresh page?
+- trashing all flagged items: controller doesn't return a RestResponse, so undo/redo status not getting updated.
 - implement cron job to backup cms db on desktop
 - enhancement: move flagged items to the same location
 

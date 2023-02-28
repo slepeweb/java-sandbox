@@ -34,4 +34,5 @@ public interface ItemService {
 	void updateItemPath(Long moverId, String newChildPath);
 	void updateOrigId(Item ni);
 	void updateEditable(Item i);
+	Item updateDateUpdated(Item i);
 }

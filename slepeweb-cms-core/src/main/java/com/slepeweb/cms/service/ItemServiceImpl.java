@@ -63,7 +63,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			 * Return the updated item instance with nullified field values, links and tags,
 			 * forcing these data to be re-calculated on demand.
 			 */
-			return dbRecord.setLinks(null).setFieldValues(null).setTags(null);
+			return dbRecord.setLinks(null).setFieldValues(null).setTags(null).setAllMedia(null);
 		}
 		else {
 			insert(i);
@@ -73,7 +73,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			 * Return the inserted item instance with nullified field values, links and tags,
 			 * forcing these data to be re-calculated on demand.
 			 */
-			return i.setLinks(null).setFieldValues(null).setTags(null);
+			return i.setLinks(null).setFieldValues(null).setTags(null).setAllMedia(null);
 		}
 	}
 	
@@ -273,7 +273,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				// First of all delete associated files from the file store. This MUST be the first step.
 				// (Remember that media and item tables are linked by a foreign key constraint 'on delete cascade')
 				if (i.getType().isMedia()) {
-					this.mediaFileService.delete(i);
+					this.mediaFileService.wipeBinaryContent(i);
 				}
 				
 				
@@ -282,8 +282,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				 * This ensures that if the Item is in fact a Product, then the overriden delete()
 				 * method in Product gets executed.
 				 */
-				i.delete();
-				
+				i.delete();				
 				num++;
 			}
 		}
@@ -292,7 +291,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 				// Above comment applies here too.
 				Item i = getItemFromBin(id);
 				if (i != null) {
-					this.mediaFileService.delete(i);
+					if (i.getType().isMedia()) {
+						this.mediaFileService.wipeBinaryContent(i);
+					}
+					
 					i.delete();
 					num++;
 				}
@@ -460,6 +462,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	public boolean updateSearchable(Long id, boolean option) {
 		return updateBinaryProperty("searchable", id, option);
+	}
+	
+	public Item updateDateUpdated(Item i) {
+		Timestamp t = new Timestamp(System.currentTimeMillis());
+		this.jdbcTemplate.update("update item set dateupdated = ? where id = ?", t, i.getId());
+		return getItem(i.getId());
 	}
 	
 	private boolean updateBinaryProperty(String column, Long id, boolean option) {

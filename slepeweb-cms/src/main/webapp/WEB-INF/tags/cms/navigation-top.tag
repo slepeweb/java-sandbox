@@ -27,7 +27,7 @@
 				<div id="item-sibling-flag">
 					<i class="fa-solid fa-flag" title="Flag this and ALL sibling items"></i>
 					<div>
-						<i class="fa-solid fa-flag"></i>
+						<i class="fa-solid fa-flag" title="Flag this and ALL sibling items"></i>
 					</div>
 				</div>
 				
@@ -35,7 +35,7 @@
 				<div id="item-flag-clear">
 					<i class="fa-solid fa-flag" title="Clear all item flags"></i>
 					<div title="Clear all item flags">
-						<i class="fa-solid fa-xmark"></i>
+						<i class="fa-solid fa-xmark" title="Clear all item flags"></i>
 					</div>
 				</div>
 				

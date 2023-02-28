@@ -44,9 +44,16 @@ _cms.media.behaviour.upload = function(nodeKey) {
 		            return myXhr;
 		        }
 		    },
-	        function() {
-	        	_cms.support.flashMessage(_cms.support.toStatus(false, "Media successfully uploaded"));
+	        function(resp) {
+	        	if (! resp.error) {
+	        		_cms.support.flashMessage(_cms.support.toStatus(false, "Media successfully uploaded"));
+	        	}
+	        	else {
+	        		_cms.support.flashMessage(_cms.support.toStatus(true, "Media upload failed!"));
+	        	}
+	        	
 	        	_cms.media.refresh.tab(nodeKey);
+				_cms.undoRedo.displayAll(resp.data);
 	        }
 	    );
 	});

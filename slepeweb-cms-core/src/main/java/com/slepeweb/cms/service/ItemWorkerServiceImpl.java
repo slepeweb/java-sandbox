@@ -261,9 +261,8 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		saveLinks(ni);
 		
 		// Does this item have media?
-		Media m = this.mediaService.getMedia(sourceId);
 		Media nm;
-		if (m != null) {
+		for (Media m : this.mediaService.getAllMedia(sourceId)) {
 			nm = CmsBeanFactory.makeMedia();
 			nm.assimilate(m);
 			nm.setItemId(ni.getId());

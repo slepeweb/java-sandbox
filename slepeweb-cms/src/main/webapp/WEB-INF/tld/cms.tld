@@ -10,6 +10,12 @@
 	<uri>cmsFuncs</uri>
 
 	<function>
+		<name>now</name>
+		<function-class>com.slepeweb.common.util.DateUtil</function-class>
+		<function-signature>java.lang.Long nowInMillis()</function-signature>
+	</function>
+	
+	<function>
 		<name>formatBytes</name>
 		<function-class>com.slepeweb.common.util.NumberUtil</function-class>
 		<function-signature>java.lang.String formatBytes(java.lang.Long)</function-signature>

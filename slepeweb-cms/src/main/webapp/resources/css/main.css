@@ -29,8 +29,9 @@ header select {
 	width: 100%;
 }
 
-header div#item-flag {
+div#item-flag {
 	font-size: 1.5em;
+	cursor: pointer;
 }
 
 div.ha {
@@ -538,6 +539,15 @@ div#item-sibling-flag, div#item-flag-clear, div#item-flag-show {
 	font-size: 1.5em;
 }
 
+div#item-flag i, 
+div#item-sibling-flag i, 
+div#item-flag-clear i, 
+div#item-flag-show i,
+div#trash-action i
+{
+	cursor: pointer;
+}
+
 div#item-sibling-flag div {
 	position: absolute;
 	top: 6px;
@@ -552,6 +562,8 @@ div#item-flag-clear div {
 	color: #58bbd5;
 	font-size: 1.5em;
 }
+
+
 
 img.egg-timer-gif {
 	width: 100%;
@@ -613,7 +625,7 @@ div.cms-icon-content {background-position: 0px -16px; background-image: url("fan
 	div.media-details {
 		display: grid;
 		gap: 30px;
-		grid-template-columns: fit-content(150px) 1fr;
+		grid-template-columns: fit-content(200px) 1fr;
 	}
 	
 	#search-bar {
