@@ -10,8 +10,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
@@ -25,22 +23,53 @@ import com.slepeweb.common.util.IOUtil;
 public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileService {
 	
 	private static Logger LOG = Logger.getLogger(MediaFileServiceImpl.class);
-	public static final int BIN_CAPACITY = 200;
-	public static final int MAX_TEMP_FILES = 4; // This should be 2 * ItemUpdateHistory.MAX_SIZE + 2
-	public static final String TMP_FOLDER = "/tmp";
-	public static final String TMP_FILE_PREFIX = "pho-";
 	
-	private String repository = "/home/photos";
+	private int binCapacity;
+	private int maxTempFiles; // This should be 2 * ItemUpdateHistory.MAX_SIZE + 2	
+	private String tempFolder;
+	private String tempFilePrefix;	
+	private String repository;
+	
 	private Map<String, Integer> fileCount = new HashMap<String, Integer>();
 	private String currentBin;
 	
-	@PostConstruct
-	private void init() throws Exception {
-		File root = new File(repository);
+	public void setBinCapacity(int binCapacity) {
+		this.binCapacity = binCapacity;
+	}
+
+	public void setMaxTempFiles(int maxTempFiles) {
+		this.maxTempFiles = maxTempFiles;
+	}
+
+	public void setTempFolder(String tempFolder) {
+		this.tempFolder = tempFolder;
+	}
+
+	public void setTempFilePrefix(String tempFilePrefix) {
+		this.tempFilePrefix = tempFilePrefix;
+	}
+
+	public void setFileCount(Map<String, Integer> fileCount) {
+		this.fileCount = fileCount;
+	}
+
+	public void setCurrentBin(String currentBin) {
+		this.currentBin = currentBin;
+	}
+	
+	public void setRepository(String repository) {
+		this.repository = repository;
+		init();
+	}
+
+	//@PostConstruct
+	private void init() {
+		File root = new File(this.repository);
 		
 		// Make sure administrator has created a file repository.
 		if (! (root.exists() && root.isDirectory())) {
-			throw new Exception(String.format("File storage directory does not exist [%s]", repository));
+			LOG.error(String.format("File storage directory does not exist [%s]", this.repository));
+			return;
 		}
 		
 		// Count the number of files in each bin
@@ -161,7 +190,7 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 		if (count == null) {
 			return createBin(testCase) ? testCase : null;
 		}
-		else if (count >= BIN_CAPACITY) {
+		else if (count >= this.binCapacity) {
 			return identifyBinWithSpace(nextBin(testCase));
 		}
 		else {			
@@ -190,10 +219,6 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 		}
 		
 		return new String(chars);
-	}
-	
-	public void setRepository(String repository) {
-		this.repository = repository;
 	}
 	
 	public String getRepositoryFilePath(String bin, String filename) {
@@ -235,9 +260,9 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 
 	public String getTempMediaFilepath(Item i, boolean isThumbnail) {
 		return 
-			TMP_FOLDER + 
+			this.tempFolder + 
 			"/" +
-			TMP_FILE_PREFIX +
+			this.tempFilePrefix +
 			i.getDateUpdated().getTime() + 
 			"-" + 
 			i.getId() +
@@ -246,13 +271,14 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 	
 	private int deleteExcessTempFiles() {
 		int count = 0;
-		int maxFiles = MAX_TEMP_FILES;
+		int maxFiles = this.maxTempFiles;
+		final String prefix = this.tempFilePrefix;
 		
-		File f = new File(TMP_FOLDER);
+		File f = new File(this.tempFolder);
 		FilenameFilter filter = new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.startsWith(TMP_FILE_PREFIX);
+				return name.startsWith(prefix);
 			}			
 		};
 		
@@ -266,7 +292,7 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
                 }
 			});
 			
-			for (int n = existing.length; n > MAX_TEMP_FILES; n--) {
+			for (int n = existing.length; n > this.maxTempFiles; n--) {
 				existing[n - 1].delete();
 				count ++;
 			}
@@ -281,7 +307,7 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 	 * Create a directory, and map it.
 	 */
 	private boolean createBin(String id) {
-		File f = new File(repository + "/" + id);
+		File f = new File(this.repository + "/" + id);
 		if (f.mkdir()) {
 			this.fileCount.put(id, 0);
 			LOG.info(String.format("Created new bin [%s]", id));

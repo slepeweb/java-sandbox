@@ -22,7 +22,7 @@ header {
 	grid-template-areas: 
 		"ha ha ha ha ha ha"
 		"hb hb hb hc hc hc"
-		"hd hf hf hf hf hf"		
+		"hd hf hf hf hf hg"		
 }
 
 header select {
@@ -401,6 +401,18 @@ div.action-reset-combo {
 	justify-self: center;
 }
 
+div#trash-action-in-header {
+	grid-area: hg;
+	display: grid;
+	align-items: center;
+}
+
+div#trash-action-in-header i {
+	display: block;
+	color: red;	
+	cursor: pointer;
+}
+
 .progressbar {
 	display: inline-block;
 /* 	width: 15em; */
@@ -410,6 +422,7 @@ div.action-reset-combo {
 div.section-ops {
 	display: grid;
 	grid-template-columns: 4fr 1fr 2fr;
+	margin-top: 2em;
 }
 
 div.section-ops.delete {
@@ -424,12 +437,17 @@ div.section-ops input[type=radio] {
 	margin-left: 1.0em
 }
 
-div.section-ops.space-top {
-	margin-top: 1em;
+div#item-editor div.section-ops button {
+	margin-top: 0em;
+	width: 7em;
 }
 
-#item-editor .section-ops button {
-	margin-top: 0em;
+div.section-ops .radio-pair {
+	display: inline-block;
+}
+
+.gap-1em {
+	margin-left: 1em;
 }
 
 #core-commerce {
@@ -529,10 +547,6 @@ div#copy-data-section i.refresher {
 	padding: 0 1em 0 1em;
 }
 
-div#flagged-items-section button {
-	width: 10em;
-}
-
 div#item-sibling-flag, div#item-flag-clear, div#item-flag-show {
 	position: relative;
 	color: #016b9b;
@@ -611,7 +625,7 @@ div.cms-icon-content {background-position: 0px -16px; background-image: url("fan
 		grid-template-columns: repeat(9, 1fr);
 		grid-template-areas: 
 			"ha ha ha ha hb hb hc hc hc"
-			"hd hf hf hf hf hf hf hf hf"
+			"hd hf hf hf hf hf hf hf hg"
 	}
 	
 	body {
@@ -651,8 +665,5 @@ div.cms-icon-content {background-position: 0px -16px; background-image: url("fan
 		width: 100%;
 	}
 	
-	.section-ops .radio-pair {
-		display: inline-block;
-	}
 }
 

@@ -49,6 +49,11 @@
 		<!-- Search bar - includes undo/redo and trash controls -->
 		<cms:searchBar />	
 		
+		<div id="trash-action-in-header" title="Trash the current item PLUS ALL descendants">
+			<i class="fa-solid fa-trash-can fa-2x"></i>
+		</div>
+		
+		
 		<div id="leftnav-hider">
 			<i></i>
 			<i class="fa-solid fa-angle-up fa-2x"></i>

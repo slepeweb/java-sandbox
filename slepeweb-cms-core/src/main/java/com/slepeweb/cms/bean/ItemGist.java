@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class ItemGist extends ItemIdentifier {
 
-	// Arbitrary date - can be used for sorting purposes.
-	private Date date;
+	// Arbitrary date - used for sorting purposes.
+	private Date date = new Date();
 	
 	public ItemGist(Item i) {
 		super(i.getOrigId());

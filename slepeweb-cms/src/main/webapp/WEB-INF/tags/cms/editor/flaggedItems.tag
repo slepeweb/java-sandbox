@@ -4,6 +4,25 @@
 <cms:debug><!-- tags/cms/editor/flaggedItems.tag --></cms:debug>
 
 <div>
+	<div id="move-flagged-section" class="section-ops">
+		<div><strong>Move ALL</strong> currently flagged items
+		
+			<span class="gap-1em"><select name="position">
+				<option value="none">Choose ...</option>
+				<option value="before">Before</option>
+				<option value="over">Below</option>
+				<option value="after">After</option>
+			</select></span>
+			
+			<div>
+				<i class="fa-solid fa-sitemap itempicker gap-1em" title="Pick a target from the content structure"></i>
+				<span id="move-target-identifier2">(your chosen target)</span>
+			</div>
+		</div>
+		
+		<div><button id="move-flagged-button" disabled="disabled" type="button">Move items</button></div>
+	</div>
+
 	<div class="section-ops">
 		<p><strong>Trash ALL</strong> currently flagged items:</p>
 		<div><button id="trash-button" type="button">Trash ALL</button></div>

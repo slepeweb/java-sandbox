@@ -1,5 +1,21 @@
 _cms.flags = {
+	move: {},
+	sel: {
+		FLAGGED_ITEMS_SECTION: 'div#flagged-items-section',
+		COPY_DATA_SECTION: 'div#copy-data-section',
+		COPY_DOWN_ARROW: 'p#copy-data-downarrow',
+		MOVE_SECTION: 'div#move-flagged-section',
+	}
 };
+
+_cms.flags.sel.COPY_DATA_FORM = _cms.flags.sel.COPY_DATA_SECTION + ' div#copy-flagged-data-form';
+_cms.flags.sel.COPY_BUTTON = _cms.flags.sel.FLAGGED_ITEMS_SECTION + ' button#copy-data-button';
+_cms.flags.sel.COPY_DATA_REFRESHER = _cms.flags.sel.COPY_DATA_SECTION + ' i.refresher';
+_cms.flags.sel.TRASH_BUTTON = _cms.flags.sel.FLAGGED_ITEMS_SECTION + ' button#trash-button';
+_cms.flags.sel.MOVE_ITEM_PICKER = _cms.flags.sel.MOVE_SECTION + ' i.itempicker';
+_cms.flags.sel.MOVE_MODE_SELECT = _cms.flags.sel.MOVE_SECTION + ' select[name=position]';
+_cms.flags.sel.MOVE_ACTION_BUTTON = _cms.flags.sel.FLAGGED_ITEMS_SECTION + ' button#move-flagged-button';
+_cms.flags.sel.MOVE_TARGET_ID = _cms.flags.sel.MOVE_SECTION + ' #move-target-identifier2';
 
 _cms.flags.exist = function() {
 	let exist = $('div#flagged-items-dialog li').length > 0;
@@ -11,7 +27,7 @@ _cms.flags.exist = function() {
 
 _cms.flags.behaviour = function() {
 	// Trash button
-	$('div#flagged-items-section button#trash-button').click(function(e) {
+	$(_cms.flags.sel.TRASH_BUTTON).click(function(e) {
 		if (_cms.flags.exist()) {
 			_cms.dialog.open(_cms.dialog.eggTimer);
 			_cms.support.ajax('GET', '/rest/flaggedItems/trash/all', {}, function(a,b,c) {
@@ -22,7 +38,7 @@ _cms.flags.behaviour = function() {
 	});
 	
 	// Copy data button
-	$('div#flagged-items-section button#copy-data-button').click(function(e) {
+	$(_cms.flags.sel.COPY_BUTTON).click(function(e) {
 		if (_cms.flags.exist()) {
 			_cms.dialog.open(_cms.dialog.eggTimer);
 			
@@ -51,8 +67,8 @@ _cms.flags.behaviour = function() {
 	});
 	
 	// Copy dialog show or hide button
-	$('p#copy-data-downarrow').click(function() {
-		var div$ = $('div#copy-data-section');
+	$(_cms.flags.sel.COPY_DOWN_ARROW).click(function() {
+		var div$ = $(_cms.flags.sel.COPY_DATA_SECTION);
 		var i$ = $(this).find('i');
 		var hide = 'hide';
 		var uparrow = 'fa-angle-up';
@@ -71,13 +87,46 @@ _cms.flags.behaviour = function() {
 	});	
 	
 	// Refresh data in copy-flagged-items form
-	$('div#copy-data-section i.refresher').click(function() {
+	$(_cms.flags.sel.COPY_DATA_REFRESHER).click(function() {
 		_cms.flags.refreshCopyForm(_cms.editingItemId);
+	});
+	
+	// Item picker, for move destination
+	$(_cms.flags.sel.MOVE_ITEM_PICKER).click(function() {
+		_cms.leftnav.mode = "move-flagged";
+		_cms.leftnav.dialog.open();
+	});	
+	
+	// Mode selector for move op
+	$(_cms.flags.sel.MOVE_MODE_SELECT).change(function(){
+		_cms.flags.move.check_data_is_complete();
+	});
+
+	// Move button
+	$(_cms.flags.sel.MOVE_ACTION_BUTTON).click(function(e) {
+		if (_cms.flags.exist()) {
+			_cms.dialog.open(_cms.dialog.eggTimer);
+			
+			var params = {
+				mode: $(_cms.flags.sel.MOVE_MODE_SELECT).val(),
+				target: _cms.leftnav.tree.activeNode.key
+			};
+			
+			_cms.support.ajax('POST', '/rest/flaggedItems/move', {data: params, dataType: 'json'}, 
+				function(resp,b,c) {
+					_cms.dialog.close(_cms.dialog.eggTimer);
+					
+					if (! resp.error) {
+						window.location = _cms.ctx + '/page/editor/' + resp.data + 
+							'?status=' + (resp.error ? 'error' : 'success') + '&msg=' + resp.message; 
+					}
+				});
+		}
 	});
 }
 
 _cms.flags.collateFormData = function(clazz, type, params) {
-	$(`div#copy-data-section input.${clazz}:checked`).each(function(index, ele) {
+	$(`${_cms.flags.sel.COPY_DATA_SECTION} input.${clazz}:checked`).each(function(index, ele) {
 		var checkbox$ = $(ele);
 		var input$ = checkbox$.next().next();
 		var name = type + '$' + checkbox$.attr('data-name');
@@ -111,7 +160,16 @@ _cms.flags.refreshDialogIfOpen = function() {
 _cms.flags.refreshCopyForm = function(key) {
 	_cms.support.ajax('GET', '/rest/item/' + key + '/refresh/copyFlaggedForm', {dataType: 'html', mimeType: 'text/html'}, 
 		function(html, status, z) {
-			$('div#copy-flagged-data-form').html(html);
+			$(_cms.flags.sel.COPY_DATA_FORM).html(html);
 		}
 	);
 }
+
+_cms.flags.move.check_data_is_complete = function() {
+	var isComplete = $(_cms.flags.sel.MOVE_MODE_SELECT).val() != "none" && 
+		$(_cms.flags.sel.MOVE_TARGET_ID).html().startsWith("'");
+	
+	_cms.support.enableIf(_cms.flags.sel.MOVE_ACTION_BUTTON, isComplete);
+}
+
+

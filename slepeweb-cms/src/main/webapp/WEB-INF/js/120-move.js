@@ -68,12 +68,6 @@ _cms.move.behaviour.itempicker = function() {
 	});
 }
 
-_cms.move.dataIsComplete = function() {
-	var position = $(_cms.move.sel.POSITION_SELECTOR).val();
-	var target = $(_cms.move.sel.MOVE_TARGET_ID).html();
-	return position != "none" && target.startsWith("'");
-}
-
 _cms.move.behaviour.changePosition = function() {
 	$(_cms.move.sel.POSITION_SELECTOR).change(function(){
 		_cms.move.check_data_is_complete();

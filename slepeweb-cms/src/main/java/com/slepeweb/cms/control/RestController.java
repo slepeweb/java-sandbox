@@ -92,7 +92,6 @@ import com.slepeweb.common.util.ImageUtil;
 @RequestMapping("/rest")
 public class RestController extends BaseController {
 	private static Logger LOG = Logger.getLogger(RestController.class);
-	public static final String THUMBNAIL_EXT = "-thumb";
 	
 	@Autowired private ItemService itemService;
 	@Autowired private ItemWorkerService itemWorkerService;
@@ -1005,36 +1004,46 @@ public class RestController extends BaseController {
 	public RestResponse moveItem(
 			@PathVariable long moverId,
 			@RequestParam(value="targetId", required=true) Long targetId,
-			@RequestParam(value="targetParentId", required=true) Long targetParentId,
-			@RequestParam(value="moverParentId", required=true) Long moverParentId,
 			@RequestParam(value="mode", required=true) String mode,
-			HttpServletRequest req,
-			ModelMap model) {	
+			HttpServletRequest req) {	
 		
-		RestResponse resp = new RestResponse();
-		User u = getUser(req);
-		Item i = getEditableVersion(moverId, u, true);
+		Item i = getEditableVersion(moverId, getUser(req), true);
+		Item[] movers = moveItem(i, mode, targetId);
+				
+		RestResponse resp =  new RestResponse();
+		if (movers != null) {
+			resp.
+				setData(pushItemUpdateRecord(req, movers[0], movers[1], Action.move)).
+				addMessage("Item moved");
+		}
+		else {
+			resp.setError(true).addMessage("Move error");
+		}
+		
+		return resp;
+	}
+	
+	private Item[] moveItem(Item i, String mode, long targetId) {
 		if (i.isRoot()) {
-			return resp.setError(true).setData(i.getId()).addMessage("Cannot move the root item");
+			LOG.error("Cannot move the root item");
+			return null;
 		}
 		
 		// Keep a record of the mover item, to store in ItemUpdateHistory
 		MoverItem mover = new MoverItem(i, new RelativeLocation(targetId, mode));
-		MoverItem moved = null;
 		
 		try {
-			moved = mover.move();
+			MoverItem moved =  mover.move();
+			return new Item[] {mover, moved};
 		}
 		catch (MissingDataException e) {
-			return resp.setError(true).setData(mover.getId()).addMessage(e.getMessage());
+			LOG.error("Missing data", e);
 		}
 		catch (ResourceException e) {
-			return resp.setError(true).setData(mover.getId()).addMessage(e.getMessage());
+			LOG.error("Missing data", e);
 		}
 		
-		return resp.setError(false).
-				setData(pushItemUpdateRecord(req, mover, moved, Action.move)).
-				addMessage("Item moved");
+		return null;
 	}
 	
 	@RequestMapping(value="/links/{parentId}/save", method=RequestMethod.POST, produces="application/json")
@@ -1288,8 +1297,9 @@ public class RestController extends BaseController {
 		return count;		
 	}
 	
-	@RequestMapping(value="/flaggedItems/trash/all", method=RequestMethod.GET)
-	public String trashAllFlaggedItems(HttpServletRequest request, ModelMap model) {
+	@RequestMapping(value="/flaggedItems/trash/all", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse trashAllFlaggedItems(HttpServletRequest request, ModelMap model) {
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
 		Iterator<Long> iter = flaggedItems.keySet().iterator();
 		Long origId;
@@ -1305,10 +1315,58 @@ public class RestController extends BaseController {
 		}
 		
 		flaggedItems.clear();
-		model.addAttribute("_flaggedItems", flaggedItems);
-		model.addAttribute("_itemIsFlagged", false);
-		model.addAttribute("_flaggedItemsMessage", String.format("%d items have been moved to the trash bin", count));
-		return "cms.refresh.flaggedItems";		
+		
+		return new RestResponse().
+				addMessage(String.format("%d items have been moved to the trash bin", count));		
+	}
+	
+	@RequestMapping(value="/flaggedItems/move", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public RestResponse moveFlaggedItems(
+			@RequestParam(value="target", required=true) Long targetId,
+			@RequestParam(value="mode", required=true) String mode,
+			HttpServletRequest req) {
+		
+		Map<Long, ItemGist> flaggedItems = getFlaggedItems(req);
+		Iterator<Long> iter = flaggedItems.keySet().iterator();
+		Long origId;
+		Item i, lastMoved = null;
+		Item[] movers;
+		int count = 0;
+		
+		while (iter.hasNext()) {
+			origId = iter.next();
+			i = getEditableVersion(origId, getUser(req));
+			
+			if (i != null) {
+				movers = moveItem(i, mode, targetId);
+				if (movers != null) {
+					lastMoved = movers[1];
+					mode = "after";
+					targetId = lastMoved.getOrigId();
+					count += 1;
+					
+					// Update flagged items, esp. item path
+					flaggedItems.put(movers[1].getOrigId(), new ItemGist(movers[1]));
+				}
+			}
+		}
+		
+		RestResponse resp = new RestResponse();
+		
+		if (count > 0) {
+			// This action cannot be undone
+			pushItemUpdateRecord(req, lastMoved, lastMoved, Action.none);
+			
+			// No need to return UndoRedoStatus object, since entire page will get re-loaded.
+			resp.addMessage(String.format("%d moves completed", count)).
+				setData(lastMoved.getOrigId());
+		}
+		else {
+			resp.setError(true).addMessage("No items moved");
+		}
+		
+		return resp;
 	}
 	
 	// @currentItemOrigId is the origId of the current item, which may or may not be included in 

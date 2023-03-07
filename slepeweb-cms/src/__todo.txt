@@ -1,12 +1,7 @@
 TODO: This is the main todo file:
 
 HIGH
-- MediaFileService contains canned data + explicit references to 'pho' !!!
-- isolate trash can - too close to search control.
-- restoring the entire trash bin does not update the left nav - refresh page?
-- trashing all flagged items: controller doesn't return a RestResponse, so undo/redo status not getting updated.
 - implement cron job to backup cms db on desktop
-- enhancement: move flagged items to the same location
 
 MEDIUM
 - Thumbnails sometimes have wrong orientation - will take a lot of work to rectify. See ImageUtil.

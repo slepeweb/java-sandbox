@@ -93,5 +93,13 @@
 			</list>
 		</property>
 	</bean>
-	
+
+	<bean id="mediaFileService" class="com.slepeweb.cms.service.MediaFileServiceImpl">
+		<property name="binCapacity" value="200" />
+		<property name="maxTempFiles" value="4" />
+		<property name="tempFolder" value="/tmp" />
+		<property name="tempFilePrefix" value="cms-" />
+		<property name="repository" value="/home/photos" />
+	</bean>
+
 </beans>

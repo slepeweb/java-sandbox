@@ -26,7 +26,7 @@ _cms.misc = {
 
 // The trash icon used to be in the 'misc' editor tab, but has now been moved
 // to the page header.
-_cms.misc.sel.DELETE_BUTTON = "div#trash-action > i";
+_cms.misc.sel.DELETE_BUTTON = "div#trash-action-in-header > i";
 
 _cms.support.setTabIds(_cms.misc, "misc");
 
@@ -175,11 +175,16 @@ _cms.misc.behaviour.trash.restore = function() {
 		_cms.support.ajax('GET', url, {dataType: "json", data: params},			
 			function(resp, status, z) {
 				if (! resp.error) {
-					// Load restored item into the leftnav
+					// Load _FIRST_ restored item into the leftnav. First identify its parent ...
 					var parentNode = _cms.leftnav.tree.getNodeByKey(resp.data[0].key);
 					
 					if (parentNode != null) {
-						parentNode.addNode(resp.data[1]);
+						// Add restored item to parent node in leftnav.
+						// parentNode.addNode(resp.data[1]);
+						
+						// NO - you end up getting only one node below the parent.
+						// SO, force-reload ALL items below the parent:
+						parentNode.load(true);
 					}
 					
 					// Navigate to the restored item
