@@ -37,7 +37,9 @@
 	</c:if>
 	
 	<h3>Flagged Item Operations</h3>
-	<div id="flagged-items-section">
+	<div id="flagged-items-section-wrapper">
+		<p><strong>There are <span class="num-flags">N</span> flagged items</strong></p>
+		
 		<edit:flaggedItems />
 	</div>
 	

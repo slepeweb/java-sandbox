@@ -17,29 +17,37 @@ _cms.flags.sel.MOVE_MODE_SELECT = _cms.flags.sel.MOVE_SECTION + ' select[name=po
 _cms.flags.sel.MOVE_ACTION_BUTTON = _cms.flags.sel.FLAGGED_ITEMS_SECTION + ' button#move-flagged-button';
 _cms.flags.sel.MOVE_TARGET_ID = _cms.flags.sel.MOVE_SECTION + ' #move-target-identifier2';
 
-_cms.flags.exist = function() {
-	let exist = $('div#flagged-items-dialog li').length > 0;
+_cms.flags.numberOf = function() {
+	return $('div#flagged-items-dialog li').length;
+}
+
+_cms.flags.reportIfNotExist = function() {
+	let exist = _cms.flags.numberOf() > 0;
 	if (! exist) {
 		_cms.support.flashMessage(_cms.support.toStatus(true, 'No action taken - zero items flagged'));
 	}
 	return exist;
 }
 
+_cms.flags.trashItems = function() {
+	if (_cms.flags.reportIfNotExist()) {
+		_cms.dialog.open(_cms.dialog.eggTimer);
+		_cms.support.ajax('GET', '/rest/flaggedItems/trash/all', {}, function(a,b,c) {
+			_cms.dialog.close(_cms.dialog.eggTimer);
+			window.location = _cms.ctx + '/page/editor/' + _cms.rootItemOrigId +'?status=success&msg=Flagged items trashed - now on Homepage'; 
+		});
+	}
+}
+
 _cms.flags.behaviour = function() {
 	// Trash button
 	$(_cms.flags.sel.TRASH_BUTTON).click(function(e) {
-		if (_cms.flags.exist()) {
-			_cms.dialog.open(_cms.dialog.eggTimer);
-			_cms.support.ajax('GET', '/rest/flaggedItems/trash/all', {}, function(a,b,c) {
-				_cms.dialog.close(_cms.dialog.eggTimer);
-				window.location = _cms.ctx + '/page/editor/' + _cms.rootItemOrigId +'?status=success&msg=Flagged items trashed - now on Homepage'; 
-			});
-		}
+		_cms.dialog.open(_cms.dialog.confirmTrashFlagged);
 	});
 	
 	// Copy data button
 	$(_cms.flags.sel.COPY_BUTTON).click(function(e) {
-		if (_cms.flags.exist()) {
+		if (_cms.flags.reportIfNotExist()) {
 			_cms.dialog.open(_cms.dialog.eggTimer);
 			
 			var params = {
@@ -104,7 +112,7 @@ _cms.flags.behaviour = function() {
 
 	// Move button
 	$(_cms.flags.sel.MOVE_ACTION_BUTTON).click(function(e) {
-		if (_cms.flags.exist()) {
+		if (_cms.flags.reportIfNotExist()) {
 			_cms.dialog.open(_cms.dialog.eggTimer);
 			
 			var params = {
@@ -147,14 +155,23 @@ _cms.flags.refreshDialog = function() {
 	_cms.support.ajax('GET', '/rest/flaggedItems/list', {dataType: 'html', mimeType: 'text/html'}, 
 		function(html, status, z) {
 			$('#flagged-items-dialog').html(html);
+			
+			// Display the current number of flagged items
+			let numFlags = _cms.flags.numberOf();
+			$('span.num-flags').html(numFlags.toString());
+			
+			// Hide the entire 'flagged items' section if there are no flagged items
+			_cms.support.hideIf(_cms.flags.sel.FLAGGED_ITEMS_SECTION, numFlags === 0);
 		}
 	);
 }
 
-_cms.flags.refreshDialogIfOpen = function() {
-	if (_cms.dialog.flaggedItems.open) {
+_cms.flags.refreshFlaggedSection = function() {
+	// This may update the number of flagged items
+	//if (_cms.dialog.flaggedItems.open) {
 		_cms.flags.refreshDialog();
-	}
+	//}
+	
 }
 
 _cms.flags.refreshCopyForm = function(key) {

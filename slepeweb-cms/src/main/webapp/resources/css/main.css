@@ -358,7 +358,7 @@ div.action-reset-combo {
 								cursor: pointer;
 							}
 							
-							#item-editor #trash-button, #item-editor #trash-flagged-button {
+							#item-editor #trash-button, #item-editor #trash-flagged-button, button#trash-empty-button {
 								background: red;
 								font-weight: bold;
 							}

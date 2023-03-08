@@ -3,7 +3,7 @@
         
 <cms:debug><!-- tags/cms/editor/flaggedItems.tag --></cms:debug>
 
-<div>
+<div id="flagged-items-section">
 	<div id="move-flagged-section" class="section-ops">
 		<div><strong>Move ALL</strong> currently flagged items
 		

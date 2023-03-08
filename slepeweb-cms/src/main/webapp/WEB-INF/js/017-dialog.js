@@ -6,6 +6,7 @@ _cms.dialog = {
 	badFieldValueFormat: {obj: null},
 	confirmFieldUpdate: {obj: null},
 	confirmTrash: {obj: null},
+	confirmTrashFlagged: {obj: null},
 	addLink: {obj: null},
 	linkGuidance: {obj: null},
 	fieldGuidance: {obj: null},
@@ -20,6 +21,7 @@ _cms.dialog = {
 		ILLEGAL_TARGET: "#illegal-link-target-dialog",
 		CONFIRM_FIELD_UPDATE: "#confirm-field-update-dialog",
 		CONFIRM_TRASH_ACTION: "#confirm-trash-dialog",
+		CONFIRM_TRASH_FLAGGED_ACTION: "#confirm-trash-flagged-dialog",
 	}
 }
 
@@ -63,6 +65,24 @@ _cms.dialog.confirmTrash.define = function() {
 	
 	_cms.dialog.confirmTrash.obj = _cms.dialog.define("Confirm trashing", 
 			_cms.dialog.sel.CONFIRM_TRASH_ACTION, 200, 200, buttons, close);
+}
+
+_cms.dialog.confirmTrashFlagged.define = function() {
+	var close = function() {
+		_cms.dialog.close(_cms.dialog.confirmTrashFlagged);
+	}
+	
+	var buttons = {
+		"Trash ALL items": function() {
+			_cms.flags.trashItems();
+		},
+		Cancel: function() {
+			close();
+		}
+	}
+	
+	_cms.dialog.confirmTrashFlagged.obj = _cms.dialog.define("Confirm trashing ALL flagged items", 
+			_cms.dialog.sel.CONFIRM_TRASH_FLAGGED_ACTION, 200, 200, buttons, close);
 }
 
 _cms.dialog.confirmFieldUpdate.define = function() {
@@ -202,6 +222,7 @@ _cms.dialog.warning = function(title, d, selector) {
 
 _cms.dialog.onpageload = function() {
 	_cms.dialog.confirmTrash.define();
+	_cms.dialog.confirmTrashFlagged.define();
 	_cms.dialog.confirmFieldUpdate.define();
 	_cms.dialog.addLink.define();
 	_cms.dialog.searchresults.define();

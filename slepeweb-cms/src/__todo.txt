@@ -1,6 +1,7 @@
 TODO: This is the main todo file:
 
 HIGH
+- Need better handling on session expiry
 - implement cron job to backup cms db on desktop
 
 MEDIUM

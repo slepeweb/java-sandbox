@@ -51,6 +51,14 @@
 	</p>
 </div>
 
+<div id="confirm-trash-flagged-dialog" class="hide cms-dialog">
+	<p>
+		<span class="ui-icon ui-icon-alert cms-icon"></span>
+		This will trash ALL FLAGGED items, PLUS any shortcuts 
+		to them, <strong>PLUS ALL</strong> their descendants. Are you sure you want to do this?
+	</p>
+</div>
+
 <div id="dialog-leftnav" class="hide">
 	<div id="leftnav"></div>
 </div>

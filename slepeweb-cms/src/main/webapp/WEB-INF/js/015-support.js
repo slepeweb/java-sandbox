@@ -153,6 +153,17 @@ _cms.support.enableIf = function(selector, condition) {
 	}
 }
 
+_cms.support.hideIf = function(selector, condition) {
+	if (condition) {
+		$(selector).addClass('hide');
+		return true;
+	}
+	else {
+		$(selector).removeClass('hide');
+		return false;
+	}
+}
+
 _cms.support.fs = function(base, name) {
 	return _cms.support.f(base, name, "select");
 }
@@ -235,7 +246,7 @@ _cms.support.itemFlagger.onPageLoad = function() {
 	$('div#item-sibling-flag').click(function(e) {
 		_cms.support.ajax('GET', '/rest/item/' + _cms.editingItemId + '/flag/siblings', {dataType: 'json'}, function(n) {
 			_cms.support.displayItemFlag(true);			
-			_cms.flags.refreshDialogIfOpen();
+			_cms.flags.refreshFlaggedSection();
 			_cms.support.flashMessage(_cms.support.toStatus(false, `${n} sibling items flagged`));
 		});
 	});
@@ -244,7 +255,7 @@ _cms.support.itemFlagger.onPageLoad = function() {
 	$('div#item-flag-clear').click(function(e) {
 		_cms.support.ajax('GET', '/rest/flaggedItems/unflag/all', {dataType: 'json'}, function(n) {
 			_cms.support.displayItemFlag(false);
-			_cms.flags.refreshDialogIfOpen();
+			_cms.flags.refreshFlaggedSection();
 			_cms.support.flashMessage(_cms.support.toStatus(false, `${n} items un-flagged`));
 		});
 	});
@@ -269,7 +280,7 @@ _cms.support.itemFlagger.onItemLoad = function() {
 			
 		_cms.support.ajax('GET', url, {dataType: 'json'}, function(flagged, status, z) {
 			_cms.support.displayItemFlag(flagged);
-			_cms.flags.refreshDialogIfOpen();
+			_cms.flags.refreshFlaggedSection();
 			_cms.support.flashMessage(_cms.support.toStatus(false, `Current item ${action}ged`));
 		});
 	});

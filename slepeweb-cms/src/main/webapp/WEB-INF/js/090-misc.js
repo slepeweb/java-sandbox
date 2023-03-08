@@ -210,7 +210,10 @@ _cms.misc.behaviour.trash.trash = function(nodeKey) {
 _cms.misc.accordionListener = function(e, ui) {
 	if (ui.newHeader.text().startsWith('Flagged')) {
 		_cms.flags.refreshDialog();
-		_cms.dialog.open(_cms.dialog.flaggedItems);
+		
+		if (_cms.flags.numberOf() > 0) {
+			_cms.dialog.open(_cms.dialog.flaggedItems);
+		}
 	}
 	else if (ui.newHeader.text().startsWith('Trash')) {
 		_cms.misc.refresh.trash();
@@ -240,6 +243,7 @@ _cms.misc.onrefresh = function(nodeKey) {
 	 */
 	_cms.misc.behaviour.trash.showOrHide();
 	_cms.flags.behaviour();
+	_cms.flags.refreshFlaggedSection();
 	
 	$('#misc-accordion').accordion({
 		heightStyle: "content",
