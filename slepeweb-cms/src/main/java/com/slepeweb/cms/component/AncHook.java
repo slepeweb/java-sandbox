@@ -11,7 +11,7 @@ public class AncHook extends NoHook {
 	@Autowired private IGuidance ancPartnerLinkGuidance;
 	
 	@Override
-	public void addItem(Item i) {
+	public void addItemPost(Item i) {
 		// Set surname to be the same as that of the parent
 		Item parent = i.getParent();
 		String surname = parent.getFieldValue(FieldName.LASTNAME);

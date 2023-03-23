@@ -474,7 +474,13 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		int flag = option ? 1 : 0;
 		String sql = String.format("update item set %s = ? where id = ?", column);
 		
-		return this.jdbcTemplate.update(sql, flag, id) > 0;
+		if (this.jdbcTemplate.update(sql, flag, id) > 0) {
+			Item i = getItem(id);
+			this.solrService4Cms.save(i);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	private Item getItem(String sql, Object[] params) {

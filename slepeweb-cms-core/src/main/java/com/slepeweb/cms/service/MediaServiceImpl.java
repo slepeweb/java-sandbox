@@ -61,7 +61,7 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 		
 		if (meta != null) {
 			this.jdbcTemplate.update(
-					"insert into media (itemid, size, folder, thumbnail) values (?, ?, ?, ?, ?)", 
+					"insert into media (itemid, size, folder, thumbnail) values (?, ?, ?, ?)", 
 					m.getItemId(), meta.getSize(), meta.getBin(), m.isThumbnail());
 			
 			LOG.info(compose("Added new media", m.getItemId(), meta.getBin()));

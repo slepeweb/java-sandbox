@@ -1,6 +1,9 @@
 package com.slepeweb.site.pho.control;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,12 +14,18 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.TagList;
+import com.slepeweb.cms.constant.ItemTypeName;
+import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.common.solr.bean.SolrConfig;
+import com.slepeweb.common.solr.bean.SolrPager;
+import com.slepeweb.common.solr.bean.SolrResponse;
 import com.slepeweb.site.control.BaseController;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.pho.bean.PhoCookieValues;
@@ -31,6 +40,7 @@ public class PhotosPageController extends BaseController {
 	@Autowired private SolrService4Photos solrService4Photos;
 	@Autowired private PhoCookieService phoCookieService;
 	@Autowired private TagService tagService;
+	@Autowired private ItemService itemService;
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
@@ -71,6 +81,43 @@ public class PhotosPageController extends BaseController {
 			ModelMap model) {	
 
 		return search(i, i.getSite().getShortname(), request, response, model);
+	}
+	
+	@RequestMapping(value="/search/related", method=RequestMethod.GET)	
+	public String related(
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			@RequestParam(value="id", required=true) Long id,
+			HttpServletRequest request,
+			ModelMap model) {	
+		
+		Item parent = this.itemService.getItem(id);
+		List<SolrDocument4Cms> docs = new ArrayList<SolrDocument4Cms>();
+		
+		if (parent != null) {
+			List<String> targets = Arrays.asList(new String[] {
+					ItemTypeName.PHOTO_JPG, ItemTypeName.MOVIE_MP4
+			});
+			
+			for (Item r : parent.getRelatedItems()) {
+				if (targets.contains(r.getType().getName())) {
+					docs.add(new SolrDocument4Cms(r));
+				}
+			}
+		}
+
+		Page page = getStandardPage(i, shortSitename, "relations", model);
+		page.setTitle(i.getName());
+		
+		SolrResponse<SolrDocument4Cms> response = new SolrResponse<SolrDocument4Cms>();
+		response.setResults(docs);
+		response.setTotalHits(docs.size());
+			
+		response.setPager(new SolrPager<SolrDocument4Cms>(
+		response.getTotalHits(), 10, 1));		
+			
+		model.addAttribute("_search", response);
+		return page.getView();
 	}
 	
 	private String search(

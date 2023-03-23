@@ -118,6 +118,7 @@ span.close-slide-info {
 
 a.disabled {
 	opacity: 0.3;
+	cursor: default;
 }
 
 .cursor {

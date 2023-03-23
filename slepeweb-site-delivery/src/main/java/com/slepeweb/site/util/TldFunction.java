@@ -2,10 +2,14 @@ package com.slepeweb.site.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.cms.bean.Dateish;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.commerce.bean.Product;
 
@@ -34,6 +38,17 @@ public class TldFunction {
 	
 	public static Dateish toDateish(String s) {
 		return new Dateish(s);
+	}
+	
+	public static List<SolrDocument4Cms> json2SolrCmsDoc(String json) {
+		try {
+			TypeReference<List<SolrDocument4Cms>> type = new TypeReference<List<SolrDocument4Cms>>() {};
+			List<SolrDocument4Cms> list = new ObjectMapper().readValue(json, type);
+			return list;
+		} catch (Exception e) {
+			// Handle the problem
+		}
+		return null;
 	}
 	
 }

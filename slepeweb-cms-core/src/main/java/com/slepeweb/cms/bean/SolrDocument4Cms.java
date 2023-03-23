@@ -2,6 +2,8 @@ package com.slepeweb.cms.bean;
 
 import org.apache.solr.client.solrj.beans.Field;
 
+import com.slepeweb.cms.constant.FieldName;
+
 public class SolrDocument4Cms {
 
 	@Field("key") private String key;
@@ -19,8 +21,30 @@ public class SolrDocument4Cms {
 	@Field("editable") private boolean editable;
 	@Field("viewable") private boolean viewable;
 	@Field("extraStr1") private String extraStr1;
+	@Field("extraStr2") private String extraStr2;
+	@Field("extraStr3") private String extraStr3;
 	
 	public SolrDocument4Cms() {}
+	
+	public SolrDocument4Cms(Item i) {
+		this.
+			setId(String.valueOf(i.getId())).
+			setLanguage(i.getLanguage()).
+			setKey(getId(), getLanguage()).
+			setSiteId(String.valueOf(i.getSite().getId())).
+			setOrigId(String.valueOf(i.getOrigId())).
+			setPath(i.getPath()).
+			setType(i.getType().getName()).
+			setType(i.getType().getName()).
+			setTitle(i.getFieldValue(FieldName.TITLE)).
+			setSubtitle(i.getFieldValue(FieldName.SUBTITLE)).
+			setTeaser(i.getFieldValue(FieldName.TEASER)).
+			setBodytext(i.getFieldValue(FieldName.BODYTEXT)).
+			setTags(i.getTagsAsString()).
+			setEditable(i.isEditable()).
+			setViewable(i.isPublished());
+	}
+	
 	
 	@Override
 	public String toString() {
@@ -172,5 +196,21 @@ public class SolrDocument4Cms {
 	public SolrDocument4Cms setExtraStr1(String s) {
 		this.extraStr1 = s;
 		return this;
+	}
+
+	public String getExtraStr2() {
+		return extraStr2;
+	}
+
+	public void setExtraStr2(String extraStr2) {
+		this.extraStr2 = extraStr2;
+	}
+
+	public String getExtraStr3() {
+		return extraStr3;
+	}
+
+	public void setExtraStr3(String extraStr3) {
+		this.extraStr3 = extraStr3;
 	}
 }

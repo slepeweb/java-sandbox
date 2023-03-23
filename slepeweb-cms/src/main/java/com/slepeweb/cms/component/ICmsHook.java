@@ -4,8 +4,8 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.guidance.IGuidance;
 
 public interface ICmsHook {
-	void addItem(Item i);
-	void updateFields(Item i);
+	void addItemPost(Item i);
+	void updateLinksPost(Item i);
 	IGuidance getFieldGuidance(String variable);
 	IGuidance getLinknameGuidance(String name);
 }

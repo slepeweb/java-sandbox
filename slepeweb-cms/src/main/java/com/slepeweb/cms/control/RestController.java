@@ -694,7 +694,7 @@ public class RestController extends BaseController {
 			
 			// Site-specific actions on adding a new item
 			ICmsHook h = this.cmsHooker.getHook(i.getSite().getShortname());
-			h.addItem(i);
+			h.addItemPost(i);
 			
 			Object[] o = new Object[]{
 					Node.toNode(i), 
@@ -1116,6 +1116,10 @@ public class RestController extends BaseController {
 		
 		try {
 			parent.saveLinks();
+			
+			// Related items are stored in solr for pho site.
+			ICmsHook hook = this.cmsHooker.getHook(parent.getSite().getShortname());
+			hook.updateLinksPost(parent);			
 			
 			resp.addMessage(String.format("%d links saved", links.size()));
 			

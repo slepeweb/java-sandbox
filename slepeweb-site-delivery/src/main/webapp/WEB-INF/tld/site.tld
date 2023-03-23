@@ -91,4 +91,10 @@
 		<function-signature>com.slepeweb.cms.bean.Dateish toDateish(java.lang.String)</function-signature>
 	</function>
 	
+	<function>
+		<name>json2SolrCmsDoc</name>
+		<function-class>com.slepeweb.site.util.TldFunction</function-class>
+		<function-signature>java.util.List json2SolrCmsDoc(java.lang.String)</function-signature>
+	</function>
+	
 </taglib>

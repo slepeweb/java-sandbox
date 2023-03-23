@@ -145,6 +145,9 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		// Update child item path
 		this.itemService.updateItemPath(mover.getId(), newChildPath);
 		
+		// Re-index all children
+		this.solrService4Cms.indexSection(mover);
+		
 		// Force newParent links to be re-calculated, since they have now changed
 		newParent.setLinks(null);
 		

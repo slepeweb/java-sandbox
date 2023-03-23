@@ -29,6 +29,8 @@ function displayMedia(id) {
 		_cursor.currentId = id;
 	}
 	
+	setArrowVisibility()
+		
 	// Populate and display given slide
 	sourceAndDisplay(_cursor.currentId, true)
   
@@ -78,6 +80,22 @@ function scaleDown(w, h) {
 	return scale < 1 ? [w * scale, h * scale] : [w, h]
 }
 
+function setArrowVisibility() {
+	if (_cursor.hasNext()) {
+		$(_rightArrowSel).removeClass("disabled");
+	}
+	else {
+		$(_rightArrowSel).addClass("disabled");
+	}
+	
+	if (_cursor.hasPrevious()) {
+		$(_leftArrowSel).removeClass("disabled");
+	}
+	else {
+		$(_leftArrowSel).addClass("disabled");
+	}
+}
+
 function assignUIBehaviours() {
 	$("img").on("load", function() {
 		let media = $(this)
@@ -119,12 +137,11 @@ function assignUIBehaviours() {
 		$(this).find(".search-result-info").addClass("hide")
 	});
 		
-	$(".search-result").click(function(){
+	$(".search-result").click(function() {
 		var indexStr = $(this).attr("data-id")
 		
-		if (indexStr) {
-			_currentSlideId = parseInt(indexStr)
-			displayMedia(_currentSlideId)
+		if (indexStr !== undefined) {
+			displayMedia(parseInt(indexStr))
 			openModal()
 		}
 	});
@@ -136,20 +153,6 @@ function assignUIBehaviours() {
 			let inc = parseInt($(this).attr("data-inc"))
 			if (_cursor.increment(inc)) {
 				displayMedia()
-			}
-			
-			if (_cursor.hasNext()) {
-				$(_rightArrowSel).removeClass("disabled");
-			}
-			else {
-				$(_rightArrowSel).addClass("disabled");
-			}
-			
-			if (_cursor.hasPrevious()) {
-				$(_leftArrowSel).removeClass("disabled");
-			}
-			else {
-				$(_leftArrowSel).addClass("disabled");
 			}
 		}
 	})

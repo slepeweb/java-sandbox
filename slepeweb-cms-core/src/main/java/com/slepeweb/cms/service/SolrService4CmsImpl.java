@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.cms.bean.Dateish;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
@@ -189,12 +190,31 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				// For photos site
 				if (i.getSite().getShortname().equals("pho")) {
-					String name = doc.getType();
-					if (name.startsWith(ItemTypeName.PHOTO_PREFIX) || name.startsWith(ItemTypeName.MOVIE_PREFIX)) {
+					if (isPhoMedia(doc.getType())) {
+						// Date-ish for media types
 						s = getFieldValue(i, FieldName.DATEISH, false, null);
 						if (s != null) {	
 							Dateish ish = new Dateish(s);
 							doc.setExtraStr1(ish.toSortableString());
+						}
+						
+						// Related media items, coded as json strings
+						if (i.getRelatedItems().size() > 0) {
+							List<SolrDocument4Cms> related = new ArrayList<SolrDocument4Cms>();
+							for (Item r : i.getRelatedItems()) {
+								if (isPhoMedia(r.getType().getName())) {
+									for (Object o : makeDocuments(r)) {
+										related.add((SolrDocument4Cms) o);
+									}
+								}
+							}
+							
+							try {
+								doc.setExtraStr2(new ObjectMapper().writeValueAsString(related));
+							}
+							catch (Exception e) {
+								// TODO: Log error
+							}
 						}
 					}
 				}
@@ -207,6 +227,10 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 		}
 		
 		return null;
+	}
+	
+	private boolean isPhoMedia(String name) {
+		return name.startsWith(ItemTypeName.PHOTO_PREFIX) || name.startsWith(ItemTypeName.MOVIE_PREFIX);
 	}
 	
 	private String getFieldValue(Item i, String variable, boolean resolve, String dflt) {

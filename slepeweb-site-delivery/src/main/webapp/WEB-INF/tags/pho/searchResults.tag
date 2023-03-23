@@ -69,12 +69,21 @@
 		    	</video>
 		    </c:when></c:choose>
 		    
+		    <c:set var="_relatedMedia" value="${site:json2SolrCmsDoc(_result.extraStr2)}" />
+		    
 		    <div class="slide-info">
 					<p class="heading">${_result.title} <span class="close-slide-info cursor">&times;</span></p>
 					<p class="caption">${_teaser}</p>
 					<pho:captionTagList list="${_result.tags}" />
+
+					<c:if test="${not empty _relatedMedia}">
+						<div class="related-media">
+							<p>
+								<a href="?view=related&id=${_result.id}" target="_blank">! Related media !</a>
+							</p>
+						</div>
+					</c:if>					
 				</div>
-	    
 	    </div>
 	    	
 		</c:forEach>
