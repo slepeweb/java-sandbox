@@ -255,7 +255,7 @@ public class SiteRestController extends BaseController {
 		model.addAttribute(SiteRestController.BASKET_COOKIE, b);
 		
 		String shortSitename = "";
-		Host h = this.hostService.getHost(req.getServerName());
+		Host h = this.hostService.getHost(req.getServerName(), req.getServerPort());
 		if (h != null) {
 			shortSitename = h.getSite().getShortname();
 		}

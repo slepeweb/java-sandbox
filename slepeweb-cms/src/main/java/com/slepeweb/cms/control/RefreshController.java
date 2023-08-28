@@ -85,7 +85,7 @@ public class RefreshController extends BaseController {
 		// Hostname to render content.
 		// TODO: should really be a staging host
 		// TODO: This code block is duplicated in RestController - refactor
-		List<Host> hosts = this.cmsService.getHostService().getAllHosts(i.getSite().getId());
+		List<Host> hosts = this.cmsService.getHostService().getHosts(i.getSite().getId());
 		if (hosts != null && hosts.size() > 0) {
 			model.addAttribute("host", hosts.get(0));
 		}

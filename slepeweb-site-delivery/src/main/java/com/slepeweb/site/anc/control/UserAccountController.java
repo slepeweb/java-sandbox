@@ -230,7 +230,7 @@ public class UserAccountController extends BaseController {
 				u.setSecret(secret);
 				this.userService.partialUpdate(u);
 				
-				Host h = i.getSite().getPublicLiveHost();
+				Host h = i.getSite().getDeliveryHost();
 				String href = String.format("%s/%s/login/register?view=password/%s", 
 						h != null ? h.getNamePortAndProtocol() : "",
 						i.getLanguage(), 

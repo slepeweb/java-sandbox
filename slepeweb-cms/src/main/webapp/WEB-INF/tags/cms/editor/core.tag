@@ -17,11 +17,15 @@
 	<div class="ff">
 		<label for="path">Path: </label><input disabled="disabled" value="${editingItem.path}" />
 		
-		<c:if test="${not empty _host}">
+		<c:if test="${editingItem.published}">		
+			<!-- Editorial host: ${editingItem.site.editorialHost} -->
+			<!-- Delivery host: ${editingItem.site.deliveryHost} -->
+			<c:set var="_host" value="${editingItem.site.deliveryHost}" />
+			
 			<c:set var="url" value="${editingItem.path}" />
 			<c:if test="${editingItem.site.multilingual}"><c:set var="url" value="/${editingItem.site.language}${url}" /></c:if>
-			<a href="${_host.namePortAndProtocol}${url}" target="_blank">View</a>
-		</c:if>		
+			<a href="${_host.namePortAndProtocol}${url}" target="_blank">View published page</a>
+		</c:if>
 	</div>
 	
 	<div class="ff">

@@ -77,8 +77,11 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 	
 	private int indexSectionRecursive(Item parentItem) {
 		// The solrService composites content from this item and its main components
-		save(parentItem);
-		int count = 1;
+		int count = 0;
+		if (! parentItem.getType().getName().equals(ItemTypeName.CONTENT_FOLDER)) {
+			save(parentItem);
+			count++;
+		}
 		
 		for (Link l : parentItem.getBindings()) {
 			if (! l.getType().equals(LinkType.shortcut)) {

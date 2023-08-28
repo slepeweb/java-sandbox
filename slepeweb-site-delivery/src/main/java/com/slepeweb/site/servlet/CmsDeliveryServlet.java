@@ -267,8 +267,7 @@ public class CmsDeliveryServlet {
     }
 	
 	private Site getSite(HttpServletRequest req) {
-		String hostname = req.getServerName();
-		Host h = this.cmsService.getHostService().getHost(hostname);
+		Host h = this.cmsService.getHostService().getHost(req.getServerName(), req.getServerPort());
 		if (h != null) {
 			return h.getSite();
 		}
@@ -344,9 +343,13 @@ public class CmsDeliveryServlet {
 		Redirector r = new Redirector();
 
 		if (! i.isAccessible()) {
-			if (! i.getPath().equals(SiteAccessService.NOT_AUTHORISED_PATH)) {
+			String notAuthorisedPath = i.getSite().isMultilingual() ? 
+						String.format("/%s%s", i.getLanguage(), SiteAccessService.LOGIN_PATH) :
+							SiteAccessService.LOGIN_PATH;
+			
+			if (! i.getPath().equals(notAuthorisedPath)) {
 				// Redirect to not-authorised page
-				r.setPath(String.format("/%s%s", i.getLanguage(), SiteAccessService.NOT_AUTHORISED_PATH));
+				r.setPath(notAuthorisedPath);
 				r.setRequired(true);
 			}
 		}

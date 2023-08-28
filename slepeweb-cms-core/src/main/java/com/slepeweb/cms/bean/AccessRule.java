@@ -21,7 +21,7 @@ public class AccessRule extends CmsBean {
 		return sb.toString();
 	}
 	
-	public void append(String name, String value, StringBuilder sb) {
+	private void append(String name, String value, StringBuilder sb) {
 		if (StringUtils.isNotBlank(name)) {
 			if (sb.length() > 0) {
 				sb.append(", ");

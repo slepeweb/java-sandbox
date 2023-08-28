@@ -93,6 +93,20 @@ public class CmsServiceImpl implements CmsService {
 	public void setStaticSiteRoot(String staticSiteRoot) {
 		this.staticSiteRoot = staticSiteRoot;
 	}
+	
+	private boolean productionDeployment;
+
+	public boolean isProductionDeployment() {
+		return productionDeployment;
+	}
+
+	public boolean isDevDeployment() {
+		return ! isProductionDeployment();
+	}
+
+	public void setProductionDeployment(boolean b) {
+		this.productionDeployment = b;
+	}
 
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {

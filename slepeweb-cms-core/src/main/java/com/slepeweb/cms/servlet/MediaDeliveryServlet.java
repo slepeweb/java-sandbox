@@ -61,8 +61,7 @@ public class MediaDeliveryServlet {
     }
 	
 	private Site getSite(HttpServletRequest req) {
-		String hostname = req.getServerName();
-		Host h = this.cmsService.getHostService().getHost(hostname);
+		Host h = this.cmsService.getHostService().getHost(req.getServerName(), req.getServerPort());
 		if (h != null) {
 			return h.getSite();
 		}

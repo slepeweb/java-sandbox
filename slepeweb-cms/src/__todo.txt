@@ -1,6 +1,10 @@
 TODO: This is the main todo file:
 
 HIGH
+- AccessRule could use an extra dimension: tag pattern
+--- eg. if tag list includes 'restricted', then only certain roles (or groups) can access it
+- Solr documents should be tested by isAccessible(), as well as items. Suggest service converts Item to SolrDocument.
+- Can user access control to cms-d be made global? (ie not specific to anc site).
 - Need better handling on session expiry
 - implement cron job to backup cms db on desktop
 

@@ -13,6 +13,7 @@ import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Host;
+import com.slepeweb.cms.bean.Host.Deployment;
 import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
@@ -39,6 +40,7 @@ public class RowMapperUtil {
 					setName(rs.getString("name")).
 					setPort(rs.getInt("port")).
 					setType(HostType.valueOf(rs.getString("type"))).
+					setDeployment(Deployment.valueOf(rs.getString("deployment"))).
 					setProtocol(rs.getString("protocol"));
 			
 			Site s = mapSite(rs, "siteid", "sitename", "shortname");

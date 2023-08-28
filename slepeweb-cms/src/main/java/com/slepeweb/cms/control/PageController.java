@@ -38,8 +38,7 @@ public class PageController extends BaseController {
 	public String doMain(HttpServletRequest req, HttpServletResponse res, ModelMap model) 
 		throws IOException {
 		
-		String hostname = req.getServerName();
-		Host h = this.cmsService.getHostService().getHost(hostname);
+		Host h = this.cmsService.getHostService().getHost(req.getServerName(), req.getServerPort());
 		long itemId = 0;
 		
 		if (h != null) {

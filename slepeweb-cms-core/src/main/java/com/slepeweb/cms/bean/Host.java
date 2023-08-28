@@ -9,9 +9,14 @@ public class Host extends CmsBean {
 	private Site site;
 	private Integer port;
 	private HostType type;
+	private Deployment deployment;
 	
 	public enum HostType {
-		staging, live, publicstaging, publiclive;
+		editorial, delivery, both;
+	}
+
+	public enum Deployment {
+		development, production;
 	}
 
 		
@@ -23,6 +28,7 @@ public class Host extends CmsBean {
 			setSite(h.getSite()).
 			setPort(h.getPort()).
 			setType(h.getType());
+			setDeployment(h.getDeployment());
 		}
 	}
 	
@@ -30,12 +36,12 @@ public class Host extends CmsBean {
 		return 
 			StringUtils.isNotBlank(getName()) &&
 			getSite() != null && 
-			getSite().getId() > 0;
+			getSite().getId() > 0 ;
 	}
 	
 	@Override
 	public String toString() {
-		return getNamePortAndProtocol();
+		return String.format("(%s) %s", getType().name(), getNamePortAndProtocol());
 	}
 	
 	public Host save() {
@@ -117,6 +123,15 @@ public class Host extends CmsBean {
 		return this;
 	}
 
+	public Deployment getDeployment() {
+		return deployment;
+	}
+
+	public Host setDeployment(Deployment deployment) {
+		this.deployment = deployment;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -125,6 +140,7 @@ public class Host extends CmsBean {
 		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
 		result = prime * result + ((port == null) ? 0 : port.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((deployment == null) ? 0 : deployment.hashCode());
 		return result;
 	}
 
@@ -153,6 +169,8 @@ public class Host extends CmsBean {
 		} else if (!port.equals(other.port))
 			return false;
 		if (type != other.type)
+			return false;
+		if (deployment != other.deployment)
 			return false;
 		return true;
 	}

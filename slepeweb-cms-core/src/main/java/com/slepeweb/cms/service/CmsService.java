@@ -11,6 +11,8 @@ public interface CmsService {
 	boolean isDeliveryContext();
 	boolean isCommerceEnabled();
 	String getStaticSiteRoot();
+	boolean isProductionDeployment();
+	boolean isDevDeployment();
 	
 	HostService getHostService();
 	SiteService getSiteService();

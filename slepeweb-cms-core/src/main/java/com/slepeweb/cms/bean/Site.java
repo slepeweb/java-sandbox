@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.slepeweb.cms.bean.Host.Deployment;
 import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.except.ResourceException;
 
@@ -139,30 +140,21 @@ public class Site extends CmsBean {
 		return this;
 	}
 	
-	public Host getStagingHost() {
-		return getHost(HostType.valueOf("staging"));
+	public Host getEditorialHost() {
+		return getHost(HostType.valueOf("editorial"), identifyDeployment());
 	}
 	
-	public Host getLiveHost() {
-		return getHost(HostType.valueOf("live"));
+	public Host getDeliveryHost() {
+		return getHost(HostType.valueOf("delivery"), identifyDeployment());
 	}
 	
-	public Host getPublicLiveHost() {
-		return getHost(HostType.valueOf("publiclive"));
+	private Deployment identifyDeployment() {
+		return getCmsService().isDevDeployment() ? 
+			Deployment.valueOf("development") : Deployment.valueOf("production");
 	}
 	
-	public Host getPublicStagingHost() {
-		return getHost(HostType.valueOf("publicstaging"));
-	}
-	
-	private Host getHost(HostType type) {
-		List<Host> all = getCmsService().getHostService().getHosts(getId(), type);
-		if (all.size() == 0) {
-			return null;
-		}
-		else {
-			return all.get(0);
-		}
+	private Host getHost(HostType type, Deployment deploy) {
+		return getCmsService().getHostService().getHost(getId(), type, deploy);
 	}
 
 	public boolean isSecured() {

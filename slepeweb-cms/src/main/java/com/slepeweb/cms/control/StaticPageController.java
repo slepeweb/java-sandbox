@@ -27,14 +27,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Host;
-import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StaticItem;
 import com.slepeweb.cms.bean.Url;
 import com.slepeweb.cms.bean.User;
-import com.slepeweb.cms.service.HostService;
+import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.common.bean.NameValuePair;
 import com.slepeweb.common.service.HttpService;
@@ -50,8 +49,8 @@ public class StaticPageController extends BaseController {
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 	
 	@Autowired private SiteService siteService;
-	@Autowired private HostService hostService;
 	@Autowired private HttpService httpService;
+	@Autowired private CmsService cmsService;
 	
 	@RequestMapping(value="/{siteShortname}")	
 	public String main(@PathVariable String siteShortname, HttpServletRequest req, ModelMap model) {	
@@ -60,11 +59,7 @@ public class StaticPageController extends BaseController {
 		Map<String, StaticItem> urlMap = new HashMap<String, StaticItem>();
 		
 		if (s != null) {
-			Host h = null;
-			List<Host> hosts = this.hostService.getHosts(s.getId(), HostType.live);
-			if (hosts != null && hosts.size() > 0) {
-				h = hosts.get(0);
-			}
+			Host h = s.getDeliveryHost();
 
 			if (h != null) {
 				User u = getUser(req);

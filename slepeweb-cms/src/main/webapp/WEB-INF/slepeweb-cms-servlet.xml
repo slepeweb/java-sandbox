@@ -29,6 +29,7 @@
 		<property name="editorialContext" value="true" />
 		<property name="commerceEnabled" value="false" />
 		<property name="staticSiteRoot" value="/var/www/html" />
+		<property name="productionDeployment" value="false" /> <!-- __DEPLOYMENT -->
 	</bean>
 	
 	<!-- Tiles -->

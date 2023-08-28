@@ -56,3 +56,26 @@ Thumbnails
 ----------
 alter table media add column thumbnail boolean default false after data
 ALTER TABLE media DROP PRIMARY KEY, add constraint PK_MEDIA PRIMARY KEY (itemid, thumbnail)
+
+Host types
+----------
+ALTER TABLE `slepeweb_cms`.`host` 
+CHANGE COLUMN `protocol` `protocol` VARCHAR(8) NULL DEFAULT 'https' ;
+
+ALTER TABLE `slepeweb_cms`.`host` 
+CHANGE COLUMN `port` `port` INT NULL DEFAULT 8080 ;
+
+ALTER TABLE `slepeweb_cms`.`host` 
+ADD COLUMN `deployment` ENUM('development', 'production') NULL DEFAULT 'development' AFTER `type`;
+
+ALTER TABLE `slepeweb_cms`.`host` 
+CHANGE COLUMN `type` `type` ENUM('staging', 'live', 'publicstaging', 'publiclive', 'editorial', 'delivery') NULL DEFAULT NULL ;
+
+update host set type='editorial', deployment='development' where type='staging';
+update host set type='delivery', deployment='development' where type='live';
+update host set type='delivery', deployment='production' where type='publiclive';
+
+ALTER TABLE `slepeweb_cms`.`host` 
+CHANGE COLUMN `type` `type` ENUM('editorial', 'delivery') NULL DEFAULT 'editorial' ;
+
+alter table host add unique key idx_site_type_deployment(siteid,type,deployment);

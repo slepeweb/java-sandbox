@@ -71,10 +71,11 @@ public class SetupController extends BaseController {
 	@RequestMapping(value="/solr/index", produces="text/text")	
 	@ResponseBody
 	public String solrIndex(@RequestParam(value="host", required=true) String hostName,
+			@RequestParam(value="port", required=true) Integer port,
 			@RequestParam(value="path", required=true) String startPath) {
 		
 		String msg;
-		Host h = this.hostService.getHost(hostName);
+		Host h = this.hostService.getHost(hostName, port);
 		if (h == null) {
 			LOG.warn(msg = String.format("Host not found [%s]", hostName));	
 			return msg;

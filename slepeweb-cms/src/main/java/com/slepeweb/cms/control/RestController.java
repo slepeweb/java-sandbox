@@ -126,9 +126,6 @@ public class RestController extends BaseController {
 			model.put("allVersions", i.getAllVersions());
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
 			
-			// Host to render content
-			model.addAttribute("_host", i.getSite().getPublicStagingHost());
-			
 			if (i.isProduct()) {
 				model.addAttribute("availableAxes", this.cmsService.getAxisService().get());
 			}

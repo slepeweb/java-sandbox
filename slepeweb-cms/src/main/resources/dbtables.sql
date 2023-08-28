@@ -45,9 +45,11 @@ create table host
 	siteid int,
 	name varchar(255),
 	port int,
-	type enum ('staging', 'live', 'publicstaging', 'publiclive'),
+	type enum('editorial', 'delivery') DEFAULT 'editorial',
+	deployment enum('development', 'production') DEFAULT 'development',
 	primary key (id),
 	unique key idx_host_name_port_type (name, port, type),
+	unique key idx_type_deployment (siteid, type, deployment),
 	constraint foreign key (siteid) references site(id) on delete cascade
 ) ENGINE=InnoDB;
 

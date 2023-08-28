@@ -35,9 +35,11 @@
 		<div>
 			<p><strong>Thumbnail:</strong></p>
 			<c:choose><c:when test="${editingItem.thumbnailWithBinaryContent}">
-				<c:set var="_host" value="${editingItem.site.stagingHost}" />
+			<!-- Editorial host: ${editingItem.site.editorialHost} -->
+			<!-- Delivery host: ${editingItem.site.deliveryHost} -->
+				<c:set var="_host" value="${editingItem.site.editorialHost}" />
 				<c:set var="_timestamp" value="${cmsf:now()}" />
-				<img src="${_host.protocol}://${_host.name}:${_host.port}/cms/media${editingItem.path}?view=thumbnail&_=${_timestamp}" />
+				<img src="${_host.namePortAndProtocol}/cms/media${editingItem.path}?view=thumbnail&_=${_timestamp}" />
 			</c:when><c:otherwise>
 				<p>No thumbnail uploaded.</p>
 			</c:otherwise></c:choose>
