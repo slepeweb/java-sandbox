@@ -109,7 +109,7 @@ public class UserAccountController extends BaseController {
 					setLastName(req.getParameter("lastname")).
 					setEmail(req.getParameter("email")).
 					setPhone(req.getParameter("phone")).
-					addRole(i.getSite(), "visitor");
+					addRole(i.getSite().getId(), "visitor");
 			
 			// Does this user already exist?
 			User check = this.userService.get(u.getEmail());

@@ -47,7 +47,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 	
 	public void saveRoles(User u, Site s) {
 		deleteUserRoles(u, s);
-		for (String role : u.getRoles(s)) {
+		for (String role : u.getRoles(s.getId())) {
 			insertUserRole(u, s, role);
 		}
 	}

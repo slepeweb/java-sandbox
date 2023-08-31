@@ -120,7 +120,7 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		List<Site> list = new ArrayList<Site>();
 		
 		for (Site s : getAllSites()) {
-			if (u.hasRole(s, role)) {
+			if (u.hasRole(s.getId(), role)) {
 				list.add(s);
 			}
 		}

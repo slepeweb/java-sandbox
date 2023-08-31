@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.AccessRule;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.User;
 
 @Repository
@@ -21,21 +21,16 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	@Autowired private CmsService cmsService;
 	@Autowired private AccessService accessService;
 
-	private Map<String, List<AccessRule>> readRules = new HashMap<String, List<AccessRule>>();
-	private Map<String, List<AccessRule>> writeRules = new HashMap<String, List<AccessRule>>();
+	private Map<Long, List<AccessRule>> readRules = new HashMap<Long, List<AccessRule>>();
+	private Map<Long, List<AccessRule>> writeRules = new HashMap<Long, List<AccessRule>>();
 	
 	public boolean isAccessible(Item i) {
-		String springTemplatePath = i.getTemplate() != null ? i.getTemplate().getController() : null;
-		return isAccessible(i, springTemplatePath);
-	}
-	
-	public boolean isAccessible(Item i, String springTemplatePath) {
 		if (this.cmsService.isEditorialContext()) {
-			return isAccessible(i, null, getWriteRules(i.getSite().getShortname()));
+			return isAccessible(i, getWriteRules(i.getSite().getId()));
 		}
 		else {
 			if (i.getSite().isSecured()) {
-				return isAccessible(i, springTemplatePath, getReadRules(i.getSite().getShortname()));
+				return isAccessible(i, getReadRules(i.getSite().getId()));
 			}
 			else {
 				return true;
@@ -43,10 +38,10 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 		}
 	}
 	
-	private boolean isAccessible(Item i, String springTemplatePath, List<AccessRule> rules) {		
+	private boolean isAccessible(Item i, List<AccessRule> rules) {		
 		// The first matching rule applies - rules should be ordered from most specific to least.
 		for (AccessRule rule : rules) {
-			if (itemMatchesRule(i, springTemplatePath, rule)) {
+			if (itemMatchesRule(i, rule)) {
 				
 				// This rule matches. All later rules in the list are ignored.
 				if (rule.givesAccess()) {
@@ -62,38 +57,85 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 				 * we must now test whether the user has the role specified in the 'role' column.
 				 * User does NOT get access by this rule UNLESS he has specified role.
 				 */
-				return userRolesMatchRule(i.getUser(), i.getSite(), rule);
+				return userRolesMatchRule(i.getUser(), i.getSite().getId(), rule);
 			}
 		}
 			
 		return false; 
 	}
 
-	private List<AccessRule> getReadRules(String siteName) {
-		List<AccessRule> list = this.readRules.get(siteName);
+	private List<AccessRule> getReadRules(Long siteId) {
+		List<AccessRule> list = this.readRules.get(siteId);
 		if (list == null) {
-			list = this.accessService.getReadable(siteName);
-			this.readRules.put(siteName, list);
+			list = this.accessService.getReadable(siteId);
+			this.readRules.put(siteId, list);
 		}
 		return list;
 	}
 
-	private List<AccessRule> getWriteRules(String siteName) {
-		List<AccessRule> list = this.writeRules.get(siteName);
+	private List<AccessRule> getWriteRules(Long siteId) {
+		List<AccessRule> list = this.writeRules.get(siteId);
 		if (list == null) {
-			list = this.accessService.getWriteable(siteName);
-			this.writeRules.put(siteName, list);
+			list = this.accessService.getWriteable(siteId);
+			this.writeRules.put(siteId, list);
 		}
 		return list;
+	}
+
+	public boolean isAccessible(SolrDocument4Cms doc, User u) {
+		Long key = Long.valueOf(doc.getSiteId());
+		boolean access = true;
+		
+		if (this.cmsService.isEditorialContext()) {
+			access = isAccessible(doc, u, getWriteRules(key));
+		}
+		else {
+			access = isAccessible(doc, u, getReadRules(key));
+		}
+		
+		doc.setAccessible(access);
+		return access;
+	}
+	
+	private boolean isAccessible(SolrDocument4Cms doc, User u, List<AccessRule> rules) {		
+		// The first matching rule applies - rules should be ordered from most specific to least.
+		for (AccessRule rule : rules) {
+			if (documentMatchesRule(doc, rule)) {
+				
+				// This rule matches. All later rules in the list are ignored.
+				if (rule.givesAccess()) {
+					/*
+					 * ie. the 'access' column in db has value 'true', which means
+					 * the rule is satisfied, and we don't need to consult the 'role' column.
+					 */
+					return true;
+				}
+				
+				/*
+				 * So, the 'access' column in db has value 'false', which means
+				 * we must now test whether the user has the role specified in the 'role' column.
+				 * User does NOT get access by this rule UNLESS he has specified role.
+				 */
+				return userRolesMatchRule(u, Long.valueOf(doc.getSiteId()), rule);
+			}
+		}
+			
+		return false; 
 	}
 
 	public boolean itemMatchesRule(Item i, AccessRule rule) {
-		return itemMatchesRule(i, 
-				i.getTemplate() == null ? null : i.getTemplate().getController(), rule);
+		return ruleMatches(
+				i.getTemplate() == null ? null : i.getTemplate().getController(), 
+				i.getType().getName(), i.getPath(), rule);
 	}
 	
-	public boolean itemMatchesRule(Item i, String springTemplatePath, AccessRule rule) {
-		// Must match ALL constraints
+	public boolean documentMatchesRule(SolrDocument4Cms doc, AccessRule rule) {
+		return ruleMatches(null, doc.getType(), doc.getPath(), rule);
+	}
+
+	public boolean ruleMatches(String springTemplatePath, String type, String path, AccessRule rule) {
+		
+		// Must match ALL constraints to return positive
 		
 		if (StringUtils.isNotBlank(rule.getTemplatePattern())) {
 			// Template rule applies
@@ -107,14 +149,14 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 
 		if (StringUtils.isNotBlank(rule.getItemTypePattern())) {
 			// Item type rule applies
-			if (! i.getType().getName().matches(rule.getItemTypePattern())) {			
+			if (! type.matches(rule.getItemTypePattern())) {			
 				return false; 
 			}
 		}
 
 		if (StringUtils.isNotBlank(rule.getItemPathPattern())) {
 			// Item path rule applies
-			if (! i.getPath().matches(rule.getItemPathPattern())) {			
+			if (! path.matches(rule.getItemPathPattern())) {			
 				return false; 
 			}
 		}
@@ -122,11 +164,11 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 		return true;
 	}
 	
-	public boolean userRolesMatchRule(User u, Site s, AccessRule rule) {
+	public boolean userRolesMatchRule(User u, Long siteId, AccessRule rule) {
 		
 		if (u != null) {
 			// Must match ANY of the user's roles
-			for (String r : u.getRoles(s)) {
+			for (String r : u.getRoles(siteId)) {
 				if (r.matches(rule.getRolePattern())) {
 					return true;
 				}

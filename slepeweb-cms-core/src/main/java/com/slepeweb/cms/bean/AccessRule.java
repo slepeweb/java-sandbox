@@ -5,8 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 public class AccessRule extends CmsBean {
 
 	private static final long serialVersionUID = 3525217730680353953L;
-	private Long id;
-	private String name, mode, siteShortname, itemTypePattern, templatePattern, itemPathPattern, rolePattern;
+	private Long id, siteId;
+	private String name, mode, itemTypePattern, templatePattern, itemPathPattern, rolePattern;
 	private boolean access, enabled;
 
 	@Override
@@ -82,12 +82,12 @@ public class AccessRule extends CmsBean {
 		return this;
 	}
 
-	public String getSiteShortname() {
-		return siteShortname;
+	public Long getSiteId() {
+		return siteId;
 	}
 
-	public AccessRule setSiteShortname(String name) {
-		this.siteShortname = name;
+	public AccessRule setSiteId(Long l) {
+		this.siteId = l;
 		return this;
 	}
 

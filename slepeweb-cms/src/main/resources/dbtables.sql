@@ -279,7 +279,7 @@ create table axisvalue
 create table access
 (
 	id int not null auto_increment,
-	site varchar(64),
+	siteid int not null,
 	mode varchar(1),
 	name varchar(64),
 	itemtype varchar(64),
@@ -289,7 +289,7 @@ create table access
 	access boolean,
 	enabled boolean,
 	primary key (id),
-	unique key idx_access_site_mode_name (site, mode, name),
+	unique key idx_access_siteid_mode_name (siteid, mode, name),
 	index idx_enabled (site, mode, enabled)
 ) ENGINE=InnoDB;
 

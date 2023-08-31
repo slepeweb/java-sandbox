@@ -12,6 +12,7 @@ public class SolrDocument4Cms {
 	@Field("language") private String language = "en";
 	@Field("siteid") private String siteId;
 	@Field("type") private String type;
+	@Field("template") private String template;
 	@Field("title") private String title;
 	@Field("subtitle") private String subtitle;
 	@Field("teaser") private String teaser;
@@ -24,6 +25,8 @@ public class SolrDocument4Cms {
 	@Field("extraStr2") private String extraStr2;
 	@Field("extraStr3") private String extraStr3;
 	
+	private boolean accessible = true;
+	
 	public SolrDocument4Cms() {}
 	
 	public SolrDocument4Cms(Item i) {
@@ -35,7 +38,7 @@ public class SolrDocument4Cms {
 			setOrigId(String.valueOf(i.getOrigId())).
 			setPath(i.getPath()).
 			setType(i.getType().getName()).
-			setType(i.getType().getName()).
+			setTemplate(i.getTemplate().getController()).
 			setTitle(i.getFieldValue(FieldName.TITLE)).
 			setSubtitle(i.getFieldValue(FieldName.SUBTITLE)).
 			setTeaser(i.getFieldValue(FieldName.TEASER)).
@@ -132,6 +135,15 @@ public class SolrDocument4Cms {
 		return this;
 	}
 
+	public String getTemplate() {
+		return template;
+	}
+
+	public SolrDocument4Cms setTemplate(String template) {
+		this.template = template;
+		return this;
+	}
+
 	public String getLanguage() {
 		return language;
 	}
@@ -212,5 +224,13 @@ public class SolrDocument4Cms {
 
 	public void setExtraStr3(String extraStr3) {
 		this.extraStr3 = extraStr3;
+	}
+
+	public boolean isAccessible() {
+		return accessible;
+	}
+
+	public void setAccessible(boolean accessible) {
+		this.accessible = accessible;
 	}
 }

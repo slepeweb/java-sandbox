@@ -6,8 +6,8 @@ import com.slepeweb.cms.bean.AccessRule;
 public interface AccessService {
 	void delete(Long id);
 	AccessRule get(Long id);
-	AccessRule get(String siteName, String ruleName);
-	List<AccessRule> getReadable(String siteName);
-	List<AccessRule> getWriteable(String siteName);
+	AccessRule get(Long siteId, String ruleName);
+	List<AccessRule> getReadable(Long siteId);
+	List<AccessRule> getWriteable(Long siteId);
 	AccessRule save(AccessRule ar);
 }

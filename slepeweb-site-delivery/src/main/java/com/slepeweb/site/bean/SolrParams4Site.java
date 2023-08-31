@@ -13,6 +13,7 @@ public class SolrParams4Site extends SolrParams {
 	public SolrParams4Site(Item i, SolrConfig config) {
 		super(config);
 		this.searchResultsItem = i;
+		setUser(i.getUser());
 	}
 	
 	public String getSearchText() {

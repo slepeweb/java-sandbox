@@ -10,6 +10,11 @@ public class SolrParams {
 	private SolrConfig config;
 	private int pageNum, pageSize;
 	
+	/*
+	 * This object should always be a User object, as defined in the cms-core project
+	 */
+	private Object user; 
+	
 	// For Jackson
 	public SolrParams() {}
 	
@@ -59,6 +64,14 @@ public class SolrParams {
 
 	public SolrConfig getConfig() {
 		return config;
+	}
+
+	public Object getUser() {
+		return user;
+	}
+
+	public void setUser(Object user) {
+		this.user = user;
 	}
 
 }

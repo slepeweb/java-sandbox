@@ -9,9 +9,12 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.SolrDocument4Cms;
+import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.service.SiteAccessService;
 import com.slepeweb.common.solr.bean.SolrPager;
 import com.slepeweb.common.solr.bean.SolrResponse;
 import com.slepeweb.common.solr.service.SolrService4SiteBase;
@@ -21,6 +24,8 @@ import com.slepeweb.site.pho.bean.SolrParams4Pho;
 public class SolrService4PhotosImpl extends SolrService4SiteBase implements SolrService4Photos {
 	
 	private static Logger LOG = Logger.getLogger(SolrService4PhotosImpl.class);
+	
+	@Autowired private SiteAccessService siteAccessService;
 
 	@PostConstruct
 	public void init() throws Exception {
@@ -74,8 +79,9 @@ public class SolrService4PhotosImpl extends SolrService4SiteBase implements Solr
 				response.setPager(new SolrPager<SolrDocument4Cms>(
 						response.getTotalHits(), 
 						params.getPageSize(), 
-						params.getPageNum()));		
+						params.getPageNum()));	
 				
+				flagInaccessibleDocuments(response, params.getUser());
 				return response;
 				
 			} catch (Exception e) {
@@ -90,4 +96,14 @@ public class SolrService4PhotosImpl extends SolrService4SiteBase implements Solr
 		
 		return null;
 	}	
+	
+	private void flagInaccessibleDocuments(SolrResponse<SolrDocument4Cms> resp, Object o) {
+		if (o instanceof User) {
+			User u = (User) o;
+			
+			for (SolrDocument4Cms doc : resp.getResults()) {
+				this.siteAccessService.isAccessible(doc, u);
+			}
+		}
+	}
 }

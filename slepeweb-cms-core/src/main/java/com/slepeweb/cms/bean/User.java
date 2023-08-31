@@ -103,27 +103,27 @@ public class User extends CmsBean {
 		return this;
 	}
 
-	public List<String> getRoles(Site s) {
+	public List<String> getRoles(Long siteId) {
 		if (this.roles == null) {
 			this.roles = new HashMap<Long, List<String>>();
 		}
 		
-		List<String> r = this.roles.get(s.getId());
+		List<String> r = this.roles.get(siteId);
 		if (r == null) {
-			r = getCmsService().getUserService().getRoles(getId(), s.getId());
-			this.roles.put(s.getId(), r);
+			r = getCmsService().getUserService().getRoles(getId(), siteId);
+			this.roles.put(siteId, r);
 		}
 		
 		return r;
 	}
 
-	public boolean hasRole(Site s, String role) {
-		List<String> roles = getRoles(s);
+	public boolean hasRole(Long siteId, String role) {
+		List<String> roles = getRoles(siteId);
 		return roles != null && roles.contains(role);
 	}
 
-	public User addRole(Site s, String r) {
-		getRoles(s).add(r);
+	public User addRole(Long siteId, String r) {
+		getRoles(siteId).add(r);
 		return this;
 	}
 	

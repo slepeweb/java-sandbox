@@ -309,7 +309,7 @@ public class RowMapperUtil {
 		public AccessRule mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return CmsBeanFactory.makeAccessRule().
 					setId(rs.getLong("id")).
-					setSiteShortname(rs.getString("site")).
+					setSiteId(rs.getLong("siteid")).
 					setName(rs.getString("name")).
 					setRolePattern(rs.getString("role")).
 					setItemTypePattern(rs.getString("itemtype")).

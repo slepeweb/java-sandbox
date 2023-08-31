@@ -33,9 +33,9 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 	}
 	
 	private AccessRule insert(AccessRule ar) {		
-		this.jdbcTemplate.update( "insert into access (site, name, role, itemtype, template, " + 
+		this.jdbcTemplate.update( "insert into access (siteid, name, role, itemtype, template, " + 
 				"path, access) values (?, ?, ?, ?, ?, ?, ?)", 
-				ar.getSiteShortname(), ar.getName(), ar.getRolePattern(), ar.getItemTypePattern(), 
+				ar.getSiteId(), ar.getName(), ar.getRolePattern(), ar.getItemTypePattern(), 
 				ar.getTemplatePattern(), ar.getItemPathPattern(), ar.isAccess());	
 		
 		ar.setId(getLastInsertId());			
@@ -50,8 +50,8 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 			dbRecord.assimilate(ar);
 			
 			this.jdbcTemplate.update(
-					"update access set site=?, name=?, role=?, itemtype=?, template=?, path=?, access=? where id=?", 
-					dbRecord.getSiteShortname(), dbRecord.getName(), dbRecord.getRolePattern(), dbRecord.getItemTypePattern(),
+					"update access set name=?, role=?, itemtype=?, template=?, path=?, access=? where id=?", 
+					dbRecord.getName(), dbRecord.getRolePattern(), dbRecord.getItemTypePattern(),
 					dbRecord.getTemplatePattern(), dbRecord.getItemPathPattern(), dbRecord.isAccess(), dbRecord.getId());
 			
 			LOG.info(compose("Updated Rule", ar));
@@ -70,9 +70,9 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 	}
 
 	@Cacheable(value="serviceCache")
-	public AccessRule get(String siteShortname, String ruleName) {
-		return (AccessRule) getFirstInList(this.jdbcTemplate.query("select * from access where site=? and name = ?", 
-				new Object[]{siteShortname, ruleName}, new RowMapperUtil.AccessMapper()));
+	public AccessRule get(Long siteId, String ruleName) {
+		return (AccessRule) getFirstInList(this.jdbcTemplate.query("select * from access where siteid=? and name = ?", 
+				new Object[]{siteId, ruleName}, new RowMapperUtil.AccessMapper()));
 	}
 
 	@Cacheable(value="serviceCache")
@@ -81,19 +81,19 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 				new Object[]{id}, new RowMapperUtil.AccessMapper()));
 	}
 	
-	private List<AccessRule> getList(String siteShortname, String mode) {
+	private List<AccessRule> getList(Long siteId, String mode) {
 		return this.jdbcTemplate.query(
-				String.format("select * from access where site=? and mode=? and enabled=? order by name"), 
-				new Object[] {siteShortname, mode, true}, new RowMapperUtil.AccessMapper());
+				String.format("select * from access where siteid=? and mode=? and enabled=? order by name"), 
+				new Object[] {siteId, mode, true}, new RowMapperUtil.AccessMapper());
 	}
 	
 	@Cacheable(value="serviceCache")
-	public List<AccessRule> getReadable(String siteShortname) {
-		return getList(siteShortname, "r");
+	public List<AccessRule> getReadable(Long siteId) {
+		return getList(siteId, "r");
 	}
 	
 	@Cacheable(value="serviceCache")
-	public List<AccessRule> getWriteable(String siteShortname) {
-		return getList(siteShortname, "w");
+	public List<AccessRule> getWriteable(Long siteId) {
+		return getList(siteId, "w");
 	}
 }

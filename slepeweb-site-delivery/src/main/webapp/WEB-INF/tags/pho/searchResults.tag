@@ -24,24 +24,36 @@
 		<c:if test="${not empty _dateish.year}"><c:set var="_teaser">${_result.teaser} (${_dateish.deliveryString})</c:set></c:if>
 		
 		<div class="search-result" data-id="${_stat.count - 1}">
+		<!-- Accessible?  ${_result.accessible ? "Yes" : "No"} -->
 		
-	    <img 
-	    	class="thumbnail" 
-	    	src="${_result.path}?view=thumbnail"
-	    	data-slide-src="${_result.path}"
-	    	data-type="${_result.type}"
-	    	data-id="${_stat.count - 1}"
-	    	/>
-	    
-	    <c:if test="${_result.type eq 'Movie MP4'}">
-	    	<p class="video-icon"><i class="fa-solid fa-film"></i></p>
-	    </c:if>
-	    
-	    <div class="search-result-info hide">
-				<p class="heading">${_result.title}</p>
-				<p class="caption">${_teaser}</p>
-				<pho:captionTagList list="${_result.tags}" />
-			</div>
+			<c:choose><c:when test="${_result.accessible}">
+			
+		    <img 
+		    	class="thumbnail" 
+		    	src="${_result.path}?view=thumbnail"
+		    	data-slide-src="${_result.path}"
+		    	data-type="${_result.type}"
+		    	data-id="${_stat.count - 1}"
+		    	/>
+		    
+		    <c:if test="${_result.type eq 'Movie MP4'}">
+		    	<p class="video-icon"><i class="fa-solid fa-film"></i></p>
+		    </c:if>
+		    
+		    <div class="search-result-info hide">
+					<p class="heading">${_result.title}</p>
+					<p class="caption">${_teaser}</p>
+					<pho:captionTagList list="${_result.tags}" />
+				</div>
+				
+			</c:when><c:otherwise>
+			
+		    <img 
+		    	class="thumbnail" 
+		    	src="/resources/pho/images/forbidden.png"
+		    	alt="No access"
+		    	/>
+			</c:otherwise></c:choose>
     
     </div>
     	

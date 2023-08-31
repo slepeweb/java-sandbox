@@ -36,6 +36,7 @@ public class Item extends CmsBean {
 	
 	// These properties pertain to access control
 	private User user;
+	private Boolean accessible;
 	
 	private Long id = -1L, origId;
 	private List<Link> links, parentLinks;
@@ -838,7 +839,11 @@ public class Item extends CmsBean {
 	}
 
 	public boolean isAccessible() {
-		return getCmsService().getSiteAccessService().isAccessible(this);
+		if (this.accessible == null) {
+			this.accessible = getCmsService().getSiteAccessService().isAccessible(this);
+		}
+		
+		return this.accessible;
 	}
 	
 	public String getSolrKey() {
