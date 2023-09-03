@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.cms.bean.Dateish;
-import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
@@ -22,6 +21,7 @@ import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.SolrParams4Cms;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.ItemTypeName;
+import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.common.solr.bean.SolrPager;
 import com.slepeweb.common.solr.bean.SolrResponse;
 import com.slepeweb.common.solr.service.SolrService4CmsBase;
@@ -108,31 +108,11 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				
 				// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				// Standard approach
-				doc = new SolrDocument4Cms().
-					/* 
-					 * 10/1/2022: The document key used to be based upon the item original id, but
-					 * has now been changed to the id. This means that the solr index will store
-					 * multiple versions of the same item, and queries need to choose whether
-					 * editable or viewable items are required.
-					 */
-					setKey(String.valueOf(i.getId()), language).
-					setOrigId(String.valueOf(i.getOrigId())).
-					setSiteId(String.valueOf(i.getSite().getId())).
-					setType(i.getType().getName()).
-					setTitle(getFieldValue(i, FieldName.TITLE, language, false, null)).
-					setTeaser(getFieldValue(i, FieldName.TEASER, language, false, null)).
-					setTags(i.getTagsAsString()).
-					setPath(i.getPath()).
-					setEditable(i.isEditable()).
-					setViewable(i.isPublished());
+				doc = new SolrDocument4Cms(i, language);
 				
-				if (i.getSite().isMultilingual()) {
-					doc.setPath(String.format("/%s%s", language, i.getPath()));
-				}
-				
-				if (i.getType().getName().startsWith("Image")) {
-					doc.setTitle(getFieldValue(i, FieldName.ALT_TEXT, language, false, null));
-					doc.setTeaser(getFieldValue(i, FieldName.CAPTION, language, false, null));
+				if (! i.getSite().getShortname().equals("pho") && i.getType().isImage()) {
+					doc.setTitle(CmsUtil.getFieldValue(i, FieldName.ALT_TEXT, language, false, null));
+					doc.setTeaser(CmsUtil.getFieldValue(i, FieldName.CAPTION, language, false, null));
 				}
 				
 				if (StringUtils.isBlank(doc.getTitle())) {
@@ -143,8 +123,8 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				// For test site
 				if (i.getSite().getShortname().equals("z")) {
-					if (StringUtils.isNotBlank(i.getFieldValue("ztitle"))) {
-						doc.setTitle(i.getFieldValue("ztitle"));
+					if (StringUtils.isNotBlank(s = CmsUtil.getFieldValue(i, "ztitle", language, false, null))) {
+						doc.setTitle(s);
 					}
 				}
 				// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -152,7 +132,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				// For sws site: accumulating content from page components
 				if (i.getSite().getShortname().equals("sws")) {
-					StringBuilder sbBody = new StringBuilder(i.getFieldValue(FieldName.BODYTEXT));
+					StringBuilder sbBody = new StringBuilder(CmsUtil.getFieldValue(i, FieldName.BODYTEXT, language, true, null));
 					StringBuilder sbSubtitle = new StringBuilder();
 					
 					for (Link l : i.getComponents()) {
@@ -169,7 +149,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 				// For anc site
 				if (i.getSite().getShortname().equals("anc")) {
-					doc.setBodytext(getFieldValue(i, FieldName.OVERVIEW, language, true, null));
+					doc.setBodytext(CmsUtil.getFieldValue(i, FieldName.OVERVIEW, language, true, null));
 					
 					if (i.getType().getName().equals("Boy") || i.getType().getName().equals("Girl")) {
 						StringBuilder sb = new StringBuilder(i.getFieldValue("firstname")).append(" ").
@@ -181,11 +161,11 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 							fullName = "(Un-named)";
 						}
 						doc.setTitle(fullName);
-						doc.setTeaser(StringUtils.abbreviate(getFieldValue(i, FieldName.OVERVIEW, language, false, null), MAX_WIDTH));
+						doc.setTeaser(StringUtils.abbreviate(CmsUtil.getFieldValue(i, FieldName.OVERVIEW, language, false, null), MAX_WIDTH));
 					}
 					else if (i.getType().getName().equals("Document")) {
-						doc.setTitle(getFieldValue(i, FieldName.HEADING, language, false, null));
-						doc.setTeaser(StringUtils.abbreviate(getFieldValue(i, FieldName.OVERVIEW, language, false, null), MAX_WIDTH));
+						doc.setTitle(CmsUtil.getFieldValue(i, FieldName.HEADING, language, false, null));
+						doc.setTeaser(StringUtils.abbreviate(CmsUtil.getFieldValue(i, FieldName.OVERVIEW, language, false, null), MAX_WIDTH));
 					}
 				}
 				// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -195,7 +175,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 				if (i.getSite().getShortname().equals("pho")) {
 					if (isPhoMedia(doc.getType())) {
 						// Date-ish for media types
-						s = getFieldValue(i, FieldName.DATEISH, false, null);
+						s = CmsUtil.getFieldValue(i, FieldName.DATEISH, false, null);
 						if (s != null) {	
 							Dateish ish = new Dateish(s);
 							doc.setExtraStr1(ish.toSortableString());
@@ -234,21 +214,6 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 	
 	private boolean isPhoMedia(String name) {
 		return name.startsWith(ItemTypeName.PHOTO_PREFIX) || name.startsWith(ItemTypeName.MOVIE_PREFIX);
-	}
-	
-	private String getFieldValue(Item i, String variable, boolean resolve, String dflt) {
-		return getFieldValue(i, variable, i.getSite().getLanguage(), resolve, dflt);
-	}
-	
-	private String getFieldValue(Item i, String variable, String language, boolean resolve, String dflt) {
-		FieldValue fv = i.getFieldValueObj(variable, language);
-		String result = dflt;
-		
-		if (fv != null) {
-			result = resolve ? fv.getStringValueResolved() : fv.getStringValue();
-		}
-		
-		return result;
 	}
 	
 	private void scrapeComponents(Item i, StringBuilder sbBody, StringBuilder sbSubtitle) {

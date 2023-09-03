@@ -8,7 +8,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 
 public abstract class SolrService4CmsBase extends SolrServiceBase {
 	
-	private static Logger LOG = Logger.getLogger(SolrServiceBase.class);
+	private static Logger LOG = Logger.getLogger(SolrService4CmsBase.class);
 		
 	protected Object getDocument(long itemId, String language, Class<?> clazz) {
 		try {

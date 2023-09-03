@@ -3,6 +3,7 @@ package com.slepeweb.cms.bean;
 import org.apache.solr.client.solrj.beans.Field;
 
 import com.slepeweb.cms.constant.FieldName;
+import com.slepeweb.cms.utils.CmsUtil;
 
 public class SolrDocument4Cms {
 
@@ -30,22 +31,41 @@ public class SolrDocument4Cms {
 	public SolrDocument4Cms() {}
 	
 	public SolrDocument4Cms(Item i) {
+		this(i, i.getSite().getLanguage());
+	}
+	
+	public SolrDocument4Cms(Item i, String language) {
+		/* 
+		 * 10/1/2022: The document key used to be based upon the item original id, but
+		 * has now been changed to the id. This means that the solr index will store
+		 * multiple versions of the same item, and queries need to choose whether
+		 * editable or viewable items are required.
+		 */
 		this.
 			setId(String.valueOf(i.getId())).
-			setLanguage(i.getLanguage()).
-			setKey(getId(), getLanguage()).
-			setSiteId(String.valueOf(i.getSite().getId())).
 			setOrigId(String.valueOf(i.getOrigId())).
+			setLanguage(language).
+			setKey(getId(), language).
+			setSiteId(String.valueOf(i.getSite().getId())).
 			setPath(i.getPath()).
 			setType(i.getType().getName()).
-			setTemplate(i.getTemplate().getController()).
-			setTitle(i.getFieldValue(FieldName.TITLE)).
-			setSubtitle(i.getFieldValue(FieldName.SUBTITLE)).
-			setTeaser(i.getFieldValue(FieldName.TEASER)).
-			setBodytext(i.getFieldValue(FieldName.BODYTEXT)).
+			
+			setTitle(CmsUtil.getFieldValue(i, FieldName.TITLE, language, false, null)).
+			setSubtitle(CmsUtil.getFieldValue(i, FieldName.SUBTITLE, language, false, null)).
+			setTeaser(CmsUtil.getFieldValue(i, FieldName.TEASER, language, false, null)).
+			setBodytext(CmsUtil.getFieldValue(i, FieldName.BODYTEXT, language, true, null)).
+			
 			setTags(i.getTagsAsString()).
 			setEditable(i.isEditable()).
 			setViewable(i.isPublished());
+		
+		if (i.getTemplate() != null) {
+			setTemplate(i.getTemplate().getController());
+		}
+		
+		if (i.getSite().isMultilingual()) {
+			setPath(String.format("/%s%s", language, i.getPath()));
+		}		
 	}
 	
 	

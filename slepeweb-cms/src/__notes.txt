@@ -19,12 +19,14 @@ mysql -u cms -p slepeweb_cms < path-to-sql-file
 ===========================================================
 Export/import wars:
 
-In Eclipse (on desktop), export slepeweb-cms project as a WAR file to ~george/to-ubuntu
-scp slepeweb-cms.war rpi@rpi4b:~
-scp slepeweb-site-delivery.war rpi@rpi4b:~
+In Eclipse (on desktop), export slepeweb-cms project as a WAR file to ~george/to-rpi4b
+In shell:
+
+cd ~george/to-rpi4b
+./install-cms.sh [-c] [-d] [-q]
 
 On rpi4b:
-/home/rpi/deploy
+/home/rpi/deploy-cms
 
 ===========================================================
 Stop tomcat:

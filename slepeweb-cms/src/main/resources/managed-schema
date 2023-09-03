@@ -1,7 +1,10 @@
+  <field name="_root_" type="string" indexed="true" stored="false"/>
+  <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>
+  <field name="_version_" type="long" indexed="true" stored="true"/>
   <field name="bodytext" type="text_general" multiValued="false" indexed="true" required="false" stored="false"/>
   <field name="editable" type="boolean" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="extraStr1" type="lowercase" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="origId" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="key" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="language" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="path" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
@@ -12,5 +15,9 @@
   <field name="teaser" type="text_general" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="title" type="text_general" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="type" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="template" type="string" multiValued="false" indexed="false" required="false" stored="true"/>
   <field name="viewable" type="boolean" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="extraStr1" type="lowercase" multiValued="false" indexed="true" required="false" stored="true"/>
+  <field name="extraStr2" type="lowercase" multiValued="false" indexed="true" required="false" stored="true"/>
+  <field name="extraStr3" type="lowercase" multiValued="false" indexed="true" required="false" stored="true"/>
   <copyField source="path" dest="path_tokens"/>

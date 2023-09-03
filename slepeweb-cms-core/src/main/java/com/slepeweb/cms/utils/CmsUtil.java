@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 
@@ -52,4 +53,20 @@ public class CmsUtil {
 		}
 		return result;
 	}
+	
+	public static String getFieldValue(Item i, String variable, boolean resolve, String dflt) {
+		return getFieldValue(i, variable, i.getSite().getLanguage(), resolve, dflt);
+	}
+	
+	public static String getFieldValue(Item i, String variable, String language, boolean resolve, String dflt) {
+		FieldValue fv = i.getFieldValueObj(variable, language);
+		String result = dflt;
+		
+		if (fv != null) {
+			result = resolve ? fv.getStringValueResolved() : fv.getStringValue();
+		}
+		
+		return result;
+	}
+
 }

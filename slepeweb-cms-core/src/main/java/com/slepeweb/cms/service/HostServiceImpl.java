@@ -100,7 +100,7 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	/*
 	 * The db has a unique key constraint for (siteid, hostType, deployment)
 	 */
-	//@Cacheable(value="serviceCache")
+	@Cacheable(value="serviceCache")
 	public Host getHost(Long siteId, HostType type, Deployment deployment) {
 		return getFirstHost(
 				String.format(SELECT_TEMPLATE, " h.siteid = ? and h.type = ? and h.deployment = ?"), new Object[]{siteId, type.name(), deployment.name()});
