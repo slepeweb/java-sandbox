@@ -78,7 +78,8 @@ public class ItemUpdateUndoServiceImpl implements ItemUpdateUndoService {
 						setSimpleName(i.getSimpleName()).
 						setDateUpdated(i.getDateUpdated()).
 						setPublished(i.isPublished()).
-						setSearchable(i.isSearchable());
+						setSearchable(i.isSearchable()).
+						setOwnerId(i.getOwnerId());
 						
 					dbRecord.save();
 					

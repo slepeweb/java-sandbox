@@ -15,4 +15,5 @@ public interface SiteService {
 	List<Site> getAllSites();
 	List<Site> getAllSites(User u, String role);
 	Site save(Site s) throws ResourceException;
+	List<User> getContributors(long siteId);
 }

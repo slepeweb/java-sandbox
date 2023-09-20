@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemGist;
+import com.slepeweb.cms.bean.Ownership;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.CookieService;
 
@@ -28,7 +30,8 @@ public class RefreshController extends BaseController {
 	public String refreshCoreTab(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		User u = getUser(req);
+		Item i = getEditableVersion(origId, u);
 		model.addAttribute("editingItem", i);
 		model.addAttribute("site", i.getSite());
 		model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
@@ -40,6 +43,9 @@ public class RefreshController extends BaseController {
 		// Get recently-used tags, and full list of tags for the site
 		model.addAttribute(AttrName.TAG_INPUT_SUPPORT, getTagInfo(i.getSite().getId(), req));
 		
+		// Site content ownership
+		model.addAttribute(AttrName.OWNERSHIP, new Ownership(i, u));
+
 		return "cms.refresh.core";		
 	}
 	

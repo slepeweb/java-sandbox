@@ -58,6 +58,7 @@ import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.MoverItem;
 import com.slepeweb.cms.bean.MoverItem.RelativeLocation;
+import com.slepeweb.cms.bean.Ownership;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrParams4Cms;
@@ -116,7 +117,8 @@ public class RestController extends BaseController {
 			@RequestParam(value="language", required=false) String requestedLanguage,
 			HttpServletRequest req, HttpServletResponse res) {	
 		
-		Item i = this.getEditableVersion(origId, getUser(req));
+		User u = getUser(req);
+		Item i = this.getEditableVersion(origId, u);
 		
 		if (i != null) {
 			String lang = chooseLanguage(i.getSite().isMultilingual(), requestedLanguage, i.getSite().getLanguage());
@@ -157,6 +159,9 @@ public class RestController extends BaseController {
 			
 			// Item update history - supporting undo/redo functionality
 			model.addAttribute(AttrName.UNDO_REDO_STATUS, new UndoRedoStatus(this.getItemUpdateHistory(req)));
+			
+			// Site content ownership
+			model.addAttribute(AttrName.OWNERSHIP, new Ownership(i, u));
 		}		
 		
 		return "cms.item.editor";		
@@ -255,7 +260,10 @@ public class RestController extends BaseController {
 		Item i = getEditableVersion(origId, u, true);	
 		
 		RestResponse resp = new RestResponse();
-		Template t = this.cmsService.getTemplateService().getTemplate(getLongParam(req, "template"));
+		Long templateId = getLongParam(req, "template");
+		Template t = templateId != null ?
+				this.cmsService.getTemplateService().getTemplate(templateId) : null;
+		
 		Object[] data = new Object[4];
 		
 		boolean wasPublished = i.isPublished();
@@ -267,6 +275,11 @@ public class RestController extends BaseController {
 			setSearchable(getBooleanParam(req, "searchable")).
 			setPublished(getBooleanParam(req, "published")).
 			setTemplate(t);
+		
+		Long ownerId = getLongParam(req, "owner");
+		if (ownerId != null) {
+			i.setOwnerId(ownerId);
+		}
 		
 		if (i.isShortcut()) {
 			// Whilst the corresponding form fields are disabled ...
@@ -327,7 +340,8 @@ public class RestController extends BaseController {
 	}
 	
 	private Long getLongParam(HttpServletRequest req, String name) {
-		return Long.valueOf(getParam(req, name));
+		String s = getParam(req, name);
+		return s != null ? Long.valueOf(s) : null;
 	}
 	
 	private boolean getBooleanParam(HttpServletRequest req, String name) {
@@ -654,6 +668,7 @@ public class RestController extends BaseController {
 				setPath(String.format("%s/%s", parent.getPath(), simplename)).
 				setTemplate(t).
 				setType(it).
+				setOwnerId(u.getId()).
 				setName(name).
 				setSimpleName(simplename).
 				setDateCreated(new Timestamp(System.currentTimeMillis())).

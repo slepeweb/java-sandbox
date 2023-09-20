@@ -110,7 +110,7 @@ _cms.leftnav.navigate = function(key, tab, successCallback, args) {
 				_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to update the leftnav tree"));
 			}
 		);
-	}	
+	}
 }
 
 _cms.leftnav.loadBreadcrumbs = function(key, successCallback, errorCallback) {

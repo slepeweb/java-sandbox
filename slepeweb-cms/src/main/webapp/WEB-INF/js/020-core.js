@@ -13,6 +13,7 @@ _cms.core.sel.ALL_SELECTS = _cms.core.sel.CORE_TAB + " select";
 _cms.core.sel.NAME_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "name");
 _cms.core.sel.SIMPLENAME_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "simplename");
 _cms.core.sel.TEMPLATE_SELECT = _cms.support.fs(_cms.core.sel.CORE_TAB, "template");
+_cms.core.sel.OWNER_SELECT = _cms.support.fs(_cms.core.sel.CORE_TAB, "owner");
 _cms.core.sel.SEARCHABLE_CHECKBOX = _cms.support.fi(_cms.core.sel.CORE_TAB, "searchable");
 _cms.core.sel.PUBLISHED_CHECKBOX = _cms.support.fi(_cms.core.sel.CORE_TAB, "published");
 _cms.core.sel.TAGS_INPUT = _cms.support.fi(_cms.core.sel.CORE_TAB, "tags");
@@ -36,7 +37,8 @@ _cms.core.behaviour.update = function(nodeKey) {
 			template: $(_cms.core.sel.TEMPLATE_SELECT).val(),
 			searchable: $(_cms.core.sel.SEARCHABLE_CHECKBOX).is(':checked'),
 			published: $(_cms.core.sel.PUBLISHED_CHECKBOX).is(':checked'),
-			tags: $(_cms.core.sel.TAGS_INPUT).val()
+			tags: $(_cms.core.sel.TAGS_INPUT).val(),
+			owner: $(_cms.core.sel.OWNER_SELECT).val()
 		};
 		
 		if (isProduct) {

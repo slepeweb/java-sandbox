@@ -86,10 +86,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		// Item table
 		try {
 			this.jdbcTemplate.update(
-					"insert into item (name, simplename, path, siteid, typeid, templateid, datecreated, dateupdated, deleted, editable, published, searchable, version) " +
-					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+					"insert into item (name, simplename, path, siteid, typeid, templateid, ownerid, datecreated, dateupdated, deleted, editable, published, searchable, version) " +
+					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 					i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
-					i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getDateCreated(), i.getDateUpdated(), false, true, false, false, i.getVersion());				
+					i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getOwnerId(), 
+					i.getDateCreated(), i.getDateUpdated(), false, true, false, false, i.getVersion());				
 		}
 		catch (DuplicateKeyException e) {
 			throw new DuplicateItemException("Item already exists - check the bin");
@@ -176,9 +177,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			dbRecord.setDateUpdated(new Timestamp(System.currentTimeMillis()));
 			
 			this.jdbcTemplate.update(
-					"update item set name = ?, simplename = ?, path = ?, templateid = ?, dateupdated = ?, deleted = ?, editable = ?, published = ?, searchable = ?, version = ? where id = ?",
+					"update item set name = ?, simplename = ?, path = ?, templateid = ?, ownerid = ?, dateupdated = ?, deleted = ?, editable = ?, published = ?, searchable = ?, version = ? where id = ?",
 					dbRecord.getName(), dbRecord.getSimpleName(), dbRecord.getPath(), 
-					dbRecord.getTemplate() == null ? 0 : dbRecord.getTemplate().getId(), 
+					dbRecord.getTemplate() == null ? 0 : dbRecord.getTemplate().getId(), dbRecord.getOwnerId(),
 					dbRecord.getDateUpdated(), dbRecord.isDeleted(), dbRecord.isEditable(), dbRecord.isPublished(), dbRecord.isSearchable(), dbRecord.getVersion(), i.getId());
 			
 			LOG.info(compose("Updated item", i));

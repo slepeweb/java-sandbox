@@ -16,8 +16,6 @@ import com.slepeweb.cms.bean.User;
 @Repository
 public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccessService {
 	
-//	private static Logger LOG = Logger.getLogger(HostServiceImpl.class);	
-	
 	@Autowired private CmsService cmsService;
 	@Autowired private AccessService accessService;
 
@@ -123,17 +121,22 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 		return false; 
 	}
 
-	public boolean itemMatchesRule(Item i, AccessRule rule) {
+	private boolean itemMatchesRule(Item i, AccessRule rule) {
 		return ruleMatches(
 				i.getTemplate() == null ? null : i.getTemplate().getController(), 
-				i.getType().getName(), i.getPath(), rule);
+				
+				// Don't evaluate item tags unless rule specifies tag pattern
+				// This will eliminate unnecessary db queries
+				StringUtils.isNotBlank(rule.getTagPattern()) ? i.getTagsAsString() : null, 
+						
+				i.getPath(), i.getOwnerId(), rule);
 	}
 	
-	public boolean documentMatchesRule(SolrDocument4Cms doc, AccessRule rule) {
-		return ruleMatches(null, doc.getType(), doc.getPath(), rule);
+	private boolean documentMatchesRule(SolrDocument4Cms doc, AccessRule rule) {
+		return ruleMatches(null, doc.getType(), doc.getPath(), doc.getOwnerId(), rule);
 	}
 
-	public boolean ruleMatches(String springTemplatePath, String type, String path, AccessRule rule) {
+	private boolean ruleMatches(String springTemplatePath, String tagList, String path, Long ownerId, AccessRule rule) {
 		
 		// Must match ALL constraints to return positive
 		
@@ -147,16 +150,37 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 			}
 		}
 
-		if (StringUtils.isNotBlank(rule.getItemTypePattern())) {
-			// Item type rule applies
-			if (! type.matches(rule.getItemTypePattern())) {			
-				return false; 
+		if (StringUtils.isNotBlank(rule.getTagPattern())) {
+			// Item tags rule applies
+			
+			if (StringUtils.isBlank(tagList)) {
+				return false;
+			}
+			
+			boolean tagIsMatch = false;
+			
+			for (String tag : tagList.split(",")) {
+				if (tag.trim().matches(rule.getTagPattern())) {		
+					tagIsMatch = true; 
+					break;
+				}
+			}
+			
+			if (! tagIsMatch) {
+				return false;
 			}
 		}
 
 		if (StringUtils.isNotBlank(rule.getItemPathPattern())) {
 			// Item path rule applies
 			if (! path.matches(rule.getItemPathPattern())) {			
+				return false; 
+			}
+		}
+		
+		if (StringUtils.isNotBlank(rule.getOwnerIdPattern())) {
+			// Item owner rule applies
+			if (ownerId == null || ! String.valueOf(ownerId).matches(rule.getOwnerIdPattern())) {			
 				return false; 
 			}
 		}

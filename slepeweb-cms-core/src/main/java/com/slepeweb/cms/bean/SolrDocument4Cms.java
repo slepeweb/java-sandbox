@@ -10,6 +10,7 @@ public class SolrDocument4Cms {
 	@Field("key") private String key;
 	@Field("id") private String id;
 	@Field("origId") private String origId;
+	@Field("ownerId") private Long ownerId;
 	@Field("language") private String language = "en";
 	@Field("siteid") private String siteId;
 	@Field("type") private String type;
@@ -92,6 +93,15 @@ public class SolrDocument4Cms {
 		return this;
 	}
 	
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public SolrDocument4Cms setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
+		return this;
+	}
+
 	public String getTitle() {
 		return title;
 	}

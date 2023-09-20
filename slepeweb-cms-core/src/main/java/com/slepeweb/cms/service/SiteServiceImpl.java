@@ -128,4 +128,11 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		return list;
 	}
 
+	//@Cacheable(value="serviceCache")
+	public List<User> getContributors(long siteId) {
+		return this.jdbcTemplate.query(
+			"select * from user where id in (SELECT distinct ownerid from item where siteid=?) order by lastname, firstname", 
+			new Object[] {siteId},
+			new RowMapperUtil.UserMapper());
+	}
 }

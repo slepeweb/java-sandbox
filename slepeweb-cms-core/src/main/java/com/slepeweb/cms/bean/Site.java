@@ -165,6 +165,10 @@ public class Site extends CmsBean {
 		this.secured = secured;
 		return this;
 	}
+	
+	public List<User> getContributors() {
+		return getCmsService().getSiteService().getContributors(getId());
+	}
 
 	@Override
 	public int hashCode() {

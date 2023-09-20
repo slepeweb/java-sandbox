@@ -203,6 +203,10 @@ input[type="checkbox"], input[type="radio"] {
 	z-index: -1;
 }
 
+span.inaccessible {
+	opacity: 0.5;
+}
+
 details {
 	padding-top: 1em;
 	padding-bottom: 1em;

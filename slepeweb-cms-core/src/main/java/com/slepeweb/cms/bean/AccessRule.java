@@ -6,18 +6,18 @@ public class AccessRule extends CmsBean {
 
 	private static final long serialVersionUID = 3525217730680353953L;
 	private Long id, siteId;
-	private String name, mode, itemTypePattern, templatePattern, itemPathPattern, rolePattern;
+	private String name, mode, tagPattern, templatePattern, itemPathPattern, ownerIdPattern, rolePattern;
 	private boolean access, enabled;
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		append("name", this.name, sb);
-		append("itemType", this.itemTypePattern, sb);
-		append("template", this.templatePattern, sb);
+		append("tag", this.tagPattern, sb);
+		append("ownerId", this.ownerIdPattern, sb);
 		append("itemPath", this.itemPathPattern, sb);
-		append("role", this.rolePattern, sb);
 		append("access", String.valueOf(this.access), sb);
+		append("role2access", this.rolePattern, sb);
 		return sb.toString();
 	}
 	
@@ -63,6 +63,28 @@ public class AccessRule extends CmsBean {
 		// TODO Auto-generated method stub
 
 	}
+	
+	/*
+	 * Example regex patterns:
+	 * 
+	 * 	1) Match IFF test string does NOT contain complete word 'foo' OR 'bar':
+	 * 			^(?!.*?\bfoo|bar\b).*$
+	 * 
+	 * 		Notes:
+	 * 			^		Regexp must address the complete test string, ie from ^ to $
+	 * 			?!		Keyword to indicate regexp is negated
+	 * 			\b		Word boundaries
+	 */
+
+
+	
+	private String negateIf(String p) {
+		if (StringUtils.isNotBlank(p) && p.length() > 1 && p.startsWith("!")) {
+			return "^(?!.*?\\b" + p.substring(1) + "\\b).*$";
+		}
+		
+		return p;
+	}
 
 	public String getMode() {
 		return mode;
@@ -92,7 +114,16 @@ public class AccessRule extends CmsBean {
 	}
 
 	public String getRolePattern() {
-		return rolePattern;
+		return negateIf(rolePattern);
+	}
+
+	public AccessRule setOwnerIdPattern(String pattern) {
+		this.ownerIdPattern = pattern;
+		return this;
+	}
+
+	public String getOwnerIdPattern() {
+		return negateIf(ownerIdPattern);
 	}
 
 	public AccessRule setRolePattern(String pattern) {
@@ -100,17 +131,17 @@ public class AccessRule extends CmsBean {
 		return this;
 	}
 
-	public String getItemTypePattern() {
-		return itemTypePattern;
+	public String getTagPattern() {
+		return negateIf(tagPattern);
 	}
 
-	public AccessRule setItemTypePattern(String pattern) {
-		this.itemTypePattern = pattern;
+	public AccessRule setTagPattern(String pattern) {
+		this.tagPattern = pattern;
 		return this;
 	}
 
 	public String getTemplatePattern() {
-		return templatePattern;
+		return negateIf(templatePattern);
 	}
 
 	public AccessRule setTemplatePattern(String pattern) {
@@ -119,7 +150,7 @@ public class AccessRule extends CmsBean {
 	}
 
 	public String getItemPathPattern() {
-		return itemPathPattern;
+		return negateIf(itemPathPattern);
 	}
 
 	public AccessRule setItemPathPattern(String pattern) {

@@ -35,10 +35,11 @@ public class Item extends CmsBean {
 	private boolean deleted, editable = true, published, searchable;
 	
 	// These properties pertain to access control
-	private User user;
+	private User user, owner;
 	private Boolean accessible;
 	
 	private Long id = -1L, origId;
+	private Long ownerId;
 	private List<Link> links, parentLinks;
 	private List<Tag> tags;
 	private Item parent;
@@ -85,6 +86,7 @@ public class Item extends CmsBean {
 			setSearchable(i.isSearchable());
 			setVersion(i.getVersion());
 			setLanguage(i.getLanguage());
+			setOwnerId(i.getOwnerId());
 			
 			// Must assimilate fields and links too? What about tags?
 			// NO - fields and links are loaded when needed.
@@ -506,6 +508,10 @@ public class Item extends CmsBean {
 	}
 
 	public List<Link> getLinks() {
+		return getLinks(false);
+	}
+	
+	public List<Link> getLinks(boolean filterInaccessibles) {
 		if (this.links == null) {
 			this.links = getLinkService().getLinks(getId());
 			
@@ -513,9 +519,13 @@ public class Item extends CmsBean {
 			 * In CMSe and CMSd, you need read access to be able to see an item.
 			 * In CMSe, you additionally need write access to update an item.
 			 * Accessibility can only be determined given user details.
-			 */
-			if (getUser() != null) {
+			 */			
+			if (filterInaccessibles && getUser() != null) {
 				filterReadableLinks(this.links);
+			}
+			
+			if (getUser() != null) {
+				setUser(this.links);
 			}
 			
 			// Set the language on each linked item
@@ -668,8 +678,8 @@ public class Item extends CmsBean {
 		result = prime * result + (deleted ? 1231 : 1237);
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
-		result = prime * result + ((site == null) ? 0 : site.getId().hashCode());
-		result = prime * result + ((type == null) ? 0 : type.getId().hashCode());
+		result = prime * result + ((template == null) ? 0 : template.getId().hashCode());
+		result = prime * result + ((ownerId == null) ? 0 : ownerId.hashCode());
 		result = prime * result + ((dateUpdated == null) ? 0 : dateUpdated.hashCode());
 		result = prime * result + (published ? 1231 : 1237);
 		result = prime * result + (searchable ? 1231 : 1237);
@@ -701,15 +711,17 @@ public class Item extends CmsBean {
 				return false;
 		} else if (!path.equals(other.path))
 			return false;
-		if (site == null) {
-			if (other.site != null)
+		
+		if (template == null) {
+			if (other.template != null)
 				return false;
-		} else if (!site.getId().equals(other.site.getId()))
+		} else if (!template.getId().equals(other.template.getId()))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		
+		if (ownerId == null) {
+			if (other.ownerId != null)
 				return false;
-		} else if (!type.getId().equals(other.type.getId()))
+		} else if (!ownerId.equals(other.ownerId))
 			return false;
 		
 		if (dateUpdated == null) {
@@ -846,8 +858,25 @@ public class Item extends CmsBean {
 		return this.accessible;
 	}
 	
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public Item setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
+		return this;
+	}
+
 	public String getSolrKey() {
 		return String.format("%s-%s", getId(), getLanguage());
+	}
+	
+	public User getOwner() {
+		if (this.owner == null && this.ownerId != null) {
+			this.owner = getCmsService().getUserService().get(this.ownerId);
+		}
+		
+		return this.owner;
 	}
 	
 	public String getTempMediaFilepath(boolean isThumbnail) {
@@ -874,6 +903,17 @@ public class Item extends CmsBean {
 						iter.remove();
 					}
 				}
+			}
+		}
+		
+		return links;
+	}
+
+
+	private List<Link> setUser(List<Link> links) {
+		if (links != null) {
+			for (Link l :  links) {
+				l.getChild().setUser(getUser());
 			}
 		}
 		

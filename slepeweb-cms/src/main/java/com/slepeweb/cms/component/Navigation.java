@@ -32,14 +32,22 @@ public class Navigation {
 	public static class Node {
 		private Node parentNode;
 		private String title, key, extraClasses;
-		private boolean folder, lazy = true, expanded, selected, shortcut;
+		private boolean folder, lazy = true, expanded, selected, shortcut, accessible;
 		private List<Node> children;
 		
 		public static Node toNode(Item i) {
-			return new Navigation.Node().
+			Node n = new Navigation.Node().
 					setTitle(i.getName()).
 					setKey(i.getOrigId().toString()).
-					setExtraClasses(getCmsIconClass(i));
+					setAccessible(i.isAccessible());
+			
+			String clazz = getCmsIconClass(i);
+			
+			if (! n.isAccessible()) {
+				clazz += " inaccessible";
+			}
+			
+			return n.setExtraClasses(clazz);
 		}
 		
 		public static String getCmsIconClass(Item i) {
@@ -176,6 +184,15 @@ public class Navigation {
 					setExtraClasses(getExtraClasses() + " shortcut");
 				}
 			}
+			return this;
+		}
+
+		public boolean isAccessible() {
+			return accessible;
+		}
+
+		public Node setAccessible(boolean accessible) {
+			this.accessible = accessible;
 			return this;
 		}
 

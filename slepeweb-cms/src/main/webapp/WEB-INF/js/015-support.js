@@ -322,6 +322,9 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 		
 		// On successful loading of forms 
 		function(html, status, z) {
+			// Clear any message in the status block
+			_cms.support.flashMessage(_cms.support.toStatus(false, ''))
+	
 			// origId of currently selected item
 			_cms.editingItemId = nodeKey;
 			
@@ -361,6 +364,7 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 			if (callback) {
 				callback(args);
 			}
+			
 		});
 };
 

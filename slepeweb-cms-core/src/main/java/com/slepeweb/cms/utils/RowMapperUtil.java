@@ -97,6 +97,7 @@ public class RowMapperUtil {
 				setName(rs.getString("name")).
 				setSimpleName(rs.getString("simplename")).
 				setPath(rs.getString("path")).
+				setOwnerId(rs.getLong("ownerid")).
 				setDateCreated(rs.getTimestamp("datecreated")).
 				setDateUpdated(rs.getTimestamp("dateupdated")).
 				setDeleted(rs.getBoolean("deleted")).
@@ -312,9 +313,10 @@ public class RowMapperUtil {
 					setSiteId(rs.getLong("siteid")).
 					setName(rs.getString("name")).
 					setRolePattern(rs.getString("role")).
-					setItemTypePattern(rs.getString("itemtype")).
+					setTagPattern(rs.getString("tag")).
 					setTemplatePattern(rs.getString("template")).
 					setItemPathPattern(rs.getString("path")).
+					setOwnerIdPattern(rs.getString("ownerid")).
 					setAccess(rs.getBoolean("access")).
 					setEnabled(rs.getBoolean("enabled"));
 		}

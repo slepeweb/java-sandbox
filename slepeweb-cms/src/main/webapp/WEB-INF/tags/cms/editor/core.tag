@@ -48,6 +48,23 @@
 			</c:forEach>
 		</select>
 	</div>
+	
+	<div class="ff">
+		<label>Owner: </label>
+		
+		<c:choose><c:when test="${not _ownership.updateable}">
+			<input disabled="disabled" value="${_ownership.owner.fullName}" />
+		</c:when><c:otherwise>
+			<select name="owner">
+				<c:forEach items="${_ownership.siteContributors}" var="_siteContributor">
+					<option value="${_siteContributor.id}"
+						<c:if test="${_siteContributor.id == _ownership.owner.id}">selected="selected"</c:if>>
+							${_siteContributor.lastName}, ${_siteContributor.firstName}</option>
+				</c:forEach>
+			</select>
+		</c:otherwise></c:choose>
+	</div>
+	
 	<div class="ff">
 		<label for="name">Name: </label><input type="text" name="name" value="${editingItem.name}" />
 	</div>

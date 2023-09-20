@@ -5,6 +5,7 @@
   <field name="editable" type="boolean" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="origId" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="ownerId" type="long" multiValued="false" indexed="true" required="false" stored="true"/>
   <field name="key" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="language" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="path" type="string" multiValued="false" indexed="true" required="true" stored="true"/>

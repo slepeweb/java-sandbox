@@ -6,4 +6,5 @@ public class AttrName {
 	public static final String FLAGGED_ITEMS = "_flaggedItems";
 	public static final String RECENT_TAGS = "_recentTags";
 	public static final String TAG_INPUT_SUPPORT = "_tis";
+	public static final String OWNERSHIP = "_ownership";
 }

@@ -33,10 +33,10 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 	}
 	
 	private AccessRule insert(AccessRule ar) {		
-		this.jdbcTemplate.update( "insert into access (siteid, name, role, itemtype, template, " + 
-				"path, access) values (?, ?, ?, ?, ?, ?, ?)", 
-				ar.getSiteId(), ar.getName(), ar.getRolePattern(), ar.getItemTypePattern(), 
-				ar.getTemplatePattern(), ar.getItemPathPattern(), ar.isAccess());	
+		this.jdbcTemplate.update( "insert into access (siteid, name, role, tag, template, " + 
+				"path, ownerid, access) values (?, ?, ?, ?, ?, ?, ?, ?)", 
+				ar.getSiteId(), ar.getName(), ar.getRolePattern(), ar.getTagPattern(), 
+				ar.getTemplatePattern(), ar.getItemPathPattern(), ar.getOwnerIdPattern(), ar.isAccess());	
 		
 		ar.setId(getLastInsertId());			
 		//this.cacheEvictor.evict(ar);
@@ -50,9 +50,10 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 			dbRecord.assimilate(ar);
 			
 			this.jdbcTemplate.update(
-					"update access set name=?, role=?, itemtype=?, template=?, path=?, access=? where id=?", 
-					dbRecord.getName(), dbRecord.getRolePattern(), dbRecord.getItemTypePattern(),
-					dbRecord.getTemplatePattern(), dbRecord.getItemPathPattern(), dbRecord.isAccess(), dbRecord.getId());
+					"update access set name=?, role=?, tag=?, template=?, path=?, ownerid=?, access=? where id=?", 
+					dbRecord.getName(), dbRecord.getRolePattern(), dbRecord.getTagPattern(),
+					dbRecord.getTemplatePattern(), dbRecord.getItemPathPattern(), 
+					dbRecord.getOwnerIdPattern(), dbRecord.isAccess(), dbRecord.getId());
 			
 			LOG.info(compose("Updated Rule", ar));
 		}

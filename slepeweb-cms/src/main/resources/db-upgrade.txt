@@ -79,3 +79,22 @@ ALTER TABLE `slepeweb_cms`.`host`
 CHANGE COLUMN `type` `type` ENUM('editorial', 'delivery') NULL DEFAULT 'editorial' ;
 
 alter table host add unique key idx_site_type_deployment(siteid,type,deployment);
+
+Access rules
+------------
+Item type is not really useful; use tag list instead
+
+ALTER TABLE `slepeweb_cms`.`access` 
+CHANGE COLUMN `itemtype` `tag` VARCHAR(64) NULL DEFAULT NULL ;
+
+ALTER TABLE `slepeweb_cms`.`access` 
+ADD COLUMN `ownerid` VARCHAR(64) NULL AFTER `path`;
+
+ALTER TABLE `slepeweb_cms`.`item` 
+ADD COLUMN `ownerid` INT NULL DEFAULT NULL AFTER `templateid`;
+
+update item set ownerid=1;
+
+ALTER TABLE `slepeweb_cms`.`item` 
+ADD INDEX `idx_siteid_ownerid` (`siteid` ASC, `ownerid` ASC) VISIBLE;
+;
