@@ -13,7 +13,7 @@ public class User extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private Long id;
 	private String firstName, lastName, email, phone, password, secret;
-	private boolean enabled, loggedIn;
+	private boolean enabled, loggedIn, editor;
 	private Map<Long, List<String>> roles;
 	
 	public void assimilate(Object obj) {
@@ -24,6 +24,7 @@ public class User extends CmsBean {
 			setEmail(u.getEmail());
 			setPhone(u.getPhone());
 			setPassword(u.getPassword());
+			setEditor(u.isEditor());
 			setEnabled(u.isEnabled());
 			setSecret(u.getSecret());
 		}
@@ -172,13 +173,23 @@ public class User extends CmsBean {
 		return this;
 	}
 
+	public boolean isEditor() {
+		return editor;
+	}
+
+	public User setEditor(boolean editor) {
+		this.editor = editor;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
+		result = prime * result + (editor ? 1231 : 1237);
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
+		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
 		result = prime * result + ((phone == null) ? 0 : phone.hashCode());
 		return result;
@@ -193,10 +204,7 @@ public class User extends CmsBean {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		if (lastName == null) {
-			if (other.lastName != null)
-				return false;
-		} else if (!lastName.equals(other.lastName))
+		if (editor != other.editor)
 			return false;
 		if (email == null) {
 			if (other.email != null)
@@ -207,6 +215,11 @@ public class User extends CmsBean {
 			if (other.firstName != null)
 				return false;
 		} else if (!firstName.equals(other.firstName))
+			return false;
+		if (lastName == null) {
+			if (other.lastName != null)
+				return false;
+		} else if (!lastName.equals(other.lastName))
 			return false;
 		if (password == null) {
 			if (other.password != null)

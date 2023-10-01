@@ -108,15 +108,11 @@ public class PageController extends BaseController {
 		HttpServletRequest req,
 		HttpServletResponse res,
 		ModelMap model) throws IOException {
- 
-		if (req.getParameter("logout") != null) {
-			model.addAttribute("msg", "You've been successfully logged out.");
-		}
-		
+ 		
 		if (req.getMethod().equalsIgnoreCase("post")) {
 			String email = req.getParameter("email");
 			String pwd = req.getParameter("password");
-			LoginSupport supp = this.loginService.login(email, pwd, req);
+			LoginSupport supp = this.loginService.login(email, pwd, true, req);
 			
 			if (! supp.isSuccess()) {
 				model.addAttribute("error", supp.getErrorMessage());
@@ -128,6 +124,7 @@ public class PageController extends BaseController {
 		else if (req.getMethod().equalsIgnoreCase("get")) {
 			if (req.getParameter("logout") != null) {
 				this.loginService.logout(req);
+				model.addAttribute("msg", "You've been successfully logged out.");
 			}
 		}
  

@@ -56,9 +56,9 @@ public class BaseController {
 		return this.cmsService;
 	}
 	
-	@ModelAttribute(value="_user")
+	@ModelAttribute(value=AttrName.USER)
 	protected User getUser(HttpServletRequest req) {
-		return (User) req.getSession().getAttribute("_user");
+		return (User) req.getSession().getAttribute(AttrName.USER);
 	}
 	
 	protected String userLog(User u, Object... message) {

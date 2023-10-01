@@ -11,6 +11,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.constant.AttrName;
+
 public class LoginFilter implements Filter {
 	
 	private String loginPath;
@@ -26,15 +29,23 @@ public class LoginFilter implements Filter {
 			throws IOException, ServletException {
 				
 		HttpServletRequest req = (HttpServletRequest) request;	
-		if (req.getSession().getAttribute("_user") == null && 
+		HttpServletResponse res = (HttpServletResponse) response;	
+		User u = (User) req.getSession().getAttribute(AttrName.USER);
+		
+		if (	u == null && 
 				! req.getServletPath().equals(this.loginPath) &&
 				! req.getServletPath().startsWith("/resources")) {
 			
-			HttpServletResponse res = (HttpServletResponse) response;	
-			req.getRequestDispatcher(this.loginPath).forward(req, res);;
+			req.getRequestDispatcher(this.loginPath).forward(req, res);
 			return;
 		}
 		
+		if (u != null && ! u.isEditor()) {
+			req.getSession().setAttribute(AttrName.USER, null);
+			res.sendError(HttpServletResponse.SC_FORBIDDEN);
+			return;
+		}
+			
 		chain.doFilter(request, response);		
 	}
 

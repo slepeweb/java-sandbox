@@ -331,6 +331,7 @@ public class RowMapperUtil {
 					setEmail(rs.getString("email")).
 					setPhone(rs.getString("phone")).
 					setPassword(rs.getString("password")).
+					setEditor(rs.getBoolean("editor")).
 					setEnabled(rs.getBoolean("enabled")).
 					setSecret(rs.getString("secret"));
 		}

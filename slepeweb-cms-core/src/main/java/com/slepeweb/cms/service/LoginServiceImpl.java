@@ -20,6 +20,10 @@ public class LoginServiceImpl implements LoginService {
 	@Autowired private UserService userService;
 	
 	public LoginSupport login(String email, String password, HttpServletRequest req) {
+		return login(email, password, false, req);
+	}
+	
+	public LoginSupport login(String email, String password, boolean asContentEditor, HttpServletRequest req) {
 		
 		LoginSupport supp = new LoginSupport();
 		
@@ -29,7 +33,12 @@ public class LoginServiceImpl implements LoginService {
 			if (u != null) {
 				supp.setUser(u);
 				
-				if (u.getPassword() != null) {
+				if (asContentEditor && ! u.isEditor()) {
+					String s = String.format("'%s' does not have permission to use the content editor", email);
+					supp.setErrorMessage(s);
+					LOG.info(s);
+				}
+				else if (u.getPassword() != null) {
 					StandardPasswordEncoder encoder = new StandardPasswordEncoder();					
 					if (encoder.matches(password, u.getPassword())) {
 						if (u.isEnabled()) {

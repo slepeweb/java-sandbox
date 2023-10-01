@@ -1,4 +1,9 @@
 ===========================================================
+Stop tomcat:
+
+sudo systemctl stop tomcat
+
+===========================================================
 Stop mysql server:
 
 sudo service mysql stop
@@ -9,12 +14,7 @@ Export cms db from desktop:
 cd ~/bash-scripts
 ./db-backup -cms
 
-This produces a sql file, held below ~/db-backup-files.
-
-===========================================================
-Import cms db:
-
-mysql -u cms -p slepeweb_cms < path-to-sql-file
+This produces a sql file, held below ~/db-backup-files. Copy this file to ~george/to-rpi4b
 
 ===========================================================
 Export/import wars:
@@ -22,13 +22,19 @@ Export/import wars:
 In Eclipse (on desktop), export slepeweb-cms project as a WAR file to ~george/to-rpi4b
 In shell:
 
-cd ~george/to-rpi4b
-./install-cms.sh [-c] [-d] [-q]
 
-On rpi4b:
+cd ~george/to-rpi4b
+./install-cms.sh [-e] [-d] [-q]
+	-e : cms.war
+	-d : site-delivery.war
+	-q : sql
+
+On rpi4b, import wars & sql:
+
 /home/rpi/deploy-cms
 
 ===========================================================
-Stop tomcat:
+Import cms db:
 
-sudo systemctl stop tomcat
+mysql -u cms -p slepeweb_cms < path-to-sql-file
+

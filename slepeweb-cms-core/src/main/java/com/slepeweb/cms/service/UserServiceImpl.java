@@ -64,8 +64,8 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 	}
 	
 	private User insert(User u) {		
-		this.jdbcTemplate.update( "insert into user (firstname, lastname, email, phone, password, enabled, secret) values (?, ?, ?, ?, ?, ?, ?)", 
-				u.getFirstName(), u.getLastName(), u.getEmail(), u.getPhone(), u.getPassword(), u.isEnabled(), u.getSecret());	
+		this.jdbcTemplate.update( "insert into user (firstname, lastname, email, phone, password, editor, enabled, secret) values (?, ?, ?, ?, ?, ?, ?)", 
+				u.getFirstName(), u.getLastName(), u.getEmail(), u.getPhone(), u.getPassword(), u.isEditor(), u.isEnabled(), u.getSecret());	
 		
 		u.setId(getLastInsertId());			
 		LOG.info(compose("Added new user", u));		
@@ -77,9 +77,9 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 			dbRecord.assimilate(u);
 			
 			this.jdbcTemplate.update(
-					"update user set firstname=?, lastname=?, phone=?, password=?, enabled=?, secret=? where id=?", 
+					"update user set firstname=?, lastname=?, phone=?, password=?, editor=?, enabled=?, secret=? where id=?", 
 					dbRecord.getFirstName(), dbRecord.getLastName(), dbRecord.getPhone(),  
-					dbRecord.getPassword(), dbRecord.isEnabled(), dbRecord.getSecret(), dbRecord.getId());
+					dbRecord.getPassword(), dbRecord.isEditor(), dbRecord.isEnabled(), dbRecord.getSecret(), dbRecord.getId());
 			
 			LOG.info(compose("Updated user", u));
 		}

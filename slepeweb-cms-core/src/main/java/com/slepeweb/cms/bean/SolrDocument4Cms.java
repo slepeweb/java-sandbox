@@ -45,6 +45,7 @@ public class SolrDocument4Cms {
 		this.
 			setId(String.valueOf(i.getId())).
 			setOrigId(String.valueOf(i.getOrigId())).
+			setOwnerId(i.getOwnerId()).
 			setLanguage(language).
 			setKey(getId(), language).
 			setSiteId(String.valueOf(i.getSite().getId())).
