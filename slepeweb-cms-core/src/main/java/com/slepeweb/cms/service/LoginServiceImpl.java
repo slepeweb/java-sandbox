@@ -51,6 +51,10 @@ public class LoginServiceImpl implements LoginService {
 							LOG.info(String.format("Failed attempt to login to disabled account [%s]", email));
 						}
 					}
+					else {
+						supp.setErrorMessage("Invalid account details!");
+						LOG.info(String.format("Failed login [%s]", email));
+					}
 				}
 				else {
 					supp.setErrorMessage("Account availability error!");

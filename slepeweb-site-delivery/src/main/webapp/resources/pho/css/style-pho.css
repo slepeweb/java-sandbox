@@ -839,6 +839,18 @@ p#search-results-pager span.pagelink.selected {
   display: none;
 }
 
+.underline {
+  text-decoration: underline;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
 div#search-area {
   width: 400px;
   margin: auto;

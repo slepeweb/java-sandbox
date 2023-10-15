@@ -303,6 +303,7 @@ create table user
 	email varchar(128) not null,
 	phone varchar(24) not null,
 	password varchar(256),
+	editor boolean,
 	enabled boolean,
 	secret varchar(256),
 	unique key idx_user_email (email),

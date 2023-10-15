@@ -74,8 +74,10 @@ public class MediaFileServiceImpl extends BaseServiceImpl implements MediaFileSe
 		
 		// Count the number of files in each bin
 		for (File child : root.listFiles()) {
-			this.fileCount.put(child.getName(), child.list().length);
-			LOG.info(String.format("File storage bin %s has %d entries", child.getName(), child.list().length));
+			if (child.isDirectory() && child.getName().length() == 2) {
+				this.fileCount.put(child.getName(), child.list().length);
+				LOG.info(String.format("File storage bin %s has %d entries", child.getName(), child.list().length));
+			}
 		}
 		
 		// Is the repository empty?
