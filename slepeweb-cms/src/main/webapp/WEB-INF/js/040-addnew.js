@@ -47,7 +47,7 @@ _cms.add.behaviour.add = function(nodeKey) {
 			}, 
 			dataType: "json",
 			success: function(resp, status, z) {
-				_cms.support.flashMessage(resp);
+				//_cms.support.flashMessage(resp);
 				_cms.undoRedo.displayAll(resp.data[3]);
 				
 				if (! resp.error) {
@@ -73,7 +73,7 @@ _cms.add.behaviour.add = function(nodeKey) {
 							tab = "media-tab";
 						}
 						
-						_cms.leftnav.navigate(childNode.key, tab);
+						_cms.leftnav.navigate(childNode.key, tab, _cms.support.flashMessage, resp);
 					}
 				}
 			},

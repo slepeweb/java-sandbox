@@ -4,10 +4,12 @@
 <cms:debug><!-- tags/cms/editor/addnew.tag --></cms:debug>
 	
 <c:set var="_positionOptions">below,alongside</c:set>
+<c:set var="_lastPosition" value="${_stickyAddNewControls.lastPosition}"/>
+
 <c:if test="${editingItem.shortcut or editingItem.type.media}">
 	<c:set var="_positionOptions">alongside</c:set>
 	<%-- Overriding the cookie value setting will force the 'alongside' option to be selected --%>
-	<c:set var="_lastRelativePosition">alongside</c:set>
+	<c:set var="_lastPosition">alongside</c:set>
 </c:if>
 
 <form>
@@ -16,7 +18,7 @@
 			<select name="relativePosition">
 				<option value="0">Choose ...</option>
 				<c:forTokens items="${_positionOptions}" delims="," var="relativePosition">
-					<option value="${relativePosition}" <c:if test="${_lastRelativePosition eq relativePosition}">selected</c:if>>${relativePosition}</option>
+					<option value="${relativePosition}" <c:if test="${_lastPosition eq relativePosition}">selected</c:if>>${relativePosition}</option>
 				</c:forTokens>
 			</select>
 			'<span class="current-item-name">${editingItem.name}</span>'
@@ -27,7 +29,9 @@
 		<select name="template">
 			<option value="0">Choose ...</option>
 			<c:forEach items="${editingItem.site.availableTemplates}" var="template">
-				<option value="${template.id}" 
+				<option 
+					value="${template.id}" 
+					<c:if test="${_stickyAddNewControls.lastTemplate eq template.id}">selected</c:if>
 					data-isproduct="${template.itemTypeId == _productTypeId ? 1 : 0}">${template.name}</option>
 			</c:forEach>
 		</select>
@@ -38,7 +42,9 @@
 		<select name="itemtype">
 			<option value="0">Choose ...</option>
 			<c:forEach items="${editingItem.site.availableItemTypes}" var="st">
-				<option value="${st.type.id}"
+				<option 
+					value="${st.type.id}"
+					<c:if test="${_stickyAddNewControls.lastType eq st.type.id}">selected</c:if>
 					data-isproduct="${st.type.id == _productTypeId ? 1 : 0}">${st.type.name}</option>
 			</c:forEach>
 		</select>			

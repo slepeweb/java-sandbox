@@ -96,7 +96,10 @@ _cms.leftnav.navigate = function(key, tab, successCallback, args) {
 			node.setActive(false);
 		}
 		node.setActive(true);
-		doSuccessCallback();
+		
+		// Delay execution of callback - typically used to display flash message AFTER
+		// the item editor pages have been updated as a result of item navigation.
+		setTimeout(doSuccessCallback, 500);
 	}
 	else {
 		// This item hasn't been loaded into the fancytree yet 
@@ -107,7 +110,7 @@ _cms.leftnav.navigate = function(key, tab, successCallback, args) {
 				doSuccessCallback();
 			},
 			function() {
-				_cms.support.flashMessage(_cms.support.toStatus(false, "Failed to update the leftnav tree"));
+				_cms.support.flashMessage(_cms.support.toStatus(true, "Failed to update the leftnav tree"));
 			}
 		);
 	}
@@ -120,7 +123,7 @@ _cms.leftnav.loadBreadcrumbs = function(key, successCallback, errorCallback) {
 				//console.log('_cms.leftnav.tree.loadKeyPath:', node.key, status);
 				if (status === "ok") {
 				    node.setActive();
-				    successCallback
+				    successCallback();
 				}
 			});
 		},

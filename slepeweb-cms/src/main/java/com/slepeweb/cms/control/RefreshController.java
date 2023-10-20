@@ -116,7 +116,7 @@ public class RefreshController extends BaseController {
 		model.addAttribute("editingItem", i);
 		
 		// Last relative position selection for 'addnew'
-		model.addAttribute("_lastRelativePosition", this.cookieService.getRelativePositionCookieValue(req));
+		model.addAttribute("_stickyAddNewControls", this.cookieService.getStickyAddNewControls(req));
 		
 		return "cms.refresh.add";		
 	}

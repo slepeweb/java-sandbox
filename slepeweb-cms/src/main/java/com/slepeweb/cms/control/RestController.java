@@ -62,6 +62,7 @@ import com.slepeweb.cms.bean.Ownership;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrParams4Cms;
+import com.slepeweb.cms.bean.StickyAddNewControls;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.UndoRedoStatus;
 import com.slepeweb.cms.bean.User;
@@ -139,7 +140,7 @@ public class RestController extends BaseController {
 			this.cookieService.updateBreadcrumbsCookie(i, req, res);
 			
 			// Last relative position selection for 'addnew'
-			model.addAttribute("_lastRelativePosition", this.cookieService.getRelativePositionCookieValue(req));
+			model.addAttribute("_stickyAddNewControls", this.cookieService.getStickyAddNewControls(req));
 			
 			// Total number of editable items in this section
 			String path = i.isSiteRoot() ? "/" : i.getPath() + "/";
@@ -646,8 +647,6 @@ public class RestController extends BaseController {
 		
 		RestResponse resp = new RestResponse();
 		
-		this.cookieService.saveCookie(CookieService.RELATIVE_POSITION_NAME, relativePosition, CookieService.CMS_COOKIE_PATH, res);
-		
 		Template t = null;
 		if (templateId > 0) {
 			t = this.cmsService.getTemplateService().getTemplate(templateId);
@@ -657,6 +656,10 @@ public class RestController extends BaseController {
 		}
 		
 		ItemType it = this.cmsService.getItemTypeService().getItemType(itemTypeId);
+		
+		StickyAddNewControls stick = new StickyAddNewControls(relativePosition, templateId, itemTypeId);
+		this.cookieService.saveCookie(CookieService.STICKY_ADDNEW_CONTROLS, stick.toString(), CookieService.CMS_COOKIE_PATH, res);
+		
 		User u = getUser(req);
 		Item parent = getEditableVersion(parentOrigId, u, true);
 		if (relativePosition.equals("alongside") && ! parent.isRoot()) {
