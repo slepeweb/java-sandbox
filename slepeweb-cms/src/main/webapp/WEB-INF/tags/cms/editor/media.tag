@@ -50,29 +50,31 @@
 	
 	<div class="ff">
 		<label>Choose file to upload</label>
-		<input name="media" type="file" />
+		<div class="inputs"><input name="media" type="file" /></div>
 	</div>
 	
 	<c:if test="${editingItem.type.image or editingItem.type.video}">
 		<div class="ff">
 			<label>Thumbnail?</label>
-			<span>
-				None<input name="thumbnail" type="radio" value="none" data-mimetype="${editingItem.type.mimeType}" checked="checked" />
-				File IS thumbnail<input name="thumbnail" type="radio" value="onlythumb" data-mimetype="${editingItem.type.mimeType}" />
-				
-				<c:if test="${editingItem.type.image}">
-					Autoscale<input name="thumbnail" type="radio" value="autoscale" data-mimetype="${editingItem.type.mimeType}" />
-				</c:if>
-			</span>
+			<div class="inputs">
+				<span>
+					None<input name="thumbnail" type="radio" value="none" data-mimetype="${editingItem.type.mimeType}" checked="checked" />
+					File IS thumbnail<input name="thumbnail" type="radio" value="onlythumb" data-mimetype="${editingItem.type.mimeType}" />
+					
+					<c:if test="${editingItem.type.image}">
+						Autoscale<input name="thumbnail" type="radio" value="autoscale" data-mimetype="${editingItem.type.mimeType}" />
+					</c:if>
+				</span>
+			</div>
 		</div>
 		
 		<div class="ff hide thumbnail-option">
 			<label>Width (px)</label>
-			<input name="width" type="text" value="200" />
+			<div class="inputs"><input name="width" type="text" value="200" /></div>
 		</div>
 	</c:if>
 	
-	<div class="button-set ff">
+	<div class="button-set">
 		<button class="action" type="button" disabled="disabled">Upload</button>
 		<button class="reset" type="button" disabled="disabled">Reset form</button>
 	</div>

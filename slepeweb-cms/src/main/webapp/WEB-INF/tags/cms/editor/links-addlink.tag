@@ -23,32 +23,40 @@
 	<div>
 		<div class="ff">
 			<label>Type: </label>
-			<select name="linktype">
-				<option value="unknown">Choose ...</option>
-				<c:forTokens items="${_linkTypes}" delims="," var="type">
-					<option value="${type}">${type}</option>
-				</c:forTokens>
-			</select>	
+			<div class="inputs">
+				<select name="linktype">
+					<option value="unknown">Choose ...</option>
+					<c:forTokens items="${_linkTypes}" delims="," var="type">
+						<option value="${type}">${type}</option>
+					</c:forTokens>
+				</select>
+			</div>
 		</div>
 		
 		<div class="ff">
 			<label>Subtype: </label>
-			<select name="linkname">
-				<option value="unknown">Choose ...</option>
-				<option value="std">std</option>
-			</select>	
+			<div class="inputs">
+				<select name="linkname">
+					<option value="unknown">Choose ...</option>
+					<option value="std">std</option>
+				</select>
+			</div>
 		</div>
 		
 		<div class="ff">
 			<label>Data: </label>
-			<input name="linkdata" value="" />
-			<span id="link-guidance-icon"><i class="far fa-question-circle"></i></span>
+			<div class="inputs">
+				<input name="linkdata" value="" />
+				<span id="link-guidance-icon"><i class="far fa-question-circle"></i></span>
+			</div>
 		</div>
 					
 		<div class="ff">
 			<label>Target: </label>
-			<span><i class="fa-solid fa-sitemap itempicker"></i></span>
-			<span id="link-target-identifier"></span>
+			<div class="inputs">
+				<span><i class="fa-solid fa-sitemap itempicker"></i></span>
+				<span id="link-target-identifier"></span>
+			</div>
 		</div>
 
 		<input type="hidden" name="linkId" value="-1" />

@@ -31,5 +31,9 @@
 	<script src="${applicationContextPath}/rest/js" type="text/javascript"></script>
 </c:if>
 
+<%-- Quill Rich Text Editor --%>
+<script src="${applicationContextPath}/resources/js/quill-2.0.2.js"></script>
+<link href="${applicationContextPath}/resources/css/quill-2.0.2-snow.css" rel="stylesheet">
+
 <cms:extraCSS />
 <cms:extraJS />

@@ -97,6 +97,20 @@
 		// Set the behaviour of the trash button
 		_cms.misc.behaviour.trash.trash(_cms.editingItemId);
 		
+		// Set up the wysiwyg editor
+		_cms.field.wysiwygEditor = new Quill('#wysiwyg-editor', {
+// 			modules: {
+// 			    toolbar: [
+// 			      [{ header: [1, 2, false] }],
+// 			      ['bold', 'italic', 'underline'],
+// 			      ['image', 'code-block'],
+// 			    ],
+// 			  },
+			toolbar: '#wysiwyg-toolbar',
+			placeholder: 'Compose an epic...',
+			theme: 'snow'
+		})
+		
 	});
 </script>
 

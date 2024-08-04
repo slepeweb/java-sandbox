@@ -186,6 +186,50 @@ _cms.field.behaviour.guidanceIcon = function() {
 	});
 }
 
+_cms.field.behaviour.markup = function() {
+	$("span.wysiwyg-open-icon").click(function(e) {
+		let div$ = $(this).parent().parent()
+		let text$ = div$.find('textarea')
+		console.log('Area contains:', text$.val())
+		
+		// NEXT BLOCK IS NOT WORKING - DELTA OPERATIONS ARE EMPTY
+		let delta = _cms.field.wysiwygEditor.clipboard.convert({html: text$.val()})	
+		_cms.field.wysiwygEditor.setContents(delta, 'silent')
+		
+		sessionStorage.setItem('current-wysiwyg-field', div$.attr('id'))
+		$('#wysiwyg-wrapper').css('visibility', 'visible')
+	})
+
+	$("div#wysiwyg-close-icon").click(function(e) {
+		let id = sessionStorage.getItem('current-wysiwyg-field')
+		let sel = 'form#field-form div#' + id
+		let div$ = $(sel)
+		let text$ = div$.find('textarea')
+		console.log('Updating field to', _cms.field.wysiwygEditor.getSemanticHTML())
+		text$.val(_cms.field.formatHtml(_cms.field.wysiwygEditor.getSemanticHTML()))
+		$('#wysiwyg-wrapper').css('visibility', 'hidden')
+	})
+}
+
+_cms.field.formatHtml = function(html) {
+    var tab = '\t';
+    var result = '';
+    var indent= '';
+
+    html.split(/>\s*</).forEach(function(element) {
+        if (element.match( /^\/\w/ )) {
+            indent = indent.substring(tab.length);
+        }
+
+        result += indent + '<' + element + '>\r\n';
+
+        if (element.match( /^<?\w[^>]*[^\/]$/ ) && !element.startsWith("input")  ) { 
+            indent += tab;              
+        }
+    });
+
+    return result.substring(1, result.length-3);
+}
 
 
 _cms.field.onrefresh = function(nodeKey) {
@@ -194,6 +238,8 @@ _cms.field.onrefresh = function(nodeKey) {
 	_cms.field.behaviour.changelanguage();
 	_cms.field.behaviour.formchange();
 	_cms.field.behaviour.guidanceIcon();
+	_cms.field.behaviour.markup();
+	
 	
 	// Not really a behaviour, but required after the tab has been refreshed
 	_cms.field.setlanguage();

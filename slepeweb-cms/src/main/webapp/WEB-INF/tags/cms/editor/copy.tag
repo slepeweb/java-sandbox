@@ -7,10 +7,11 @@
 
 <form>
 	<div class="ff">
-		<label for="name">Name: </label><input name="name" value="${editingItem.name}-COPY" />
+		<label for="name">Name: </label><div class="inputs"><input name="name" value="${editingItem.name}-COPY" /></div>
 	</div>
+	
 	<div class="ff">
-		<label for="simplename">Simple name: </label><input name="simplename" value="" />
+		<label for="simplename">Simple name: </label><div class="inputs"><input name="simplename" value="" /></div>
 	</div>
 	
 	<details>

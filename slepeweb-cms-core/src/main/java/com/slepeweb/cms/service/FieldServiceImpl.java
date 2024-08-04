@@ -32,7 +32,7 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 	
 	private void insertField(Field f) {
 		this.jdbcTemplate.update(
-				"insert into field (name, variable, multilingual, fieldtype, helptext, size, dflt, valid, validation) values (?, ?, ?, ?, ?, ?, ?, ?)", 
+				"insert into field (name, variable, multilingual, fieldtype, helptext, size, dflt, valid) values (?, ?, ?, ?, ?, ?, ?, ?)", 
 				f.getName(), f.getVariable(), f.isMultilingual(), f.getType().name(), f.getHelp(), f.getSize(), 
 				f.getDefaultValue(), f.getValidValues());				
 		

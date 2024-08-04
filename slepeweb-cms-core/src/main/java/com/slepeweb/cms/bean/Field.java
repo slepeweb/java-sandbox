@@ -188,8 +188,8 @@ public class Field extends CmsBean {
 			sb.append("</").append(SELECT_TAG).append(">");
 		}
 		else if (tag.equals(TEXT_AREA_TAG)) {
-			sb.append("<").append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\"%s>%s</%s>", 
-					getVariable(), cols, rows, getTooltip(), notNullStringValue, tag));
+			sb.append("<").append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\" spellcheck=\"%s\"%s>%s</%s>", 
+					getVariable(), cols, rows, isMarkup() ? "false" : "true", getTooltip(), notNullStringValue, tag));
 		}
 		
 		return sb.toString();
@@ -384,6 +384,10 @@ public class Field extends CmsBean {
 
 	public boolean isMultilingual() {
 		return multilingual;
+	}
+
+	public boolean isMarkup() {
+		return this.type == FieldType.markup;
 	}
 
 	public Field setMultilingual(boolean multilingual) {

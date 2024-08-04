@@ -33,7 +33,7 @@ public class LinkNameServiceImpl extends BaseServiceImpl implements LinkNameServ
 	}
 	
 	private void insertLinkName(LinkName ln) {
-		this.jdbcTemplate.update("insert into linkname (siteid, linktypeid, name, validation) values (?, ?, ?)",
+		this.jdbcTemplate.update("insert into linkname (siteid, linktypeid, name) values (?, ?, ?)",
 				ln.getSiteId(), ln.getLinkTypeId(), ln.getName());
 		
 		ln.setId(getLastInsertId());

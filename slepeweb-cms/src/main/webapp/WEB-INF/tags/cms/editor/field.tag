@@ -18,18 +18,25 @@
 	</c:if>
 	
 	<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
-		<div id="form-fields-${_lang}" class="hideable">
+		<div id="form-fields-${_lang}" class="hideable fieldset">
 			<c:forEach items="${_fieldSupport[_lang]}" var="fes">
 				<c:choose><c:when test="${fes.field.type == 'layout'}">
 					<hr />
 				</c:when><c:otherwise>
-					<div class="ff">
-						<label for="${fes.field.variable}">${fes.label} : </label>
-						${fes.inputTag}
-						<c:if test="${not empty fes.guidance}">
-							<span class="field-guidance-icon"><i class="far fa-question-circle"></i></span>
-						</c:if>
-						
+					<div id="${fes.field.variable}" class="ff<c:if test='${fes.field.markup}'> markup</c:if>">
+						<label>${fes.label} : </label>
+						<div class="inputs">
+							${fes.inputTag}
+						</div>
+						<div class="extras">
+							<c:if test="${not empty fes.guidance}">
+								<span class="field-guidance-icon"><i class="far fa-question-circle"></i></span>
+							</c:if>
+							
+							<c:if test="${fes.field.markup}">
+								<span class="wysiwyg-open-icon">Wysiwyg editor</span>
+							</c:if>
+						</div>
 					</div>
 					
 					<c:if test="${not empty fes.guidance and _lang eq editingItem.language}">

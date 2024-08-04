@@ -139,8 +139,34 @@ hr {
 	width: 100%;
 }
 
+div.ff:nth-child(odd) {
+	background-color: #eaeaea;
+}
+
 div.ff {
-	padding-bottom: 1em;
+	padding-bottom: 0.5em;
+	padding-top: 0.5em;
+	display: grid;
+	grid-template-columns: repeat(9, 1fr);
+	align-items: center;
+}
+
+div.ff label {
+	grid-column: 1 / span 2;
+	margin-left: 0.5em;
+}
+
+div.ff div.inputs {
+	grid-column: 3 / span 5;
+}
+
+div.ff div.extras {
+	grid-column: 8 / span 2;
+}
+
+span.wysiwyg-open-icon {
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 #field-language-selector select {
@@ -623,6 +649,32 @@ div.cms-icon-movie {background-position: 0px -32px; background-image: url("fancy
 div.cms-icon-photo {background-position: -16px -32px; background-image: url("fancytree-cms-icons.gif");}
 div.cms-icon-content {background-position: 0px -16px; background-image: url("fancytree-cms-icons.gif");}
 
+div#wysiwyg-wrapper {
+	visibility: hidden;
+	z-index: 100;
+	height: 95%;
+	width: 100%;
+	position: absolute;
+	top: 5%;
+	left: 0px;
+	margin-top: 12px;
+}
+
+div#wysiwyg-close-icon {
+	position: absolute;
+	top: 6px;
+	right: 1em;
+	z-index: 100;
+	width: 20px;
+}
+
+.ql-editor {
+	background-color: antiquewhite;
+}
+
+.ql-toolbar {
+	background-color: aquamarine;
+}
 
 @media (min-width: 700px) {
 	header {
