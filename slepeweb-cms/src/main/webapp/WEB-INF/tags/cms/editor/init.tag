@@ -98,14 +98,38 @@
 		_cms.misc.behaviour.trash.trash(_cms.editingItemId);
 		
 		// Set up the wysiwyg editor
+		// REGISTRATION IS NOT WORKING
+		Quill.register({
+      'modules/better-table': quillBetterTable
+    }, true)
+    
 		_cms.field.wysiwygEditor = new Quill('#wysiwyg-editor', {
-// 			modules: {
-// 			    toolbar: [
-// 			      [{ header: [1, 2, false] }],
-// 			      ['bold', 'italic', 'underline'],
-// 			      ['image', 'code-block'],
-// 			    ],
-// 			  },
+			modules: {
+				table: false,
+				
+				'better-table': {
+					operationMenu: {
+						items: {
+							unmergeCells: {
+								text: 'Unmerge Cells'
+              }
+            },
+            color: {
+              colors: ['red', 'green', 'yellow', 'white', 'grey', 'black'],
+              text: 'Background Colors:'
+            }
+          },
+				},
+				keyboard: {
+          bindings: quillBetterTable.keyboardBindings
+        },
+				toolbar: [
+		      [{ header: [2, 3, false] }],
+		      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+		      ['bold', 'italic', 'underline', 'strike'],
+		      ['link', 'image', 'code-block'],
+		    ],
+			 },
 			toolbar: '#wysiwyg-toolbar',
 			placeholder: 'Compose an epic...',
 			theme: 'snow'

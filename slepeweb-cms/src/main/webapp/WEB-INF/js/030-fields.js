@@ -190,9 +190,7 @@ _cms.field.behaviour.markup = function() {
 	$("span.wysiwyg-open-icon").click(function(e) {
 		let div$ = $(this).parent().parent()
 		let text$ = div$.find('textarea')
-		console.log('Area contains:', text$.val())
 		
-		// NEXT BLOCK IS NOT WORKING - DELTA OPERATIONS ARE EMPTY
 		let delta = _cms.field.wysiwygEditor.clipboard.convert({html: text$.val()})	
 		_cms.field.wysiwygEditor.setContents(delta, 'silent')
 		
@@ -205,9 +203,28 @@ _cms.field.behaviour.markup = function() {
 		let sel = 'form#field-form div#' + id
 		let div$ = $(sel)
 		let text$ = div$.find('textarea')
-		console.log('Updating field to', _cms.field.wysiwygEditor.getSemanticHTML())
 		text$.val(_cms.field.formatHtml(_cms.field.wysiwygEditor.getSemanticHTML()))
 		$('#wysiwyg-wrapper').css('visibility', 'hidden')
+	})
+}
+
+_cms.field.behaviour.widefield = function() {
+	$("div#widefield-open-icon").click(function(e) {
+		let div$ = $(this).parent().parent()
+		let text$ = div$.find('textarea')
+		
+		$('textarea#widefield-editor').val(text$.val())
+		sessionStorage.setItem('current-widefield', div$.attr('id'))
+		$('#widefield-wrapper').css('visibility', 'visible')
+	})
+
+	$("div#widefield-close-icon").click(function(e) {
+		let id = sessionStorage.getItem('current-widefield')
+		let sel = 'form#field-form div#' + id
+		let div$ = $(sel)
+		let text$ = div$.find('textarea')
+		text$.val($('textarea#widefield-editor').val())
+		$('#widefield-wrapper').css('visibility', 'hidden')
 	})
 }
 
@@ -239,7 +256,7 @@ _cms.field.onrefresh = function(nodeKey) {
 	_cms.field.behaviour.formchange();
 	_cms.field.behaviour.guidanceIcon();
 	_cms.field.behaviour.markup();
-	
+	_cms.field.behaviour.widefield();
 	
 	// Not really a behaviour, but required after the tab has been refreshed
 	_cms.field.setlanguage();

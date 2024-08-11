@@ -1,0 +1,11 @@
+<%@ 
+	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+
+<geo:pageLayout type="std">
+	<gen:debug><!-- jsp/geo/standard.jsp --></gen:debug>
+		
+	<div class="main standard">
+		<h2>${_item.fields.title}</h2>
+	</div>
+</geo:pageLayout>

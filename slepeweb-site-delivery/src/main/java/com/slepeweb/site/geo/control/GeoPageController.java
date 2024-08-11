@@ -28,4 +28,16 @@ public class GeoPageController extends BaseController {
 		return page.getView();
 	}
 
+	@RequestMapping(value="/pagestd")	
+	public String standard(
+			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			@ModelAttribute(SITE) Site site, 
+			HttpServletRequest req,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "standard", model);
+		return page.getView();
+	}
+
 }

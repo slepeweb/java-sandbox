@@ -35,6 +35,7 @@
 							
 							<c:if test="${fes.field.markup}">
 								<span class="wysiwyg-open-icon">Wysiwyg editor</span>
+								<div id="widefield-open-icon"><i class="fa-solid fa-arrows-left-right-to-line"></i></div>
 							</c:if>
 						</div>
 					</div>

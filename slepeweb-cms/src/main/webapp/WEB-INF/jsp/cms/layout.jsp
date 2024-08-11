@@ -25,6 +25,14 @@
 					<i class="fa-regular fa-rectangle-xmark fa-2x"></i>
 				</div>
 			</div>
+			
+			<div id="widefield-wrapper">
+				<div id="widefield-toolbar"></div>
+				<textarea id="widefield-editor"></textarea>				
+				<div id="widefield-close-icon">
+					<i class="fa-regular fa-rectangle-xmark fa-2x"></i>
+				</div>
+			</div>
 		</div>
 	
 		<div id="footer-wrapper">

@@ -112,6 +112,7 @@ public class ComponentServiceImpl implements ComponentService {
 		return c;
 	}
 	
+	/*
 	public ImageComponent image_gif(Link l) {
 		return image(l);
 	}
@@ -123,6 +124,7 @@ public class ComponentServiceImpl implements ComponentService {
 	public ImageComponent image_png(Link l) {
 		return image(l);
 	}
+	*/
 	
 	public ImageComponent image(Link l) {
 		ImageComponent c = new ImageComponent().setup(l);
