@@ -21,6 +21,7 @@ import com.slepeweb.site.model.LogozerComponent;
 import com.slepeweb.site.model.RssComponent;
 import com.slepeweb.site.model.SimpleComponent;
 import com.slepeweb.site.model.StandardComponent;
+import com.slepeweb.site.model.TableComponent;
 import com.slepeweb.site.model.TwitterComponent;
 import com.slepeweb.site.sws.service.DilbertService;
 
@@ -75,6 +76,10 @@ public class ComponentServiceImpl implements ComponentService {
 
 	public StandardComponent standard(Link l) {
 		return new StandardComponent().setup(l);				
+	}
+	
+	public TableComponent table(Link l) {
+		return new TableComponent().setup(l);				
 	}
 	
 	public CustomComponent custom(Link l) {
@@ -144,7 +149,7 @@ public class ComponentServiceImpl implements ComponentService {
 		c.setType("simple");
 		String url = l.getChild().getFieldValue(FieldName.DATA);
 		if (url != null) {
-			c.setBlurb(this.dilbertService.getTodaysDilbert(url));
+			c.setBody(this.dilbertService.getTodaysDilbert(url));
 		}
 		return c;
 	}

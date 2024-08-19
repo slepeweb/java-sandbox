@@ -63,8 +63,9 @@
 	<div id="leftnav"></div>
 </div>
 
-<%-- This more complicated dialog deserves its own tag --%>
+<%-- These more complicated dialogs deserves their own tags --%>
 <edit:links-addlink />
+<edit:links-editbinding />
 
 <div id="searchresults-container" class="hide">
 	<p>Pick an item in the list</p>

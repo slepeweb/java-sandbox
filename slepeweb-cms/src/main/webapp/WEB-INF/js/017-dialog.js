@@ -8,6 +8,7 @@ _cms.dialog = {
 	confirmTrash: {obj: null},
 	confirmTrashFlagged: {obj: null},
 	addLink: {obj: null},
+	editBindingLink: {obj: null},
 	linkGuidance: {obj: null},
 	fieldGuidance: {obj: null},
 	searchresults: {obj: null},
@@ -124,6 +125,25 @@ _cms.dialog.addLink.define = function() {
 			"Add/edit a link", _cms.links.sel.ADD_LINK_CONTAINER, 300, 250, buttons, close);
 }
 
+_cms.dialog.editBindingLink.define = function() {	
+	var close = function() {
+		_cms.dialog.close(_cms.dialog.editBindingLink);
+	}
+	
+	var buttons = {
+		Update: function() {
+			_cms.links.updateBinding(_cms.editingItemId);
+			close();
+		},
+		Cancel: function() {
+			close();
+		}
+	}
+	
+	_cms.dialog.editBindingLink.obj = _cms.dialog.define(
+			"Edit binding", _cms.links.sel.EDIT_BINDING_CONTAINER, 300, 250, buttons, close);
+}
+
 _cms.dialog.searchresults.define = function() {	
 	var close = function() {
 		_cms.dialog.close(_cms.dialog.searchresults);
@@ -225,6 +245,7 @@ _cms.dialog.onpageload = function() {
 	_cms.dialog.confirmTrashFlagged.define();
 	_cms.dialog.confirmFieldUpdate.define();
 	_cms.dialog.addLink.define();
+	_cms.dialog.editBindingLink.define();
 	_cms.dialog.searchresults.define();
 	_cms.dialog.linkGuidance.define();
 	_cms.dialog.fieldGuidance.define();

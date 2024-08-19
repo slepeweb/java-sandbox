@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.component.Navigation;
@@ -24,7 +25,10 @@ import com.slepeweb.cms.component.Navigation.Node;
 @Controller
 @RequestMapping("/rest")
 public class NavigationController extends BaseController {
-	
+	/* 
+	 * This method crawls down the site to one level deep, starting from both 
+	 * the 'site' root and the 'content' root.
+	 */
 	@RequestMapping(value="/leftnav/lazy/one", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public List<Navigation.Node> doLazyNavOneLevel(
@@ -52,6 +56,16 @@ public class NavigationController extends BaseController {
 		return children != null ? children : new ArrayList<Navigation.Node>(0);		
 	}
 	
+	/*
+	 * This method creates a Node hierarchy. It's difficult to decribe in writing. The
+	 * hierarchy corresponds to ONE SECTION of the item hierarchy (binding + components).
+	 * Given an item at /aa/bb/cc, this method will create the following Nodes:
+	 * - /
+	 * - All the items below /
+	 * - All the items below /aa
+	 * - All the items below /aa/bb
+	 * - All the items below /aa/bb/cc
+	 */
 	@RequestMapping(value="/leftnav/lazy/thread", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public List<Navigation.Node> doLazyNavThread(
@@ -75,7 +89,7 @@ public class NavigationController extends BaseController {
 		Site site = item.getSite();
 		
 		// pathComponents is relative to the pseudo root item, which in this case is '/'
-		level0.add(dive(site.getItem("/").setUser(u), pathComponents));
+		level0.add(dive(site.getItem("/").setUser(u), pathComponents, null));
 		
 		// The pseudo root for items in the 'Content' section is /content, so this
 		// component should NOT be in the pathComponents list, otherwise the main navigation
@@ -84,7 +98,7 @@ public class NavigationController extends BaseController {
 			pathComponents.remove(0);
 		}
 		
-		level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH).setUser(u), pathComponents));
+		level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH).setUser(u), pathComponents, null));
 		
 		return level0;		
 	}
@@ -127,14 +141,17 @@ public class NavigationController extends BaseController {
 	
 	private Navigation.Node dive(Item parentItem, int numLevels) {
 		Navigation.Node pNode = Node.toNode(parentItem), cNode;		
-		List<Link> bindings = parentItem.getBindings();
+		List<Link> bindings = parentItem.getOrthogonalBindings();
 		pNode.setFolder(bindings.size() > 0);
+		Item child;
 		
 		if (numLevels > 0) {
 			for (Link l : bindings) {
-				cNode = dive(l.getChild(), numLevels - 1);
-				cNode.setShortcut(l.getChild().isShortcut());
-				cNode.setExtraClasses(Node.getCmsIconClass(l.getChild()));
+				child = l.getChild();
+				System.out.println(String.format("Diving(1): From %s to %s", parentItem.getPath(), child.getPath()));				
+				cNode = dive(child, numLevels - 1);
+				cNode.setShortcut(child.isShortcut());
+				cNode.setExtraClasses(child.getType().getName().toLowerCase());
 				pNode.addChild(cNode);
 			}
 		}
@@ -142,15 +159,16 @@ public class NavigationController extends BaseController {
 		return pNode;
 	}
 	
-	private Navigation.Node dive(Item parentItem, final Vector<String> pathComponents) {
+	private Navigation.Node dive(Item parentItem, final Vector<String> pathComponents, Link parentLink) {
 		Navigation.Node pNode = Node.toNode(parentItem);		
 		Navigation.Node cNode;
-		List<Link> bindings = parentItem.getBindings();
+		List<Link> bindings = parentItem.getOrthogonalBindings();
 		pNode.setFolder(bindings.size() > 0);
 		Item child;
 		
 		for (Link l : bindings) {
 			child = l.getChild();
+			//System.out.println(String.format("Diving(2): From %s to %s", parentItem.getPath(), child.getPath()));
 			
 			if (
 					! child.isShortcut() && 
@@ -162,19 +180,19 @@ public class NavigationController extends BaseController {
 				workingPath.remove(0);
 				
 				// There are more nodes below this one - continue diving
-				cNode = dive(child, workingPath);
-				if (pathComponents.size() == 1) {
-					//cNode.setSelected(true);
-				}
+				cNode = dive(child, workingPath, l);
 			}
 			else {
-				// We've reached the end of this trail
 				cNode = Node.toNode(child);
 				cNode.setFolder(child.getBoundItems().size() > 0);
 			}
 			
-			cNode.setShortcut(child.isShortcut());
+			//cNode.setShortcut(child.isShortcut());
 			pNode.addChild(cNode);
+		}
+		
+		if (parentLink != null && parentLink.getType().equals(LinkType.component)) {
+			pNode.setExtraClasses("component");
 		}
 		
 		return pNode;

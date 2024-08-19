@@ -30,6 +30,8 @@ public class Navigation {
 	
 	/* This class represents a FancyTree node - see FancyTree documentation */
 	public static class Node {
+		public static final String ICON_PREFIX = "cms-icon-";
+		
 		private Node parentNode;
 		private String title, key, extraClasses;
 		private boolean folder, lazy = true, expanded, selected, shortcut, accessible;
@@ -39,41 +41,11 @@ public class Navigation {
 			Node n = new Navigation.Node().
 					setTitle(i.getName()).
 					setKey(i.getOrigId().toString()).
-					setAccessible(i.isAccessible());
+					setAccessible(i.isAccessible()).
+					setShortcut(i.isShortcut()).
+					setExtraClasses(i);
 			
-			String clazz = getCmsIconClass(i);
-			
-			if (! n.isAccessible()) {
-				clazz += " inaccessible";
-			}
-			
-			return n.setExtraClasses(clazz);
-		}
-		
-		public static String getCmsIconClass(Item i) {
-			ItemType t = i.getType(); 
-			if (i.isShortcut()) {
-				Shortcut sh = (Shortcut) i;
-				if (sh.getReferred() != null) {
-					t = sh.getReferred().getType();
-				}
-			}
-			
-			String typeName = t.getName().toLowerCase();
-			
-			if (typeName.endsWith("homepage")) {
-				typeName = "homepage";
-			}
-			else if (typeName.startsWith("image")) {
-				typeName = "image";
-			}
-			
-			String prefix = "cms-icon-";
-			if (i.isShortcut()) {
-				prefix = prefix + "shortcut-";
-			}
-			
-			return prefix + typeName;
+			return n;
 		}
 		
 		@Override
@@ -176,14 +148,6 @@ public class Navigation {
 
 		public Node setShortcut(boolean shortcut) {
 			this.shortcut = shortcut;
-			if (shortcut) {
-				if (this.extraClasses == null) {
-					setExtraClasses("shortcut");
-				}
-				else {
-					setExtraClasses(getExtraClasses() + " shortcut");
-				}
-			}
 			return this;
 		}
 
@@ -196,13 +160,43 @@ public class Navigation {
 			return this;
 		}
 
-		public String getExtraClasses() {
-			return this.extraClasses;
+		public Node setExtraClasses(Item i) {
+			ItemType t = i.getType(); 
+			
+			if (i.isShortcut()) {
+				Shortcut sh = (Shortcut) i;
+				if (sh.getReferred() != null) {
+					t = sh.getReferred().getType();
+				}
+			}
+			
+			String typeName = t.getName().toLowerCase();
+			
+			if (typeName.endsWith("homepage")) {
+				typeName = "homepage";
+			}
+			else if (typeName.startsWith("image")) {
+				typeName = "image";
+			}
+			
+			this.extraClasses = composeExtraClasses(typeName);
+			return this;
+		}
+		
+		public Node setExtraClasses(String typeName) {			
+			this.extraClasses = composeExtraClasses(typeName);			
+			return this;
 		}
 
-		public Node setExtraClasses(String extraClasses) {
-			this.extraClasses = extraClasses;
-			return this;
+		public String getExtraClasses() {
+			return extraClasses;
+		}
+
+		public String composeExtraClasses(String iconType) {
+			String clazz = ICON_PREFIX + iconType;
+			clazz += isShortcut() ? "-shortcut" : "";
+			clazz += ! isAccessible() ? " inaccessible" : "";
+			return clazz;
 		}
 	}
 

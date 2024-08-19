@@ -1,5 +1,7 @@
 package com.slepeweb.cms.service;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
@@ -65,6 +67,11 @@ public class LinkTypeServiceImpl extends BaseServiceImpl implements LinkTypeServ
 	public LinkType getLinkType(String name) {
 		return (LinkType) getFirstInList(this.jdbcTemplate.query("select * from linktype where name = ?", 
 				new Object[] {name}, new RowMapperUtil.LinkTypeMapper()));		 
+	}
+
+	@Cacheable(value="serviceCache")
+	public List<LinkType> getLinkTypes() {
+		return this.jdbcTemplate.query("select * from linktype", new RowMapperUtil.LinkTypeMapper());		 
 	}
 
 	public int getCount() {

@@ -80,6 +80,7 @@ import com.slepeweb.cms.service.FieldService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemUpdateUndoService;
 import com.slepeweb.cms.service.ItemWorkerService;
+import com.slepeweb.cms.service.LinkService;
 import com.slepeweb.cms.service.MediaFileService;
 import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.SolrService4Cms;
@@ -96,6 +97,7 @@ public class RestController extends BaseController {
 	private static Logger LOG = Logger.getLogger(RestController.class);
 	
 	@Autowired private ItemService itemService;
+	@Autowired private LinkService linkService;
 	@Autowired private ItemWorkerService itemWorkerService;
 	@Autowired private FieldService fieldService;
 	@Autowired private FieldForTypeService fieldForTypeService;
@@ -189,7 +191,8 @@ public class RestController extends BaseController {
 			}
 		}
 		else {
-			Item parentItem = i.getParent();
+			Link parentLink = i.getOrthogonalParentLink();
+			Item parentItem = parentLink.getChild();
 			
 			if (parentItem != null) {			
 				parent = parentItem.getOrigId();
@@ -634,6 +637,8 @@ public class RestController extends BaseController {
 			@RequestParam("relativePosition") String relativePosition, 
 			@RequestParam("template") long templateId, 
 			@RequestParam("itemtype") long itemTypeId, 
+			@RequestParam("linktype") String linkType, 
+			@RequestParam("linkname") String linkName, 
 			@RequestParam("name") String name, 
 			@RequestParam(value="simplename", required=false) String simplename, 
 			@RequestParam(value="partNum", required=false) String partNum, 
@@ -671,6 +676,8 @@ public class RestController extends BaseController {
 				setPath(String.format("%s/%s", parent.getPath(), simplename)).
 				setTemplate(t).
 				setType(it).
+				setLinkType(linkType).
+				setLinkName(linkName).
 				setOwnerId(u.getId()).
 				setName(name).
 				setSimpleName(simplename).
@@ -1146,6 +1153,40 @@ public class RestController extends BaseController {
 			
 			// Return a list of shortcuts as response data, so that leftnav tree can be refreshed
 			resp.setData(response);
+		}
+		catch (ResourceException e) {
+			resp.setError(true).addMessage(e.getMessage());
+		}
+		
+		return resp;
+	}
+	
+	@RequestMapping(value="/updatebinding/{childId}", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public RestResponse updateBindings(
+			@RequestBody String[] params, 
+			@PathVariable long childId, 
+			HttpServletRequest req, 
+			ModelMap model) {	
+
+		RestResponse resp = new RestResponse();
+		
+		// Keep a copy of the item being edited 
+		long parentId = Long.valueOf(params[0]);
+		String linkType = params[1];
+		String linkName = params[2];
+		
+		Link l = this.linkService.getLink(parentId, childId);
+		if (l == null) {
+			return resp.setError(true).addMessage("Failed to identify link");
+		}
+		
+		l.setType(linkType);
+		l.setName(linkName);
+		
+		try {
+			this.linkService.save(l);
+			resp.setError(false).addMessage("Link updated");
 		}
 		catch (ResourceException e) {
 			resp.setError(true).addMessage(e.getMessage());

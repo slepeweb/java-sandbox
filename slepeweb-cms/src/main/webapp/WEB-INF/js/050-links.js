@@ -16,7 +16,9 @@
  * Index of functions:
  *		_cms.links.behaviour.add
  *		_cms.links.behaviour.changetype					Triggered when user selects a new link type (eg. relation)
+ *		_cms.links.behaviour.changebindingtype
  *		_cms.links.behaviour.edit
+ *		_cms.links.behaviour.editbindinglink
  *		_cms.links.behaviour.itempicker
  *		_cms.links.behaviour.linkguidanceicon
  *		_cms.links.behaviour.linknamechange				Triggered when user selects a different linkname (eg. std)
@@ -47,6 +49,7 @@
  *		_cms.links.setLinkForm
  *		_cms.links.shortcut.settings
  *		_cms.links.show_addlink_form
+ *		_cms.links.showEditBindingForm
  *		_cms.links.updateLink
  *		_cms.links.use_form_data
  *		_cms.links.useLink
@@ -66,10 +69,12 @@ _cms.links = {
 	sel: {
 		LINKS_TAB: "#links-tab",
 		ADD_LINK_CONTAINER: "#addlinkdiv",
+		EDIT_BINDING_CONTAINER: "#editbindingdiv",
 		ITEM_PICKER: "#addlinkdiv i.itempicker",
 		ALL_SELECTS: "#addlinkdiv select",
 		SORTABLE_LINKS_CONTAINER: "#sortable-links",
 		EDIT_LINK_BUTTONS: ".edit-link",
+		EDIT_BINDING_LINK_BUTTON: "#edit-binding-link",
 		REMOVE_LINK_BUTTONS: ".remove-link",
 		LINKTO_BUTTONS: ".link-linker",
 		LINK_TARGET_IDENTIFIER: "#link-target-identifier",
@@ -80,8 +85,11 @@ _cms.links = {
 
 _cms.links.sel.LINKTYPE_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKTYPE_SELECT;
 _cms.links.sel.LINKNAME_SELECT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKNAME_SELECT;
+_cms.links.sel.BINDING_LINKTYPE_SELECT = _cms.links.sel.EDIT_BINDING_CONTAINER + " " + _cms.links.selrel.LINKTYPE_SELECT;
+_cms.links.sel.BINDING_LINKNAME_SELECT = _cms.links.sel.EDIT_BINDING_CONTAINER + " " + _cms.links.selrel.LINKNAME_SELECT;
 _cms.links.sel.LINKDATA_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKDATA_INPUT;
 _cms.links.sel.CHILDID_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.CHILDID_INPUT;
+_cms.links.sel.BINDING_CHILDID_INPUT = _cms.links.sel.EDIT_BINDING_CONTAINER + " " + _cms.links.selrel.CHILDID_INPUT;
 _cms.links.sel.STATE_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.STATE_INPUT;
 _cms.links.sel.LINKID_INPUT = _cms.links.sel.ADD_LINK_CONTAINER + " " + _cms.links.selrel.LINKID_INPUT;
 _cms.links.sel.SORTABLE_LINKS = _cms.links.sel.SORTABLE_LINKS_CONTAINER + " div.sortable-link";
@@ -97,6 +105,33 @@ _cms.links.show_addlink_form = function(data) {
 		_cms.links.setLinkForm(data);
 	}	
 	_cms.dialog.open(_cms.dialog.addLink);
+}
+
+_cms.links.showEditBindingForm = function(data) {
+	if (data) {
+		var linkTypeOptions = ['binding', 'component'];
+		var current = data[1];
+		var linkNames = _cms.linkNameOptions[current];
+		
+		var form = $(_cms.links.sel.EDIT_BINDING_CONTAINER);
+		form.find(_cms.links.selrel.CHILDID_INPUT).val(data[0]);
+		
+		var html = ''
+		var selected;
+		
+		linkTypeOptions.forEach(function(ele, i) {
+			html += _cms.support.toOptionHtml(ele, current);
+		});
+		form.find(_cms.links.selrel.LINKTYPE_SELECT).html(html);
+		
+		current = data[2];
+		html = '';
+		linkNames.forEach(function(ele, i) {
+			html += _cms.support.toOptionHtml(ele, current);
+		});
+		form.find(_cms.links.selrel.LINKNAME_SELECT).html(html);
+	}	
+	_cms.dialog.open(_cms.dialog.editBindingLink);
 }
 
 _cms.links.behaviour.itempicker = function() {
@@ -129,6 +164,18 @@ _cms.links.behaviour.changetype = function() {
 	// Re-populate linkname options when link type is selected
 	$(_cms.links.sel.LINKTYPE_SELECT).change(function(e) {
 		_cms.links.repopulateLinkNameDropdown($(this).val());
+	});
+}
+
+_cms.links.behaviour.changebindingtype = function() {
+	// Re-populate linkname options when link type is selected
+	$(_cms.links.sel.BINDING_LINKTYPE_SELECT).change(function(e) {
+		var names = _cms.linkNameOptions[$(this).val()];
+		var html = '';
+		names.forEach(function(ele, i) {
+			html += _cms.support.toOptionHtml(ele);
+		});
+		$(_cms.links.sel.BINDING_LINKNAME_SELECT).html(html);
 	});
 }
 
@@ -201,6 +248,17 @@ _cms.links.behaviour.edit = function() {
 	$(_cms.links.sel.EDIT_LINK_BUTTONS).off().click(function() {
 		var parent = $(this).parent();
 		var span = parent.find("span.hide");
+		
+		/* 
+			dataparts is an array containing the following elements:
+			0: link.childid (OR the parentid for parent links)
+			1: link.type
+			2: link.name
+			3: ?
+			4: ?
+			5: ?
+			6: text string used to describe/identify link
+		*/
 		var dataparts = span.html().split("\|");
 		
 		// Append an element to the array identifying the name of the child link.
@@ -211,6 +269,24 @@ _cms.links.behaviour.edit = function() {
 
 		_cms.links.repopulateLinkNameDropdown(dataparts[1], dataparts[2]);
 		_cms.links.show_addlink_form(dataparts);
+	});
+}
+
+_cms.links.behaviour.editbindinglink = function() {
+	// Open form to edit an existing link
+	$(_cms.links.sel.EDIT_BINDING_LINK_BUTTON).off().click(function() {
+		var parent = $(this).parent();
+		var span = parent.find("span.hide");
+		var dataparts = span.html().split("\|");
+		
+		// Append an element to the array identifying the name of the child link.
+		// This data is only available in the array for editing existing links, and NOT
+		// for adding new ones.
+		var grandparent = parent.parent();
+		dataparts.push(grandparent.find("span.link-identifier").html());
+
+		//_cms.links.repopulateLinkNameDropdown(dataparts[1], dataparts[2]);
+		_cms.links.showEditBindingForm(dataparts);
 	});
 }
 
@@ -407,6 +483,23 @@ _cms.links.repopulateGuidance = function(linkName) {
 	$("#link-guidance").html(guidance);
 }
 
+_cms.links.updateBinding = function(nodeKey) {
+	var params = [$(_cms.links.sel.BINDING_CHILDID_INPUT).val(), 	// parentId !!!
+			$(_cms.links.sel.BINDING_LINKTYPE_SELECT).val(), 		// linkType
+			$(_cms.links.sel.BINDING_LINKNAME_SELECT).val()];		// linkName
+	
+	// Ajax call to save links to db 
+	_cms.support.ajax('POST', '/rest/updatebinding/' + nodeKey, 
+		{data: JSON.stringify(params), contentType: 'application/json; charset=utf-8', dataType: 'json', processData: false},
+			// On success
+			function(resp, status, z) {
+				_cms.support.flashMessage(resp);
+				_cms.links.refresh.tab(nodeKey);
+				_cms.links.activateSaveButton(false);
+			}
+	);
+}
+
 _cms.links.activateSaveButton = function(activate) {
 	if (activate) {
 		_cms.support.enable(_cms.links.sel.SAVE_LINKS_BUTTON);
@@ -499,7 +592,7 @@ _cms.links.shortcut.settings = function() {
 		}
 		else {
 			_cms.support.enable(_cms.links.sel.ADD_LINK_BUTTON);
-			$(_cms.links.sel.LINKTYPE_SELECT).empty().html('<option value="shortcut">shortcut</option>');
+			$(_cms.links.sel.LINKTYPE_SELECT).empty().html(_cms.support.toOptionHtml('shortcut'));
 		}
 		
 	}
@@ -507,9 +600,9 @@ _cms.links.shortcut.settings = function() {
 		_cms.support.enable(_cms.links.sel.ADD_LINK_BUTTON);
 		$(_cms.links.sel.LINKTYPE_SELECT).empty().html(
 				'<option value="unknown">Choose ...</option>' + 
-				'<option value="relation">relation</option>' + 
-				'<option value="inline">inline</option>' + 
-				'<option value="component">component</option>');
+				_cms.support.toOptionHtml('relation') +
+				_cms.support.toOptionHtml('inline') +
+				_cms.support.toOptionHtml('component'));
 	}
 }
 
@@ -540,6 +633,7 @@ _cms.links.repopulateLinkNameDropdown = function(linkType, currentLinkname) {
 // Things to do once-only on page load
 _cms.links.onpageload = function() {
 	_cms.links.behaviour.changetype();
+	_cms.links.behaviour.changebindingtype();
 	_cms.links.behaviour.itempicker();
 	_cms.links.behaviour.linkguidanceicon();
 	_cms.links.behaviour.linknamechange();
@@ -553,6 +647,7 @@ _cms.links.onrefresh = function(nodeKey) {
 	_cms.links.behaviour.reset(nodeKey);
 	_cms.links.behaviour.remove();
 	_cms.links.behaviour.edit();
+	_cms.links.behaviour.editbindinglink();
 	_cms.links.behaviour.navigate();
 	
 	_cms.links.shortcut.settings();	

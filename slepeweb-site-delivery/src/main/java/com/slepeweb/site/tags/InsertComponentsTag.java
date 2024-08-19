@@ -13,7 +13,7 @@ public class InsertComponentsTag extends ComponentTagSupport {
 	private static Logger LOG = Logger.getLogger(InsertComponentsTag.class);
 	
 	private List<SimpleComponent> list;
-	private String type, view;
+	private String type;
 
 	public void delegate() {
 		if (this.list != null) {
@@ -38,7 +38,6 @@ public class InsertComponentsTag extends ComponentTagSupport {
 	@Override
 	public void release() {
 		this.type = null;
-		this.view = null;
 	}
 	
 	public void setList(List<SimpleComponent> list) {
@@ -49,14 +48,9 @@ public class InsertComponentsTag extends ComponentTagSupport {
 		this.type = type;
 	}
 
-	public void setView(String s) {
-		this.view = s;
-	}
 	
 	private boolean matchesFilter(SimpleComponent c) {
 		return
-			(this.type == null && this.view == null) ||
-			(this.type != null && this.type.equals(c.getType())) ||
-			(this.view != null && this.view.equals(c.getView()));
+			this.type == null || this.type.equals(c.getType());
 	}
 }

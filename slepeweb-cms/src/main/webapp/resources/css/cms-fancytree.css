@@ -64,6 +64,12 @@ span.fancytree-node.cms-icon-photo>span.fancytree-icon:hover {
 	background-image: url("fancytree-cms-icons.gif");
 }
 
+span.fancytree-node.cms-icon-component>span.fancytree-icon,
+span.fancytree-node.cms-icon-component>span.fancytree-icon:hover {
+	background-position: -48px -80px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
 span.fancytree-node.cms-icon-shortcut-boy>span.fancytree-icon,
 span.fancytree-node.cms-icon-shortcut-boy>span.fancytree-icon:hover {
 	background-position: -32px -16px;
@@ -111,6 +117,13 @@ span.fancytree-node.cms-icon-shortcut-photo>span.fancytree-icon:hover {
 	background-position: -16px -48px;
 	background-image: url("fancytree-cms-icons.gif");
 }
+
+span.fancytree-node.cms-icon-shortcut-component>span.fancytree-icon,
+span.fancytree-node.cms-icon-shortcut-component>span.fancytree-icon:hover {
+	background-position: -48px -96px;
+	background-image: url("fancytree-cms-icons.gif");
+}
+
 
 div.cms-icon {
 	background-image: url("fancytree-cms-icons.gif");

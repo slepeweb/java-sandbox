@@ -11,21 +11,21 @@ import com.slepeweb.site.util.StringUtil;
 
 public class SimpleComponent implements NestableComponent, Serializable {
 	private static final long serialVersionUID = 1L;
-	private String name, heading, blurb;
-	private String type, view;
+	private String name, heading, body;
+	private String type;
 	private String cssClass, js;
 	private Long id;
 	private List<SimpleComponent> components = new ArrayList<SimpleComponent>();
 
 	public SimpleComponent setup(Link l) {
-		setView(StringUtil.toIdentifier(l.getName()));
-		setId(l.getChild().getId());
-		setType(l.getChild());
-		setCssClass(l.getChild().getFieldValue("css"));	
-		setJs(l.getChild().getFieldValue("js"));
-		setHeading(l.getChild().getFieldValue("heading"));
-		setBlurb(l.getChild().getFieldValueResolved("blurb", new StringWrapper("")));
-		setName(l.getChild().getName());
+		Item i = l.getChild();
+		setId(i.getId());
+		setType(i.getType().getName());
+		setCssClass(i.getFieldValue("css"));	
+		setJs(i.getFieldValue("js"));
+		setHeading(i.getFieldValue("heading"));
+		setBody(i.getFieldValueResolved("body", new StringWrapper("")));
+		setName(i.getName());
 		return this;
 	}
 	
@@ -33,15 +33,6 @@ public class SimpleComponent implements NestableComponent, Serializable {
 		return String.format("SimpleComponent (%s): %s", getType(), getHeading());
 	}
 	
-	public String getView() {
-		return view;
-	}
-
-	public SimpleComponent setView(String view) {
-		this.view = view;
-		return this;
-	}
-
 	public List<SimpleComponent> getComponents() {
 		return components;
 	}
@@ -55,17 +46,10 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	}
 
 	public SimpleComponent setType(String type) {
-		this.type = type;
+		this.type = StringUtil.toIdentifier(type);
 		return this;
 	}
 	
-	public SimpleComponent setType(Item i) {
-		String linkedItemType = i.getType().getName();
-		setType(StringUtil.toIdentifier(linkedItemType.equals("Component") ?
-							i.getFieldValue("component-type") : linkedItemType));
-		return this;
-	}
-
 	public String getCssClass() {
 		return cssClass;
 	}
@@ -84,12 +68,12 @@ public class SimpleComponent implements NestableComponent, Serializable {
 		return this;
 	}
 
-	public String getBlurb() {
-		return blurb;
+	public String getBody() {
+		return body;
 	}
 
-	public SimpleComponent setBlurb(String blurb) {
-		this.blurb = blurb;
+	public SimpleComponent setBody(String blurb) {
+		this.body = blurb;
 		return this;
 	}
 

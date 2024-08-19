@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,9 @@ import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.ItemUpdateHistory;
 import com.slepeweb.cms.bean.ItemUpdateRecord.Action;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.TagInputSupport;
 import com.slepeweb.cms.bean.UndoRedoStatus;
@@ -33,6 +37,8 @@ import com.slepeweb.cms.component.ICmsHook;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.cms.service.LinkNameService;
+import com.slepeweb.cms.service.LinkTypeService;
 
 @Controller
 public class BaseController {
@@ -40,6 +46,8 @@ public class BaseController {
 	
 	@Autowired protected CmsService cmsService;
 	@Autowired protected CmsHooker cmsHooker;
+	@Autowired protected LinkTypeService linkTypeService;
+	@Autowired protected LinkNameService linkNameService;
 	
 	private String contextPath;
 
@@ -211,6 +219,33 @@ public class BaseController {
 		ItemUpdateHistory h = getItemUpdateHistory(request);
 		h.push(before, after, a);
 		return new UndoRedoStatus(h);
+	}
+	
+	@Cacheable(value="serviceCache")
+	protected Map<String, String> getLinkTypeNameOptions(Site s) {
+		Map<String, String> m = new HashMap<String, String> ();
+		
+		List<LinkType> types = this.linkTypeService.getLinkTypes();
+		List<LinkName> names;
+		String json;
+		boolean isFirst;
+		
+		for (LinkType t : types) {
+			names = this.linkNameService.getLinkNames(s.getId(), t.getId());
+			json = "[";
+			isFirst = true;
+			
+			for (LinkName ln : names) {
+				if (! isFirst) {
+					json += ", ";
+				}
+				json += String.format("'%s'", ln.getName());
+				isFirst = false;
+			}
+			json += "]";
+			m.put(t.getName(), json);
+		}
+		return m;
 	}
 }
 

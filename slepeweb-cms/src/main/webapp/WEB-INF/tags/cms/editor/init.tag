@@ -66,6 +66,14 @@
 		};
 	}
 	
+	_cms.linkNameOptions = {
+			relation: ${_linkTypeNameOptions.relation},
+			inline: ${_linkTypeNameOptions.inline},
+			component: ${_linkTypeNameOptions.component},
+			binding: ${_linkTypeNameOptions.binding},
+			shortcut: ${_linkTypeNameOptions.shortcut}
+	};
+	
 	$(function() {
 		/* 
 			The leftnav is built once only per page request. Subsequent UI actions

@@ -64,7 +64,6 @@ public class BuildTest extends BaseTest {
 		LinkType bindingLinkType = addLinkType(LinkType.binding);
 		LinkType relationLinkType = addLinkType(LinkType.relation);
 		LinkType inlineLinkType = addLinkType(LinkType.inline);
-		LinkType componentLinkType = addLinkType(LinkType.component);
 		
 		// Create item types
 		ItemType cfolderType = addType(ItemType.CONTENT_FOLDER_TYPE_NAME);
@@ -137,13 +136,13 @@ public class BuildTest extends BaseTest {
 			r.setNotes(LogUtil.compose("Test site has been created", site.getName()));
 			
 			// Create link names
-			for (LinkType lt : new LinkType[] {bindingLinkType, inlineLinkType, relationLinkType, componentLinkType}) {
+			for (LinkType lt : new LinkType[] {bindingLinkType, inlineLinkType, relationLinkType}) {
 				addLinkName(site, lt, LinkName.std);
 			}
 			
 			// Create more link names
 			for (String name : new String[] {"leftside", "rightside", "footer", "main"}) {
-				addLinkName(site, componentLinkType, name);
+				addLinkName(site, bindingLinkType, name);
 			}
 			
 			Template newsTemplate = addTemplate(NEWS_TEMPLATE_NAME, "/page/news", site.getId(), newsType.getId());

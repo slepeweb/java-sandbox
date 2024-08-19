@@ -329,7 +329,7 @@ details {
 }
 
 .sortable-link .right {
-	grid-column: 3 / 4;
+	grid-column: 3;
 	justify-self: right;
 }
 
@@ -348,12 +348,12 @@ details {
 	text-decoration: underline;
 }
 
-#sortable-links button.link-linker {
+#links-tab button.link-linker {
 	padding-left: 6px;
 	background-color: #db9131;
 }
 
-#sortable-links button.edit-link {
+#links-tab button.edit-link, #links-tab button.edit-parent-link {
 	padding-left: 6px;
 	background-color: #6eac2c;
 }
@@ -648,6 +648,7 @@ div.cms-icon-homepage {background-position: -16px 0px; background-image: url("fa
 div.cms-icon-movie {background-position: 0px -32px; background-image: url("fancytree-cms-icons.gif");}
 div.cms-icon-photo {background-position: -16px -32px; background-image: url("fancytree-cms-icons.gif");}
 div.cms-icon-content {background-position: 0px -16px; background-image: url("fancytree-cms-icons.gif");}
+div.cms-icon-component {background-position: -48px -80px; background-image: url("fancytree-cms-icons.gif");}
 
 div#wysiwyg-wrapper, div#widefield-wrapper {
 	visibility: hidden;

@@ -100,6 +100,9 @@ public class PageController extends BaseController {
 		// undo/redo status
 		getUndoRedoStatus(req, model);
 		
+		// Provide link name options for each link type
+		model.addAttribute("_linkTypeNameOptions", getLinkTypeNameOptions(i.getSite()));
+		
 		return "cms.editor";
 	}
 	

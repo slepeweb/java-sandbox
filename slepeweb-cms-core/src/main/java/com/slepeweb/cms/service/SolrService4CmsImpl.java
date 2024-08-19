@@ -136,7 +136,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 					StringBuilder sbSubtitle = new StringBuilder();
 					
 					for (Link l : i.getComponents()) {
-						if (l.getName().equals(LinkName.MAIN)) {
+						if (l.getName().equals(LinkName.std)) {
 							scrapeComponents(l.getChild(), sbBody, sbSubtitle);
 						}
 					}

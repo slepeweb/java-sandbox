@@ -13,7 +13,7 @@ public class ImageComponent extends SimpleComponent {
 	public ImageComponent setup(Link l) {
 		super.setup(l);
 		setHeading(l.getChild().getFieldValue("alt"));
-		setBlurb(l.getChild().getFieldValue("caption"));
+		setBody(l.getChild().getFieldValue("caption"));
 		
 		String max = l.getChild().getFieldValue("maxwidth");
 		if (StringUtils.isNumeric(max)) {
@@ -32,7 +32,7 @@ public class ImageComponent extends SimpleComponent {
 	}
 	
 	public String getCaption() {
-		return getBlurb();
+		return getBody();
 	}
 
 	public String getSrc() {

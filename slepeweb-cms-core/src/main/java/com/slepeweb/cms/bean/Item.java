@@ -51,6 +51,13 @@ public class Item extends CmsBean {
 	
 	protected List<Media> allMedia;
 	
+	// Added for convenience, and only applicable when adding a new item, in order that
+	// we can choose between binding and component when adding a new item.
+	// This properties are NOT set when retrieving items from the db.
+	// It would have been neater to extend the Item class, but on investigation, that
+	// would be too disruptive to the code.
+	private String linkType, linkName;
+	
 	public Item setAllMedia(List<Media> allMedia) {
 		this.allMedia = allMedia;
 		return this;
@@ -538,6 +545,10 @@ public class Item extends CmsBean {
 		return getParentLinks(false);
 	}
 	
+	public List<Link> getParentLinksIncludingBindings() {
+		return getParentLinks(true);
+	}
+	
 	public List<Link> getParentLinks(boolean includeBinding) {
 		if (this.parentLinks == null) {
 			this.parentLinks = getLinkService().getParentLinks(getId());
@@ -549,7 +560,7 @@ public class Item extends CmsBean {
 		if (! includeBinding) {
 			List<Link> links = new ArrayList<Link>(this.parentLinks.size());
 			for (Link l : this.parentLinks) {
-				if (! l.getType().equals(LinkType.binding)) {
+				if (! l.getType().equals(LinkType.binding) && ! l.getType().equals(LinkType.component)) {
 					links.add(l);
 				}
 			}
@@ -558,6 +569,10 @@ public class Item extends CmsBean {
 		}
 		
 		return this.parentLinks;
+	}
+	
+	public Link getOrthogonalParentLink() {
+		return filterOrthogonalParentLink();
 	}
 	
 	private void setLinkLanguage(List<Link> links, String language) {
@@ -614,27 +629,59 @@ public class Item extends CmsBean {
 	}
 	
 	public List<Link> getComponents() {
-		return filterLinks(new String[] {LinkType.component});
+		return  filterLinks(new String[] {LinkType.component});
 	}
 	
 	private List<Link> filterLinks(String[] linkTypes) {
 		List<Link> list = new ArrayList<Link>();
 		for (Link l : getLinks()) {
-			for (String type : linkTypes) {
-				if (l.getType().equals(type)) {
-					list.add(l);
-				}
+			if (matches(l.getType(), linkTypes)) {
+				list.add(l);
 			}
 		}
 		return list;
 	}
+	
+	private Link filterOrthogonalParentLink() {
+		String[] targets = new String[] {LinkType.binding, LinkType.component};
+		for (Link l : getParentLinksIncludingBindings()) {
+			if (matches(l.getType(), targets)) {
+				return l;
+			}
+		}
+		return null;
+	}
+	
+	private boolean matches(String target, String[] options) {
+		if (options != null) {
+			for (String s : options) {
+				if (s.equals(target)) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
+		// Nothing to match target against, so target IS considered valid
+		return true;
+	}
 
-	public List<Link> getAllLinksBarBindings() {
+	public List<Link> getNonOrthogonalBindings() {
 		return filterLinks(new String[] {
 				LinkType.inline, 
 				LinkType.relation, 
-				LinkType.component, 
 				LinkType.shortcut});
+	}
+
+	public List<Link> getOrthogonalBindings() {
+		return filterLinks(getOrthogonalLinkTypes());
+	}
+	
+	public String[] getOrthogonalLinkTypes() {
+		return new String[] {
+				LinkType.binding, 
+				LinkType.component};
 	}
 
 	public List<Item> getAllVersions() {
@@ -647,7 +694,7 @@ public class Item extends CmsBean {
 	}
 	
 	public final List<Item> getBoundItems() {
-		return CmsUtil.toItems(getBindings());
+		return CmsUtil.toItems(getOrthogonalBindings());
 	}
 	
 	public List<Item> getRelatedItems() {
@@ -804,6 +851,28 @@ public class Item extends CmsBean {
 	public Item setEditable(boolean editable) {
 		this.editable = editable;
 		return this;
+	}
+
+	public String getLinkType() {
+		return linkType;
+	}
+
+	public Item setLinkType(String linkType) {
+		this.linkType = linkType;
+		return this;
+	}
+
+	public String getLinkName() {
+		return linkName;
+	}
+
+	public Item setLinkName(String linkName) {
+		this.linkName = linkName;
+		return this;
+	}
+	
+	public boolean isX() {
+		return StringUtils.isNotBlank(this.linkType) && StringUtils.isNotBlank(this.linkName);
 	}
 
 	public Long getOrigId() {

@@ -72,7 +72,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		
 		// Cannot create a binding to a parent when the same item is already linked
 		// to the parent as an inline/relation/shortcut.
-		for (Link l : newParent.getAllLinksBarBindings()) {
+		for (Link l : newParent.getNonOrthogonalBindings()) {
 			if (l.getChild().equalsId(mover)) {
 				throw new ResourceException("This item is already linked to the new parent as a relation/inline/shortcut");
 			}
@@ -88,6 +88,13 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 				setChild(mover).
 				setType(LinkType.binding).
 				setName("std");
+		
+		// Identify the orthogonal parent. The link type will be either binding or component - nothing else.
+		// Retain this link type once the item is moved.
+		Link oldLink = mover.getOrthogonalParentLink();
+		if (oldLink != null) {
+			moverLink.setType(oldLink.getType()).setName(oldLink.getName()).setData(oldLink.getData());
+		}
 		
 		// Add mover to new parent's bindings
 		List<Link> bindings = newParent.getBindings();

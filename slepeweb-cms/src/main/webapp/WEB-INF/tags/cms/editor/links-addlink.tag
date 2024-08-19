@@ -15,7 +15,7 @@
 		</ul>
 	</details>	
 	
-	<c:set var="_linkTypes">relation,inline,shortcut,component</c:set>
+	<c:set var="_linkTypes">relation,inline,shortcut</c:set>
 	<c:if test="${editingItem.shortcut}">
 		<c:set var="_linkTypes">shortcut</c:set>
 	</c:if>

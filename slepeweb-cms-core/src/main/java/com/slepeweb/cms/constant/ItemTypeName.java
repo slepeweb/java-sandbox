@@ -17,4 +17,6 @@ public class ItemTypeName {
 	public static final String PHOTO_JPG = PHOTO_PREFIX + "JPG";
 	public static final String MOVIE_PREFIX = "Movie ";
 	public static final String MOVIE_MP4 = MOVIE_PREFIX + "MP4";
+	public static final String TABLE = "Table";
+	public static final String TABLE_ROW = "Table row";
 }

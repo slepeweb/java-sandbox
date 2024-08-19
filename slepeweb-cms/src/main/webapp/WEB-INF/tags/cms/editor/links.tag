@@ -3,14 +3,14 @@
         
 <cms:debug><!-- tags/cms/editor/links.tag --></cms:debug>
 	
-<h2>Linked to</h2>
+<h2>Inlines, relations & shortcuts</h2>
 
 <div id="sortable-links">
-	<c:forEach items="${editingItem.allLinksBarBindings}" var="link" varStatus="_stat">
+	<c:forEach items="${editingItem.nonOrthogonalBindings}" var="link" varStatus="_stat">
 		<div class="sortable-link ui-state-default">
 			<div class="left">
 				<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-				<span class="link-identifier">${link.type} (${link.name}): ${link.child.name}</span>
+					<span class="link-identifier">${link.type}&nbsp;&nbsp;|&nbsp;&nbsp;${link.name}&nbsp;&nbsp;|&nbsp;&nbsp;${link.child.name}</span>
 			</div>
 			
 			<div class="right">
@@ -22,7 +22,7 @@
 		</div>
 	</c:forEach>
 
-	<c:if test="${empty editingItem.allLinksBarBindings}">
+	<c:if test="${empty editingItem.nonOrthogonalBindings}">
 		<p>None</p>
 	</c:if>
 </div>
@@ -37,26 +37,27 @@
 	</div>
 </form>
 
-<c:if test="${not editingItem.shortcut}">
-	<div class="spacer3em">
-		<h2>Linked from</h2>
-		<c:choose><c:when test="${not empty editingItem.parentLinks}">
-			<table>
-				<tr>
-					<th align="left">Link type</th>
-					<th align="left">Link name</th>
-					<th align="left">From</th>
-				</tr>
-				<c:forEach items="${editingItem.parentLinks}" var="_link">
-					<tr>
-						<td width="20%">${_link.type}</td>
-						<td width="20%">${_link.name}</td>
-						<td><span class="link-linker" data-id="${_link.child.origId}">${_link.child.name}</span></td>
-					</tr>
-				</c:forEach>
-			</table>
-		</c:when><c:otherwise>
-			<p>None</p>
-		</c:otherwise></c:choose>
+
+
+<div class="spacer3em">
+	<h2>Parent links</h2>
+	
+	<div id="parent-links" class="spacer3m">
+		<c:forEach items="${editingItem.parentLinksIncludingBindings}" var="link" varStatus="_stat">
+			<div class="sortable-link ui-state-default">
+				<div class="left">
+					<span class="ui-icon"></span>
+					<span class="link-identifier">${link.type}&nbsp;&nbsp;|&nbsp;&nbsp;${link.name}&nbsp;&nbsp;|&nbsp;&nbsp;${link.child.name}</span>
+				</div>
+				
+				<div class="right">
+					<button class="link-linker" data-id="${link.child.id}" title="Navigate to this item"><i class="fas fa-location-arrow"></i></button>
+					<c:if test="${link.type eq 'component' or link.type eq 'binding'}">
+						<button id="edit-binding-link" title="Edit link"><i class="far fa-edit"></i></button>
+					</c:if>
+					<span class="hide">${link.child.id}|${link.type}|${link.name}|${link.data}|${_stat.index}|1</span>
+				</div>
+			</div>
+		</c:forEach>
 	</div>
-</c:if>
+</div>

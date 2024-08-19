@@ -42,7 +42,7 @@
 	</div>
 	
 	<div class="ff">
-		<label for="type">Type: </label>
+		<label for="type">Item type: </label>
 		<div class="inputs">
 			<select name="itemtype">
 				<option value="0">Choose ...</option>
@@ -52,6 +52,27 @@
 						<c:if test="${_stickyAddNewControls.lastType eq st.type.id}">selected</c:if>
 						data-isproduct="${st.type.id == _productTypeId ? 1 : 0}">${st.type.name}</option>
 				</c:forEach>
+			</select>
+		</div>
+	</div>
+	
+	<div class="ff">
+		<label for="type">Link type: </label>
+		<div class="inputs">
+			<select name="linktype">
+				<option value="0">Choose ...</option>
+				<c:forEach items="${editingItem.orthogonalLinkTypes}" var="ltype">
+					<option value="${ltype}">${ltype}</option>
+				</c:forEach>
+			</select>
+		</div>
+	</div>
+	
+	<div class="ff">
+		<label for="type">Link name: </label>
+		<div class="inputs">
+			<select name="linkname">
+				<option value="0">Choose ...</option>
 			</select>
 		</div>
 	</div>

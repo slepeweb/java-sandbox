@@ -311,6 +311,14 @@ _cms.support.ajax = function(method, url, data, success, fail) {
 	$.ajax(_cms.ctx + url, params);
 }
 
+_cms.support.toOptionHtml = function(option, choice) {
+	var flag = "";
+	if (choice) {
+		flag = option == choice ? "selected" : "";
+	}
+	return `<option value="${option}" ${flag}>${option}</option>`;
+}
+
 /*
 	Re-calculates content according to a newly selected item. This applies to
 	both editor tabs, and to page-level controls. (Remember, editor tabs get updated

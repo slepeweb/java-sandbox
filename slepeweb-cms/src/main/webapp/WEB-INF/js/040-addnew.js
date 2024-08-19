@@ -8,6 +8,8 @@ _cms.add = {
 
 _cms.add.sel.RELATIVE_POSITION_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "relativePosition");
 _cms.add.sel.TEMPLATE_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "template");
+_cms.add.sel.LINK_TYPE_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "linktype");
+_cms.add.sel.LINK_NAME_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "linkname");
 _cms.add.sel.ITEMTYPE_SELECTOR = _cms.support.fs(_cms.add.sel.ADD_TAB, "itemtype");
 _cms.add.sel.NAME_INPUT = _cms.support.fi(_cms.add.sel.ADD_TAB, "name");
 _cms.add.sel.SIMPLENAME_INPUT = _cms.support.fi(_cms.add.sel.ADD_TAB, "simplename");
@@ -36,6 +38,8 @@ _cms.add.behaviour.add = function(nodeKey) {
 			data: {
 				relativePosition: position,
 				template: $(_cms.add.sel.TEMPLATE_SELECTOR).val(),
+				linktype: $(_cms.add.sel.LINK_TYPE_SELECTOR).val(),
+				linkname: $(_cms.add.sel.LINK_NAME_SELECTOR).val(),
 				itemtype: $(_cms.add.sel.ITEMTYPE_SELECTOR).val(),
 				name: $(_cms.add.sel.NAME_INPUT).val(),
 				simplename: $(_cms.add.sel.SIMPLENAME_INPUT).val(),
@@ -103,6 +107,22 @@ _cms.add.behaviour.changetemplate = function() {
 	});
 }
 
+_cms.add.behaviour.changelinktype = function() {
+	//Add behaviour to linktype selector
+	$(_cms.add.sel.LINK_TYPE_SELECTOR).change(function (e) {
+		var linkTypeOption$ = $(e.target);
+		var linkNameDropdown$ = $(_cms.add.sel.LINK_NAME_SELECTOR);		
+		var nameOptions = _cms.linkNameOptions[linkTypeOption$.val()]
+		
+		var h = ''; 
+		for (var s of nameOptions) {
+			h += _cms.support.toOptionHtml(s);
+		}
+		
+		linkNameDropdown$.empty().html(h);
+	});
+}
+
 _cms.add.behaviour.changetype = function() {
 	// Add commerce form controls when user selects Product for item type 
 	$(_cms.add.sel.ITEMTYPE_SELECTOR).change(function (e) {
@@ -148,6 +168,7 @@ _cms.add.refresh.tab = function(nodeKey) {
 _cms.add.onrefresh = function(nodeKey) {
 	_cms.add.behaviour.add(nodeKey);
 	_cms.add.behaviour.changetype();
+	_cms.add.behaviour.changelinktype();
 	_cms.add.behaviour.changetemplate();
 	_cms.add.behaviour.formchange();
 	_cms.add.behaviour.reset(nodeKey);
