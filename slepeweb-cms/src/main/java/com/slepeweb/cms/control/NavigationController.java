@@ -187,7 +187,7 @@ public class NavigationController extends BaseController {
 				cNode.setFolder(child.getBoundItems().size() > 0);
 			}
 			
-			//cNode.setShortcut(child.isShortcut());
+			cNode.setShortcut(child.isShortcut());
 			pNode.addChild(cNode);
 		}
 		
