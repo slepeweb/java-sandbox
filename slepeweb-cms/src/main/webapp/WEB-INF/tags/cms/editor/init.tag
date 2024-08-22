@@ -106,9 +106,8 @@
 		_cms.misc.behaviour.trash.trash(_cms.editingItemId);
 		
 		// Set up the wysiwyg editor
-		// REGISTRATION IS NOT WORKING
 		Quill.register({
-      'modules/better-table': quillBetterTable
+     'modules/better-table': quillBetterTable
     }, true)
     
 		_cms.field.wysiwygEditor = new Quill('#wysiwyg-editor', {

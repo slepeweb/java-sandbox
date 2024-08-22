@@ -141,7 +141,7 @@ public class NavigationController extends BaseController {
 	
 	private Navigation.Node dive(Item parentItem, int numLevels) {
 		Navigation.Node pNode = Node.toNode(parentItem), cNode;		
-		List<Link> bindings = parentItem.getOrthogonalBindings();
+		List<Link> bindings = parentItem.getOrthogonalLinks();
 		pNode.setFolder(bindings.size() > 0);
 		Item child;
 		
@@ -162,7 +162,7 @@ public class NavigationController extends BaseController {
 	private Navigation.Node dive(Item parentItem, final Vector<String> pathComponents, Link parentLink) {
 		Navigation.Node pNode = Node.toNode(parentItem);		
 		Navigation.Node cNode;
-		List<Link> bindings = parentItem.getOrthogonalBindings();
+		List<Link> bindings = parentItem.getOrthogonalLinks();
 		pNode.setFolder(bindings.size() > 0);
 		Item child;
 		

@@ -667,14 +667,14 @@ public class Item extends CmsBean {
 		return true;
 	}
 
-	public List<Link> getNonOrthogonalBindings() {
+	public List<Link> getNonOrthogonalLinks() {
 		return filterLinks(new String[] {
 				LinkType.inline, 
 				LinkType.relation, 
 				LinkType.shortcut});
 	}
 
-	public List<Link> getOrthogonalBindings() {
+	public List<Link> getOrthogonalLinks() {
 		return filterLinks(getOrthogonalLinkTypes());
 	}
 	
@@ -694,7 +694,7 @@ public class Item extends CmsBean {
 	}
 	
 	public final List<Item> getBoundItems() {
-		return CmsUtil.toItems(getOrthogonalBindings());
+		return CmsUtil.toItems(getOrthogonalLinks());
 	}
 	
 	public List<Item> getRelatedItems() {

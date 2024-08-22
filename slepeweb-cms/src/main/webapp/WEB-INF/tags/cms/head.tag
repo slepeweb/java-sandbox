@@ -14,13 +14,14 @@
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 
+<!-- jQuery code -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/start/jquery-ui.css">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js" type="text/javascript"></script>
 
+
 <!-- Include Fancytree skin and library, and jquery file-upload -->
 <link href="${applicationContextPath}/resources/fancytree/skin-win8/ui.fancytree.min.css" rel="stylesheet" type="text/css">
-
 <script src="${applicationContextPath}/resources/fancytree/jquery.fancytree.min.js" type="text/javascript"></script>
 <script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>
 

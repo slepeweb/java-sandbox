@@ -6,7 +6,7 @@
 <h2>Inlines, relations & shortcuts</h2>
 
 <div id="sortable-links">
-	<c:forEach items="${editingItem.nonOrthogonalBindings}" var="link" varStatus="_stat">
+	<c:forEach items="${editingItem.nonOrthogonalLinks}" var="link" varStatus="_stat">
 		<div class="sortable-link ui-state-default">
 			<div class="left">
 				<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
@@ -22,7 +22,7 @@
 		</div>
 	</c:forEach>
 
-	<c:if test="${empty editingItem.nonOrthogonalBindings}">
+	<c:if test="${empty editingItem.nonOrthogonalLinks}">
 		<p>None</p>
 	</c:if>
 </div>

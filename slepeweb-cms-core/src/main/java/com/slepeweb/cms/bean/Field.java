@@ -389,6 +389,10 @@ public class Field extends CmsBean {
 	public boolean isMarkup() {
 		return this.type == FieldType.markup;
 	}
+	
+	public boolean isExpandable() {
+		return isMarkup() || (this.type == FieldType.text && (this.size == -1 || this.size > 120 ));
+	}
 
 	public Field setMultilingual(boolean multilingual) {
 		this.multilingual = multilingual;
