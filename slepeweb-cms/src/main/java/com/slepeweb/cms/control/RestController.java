@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -497,6 +498,16 @@ public class RestController extends BaseController {
 				 * and param 'datepublished_t' will hold the time.
 				 */
 				dateValueStr = request.getParameter(String.format("%s_d", variable));
+				
+				if (StringUtils.isBlank(dateValueStr)) {
+					String defaultValue = fft.getField().getDefaultValue();
+					if (defaultValue != null && defaultValue.equals("{today}")) {
+						DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+						Date today = Calendar.getInstance().getTime();        
+						dateValueStr = df.format(today);
+					}
+				}
+				
 				timeValueStr = null;
 				
 				if (ft == FieldType.datetime) {

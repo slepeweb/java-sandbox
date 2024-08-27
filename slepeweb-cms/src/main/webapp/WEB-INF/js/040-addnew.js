@@ -1,3 +1,19 @@
+/*
+	Function Index
+	--------------
+	_cms.add.behaviour.add(nodeKey)
+	_cms.add.behaviour.changelinktype()
+	_cms.add.behaviour.changetemplate()
+	_cms.add.behaviour.changetype()
+	_cms.add.behaviour.formchange()
+	_cms.add.behaviour.reset(nodeKey)
+	_cms.add.check_data_is_complete()
+	_cms.add.onrefresh(nodeKey)
+	_cms.add.refresh.tab(nodeKey)
+	_cms.add.setButtonStates()
+	_cms.add.setLinkNames(linkType)
+*/
+
 _cms.add = {
 	behaviour: {},
 	refresh: {},
@@ -34,7 +50,8 @@ _cms.add.behaviour.add = function(nodeKey) {
 		
 		$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/add", {
 			type: "POST",
-			cache: false,
+			cache: false,	<!-- _defaultBindingName: ${_linkTypeNameOptions._defaultBindingName} -->
+			
 			data: {
 				relativePosition: position,
 				template: $(_cms.add.sel.TEMPLATE_SELECTOR).val(),
@@ -111,6 +128,8 @@ _cms.add.behaviour.changelinktype = function() {
 	//Add behaviour to linktype selector
 	$(_cms.add.sel.LINK_TYPE_SELECTOR).change(function (e) {
 		var linkTypeOption$ = $(e.target);
+		cms.add.setLinkNames(linkTypeOption$.val());
+		/*
 		var linkNameDropdown$ = $(_cms.add.sel.LINK_NAME_SELECTOR);		
 		var nameOptions = _cms.linkNameOptions[linkTypeOption$.val()]
 		
@@ -120,6 +139,7 @@ _cms.add.behaviour.changelinktype = function() {
 		}
 		
 		linkNameDropdown$.empty().html(h);
+		*/
 	});
 }
 
@@ -164,6 +184,18 @@ _cms.add.refresh.tab = function(nodeKey) {
 	_cms.support.refreshtab("add", nodeKey, _cms.add.onrefresh);
 }
 
+_cms.add.setLinkNames = function(linkType) {
+	var linkNameDropdown$ = $(_cms.add.sel.LINK_NAME_SELECTOR);		
+	var nameOptions = _cms.linkNameOptions[linkType]
+	
+	var h = ''; 
+	for (var s of nameOptions) {
+		h += _cms.support.toOptionHtml(s);
+	}
+	
+	linkNameDropdown$.empty().html(h);
+}
+
 // Behaviours to apply once html is loaded/reloaded
 _cms.add.onrefresh = function(nodeKey) {
 	_cms.add.behaviour.add(nodeKey);
@@ -172,4 +204,6 @@ _cms.add.onrefresh = function(nodeKey) {
 	_cms.add.behaviour.changetemplate();
 	_cms.add.behaviour.formchange();
 	_cms.add.behaviour.reset(nodeKey);
+	$(_cms.add.sel.LINK_TYPE_SELECTOR).val('binding');
+	_cms.add.setLinkNames('binding');
 }

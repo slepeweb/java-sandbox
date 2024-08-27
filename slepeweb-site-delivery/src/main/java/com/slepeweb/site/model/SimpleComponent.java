@@ -7,11 +7,13 @@ import java.util.List;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.StringWrapper;
+import com.slepeweb.cms.constant.FieldName;
+import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.site.util.StringUtil;
 
 public class SimpleComponent implements NestableComponent, Serializable {
 	private static final long serialVersionUID = 1L;
-	private String name, heading, body;
+	private String heading, body;
 	private String type;
 	private String cssClass, js;
 	private Long id;
@@ -20,12 +22,11 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	public SimpleComponent setup(Link l) {
 		Item i = l.getChild();
 		setId(i.getId());
-		setType(i.getType().getName());
-		setCssClass(i.getFieldValue("css"));	
-		setJs(i.getFieldValue("js"));
-		setHeading(i.getFieldValue("heading"));
-		setBody(i.getFieldValueResolved("body", new StringWrapper("")));
-		setName(i.getName());
+		setType(i);
+		setCssClass(i.getFieldValue(FieldName.CSS));	
+		setJs(i.getFieldValue(FieldName.JS));
+		setHeading(i.getFieldValue(FieldName.HEADING));
+		setBody(i.getFieldValueResolved(FieldName.BODYTEXT, new StringWrapper("")));
 		return this;
 	}
 	
@@ -50,6 +51,12 @@ public class SimpleComponent implements NestableComponent, Serializable {
 		return this;
 	}
 	
+	public SimpleComponent setType(Item i) {
+		String linkedItemType = i.getType().getName();
+		setType(linkedItemType.equals(ItemTypeName.COMPONENT) ? i.getFieldValue("component-type") : linkedItemType);
+		return this;
+	}
+
 	public String getCssClass() {
 		return cssClass;
 	}
@@ -74,15 +81,6 @@ public class SimpleComponent implements NestableComponent, Serializable {
 
 	public SimpleComponent setBody(String blurb) {
 		this.body = blurb;
-		return this;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public SimpleComponent setName(String name) {
-		this.name = name;
 		return this;
 	}
 

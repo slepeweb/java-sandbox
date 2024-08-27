@@ -60,7 +60,6 @@
 		<label for="type">Link type: </label>
 		<div class="inputs">
 			<select name="linktype">
-				<option value="0">Choose ...</option>
 				<c:forEach items="${editingItem.orthogonalLinkTypes}" var="ltype">
 					<option value="${ltype}">${ltype}</option>
 				</c:forEach>
@@ -72,7 +71,6 @@
 		<label for="type">Link name: </label>
 		<div class="inputs">
 			<select name="linkname">
-				<option value="0">Choose ...</option>
 			</select>
 		</div>
 	</div>

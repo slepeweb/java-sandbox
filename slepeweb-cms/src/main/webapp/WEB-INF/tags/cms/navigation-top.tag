@@ -19,29 +19,29 @@
 			<!-- Item flagging controls -->
 			<div id="misc-controls">
 				<!-- Flag the current item -->
-				<div id="item-flag">
-					<i class="fa-solid fa-flag item-flag <c:if test='${_itemIsFlagged}'>flagged</c:if>" title="Flag this item"></i>
+				<div id="item-flag" title="Flag this item">
+					<i class="fa-solid fa-flag item-flag <c:if test='${_itemIsFlagged}'>flagged</c:if>"></i>
 				</div>
 				
 				<!-- Flag all sibling items -->
-				<div id="item-sibling-flag">
-					<i class="fa-solid fa-flag" title="Flag this and ALL sibling items"></i>
-					<div>
-						<i class="fa-solid fa-flag" title="Flag this and ALL sibling items"></i>
+				<div id="item-sibling-flag" title="Flag this and ALL sibling items">
+					<i class="fa-solid fa-flag"></i>
+					<div title="Flag this and ALL sibling items">
+						<i class="fa-solid fa-flag"></i>
 					</div>
 				</div>
 				
 				<!-- Clear all item flags -->
-				<div id="item-flag-clear">
-					<i class="fa-solid fa-flag" title="Clear all item flags"></i>
-					<div title="Clear all item flags">
-						<i class="fa-solid fa-xmark" title="Clear all item flags"></i>
+				<div id="item-flag-clear" title="Clear all item flags">
+					<i class="fa-solid fa-flag"></i>
+					<div>
+						<i class="fa-solid fa-xmark"></i>
 					</div>
 				</div>
 				
 				<!-- Show list of flagged items -->
-				<div id="item-flag-show">
-					<i class="fa-solid fa-eye" title="Show list of flagged items"></i>
+				<div id="item-flag-show" title="Show list of flagged items">
+					<i class="fa-solid fa-eye"></i>
 				</div>
 			</div>			
 		</div>
