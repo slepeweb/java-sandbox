@@ -213,7 +213,7 @@ public class PageController extends BaseController {
 	@SuppressWarnings("unused")
 	private SiblingItemPager getSiblings(Item i, String[] typesOfInterest, int max) {
 		LinkFilter f = new LinkFilter().setItemTypes(typesOfInterest);
-		List<Item> children = f.filterItems(i.getParent().getBindings());		
+		List<Item> children = f.filterItems(i.getOrthogonalParent().getBindings());		
 		return new SiblingItemPager(children, i, max);
 	}
 }

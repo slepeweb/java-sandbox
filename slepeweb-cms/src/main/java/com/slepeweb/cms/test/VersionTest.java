@@ -104,8 +104,8 @@ public class VersionTest extends BaseTest {
 				r.setNotes(String.format("Version %d is %s", newsSectionItem.getVersion(), newsSectionItem.isEditable() ? "editable" : "NOT editable"));
 				r.failIf(newsSectionItem.isEditable());
 	
-				Item neuParent = newVersionOfNewsSection.getParent();
-				Item parent = newsSectionItem.getParent();
+				Item neuParent = newVersionOfNewsSection.getOrthogonalParent();
+				Item parent = newsSectionItem.getOrthogonalParent();
 				
 				r = trs.execute(7050);
 				r.setNotes(String.format("The parent id of the new version of the news section is %d", neuParent.getId()));

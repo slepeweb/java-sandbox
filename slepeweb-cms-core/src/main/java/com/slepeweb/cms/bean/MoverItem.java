@@ -50,7 +50,7 @@ public class MoverItem extends Item {
 		setOrigId(i.getOrigId());
 		setCmsService(i.getCmsService());
 		
-		Item parent = i.getParent();
+		Item parent = i.getOrthogonalParent();
 		if (parent == null) {
 			return;
 		}

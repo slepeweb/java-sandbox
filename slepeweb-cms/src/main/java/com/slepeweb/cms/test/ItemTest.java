@@ -250,7 +250,7 @@ public class ItemTest extends BaseTest {
 			
 			if (newsItem != null) {
 				r = trs.execute(4120);
-				Item newsSection = newsItem.getParent();
+				Item newsSection = newsItem.getOrthogonalParent();
 				
 				if (newsSection != null) {
 					r.setNotes(String.format("Parent path is [%s]", newsSection.getPath()));
@@ -260,7 +260,7 @@ public class ItemTest extends BaseTest {
 					else {
 						// 4130
 						r = trs.execute(4130);
-						Item root = newsSection.getParent();
+						Item root = newsSection.getOrthogonalParent();
 						if (root != null) {
 							r.fail().setNotes(String.format("Parent path is [%s]", root.getPath()));
 							r.failIf(! root.getPath().equals("/"));

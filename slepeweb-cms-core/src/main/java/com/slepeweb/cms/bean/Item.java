@@ -43,7 +43,6 @@ public class Item extends CmsBean {
 	private List<Link> links, parentLinks;
 	private List<Tag> tags;
 	private Item parent;
-	private List<Item> relatedParents;
 	private int version = 1;
 	
 	// NOTE: language is not saved in the database; it is assigned on item creation
@@ -125,7 +124,7 @@ public class Item extends CmsBean {
 		list.add(getId());
 		Item climber = this, parent;
 		
-		while ((parent = climber.getParent()) != null) {
+		while ((parent = climber.getOrthogonalParent()) != null) {
 			list.add(parent.getId());
 			climber = parent;
 		}
@@ -140,44 +139,15 @@ public class Item extends CmsBean {
 		return sb.toString();
 	}
 	
-	public Item getParent() {
+	public Item getOrthogonalParent() {
 		if (this.parent == null) {
-			if (getId() != null) {
-				Link l = this.cmsService.getLinkService().getParent(getId());
-				if (l != null) {
-					// In this case, the 'child' IS the 'parent'
-					this.parent = l.getChild();
-					this.parent.setLanguage(getLanguage());
-				}
+			Link l = getOrthogonalParentLink();
+			if (l != null) {
+				this.parent = l.getChild();
+				this.parent.setLanguage(getLanguage());
 			}
 		}
 		return this.parent;
-	}
-	
-	public List<Item> getRelatedParents() {
-		return getRelatedItems();
-	}
-	
-	public List<Item> getRelatedParents(LinkFilter filter) {
-		if (this.relatedParents == null) {
-			if (getId() != null) {
-				this.relatedParents = new ArrayList<Item>();
-				List<Link> list = this.cmsService.getLinkService().getRelatedParents(getId());
-				
-				if (list != null) {
-					if (filter != null) {
-						this.relatedParents = filter.filterItems(list);
-					}
-					else {				
-						for (Link l : list) {
-							this.relatedParents.add(l.getChild());
-						}
-					}
-				}
-			}
-		}
-		
-		return this.relatedParents;
 	}
 	
 	@Override
@@ -446,8 +416,8 @@ public class Item extends CmsBean {
 				 */
 				String parentPath = null;
 				
-				if (getParent() != null) {
-					parentPath = getParent().getPath();
+				if (getOrthogonalParent() != null) {
+					parentPath = getOrthogonalParent().getPath();
 				}
 				else {
 					parentPath = getParentPath();
@@ -644,11 +614,20 @@ public class Item extends CmsBean {
 	
 	private Link filterOrthogonalParentLink() {
 		String[] targets = new String[] {LinkType.binding, LinkType.component};
-		for (Link l : getParentLinksIncludingBindings()) {
+		List<Link> plinks = getParentLinksIncludingBindings();
+		
+		if (plinks.size() > 1) {
+			LOG.error(String.format("DB Integrity Error; Child item [%d] has more than one orthogonal parent", getId()));
+		}
+
+		// Return first link that's either a binding or component
+		for (Link l : plinks) {
 			if (matches(l.getType(), targets)) {
 				return l;
 			}
 		}
+		
+		LOG.error(String.format("DB Integrity Error; Child item [%d] has NO parent", getId()));
 		return null;
 	}
 	

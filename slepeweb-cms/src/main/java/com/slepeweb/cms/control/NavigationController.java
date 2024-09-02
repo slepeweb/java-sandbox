@@ -119,7 +119,7 @@ public class NavigationController extends BaseController {
 		if (i != null) {
 			trail.add(i.getOrigId());
 			
-			while ((i = i.getParent()) != null) {
+			while ((i = i.getOrthogonalParent()) != null) {
 				trail.add(i.getOrigId());
 			}
 			

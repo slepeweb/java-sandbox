@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.site.model.SimpleComponent;
@@ -24,31 +25,36 @@ public class ComponentServiceImpl implements ComponentService {
 	public List<SimpleComponent> getComponents(List<Link> componentLinks, String targetLinkName) {
 
 		List<SimpleComponent> components = new ArrayList<SimpleComponent>();
-		SimpleComponent simple = new SimpleComponent();
+		SimpleComponent target;
+		Object obj;
+		Item i;
+		String componentType;
+		Constructor<?> constructor;
+		Class<?> clazz;
+		String fullPath;
 
 		if (componentLinks != null && componentLinks.size() > 0) {
 			for (final Link link : componentLinks) {
+				i = link.getChild();
+				
 				if (targetLinkName == null || link.getName().equals(targetLinkName)) {
-					simple.setup(link);
+					componentType = SimpleComponent.getComponentType(i.getType().getName(), i.getFieldValue("component-type"));
 										
 					try {
-						String fullPath = "com.slepeweb.site.model." + StringUtils.capitalize(simple.getType()) + "Component";
-						Class<?> clazz = Class.forName(fullPath);
-						Constructor<?> constructor = clazz.getDeclaredConstructor();
-						Object obj = constructor.newInstance();
-						SimpleComponent target = (SimpleComponent) obj;
-						target.setup(link);
-	
-						if (obj != null) {
-							components.add(target);
-							LOG.debug(String.format("Component: %s() [%s]", simple.getType(), link.getChild().getPath()));
-						}
+						fullPath = "com.slepeweb.site.model." + StringUtils.capitalize(componentType) + "Component";
+						clazz = Class.forName(fullPath);
+						constructor = clazz.getDeclaredConstructor();
+						obj = constructor.newInstance();
+						target = (SimpleComponent) obj;
+						target.setComponentService(this).setup(link);
+						components.add(target);
+						LOG.info(String.format("Component: %s() [%s]", componentType, i.getPath()));
 					} 
 					catch (NoSuchMethodException e) {
-						LOG.warn(LogUtil.compose("Method not found", simple.getType()));
+						LOG.warn(LogUtil.compose("Method not found", componentType));
 					}
 					catch (Exception e) {
-						LOG.warn(LogUtil.compose("Uncaught error", simple.getType()), e);
+						LOG.warn(LogUtil.compose("Uncaught error", componentType), e);
 					}
 				}
 			}

@@ -37,7 +37,7 @@ public class LogozerComponent extends SimpleComponent {
 	
 	@Override
 	public String toString() {
-		return String.format("LogozerComponent (%s)", getName());
+		return String.format("LogozerComponent (%s)", getHeading());
 	}
 
 	public int getNumCells() {

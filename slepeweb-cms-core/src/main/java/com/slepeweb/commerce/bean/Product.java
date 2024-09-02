@@ -165,13 +165,13 @@ public class Product extends Item {
 			
 			Item mainImage = getFirstInlineImage();
 			if (mainImage != null) {
-				Item container = mainImage.getParent();
+				Item container = mainImage.getOrthogonalParent();
 				
 				// This image might be in a variants folder.
 				if (container != null && container.getSimpleName().equals(VARIANTS_FOLDER_SIMPLENAME)) {
 					this.variantImageFolder = container;
 					// Climb one level higher
-					container = container.getParent();
+					container = container.getOrthogonalParent();
 				}
 				
 				if (container != null) {

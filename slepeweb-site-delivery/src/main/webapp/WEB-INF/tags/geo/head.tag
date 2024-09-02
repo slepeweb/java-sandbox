@@ -8,7 +8,8 @@
 
 <link rel="stylesheet" href="/resources/pho/css/jquery-ui.min.css" type="text/css">
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/start/jquery-ui.css" type="text/css">
-<link rel="stylesheet" href="/resources/pho/css/style-pho.css" type="text/css">
+<link rel="stylesheet" href="/resources/geo/css/main.css" type="text/css">
+<link rel="stylesheet" href="/resources/geo/css/nav.css" type="text/css">
 
 <script 
 	src="https://code.jquery.com/jquery-3.6.0.min.js" 
@@ -21,7 +22,8 @@
 	crossorigin="anonymous"></script>
 	
 <script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>
-<!-- <script src="/resources/pho/js/site.js"></script> -->
+
+<script src="/resources/geo/js/nav.js"></script>
 	
 <gen:extraCSS />
 <gen:extraInpageCSS />

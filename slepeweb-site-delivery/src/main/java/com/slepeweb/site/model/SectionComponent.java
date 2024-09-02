@@ -5,41 +5,29 @@ import java.util.List;
 
 import com.slepeweb.cms.bean.Link;
 
-public class StandardComponent extends SimpleComponent {
+public class SectionComponent extends SimpleComponent {
 	private static final long serialVersionUID = 1L;
-	private List<Image> images;
+	private Image image;
 	private List<LinkTarget> targets;
+	private String identifier;
 
-	public StandardComponent setup(Link l) {
+	public SectionComponent setup(Link l) {
 		super.setup(l);
-		
-		// Images
-		setImages(new ArrayList<Image>());
-		for (Link ll : l.getChild().getInlines()) {
-			if (! ll.getName().equals(Image.BACKGROUND)) {
-				getImages().add(new Image(ll));
-			}
-		}
-		
-		// Link targets
-		setTargets(new ArrayList<LinkTarget>());
-		for (Link ll : l.getChild().getRelations()) {
-			getTargets().add(new LinkTarget(ll.getChild()));
-		}
-		
+		this.targets = new ArrayList<LinkTarget>();
+		this.identifier = l.getChild().getFieldValue("identifier");
 		return this;
 	}
 	
 	public String toString() {
-		return String.format("StandardComponent (%s): %s", getType(), getHeading());
+		return String.format("SectionComponent (%s): %s", getType(), getHeading());
 	}
 	
-	public List<Image> getImages() {
-		return images;
+	public Image getImage() {
+		return image;
 	}
 
-	public StandardComponent setImages(List<Image> media) {
-		this.images = media;
+	public SectionComponent setImage(Image media) {
+		this.image = media;
 		return this;
 	}
 
@@ -47,31 +35,8 @@ public class StandardComponent extends SimpleComponent {
 		return targets;
 	}
 
-	public StandardComponent setTargets(List<LinkTarget> targets) {
-		this.targets = targets;
-		return this;
-	}
-
-	public Image getBackgroundImage() {
-		return getImage(true);
-	}
-	
-	public Image getMainImage() {
-		return getImage(false);
-	}
-	
-	private Image getImage(boolean targetIsBackground) {
-		boolean isBackgroundImage;
-		for (Image img : getImages()) {
-			isBackgroundImage = img.getType().equals(Image.BACKGROUND);
-			if (
-					(targetIsBackground && isBackgroundImage) ||
-					(! targetIsBackground && ! isBackgroundImage)) {
-				
-				return img;
-			}
-		}
-		return null;
+	public String getIdentifier() {
+		return identifier;
 	}
 
 }

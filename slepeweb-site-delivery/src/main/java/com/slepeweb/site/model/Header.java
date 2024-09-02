@@ -32,7 +32,7 @@ public class Header implements Serializable {
 		
 		while (! i.getPath().equals("/")) {
 			this.breadcrumbItems.add(i);
-			i = i.getParent();
+			i = i.getOrthogonalParent();
 		}
 		
 		// Lastly, add the root item
@@ -47,7 +47,7 @@ public class Header implements Serializable {
 		Item root = itemService.getItem(i.getSite().getId(), "/");
 		
 		if (root != null) {
-			this.topNavigation.addAll(navigationService.drillDown(root, 1, i.getPath()).getChildren());
+			this.topNavigation.addAll(navigationService.drillDown(root, 3, i.getPath()).getChildren());
 			LOG.debug(String.format("Top navigation has %d entries", this.topNavigation.size()));
 		}
 	}

@@ -1,0 +1,155 @@
+/* Basic reset 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+*/
+
+/* Header styling */
+header {
+    color: white;
+    align-content: center;
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: #6f86ca;
+		display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    height: 70%;
+}
+
+.brand-title {
+    font-size: 1.5em;
+}
+
+.navbar ul {
+    display: flex;
+    margin: 0;
+    list-style: none;
+}
+
+.navbar li {
+    padding: 0 15px;
+    position: relative;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    padding: 8px 15px;
+    transition: background 0.3s;
+}
+
+.navbar a:hover {
+    background-color: #555;
+}
+
+/* Dropdown menu styling */
+div.submenu-1 {
+    display: none;
+    position: absolute;
+    background-color: #6d9da8;
+    min-width: 160px;
+    top: 100%;
+    z-index: 1;
+}
+
+div.submenu-1.active, div.submenu-2.active {
+	display: block;
+}
+
+.submenu-1 a {
+    display: block;
+    padding: 10px;
+}
+
+.submenu-1 a:hover {
+    background-color: #555;
+}
+
+/* Submenu styling */
+.submenu-2 {
+    display: none;
+    position: absolute;
+    left: 90%;
+    top: 12px;
+    background-color: #367584;
+    min-width: 160px;
+    z-index: 2;
+}
+
+.submenu-2 a {
+    padding: 10px;
+    white-space: nowrap;
+}
+
+/* Toggle button styling */
+.menu-bars {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.menu-bars .bar {
+    height: 3px;
+    width: 25px;
+    background-color: white;
+    margin: 4px 0;
+}
+
+div#breadcrumbs {
+	margin: 6px 0 6px 0;
+	font-size: 0.9em;
+}
+
+div#breadcrumbs ul {
+	display: flex;
+}
+
+div#breadcrumbs ul {
+	list-style: none;
+}
+
+div#breadcrumbs a {
+	text-decoration: none;
+	color: #666;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .navbar {
+        display: none;
+        width: 100%;
+    }
+
+    .navbar ul {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .navbar ul li {
+        text-align: center;
+        padding: 15px 0;
+        width: 100%;
+    }
+
+    .menu-bars {
+        display: flex;
+    }
+
+    .navbar.active {
+        display: flex;
+    }
+
+    .submenu-1 {
+        position: static;
+    }
+
+    .submenu-2 {
+        position: static;
+    }
+}

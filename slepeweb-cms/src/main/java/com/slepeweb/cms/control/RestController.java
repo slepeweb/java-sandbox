@@ -679,7 +679,7 @@ public class RestController extends BaseController {
 		User u = getUser(req);
 		Item parent = getEditableVersion(parentOrigId, u, true);
 		if (relativePosition.equals("alongside") && ! parent.isRoot()) {
-			parent = parent.getParent();
+			parent = parent.getOrthogonalParent();
 		}
 		 
 		Item i = CmsBeanFactory.makeItem(it.getName()).
@@ -968,7 +968,7 @@ public class RestController extends BaseController {
 			// Get the first of the restored items
 			Item i = this.cmsService.getItemService().getEditableVersion(origIds[0]);
 			if (i != null) {
-				Item parent = i.getParent();
+				Item parent = i.getOrthogonalParent();
 				
 				return resp.
 						setError(false).
@@ -995,7 +995,7 @@ public class RestController extends BaseController {
 			resp.setError(false).addMessage(String.format("Restored %d items from the trash", numRestored));
 			
 			Node iNode = Node.toNode(allTrashedItems.get(0));
-			Node pNode = Node.toNode(allTrashedItems.get(0).getParent());
+			Node pNode = Node.toNode(allTrashedItems.get(0).getOrthogonalParent());
 			
 			return resp.setData(new Object[] {pNode, iNode});
 		}
@@ -1332,7 +1332,7 @@ public class RestController extends BaseController {
 	@ResponseBody
 	public int flagSiblings(@PathVariable long origId, HttpServletRequest request) {
 		Item i = this.getEditableVersion(origId, getUser(request));
-		Item parent = i.getParent();
+		Item parent = i.getOrthogonalParent();
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
 		Date now = new Date();
 		int count = 0;

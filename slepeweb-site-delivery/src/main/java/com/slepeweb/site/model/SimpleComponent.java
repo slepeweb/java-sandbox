@@ -1,7 +1,6 @@
 package com.slepeweb.site.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.slepeweb.cms.bean.Item;
@@ -9,6 +8,7 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.ItemTypeName;
+import com.slepeweb.site.service.ComponentService;
 import com.slepeweb.site.util.StringUtil;
 
 public class SimpleComponent implements NestableComponent, Serializable {
@@ -17,7 +17,8 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	private String type;
 	private String cssClass, js;
 	private Long id;
-	private List<SimpleComponent> components = new ArrayList<SimpleComponent>();
+	private List<SimpleComponent> components;
+	private ComponentService componentService;
 
 	public SimpleComponent setup(Link l) {
 		Item i = l.getChild();
@@ -27,6 +28,11 @@ public class SimpleComponent implements NestableComponent, Serializable {
 		setJs(i.getFieldValue(FieldName.JS));
 		setHeading(i.getFieldValue(FieldName.HEADING));
 		setBody(i.getFieldValueResolved(FieldName.BODYTEXT, new StringWrapper("")));
+		
+		if (this.componentService != null) {
+			this.components = this.componentService.getComponents(i.getComponents());
+		}
+		
 		return this;
 	}
 	
@@ -53,8 +59,12 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	
 	public SimpleComponent setType(Item i) {
 		String linkedItemType = i.getType().getName();
-		setType(linkedItemType.equals(ItemTypeName.COMPONENT) ? i.getFieldValue("component-type") : linkedItemType);
+		setType(getComponentType(linkedItemType, i.getFieldValue("component-type")));
 		return this;
+	}
+	
+	public static String getComponentType(String itemType, String componentType) {
+		return itemType.equals(ItemTypeName.COMPONENT) ? componentType : itemType;
 	}
 
 	public String getCssClass() {
@@ -98,6 +108,15 @@ public class SimpleComponent implements NestableComponent, Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public ComponentService getComponentService() {
+		return componentService;
+	}
+
+	public SimpleComponent setComponentService(ComponentService componentService) {
+		this.componentService = componentService;
+		return this;
 	}
 
 }

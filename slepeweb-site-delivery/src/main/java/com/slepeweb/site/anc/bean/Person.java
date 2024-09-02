@@ -102,7 +102,7 @@ public class Person {
 
 	private void setParentage() {
 		// This is the primary parent, linked by 'binding'
-		Item parentItem = this.item.getParent();
+		Item parentItem = this.item.getOrthogonalParent();
 		
 		if (
 				parentItem != null && 
@@ -186,7 +186,7 @@ public class Person {
 		LinkFilter f = new LinkFilter().setItemTypes(new String[] {Person.BOY, Person.GIRL});
 
 		this.siblings = new ArrayList<Person>();
-		for (Item sibling : f.filterItems(this.item.getParent().getBindings())) {
+		for (Item sibling : f.filterItems(this.item.getOrthogonalParent().getBindings())) {
 			if (! sibling.getPath().equals(this.item.getPath())) {
 				this.siblings.add(new Person(sibling));
 			}

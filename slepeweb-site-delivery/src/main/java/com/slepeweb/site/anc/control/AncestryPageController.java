@@ -171,7 +171,7 @@ public class AncestryPageController extends BaseController {
 		Page page = getStandardPage(i, shortSitename, "personHistory", model);
 		page.setTitle(i.getFieldValue("heading"));
 		
-		Person subject = new Person(i.getParent());
+		Person subject = new Person(i.getOrthogonalParent());
 		model.addAttribute(PERSON, subject);
 		model.addAttribute(MENU, createPersonMenu(i, subject, null));
 		model.addAttribute(SUBMENU, createPersonSubMenu(i, subject, subject.getDocuments(), null, null));

@@ -10,8 +10,11 @@ public class Image implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static final String BACKGROUND = "background";
 	
+	public enum Align {left, centre, right}
+	
 	private String title, src, alt, type;
 	private int width, height;
+	private Align align = Align.left;
 	
 	public Image() {}
 	
@@ -77,6 +80,15 @@ public class Image implements Serializable {
 
 	public Image setType(String type) {
 		this.type = type;
+		return this;
+	}
+
+	public Align getAlign() {
+		return align;
+	}
+
+	public Image setAlign(Align align) {
+		this.align = align;
 		return this;
 	}
 }

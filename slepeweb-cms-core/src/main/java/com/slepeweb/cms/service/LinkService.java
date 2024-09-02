@@ -22,7 +22,7 @@ public interface LinkService {
 	int getCount();
 	int getCount(Long parentId);
 	
-	Link getParent(Long childId);
+	//Link getParent(Long childId) throws ResourceException;
 	List<Link> getParentLinks(Long childId);
 	List<Link> getRelatedParents(Long childId);
 }

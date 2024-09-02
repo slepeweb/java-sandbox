@@ -58,12 +58,12 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 			throw new ResourceException("Target of move not found");
 		}
 		
-		Item newParent = mode.equals(MoverItem.MOVE_OVER) ? target : target.getParent();
+		Item newParent = mode.equals(MoverItem.MOVE_OVER) ? target : target.getOrthogonalParent();
 		if (newParent == null) {
 			throw new ResourceException("Attempted to move an item to one of its descendants");
 		}
 		
-		LOG.info(String.format("Moving [%s] (mover) %s [%s] (target)", mover, /*to.getMode()*/ mode.toUpperCase(), target));			
+		LOG.info(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mode.toUpperCase(), target));			
 		
 		// Cannot move an item to one of its descendants
 		if (newParent.getPath().startsWith(mover.getPath())) {
@@ -79,15 +79,16 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		}
 		
 		// Break the parent link for the mover, EVEN IF old-parent = new-parent
-		this.linkService.deleteLinks(mover.getParent().getId(), mover.getId());
+		Link oldParentLink = mover.getOrthogonalParentLink();
+		this.linkService.deleteLinks(oldParentLink.getChild().getId(), mover.getId());
 		LOG.debug("  Removed links between mover and old parent");		
 		
 		// Bind to new parent - we'll save() the mover link later
 		Link moverLink = CmsBeanFactory.makeLink().
 				setParentId(newParent.getId()).
 				setChild(mover).
-				setType(LinkType.binding).
-				setName("std");
+				setType(oldParentLink.getType()).
+				setName(oldParentLink.getName());
 		
 		// Identify the orthogonal parent. The link type will be either binding or component - nothing else.
 		// Retain this link type once the item is moved.
@@ -181,7 +182,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		 *  so keep record of required data before the new version is created.
 		 */
 		int origVersion = source.getVersion();
-		Item parent = source.getParent();
+		Item parent = source.getOrthogonalParent();
 		int origOrdering = this.linkService.getLink(parent.getId(), source.getId()).getOrdering();
 		long sourceId = source.getId();
 		long sourceOrigId = source.getOrigId();

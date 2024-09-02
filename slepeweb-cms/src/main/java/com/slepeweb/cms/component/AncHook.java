@@ -13,7 +13,7 @@ public class AncHook extends NoHook {
 	@Override
 	public void addItemPost(Item i) {
 		// Set surname to be the same as that of the parent
-		Item parent = i.getParent();
+		Item parent = i.getOrthogonalParent();
 		String surname = parent.getFieldValue(FieldName.LASTNAME);
 		i.setFieldValue(FieldName.LASTNAME, surname);
 		
