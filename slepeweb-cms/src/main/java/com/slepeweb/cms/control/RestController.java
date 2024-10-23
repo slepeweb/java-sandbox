@@ -703,6 +703,10 @@ public class RestController extends BaseController {
 			i.setPublished(true);
 		}
 		
+		// Site-specific actions on adding a new item
+		ICmsHook h = this.cmsHooker.getHook(i.getSite().getShortname());
+		h.addItemPre(i);
+
 		Product p = null;
 		
 		if (i.isProduct()) {
@@ -725,8 +729,6 @@ public class RestController extends BaseController {
 			
 			LOG.info(userLog(u, "saved item", i));
 			
-			// Site-specific actions on adding a new item
-			ICmsHook h = this.cmsHooker.getHook(i.getSite().getShortname());
 			h.addItemPost(i);
 			
 			Object[] o = new Object[]{

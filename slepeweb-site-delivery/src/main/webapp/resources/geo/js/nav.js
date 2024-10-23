@@ -1,18 +1,82 @@
+class MenuHandler {
+	constructor() {
+		this.submenusActive = false;
+		this.debugFlag = false;
+	}
+	
+	deactivateAllSubmenus(msg) {
+		this.deactivateSubmenus([1, 2], msg)
+	}
+	
+	deactivateSubmenus(levels, msg) {
+		let s = ' Hiding all ';
+		for (let i = 0; i < levels.length; i++) {
+			s += 'level-' + levels[i] + ', ';
+		}
+		s = s.substr(0, s.length - 1);
+		s += ' menu(s)';
+		
+		this.debug(msg ? msg : '', s);
+		
+		for (let i = 0; i < levels.length; i++) {
+			this.deactivate($("div.submenu-" + levels[i]));
+		}
+	}
+	
+	activate(ele$, msg) {
+		this.debug(msg ? msg : '');
+		ele$.addClass('active');
+		this.submenusActive = true;
+	}
+		
+	deactivate(ele$, msg) {
+		this.debug(msg ? msg : '');
+		ele$.removeClass('active');
+	}
+	
+	debug(...msg) {
+		if (this.debugFlag) {
+			let s = '';
+			for (let part of msg) {
+				s += ' ' + part;
+			}
+			
+			if (s.trim().length > 0) {
+				console.log(s);
+			}
+		}
+	}
+		
+};
+
+let _menu = new MenuHandler();
+
 $(function() {
-	$("div.navbar a.toplevel").mouseover(function() {
+	// Mouse pointer is over a top-level menu option
+	$("div.navbar a.toplevel").on('mouseenter', function(e) {
+		e.stopPropagation();
 		let a$ = $(this);
-		$("div.navbar div.submenu-1").removeClass("active");
-		a$.next().addClass("active");
+		_menu.deactivateAllSubmenus('Mouse entered level-0 menu');
+		_menu.activate(a$.next(), '   Activating corresponding level-1 menu');
 	});
 	
-	$("div.submenu-1 > a").mouseover(function() {
+	// Mouse pointer is over a level-1 menu option.
+	// Open the corresponding level-2 submenu
+	$("div.submenu-1 > div > a").on('mouseenter', function(e) {
+		e.stopPropagation();
 		let a$ = $(this);
-		$("div.submenu-1 div.submenu-2").removeClass("active");
-		a$.next().addClass("active");
+		_menu.deactivateSubmenus([2], 'Mouse entered level-1 menu');
+		_menu.activate(a$.next(), '   Activating corresponding level-2 menu');
 	});
 	
-	$("div.submenu-1, div.submenu-2").mouseleave(function() {
-		let div$ = $(this);
-		div$.removeClass("active");
+	/*
+	$("div.submenu-2").on('mouseenter', function(e) {
+		e.stopPropagation();
 	});
+	*/
+	
+	$("div.main").on('mouseenter', function(e) {
+		_menu.deactivateAllSubmenus('Moused over main page area');	
+	});
+	
 });

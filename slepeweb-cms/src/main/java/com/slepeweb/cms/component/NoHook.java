@@ -6,6 +6,11 @@ import com.slepeweb.cms.bean.guidance.IGuidance;
 public class NoHook implements ICmsHook {
 	
 	@Override
+	public void addItemPre(Item i) {
+		// Do nothing
+	}
+
+	@Override
 	public void addItemPost(Item i) {
 		// Do nothing
 	}

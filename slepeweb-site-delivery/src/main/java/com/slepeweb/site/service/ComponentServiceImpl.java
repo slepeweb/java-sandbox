@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -28,33 +27,31 @@ public class ComponentServiceImpl implements ComponentService {
 		SimpleComponent target;
 		Object obj;
 		Item i;
-		String componentType;
+		String[] componentData;
 		Constructor<?> constructor;
 		Class<?> clazz;
-		String fullPath;
 
 		if (componentLinks != null && componentLinks.size() > 0) {
 			for (final Link link : componentLinks) {
 				i = link.getChild();
 				
 				if (targetLinkName == null || link.getName().equals(targetLinkName)) {
-					componentType = SimpleComponent.getComponentType(i.getType().getName(), i.getFieldValue("component-type"));
+					componentData = SimpleComponent.getComponentType(i);
 										
 					try {
-						fullPath = "com.slepeweb.site.model." + StringUtils.capitalize(componentType) + "Component";
-						clazz = Class.forName(fullPath);
+						clazz = Class.forName(componentData[0]);
 						constructor = clazz.getDeclaredConstructor();
 						obj = constructor.newInstance();
 						target = (SimpleComponent) obj;
 						target.setComponentService(this).setup(link);
 						components.add(target);
-						LOG.info(String.format("Component: %s() [%s]", componentType, i.getPath()));
+						LOG.info(String.format("Component: %s() [%s]", componentData[0], i.getPath()));
 					} 
 					catch (NoSuchMethodException e) {
-						LOG.warn(LogUtil.compose("Method not found", componentType));
+						LOG.warn(LogUtil.compose("Method not found", componentData[0]));
 					}
 					catch (Exception e) {
-						LOG.warn(LogUtil.compose("Uncaught error", componentType), e);
+						LOG.warn(LogUtil.compose("Uncaught error", componentData[0]), e);
 					}
 				}
 			}

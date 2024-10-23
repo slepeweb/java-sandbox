@@ -433,7 +433,9 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 	private void removeStaleLinks(List<Link> dbRecordLinks, List<Link> updatedLinks) {
 		if (dbRecordLinks != null && updatedLinks != null) {
 			for (Link dbLink : dbRecordLinks) {
-				if (! updatedLinks.contains(dbLink) && ! dbLink.getType().equals("binding")) {
+				if (! updatedLinks.contains(dbLink) && 
+						! (dbLink.getType().equals(LinkType.binding) || dbLink.getType().equals(LinkType.component))) {
+					
 					dbLink.delete();
 					LOG.info(compose("Deleted old inline/relation link", dbLink));
 				}

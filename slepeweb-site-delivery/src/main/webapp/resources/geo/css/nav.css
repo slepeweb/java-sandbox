@@ -19,7 +19,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding-left: 10px;
-    height: 70%;
+    height: 100%;
 }
 
 .brand-title {
@@ -52,37 +52,43 @@ header {
 div.submenu-1 {
     display: none;
     position: absolute;
+    top: 100%;
     background-color: #6d9da8;
     min-width: 160px;
-    top: 100%;
     z-index: 1;
+    line-height: 0.7em;
 }
 
 div.submenu-1.active, div.submenu-2.active {
 	display: block;
 }
 
-.submenu-1 a {
+div.submenu-1 a {
     display: block;
     padding: 10px;
 }
 
-.submenu-1 a:hover {
+div.submenu-1 > div {
+	position: relative;
+}
+
+div.submenu-1 a:hover {
     background-color: #555;
 }
 
 /* Submenu styling */
-.submenu-2 {
+div.submenu-2 {
     display: none;
     position: absolute;
     left: 90%;
-    top: 12px;
+    top: 0.5em;
     background-color: #367584;
     min-width: 160px;
     z-index: 2;
+    line-height: 0.7em;
 }
 
-.submenu-2 a {
+div.submenu-2 a {
     padding: 10px;
     white-space: nowrap;
 }

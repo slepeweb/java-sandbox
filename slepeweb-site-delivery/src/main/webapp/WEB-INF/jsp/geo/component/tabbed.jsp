@@ -8,12 +8,12 @@
 	
 	<ul>
 		<c:forEach items="${_comp.components}" var="subComp">
-			<li><a href="#${subComp.identifier}-tab">${subComp.identifier}</a></li>
+			<li><a href="#${site:compress(subComp.identifier)}-tab">${subComp.identifier}</a></li>
 		</c:forEach>
 	</ul>
 	
 	<c:forEach items="${_comp.components}" var="subComp">
-		<div id="${subComp.identifier}-tab">
+		<div id="${site:compress(subComp.identifier)}-tab">
 			<site:insertComponent site="${_item.site.shortname}" component="${subComp}" />
 		</div>
 	</c:forEach>

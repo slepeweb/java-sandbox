@@ -615,20 +615,26 @@ public class Item extends CmsBean {
 	private Link filterOrthogonalParentLink() {
 		String[] targets = new String[] {LinkType.binding, LinkType.component};
 		List<Link> plinks = getParentLinksIncludingBindings();
+		List<Link> orthos = new ArrayList<Link>();
 		
-		if (plinks.size() > 1) {
-			LOG.error(String.format("DB Integrity Error; Child item [%d] has more than one orthogonal parent", getId()));
-		}
-
-		// Return first link that's either a binding or component
+		// Filter out orthogonal link(s), binding or component - there should only be one!
 		for (Link l : plinks) {
 			if (matches(l.getType(), targets)) {
-				return l;
+				orthos.add(l);
 			}
 		}
 		
-		LOG.error(String.format("DB Integrity Error; Child item [%d] has NO parent", getId()));
-		return null;
+		if (orthos.size() > 1) {
+			LOG.error(String.format("DB Integrity Error; Child item [%d] has more than one orthogonal parent", getId()));
+			return null;
+		}
+		else if (orthos.size() == 0) {
+			LOG.error(String.format("DB Integrity Error; Child item [%d] has NO parent", getId()));
+			return null;
+		}
+		else {
+			return orthos.get(0);
+		}
 	}
 	
 	private boolean matches(String target, String[] options) {
@@ -674,6 +680,16 @@ public class Item extends CmsBean {
 	
 	public final List<Item> getBoundItems() {
 		return CmsUtil.toItems(getOrthogonalLinks());
+	}
+	
+	public final List<Item> getBoundPages() {
+		List<Item> list = new ArrayList<Item>();
+		for (Item i : CmsUtil.toItems(getOrthogonalLinks())) {
+			if (i.isPage()) {
+				list.add(i);
+			}
+		}
+		return list;
 	}
 	
 	public List<Item> getRelatedItems() {
@@ -864,7 +880,7 @@ public class Item extends CmsBean {
 	}
 	
 	public boolean isPage() {
-		return ! getType().isMedia();
+		return getTemplate() != null;
 	}
 
 	public boolean isSearchable() {

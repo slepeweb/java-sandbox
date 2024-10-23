@@ -3,6 +3,8 @@ package com.slepeweb.site.model;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.StringWrapper;
@@ -15,8 +17,9 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	private static final long serialVersionUID = 1L;
 	private String heading, body;
 	private String type;
-	private String cssClass, js;
+	private String cssClass, js, data;
 	private Long id;
+	private String identifier;
 	private List<SimpleComponent> components;
 	private ComponentService componentService;
 
@@ -26,8 +29,11 @@ public class SimpleComponent implements NestableComponent, Serializable {
 		setType(i);
 		setCssClass(i.getFieldValue(FieldName.CSS));	
 		setJs(i.getFieldValue(FieldName.JS));
+		setData(i.getFieldValue(FieldName.DATA));
 		setHeading(i.getFieldValue(FieldName.HEADING));
 		setBody(i.getFieldValueResolved(FieldName.BODYTEXT, new StringWrapper("")));
+		setIdentifier(i.getFieldValue("identifier"));
+
 		
 		if (this.componentService != null) {
 			this.components = this.componentService.getComponents(i.getComponents());
@@ -58,13 +64,18 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	}
 	
 	public SimpleComponent setType(Item i) {
-		String linkedItemType = i.getType().getName();
-		setType(getComponentType(linkedItemType, i.getFieldValue("component-type")));
+		setType(getComponentType(i)[1]);
 		return this;
 	}
 	
-	public static String getComponentType(String itemType, String componentType) {
-		return itemType.equals(ItemTypeName.COMPONENT) ? componentType : itemType;
+	public static String[] getComponentType(Item i) {
+		String itemType = i.getType().getName();
+
+		if (itemType.equals(ItemTypeName.COMPONENT)) {
+			return new String[] {"com.slepeweb.site.model.SimpleComponent", i.getFieldValue("component-type")};
+		}
+
+		return new String[] {"com.slepeweb.site.model." + StringUtils.capitalize(itemType) + "Component", itemType};
 	}
 
 	public String getCssClass() {
@@ -108,6 +119,22 @@ public class SimpleComponent implements NestableComponent, Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getIdentifier() {
+		return StringUtils.isNotBlank(this.identifier) ? this.identifier : getHeading();
+	}
+
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
 	}
 
 	public ComponentService getComponentService() {

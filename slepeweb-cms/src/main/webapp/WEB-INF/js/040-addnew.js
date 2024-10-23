@@ -144,6 +144,9 @@ _cms.add.behaviour.changelinktype = function() {
 }
 
 _cms.add.behaviour.changetype = function() {
+	// De-select the template
+	$(_cms.add.sel.TEMPLATE_SELECTOR).val("0");
+
 	// Add commerce form controls when user selects Product for item type 
 	$(_cms.add.sel.ITEMTYPE_SELECTOR).change(function (e) {
 		_cms.support.displayCommerceElements($(e.target));

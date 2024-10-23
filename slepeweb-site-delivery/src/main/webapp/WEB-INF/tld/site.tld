@@ -97,4 +97,10 @@
 		<function-signature>java.util.List json2SolrCmsDoc(java.lang.String)</function-signature>
 	</function>
 	
+	<function>
+		<name>compress</name>
+		<function-class>com.slepeweb.site.util.TldFunction</function-class>
+		<function-signature>java.lang.String compress(java.lang.String)</function-signature>
+	</function>
+	
 </taglib>

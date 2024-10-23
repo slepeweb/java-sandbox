@@ -106,12 +106,14 @@
 	
 	<bean id="ancHook" class="com.slepeweb.cms.component.AncHook" />
 	<bean id="phoHook" class="com.slepeweb.cms.component.PhoHook" />
+	<bean id="geoHook" class="com.slepeweb.cms.component.GeoHook" />
 	
 	<bean id="cmsHooker" class="com.slepeweb.cms.component.CmsHooker">
 		<property name="hooks">
 			<map>
 				<entry key="anc" value-ref="ancHook" />
 				<entry key="pho" value-ref="phoHook" />
+				<entry key="geo" value-ref="geoHook" />
 			</map>
 		</property>
 	</bean>

@@ -148,7 +148,7 @@ public class NavigationController extends BaseController {
 		if (numLevels > 0) {
 			for (Link l : bindings) {
 				child = l.getChild();
-				System.out.println(String.format("Diving(1): From %s to %s", parentItem.getPath(), child.getPath()));				
+				//System.out.println(String.format("Diving(1): From %s to %s", parentItem.getPath(), child.getPath()));				
 				cNode = dive(child, numLevels - 1);
 				cNode.setShortcut(child.isShortcut());
 				cNode.setExtraClasses(child.getType().getName().toLowerCase());

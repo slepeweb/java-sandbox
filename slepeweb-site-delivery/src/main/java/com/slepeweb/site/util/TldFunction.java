@@ -51,4 +51,7 @@ public class TldFunction {
 		return null;
 	}
 	
+	public static String compress(String s) {
+		return com.slepeweb.common.util.StringUtil.compress(s);
+	}
 }

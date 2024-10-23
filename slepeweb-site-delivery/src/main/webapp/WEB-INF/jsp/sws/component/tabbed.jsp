@@ -14,7 +14,7 @@
 	<div id="tabs">
 		<ul>
 			<c:forEach items="${_comp.components}" var="component" varStatus="status">
-				<li><a href="#tabs-${status.count}">${component.name}</a></li>
+				<li><a href="#tabs-${status.count}">${component.identifier}</a></li>
 			</c:forEach>
 		</ul>
 	

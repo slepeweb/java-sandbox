@@ -5,7 +5,7 @@
 <geo:pageLayout type="std">
 	<gen:debug><!-- jsp/geo/standard.jsp --></gen:debug>
 		
-	<div class="main standard">
+	<div class="main standard-wide">
 		<h2>${_item.fields.title}</h2>
 		<div>${_item.fields.bodytext}</div>
 		
