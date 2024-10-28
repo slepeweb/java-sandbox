@@ -24,9 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +88,9 @@ import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.util.DateUtil;
 import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.common.util.ImageUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/rest")
@@ -168,7 +168,7 @@ public class RestController extends BaseController {
 			model.addAttribute(AttrName.OWNERSHIP, new Ownership(i, u));
 		}		
 		
-		return "cms.item.editor";		
+		return "item-editor";		
 	}
 	
 	private Map<String, Long> getNavigationLinks(Item i) {
@@ -1228,7 +1228,7 @@ public class RestController extends BaseController {
 		}
 		
 		model.addAttribute("_linknameOptions", options);
-		return "cms.linknameOptions";
+		return "linknameOptions";
 	}
 	
 	@RequestMapping(value="/item/{origId}/name", method=RequestMethod.POST, produces="text/text")
@@ -1321,7 +1321,7 @@ public class RestController extends BaseController {
 			model.addAttribute("_response", this.solrService4Cms.query(params));
 		}
 		
-		return "cms.searchresults";		
+		return "searchresults";		
 	}
 	
 	@RequestMapping(value="/item/{origId}/flag", method=RequestMethod.GET, produces="application/json")
@@ -1358,7 +1358,7 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/flaggedItems/list", method=RequestMethod.GET)
 	public String listFlaggedItems(HttpServletRequest request, ModelMap model) {
 		model.addAttribute("_flaggedItems", getSortedFlaggedItems(getFlaggedItems(request)));
-		return "cms.refresh.flaggedItemsList";		
+		return "refresh/flaggedItemsList";		
 	}
 	
 	@RequestMapping(value="/flaggedItems/unflag/all", method=RequestMethod.GET, produces="application/json")

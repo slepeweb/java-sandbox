@@ -3,7 +3,6 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.LinkType;
@@ -36,13 +35,11 @@ public class LinkTypeServiceImpl extends BaseServiceImpl implements LinkTypeServ
 		this.jdbcTemplate.update("insert into linktype (name) values (?)", lt.getName());
 		
 		lt.setId(getLastInsertId());
-		this.cacheEvictor.evict(lt);
 		LOG.info(compose("Added new link type", lt));
 	}
 	
 	private void updateLinkType(LinkType dbRecord, LinkType lt) {
 		if (! dbRecord.equals(lt)) {
-			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(lt);
 			
 			this.jdbcTemplate.update(
@@ -59,17 +56,14 @@ public class LinkTypeServiceImpl extends BaseServiceImpl implements LinkTypeServ
 	public void deleteLinkType(LinkType lt) {
 		if (this.jdbcTemplate.update("delete from linktype where id = ?", lt.getId()) > 0) {
 			LOG.warn(compose("Deleted linktype", String.valueOf(lt.getId())));
-			this.cacheEvictor.evict(lt);
 		}
 	}
 
-	@Cacheable(value="serviceCache")
 	public LinkType getLinkType(String name) {
 		return (LinkType) getFirstInList(this.jdbcTemplate.query("select * from linktype where name = ?", 
-				new Object[] {name}, new RowMapperUtil.LinkTypeMapper()));		 
+				new RowMapperUtil.LinkTypeMapper(), name));		 
 	}
 
-	@Cacheable(value="serviceCache")
 	public List<LinkType> getLinkTypes() {
 		return this.jdbcTemplate.query("select * from linktype", new RowMapperUtil.LinkTypeMapper());		 
 	}

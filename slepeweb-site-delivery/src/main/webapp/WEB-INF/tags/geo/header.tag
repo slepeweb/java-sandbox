@@ -42,8 +42,9 @@
 		<ul>
 			<c:set var="first" value="${true}" />
 		 	<c:forEach items="${_page.header.breadcrumbs}" var="i">
-		 		<c:if test="${i.href ne '/'}">	 		
-			 		<li><a href="${i.href}"><c:if test="${not first}"><span><i class="fa-solid fa-arrow-right"></i></span></c:if> ${i.title}</a></li>
+		 		<c:if test="${i.href ne '/'}">
+			 		<c:if test="${not first}"><li><i class="fa-solid fa-arrow-right"></i></li></c:if> 
+			 		<li><a href="${i.href}">${i.title}</a></li>
 					<c:set var="first" value="${false}" />
 				</c:if>
 		 	</c:forEach>

@@ -1,6 +1,6 @@
 package com.slepeweb.site.pho.bean;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class PhoCookieValues {
 	private String text, from, to;

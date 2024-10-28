@@ -3,7 +3,6 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FieldForType;
@@ -41,15 +40,11 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 				fft.getField().getId(), fft.getTypeId(), fft.getOrdering(), fft.isMandatory());
 		
 		// NOTE: No new key generated for this insert
-		// NOTE: Although this fft won't be cached, the object returned by getFieldsForType needs to be refreshed. So,
-		//       for convenience, do the lot.
-		this.cacheEvictor.evict(fft);
 		LOG.info(compose("Inserted new field for type", fft));
 	}
 
 	private void updateFieldForType(FieldForType dbRecord, FieldForType fft) {
 		if (! dbRecord.equals(fft)) {
-			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(fft);
 			
 			this.jdbcTemplate.update(
@@ -67,37 +62,29 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 		if (this.jdbcTemplate.update("delete from fieldfortype where fieldid = ? and itemtypeid = ?", 
 				fft.getField().getId(), fft.getTypeId()) > 0) {
 			LOG.warn(compose("Deleted field for type", ""));
-			this.cacheEvictor.evict(fft);
 		}
 	}
 	
-	@Cacheable(value="serviceCache")
 	public FieldForType getFieldForType(Long fieldId, Long itemTypeId) {
-		Object[] params = new Object[] {fieldId, itemTypeId};
-		
 		String sql = String.format(SELECTOR_TEMPLATE, "fft.fieldid = ? and fft.itemtypeid = ?");
-		return (FieldForType) getFirstInList(this.jdbcTemplate.query(sql, params, new RowMapperUtil.FieldForTypeMapper()));
+		return this.jdbcTemplate.queryForObject(sql, new RowMapperUtil.FieldForTypeMapper(), fieldId, itemTypeId);
 	}
 
-	@Cacheable(value="serviceCache")
 	public List<FieldForType> getFieldsForType(Long itemTypeId) {
-		Object[] params = new Object[] {itemTypeId};
-		
 		String sql = String.format(SELECTOR_TEMPLATE, "fft.itemtypeid = ?");
-		return this.jdbcTemplate.query(sql, params, new RowMapperUtil.FieldForTypeMapper());
+		return this.jdbcTemplate.query(sql, new RowMapperUtil.FieldForTypeMapper(), itemTypeId);
 	}
 
 	public int getCount() {
 		return getCount(null);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getCount(Long itemTypeId) {
 		if (itemTypeId != null) {
-			return this.jdbcTemplate.queryForInt("select count(*) from fieldfortype where itemtypeid = ?", itemTypeId);
+			return this.jdbcTemplate.queryForObject("select count(*) from fieldfortype where itemtypeid = ?", Integer.class, itemTypeId);
 		}
 		else {
-			return this.jdbcTemplate.queryForInt("select count(*) from fieldfortype");
+			return this.jdbcTemplate.queryForObject("select count(*) from fieldfortype", Integer.class);
 		}
 	}
 }

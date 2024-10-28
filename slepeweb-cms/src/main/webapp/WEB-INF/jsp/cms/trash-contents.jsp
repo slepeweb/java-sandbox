@@ -1,6 +1,4 @@
-<%@ 
-	page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
-	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
+<%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <c:choose><c:when test="${fn:length(_trashContents) > 0}">
 	<p><span class="in-your-face-text">NOTE</span> that trashed items are displayed in path order. Should you restore an item whose 

@@ -1,10 +1,10 @@
-  <field name="id" type="string" indexed="true" required="true" stored="true"/>
-  <field name="entered" type="date" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="amount" type="long" indexed="true" required="true" stored="true"/>
-  <field name="account" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="payee" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
-  <field name="major" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
-  <field name="minor" type="string" multiValued="false" indexed="true" required="false" stored="true"/>
-  <field name="memo" type="text_en" multiValued="false" indexed="true" required="false" stored="true"/>
-  <field name="type" type="integer" multiValued="false" indexed="true" required="true" stored="true"/>
+<!--   <field name="id" type="string" indexed="true" required="true" stored="true"/> -->
+<!--   <field name="entered" type="date" multiValued="false" indexed="true" required="true" stored="true"/> -->
+<!--   <field name="amount" type="long" indexed="true" required="true" stored="true"/> -->
+<!--   <field name="account" type="string" multiValued="false" indexed="true" required="true" stored="true"/> -->
+<!--   <field name="payee" type="string" multiValued="false" indexed="true" required="false" stored="true"/> -->
+<!--   <field name="major" type="string" multiValued="false" indexed="true" required="false" stored="true"/> -->
+<!--   <field name="minor" type="string" multiValued="false" indexed="true" required="false" stored="true"/> -->
+<!--   <field name="memo" type="text_en" multiValued="false" indexed="true" required="false" stored="true"/> -->
+<!--   <field name="type" type="integer" multiValued="false" indexed="true" required="true" stored="true"/> -->
   

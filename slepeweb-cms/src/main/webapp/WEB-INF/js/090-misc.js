@@ -75,7 +75,7 @@ _cms.misc.opSection = function(nodeKey, method, url, bar, data, success, error) 
 			_cms.support.flashMessage(resp);
 			_cms.misc.updateProgressbar(bar, "destroy");
 			_cms.support.refreshtab("core", nodeKey);
-			_cms.undoRedo.displayAll(rep.data);
+			_cms.undoRedo.displayAll(resp.data);
 		}
 	}
 	

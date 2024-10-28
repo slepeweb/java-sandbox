@@ -16,7 +16,7 @@ public class SolrServiceBase {
 
 	protected SolrClient getClient() {
 		if (this.client == null) {
-			this.client = new HttpSolrClient(this.serverUrl);
+			this.client = new HttpSolrClient.Builder(this.serverUrl).build();
 			LOG.info(String.format("Initialised solr server [%s]", this.serverUrl));
 		}
 		return this.client;
@@ -25,7 +25,9 @@ public class SolrServiceBase {
 	protected ConcurrentUpdateSolrClient getBatchingClient() {
 		if (this.batchingClient == null) {
 			try {
-				this.batchingClient = new ConcurrentUpdateSolrClient(getServerUrl(), 100, 5);
+				this.batchingClient = new ConcurrentUpdateSolrClient.Builder(getServerUrl()).
+						withQueueSize(100).
+						withThreadCount(2).build();
 				this.batchingClient.ping();
 				LOG.info(String.format("Solr server is available for bulk updates [%s]", getServerUrl()));
 			}

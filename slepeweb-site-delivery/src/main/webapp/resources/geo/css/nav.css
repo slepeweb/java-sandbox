@@ -19,11 +19,12 @@ header {
     justify-content: space-between;
     align-items: center;
     padding-left: 10px;
-    height: 100%;
+    height: 5em;
 }
 
 .brand-title {
     font-size: 1.5em;
+    align-content: center;
 }
 
 .navbar ul {
@@ -114,10 +115,15 @@ div#breadcrumbs {
 
 div#breadcrumbs ul {
 	display: flex;
+	color: #666;
 }
 
 div#breadcrumbs ul {
 	list-style: none;
+}
+
+div#breadcrumbs ul li {
+	padding: 0 3px 0 3px;
 }
 
 div#breadcrumbs a {

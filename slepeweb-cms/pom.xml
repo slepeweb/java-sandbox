@@ -5,7 +5,7 @@
 	<artifactId>cms</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Slepeweb CMS</name>
+	<name>Slepeweb CMS Editorial</name>
 	<url>http://maven.apache.org</url>
 
 	<build>
@@ -20,11 +20,17 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
+		    <groupId>jakarta.servlet.jsp.jstl</groupId>
+		    <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+		    <version>3.0.0</version>
 		</dependency>
-
+		
+		<dependency>
+		    <groupId>org.glassfish.web</groupId>
+		    <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+		    <version>3.0.1</version>
+		</dependency>
+		
 		<!-- Spring framework -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -88,9 +94,9 @@
 		</dependency>
 	
 		<dependency>
-		  <groupId>commons-dbcp</groupId>
-		  <artifactId>commons-dbcp</artifactId>
-		  <version>1.4</version>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-dbcp2</artifactId>
+		  <version>2.9.0</version>
 		</dependency>
 
 	  <dependency>
@@ -124,12 +130,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>net.sf.ehcache</groupId>
-			<artifactId>ehcache</artifactId>
-			<version>2.8.3</version>
-		</dependency>
-
-		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
 			<version>2.2.2</version>
@@ -141,19 +141,18 @@
 			<version>1.2.17</version>
 		</dependency>
 
-
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>5.3.6.Final</version>
-		</dependency>
-
-		<dependency>
-		    <groupId>javax.validation</groupId>
-		    <artifactId>validation-api</artifactId>
-		    <version>1.1.0.Final</version>
+		    <groupId>jakarta.validation</groupId>
+		    <artifactId>jakarta.validation-api</artifactId>
+		    <version>3.0.2</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>7.0.0.Final</version>
+		</dependency>
+
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
@@ -175,7 +174,7 @@
 		<dependency>
 	    <groupId>org.apache.solr</groupId>
 	    <artifactId>solr-solrj</artifactId>
-	    <version>5.5.4</version>
+	    <version>8.11.4</version>
 		</dependency>
 		
 		<dependency>
@@ -187,7 +186,7 @@
 	</dependencies>
 	
 	<properties>
-		<spring.version>3.2.12.RELEASE</spring.version>
+		<spring.version>6.0.23</spring.version>
 		<spring.security.version>3.2.5.RELEASE</spring.security.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

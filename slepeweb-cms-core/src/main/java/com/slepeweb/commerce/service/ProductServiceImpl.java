@@ -82,15 +82,13 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 	public Product get(Long origItemId) {
 		return (Product) getLastInList(this.jdbcTemplate.query(
 			"select * from product where origitemid = ?", 
-			new Object[] {origItemId}, 
-			new CommerceRowMapper.ProductMapper()));		
+			new CommerceRowMapper.ProductMapper(), origItemId));		
 	}
 	
 	public Product get(Long siteId, String partNum) {
 		return (Product) getLastInList(this.jdbcTemplate.query(
 			"select * from product where siteid = ? and partnum = ?", 
-			new Object[] {siteId, partNum}, 
-			new CommerceRowMapper.ProductMapper()));		
+			new CommerceRowMapper.ProductMapper(), siteId, partNum));		
 	}
 	
 	/*
@@ -107,9 +105,8 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 		}
 	}
 		
-	@SuppressWarnings("deprecation")
 	public long count() {
-		return this.jdbcTemplate.queryForInt("select count(*) from product");
+		return this.jdbcTemplate.queryForObject("select count(*) from product", Integer.class);
 	}
 	
 	public Product copy(Product source, String name, String simplename, String partNum, Integer copyId) 

@@ -1,8 +1,8 @@
 package com.slepeweb.cms.service;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.slepeweb.cms.bean.LoginSupport;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 public interface LoginService {

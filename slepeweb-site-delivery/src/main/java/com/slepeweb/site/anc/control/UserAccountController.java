@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jsoup.helper.StringUtil;
@@ -31,6 +28,9 @@ import com.slepeweb.common.service.SendMailService;
 import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.site.anc.service.AncCookieService;
 import com.slepeweb.site.control.BaseController;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/spring/anc")

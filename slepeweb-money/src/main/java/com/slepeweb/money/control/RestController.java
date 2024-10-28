@@ -3,8 +3,6 @@ package com.slepeweb.money.control;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RestResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 @Controller

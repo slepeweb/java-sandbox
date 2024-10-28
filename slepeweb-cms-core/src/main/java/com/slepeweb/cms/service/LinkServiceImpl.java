@@ -154,13 +154,12 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 
 	public List<Link> getLinks(Long parentId) {
 		String sql = String.format(CHILD_SELECT_TEMPLATE, "l.parentid = ? and i.deleted = 0" + getVersionClause());
-		return this.jdbcTemplate.query(sql, new Object[] {parentId}, new RowMapperUtil.LinkMapper());		 
+		return this.jdbcTemplate.query(sql, new RowMapperUtil.LinkMapper(), parentId);		 
 	}
 
 	public List<Link> getParentLinks(Long childId) {
 		String sql = String.format(PARENT_SELECT_TEMPLATE, "l.childid = ? and i.deleted = 0" + getVersionClause());
-		return this.jdbcTemplate.query(sql, new Object[] {childId}, 
-				new RowMapperUtil.ParentLinkMapper());
+		return this.jdbcTemplate.query(sql, new RowMapperUtil.ParentLinkMapper(), childId);
 	}
 
 	public List<Link> getBindings(Long parentId) {
@@ -183,7 +182,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		LinkType lt = this.linkTypeService.getLinkType(linkType);
 		if (lt != null) {
 			String sql = String.format(CHILD_SELECT_TEMPLATE, "l.parentid = ? and l.linktypeid = ? and i.deleted = 0" + getVersionClause());
-			return this.jdbcTemplate.query(sql, new Object[] {parentId, lt.getId()}, new RowMapperUtil.LinkMapper());	
+			return this.jdbcTemplate.query(sql, new RowMapperUtil.LinkMapper(), parentId, lt.getId());	
 		}
 		else {
 			LOG.error(compose("Failed to retrieve Links", parentId, linkType));
@@ -197,27 +196,26 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 	public List<Link> getBindings2TrashedItems(Long parentId) {
 		LinkType lt = this.linkTypeService.getLinkType("binding");
 		String sql = String.format(CHILD_SELECT_TEMPLATE, "l.parentid = ? and l.linktypeid = ? and deleted = 1");
-		return this.jdbcTemplate.query(sql, new Object[] {parentId, lt.getId()}, new RowMapperUtil.LinkMapper());	
+		return this.jdbcTemplate.query(sql, new RowMapperUtil.LinkMapper(), parentId, lt.getId());	
 	}
 
 	public Link getLink(Long parentId, Long childId) {
 		String sql = String.format(CHILD_SELECT_TEMPLATE, "l.parentid = ? and l.childid = ? and i.deleted = 0" 
 				/* Not necessary for id's  + getVersionClause(parent.isStaging())*/);
-		return (Link) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {parentId, childId}, 
-				new RowMapperUtil.LinkMapper()));
+		return (Link) getFirstInList(this.jdbcTemplate.query(sql, 
+				new RowMapperUtil.LinkMapper(), parentId, childId));
 	}
 	
 	public int getCount() {
 		return getCount(null);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getCount(Long parentId) {
 		if (parentId != null) {
-			return this.jdbcTemplate.queryForInt("select count(*) from link where parentid = ?", parentId);
+			return this.jdbcTemplate.queryForObject("select count(*) from link where parentid = ?", Integer.class, parentId);
 		}
 		else {
-			return this.jdbcTemplate.queryForInt("select count(*) from link");
+			return this.jdbcTemplate.queryForObject("select count(*) from link", Integer.class);
 		}
 	}
 	
@@ -226,8 +224,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		if (lt != null) {		
 			String sql = String.format(PARENT_SELECT_TEMPLATE, "l.childid = ? and l.linktypeid = ? and i.deleted = 0" + 
 					getVersionClause());
-			return this.jdbcTemplate.query(sql, new Object[] {childId, lt.getId()}, 
-					new RowMapperUtil.ParentLinkMapper());
+			return this.jdbcTemplate.query(sql, new RowMapperUtil.ParentLinkMapper(), childId, lt.getId());
 		}
 		return null;
 	}

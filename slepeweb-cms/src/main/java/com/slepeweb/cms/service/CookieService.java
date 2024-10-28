@@ -2,13 +2,13 @@ package com.slepeweb.cms.service;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StickyAddNewControls;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface CookieService {
 	static final String CMS_COOKIE_PATH = "/cms";	

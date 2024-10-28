@@ -3,8 +3,6 @@ package com.slepeweb.money.control;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -16,6 +14,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.solr.SolrParams;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class IndexController extends BaseController {

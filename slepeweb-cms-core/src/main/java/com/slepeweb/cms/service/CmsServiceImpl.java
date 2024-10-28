@@ -1,7 +1,5 @@
 package com.slepeweb.cms.service;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
@@ -10,6 +8,8 @@ import com.slepeweb.commerce.service.AxisService;
 import com.slepeweb.commerce.service.AxisValueService;
 import com.slepeweb.commerce.service.ProductService;
 import com.slepeweb.commerce.service.VariantService;
+
+import jakarta.annotation.PostConstruct;
 
 // Bean defined in xml
 public class CmsServiceImpl implements CmsService {

@@ -71,13 +71,13 @@ public class SiteTypeServiceImpl extends BaseServiceImpl implements SiteTypeServ
 
 	public List<SiteType> get(Long siteId) {
 		String sql = String.format(SELECT_TEMPLATE, "st.siteid = ?");
-		return this.jdbcTemplate.query(sql, new Object[] {siteId}, new RowMapperUtil.SiteTypeMapper());		 
+		return this.jdbcTemplate.query(sql, new RowMapperUtil.SiteTypeMapper(), siteId);		 
 	}
 
 	public SiteType get(Long siteId, Long typeId) {
 		String sql = String.format(SELECT_TEMPLATE, "st.siteid = ? and st.typeid = ?" );
-		return (SiteType) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {siteId, typeId}, 
-				new RowMapperUtil.SiteTypeMapper()));
+		return (SiteType) getFirstInList(this.jdbcTemplate.query(sql, 
+				new RowMapperUtil.SiteTypeMapper(), siteId, typeId));
 	}
 	
 }

@@ -1,5 +1,5 @@
 <%@ tag%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="jakarta.tags.core" prefix="c"%>
 
 <footer class="container" id="site-footer">
 	<div class="row">

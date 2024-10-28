@@ -3,7 +3,7 @@ package com.slepeweb.carsearch;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.sun.xml.internal.ws.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class VehicleBean implements Serializable {
 	private static final long serialVersionUID = 1L;

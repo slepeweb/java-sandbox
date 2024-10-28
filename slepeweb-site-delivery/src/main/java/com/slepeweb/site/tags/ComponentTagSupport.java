@@ -1,12 +1,12 @@
 package com.slepeweb.site.tags;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.TagSupport;
-
 import org.apache.log4j.Logger;
 
 import com.slepeweb.site.model.SimpleComponent;
+
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.PageContext;
+import jakarta.servlet.jsp.tagext.TagSupport;
 
 
 public abstract class ComponentTagSupport extends TagSupport {

@@ -3,8 +3,6 @@ package com.slepeweb.money.control;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +28,8 @@ import com.slepeweb.money.service.SavedSearchService;
 import com.slepeweb.money.service.ScheduledTransactionService;
 import com.slepeweb.money.service.SolrService4Money;
 import com.slepeweb.money.service.TransactionService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class BaseController {

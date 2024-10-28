@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +35,8 @@ import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.common.bean.NameValuePair;
 import com.slepeweb.common.service.HttpService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/static")
@@ -87,7 +87,7 @@ public class StaticPageController extends BaseController {
 			}
 		}
 		
-		return "cms.crawl";
+		return "cms/crawlresults";
 	}
 	
 	private void crawlDynamicSite(Url sourceUrl, List<NameValuePair> httpHeaders, Site s, Host h, User u, 

@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
@@ -39,6 +36,9 @@ import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.LinkNameService;
 import com.slepeweb.cms.service.LinkTypeService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class BaseController {
@@ -221,7 +221,6 @@ public class BaseController {
 		return new UndoRedoStatus(h);
 	}
 	
-	@Cacheable(value="serviceCache")
 	protected Map<String, String> getLinkTypeNameOptions(Site s) {
 		Map<String, String> m = new HashMap<String, String> ();
 		

@@ -1,6 +1,4 @@
-<%@ 
-	page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
-	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
+<%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <c:choose><c:when test="${not empty _response.results}">
 	<ul>

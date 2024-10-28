@@ -5,9 +5,6 @@ package com.slepeweb.money;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.apache.log4j.Logger;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
@@ -26,6 +23,9 @@ import com.slepeweb.money.service.PayeeService;
 import com.slepeweb.money.service.ScheduledSplitService;
 import com.slepeweb.money.service.ScheduledTransactionService;
 import com.slepeweb.money.service.TransactionService;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 @Component
 public class ScheduledTransactionManager {

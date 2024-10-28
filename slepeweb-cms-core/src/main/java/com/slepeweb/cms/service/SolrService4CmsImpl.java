@@ -3,8 +3,6 @@ package com.slepeweb.cms.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -25,6 +23,8 @@ import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.common.solr.bean.SolrPager;
 import com.slepeweb.common.solr.bean.SolrResponse;
 import com.slepeweb.common.solr.service.SolrService4CmsBase;
+
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrService4Cms {

@@ -9,8 +9,6 @@ import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,8 @@ import com.slepeweb.cms.service.ItemTypeService;
 import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.common.util.ImageUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class PhotoSetupController extends BaseController {

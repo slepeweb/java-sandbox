@@ -5,7 +5,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.common.service.HttpService;
@@ -16,7 +15,6 @@ public class DilbertServiceImpl implements DilbertService {
 	private static Logger LOG = Logger.getLogger(DilbertServiceImpl.class);
 	@Autowired HttpService httpService;
 
-	@Cacheable(value="serviceCache")
 	public String getTodaysDilbert(String url) {
 		String res = this.httpService.get(url);
 		if (res != null) {

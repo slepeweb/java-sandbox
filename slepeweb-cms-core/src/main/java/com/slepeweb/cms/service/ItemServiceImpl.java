@@ -249,20 +249,18 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		LOG.info(compose("Older versions deleted", i));
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getBinCount() {
-		return this.jdbcTemplate.queryForInt("select count(*) from item where deleted = 1");
+		return this.jdbcTemplate.queryForObject("select count(*) from item where deleted = 1", Integer.class);
 	}
 
-	@SuppressWarnings("deprecation")
 	public int getVersionCount(long origid) {
-		return this.jdbcTemplate.queryForInt("select count(*) from item where origid=?", origid);
+		return this.jdbcTemplate.queryForObject("select count(*) from item where origid=?", Integer.class, origid);
 	}
 
 	public List<Item> getTrashedItems() {
 		List<Item> items = this.jdbcTemplate.query(
 				String.format(SELECT_TEMPLATE, "i.deleted=1 order by i.path, i.version"),
-				new Object[]{}, new RowMapperUtil.ItemMapper());
+				new RowMapperUtil.ItemMapper());
 		
 		// Just in case any one of the trashed items is a Product ...
 		for (int i = 0; i < items.size(); i++) {
@@ -382,7 +380,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	public Item getEditableVersion(Long siteId, String path) {
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.siteid=? and i.path=? and i.deleted=0 and i.editable=1"),
-			new Object[]{siteId, path});
+			siteId, path);
 	}
 
 	/*
@@ -393,7 +391,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	public List<Item> getItemsByPathLike(Long siteId, String path) {
 		String sql = String.format(SELECT_TEMPLATE, "i.siteid=? and i.path like ? and i.deleted=0" + getVersionClause());
 		List<Item> list = this.jdbcTemplate.query(
-				sql, new Object[]{siteId, path + "%"}, new RowMapperUtil.ItemMapper());
+				sql, new RowMapperUtil.ItemMapper(), siteId, path + "%");
 		
 		for (int i = 0; i < list.size(); i++) {
 			list.set(i, extendIfProduct(list.get(i)));
@@ -417,49 +415,47 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	public Item getItem(Long origId, int version) {
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.origid=? and version=? and i.deleted=0"), 
-			new Object[]{origId, version});
+			origId, version);
 	}
 	
 	public Item getEditableVersion(Long origId) {
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.origid=? and i.deleted=0 and i.editable=1"), 
-			new Object[]{origId});
+			origId);
 	}
 	
 	public Item getPublishedVersion(Long origId) {
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.origid=? and i.deleted=0 and i.published=1"), 
-			new Object[]{origId});
+			origId);
 	}
 	
 	public List<Item> getAllVersions(Long origId) {
 		return this.jdbcTemplate.query(
 			String.format(SELECT_TEMPLATE, "i.origid=? and i.deleted=0 order by i.version"),
-			new Object[]{origId}, new RowMapperUtil.ItemMapper());		
+			new RowMapperUtil.ItemMapper(), origId);		
 	}
 
 	public Item getItemFromBin(Long origId) {
 		// This operation isn't really interested in the language property
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.origid=? and i.editable=1 and i.deleted=1"), 
-			new Object[]{origId});
+			origId);
 	}
 	
 	@Deprecated
 	public int getCount(long siteId) {
-		return this.jdbcTemplate.queryForInt(
-				"select count(*) from item where siteid=? and deleted=0", new Object[] {siteId});
+		return this.jdbcTemplate.queryForObject(
+				"select count(*) from item where siteid=? and deleted=0", Integer.class, siteId);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getCountByType(Long itemTypeId) {
-		return this.jdbcTemplate.queryForInt("select count(*) from item where typeid = ?", itemTypeId);
+		return this.jdbcTemplate.queryForObject("select count(*) from item where typeid = ?", Integer.class, itemTypeId);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getCountByPath(long siteId, String path) {
-		return this.jdbcTemplate.queryForInt(
-				"select count(*) from item where siteid=? and path like ? and deleted=0", new Object[] {siteId, path + "%"});
+		return this.jdbcTemplate.queryForObject(
+				"select count(*) from item where siteid=? and path like ? and deleted=0", Integer.class, siteId, path + "%");
 	}
 	
 	public boolean updatePublished(Long id, boolean option) {
@@ -489,9 +485,9 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return false;
 	}
 	
-	private Item getItem(String sql, Object[] params) {
+	private Item getItem(String sql, Object... params) {
 		Item i = (Item) getLastInList(this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.ItemMapper()));
+			sql, new RowMapperUtil.ItemMapper(), params));
 		
 		return extendIfProduct(i);
 	}

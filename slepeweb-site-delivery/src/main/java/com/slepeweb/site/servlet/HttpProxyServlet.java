@@ -3,15 +3,15 @@ package com.slepeweb.site.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.utils.SpringContext;
 import com.slepeweb.common.service.HttpService;
+
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class HttpProxyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

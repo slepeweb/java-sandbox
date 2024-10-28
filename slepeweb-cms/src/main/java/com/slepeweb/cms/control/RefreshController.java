@@ -3,8 +3,6 @@ package com.slepeweb.cms.control;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -19,6 +17,8 @@ import com.slepeweb.cms.bean.Ownership;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.CookieService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/rest")
@@ -46,7 +46,7 @@ public class RefreshController extends BaseController {
 		// Site content ownership
 		model.addAttribute(AttrName.OWNERSHIP, new Ownership(i, u));
 
-		return "cms.refresh.core";		
+		return "refresh/core";		
 	}
 	
 	@RequestMapping(value="/item/{origId}/refresh/field", method=RequestMethod.GET)
@@ -57,7 +57,7 @@ public class RefreshController extends BaseController {
 		model.addAttribute("editingItem", i);
 		model.addAttribute("_fieldSupport", fieldEditorSupport(i));
 
-		return "cms.refresh.field";		
+		return "refresh/field";		
 	}
 	
 	@RequestMapping(value="/item/{origId}/refresh/links", method=RequestMethod.GET)
@@ -67,7 +67,7 @@ public class RefreshController extends BaseController {
 		Item i = getEditableVersion(origId, getUser(req));
 		model.addAttribute("editingItem", i);
 
-		return "cms.refresh.links";		
+		return "refresh/links";		
 	}
 	
 	@RequestMapping(value="/item/{origId}/refresh/version", method=RequestMethod.GET)
@@ -77,7 +77,7 @@ public class RefreshController extends BaseController {
 		Item i = getEditableVersion(origId, getUser(req));
 		model.addAttribute("editingItem", i);
 		model.addAttribute("allVersions", i.getAllVersions());
-		return "cms.refresh.version";		
+		return "refresh/version";		
 	}
 		
 	@RequestMapping(value="/item/{origId}/refresh/media", method=RequestMethod.GET)
@@ -96,7 +96,7 @@ public class RefreshController extends BaseController {
 			model.addAttribute("host", hosts.get(0));
 		}
 		
-		return "cms.refresh.media";		
+		return "refresh/media";		
 	}
 	
 	@RequestMapping(value="/item/{origId}/refresh/move", method=RequestMethod.GET)
@@ -105,7 +105,7 @@ public class RefreshController extends BaseController {
 		
 		Item i = getEditableVersion(origId, getUser(req));
 		model.addAttribute("editingItem", i);
-		return "cms.refresh.move";		
+		return "refresh/move";		
 	}
 		
 	@RequestMapping(value="/item/{origId}/refresh/add", method=RequestMethod.GET)
@@ -118,7 +118,7 @@ public class RefreshController extends BaseController {
 		// Last relative position selection for 'addnew'
 		model.addAttribute("_stickyAddNewControls", this.cookieService.getStickyAddNewControls(req));
 		
-		return "cms.refresh.add";		
+		return "refresh/add";		
 	}
 		
 	@RequestMapping(value="/item/{origId}/refresh/copy", method=RequestMethod.GET)
@@ -127,7 +127,7 @@ public class RefreshController extends BaseController {
 		
 		Item i = getEditableVersion(origId, getUser(req));
 		model.addAttribute("editingItem", i);
-		return "cms.refresh.copy";		
+		return "refresh/copy";		
 	}
 		
 	@RequestMapping(value="/item/{origId}/refresh/flaggedItems", method=RequestMethod.GET)
@@ -141,7 +141,7 @@ public class RefreshController extends BaseController {
 		model.addAttribute("_flaggedItems", getSortedFlaggedItems(flaggedItems));
 		model.addAttribute("_itemIsFlagged", flaggedItems.get(origId) != null);
 		model.addAttribute("_fieldSupport", fieldEditorSupport(i));
-		return "cms.refresh.flaggedItems";		
+		return "refresh/flaggedItems";		
 	}
 		
 	@RequestMapping(value="/item/{origId}/refresh/copyFlaggedForm", method=RequestMethod.GET)
@@ -151,7 +151,7 @@ public class RefreshController extends BaseController {
 		Item i = getEditableVersion(origId, getUser(req));
 		model.put("editingItem", i);
 		model.addAttribute("_fieldSupport", fieldEditorSupport(i));
-		return "cms.refresh.copyFlaggedForm";		
+		return "refresh/copyFlaggedForm";		
 	}
 		
 }

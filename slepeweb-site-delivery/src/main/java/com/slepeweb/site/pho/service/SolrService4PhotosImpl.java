@@ -2,8 +2,6 @@ package com.slepeweb.site.pho.service;
 
 import java.util.ArrayList;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -19,6 +17,8 @@ import com.slepeweb.common.solr.bean.SolrPager;
 import com.slepeweb.common.solr.bean.SolrResponse;
 import com.slepeweb.common.solr.service.SolrService4SiteBase;
 import com.slepeweb.site.pho.bean.SolrParams4Pho;
+
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class SolrService4PhotosImpl extends SolrService4SiteBase implements SolrService4Photos {

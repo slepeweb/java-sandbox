@@ -46,22 +46,6 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 
-  <!-- Ehcache -->
-	<bean id="cacheKeyGenerator" class="com.slepeweb.cms.utils.CacheKeyGenerator" />  
-	
-	<bean id="cacheManagerFactory"
-		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"
-		p:configLocation="classpath:ehcache.xml"
-		p:shared="false" />
-
-	<bean id="cacheManager"
-		class="org.springframework.cache.ehcache.EhCacheCacheManager"
-		p:cacheManager-ref="cacheManagerFactory" />
-
-	<bean id="cacheEvictor" class="com.slepeweb.cms.cache.CacheEvictor" init-method="init" />
-
-	<cache:annotation-driven key-generator="cacheKeyGenerator" />	
-
 	<tx:advice id="txAdvice" transaction-manager="txManager">
 		<tx:attributes>
 			<tx:method name="get*" read-only="true"/>
@@ -82,9 +66,6 @@
 	</bean>
 
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
-	
-	<import resource="webflow-beans.xml" />
-<!-- 	<import resource="ws-beans.xml" /> -->
 	
 	<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.site.bean.DatedLinkTarget;
@@ -18,7 +17,6 @@ import com.sun.syndication.io.XmlReader;
 public class RomeServiceImpl implements RomeService {
 	private static Logger LOG = Logger.getLogger(RomeServiceImpl.class);
 
-	@Cacheable(value="serviceCache")
 	public List<DatedLinkTarget> getFeed(String url) {
 		LOG.info(String.format("Getting RSS feed [%s] at %2$tH:%2$tM:%2$tS", url, System.currentTimeMillis()));
 

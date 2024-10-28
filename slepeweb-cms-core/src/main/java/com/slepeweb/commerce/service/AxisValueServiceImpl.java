@@ -3,7 +3,6 @@ package com.slepeweb.commerce.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
@@ -70,28 +69,22 @@ public class AxisValueServiceImpl extends BaseServiceImpl implements AxisValueSe
 		
 	}
 	
-	@Cacheable(value="serviceCache")
 	public AxisValue get(Long id) {
 		return (AxisValue) getLastInList(this.jdbcTemplate.query(
 				"select * from axisvalue where id = ?", 
-				new Object[] {id}, 
-				new CommerceRowMapper.AxisValueMapper()));
+				new CommerceRowMapper.AxisValueMapper(), id));
 	}
 	
-	@Cacheable(value="serviceCache")
 	public AxisValue get(Long axisId, String value) {
 		return (AxisValue) getLastInList(this.jdbcTemplate.query(
 				"select * from axisvalue where axisid = ? and value = ?", 
-				new Object[] {axisId, value}, 
-				new CommerceRowMapper.AxisValueMapper()));
+				new CommerceRowMapper.AxisValueMapper(), axisId, value));
 	}
 	
-	@Cacheable(value="serviceCache")
 	public List<AxisValue> getAll(Long axisId) {
 		return this.jdbcTemplate.query(
 				"select * from axisvalue where axisid = ? order by ordering", 
-				new Object[] {axisId}, 
-				new CommerceRowMapper.AxisValueMapper());
+				new CommerceRowMapper.AxisValueMapper(), axisId);
 	}
 	
 	public void delete(Long id) {

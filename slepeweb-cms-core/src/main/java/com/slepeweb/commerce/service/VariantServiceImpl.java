@@ -77,8 +77,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 	public Variant get(Long origItemId, String qualifier) {
 		return (Variant) getLastInList(this.jdbcTemplate.query(
 				"select * from variant where origitemid = ? and qualifier = ?", 
-				new Object[] {origItemId, qualifier}, 
-				new CommerceRowMapper.VariantMapper()));
+				new CommerceRowMapper.VariantMapper(), origItemId, qualifier));
 	}
 	
 	public Variant get(Long origItemId, Long alphaAxisValueId, Long betaAxisValueId) {
@@ -87,8 +86,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 		
 		return (Variant) getLastInList(this.jdbcTemplate.query(
 				sql, 
-				new Object[] {origItemId, alphaAxisValueId, betaAxisValueId}, 
-				new CommerceRowMapper.VariantMapper()));
+				new CommerceRowMapper.VariantMapper(), origItemId, alphaAxisValueId, betaAxisValueId));
 	}
 	
 	public List<Variant> getMany(Long origItemId, Long alphaAxisValueId, Long betaAxisValueId) {
@@ -97,7 +95,15 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 		list.add(origItemId);
 		appendAxisClause(sb, list, alphaAxisValueId, betaAxisValueId);
 		
-		return this.jdbcTemplate.query(sb.toString(), list.toArray(), new CommerceRowMapper.VariantMapper());
+		if (list.size() == 1) {
+			return this.jdbcTemplate.query(sb.toString(), new CommerceRowMapper.VariantMapper(), list.get(0));
+		}
+		else if (list.size() == 2) {
+			return this.jdbcTemplate.query(sb.toString(), new CommerceRowMapper.VariantMapper(), list.get(0), list.get(1));
+		}
+		else {
+			return this.jdbcTemplate.query(sb.toString(), new CommerceRowMapper.VariantMapper(), list.get(0), list.get(1), list.get(2));
+		}
 	}
 	
 	public List<Variant> getVariantsWithBetaAxis(Long origItemId, Long alphaAxisValueId) {
@@ -109,8 +115,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 				"join axisvalue bv on v.betavalueid = bv.id " +
 				"where v.origitemid = ? and v.alphavalueid = ? order by bv.ordering",
 
-				new Object[] {origItemId, alphaAxisValueId}, 
-				new CommerceRowMapper.VariantAndBetaAxisValueMapper());
+				new CommerceRowMapper.VariantAndBetaAxisValueMapper(), origItemId, alphaAxisValueId);
 	}
 	
 	public AxisValueSelector getAlphaAxisSelector(Long origItemId, Long alphaAxisId) {
@@ -122,8 +127,7 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 				"v.alphavalueid in (select id from axisvalue where axisid=?) " +
 				"order by av.ordering",
 
-				new Object[] {origItemId, alphaAxisId}, 
-				new CommerceRowMapper.AxisValueSelectorMapper());
+				new CommerceRowMapper.AxisValueSelectorMapper(), origItemId, alphaAxisId);
 		
 		return new AxisValueSelector().setOptions(alpha);
 	}
@@ -168,9 +172,8 @@ public class VariantServiceImpl extends BaseServiceImpl implements VariantServic
 		deleteMany(origItemId, null, null);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public long count() {
-		return this.jdbcTemplate.queryForInt("select count(*) from variant");
+		return this.jdbcTemplate.queryForObject("select count(*) from variant", Integer.class);
 	}
 	
 	public Long count(Long origId) {

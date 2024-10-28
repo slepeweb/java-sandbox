@@ -1,4 +1,4 @@
-<%@ tag %><%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ tag %><%@ taglib uri="jakarta.tags.core" prefix="c"%>
 
 <select id="history-selector">
 	<c:forEach items="${_history}" var="_iid">

@@ -1,8 +1,10 @@
 package com.slepeweb.money.bean;
 
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.ui.ModelMap;
+
 import com.slepeweb.money.bean.solr.SolrParams;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class SavedSearchSupport {
 	private SavedSearch savedSearch;

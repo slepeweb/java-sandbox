@@ -1,8 +1,6 @@
-<%@ 
-	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
+<%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div>
-
 	<select>
 		<option value='unknown'>Choose ...</option>
 		<c:forEach items="${_linknameOptions}" var="_option">
@@ -19,5 +17,4 @@
 			</c:if>
 		</c:forEach>
 	</div>
-	
 </div>

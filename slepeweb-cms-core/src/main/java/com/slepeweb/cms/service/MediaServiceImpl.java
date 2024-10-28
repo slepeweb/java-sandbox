@@ -79,8 +79,6 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 		dbRecord.setSize(meta.getSize());
 		
 		if (! dbRecord.equals(m)) {
-			this.cacheEvictor.evict(dbRecord);
-			
 			this.jdbcTemplate.update(
 					"update media set size = ? where itemid = ? and thumbnail = ?", 
 					meta.getSize(), dbRecord.getItemId(), dbRecord.isThumbnail());
@@ -118,15 +116,13 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 		return false;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public boolean hasMedia(Item i) {
-		return this.jdbcTemplate.queryForInt("select count(*) from media where itemid = ?", i.getId()) > 0;
+		return this.jdbcTemplate.queryForObject("select count(*) from media where itemid = ?", Integer.class, i.getId()) > 0;
 
 	}
 
-	@SuppressWarnings("deprecation")
 	public boolean hasThumbnail(Item i) {
-		return this.jdbcTemplate.queryForInt("select count(*) from media where itemid = ? and thumbnail = true", i.getId()) > 0;
+		return this.jdbcTemplate.queryForObject("select count(*) from media where itemid = ? and thumbnail = true", Integer.class, i.getId()) > 0;
 
 	}
 
@@ -155,26 +151,22 @@ public class MediaServiceImpl extends BaseServiceImpl implements MediaService {
 	public Media getMedia(Long id, boolean thumbnail) {
 		return (Media) getFirstInList(
 			this.jdbcTemplate.query("select itemid, size, folder, thumbnail from media where itemid = ? and thumbnail = ?", 
-				new Object[]{id, thumbnail},
-				new RowMapperUtil.MediaMapper()));
+				new RowMapperUtil.MediaMapper(), id, thumbnail));
 	}
 	
 	public List<Media> getAllMedia(Long id) {
 		return this.jdbcTemplate.query("select itemid, size, folder, thumbnail from media where itemid = ?", 
-				new Object[]{id},
-				new RowMapperUtil.MediaMapper());
+				new RowMapperUtil.MediaMapper(), id);
 	}
 	
 	public long getSize(Long id, boolean thumbnail) {
 		return (Long) getFirstInList(
 			this.jdbcTemplate.query("select size from media where itemid = ? and thumbnail = ?", 
-				new Object[]{id, thumbnail},
-				new RowMapperUtil.MediaSizeMapper()));
+				new RowMapperUtil.MediaSizeMapper(), id, thumbnail));
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getCount() {
-		return this.jdbcTemplate.queryForInt("select count(*) from media");
+		return this.jdbcTemplate.queryForObject("select count(*) from media", Integer.class);
 	}
 	
 	public void wipeBinaryContent(Media m) {

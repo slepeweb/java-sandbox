@@ -14,7 +14,6 @@ public class FundsServiceImpl implements FundsService {
 	
 	private static Logger LOG = Logger.getLogger(FundsServiceImpl.class);
 
-	//@Cacheable(value="serviceCache")
 	public String scrapeJs(String path) {
 		
 		String res = getResource(path);

@@ -3,7 +3,6 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.LinkName;
@@ -37,13 +36,11 @@ public class LinkNameServiceImpl extends BaseServiceImpl implements LinkNameServ
 				ln.getSiteId(), ln.getLinkTypeId(), ln.getName());
 		
 		ln.setId(getLastInsertId());
-		this.cacheEvictor.evict(ln);
 		LOG.info(compose("Added new link name", ln));
 	}
 	
 	private void updateLinkName(LinkName dbRecord, LinkName ln) {
 		if (! dbRecord.equals(ln)) {
-			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(ln);
 			
 			this.jdbcTemplate.update("update linkname set name = ? where id = ?", 
@@ -59,21 +56,18 @@ public class LinkNameServiceImpl extends BaseServiceImpl implements LinkNameServ
 	public void deleteLinkName(LinkName ln) {
 		if (this.jdbcTemplate.update("delete from linkname where id = ?", ln.getId()) > 0) {
 			LOG.warn(compose("Deleted linkname", String.valueOf(ln.getId())));
-			this.cacheEvictor.evict(ln);
 		}
 	}
 
-	@Cacheable(value="serviceCache")
 	public LinkName getLinkName(Long siteId, Long linkTypeId, String name) {
 		return (LinkName) getFirstInList(
 				this.jdbcTemplate.query("select * from linkname where siteid = ? and linktypeid = ? and name = ?", 
-						new Object[] {siteId, linkTypeId, name}, new RowMapperUtil.LinkNameMapper()));		 
+						new RowMapperUtil.LinkNameMapper(), siteId, linkTypeId, name));		 
 	}
 
-	@Cacheable(value="serviceCache")
 	public List<LinkName> getLinkNames(Long siteId, Long linkTypeId) {
 		return this.jdbcTemplate.query("select * from linkname where siteid = ? and linktypeid = ?", 
-						new Object[] {siteId, linkTypeId}, new RowMapperUtil.LinkNameMapper());		 
+						new RowMapperUtil.LinkNameMapper(), siteId, linkTypeId);		 
 	}
 
 	public int getCount() {

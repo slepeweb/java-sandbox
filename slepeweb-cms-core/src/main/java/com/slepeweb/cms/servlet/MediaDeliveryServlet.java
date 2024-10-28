@@ -1,8 +1,5 @@
 package com.slepeweb.cms.servlet;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,6 +11,9 @@ import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.MediaDeliveryService;
 import com.slepeweb.cms.utils.LogUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class MediaDeliveryServlet {

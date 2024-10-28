@@ -3,8 +3,6 @@ package com.slepeweb.money.control;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -17,6 +15,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.NamedList;
 import com.slepeweb.money.bean.Payee;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value="/payee")

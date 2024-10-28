@@ -104,26 +104,25 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 	}
 
 	public User get(String email) {
-		return get(String.format(SELECT_TEMPLATE, " email = ?"), new Object[]{email});
+		return get(String.format(SELECT_TEMPLATE, " email = ?"), email);
 	}
 
 	public User get(Long id) {
-		return get(String.format(SELECT_TEMPLATE, " id = ?"), new Object[]{id});
+		return get(String.format(SELECT_TEMPLATE, " id = ?"), id);
 	}
 	
 	public User getBySecret(String secret) {
-		return get(String.format(SELECT_TEMPLATE, " secret = ?"), new Object[]{secret});
+		return get(String.format(SELECT_TEMPLATE, " secret = ?"), secret);
 	}
 
-	private User get(String sql, Object[] params) {
+	private User get(String sql, Object... params) {
 		return (User) getFirstInList(this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.UserMapper()));
+			sql, new RowMapperUtil.UserMapper(), params));
 	}
 
 	public List<String> getRoles(Long userId, Long siteId) {
 		return this.jdbcTemplate.query(
 				"select role from role where userid = ? and siteid = ? ", 
-				new Object[]{userId, siteId},
-				new RowMapperUtil.RoleMapper());
+				new RowMapperUtil.RoleMapper(), userId, siteId);
 	}	
 }

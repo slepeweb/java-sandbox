@@ -1,7 +1,6 @@
 package com.slepeweb.cms.service;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Field;
@@ -37,13 +36,11 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 				f.getDefaultValue(), f.getValidValues());				
 		
 		f.setId(getLastInsertId());
-		this.cacheEvictor.evict(f);
 		LOG.info(compose("Inserted new field", f));
 	}
 
 	private void updateField(Field dbRecord, Field field) {
 		if (! dbRecord.equals(field)) {
-			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(field);
 			
 			this.jdbcTemplate.update(
@@ -62,27 +59,23 @@ public class FieldServiceImpl extends BaseServiceImpl implements FieldService {
 	public void deleteField(Field f) {
 		if (this.jdbcTemplate.update("delete from field where id = ?", f.getId()) > 0) {
 			LOG.warn(compose("Deleted field", f.getName()));
-			this.cacheEvictor.evict(f);
 		}
 	}
 	
-	@Cacheable(value="serviceCache")
 	public Field getField(String variable) {
-		return getField("select * from field where variable = ?", new Object[]{variable});
+		return getField("select * from field where variable = ?", variable);
 	}
 
-	@Cacheable(value="serviceCache")
 	public Field getField(Long id) {
-		return getField("select * from field where id = ?", new Object[]{id});
+		return getField("select * from field where id = ?", id);
 	}
 	
-	private Field getField(String sql, Object[] params) {
+	private Field getField(String sql, Object... params) {
 		return (Field) getFirstInList(this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.FieldMapper()));
+			sql, new RowMapperUtil.FieldMapper(), params));
 	}
 
-	@SuppressWarnings("deprecation")
 	public int getCount() {
-		return this.jdbcTemplate.queryForInt("select count(*) from field");
+		return this.jdbcTemplate.queryForObject("select count(*) from field", Integer.class);
 	}
 }

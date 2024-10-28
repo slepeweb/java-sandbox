@@ -1,9 +1,9 @@
 package com.slepeweb.site.pho.service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.slepeweb.site.pho.bean.PhoCookieValues;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface PhoCookieService {
 	String COOKIE_PATH = "/";	

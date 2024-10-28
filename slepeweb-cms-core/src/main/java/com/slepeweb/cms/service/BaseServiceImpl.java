@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.slepeweb.cms.cache.CacheEvictor;
 import com.slepeweb.cms.utils.LogUtil;
 
 public class BaseServiceImpl {
@@ -14,15 +13,13 @@ public class BaseServiceImpl {
 
 	@Autowired protected CmsService cmsService;
 	@Autowired protected JdbcTemplate jdbcTemplate;
-	@Autowired protected CacheEvictor cacheEvictor;
 	
 	protected String getVersionClause() {
 		return this.cmsService.isDeliveryContext() ? " and i.published = 1" : " and i.editable = 1";
 	}
 	
-	@SuppressWarnings("deprecation")
 	protected Long getLastInsertId() {
-		return this.jdbcTemplate.queryForLong("select last_insert_id()");
+		return this.jdbcTemplate.queryForObject("select last_insert_id()", Long.class);
 	}
 	
 	protected <T> Object getFirstInList(List<T> list) {

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.SiteConfig;
@@ -38,13 +37,11 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 				"insert into config (siteid, name, value) values (?, ?, ?)", 
 				sc.getSiteId(), sc.getName(), sc.getValue());
 		
-		this.cacheEvictor.evict(sc);
 		LOG.info(compose("Added new site configuration property", sc));
 	}
 
 	private void updateSiteConfig(SiteConfig dbRecord, SiteConfig sc) {
 		if (! dbRecord.equals(sc)) {
-			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(sc);
 			
 			this.jdbcTemplate.update(
@@ -62,30 +59,25 @@ public class SiteConfigServiceImpl extends BaseServiceImpl implements SiteConfig
 		if (this.jdbcTemplate.update("delete from config where siteid = ? and name = ?", 
 				sc.getSiteId(), sc.getName()) > 0) {
 			LOG.warn(compose("Deleted site configuration property", String.valueOf(sc.getSiteId()), sc.getName()));
-			this.cacheEvictor.evict(sc);
 		}
 	}
 
-	@Cacheable(value="serviceCache")
 	public SiteConfig getSiteConfig(Long siteId, String name) {
 		return (SiteConfig) getFirstInList(this.jdbcTemplate.query(
 				"select * from config where siteid = ? and name = ?", 
-				new Object[]{siteId, name}, 
-				new RowMapperUtil.SiteConfigMapper()));
+				new RowMapperUtil.SiteConfigMapper(), siteId, name));
 	}
 
-	@Cacheable(value="serviceCache")
 	public List<SiteConfig> getSiteConfigs(Long siteId) {
 		return this.jdbcTemplate.query("select * from config where siteid = ? order by name", 
-				new Object[]{siteId}, new RowMapperUtil.SiteConfigMapper());
+				new RowMapperUtil.SiteConfigMapper(), siteId);
 	}
 	
 	@SuppressWarnings("deprecation")
 	public int getCount() {
-		return this.jdbcTemplate.queryForInt("select count(*) from config");
+		return this.jdbcTemplate.queryForObject("select count(*) from config", Integer.class);
 	}
 
-	@Cacheable(value="serviceCache")
 	public String getProperty(Long siteId, String name, String dflt) {
 		SiteConfig config = getSiteConfig(siteId, name);
 		if (config != null) {

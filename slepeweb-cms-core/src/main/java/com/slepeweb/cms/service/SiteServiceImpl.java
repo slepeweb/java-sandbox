@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
@@ -60,14 +59,12 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 			LOG.error(compose("Content folders could not be created", ItemType.CONTENT_FOLDER_TYPE_NAME));
 		}
 		
-		this.cacheEvictor.evict(s);
 		LOG.info(compose("Added new site", s));		
 		return s;
 	}
 
 	private void updateSite(Site dbRecord, Site site) {
 		if (! dbRecord.equals(site)) {
-			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(site);
 			
 			this.jdbcTemplate.update(
@@ -86,28 +83,24 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 	public void deleteSite(Site s) {
 		if (this.jdbcTemplate.update("delete from site where id = ?", s.getId()) > 0) {
 			LOG.warn(compose("Deleted site", s.getName()));
-			this.cacheEvictor.evict(s);
 		}
 	}
 
-	@Cacheable(value="serviceCache")
 	public Site getSite(String name) {
-		return getSite("select * from site where name = ?", new Object[]{name});
+		return getSite("select * from site where name = ?", name);
 	}
 
-	@Cacheable(value="serviceCache")
 	public Site getSiteByShortname(String name) {
-		return getSite("select * from site where shortname = ?", new Object[]{name});
+		return getSite("select * from site where shortname = ?", name);
 	}
 
-	@Cacheable(value="serviceCache")
 	public Site getSite(Long id) {
-		return getSite("select * from site where id = ?", new Object[]{id});
+		return getSite("select * from site where id = ?", id);
 	}
 	
-	private Site getSite(String sql, Object[] params) {
+	private Site getSite(String sql, Object... params) {
 		return (Site) getFirstInList(this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.SiteMapper()));
+			sql, new RowMapperUtil.SiteMapper(), params));
 	}
 
 	public List<Site> getAllSites() {
@@ -115,7 +108,6 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 			"select * from site", new RowMapperUtil.SiteMapper());
 	}
 
-	@Cacheable(value="serviceCache")
 	public List<Site> getAllSites(User u, String role) {
 		List<Site> list = new ArrayList<Site>();
 		
@@ -128,11 +120,9 @@ public class SiteServiceImpl extends BaseServiceImpl implements SiteService {
 		return list;
 	}
 
-	//@Cacheable(value="serviceCache")
 	public List<User> getContributors(long siteId) {
 		return this.jdbcTemplate.query(
 			"select * from user where id in (SELECT distinct ownerid from item where siteid=?) order by lastname, firstname", 
-			new Object[] {siteId},
-			new RowMapperUtil.UserMapper());
+			new RowMapperUtil.UserMapper(), siteId);
 	}
 }

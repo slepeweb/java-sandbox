@@ -2,8 +2,6 @@ package com.slepeweb.site.control;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,8 @@ import com.slepeweb.cms.service.LoglevelUpdateService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.ComponentService;
 import com.slepeweb.site.service.NavigationService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class BaseController {

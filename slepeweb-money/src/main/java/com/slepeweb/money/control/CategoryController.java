@@ -3,8 +3,6 @@ package com.slepeweb.money.control;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -16,6 +14,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.NamedList;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value="/category")

@@ -3,7 +3,6 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.FieldForType;
@@ -49,13 +48,11 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 				it.getName(), it.getMimeType(), it.getPrivateCache(), it.getPublicCache());
 		
 		it.setId(getLastInsertId());
-		this.cacheEvictor.evict(it);
 		LOG.info(compose("Added new item type", it));
 	}
 
 	private void updateItemType(ItemType dbRecord, ItemType it) {
 		if (! dbRecord.equals(it)) {
-			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(it);
 			
 			this.jdbcTemplate.update(
@@ -85,42 +82,29 @@ public class ItemTypeServiceImpl extends BaseServiceImpl implements ItemTypeServ
 	public void deleteItemType(ItemType it) {
 		if (this.jdbcTemplate.update("delete from itemtype where id = ?", it.getId()) > 0) {
 			LOG.warn(compose("Deleted item type", it.getId()));
-			deepEvict(it);
 		}
 	}
 	
-	private void deepEvict(ItemType it) {
-		this.cacheEvictor.evict(it);
-		
-		for (FieldForType fft : it.getFieldsForType()) {
-			this.cacheEvictor.evict(fft);
-		}
-	}
-	
-	@Cacheable(value="serviceCache")
 	public ItemType getItemType(String name) {
-		return getItemType("select * from itemtype where name = ?", new Object[]{name});
+		return getItemType("select * from itemtype where name = ?", name);
 	}
 
-	@Cacheable(value="serviceCache")
 	public ItemType getItemType(Long id) {
-		return getItemType("select * from itemtype where id = ?", new Object[]{id});
+		return getItemType("select * from itemtype where id = ?", id);
 	}
 	
-	private ItemType getItemType(String sql, Object[] params) {
+	private ItemType getItemType(String sql, Object... params) {
 		return (ItemType) getFirstInList(this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.ItemTypeMapper()));
+			sql, new RowMapperUtil.ItemTypeMapper(), params));
 	}
 
-	@Cacheable(value="serviceCache")
 	public List<ItemType> getAvailableItemTypes() {
 		return this.jdbcTemplate.query("select * from itemtype order by name", 
-				new Object[]{}, new RowMapperUtil.ItemTypeMapper());
+				new RowMapperUtil.ItemTypeMapper());
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getCount() {
-		return this.jdbcTemplate.queryForInt("select count(*) from itemtype");
+		return this.jdbcTemplate.queryForObject("select count(*) from itemtype", Integer.class);
 	}
 
 }

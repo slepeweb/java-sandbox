@@ -1,47 +1,33 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><%@ 
+<%@ 
 	page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
-<html>
-	<head>
-		<cms:head loadjs="${false}"/>
-	</head>
-	<body>
+<cms:basicLayout loadjs="${false}">
 
-		<!-- Main -->	
-		<div id="main-wrapper">
-			<h2>CMS Login</h2>
+	<div id="main-wrapper">
+		<h2>CMS Login</h2>
+		
+		<c:if test="${not empty error}">
+			<div class="underline red"><p>${error}</p></div>
+		</c:if>
+		<c:if test="${not empty msg}">
+			<div class="underline green"><p>${msg}</p></div>
+		</c:if>	
+		
+		<p>Please enter your login details to gain access to the CMS:</p>
+		
+		<form id="login" method="post" action="">
+			<div>
+				<label>Email: </label><input name="email" size="128" />
+			</div>
 			
-			<c:if test="${not empty error}">
-				<div class="underline red"><p>${error}</p></div>
-			</c:if>
-			<c:if test="${not empty msg}">
-				<div class="underline green"><p>${msg}</p></div>
-			</c:if>	
+			<div>
+				<label>Password: </label><input type="password" name="password" size="32" />
+			</div>
 			
-			<p>Please enter your login details to gain access to the CMS:</p>
-			
-			<form id="login" method="post" action="">
-				<div>
-					<label>Email: </label><input name="email" size="128" />
-				</div>
-				
-				<div>
-					<label>Password: </label><input type="password" name="password" size="32" />
-				</div>
-				
-				<button class="action" type="submit">Login</button>
-			</form>	
-		</div>
+			<button class="action" type="submit">Login</button>
+		</form>	
+	</div>
 	
-		<!-- Footer -->
-	
-		<div id="footer-wrapper">
-			<br />
-			<cms:footer />
-		</div>
-	
-	</body>
-</html>	
-
+</cms:basicLayout>
 	

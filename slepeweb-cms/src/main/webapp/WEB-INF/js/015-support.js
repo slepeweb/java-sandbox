@@ -368,7 +368,7 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 			// Disable forms if user doesn't have access to update
 			_cms.support.disableFormsIfReadonly();
 			
-			// Optinal callback function call
+			// Optional callback function call
 			if (callback) {
 				callback(args);
 			}

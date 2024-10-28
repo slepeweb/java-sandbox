@@ -2,13 +2,13 @@ package com.slepeweb.money.service;
 
 import java.sql.Timestamp;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.Util;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class CookieServiceImpl implements CookieService {

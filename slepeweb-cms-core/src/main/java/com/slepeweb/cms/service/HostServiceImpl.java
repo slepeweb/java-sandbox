@@ -3,7 +3,6 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Host;
@@ -45,14 +44,12 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 				h.getName(), h.getPort(), h.getType(), h.getDeployment(), h.getProtocol());		
 		
 		h.setId(getLastInsertId());			
-		this.cacheEvictor.evict(h);
 		LOG.info(compose("Added new host", h));		
 		return h;
 	}
 
 	private void updateHost(Host dbRecord, Host h) {
 		if (! dbRecord.equals(h)) {
-			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(h);
 			
 			this.jdbcTemplate.update(
@@ -71,58 +68,51 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	public void deleteHost(Host h) {
 		if (this.jdbcTemplate.update("delete from host where id = ?", h.getId()) > 0) {
 			LOG.warn(compose("Deleted host", h.getName()));
-			this.cacheEvictor.evict(h);
 		}
 	}
 	
-	@Cacheable(value="serviceCache")
 	public Host getHost(Long id) {
-		return getFirstHost(String.format(SELECT_TEMPLATE, " h.id = ?"), new Object[]{id});
+		return getFirstHost(String.format(SELECT_TEMPLATE, " h.id = ?"), id);
 	}
 	
 	/*
 	 *  One host could serve both editorial AND delivery webapps, resulting in 2 db records.
 	 *  This method will return the first, and so should only be used to identify the site (Host.getSite()).
 	 */	
-	@Cacheable(value="serviceCache")
 	public Host getHost(String name, int port) {
 		return getFirstHost(
-				String.format(SELECT_TEMPLATE, " h.name = ? and h.port = ?"), new Object[]{name, port});
+				String.format(SELECT_TEMPLATE, " h.name = ? and h.port = ?"), name, port);
 	}
 
 	// This returns a specific host record - there should only be one, due to db constraints.
-	@Cacheable(value="serviceCache")
 	public Host getHost(String name, int port, HostType type) {
 		return getFirstHost(
-				String.format(SELECT_TEMPLATE, " h.name = ? and h.port = ? and h.type = ?"), new Object[]{name, port, type.name()});
+				String.format(SELECT_TEMPLATE, " h.name = ? and h.port = ? and h.type = ?"), name, port, type.name());
 	}
 
 	/*
 	 * The db has a unique key constraint for (siteid, hostType, deployment)
 	 */
-	@Cacheable(value="serviceCache")
 	public Host getHost(Long siteId, HostType type, Deployment deployment) {
 		return getFirstHost(
-				String.format(SELECT_TEMPLATE, " h.siteid = ? and h.type = ? and h.deployment = ?"), new Object[]{siteId, type.name(), deployment.name()});
+				String.format(SELECT_TEMPLATE, " h.siteid = ? and h.type = ? and h.deployment = ?"), siteId, type.name(), deployment.name());
 	}
 
-	private Host getFirstHost(String sql, Object[] params) {
+	private Host getFirstHost(String sql, Object... params) {
 		return (Host) getFirstInList(this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.HostMapper()));
+			sql, new RowMapperUtil.HostMapper(), params));
 	}
 
-	@Cacheable(value="serviceCache")
 	public List<Host> getHosts(Long siteId) {
 		return this.jdbcTemplate.query(
-				String.format(SELECT_TEMPLATE, " h.siteid = ?"), new Object[] {siteId}, new RowMapperUtil.HostMapper());
+				String.format(SELECT_TEMPLATE, " h.siteid = ?"), new RowMapperUtil.HostMapper(), siteId);
 	}
 
 
-	@Cacheable(value="serviceCache")
 	public List<Host> getHosts(Long siteId, HostType type) {
 		return this.jdbcTemplate.query(
 				String.format(SELECT_TEMPLATE, " h.siteid = ? and h.type = ?"), 
-				new Object[] {siteId, type.name()}, 
-				new RowMapperUtil.HostMapper());
+				new RowMapperUtil.HostMapper(),
+				siteId, type.name());
 	}
 }

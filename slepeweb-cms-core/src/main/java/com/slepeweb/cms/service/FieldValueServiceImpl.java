@@ -80,35 +80,35 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 
 	public FieldValue getFieldValue(Long fieldId, Long itemId, String language) {
 		String sql = String.format(SELECTOR_TEMPLATE, "f.id = ? and fv.itemid = ? and fv.language = ?");		
-		return (FieldValue) getFirstInList(this.jdbcTemplate.query(sql, new Object[] {fieldId, itemId, language}, 
-				new RowMapperUtil.FieldValueMapper()));
+		return (FieldValue) getFirstInList(this.jdbcTemplate.query(sql, 
+				new RowMapperUtil.FieldValueMapper(), fieldId, itemId, language));
 	}
 
 	public FieldValueSet getFieldValues(Long fieldId, Long itemId) {
 		Item i = this.itemService.getItem(itemId);
 		String sql = String.format(SELECTOR_TEMPLATE, "f.id = ? and fv.itemid = ?");		
-		return new FieldValueSet(i.getSite(), this.jdbcTemplate.query(sql, new Object[] {fieldId, itemId}, 
-				new RowMapperUtil.FieldValueMapper()));
+		return new FieldValueSet(i.getSite(), this.jdbcTemplate.query(sql, 
+				new RowMapperUtil.FieldValueMapper(), fieldId, itemId));
 	}
 
 	public FieldValueSet getFieldValues(Long itemId) {
 		Item i = this.itemService.getItem(itemId);
 		String sql = String.format(SELECTOR_TEMPLATE, "fv.itemid = ?");	
-		return new FieldValueSet(i.getSite(), this.jdbcTemplate.query(sql, new Object[] {itemId}, 
-				new RowMapperUtil.FieldValueMapper()));
+		return new FieldValueSet(i.getSite(), this.jdbcTemplate.query(sql, 
+				new RowMapperUtil.FieldValueMapper(), itemId));
 	}
 	
 	public int getCount() {
 		return getCount(null);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getCount(Long itemId) {
 		if (itemId != null) {
-			return this.jdbcTemplate.queryForInt("select count(*) from fieldvalue where itemid = ?", itemId);
+			return this.jdbcTemplate.queryForObject("select count(*) from fieldvalue where itemid = ?", 
+					Integer.class, itemId);
 		}
 		else {
-			return this.jdbcTemplate.queryForInt("select count(*) from fieldvalue");
+			return this.jdbcTemplate.queryForObject("select count(*) from fieldvalue", Integer.class);
 		}
 	}
 	

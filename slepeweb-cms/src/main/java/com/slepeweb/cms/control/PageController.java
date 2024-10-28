@@ -3,9 +3,6 @@ package com.slepeweb.cms.control;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +22,9 @@ import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.LoginService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/page")
@@ -103,7 +103,7 @@ public class PageController extends BaseController {
 		// Provide link name options for each link type
 		model.addAttribute("_linkTypeNameOptions", getLinkTypeNameOptions(i.getSite()));
 		
-		return "cms.editor";
+		return "editor";
 	}
 	
 	@RequestMapping(value="/login")
@@ -131,7 +131,7 @@ public class PageController extends BaseController {
 			}
 		}
  
-		return "cms.login"; 
+		return "login"; 
 	}
 	
 	private void getUndoRedoStatus(HttpServletRequest req, ModelMap m) {

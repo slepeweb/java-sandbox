@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
@@ -15,10 +11,16 @@ import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.CmsService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 
 public class CookieHelper {
 	
 	public final static String BREADCRUMBS = "breadcrumbs";
+	public static final String ID_SEPARATOR = "|";
+	public static final String ID_REGEX = String.format("[\\%s]", ID_SEPARATOR);
 	public final static int COOKIE_MAXAGE = 7 * 24 * 60 * 60;
 	
 	public void updateBreadcrumbsCookie(String cookiePath, Item i, HttpServletRequest req, HttpServletResponse res) {
@@ -27,7 +29,7 @@ public class CookieHelper {
 		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);	
 		updateItemNames(breadcrumbs, i.getCmsService());
 		pushBreadcrumbs(breadcrumbs, target);
-		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), StringUtils.join(breadcrumbs, ","), cookiePath, res);
+		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), StringUtils.join(breadcrumbs, ID_SEPARATOR), cookiePath, res);
 	}
 	
 	public String getBreadcrumbsCookieName(long siteId) {
@@ -68,7 +70,7 @@ public class CookieHelper {
 		if (cookieValue != null) {
 			List<ItemIdentifier> list = new ArrayList<ItemIdentifier>();
 			
-			for (String s : cookieValue.split(",")) {
+			for (String s : cookieValue.split(ID_REGEX)) {
 				list.add(new ItemIdentifier(s));
 			}
 			

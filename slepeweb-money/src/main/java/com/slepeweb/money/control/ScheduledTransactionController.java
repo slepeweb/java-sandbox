@@ -4,8 +4,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -21,6 +19,8 @@ import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.SplitTransactionFormComponent;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value="/schedule")

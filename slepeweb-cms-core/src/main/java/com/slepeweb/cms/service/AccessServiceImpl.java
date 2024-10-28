@@ -3,7 +3,6 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.AccessRule;
@@ -66,34 +65,29 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 	public void delete(Long id) {
 		if (this.jdbcTemplate.update("delete from access where id = ?", id) > 0) {
 			LOG.warn(compose("Deleted rule", id));
-			//this.cacheEvictor.evict(h);
 		}
 	}
 
-	@Cacheable(value="serviceCache")
 	public AccessRule get(Long siteId, String ruleName) {
 		return (AccessRule) getFirstInList(this.jdbcTemplate.query("select * from access where siteid=? and name = ?", 
-				new Object[]{siteId, ruleName}, new RowMapperUtil.AccessMapper()));
+				new RowMapperUtil.AccessMapper(), siteId, ruleName));
 	}
 
-	@Cacheable(value="serviceCache")
 	public AccessRule get(Long id) {
 		return (AccessRule) getFirstInList(this.jdbcTemplate.query("select * from access where id=?", 
-				new Object[]{id}, new RowMapperUtil.AccessMapper()));
+				new RowMapperUtil.AccessMapper(), id));
 	}
 	
 	private List<AccessRule> getList(Long siteId, String mode) {
 		return this.jdbcTemplate.query(
 				String.format("select * from access where siteid=? and mode=? and enabled=? order by name"), 
-				new Object[] {siteId, mode, true}, new RowMapperUtil.AccessMapper());
+				new RowMapperUtil.AccessMapper(), siteId, mode, true);
 	}
 	
-	@Cacheable(value="serviceCache")
 	public List<AccessRule> getReadable(Long siteId) {
 		return getList(siteId, "r");
 	}
 	
-	@Cacheable(value="serviceCache")
 	public List<AccessRule> getWriteable(Long siteId) {
 		return getList(siteId, "w");
 	}

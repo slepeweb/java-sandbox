@@ -3,7 +3,6 @@ package com.slepeweb.cms.service;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Template;
@@ -38,13 +37,11 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 				t.getName(), t.getController(), t.getSiteId(), t.getItemTypeId());
 
 		t.setId(getLastInsertId());
-		this.cacheEvictor.evict(t);
 		LOG.info(compose("Added new template", t));
 	}
 
 	private void updateTemplate(Template dbRecord, Template t) {
 		if (! dbRecord.equals(t)) {
-			this.cacheEvictor.evict(dbRecord);
 			dbRecord.assimilate(t);
 			
 			this.jdbcTemplate.update(
@@ -65,39 +62,30 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 		}
 	}
 	
-	@Cacheable(value="serviceCache")
 	public Template getTemplate(Long id) {
 		return (Template) getFirstInList(
 			this.jdbcTemplate.query("select * from template where id = ?", 
-				new Object[]{id},
-				new RowMapperUtil.TemplateMapper()));
+				new RowMapperUtil.TemplateMapper(), id));
 	}
 	
-	@Cacheable(value="serviceCache")
 	public Template getTemplate(Long siteId, String name) {
 		return (Template) getFirstInList(
 			this.jdbcTemplate.query("select * from template where siteid = ? and name = ?", 
-				new Object[]{siteId, name},
-				new RowMapperUtil.TemplateMapper()));
+				new RowMapperUtil.TemplateMapper(), siteId, name));
 	}
 	
-	@Cacheable(value="serviceCache")
 	public List<Template> getAvailableTemplates(Long siteId) {
 		return (List<Template>) this.jdbcTemplate.query("select * from template where siteid = ? order by name", 
-				new Object[]{siteId},
-				new RowMapperUtil.TemplateMapper());
+				new RowMapperUtil.TemplateMapper(), siteId);
 	}
 	
-	@Cacheable(value="serviceCache")
 	public List<Template> getAvailableTemplates(Long siteId, Long itemTypeId) {
 		return (List<Template>) this.jdbcTemplate.query("select * from template where siteid = ? and typeid = ? order by name", 
-				new Object[]{siteId, itemTypeId},
-				new RowMapperUtil.TemplateMapper());
+				new RowMapperUtil.TemplateMapper(), siteId, itemTypeId);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getCount() {
-		return this.jdbcTemplate.queryForInt("select count(*) from template");
+		return this.jdbcTemplate.queryForObject("select count(*) from template", Integer.class);
 	}
 
 }

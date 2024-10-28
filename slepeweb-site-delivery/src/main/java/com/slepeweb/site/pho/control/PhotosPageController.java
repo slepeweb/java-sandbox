@@ -5,9 +5,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -32,6 +29,9 @@ import com.slepeweb.site.pho.bean.PhoCookieValues;
 import com.slepeweb.site.pho.bean.SolrParams4Pho;
 import com.slepeweb.site.pho.service.PhoCookieService;
 import com.slepeweb.site.pho.service.SolrService4Photos;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/spring/pho")

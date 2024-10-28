@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -26,6 +24,8 @@ import com.slepeweb.money.bean.solr.SolrIterator;
 import com.slepeweb.money.bean.solr.SolrPager;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
+
+import jakarta.annotation.PostConstruct;
 
 @Service("solrService4Money")
 public class SolrService4MoneyImpl extends SolrServiceBase implements SolrService4Money {

@@ -2,8 +2,8 @@ package com.slepeweb.money.service;
 
 import java.sql.Timestamp;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface CookieService {
 	void updateAccountCookie(long accountId, HttpServletRequest req, HttpServletResponse res);
