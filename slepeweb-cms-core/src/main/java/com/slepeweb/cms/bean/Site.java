@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.cms.bean.Host.Deployment;
 import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.except.ResourceException;
 
@@ -141,20 +140,15 @@ public class Site extends CmsBean {
 	}
 	
 	public Host getEditorialHost() {
-		return getHost(HostType.valueOf("editorial"), identifyDeployment());
+		return getHost(HostType.valueOf("editorial"));
 	}
 	
 	public Host getDeliveryHost() {
-		return getHost(HostType.valueOf("delivery"), identifyDeployment());
+		return getHost(HostType.valueOf("delivery"));
 	}
 	
-	private Deployment identifyDeployment() {
-		return getCmsService().isDevDeployment() ? 
-			Deployment.valueOf("development") : Deployment.valueOf("production");
-	}
-	
-	private Host getHost(HostType type, Deployment deploy) {
-		return getCmsService().getHostService().getHost(getId(), type, deploy);
+	private Host getHost(HostType type) {
+		return getCmsService().getHostService().getHost(getId(), type);
 	}
 
 	public boolean isSecured() {

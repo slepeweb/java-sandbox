@@ -18,7 +18,7 @@ public class StickyAddNewControls {
 		this();
 		
 		if (s != null) {
-			String[] parts = s.split(",");
+			String[] parts = s.split("\\|");
 			if (parts.length > 0) {
 				this.lastPosition = parts[0].trim();			
 				this.lastTemplate = parts.length > 1 ? Long.valueOf(parts[1].trim()) : 0;
@@ -29,7 +29,7 @@ public class StickyAddNewControls {
 	
 	@Override
 	public String toString() {
-		return String.format("%s, %d, %d", this.lastPosition, this.lastTemplate, this.lastType);
+		return String.format("%s|%d|%d", this.lastPosition, this.lastTemplate, this.lastType);
 	}
 	
 	public long getLastType() {

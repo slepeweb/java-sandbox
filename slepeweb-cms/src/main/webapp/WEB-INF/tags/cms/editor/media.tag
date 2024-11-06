@@ -35,8 +35,10 @@
 		<div>
 			<p><strong>Thumbnail:</strong></p>
 			<c:choose><c:when test="${editingItem.thumbnailWithBinaryContent}">
-			<!-- Editorial host: ${editingItem.site.editorialHost} -->
-			<!-- Delivery host: ${editingItem.site.deliveryHost} -->
+				<%-- 
+					Both the editorial and delivery hosts are capable of rendering image data, but
+					this image is served from the editorial host, enabling un-published media to be displayed.
+				--%>
 				<c:set var="_host" value="${editingItem.site.editorialHost}" />
 				<c:set var="_timestamp" value="${cmsf:now()}" />
 				<img src="${_host.namePortAndProtocol}/cms/media${editingItem.path}?view=thumbnail&_=${_timestamp}" />

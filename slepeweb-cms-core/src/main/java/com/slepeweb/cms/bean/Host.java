@@ -4,31 +4,25 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Host extends CmsBean {
 	private static final long serialVersionUID = 1L;
-	private String name, protocol = "http";
+	private String name, publicName, protocol = "http";
 	private Long id;
 	private Site site;
 	private Integer port;
 	private HostType type;
-	private Deployment deployment;
 	
 	public enum HostType {
 		editorial, delivery, both;
 	}
 
-	public enum Deployment {
-		development, production;
-	}
-
-		
 	public void assimilate(Object obj) {
 		if (obj instanceof Host) {
 			Host h = (Host) obj;
 			setName(h.getName()).
+			setPublicName(h.getPublicName()).
 			setProtocol(h.getProtocol()).
 			setSite(h.getSite()).
 			setPort(h.getPort()).
 			setType(h.getType());
-			setDeployment(h.getDeployment());
 		}
 	}
 	
@@ -57,10 +51,16 @@ public class Host extends CmsBean {
 	}
 	
 	public String getNameAndPort() {
-		StringBuilder sb = new StringBuilder(getName());
+		String name = getPublicName();
+		int port = 80;
+		if (getCmsService().isDevDeployment()) {
+			name = getName();
+			port = getPort();
+		}
+		StringBuilder sb = new StringBuilder(name);
 		
-		if (getPort() != null && getPort() != 80) {
-			sb.append(":").append(getPort());
+		if (port != 80) {
+			sb.append(":").append(port);
 		}
 		return sb.toString();
 	}
@@ -78,6 +78,15 @@ public class Host extends CmsBean {
 		return this;
 	}
 	
+	public String getPublicName() {
+		return publicName;
+	}
+
+	public Host setPublicName(String publicName) {
+		this.publicName = publicName;
+		return this;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -123,24 +132,15 @@ public class Host extends CmsBean {
 		return this;
 	}
 
-	public Deployment getDeployment() {
-		return deployment;
-	}
-
-	public Host setDeployment(Deployment deployment) {
-		this.deployment = deployment;
-		return this;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((publicName == null) ? 0 : publicName.hashCode());
 		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
 		result = prime * result + ((port == null) ? 0 : port.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
-		result = prime * result + ((deployment == null) ? 0 : deployment.hashCode());
 		return result;
 	}
 
@@ -158,6 +158,11 @@ public class Host extends CmsBean {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (publicName == null) {
+			if (other.publicName != null)
+				return false;
+		} else if (!publicName.equals(other.publicName))
+			return false;
 		if (protocol == null) {
 			if (other.protocol != null)
 				return false;
@@ -169,8 +174,6 @@ public class Host extends CmsBean {
 		} else if (!port.equals(other.port))
 			return false;
 		if (type != other.type)
-			return false;
-		if (deployment != other.deployment)
 			return false;
 		return true;
 	}

@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.Host;
-import com.slepeweb.cms.bean.Host.Deployment;
 import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.utils.RowMapperUtil;
 
@@ -16,7 +15,7 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	private static Logger LOG = Logger.getLogger(HostServiceImpl.class);
 	
 	private final static String SELECT_TEMPLATE = 
-			"select h.id, h.name, h.protocol, h.port, h.type, h.deployment, s.id as siteid, s.name as sitename, s.shortname, s.language, s.xlanguages, s.secured " +
+			"select h.id, h.name, h.protocol, h.port, h.type, h.publicname, s.id as siteid, s.name as sitename, s.shortname, s.language, s.xlanguages, s.secured " +
 			"from host h " +
 			"join site s on h.siteid = s.id " +
 			"where %s";
@@ -40,8 +39,8 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	}
 	
 	private Host insertHost(Host h) {		
-		this.jdbcTemplate.update( "insert into host (name, port, type, deployment, protocol) values (?, ?, ?, ?, ?)", 
-				h.getName(), h.getPort(), h.getType(), h.getDeployment(), h.getProtocol());		
+		this.jdbcTemplate.update( "insert into host (name, port, type, protocol, publicname) values (?, ?, ?, ?, ?)", 
+				h.getName(), h.getPort(), h.getType(), h.getProtocol(), h.getPublicName());		
 		
 		h.setId(getLastInsertId());			
 		LOG.info(compose("Added new host", h));		
@@ -53,8 +52,8 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 			dbRecord.assimilate(h);
 			
 			this.jdbcTemplate.update(
-					"update host set name = ?, port = ?, type = ?, deployment = ?, protocol = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getPort(), dbRecord.getType(), dbRecord.getDeployment(), 
+					"update host set name = ?, port = ?, type = ?, publicname = ?, protocol = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getPort(), dbRecord.getType(), dbRecord.getPublicName(), 
 					dbRecord.getProtocol(), dbRecord.getId());
 			
 			LOG.info(compose("Updated host", h));
@@ -91,11 +90,11 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	}
 
 	/*
-	 * The db has a unique key constraint for (siteid, hostType, deployment)
+	 * The db has a unique key constraint for (siteid, hostType)
 	 */
-	public Host getHost(Long siteId, HostType type, Deployment deployment) {
+	public Host getHost(Long siteId, HostType type) {
 		return getFirstHost(
-				String.format(SELECT_TEMPLATE, " h.siteid = ? and h.type = ? and h.deployment = ?"), siteId, type.name(), deployment.name());
+				String.format(SELECT_TEMPLATE, " h.siteid = ? and h.type = ?"), siteId, type.name());
 	}
 
 	private Host getFirstHost(String sql, Object... params) {
@@ -106,13 +105,5 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 	public List<Host> getHosts(Long siteId) {
 		return this.jdbcTemplate.query(
 				String.format(SELECT_TEMPLATE, " h.siteid = ?"), new RowMapperUtil.HostMapper(), siteId);
-	}
-
-
-	public List<Host> getHosts(Long siteId, HostType type) {
-		return this.jdbcTemplate.query(
-				String.format(SELECT_TEMPLATE, " h.siteid = ? and h.type = ?"), 
-				new RowMapperUtil.HostMapper(),
-				siteId, type.name());
 	}
 }

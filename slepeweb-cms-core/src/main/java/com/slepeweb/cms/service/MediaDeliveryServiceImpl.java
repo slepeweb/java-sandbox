@@ -2,7 +2,6 @@ package com.slepeweb.cms.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -20,41 +19,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MediaDeliveryServiceImpl extends BaseServiceImpl implements MediaDeliveryService {
 	private static Logger LOG = Logger.getLogger(MediaDeliveryServiceImpl.class);
 	
-	private final Object buffPoolLock = new Object();
-	private java.lang.ref.WeakReference <List<byte[]>> buffPool;
-	
-	/**
-	 * Get a buffer from pool, creating if necessary.
-	 */
-	private byte[] getBuff() {
-		synchronized (this.buffPoolLock) {
-			if (this.buffPool != null) {
-				List<byte[]> list = this.buffPool.get();
-				if (list != null && ! list.isEmpty()) {
-					return list.remove(list.size() - 1);
-				}
-			}
-			return new byte[4096];
-		}
-	}
-
-	/**
-	 * Put buffer back into pool.
-	 */
-	private void putBuff(byte[] buff) {
-		if (buff == null) {
-			return;
-		}
-		synchronized (this.buffPoolLock) {
-			List<byte[]> list = (this.buffPool == null ? null : this.buffPool.get());
-			if (list == null) {
-				list = new java.util.ArrayList<byte[]>();
-				this.buffPool = new java.lang.ref.WeakReference<List<byte[]>>(list);
-			}
-			list.add(buff);
-		}
-	}
-
 	public void stream(Item item, HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 
@@ -65,49 +29,66 @@ public class MediaDeliveryServiceImpl extends BaseServiceImpl implements MediaDe
 		}
 		
 		Media media = thumbnailRequired ? item.getThumbnail() : item.getMedia();
+		LOG.info(String.format("Streaming media for item id %d, length %d bytes ...", item.getId(), media.getSize()));
+		
 		if (media == null || ! media.isBinaryContentLoaded()) {
-			LOG.error(String.format("No binary content found for media item", item));
+			LOG.error(String.format("... No binary content found for media item", item));
 			res.sendError(404);
 			return;
 		}
 		
 		// TODO: Temporary hack - this assumes all thumbnails are jpeg's
 		res.setContentType(thumbnailRequired ? "image/jpeg" : item.getType().getMimeType());
+		
+		// With this header, there's no need to specify content length
+		res.setHeader("Transfer-Encoding", "chunked");
+		//res.setHeader("Content-Length", String.valueOf(media.getSize()));
+		
 		InputStream in = media.getDownloadStream();
+		ServletOutputStream out = res.getOutputStream();
 		
 		if (in != null) {			
 			try {
-				res.setHeader("Content-Length", String.valueOf(media.getSize()));
-				stream(in, res.getOutputStream());
+				int n = stream(in, out);
+				
+				if (n != media.getSize()) {
+					LOG.error(String.format("... DISCREPANCY: streamed %d bytes for item %d", n, item.getId()));
+				}
 			}
 			catch (Exception e) {
-				LOG.error(String.format("Error streaming media", item), e);
+				LOG.error(String.format("... Error streaming media for id %d", item.getId()), e);
 			}
 			finally {
-				if (in != null) {
+				try {
 					in.close();
+				}
+				catch (Exception ee) {
+					LOG.error("... Failed to close input stream");
 				}
 			}
 		}
 		else {
-			LOG.warn(String.format("No binary content for this media", item));
+			LOG.warn(String.format("... No binary content for this media", item));
 		}
 	}
 	
-	private void stream(InputStream in, ServletOutputStream out) throws ServletException, IOException {
-		// Get a pooled buffer
-		byte[] buff = getBuff();
-		try {
-			for (;;) {
-				int len = in.read(buff);
-				if (len == -1) {
-					break;
-				}
+	private int stream(InputStream in, ServletOutputStream out) throws ServletException, IOException {
+
+		byte[] buff = new byte[8192];
+		int total = 0;
+		int len;
+		
+		for (;;) {
+			len = in.read(buff);
+			if (len != -1) {
+				total += len;
 				out.write(buff, 0, len);
+				out.flush();
 			}
-		} finally {
-			// Return buffer to the pool
-			putBuff(buff);
+			else {
+				LOG.info(".");
+				return total;
+			}
 		}
 	}	
 }

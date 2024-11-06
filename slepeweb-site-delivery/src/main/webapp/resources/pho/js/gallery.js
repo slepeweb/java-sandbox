@@ -34,7 +34,7 @@ function displayMedia(id) {
 	// Populate and display given slide
 	sourceAndDisplay(_cursor.currentId, true)
   
-  	if (_cursor.hasPrevious()) {
+  if (_cursor.hasPrevious()) {
 		// Populate and hide previous slide
 		sourceAndDisplay(_cursor.currentId - 1, false);
 	}
@@ -48,7 +48,7 @@ function displayMedia(id) {
 function sourceMedia(id) {
 	let slide = $(_slides[id])
   
-  	if (slide.hasClass("image")) {
+  if (slide.hasClass("image")) {
 		if (! slide.attr("src")) {
 			let src = $(_thumbnails[id]).attr("data-slide-src")
 			slide.attr("src", src)

@@ -49,7 +49,7 @@ public class BaseController {
 	@ModelAttribute(value=ITEM)
 	public Item getRequestItem(HttpServletRequest req) {
 		Item i = (Item) req.getAttribute(ITEM);
-		LOG.info(String.format("Model attribute retrieved by BaseController (%s): [%s]", ITEM, i));
+		//LOG.info(String.format("Model attribute retrieved by BaseController (%s): [%s]", ITEM, i));
 		return i;
 	}
 	

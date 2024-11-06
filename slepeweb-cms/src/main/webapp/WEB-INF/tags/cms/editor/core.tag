@@ -18,8 +18,11 @@
 		<label for="path">Path: </label><div class="inputs"><input disabled="disabled" value="${editingItem.path}" /></div>
 		
 		<c:if test="${editingItem.published}">		
-			<!-- Editorial host: ${editingItem.site.editorialHost} -->
-			<!-- Delivery host: ${editingItem.site.deliveryHost} -->
+			<%--
+				The page for this item can only be served by the delivery host. 
+				The editorial host has no such capability.
+				NOTE that the delivery host can only render published items, hence the surrounding <c:if> block.
+			--%>
 			<c:set var="_host" value="${editingItem.site.deliveryHost}" />
 			
 			<c:set var="url" value="${editingItem.path}" />

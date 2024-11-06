@@ -928,7 +928,7 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/trash/get")
 	public String getTrashedItems(ModelMap model) {			
 		model.put("_trashContents", this.cmsService.getItemService().getTrashedItems());			
-		return "cms.trash.contents";
+		return "trash-contents";
 	}
 	
 	@RequestMapping(value="/trash/empty/all", produces="application/json")

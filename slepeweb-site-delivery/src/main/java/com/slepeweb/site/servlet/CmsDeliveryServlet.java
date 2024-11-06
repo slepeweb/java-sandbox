@@ -91,7 +91,7 @@ public class CmsDeliveryServlet {
 				}
 				else {
 					req.setAttribute("_item", item);
-					LOG.info(String.format("Model attribute set by CmsDeliveryServlet (%s): [%s]", "_item", item));
+					//LOG.info(String.format("Model attribute set by CmsDeliveryServlet (%s): [%s]", "_item", item));
 					setCacheHeaders(item, requestTime, res);
 					
 					if (item.getType().isMedia()) {

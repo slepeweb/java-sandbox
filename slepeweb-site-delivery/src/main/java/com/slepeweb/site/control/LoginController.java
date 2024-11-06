@@ -1,47 +1,45 @@
-package com.slepeweb.site.pho.control;
+package com.slepeweb.site.control;
 
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.service.LoginService;
-import com.slepeweb.site.control.BaseController;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
-@RequestMapping("/spring/pho")
 public class LoginController extends BaseController {
 	
-	//private static Logger LOG = Logger.getLogger(LoginController.class);
-	public static final String USER_ATTR = "_user";
-	public static final String ADMIN_EMAIL = "admin@buttigieg.org.uk";
+	private static Logger LOG = Logger.getLogger(LoginController.class);
 	
 	@Autowired private LoginService loginService;
 	
-	@RequestMapping(value="/login")
 	public String login (
 			@ModelAttribute(ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,
-			ModelMap model) throws IOException {	
-				
+			ModelMap model) throws IOException {					
+		
 		if (req.getMethod().equalsIgnoreCase("post")) {
 			String email = req.getParameter("email");
+			StringBuffer msg = new StringBuffer(String.format("User '%s' logging in ... ", email));
+			
 			String password = req.getParameter("password");
 			String originalPath = req.getParameter("originalPath");
 			LoginSupport supp = this.loginService.login(email, password, req);
 			
 			if (supp.isSuccess()) {
+				msg.append("success!");
 				String path = originalPath;
 				if (StringUtils.isBlank(path)) {
 					path = "/";
@@ -50,7 +48,10 @@ public class LoginController extends BaseController {
 			}
 			else {
 				model.addAttribute("error", supp.getErrorMessage());
+				msg.append("FAILED: " + supp.getErrorMessage());
 			}
+			
+			LOG.info(msg);
 			
 		}
 		else if (req.getMethod().equalsIgnoreCase("get")) {

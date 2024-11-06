@@ -26,7 +26,7 @@
   <servlet>
     <servlet-name>slepeweb-cms</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
+    <multipart-config />
 	</servlet>
   	
   <listener>
