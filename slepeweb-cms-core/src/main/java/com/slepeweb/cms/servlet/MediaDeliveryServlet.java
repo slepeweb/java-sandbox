@@ -1,5 +1,6 @@
 package com.slepeweb.cms.servlet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.CmsService;
-import com.slepeweb.cms.service.MediaDeliveryService;
+import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.cms.utils.LogUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +21,6 @@ public class MediaDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(MediaDeliveryServlet.class);
 	
 	@Autowired private CmsService cmsService;
-	@Autowired private MediaDeliveryService mediaDeliveryService;
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		
@@ -37,7 +37,10 @@ public class MediaDeliveryServlet {
 					res.sendError(HttpServletResponse.SC_FORBIDDEN);
 				}
 				else {
-					this.mediaDeliveryService.stream(item, req, res);
+					String msg = CmsUtil.forward2MediaStreamer(item, req, res);
+					if (StringUtils.isNotBlank(msg)) {
+						notFound(res, msg, path);
+					}
 				}
 			}
 			else {

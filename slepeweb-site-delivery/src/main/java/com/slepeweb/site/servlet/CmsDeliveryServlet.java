@@ -24,8 +24,8 @@ import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
-import com.slepeweb.cms.service.MediaDeliveryService;
 import com.slepeweb.cms.service.SiteAccessService;
+import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
 
@@ -40,7 +40,6 @@ public class CmsDeliveryServlet {
 	private Map<Long, Long> lastDeliveryTable = new HashMap<Long, Long>(127);
 	
 	@Autowired private CmsService cmsService;
-	@Autowired private MediaDeliveryService mediaDeliveryService;
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		doGet(req, res, model);
@@ -91,12 +90,15 @@ public class CmsDeliveryServlet {
 				}
 				else {
 					req.setAttribute("_item", item);
-					//LOG.info(String.format("Model attribute set by CmsDeliveryServlet (%s): [%s]", "_item", item));
 					setCacheHeaders(item, requestTime, res);
 					
 					if (item.getType().isMedia()) {
 						LOG.debug(LogUtil.compose("Streaming binary content ...", item));
-						this.mediaDeliveryService.stream(item, req, res);
+						
+						String msg = CmsUtil.forward2MediaStreamer(item, req, res);
+						if (StringUtils.isNotBlank(msg)) {
+							notFound(res, msg, item);
+						}
 					}
 					else {
 						res.setContentType("text/html;charset=utf-8");
