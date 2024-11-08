@@ -42,9 +42,9 @@ public abstract class SolrService4CmsBase extends SolrServiceBase {
 		}
 	}
 	
-	protected boolean removeItem(String key) {
+	protected boolean removeItems(List<String> keys) {
 		try {
-			/*UpdateResponse resp = */ getClient().deleteById(key);
+			/*UpdateResponse resp = */ getClient().deleteById(keys);
 			getClient().commit();
 			LOG.debug("Item successfully removed from Solr index");
 			return true;

@@ -90,7 +90,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 					i.getName(), i.getSimpleName(), i.getPath(), i.getSite().getId(), i.getType().getId(), 
 					i.getTemplate() == null ? 0 : i.getTemplate().getId(), i.getOwnerId(), 
-					i.getDateCreated(), i.getDateUpdated(), false, true, false, false, i.getVersion());				
+					i.getDateCreated(), i.getDateUpdated(), false, true, i.isPublished(), i.isSearchable(), i.getVersion());				
 		}
 		catch (DuplicateKeyException e) {
 			throw new DuplicateItemException("Item already exists - check the bin");

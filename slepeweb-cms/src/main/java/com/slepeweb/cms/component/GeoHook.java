@@ -7,15 +7,14 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.FieldForTypeService;
 
-public class GeoHook extends NoHook {
+public class GeoHook extends BaseHook {
 	
 	@Autowired private FieldForTypeService fieldForTypeService;
 
 	
 	@Override
 	public void addItemPre(Item i) {
-		i.setPublished(true);
-		i.setSearchable(true);
+		super.addItemPre(i);
 		
 		boolean flag1 = false, flag2 = false;
 		

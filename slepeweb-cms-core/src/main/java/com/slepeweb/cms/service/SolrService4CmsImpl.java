@@ -43,7 +43,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 	}
 	
 	public boolean remove(Item i) {
-		return super.removeItem(i.getSolrKey());
+		return super.removeItems(i.getSolrKeys());
 	}
 	
 	public boolean remove(Site s) {

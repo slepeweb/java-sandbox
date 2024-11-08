@@ -8,10 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.bean.Media;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 public class CmsUtil {
 	
@@ -71,36 +67,5 @@ public class CmsUtil {
 		}
 		
 		return result;
-	}
-
-	public static String forward2MediaStreamer(Item item, HttpServletRequest req, HttpServletResponse res) {
-		
-		String msg = null;
-		
-		String viewParam = req.getParameter("view");
-		boolean thumbnailRequired = false;
-		if (StringUtils.isNotBlank(viewParam)) {
-			thumbnailRequired = viewParam.equals("thumbnail");
-		}
-
-		Media m = thumbnailRequired ? item.getThumbnail() : item.getMedia();
-		
-		if (m != null && m.isBinaryContentLoaded()) {
-			req.setAttribute("_media", m);
-			String mediaType = item.getType().isVideo() ? "video" : "image";
-			String servletPath = "/stream/" + mediaType;
-			
-			try {
-				req.getRequestDispatcher(servletPath).forward(req, res);
-			}
-			catch (Exception e) {
-				msg = e.getMessage();
-			}
-		}
-		else {
-			msg = String.format("No media found for item %s", item.getPath());
-		}
-		
-		return msg;
 	}
 }

@@ -25,7 +25,6 @@ import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.SiteAccessService;
-import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
 
@@ -94,11 +93,9 @@ public class CmsDeliveryServlet {
 					
 					if (item.getType().isMedia()) {
 						LOG.debug(LogUtil.compose("Streaming binary content ...", item));
-						
-						String msg = CmsUtil.forward2MediaStreamer(item, req, res);
-						if (StringUtils.isNotBlank(msg)) {
-							notFound(res, msg, item);
-						}
+						String mediaType = item.getType().getMimeType().split("\\/")[0];
+						String servletPath = String.format("/stream/%s/item", mediaType);
+						req.getRequestDispatcher(servletPath).forward(req, res);
 					}
 					else {
 						res.setContentType("text/html;charset=utf-8");

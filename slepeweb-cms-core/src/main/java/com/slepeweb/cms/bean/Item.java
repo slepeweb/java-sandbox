@@ -613,6 +613,11 @@ public class Item extends CmsBean {
 	}
 	
 	private Link filterOrthogonalParentLink() {
+		// No point continuing if this is a root item
+		if (this.isRoot()) {
+			return null;
+		}
+		
 		String[] targets = new String[] {LinkType.binding, LinkType.component};
 		List<Link> plinks = getParentLinksIncludingBindings();
 		List<Link> orthos = new ArrayList<Link>();
@@ -931,8 +936,12 @@ public class Item extends CmsBean {
 		return this;
 	}
 
-	public String getSolrKey() {
-		return String.format("%s-%s", getId(), getLanguage());
+	public List<String> getSolrKeys() {
+		List<String> list = new ArrayList<String>();
+		for (String lang : getSite().getAllLanguages()) {
+			list.add(String.format("%s-%s", getId(), lang));
+		}
+		return list;
 	}
 	
 	public User getOwner() {

@@ -7,7 +7,7 @@ import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.SolrService4Cms;
 
-public class PhoHook extends NoHook {
+public class PhoHook extends BaseHook {
 	
 	@Autowired private SolrService4Cms solrService4Cms;
 	@Autowired private IGuidance dateishFieldGuidance;
