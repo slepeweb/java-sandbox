@@ -34,9 +34,17 @@
 			</div>
 			
 			<div id="search-area">
-				<p><i class="fa-solid fa-magnifying-glass fa-2x"></i> <br />Use this form to
-				exercise greater control over your search results. 
-				Search term(s) are mandatory; dates are optional.</p>
+				<p><span class="h3-like">Advanced Search</span> <i class="fa-solid fa-magnifying-glass fa-2x"></i></p>
+				<details>
+					<summary>Search tips</summary>
+					<ul>
+						<li>Use this form to exercise greater control over your search results.</li>
+						<li>Search term(s) are mandatory; dates are optional.</li>
+						<li>Terms 'luca football' return all items matching EITHER 'luca' OR 'football'.</li>
+						<li>Terms '+luca +football' return ONLY items matching BOTH 'luca' AND 'football'.</li>
+						<li>Terms '+luca -football' return all items matching 'luca', EXCEPT for those also matching 'football'.</li>
+					</ul>
+				</details>
 				
 				<div id="search-form">
 					<form action="/searchresults" method="post" 

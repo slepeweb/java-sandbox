@@ -175,7 +175,7 @@ _cms.field.behaviour.formchange = function() {
 
 _cms.field.behaviour.guidanceIcon = function() {
 	$("span.field-guidance-icon").click(function(e){
-		let guidanceDiv = $(this).parent().next();
+		let guidanceDiv = $(this).parent().parent().next();
 		let dialog = $("#field-guidance");
 		if (dialog.attr("data-variable") != guidanceDiv.attr("data-variable")) {
 			dialog.html(guidanceDiv.html());

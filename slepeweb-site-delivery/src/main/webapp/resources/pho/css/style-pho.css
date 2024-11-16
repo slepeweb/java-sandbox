@@ -890,6 +890,12 @@ div#search-results p.right {
   text-align: right;
 }
 
+span.h3-like {
+	font-size: 1.6em;
+	font-weight: bold;
+	color: #666;
+}
+
 div#tag-cloud-wrapper {
   width: 60%;
   margin: auto;

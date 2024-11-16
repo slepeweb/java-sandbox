@@ -51,7 +51,7 @@ public class PhotosPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "homepage", model);
-		model.addAttribute("_latestCookieValues", this.phoCookieService.getAllCookieValues(req));
+		model.addAttribute("_latestCookieValues", this.phoCookieService.getCookieValues(req));
 		
 		TagList tagList = this.tagService.getTagCount4Site(i.getSite().getId(), 50);
 		tagList.analyze();
@@ -131,7 +131,7 @@ public class PhotosPageController extends BaseController {
 		page.setTitle(i.getName());
 		
 		PhoCookieValues formData = new PhoCookieValues(request);
-		this.phoCookieService.saveAllCookieValues(formData, response);
+		this.phoCookieService.saveCookie(formData, response);
 		
 		SolrParams4Pho params = new SolrParams4Pho(i, new SolrConfig());		
 		params.setSearchText(formData.getText());
