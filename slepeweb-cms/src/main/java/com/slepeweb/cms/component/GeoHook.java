@@ -13,9 +13,7 @@ public class GeoHook extends BaseHook {
 
 	
 	@Override
-	public void addItemPre(Item i) {
-		super.addItemPre(i);
-		
+	public void addItemPost(Item i) {
 		boolean flag1 = false, flag2 = false;
 		
 		for (FieldForType fft : this.fieldForTypeService.getFieldsForType(i.getType().getId())) {
@@ -24,14 +22,22 @@ public class GeoHook extends BaseHook {
 			}
 			
 			if (fft.getField().getVariable().equals(FieldName.CACHEABLE)) {
-				i.setFieldValue(FieldName.CACHEABLE, true);
+				i.setFieldValue(FieldName.CACHEABLE, "yes");
 				flag1 = true;
 			}
 			else if (fft.getField().getVariable().equals(FieldName.HIDE_FROM_NAV)) {
-				i.setFieldValue(FieldName.HIDE_FROM_NAV, false);
+				i.setFieldValue(FieldName.HIDE_FROM_NAV, "no");
 				flag2 = true;
 			}
 		}
+		
+		if (flag1 || flag2) {
+			try {
+				i.saveFieldValues();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
-
 }
