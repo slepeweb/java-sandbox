@@ -7,9 +7,7 @@
 		
 	<div class="main standard-3col">
 		<div class="leftside">
-			<c:if test="${fn:length(_item.boundPages) > 0}">
-				<geo:inThisSection />
-			</c:if>
+			<geo:inThisSection />
 		</div>
 		
 		<c:set var="sidebarIsPresent" value="${fn:length(_item.relatedItems) > 0}" />

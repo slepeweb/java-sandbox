@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.site.control.BaseController;
+import com.slepeweb.site.geo.bean.SectionMenu;
 import com.slepeweb.site.model.Page;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +50,11 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "standard3Col", model);
+		addInThisSection(i, model);
 		return page.getView();
 	}
 
+	private void addInThisSection(Item i, ModelMap model) {
+		model.addAttribute("_inThisSection", new SectionMenu(i));
+	}
 }

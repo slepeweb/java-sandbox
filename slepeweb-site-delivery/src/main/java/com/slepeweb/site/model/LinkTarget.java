@@ -28,6 +28,17 @@ public class LinkTarget implements Serializable {
 		return getHref();
 	}
 	
+	public String getTag() {
+		StringBuffer sb = new StringBuffer(String.format("<a href=\"%s\"", getHref()));
+		
+		if (StringUtils.isNotBlank(getStyle())) {
+			sb.append(String.format(" class=\"%s\"", getStyle()));
+		}
+		
+		sb.append(String.format(">%s</a>", getTitle()));
+		return sb.toString();
+	}
+	
 	public String getTitle() {
 		return title;
 	}

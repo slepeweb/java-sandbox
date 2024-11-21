@@ -313,6 +313,7 @@ public class Item extends CmsBean {
 		return null;
 	}
 	
+	// TODO: redundant functionality, HOWEVER, lots of old code is using it.
 	public String getFieldValueResolved(String variable, StringWrapper dflt) {
 		FieldValue fv = getFieldValueObj(variable);
 		if (fv != null) {

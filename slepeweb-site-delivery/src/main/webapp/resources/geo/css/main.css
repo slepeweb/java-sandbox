@@ -321,14 +321,8 @@ div.sidebar-wrapper {
 	padding-left: 0.5em;
 }
 
-div.in-this-section ul, div.sidebar ul {
-	padding: 0;
-	margin: 0;
-	list-style-type: none;
-}
-
-div.in-this-section div, div.sidebar div {
-	padding: 0 0 0.8em 0;
+div.in-this-section > div, div.sidebar > div {
+	padding: 0.4em 0 0.4em 0;
 	line-height: 1.0em;
 }
 
@@ -339,6 +333,15 @@ div.in-this-section a, div.sidebar a {
 
 div.in-this-section a:hover, div.sidebar a:hover {
 	text-decoration: underline;
+}
+
+div.in-this-section div.selected {
+	background-color: #c8d9b1;
+}
+
+div.in-this-section div.selected-child {
+	background-color: #c8d9b1;
+	padding: 0.4em 0 0.4em 1.0em;
 }
 
 div.standard-3col div.rightside {
