@@ -123,7 +123,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 		return Pair.of(lt, ln);
 	}
 
-	public void deleteLinks(Long parentId, Long childId) {
+	public void deleteLink(Long parentId, Long childId) {
 		if (this.jdbcTemplate.update("delete from link where parentid = ? and childid = ?", parentId, childId) > 0) {
 			LOG.warn(compose("Deleted links", String.valueOf(parentId) + " -> " + String.valueOf(childId)));
 		}

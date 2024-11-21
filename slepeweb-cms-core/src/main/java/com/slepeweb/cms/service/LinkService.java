@@ -7,7 +7,7 @@ import com.slepeweb.cms.except.ResourceException;
 
 
 public interface LinkService {
-	void deleteLinks(Long parentId, Long childId);
+	void deleteLink(Long parentId, Long childId);
 	void deleteLinks(Long parentId, String linkType, String name);
 	List<Link> getLinks(Long parentId);
 	List<Link> getLinks(Long parentId, String type);

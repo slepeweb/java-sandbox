@@ -51,7 +51,7 @@ public class ComponentServiceImpl implements ComponentService {
 						LOG.warn(LogUtil.compose("Method not found", componentData[0]));
 					}
 					catch (Exception e) {
-						LOG.warn(LogUtil.compose("Uncaught error", componentData[0]), e);
+						LOG.warn(LogUtil.compose("Uncaught error", componentData[0]));
 					}
 				}
 			}

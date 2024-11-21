@@ -9,10 +9,4 @@ public class CustomComponent extends SimpleComponent {
 		super.setup(l);
 		return this;
 	}
-	
-	@Override
-	public String toString() {
-		return String.format("CustomComponent (%s): %s", getType(), getHeading());
-	}
-
 }

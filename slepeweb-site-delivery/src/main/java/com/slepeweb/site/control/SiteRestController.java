@@ -40,7 +40,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
-@RequestMapping("/rest")
+@RequestMapping("/oldrest")
 public class SiteRestController extends BaseController {
 	//private static Logger LOG = Logger.getLogger(SiteRestController.class);
 	public static final String SLEPEWEB_SITENAME = "Slepeweb";

@@ -45,7 +45,7 @@ public class Link extends CmsBean {
 	}
 
 	public void delete() {
-		getLinkService().deleteLinks(getParentId(), getChild().getId());
+		getLinkService().deleteLink(getParentId(), getChild().getId());
 	}
 	
 	public Item getChild() {

@@ -67,7 +67,12 @@ public class FieldForTypeServiceImpl extends BaseServiceImpl implements FieldFor
 	
 	public FieldForType getFieldForType(Long fieldId, Long itemTypeId) {
 		String sql = String.format(SELECTOR_TEMPLATE, "fft.fieldid = ? and fft.itemtypeid = ?");
-		return this.jdbcTemplate.queryForObject(sql, new RowMapperUtil.FieldForTypeMapper(), fieldId, itemTypeId);
+		try {
+			return this.jdbcTemplate.queryForObject(sql, new RowMapperUtil.FieldForTypeMapper(), fieldId, itemTypeId);
+		}
+		catch(Exception e) {
+			return null;
+		}
 	}
 
 	public List<FieldForType> getFieldsForType(Long itemTypeId) {

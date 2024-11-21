@@ -389,6 +389,19 @@ footer {
   display: none;
 }
 
+div.squeeze p {
+	margin-bottom: 0;
+}
+
+div.squeeze pre {
+	margin-bottom: 1em;
+}
+
+div.twoblock {
+	display: grid;
+  grid-template-columns: 50% 50%;
+}
+
 .ui-helper-reset {
 	font-size: 14px;
 	line-height: 1.65em;

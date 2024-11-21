@@ -16,10 +16,6 @@ public class SectionComponent extends SimpleComponent {
 		return this;
 	}
 	
-	public String toString() {
-		return String.format("SectionComponent (%s): %s", getType(), getHeading());
-	}
-	
 	public Image getImage() {
 		return image;
 	}

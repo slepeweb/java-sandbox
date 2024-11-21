@@ -71,10 +71,6 @@ public class TableComponent extends SimpleComponent {
 		return headings;
 	}
 	
-	public String toString() {
-		return String.format("TableComponent (%s): %s", getType(), getHeading());
-	}
-	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

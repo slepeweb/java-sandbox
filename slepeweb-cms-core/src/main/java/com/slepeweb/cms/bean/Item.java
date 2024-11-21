@@ -55,7 +55,7 @@ public class Item extends CmsBean {
 	// This properties are NOT set when retrieving items from the db.
 	// It would have been neater to extend the Item class, but on investigation, that
 	// would be too disruptive to the code.
-	private String linkType, linkName;
+	private Link link4newItem;
 	
 	public Item setAllMedia(List<Media> allMedia) {
 		this.allMedia = allMedia;
@@ -853,26 +853,13 @@ public class Item extends CmsBean {
 		return this;
 	}
 
-	public String getLinkType() {
-		return linkType;
+	public Link getLink4newItem() {
+		return link4newItem;
 	}
 
-	public Item setLinkType(String linkType) {
-		this.linkType = linkType;
+	public Item setLink4newItem(Link link4newItem) {
+		this.link4newItem = link4newItem;
 		return this;
-	}
-
-	public String getLinkName() {
-		return linkName;
-	}
-
-	public Item setLinkName(String linkName) {
-		this.linkName = linkName;
-		return this;
-	}
-	
-	public boolean isX() {
-		return StringUtils.isNotBlank(this.linkType) && StringUtils.isNotBlank(this.linkName);
 	}
 
 	public Long getOrigId() {

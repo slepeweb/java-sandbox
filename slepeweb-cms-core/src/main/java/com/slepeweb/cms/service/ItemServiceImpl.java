@@ -129,9 +129,12 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 					setName("std").
 					setOrdering(ordering);
 				
-				if (i.isX()) {
-					l.setType(i.getLinkType());
-					l.setName(i.getLinkName());
+				Link ln = i.getLink4newItem();
+				if (ln != null) {
+					l.setType(ln.getType()).setName(ln.getName());
+					if (ln.getOrdering() > -1) {
+						l.setOrdering(ln.getOrdering());
+					}
 				}
 				
 				this.linkService.save(l);	

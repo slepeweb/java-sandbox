@@ -11,12 +11,6 @@
 	</c:if>
 </div>
 
-<%--
-<style>
-${_comp.css}
-</style>
- --%>
-
 <script>
 ${_comp.js}
 </script>

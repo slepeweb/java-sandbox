@@ -24,6 +24,7 @@ import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
+import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteAccessService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
@@ -39,6 +40,7 @@ public class CmsDeliveryServlet {
 	private Map<Long, Long> lastDeliveryTable = new HashMap<Long, Long>(127);
 	
 	@Autowired private CmsService cmsService;
+	@Autowired private ItemService itemService;
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		doGet(req, res, model);
@@ -47,6 +49,15 @@ public class CmsDeliveryServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
 		String path = getItemPath(req);
+		
+		// Deal with urls like /$_3654
+		if (path.matches("^/\\$_\\d+$") && path.length() > 3) {
+			Long origId = Long.valueOf(path.substring(3));
+			Item i = this.itemService.getItemByOriginalId(origId);
+			req.getRequestDispatcher(i.getPath()).forward(req, res);
+			return;
+		}
+		
 		String trimmedPath = path;
 		long requestTime = System.currentTimeMillis();		
 		Site site = getSite(req);

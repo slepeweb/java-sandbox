@@ -60,7 +60,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		
 		Item newParent = mode.equals(MoverItem.MOVE_OVER) ? target : target.getOrthogonalParent();
 		if (newParent == null) {
-			throw new ResourceException("Attempted to move an item to one of its descendants");
+			throw new ResourceException("Attempted to move an item alongside a root item");
 		}
 		
 		LOG.info(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mode.toUpperCase(), target));			
@@ -78,38 +78,41 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 			}
 		}
 		
-		// Break the parent link for the mover, EVEN IF old-parent = new-parent
+		// Identify the orthogonal parent. The link type will be either binding or component - nothing else.
 		Link oldParentLink = mover.getOrthogonalParentLink();
-		this.linkService.deleteLinks(oldParentLink.getChild().getId(), mover.getId());
-		LOG.debug("  Removed links between mover and old parent");		
+		if (oldParentLink == null) {
+			throw new ResourceException("Cannot move a root item");
+		}
+		
+		// Break the parent link for the mover, EVEN IF old-parent = new-parent
+		this.linkService.deleteLink(oldParentLink.getChild().getId(), mover.getId());
+		LOG.info("  Deleted link between old parent and mover");
+		
+		// Links are cached by item objects - force reload for newParent
+		newParent.setLinks(null);
+		List<Link> newOrthogonals = newParent.getOrthogonalLinks();
 		
 		// Bind to new parent - we'll save() the mover link later
 		Link moverLink = CmsBeanFactory.makeLink().
 				setParentId(newParent.getId()).
 				setChild(mover).
 				setType(oldParentLink.getType()).
-				setName(oldParentLink.getName());
+				setName(oldParentLink.getName()).
+				setData(oldParentLink.getData());
 		
-		// Identify the orthogonal parent. The link type will be either binding or component - nothing else.
-		// Retain this link type once the item is moved.
-		Link oldLink = mover.getOrthogonalParentLink();
-		if (oldLink != null) {
-			moverLink.setType(oldLink.getType()).setName(oldLink.getName()).setData(oldLink.getData());
-		}
-		
-		// Add mover to new parent's bindings
-		List<Link> bindings = newParent.getBindings();
-		
+		// Add mover to new parent's orthogonal links
 		if (mode.equals(MoverItem.MOVE_OVER)) {
-			bindings.add(moverLink);
-			LOG.info("  Added mover to end of new parent's existing bindings");	
+			newOrthogonals.add(moverLink);
+			LOG.info("  Added mover to end of new parent's existing orthogonal links");	
 		}
 		else {
 			// If mode is 'before' or 'after', identify insertions point and re-order all siblings
 			int cursor = -1;
-			for (Link l : bindings) {
+			Link l;
+			for (int i = 0; i < newOrthogonals.size(); i++) {
+				l = newOrthogonals.get(i);
 				if (l.getChild().getId().equals(target.getId())) {
-					cursor = bindings.indexOf(l);
+					cursor = i;
 					break;
 				}
 			}
@@ -117,28 +120,29 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 			// Now insert the mover into the bindings list
 			if (cursor > -1) {
 				if (mode.equals(MoverItem.MOVE_BEFORE)) {
-					bindings.add(cursor, moverLink);
+					newOrthogonals.add(cursor, moverLink);
 				}
 				else if (mode.equals(MoverItem.MOVE_AFTER)) {
-					if (cursor < bindings.size()) {
-						bindings.add(cursor + 1, moverLink);
+					if (cursor < newOrthogonals.size()) {
+						newOrthogonals.add(cursor + 1, moverLink);
 					}
 					else {
-						bindings.add(moverLink);
+						newOrthogonals.add(moverLink);
 					}
 				}
-				LOG.debug("  Inserted mover into new parent's existing bindings");	
+				LOG.info("  Inserted mover into new parent's existing orthogonal links");	
 			}
 			else {
-				bindings.add(moverLink);
+				newOrthogonals.add(moverLink);
 				LOG.warn("  Failed to determine point of insertion - placed at end");	
 			}
 		}
 		
-		// Re-order bindings from 0, then save
+		// Re-set order property of all orthogonal links, starting from 0, then save.
+		// NOTE that moverLink has NOT been saved yet ... 
 		int cursor = 0;
-		for (Link l : bindings) {
-			if (l.equals(moverLink) || l.getOrdering() != cursor) {
+		for (Link l : newOrthogonals) {
+			if (l.getChild().getId().equals(moverLink.getChild().getId()) || l.getOrdering() != cursor) {
 				l.setOrdering(cursor);
 				l.save();
 			}
@@ -182,8 +186,12 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		 *  so keep record of required data before the new version is created.
 		 */
 		int origVersion = source.getVersion();
-		Item parent = source.getOrthogonalParent();
-		int origOrdering = this.linkService.getLink(parent.getId(), source.getId()).getOrdering();
+		Link sourceParentLink = source.getOrthogonalParentLink();
+		if (sourceParentLink == null) {
+			throw new ResourceException("Cannot copy a root item");
+		}
+		
+		Item parent = sourceParentLink.getChild();
 		long sourceId = source.getId();
 		long sourceOrigId = source.getOrigId();
 		
@@ -191,11 +199,19 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		List<Link> origLinks = source.getLinks();
 		String origTagStr = source.getTagsAsString();
 		
+		// This link will advise ItemService how to locate the new item in the site structure
+		Link ln = CmsBeanFactory.makeLink().
+				setType(sourceParentLink.getType()).
+				setName(sourceParentLink.getName()).
+				setOrdering(sourceParentLink.getOrdering());
+		
 		// Core data
 		Item ni = CmsBeanFactory.makeItem(source.getType().getName());
 		ni.assimilate(source);
 		ni.
-			setParent(parent).
+			// Parentage is determined (from item path) in ItemService.insert()
+			// Here, we advise how to configure that link
+			setLink4newItem(ln).
 			setDateCreated(new Timestamp(System.currentTimeMillis()));
 		
 		if (isNewVersion) {
@@ -218,10 +234,6 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		/*
 		 * The copy is assigned a new unique id after it is saved, and the same
 		 * value is reflected in the origid field. 
-		 * 
-		 * The copy is also bound to the same
-		 * parent item, but at the end of its list. We need to override that at 
-		 * this point, so that it appears in the same position as the original was.
 		 */		
 		if (isNewVersion) {
 			// Overwrite the 'origid' field, to be the same as the source
@@ -232,10 +244,30 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		// Tags
 		saveTags(ni, origTagStr, null);
 		
-		// Overwrite the ordering of the parent link
+		// Orthogonal bindings
+		// NOTE: ItemService creates the parent/child link for new items, based on the item's path.
+		// All we need to do is update the link ordering, so that the new item appears directly after the source.
+		// parent.setLinks(null).getOrthogonalLinks();
 		Link parentLink2NewVersion = this.linkService.getLink(parent.getId(), ni.getId());
-		parentLink2NewVersion.setOrdering(origOrdering);
-		parentLink2NewVersion.save();
+		parentLink2NewVersion.
+			setType(sourceParentLink.getType()).
+			setName(sourceParentLink.getName()).
+			setData(sourceParentLink.getData());
+		
+		// Add new link to existing ones
+		int cursor = sourceParentLink.getOrdering();
+		List<Link> orthogonals = parent.getOrthogonalLinks();
+		orthogonals.add(cursor + 1, parentLink2NewVersion);
+		
+		// Now update the 'ordering column' in the db, not forgetting to save the new link!
+		cursor = 0;
+		for (Link l : orthogonals) {
+			if (l.getChild().getId().equals(parentLink2NewVersion.getChild().getId()) || l.getOrdering() != cursor) {
+				l.setOrdering(cursor);
+				l.save();
+			}
+			cursor++;
+		}
 		
 		// Field data
 		FieldValueSet fvs = new FieldValueSet(source.getSite());

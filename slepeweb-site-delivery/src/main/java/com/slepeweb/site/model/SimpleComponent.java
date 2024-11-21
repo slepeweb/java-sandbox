@@ -43,7 +43,7 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	}
 	
 	public String toString() {
-		return String.format("SimpleComponent (%s): %s", getType(), getHeading());
+		return String.format("%s (%s): %s", getClass().getTypeName(), getType(), getHeading());
 	}
 	
 	public List<SimpleComponent> getComponents() {

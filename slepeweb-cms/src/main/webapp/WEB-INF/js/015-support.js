@@ -297,7 +297,6 @@ _cms.support.ajax = function(method, url, data, success, fail) {
 		mimeType: data.mimeType,
 		success: success,
 		processData: data.processData,
-		success: success,
 		error: fail
 	}
 	

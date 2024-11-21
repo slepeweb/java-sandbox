@@ -50,8 +50,7 @@ _cms.add.behaviour.add = function(nodeKey) {
 		
 		$.ajax(_cms.ctx + "/rest/item/" + nodeKey + "/add", {
 			type: "POST",
-			cache: false,	<!-- _defaultBindingName: ${_linkTypeNameOptions._defaultBindingName} -->
-			
+			cache: false,
 			data: {
 				relativePosition: position,
 				template: $(_cms.add.sel.TEMPLATE_SELECTOR).val(),

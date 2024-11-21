@@ -1,7 +1,10 @@
 <%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 
 <c:set var="componentId" value="component-${_comp.id}" />
-<div id="${componentId}" <c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
+<c:set var="clazz" value="tabbed" />
+<c:if test="${not empty _comp.cssClass}"><c:set var="clazz" value="${clazz} ${_comp.cssClass}" /></c:if>
+
+<div id="${componentId}" class="${clazz}">
 
 	<c:if test="${not empty _comp.heading}"><h3>${_comp.heading}</h3></c:if>
 	<c:if test="${not empty _comp.body}"><div>${_comp.body}</div></c:if>	

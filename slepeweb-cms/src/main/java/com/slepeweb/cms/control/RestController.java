@@ -681,14 +681,19 @@ public class RestController extends BaseController {
 		if (relativePosition.equals("alongside") && ! parent.isRoot()) {
 			parent = parent.getOrthogonalParent();
 		}
+		
+		// This link will advise ItemService how to locate the new item in the site structure
+		Link l = CmsBeanFactory.makeLink().
+				setType(linkType).
+				setName(linkName).
+				setOrdering(-1);
 		 
 		Item i = CmsBeanFactory.makeItem(it.getName()).
 				setSite(parent.getSite()).
 				setPath(String.format("%s/%s", parent.getPath(), simplename)).
 				setTemplate(t).
 				setType(it).
-				setLinkType(linkType).
-				setLinkName(linkName).
+				setLink4newItem(l).
 				setOwnerId(u.getId()).
 				setName(name).
 				setSimpleName(simplename).

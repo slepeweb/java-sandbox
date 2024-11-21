@@ -34,7 +34,11 @@ _cms.copy.behaviour.submit = function(nodeKey) {
 				if (! resp.error) {
 					var sourceNode = _cms.leftnav.tree.getNodeByKey(nodeKey);
 					var newNode = sourceNode.getParent().addNode(resp.data[0]);
-					_cms.leftnav.navigate(newNode.key, 'core');
+					// Delay navigation, to give user a chance to read the flash message
+					setTimeout(function() {_cms.leftnav.navigate(newNode.key, 'core')},2000);
+					
+					// NOTE: Possible TODO: this places the copied item as the last sibling. Too low priority
+					// to fix. Situation corrects itself if the page is reloaded.
 				}
 			}
 		);

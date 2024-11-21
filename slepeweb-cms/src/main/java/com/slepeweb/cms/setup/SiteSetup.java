@@ -309,6 +309,10 @@ public class SiteSetup {
 					// NOTE: This method does not remove fields from an item type - do this manually.
 					long count = 0;
 					for (String variable : SiteSetupUtils.getStringIgnoreDecimal(row.getCell(3)).split(", ")) {
+						if (StringUtils.isBlank(variable)) {
+							continue;
+						}
+						
 						variable = variable.trim();
 						f = fieldCache.get(variable);
 						if (f == null) {
