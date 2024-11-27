@@ -907,6 +907,7 @@ public class Item extends CmsBean {
 		return this;
 	}
 
+	// Does this item pass access rules set in db table 'access'
 	public boolean isAccessible() {
 		if (this.accessible == null) {
 			this.accessible = getCmsService().getSiteAccessService().isAccessible(this);

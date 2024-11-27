@@ -12,6 +12,7 @@
 			<geo:header />
 			<jsp:doBody />
 			<geo:footer />
+			<geo:externalImages />
 		</div>
 	</body>
 </html>

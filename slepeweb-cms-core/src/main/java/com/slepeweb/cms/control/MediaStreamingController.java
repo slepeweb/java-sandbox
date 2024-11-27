@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Media;
-import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.MediaFileService;
 
@@ -97,25 +96,19 @@ public class MediaStreamingController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 		
-		item.setUser((User) req.getSession().getAttribute("_user"));
-		
-		if (! item.isAccessible()) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+		// Item accessibility should have been checked prior to this point.
+		String viewParam = req.getParameter("view");
+		boolean thumbnailRequired = false;
+		if (StringUtils.isNotBlank(viewParam)) {
+			thumbnailRequired = viewParam.equals("thumbnail");
 		}
-		else {
-			String viewParam = req.getParameter("view");
-			boolean thumbnailRequired = false;
-			if (StringUtils.isNotBlank(viewParam)) {
-				thumbnailRequired = viewParam.equals("thumbnail");
-			}
 
-			Media m = thumbnailRequired ? item.getThumbnail() : item.getMedia();
-			if (m == null || ! m.isBinaryContentLoaded()) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-			}
-			
-			return handle(m, mimeType, headers, req);
+		Media m = thumbnailRequired ? item.getThumbnail() : item.getMedia();
+		if (m == null || ! m.isBinaryContentLoaded()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
+		
+		return handle(m, mimeType, headers, req);
 	}
 	
 	private ResponseEntity<byte[]> handle(Media m, String mimeType, HttpHeaders headers, HttpServletRequest req) {

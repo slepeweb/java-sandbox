@@ -46,6 +46,18 @@ public class BaseController {
 		return false;
 	}
 	
+	/*
+	 * NOTEZ BIEN!
+	 * 
+	 * ALL requests hit the Spring dispatcher servlet first, and MOST of these will be
+	 * forwarded to the CmsDeliveryServlet. It's here in the CmsDeliveryServlet where request
+	 * attributes ITEM, USER, etc are created.
+	 * 
+	 * So, if CmsDeliveryServlet forwards back again to a Spring controller, that controller
+	 * will have access to model attributes ITEM, USER, etc. Otherwise, they will have null values.
+	 */
+	
+	
 	@ModelAttribute(value=ITEM)
 	public Item getRequestItem(HttpServletRequest req) {
 		Item i = (Item) req.getAttribute(ITEM);
@@ -74,7 +86,7 @@ public class BaseController {
 		LOG.trace(String.format("Model attribute (%s): [%s]", USER, u));
 		return u;
 	}
-	
+
 	
 	protected String composeJspPath(String shortHostName, String viewNameSuffix) {
 		String view = shortHostName + "/template/" + viewNameSuffix;

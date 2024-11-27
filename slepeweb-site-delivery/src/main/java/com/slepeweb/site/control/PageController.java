@@ -195,7 +195,7 @@ public class PageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "commerce/basket-111", model);
-		Cookie basketCookie = HttpUtil.getCookie(req.getCookies(), SiteRestController.BASKET_COOKIE);
+		Cookie basketCookie = HttpUtil.getCookie(req.getCookies(), ProductRestController.BASKET_COOKIE);
 		Basket basket = null;
 		
 		if (basketCookie != null) {
@@ -205,7 +205,7 @@ public class PageController extends BaseController {
 			basket = new Basket();
 		}
 		
-		model.addAttribute(SiteRestController.BASKET_COOKIE, basket);
+		model.addAttribute(ProductRestController.BASKET_COOKIE, basket);
 
 		return page.getView();
 	}

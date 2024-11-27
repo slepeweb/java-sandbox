@@ -41,7 +41,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/oldrest")
-public class SiteRestController extends BaseController {
+public class ProductRestController extends BaseController {
 	//private static Logger LOG = Logger.getLogger(SiteRestController.class);
 	public static final String SLEPEWEB_SITENAME = "Slepeweb";
 	public static final String NOCRAWL = "nocrawl";
@@ -252,7 +252,7 @@ public class SiteRestController extends BaseController {
 		
 		Cookie c = getCookie(req);
 		Basket b = Basket.parseCookieStringValue(c.getValue());
-		model.addAttribute(SiteRestController.BASKET_COOKIE, b);
+		model.addAttribute(ProductRestController.BASKET_COOKIE, b);
 		
 		String shortSitename = "";
 		Host h = this.hostService.getHost(req.getServerName(), req.getServerPort());

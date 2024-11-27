@@ -392,6 +392,10 @@ footer {
   display: none;
 }
 
+img {
+	width: 100%;
+}
+
 div.squeeze p {
 	margin-bottom: 0;
 }

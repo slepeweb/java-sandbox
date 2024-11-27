@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ import org.springframework.ui.ModelMap;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Redirector;
+import com.slepeweb.cms.bean.Rerouter;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
@@ -26,8 +25,10 @@ import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteAccessService;
+import com.slepeweb.cms.service.UserService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
+import com.slepeweb.site.service.PasskeyService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,6 +42,8 @@ public class CmsDeliveryServlet {
 	
 	@Autowired private CmsService cmsService;
 	@Autowired private ItemService itemService;
+	@Autowired private PasskeyService passkeyService;
+	@Autowired private UserService userService;
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		doGet(req, res, model);
@@ -51,10 +54,10 @@ public class CmsDeliveryServlet {
 		String path = getItemPath(req);
 		
 		// Deal with urls like /$_3654
-		if (path.matches("^/\\$_\\d+$") && path.length() > 3) {
-			Long origId = Long.valueOf(path.substring(3));
-			Item i = this.itemService.getItemByOriginalId(origId);
-			req.getRequestDispatcher(i.getPath()).forward(req, res);
+		if (path.matches("^/\\$_\\d+$")) {
+			if (! respond2ShortUrl(path, req, res)) {
+				notFound(res, "Could not process short-url request further", path);
+			}
 			return;
 		}
 		
@@ -67,11 +70,11 @@ public class CmsDeliveryServlet {
 			LOG.trace(LogUtil.compose("Site ...", site));
 
 			String language = site.getLanguage();				
-			Redirector redirector = multilingualPathChecker(site, path, language);
-			language = redirector.getLanguage();
-			trimmedPath = redirector.getPath();
+			Rerouter rerouter = multilingualPathChecker(site, path, language);
+			language = rerouter.getLanguage();
+			trimmedPath = rerouter.getPath();
 			
-			if (redirector.isRequired()) {
+			if (rerouter.isRequired()) {
 				// language is missing on a multilingual site - redirect to default language
 				res.sendRedirect(String.format("/%s%s", language, trimmedPath));
 				return;
@@ -85,10 +88,15 @@ public class CmsDeliveryServlet {
 				String springTemplatePath = getTemplatePath(item, view);
 				item.setLanguage(language);
 				item.setUser(identifyUser(req));
-				redirector = accessibilityChecker(item);
+				rerouter = accessibilityChecker(item, req);
 				
-				if (redirector.isRequired()) {
-					res.sendRedirect(redirector.getPath());
+				if (rerouter.isRequired()) {
+					if (rerouter.getAction() == Rerouter.Action.redirect) {
+						res.sendRedirect(rerouter.getPath());
+					}
+					else if (rerouter.getAction() == Rerouter.Action.error) {
+						res.sendError(rerouter.getHttpError());
+					}
 					return;
 				}
 				
@@ -140,6 +148,7 @@ public class CmsDeliveryServlet {
 		User u = (User) req.getSession().getAttribute("_user");
 		
 		if (u == null) {
+			/*
 			// Check to see if user credentials have been provided in the request headers
 			String authHeader = req.getHeader("Authorization");
 			String prefix = "Basic ";
@@ -158,9 +167,23 @@ public class CmsDeliveryServlet {
 					}
 				}
 			}
+			*/
 		}
 		
 		return u;
+	}
+	
+	private boolean respond2ShortUrl(String path, HttpServletRequest req, HttpServletResponse res) throws Exception {
+		Long origId = Long.valueOf(path.substring(3));
+		Item i = this.itemService.getItemByOriginalId(origId);
+		
+		if (i == null) {
+			return false;
+		}
+		
+		LOG.info(String.format("Request for %s (%d) using passkey [%s]", i.getPath(), origId, req.getParameter("passkey")));
+		req.getRequestDispatcher(i.getPath()).forward(req, res);
+		return true;
 	}
 	
 	private String getTemplatePath(Item i, String view) {
@@ -348,27 +371,58 @@ public class CmsDeliveryServlet {
 	}
 	
 	// Returns true if resource is accessible
-	private Redirector accessibilityChecker(Item i) {
+	private Rerouter accessibilityChecker(Item i, HttpServletRequest req) {
 		
-		Redirector r = new Redirector();
-
-		if (! i.isAccessible()) {
-			String notAuthorisedPath = i.getSite().isMultilingual() ? 
-						String.format("/%s%s", i.getLanguage(), SiteAccessService.LOGIN_PATH) :
-							SiteAccessService.LOGIN_PATH;
+		boolean siteIsSecured = i.getSite().isSecured();
+		String notAuthorisedPath = i.getSite().isMultilingual() ? 
+				String.format("/%s%s", i.getLanguage(), SiteAccessService.LOGIN_PATH) :
+					SiteAccessService.LOGIN_PATH;		
+		
+		boolean passkeyIsValid = false;
+		Rerouter r = new Rerouter();
+		
+		if (siteIsSecured) {
+			User u = i.getUser();
 			
-			if (! i.getPath().equals(notAuthorisedPath)) {
-				// Redirect to not-authorised page
-				r.setPath(notAuthorisedPath);
-				r.setRequired(true);
+			if (u == null) {
+				LOG.info("Request is from user who has not logged in ...");
+				String passkey = req.getParameter("passkey");
+				if (passkey != null) {
+					String[] parts = passkey.split("\\$\\$");
+					if (parts.length != 2) {
+						return r.setRequired(true).setAction(Rerouter.Action.error).setHttpError(500).
+								addMessage(String.format("Badly formed passkey [%s]", passkey));
+					}
+					
+					long userId = Long.parseLong(parts[0]);
+					u = this.userService.get(userId);
+					if (u == null) {
+						return r.setRequired(true).setAction(Rerouter.Action.error).setHttpError(500).
+								addMessage(String.format("User ID not recognised [%d]", userId));
+					}
+					
+					i.setUser(u);
+					if (passkeyIsValid = this.passkeyService.validateKey(parts[1])) {
+						i.setUser(u);
+					}
+				}
 			}
-		}
+			
+			if ((i.getUser() == null || ! i.isAccessible()) && ! passkeyIsValid) {
+				// Site access rules deny access to this user, AND he has no passkey.
+				if (! i.getPath().equals(notAuthorisedPath)) {
+					// Redirect to not-authorised page
+					return r.setRequired(true).setPath(notAuthorisedPath).
+							setAction(Rerouter.Action.redirect);
+				}
+			}			
+		}	
 		
 		return r;
 	}
 	
-	private Redirector multilingualPathChecker(Site site, String path, String defaultLanguage) {
-		Redirector r = new Redirector().setPath(path).setLanguage(defaultLanguage);
+	private Rerouter multilingualPathChecker(Site site, String path, String defaultLanguage) {
+		Rerouter r = new Rerouter().setAction(Rerouter.Action.redirect).setPath(path).setLanguage(defaultLanguage);
 		
 		if (site.isMultilingual() && ! path.equals("/favicon.ico")) {
 			if (path.length() > 2) {
