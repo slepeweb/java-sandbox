@@ -186,6 +186,7 @@ _cms.field.behaviour.guidanceIcon = function() {
 	});
 }
 
+/*
 _cms.field.behaviour.markup = function() {
 	$("span.wysiwyg-open-icon").click(function(e) {
 		let div$ = $(this).parent().parent()
@@ -207,6 +208,7 @@ _cms.field.behaviour.markup = function() {
 		$('#wysiwyg-wrapper').css('visibility', 'hidden')
 	})
 }
+*/
 
 _cms.field.behaviour.widefield = function() {
 	$("div#widefield-open-icon").click(function(e) {
@@ -255,7 +257,7 @@ _cms.field.onrefresh = function(nodeKey) {
 	_cms.field.behaviour.changelanguage();
 	_cms.field.behaviour.formchange();
 	_cms.field.behaviour.guidanceIcon();
-	_cms.field.behaviour.markup();
+	//_cms.field.behaviour.markup();
 	_cms.field.behaviour.widefield();
 	
 	// Not really a behaviour, but required after the tab has been refreshed

@@ -24,6 +24,7 @@
 <script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>
 
 <script src="/resources/geo/js/nav.js"></script>
+<script src="/resources/geo/js/shortUrlImages.js"></script>
 	
 <gen:extraCSS />
 <gen:extraInpageCSS />

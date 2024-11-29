@@ -30,6 +30,8 @@
 	    	data-slide-src="${_src}"
 	    	data-type="${_result.type}"
 	    	data-id="${_stat.count - 1}"
+	    	data-itemid="${_result.id}"
+	    	data-origid="${_result.origId}"
 	    	/>
 	    
 	    <c:if test="${_result.type eq 'Movie MP4'}">

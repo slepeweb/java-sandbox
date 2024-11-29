@@ -79,7 +79,7 @@ public class Host extends CmsBean {
 	}
 	
 	public String getPublicName() {
-		return publicName;
+		return this.publicName == null ? getNameAndPort() : this.publicName;
 	}
 
 	public Host setPublicName(String publicName) {

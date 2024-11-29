@@ -409,6 +409,16 @@ div.twoblock {
   grid-template-columns: 50% 50%;
 }
 
+div.twoblock > div {
+	padding: 0 0.5em 0 0.5em;
+}
+
+caption {
+	font-style: italic;
+	padding-bottom: 1em;
+	width: 100%;
+}
+
 .ui-helper-reset {
 	font-size: 14px;
 	line-height: 1.65em;

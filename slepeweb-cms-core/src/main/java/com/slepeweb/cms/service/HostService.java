@@ -11,6 +11,8 @@ public interface HostService {
 	Host getHost(Long id);
 	Host getHost(String name, int port, HostType t);
 	Host getHost(String name, int port);
+	Host getHost(String name);
+	Host getHostByPublicName(String name);
 	Host getHost(Long siteId, HostType t);
 	List<Host> getHosts(Long siteId);
 	Host save(Host s);

@@ -74,6 +74,26 @@ public class HostServiceImpl extends BaseServiceImpl implements HostService {
 		return getFirstHost(String.format(SELECT_TEMPLATE, " h.id = ?"), id);
 	}
 	
+	/*	
+	 *  DB constraints ensure there will only be one host record for a given site/type/hostname.
+	 *  One host could serve both editorial AND delivery webapps, resulting in 2 db records.
+	 *  This method will return the first, and so should only be used to identify the site (Host.getSite()).
+	 */	
+	public Host getHost(String name) {
+		return getFirstHost(
+				String.format(SELECT_TEMPLATE, " h.name = ?"), name);
+	}
+
+	/*
+	 *  DB constraints ensure there will only be one host record for a given site/type/PUBLIChostname.
+	 *  One public host could serve both editorial AND delivery webapps, resulting in 2 db records.
+	 *  This method will return the first, and so should only be used to identify the site (Host.getSite()).
+	 */	
+	public Host getHostByPublicName(String name) {
+		return getFirstHost(
+				String.format(SELECT_TEMPLATE, " h.publicname = ?"), name);
+	}
+
 	/*
 	 *  One host could serve both editorial AND delivery webapps, resulting in 2 db records.
 	 *  This method will return the first, and so should only be used to identify the site (Host.getSite()).

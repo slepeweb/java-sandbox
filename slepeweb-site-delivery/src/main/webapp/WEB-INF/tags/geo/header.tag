@@ -1,5 +1,9 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
 
+<!-- 
+	id: 		${_item.id}
+	origId:	${_item.origId}
+-->
 <header>
 	<nav class="navbar">
 		<div class="brand-title"><a href="/">GeorgieB</a></div>

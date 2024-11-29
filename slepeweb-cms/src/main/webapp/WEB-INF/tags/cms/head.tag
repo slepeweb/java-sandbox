@@ -25,11 +25,12 @@
 <script src="${applicationContextPath}/resources/fancytree/jquery.fancytree.min.js" type="text/javascript"></script>
 <script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>
 
-<%-- Quill Rich Text Editor --%>
+<%-- Quill Rich Text Editor 
 <script src="${applicationContextPath}/resources/js/quill-2.0.2.js"></script>
 <link href="${applicationContextPath}/resources/css/quill-2.0.2-snow.css" rel="stylesheet">
 <script src="${applicationContextPath}/resources/js/quill-better-table-1.2.10.js"></script>
 <link href="${applicationContextPath}/resources/css/quill-better-table-1.2.10.css" rel="stylesheet">
+--%>
 
 <link rel="stylesheet" href="${applicationContextPath}/resources/css/main.css" type="text/css">
 

@@ -53,6 +53,12 @@ public class CmsDeliveryServlet {
 		
 		String path = getItemPath(req);
 		
+		// TODO: make this configurable once we start using favicons.
+		if (path.equals("/favicon.ico")) {
+			res.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		
 		// Deal with urls like /$_3654
 		if (path.matches("^/\\$_\\d+$")) {
 			if (! respond2ShortUrl(path, req, res)) {
