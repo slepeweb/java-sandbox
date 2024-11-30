@@ -105,6 +105,7 @@
 		// Set the behaviour of the trash button
 		_cms.misc.behaviour.trash.trash(_cms.editingItemId);
 		
+		/*
 		// Set up the wysiwyg editor
 		Quill.register({
      'modules/better-table': quillBetterTable
@@ -141,7 +142,7 @@
 			placeholder: 'Compose an epic...',
 			theme: 'snow'
 		})
-		
+		*/
 	});
 </script>
 

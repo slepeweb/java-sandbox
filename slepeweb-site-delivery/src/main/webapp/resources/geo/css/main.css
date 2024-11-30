@@ -303,7 +303,7 @@ div.layout-std {
 
 div.standard-3col {
   display: grid;
-  grid-template-columns: 15% 85%;
+  grid-template-columns: 20% 80%;
 }
 
 div.standard-3col div.leftside {
@@ -319,6 +319,10 @@ div.standard-3col div.rightside div.sidebar {
 
 div.sidebar-wrapper {
 	padding-left: 0.5em;
+}
+
+div.in-this-section, div.sidebar {
+	min-width: 124px;
 }
 
 div.in-this-section > div, div.sidebar > div {
@@ -413,10 +417,15 @@ div.twoblock > div {
 	padding: 0 0.5em 0 0.5em;
 }
 
-caption {
+figure {
+	margin: 0.5em;
+}
+
+figcaption {
 	font-style: italic;
 	padding-bottom: 1em;
 	width: 100%;
+	text-align: center;
 }
 
 .ui-helper-reset {
