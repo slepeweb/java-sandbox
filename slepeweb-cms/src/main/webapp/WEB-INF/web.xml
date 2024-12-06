@@ -41,12 +41,6 @@
 		</param-value>
 	</context-param>
  
-	<!-- For Tiles -->
-  <context-param>
-    <param-name>org.apache.tiles.factory.TilesContainerFactory.MUTABLE</param-name>
-    <param-value>false</param-value>
-  </context-param>
-  
   <servlet-mapping>
     <servlet-name>slepeweb-cms</servlet-name>
     <url-pattern>/</url-pattern>

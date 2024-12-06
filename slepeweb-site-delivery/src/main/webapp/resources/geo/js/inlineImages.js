@@ -14,6 +14,7 @@ function _chooseBestCaption(data) {
 
 function _convertDiv2Img(div$) {
 		let origId = div$.attr('data-id');
+		let width = div$.attr('data-width');
 
 		$.ajax('/rest/passkey/' + origId, {
 			type: 'GET',
@@ -23,7 +24,8 @@ function _convertDiv2Img(div$) {
 				if (! resp.error && resp.data.image) {
 					// resp.data is an Item4Json object
 					// Append img and caption tags to the div
-					div$.html(`<figure><img src="${resp.data.url}" /><figcaption>${_chooseBestCaption(resp.data)}</figcaption></figure>`);
+					let w = width ? `style="width: ${width}"` : '';
+					div$.html(`<figure><img src="${resp.data.url}" ${w} /><figcaption ${w}>${_chooseBestCaption(resp.data)}</figcaption></figure>`);
 				}
 				else {
 					div$.attr('data-error', resp.message);

@@ -104,8 +104,8 @@ public class BaseController {
 		
 		List<Link> components = i.getComponents();
 		p.setComponents(this.componentService.getComponents(components, LinkName.std));
-		p.getLeftSidebar().setComponents(this.componentService.getComponents(components, LinkName.LEFT_SIDE));
-		p.getRightSidebar().setComponents(this.componentService.getComponents(components, LinkName.RIGHT_SIDE));
+		//p.getLeftSidebar().setComponents(this.componentService.getComponents(components, LinkName.LEFT_SIDE));
+		//p.getRightSidebar().setComponents(this.componentService.getComponents(components, LinkName.RIGHT_SIDE));
 		
 		model.addAttribute("_page", p);
 		return p;

@@ -24,9 +24,11 @@ public class NavigationServiceImpl implements NavigationService {
 				if (! parent.getFieldValue(FieldName.HIDE_CHILDREN_FROM_NAV, new StringWrapper("")).equalsIgnoreCase("yes")) {
 					
 					for (Link l : parent.getBindings()) {
-						childTarget = drillDown(l.getChild(), numLevels, currentItemPath);
-						if (childTarget != null) {
-							parentTarget.getChildren().add(childTarget);
+						if (l.getChild().isAccessible()) {
+							childTarget = drillDown(l.getChild(), numLevels, currentItemPath);
+							if (childTarget != null) {
+								parentTarget.getChildren().add(childTarget);
+							}
 						}
 					}
 				}

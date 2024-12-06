@@ -144,10 +144,20 @@ public class Item extends CmsBean {
 			Link l = getOrthogonalParentLink();
 			if (l != null) {
 				this.parent = l.getChild();
-				this.parent.setLanguage(getLanguage());
+				this.parent.setUser(getUser()).setLanguage(getLanguage());
 			}
 		}
 		return this.parent;
+	}
+	
+	// Get an item from the same site as the same user.
+	// Let the caller decide what to do if inaccessible
+	public Item getItem(String path) {
+		Item i = getCmsService().getItemService().getItem(getSite().getId(), path);
+		if (i != null) {
+			i.setUser(getUser());
+		}
+		return i;
 	}
 	
 	@Override

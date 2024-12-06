@@ -8,7 +8,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.site.service.NavigationService;
 
 public class Header implements Serializable {
@@ -31,21 +30,23 @@ public class Header implements Serializable {
 		Item i = getPage().getItem();
 		
 		while (! i.getPath().equals("/")) {
-			this.breadcrumbItems.add(i);
+			if (i.isAccessible()) {
+				this.breadcrumbItems.add(i);
+			}
 			i = i.getOrthogonalParent();
 		}
 		
-		// Lastly, add the root item
+		// Lastly, add the root item; v. unlikely to be inaccessible
 		this.breadcrumbItems.add(i);
 		Collections.reverse(this.breadcrumbItems);
 	}
 	
 	private void populateTopNavigation(Item i) {
 		this.topNavigation = new ArrayList<LinkTarget>();
-		ItemService itemService = i.getCmsService().getItemService();
 		NavigationService navigationService = getPage().getNavigationService();
-		Item root = itemService.getItem(i.getSite().getId(), "/");
+		Item root = i.getItem("/");
 		
+		// Can't imagine the home page will be inaccessible to a particular user
 		if (root != null) {
 			this.topNavigation.addAll(navigationService.drillDown(root, 3, i.getPath()).getChildren());
 			LOG.debug(String.format("Top navigation has %d entries", this.topNavigation.size()));

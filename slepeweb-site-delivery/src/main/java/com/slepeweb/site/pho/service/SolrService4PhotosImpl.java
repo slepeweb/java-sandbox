@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.SiteAccessService;
 import com.slepeweb.common.solr.bean.SolrPager;
 import com.slepeweb.common.solr.bean.SolrResponse;
@@ -51,6 +52,7 @@ public class SolrService4PhotosImpl extends SolrService4SiteBase implements Solr
 			
 			q.addFilterQuery(String.format("siteid:\"%d\"", params.getSiteId()));
 			q.addFilterQuery(String.format("viewable:\"%s\"", "true"));
+			q.addFilterQuery(String.format("type:\"%s\" OR type:\"%s\"", ItemTypeName.PHOTO_JPG, ItemTypeName.MOVIE_MP4));
 			
 			if (StringUtils.isNotBlank(params.getFrom()) && StringUtils.isNotBlank(params.getTo())) {					
 				q.addFilterQuery(String.format("extraStr1:[%s TO %s]", params.getFrom(), params.getTo()));
