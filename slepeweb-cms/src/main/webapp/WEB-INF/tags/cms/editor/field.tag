@@ -35,11 +35,7 @@
 							
 							<c:if test="${fes.field.expandable}">
 								<div id="widefield-open-icon"><i class="fa-solid fa-arrows-left-right-to-line"></i></div>
-							</c:if>
-							
-<%-- 							<c:if test="${fes.field.markup}"> --%>
-<!-- 								<span class="wysiwyg-open-icon">Wysiwyg editor</span> -->
-<%-- 							</c:if> --%>
+							</c:if>							
 						</div>
 					</div>
 					

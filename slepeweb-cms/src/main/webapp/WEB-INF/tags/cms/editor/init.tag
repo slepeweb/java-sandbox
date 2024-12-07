@@ -85,6 +85,7 @@
 		// Certain behaviours need only be defined on page load
 		_cms.links.onpageload();
 		_cms.dialog.onpageload();
+		_cms.field.onpageload();
 		
 		// Load the editors
 		_cms.support.renderItemForms(_cms.editingItemId, _cms.activeTab);
@@ -103,46 +104,7 @@
 		_cms.undoRedo.behaviour('div#redo-icon', 'redo');
 		
 		// Set the behaviour of the trash button
-		_cms.misc.behaviour.trash.trash(_cms.editingItemId);
-		
-		/*
-		// Set up the wysiwyg editor
-		Quill.register({
-     'modules/better-table': quillBetterTable
-    }, true)
-    
-		_cms.field.wysiwygEditor = new Quill('#wysiwyg-editor', {
-			modules: {
-				table: false,
-				
-				'better-table': {
-					operationMenu: {
-						items: {
-							unmergeCells: {
-								text: 'Unmerge Cells'
-              }
-            },
-            color: {
-              colors: ['red', 'green', 'yellow', 'white', 'grey', 'black'],
-              text: 'Background Colors:'
-            }
-          },
-				},
-				keyboard: {
-          bindings: quillBetterTable.keyboardBindings
-        },
-				toolbar: [
-		      [{ header: [2, 3, false] }],
-		      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-		      ['bold', 'italic', 'underline', 'strike'],
-		      ['link', 'image', 'code-block'],
-		    ],
-			 },
-			toolbar: '#wysiwyg-toolbar',
-			placeholder: 'Compose an epic...',
-			theme: 'snow'
-		})
-		*/
+		_cms.misc.behaviour.trash.trash(_cms.editingItemId);		
 	});
 </script>
 

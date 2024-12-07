@@ -186,30 +186,6 @@ _cms.field.behaviour.guidanceIcon = function() {
 	});
 }
 
-/*
-_cms.field.behaviour.markup = function() {
-	$("span.wysiwyg-open-icon").click(function(e) {
-		let div$ = $(this).parent().parent()
-		let text$ = div$.find('textarea')
-		
-		let delta = _cms.field.wysiwygEditor.clipboard.convert({html: text$.val()})	
-		_cms.field.wysiwygEditor.setContents(delta, 'silent')
-		
-		sessionStorage.setItem('current-wysiwyg-field', div$.attr('id'))
-		$('#wysiwyg-wrapper').css('visibility', 'visible')
-	})
-
-	$("div#wysiwyg-close-icon").click(function(e) {
-		let id = sessionStorage.getItem('current-wysiwyg-field')
-		let sel = 'form#field-form div#' + id
-		let div$ = $(sel)
-		let text$ = div$.find('textarea')
-		text$.val(_cms.field.formatHtml(_cms.field.wysiwygEditor.getSemanticHTML()))
-		$('#wysiwyg-wrapper').css('visibility', 'hidden')
-	})
-}
-*/
-
 _cms.field.behaviour.widefield = function() {
 	$("div#widefield-open-icon").click(function(e) {
 		let div$ = $(this).parent().parent()
@@ -219,7 +195,9 @@ _cms.field.behaviour.widefield = function() {
 		sessionStorage.setItem('current-widefield', div$.attr('id'))
 		$('#widefield-wrapper').css('visibility', 'visible')
 	})
+}
 
+_cms.field.onpageload = function() {
 	$("div#widefield-close-icon").click(function(e) {
 		let id = sessionStorage.getItem('current-widefield')
 		let sel = 'form#field-form div#' + id
@@ -228,6 +206,26 @@ _cms.field.behaviour.widefield = function() {
 		text$.val($('textarea#widefield-editor').val())
 		$('#widefield-wrapper').css('visibility', 'hidden')
 	})
+	
+	$("div#widefield-p-icon").click(function(e) {
+		_cms.field.widefieldInsert('<p></p>')
+	})
+
+	$("div#widefield-h2-icon").click(function(e) {
+		_cms.field.widefieldInsert('<h2></h2>')
+	})
+
+	$("div#widefield-h3-icon").click(function(e) {
+		_cms.field.widefieldInsert('<h3></h3>')
+	})
+
+	$("div#widefield-ximg-icon").click(function(e) {
+		_cms.field.widefieldInsert('<div class="ximg" data-id="123"></div>')
+	})
+}
+
+_cms.field.widefieldInsert = function(str) {
+	$('textarea#widefield-editor').insertAtCaret(str)
 }
 
 _cms.field.formatHtml = function(html) {
@@ -250,14 +248,12 @@ _cms.field.formatHtml = function(html) {
     return result.substring(1, result.length-3);
 }
 
-
 _cms.field.onrefresh = function(nodeKey) {
 	_cms.field.behaviour.update(nodeKey);
 	_cms.field.behaviour.cancel(nodeKey);
 	_cms.field.behaviour.changelanguage();
 	_cms.field.behaviour.formchange();
 	_cms.field.behaviour.guidanceIcon();
-	//_cms.field.behaviour.markup();
 	_cms.field.behaviour.widefield();
 	
 	// Not really a behaviour, but required after the tab has been refreshed
