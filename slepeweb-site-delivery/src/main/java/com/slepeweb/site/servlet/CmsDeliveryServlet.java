@@ -118,8 +118,8 @@ public class CmsDeliveryServlet {
 					
 					if (item.getType().isMedia()) {
 						LOG.debug(LogUtil.compose("Streaming binary content ...", item));
-						String mediaType = item.getType().getMimeType().split("\\/")[0];
-						String servletPath = String.format("/stream/%s/item", mediaType);
+						String mediaType = item.getType().getShortMimeType();
+						String servletPath = String.format("/stream/item/%s", mediaType);
 						req.getRequestDispatcher(servletPath).forward(req, res);
 					}
 					else {

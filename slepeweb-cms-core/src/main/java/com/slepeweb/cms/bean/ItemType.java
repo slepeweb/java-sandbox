@@ -172,6 +172,11 @@ public class ItemType extends CmsBean {
 		return mimeType;
 	}
 
+	public String getShortMimeType() {
+		String type = this.mimeType.split("\\/")[1];
+		return type.equals("jpeg") ? "jpg" : type;
+	}
+
 	public ItemType setMimeType(String mimeType) {
 		this.mimeType = mimeType;
 		return this;

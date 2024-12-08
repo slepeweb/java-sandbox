@@ -41,7 +41,7 @@
 				--%>
 				<c:set var="_host" value="${editingItem.site.editorialHost}" />
 				<c:set var="_timestamp" value="${cmsf:now()}" />
-				<img src="${_host.namePortAndProtocol}/cms/stream/image/itemid/${editingItem.id}?view=thumbnail&_=${_timestamp}" />
+				<img src="${_host.namePortAndProtocol}/cms/stream/itemid/${editingItem.id}/${editingItem.type.shortMimeType}?view=thumbnail&_=${_timestamp}" />
 			</c:when><c:otherwise>
 				<p>No thumbnail uploaded.</p>
 			</c:otherwise></c:choose>

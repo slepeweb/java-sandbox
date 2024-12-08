@@ -29,65 +29,92 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/stream")
 public class MediaStreamingController {
 	
-	public static final String VIDEO_TYPE = "video/mp4";
-    public static final String IMAGE_TYPE = "image/jpg";
+	public static final String MP4_MIMETYPE = "video/mp4";
+    public static final String JPG_MIMETYPE = "image/jpg";
+    public static final String PDF_MIMETYPE = "application/pdf";
     
 	@Autowired private ItemService itemService;
 	@Autowired private MediaFileService mediaFileService;
-    
-
-    @GetMapping(value="/video/media", produces=VIDEO_TYPE)
+	
+    @GetMapping(value="/media/mp4", produces=MP4_MIMETYPE)
     public ResponseEntity<byte[]> streamVideoGivenMediaAttr(
             @RequestHeader HttpHeaders headers, 
             HttpServletRequest req) {
 
     	Media m = (Media) req.getAttribute("_media");
-   		return handle(m, VIDEO_TYPE, headers, req);
+   		return handle(m, MP4_MIMETYPE, headers, req);
     }
     
-    @GetMapping(value="/video/itemid/{itemId}", produces=VIDEO_TYPE)
+    @GetMapping(value="/itemid/{itemId}/mp4", produces=MP4_MIMETYPE)
     public ResponseEntity<byte[]> streamVideoGivenItemId(
             @RequestHeader HttpHeaders headers, 
             @PathVariable long itemId,
             HttpServletRequest req) {
 
-   		return handle(this.itemService.getItem(itemId), VIDEO_TYPE, headers, req);
+   		return handle(this.itemService.getItem(itemId), MP4_MIMETYPE, headers, req);
     }
     
-    @GetMapping(value="/video/item", produces=VIDEO_TYPE)
+    @GetMapping(value="/item/mp4", produces=MP4_MIMETYPE)
     public ResponseEntity<byte[]> streamVideoGivenItemAttr(
             @RequestHeader HttpHeaders headers, 
             HttpServletRequest req) {
 
     	Item i = (Item) req.getAttribute("_item");
-   		return handle(i, VIDEO_TYPE, headers, req);
+   		return handle(i, MP4_MIMETYPE, headers, req);
     }
     
-    @GetMapping(value="/image/media", produces=IMAGE_TYPE)
+    @GetMapping(value="/media/jpg", produces=JPG_MIMETYPE)
     public ResponseEntity<byte[]> streamImageGivenMediaAttr(
             @RequestHeader HttpHeaders headers, 
             HttpServletRequest req) {
 
     	Media m = (Media) req.getAttribute("_media");
-   		return handle(m, IMAGE_TYPE, headers, req);
+   		return handle(m, JPG_MIMETYPE, headers, req);
     }
     
-    @GetMapping(value="/image/itemid/{itemId}", produces=IMAGE_TYPE)
+    @GetMapping(value="/itemid/{itemId}/jpg", produces=JPG_MIMETYPE)
     public ResponseEntity<byte[]> streamImageGivenItemId(
             @RequestHeader HttpHeaders headers, 
             @PathVariable long itemId,
             HttpServletRequest req) {
 
-   		return handle(this.itemService.getItem(itemId), IMAGE_TYPE, headers, req);
+   		return handle(this.itemService.getItem(itemId), JPG_MIMETYPE, headers, req);
     }
     
-    @GetMapping(value="/image/item", produces=IMAGE_TYPE)
+    @GetMapping(value="/item/jpg", produces=JPG_MIMETYPE)
     public ResponseEntity<byte[]> streamImageGivenItemAttr(
             @RequestHeader HttpHeaders headers, 
             HttpServletRequest req) {
 
     	Item i = (Item) req.getAttribute("_item");
-   		return handle(i, IMAGE_TYPE, headers, req);
+   		return handle(i, JPG_MIMETYPE, headers, req);
+    }
+    
+    @GetMapping(value="/media/pdf", produces=PDF_MIMETYPE)
+    public ResponseEntity<byte[]> streamPdfGivenMediaAttr(
+            @RequestHeader HttpHeaders headers, 
+            HttpServletRequest req) {
+
+    	Media m = (Media) req.getAttribute("_media");
+   		return handle(m, PDF_MIMETYPE, headers, req);
+    }
+    
+    @GetMapping(value="/itemid/{itemId}/pdf", produces=PDF_MIMETYPE)
+    public ResponseEntity<byte[]> streamPdfGivenItemId(
+            @RequestHeader HttpHeaders headers, 
+            @PathVariable long itemId,
+            HttpServletRequest req) {
+
+   		return handle(this.itemService.getItem(itemId), PDF_MIMETYPE, headers, req);
+    }
+    
+    @GetMapping(value="/item/pdf", produces=PDF_MIMETYPE)
+    public ResponseEntity<byte[]> streamPdfGivenItemAttr(
+            @RequestHeader HttpHeaders headers, 
+            HttpServletRequest req) {
+
+    	Item i = (Item) req.getAttribute("_item");
+   		return handle(i, PDF_MIMETYPE, headers, req);
     }
     
 	private ResponseEntity<byte[]> handle(Item item, String mimeType, HttpHeaders headers, HttpServletRequest req) {

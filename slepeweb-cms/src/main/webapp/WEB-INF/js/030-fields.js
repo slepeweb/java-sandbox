@@ -222,6 +222,19 @@ _cms.field.onpageload = function() {
 	$("div#widefield-ximg-icon").click(function(e) {
 		_cms.field.widefieldInsert('<div class="ximg" data-id="123"></div>')
 	})
+
+$("div#widefield-table-icon").click(function(e) {
+	_cms.field.widefieldInsert(`<table>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>`)
+})
 }
 
 _cms.field.widefieldInsert = function(str) {

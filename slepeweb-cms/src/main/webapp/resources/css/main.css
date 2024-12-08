@@ -670,9 +670,20 @@ textarea#widefield-editor {
 }
 
 div#widefield-toolbar {
+	display: grid;
+	grid-template-columns: 4fr 1fr;
 	background-color: grey;
 	padding: 6px;
 	width: 99%;
+}
+
+div#widefield-toolbar div.left {
+	grid-column: 1;
+}
+
+div#widefield-toolbar div.right {
+	grid-column: 2;
+	justify-self: right;
 }
 
 div#widefield-toolbar div.widefield-icon {
@@ -683,6 +694,11 @@ div#widefield-toolbar div.widefield-icon {
 	background-color: purple;
 	text-align: center;
 	cursor: pointer;
+}
+
+div#widefield-toolbar div#widefield-close-icon {
+	background-color: rgb(78, 154, 6);
+	font-weight: bold;
 }
 
 .ql-container {
