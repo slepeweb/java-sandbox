@@ -187,6 +187,10 @@ _cms.field.behaviour.guidanceIcon = function() {
 }
 
 _cms.field.behaviour.widefield = function() {
+	// First, close and clear the widefield editor(s)
+	$("div#widefield-editor").empty();
+	$('#widefield-wrapper').css('visibility', 'hidden');
+	
 	$("div#widefield-open-icon").click(function(e) {
 		let div$ = $(this).parent().parent()
 		let text$ = div$.find('textarea')
@@ -219,6 +223,10 @@ _cms.field.onpageload = function() {
 		_cms.field.widefieldInsert('<h3></h3>')
 	})
 
+	$("div#widefield-div-icon").click(function(e) {
+		_cms.field.widefieldInsert('<div></div>')
+	})
+
 	$("div#widefield-ximg-icon").click(function(e) {
 		_cms.field.widefieldInsert('<div class="ximg" data-id="123"></div>')
 	})
@@ -241,6 +249,7 @@ _cms.field.widefieldInsert = function(str) {
 	$('textarea#widefield-editor').insertAtCaret(str)
 }
 
+/*
 _cms.field.formatHtml = function(html) {
     var tab = '\t';
     var result = '';
@@ -260,6 +269,7 @@ _cms.field.formatHtml = function(html) {
 
     return result.substring(1, result.length-3);
 }
+*/
 
 _cms.field.onrefresh = function(nodeKey) {
 	_cms.field.behaviour.update(nodeKey);

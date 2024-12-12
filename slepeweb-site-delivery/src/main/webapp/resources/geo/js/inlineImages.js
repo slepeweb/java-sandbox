@@ -25,7 +25,9 @@ function _convertDiv2Img(div$) {
 					// resp.data is an Item4Json object
 					// Append img and caption tags to the div
 					let w = width ? `style="width: ${width}"` : '';
-					div$.html(`<figure><img src="${resp.data.url}" ${w} /><figcaption ${w}>${_chooseBestCaption(resp.data)}</figcaption></figure>`);
+					div$.html(`<figure>
+						<a href="${resp.data.url}" target="_blank" title="Click to see image in new tab"><img src="${resp.data.url}" ${w} /></a>
+						<figcaption ${w}>${_chooseBestCaption(resp.data)}</figcaption></figure>`);
 				}
 				else {
 					div$.attr('data-error', resp.message);
