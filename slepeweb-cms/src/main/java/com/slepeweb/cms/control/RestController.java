@@ -682,31 +682,7 @@ public class RestController extends BaseController {
 			parent = parent.getOrthogonalParent();
 		}
 		
-		// This link will advise ItemService how to locate the new item in the site structure
-		Link l = CmsBeanFactory.makeLink().
-				setType(linkType).
-				setName(linkName).
-				setOrdering(-1);
-		 
-		Item i = CmsBeanFactory.makeItem(it.getName()).
-				setSite(parent.getSite()).
-				setPath(String.format("%s/%s", parent.getPath(), simplename)).
-				setTemplate(t).
-				setType(it).
-				setLink4newItem(l).
-				setOwnerId(u.getId()).
-				setName(name).
-				setSimpleName(simplename).
-				setDateCreated(new Timestamp(System.currentTimeMillis())).
-				setDeleted(false);
-		
-		i.setDateUpdated(i.getDateCreated());
-		
-		// There should only ever be one version of a Shortcut item, and that needs to
-		// be published in order for it to be 'visible' by the delivery server.
-		if (i.isShortcut()) {
-			i.setPublished(true);
-		}
+		Item i = createItem(name, simplename, parent, t, it, linkType, linkName, u);
 		
 		// Site-specific actions on adding a new item
 		ICmsHook h = this.cmsHooker.getHook(i.getSite().getShortname());

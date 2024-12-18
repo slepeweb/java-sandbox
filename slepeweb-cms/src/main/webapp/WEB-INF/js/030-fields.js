@@ -227,8 +227,16 @@ _cms.field.onpageload = function() {
 		_cms.field.widefieldInsert('<div></div>')
 	})
 
+	$("div#widefield-div2b-icon").click(function(e) {
+		_cms.field.widefieldInsert('<div class="twoblock"></div>')
+	})
+
+	$("div#widefield-a-icon").click(function(e) {
+		_cms.field.widefieldInsert('<a href="$_1234"></div>')
+	})
+
 	$("div#widefield-ximg-icon").click(function(e) {
-		_cms.field.widefieldInsert('<div class="ximg" data-id="123"></div>')
+		_cms.field.widefieldInsert('<div class="ximg" data-id="123" data-width="100%"></div>')
 	})
 
 $("div#widefield-table-icon").click(function(e) {

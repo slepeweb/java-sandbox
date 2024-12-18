@@ -12,9 +12,10 @@ function _chooseBestCaption(data) {
 	return caption;
 }
 
-function _convertDiv2Img(div$) {
+function _processFigures(div$) {
 		let origId = div$.attr('data-id');
 		let width = div$.attr('data-width');
+		let body = div$.html();
 
 		$.ajax('/rest/passkey/' + origId, {
 			type: 'GET',
@@ -24,10 +25,13 @@ function _convertDiv2Img(div$) {
 				if (! resp.error && resp.data.image) {
 					// resp.data is an Item4Json object
 					// Append img and caption tags to the div
-					let w = width ? `style="width: ${width}"` : '';
-					div$.html(`<figure>
-						<a href="${resp.data.url}" target="_blank" title="Click to see image in new tab"><img src="${resp.data.url}" ${w} /></a>
+					let w = body ? '' : (width ? `style="width: ${width}"` : '');
+					div$.html(`<figure><a href="${resp.data.url}" target="_blank" title="Click to see image in new tab"><img src="${resp.data.url}" ${w} /></a>
 						<figcaption ${w}>${_chooseBestCaption(resp.data)}</figcaption></figure>`);
+						
+					if (body) {
+						div$.append(`<p>${body}</p>`);
+					}
 				}
 				else {
 					div$.attr('data-error', resp.message);
@@ -50,7 +54,7 @@ $(function() {
 			</div>
 	*/
 	$('div.ximg').each(function() {
-		_convertDiv2Img($(this));
+		_processFigures($(this));
 	})
 	
 });

@@ -417,6 +417,15 @@ div.twoblock > div {
 	padding: 0 0.5em 0 0.5em;
 }
 
+div.ximg {
+	display: flex;
+	align-content: space-evenly;
+}
+
+div.ximg > figure, div.ximg > p {
+	width: 100%;
+}
+
 figure {
 	margin: 0.5em;
 }

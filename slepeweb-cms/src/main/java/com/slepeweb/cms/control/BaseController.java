@@ -1,5 +1,6 @@
 package com.slepeweb.cms.control;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.cms.bean.Field.FieldType;
+import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.FieldEditorSupport;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
@@ -19,12 +21,14 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.ItemUpdateHistory;
+import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.ItemUpdateRecord.Action;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.TagInputSupport;
+import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.UndoRedoStatus;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.bean.guidance.IGuidance;
@@ -244,5 +248,39 @@ public class BaseController {
 		}
 		return m;
 	}
+	
+	protected Item createItem(String name, String simplename, Item parent, Template t, ItemType it, 
+			String linkType, String linkName, User u) {
+		
+		// This link will advise ItemService how to locate the new item in the site structure
+		Link l = CmsBeanFactory.makeLink().
+				setType(linkType).
+				setName(linkName).
+				setOrdering(-1);
+		 
+		Item i = CmsBeanFactory.makeItem(it.getName()).
+				setSite(parent.getSite()).
+				setPath(String.format("%s/%s", parent.getPath(), simplename)).
+				setTemplate(t).
+				setType(it).
+				setLink4newItem(l).
+				setOwnerId(u.getId()).
+				setName(name).
+				setSimpleName(simplename).
+				setDateCreated(new Timestamp(System.currentTimeMillis())).
+				setDeleted(false);
+		
+		i.setDateUpdated(i.getDateCreated());
+		
+		// There should only ever be one version of a Shortcut item, and that needs to
+		// be published in order for it to be 'visible' by the delivery server.
+		if (i.isShortcut()) {
+			i.setPublished(true);
+		}
+		
+		return i;
+	}
+	
+
 }
 

@@ -20,8 +20,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemType;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.except.ResourceException;
@@ -69,8 +73,9 @@ public class PhotoSetupController extends BaseController {
 			return "Setup complete";
 		}
 		else {
-			LOG.error(String.format("Failed to open root folder [%s]", folderPath));
-			return "Setup failed to start";
+			String msg = String.format("Root folder [%s] does not exist", folderPath);
+			LOG.error(msg);
+			return msg;
 		}
 	}	
 	
@@ -154,17 +159,6 @@ public class PhotoSetupController extends BaseController {
 			return item;
 		}
 		
-		// Item doesn't already exist; create it.
-		item = CmsBeanFactory.makeItem(itemType.getName()).
-			setName(filename).
-			setSimpleName(simpleName).
-			setPath(path).
-			setDateCreated(data.getNow()).
-			setDateUpdated(data.getNow()).
-			setSite(data.getSite()).
-			setType(itemType).
-			setParent(parent);
-		
 		boolean dateSpecified = false;
 		String formattedDate = null;
 		
@@ -177,9 +171,9 @@ public class PhotoSetupController extends BaseController {
 			}
 		}
 		
-		if (dateSpecified) {
-			item.setName(dateStr);
-		}
+		Template t = null;
+		String name = dateSpecified ? dateStr : simpleName;
+		item = createItem(name, simpleName, parent, t, itemType, LinkType.binding, LinkName.std, data.getUser());	
 		
 		// Save item
 		item = this.itemService.save(item);
@@ -263,6 +257,7 @@ public class PhotoSetupController extends BaseController {
 		private ItemType folderType, photoType, videoType;
 		private Timestamp now;
 		private int count;
+		private User user;
 		
 		Site getSite() {
 			return site;
@@ -319,6 +314,15 @@ public class PhotoSetupController extends BaseController {
 		
 		void incCounter() {
 			this.count += 1;
+		}
+
+		public User getUser() {
+			return user;
+		}
+
+		public Data setUser(User user) {
+			this.user = user;
+			return this;
 		}
 	}
 }

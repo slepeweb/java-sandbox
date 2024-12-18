@@ -6,6 +6,7 @@ import java.util.List;
 public class Ownership {
 	private List<User> siteContributors = new ArrayList<User>();
 	private User owner, contributor;
+	
 	public User getOwner() {
 		return owner;
 	}
