@@ -15,7 +15,10 @@ function _chooseBestCaption(data) {
 function _processFigures(div$) {
 		let origId = div$.attr('data-id');
 		let width = div$.attr('data-width');
+		let figwidth = width ? `style="width: ${width}"` : '';
+		let title = 'Click to see image in new tab';
 		let body = div$.html();
+		let caption = div$.attr('data-caption');
 
 		$.ajax('/rest/passkey/' + origId, {
 			type: 'GET',
@@ -25,13 +28,16 @@ function _processFigures(div$) {
 				if (! resp.error && resp.data.image) {
 					// resp.data is an Item4Json object
 					// Append img and caption tags to the div
-					let w = body ? '' : (width ? `style="width: ${width}"` : '');
-					div$.html(`<figure><a href="${resp.data.url}" target="_blank" title="Click to see image in new tab"><img src="${resp.data.url}" ${w} /></a>
-						<figcaption ${w}>${_chooseBestCaption(resp.data)}</figcaption></figure>`);
-						
-					if (body) {
-						div$.append(`<p>${body}</p>`);
+					if (! caption) {
+						caption = _chooseBestCaption(resp.data);
 					}
+					
+					div$.html(`<figure ${figwidth}>
+							<a href="${resp.data.url}" target="_blank" title="${title}"><img src="${resp.data.url}"></a>
+							<figcaption>${caption}</figcaption>
+						</figure>
+						${body}
+						<p class="clearfix"></p>`);
 				}
 				else {
 					div$.attr('data-error', resp.message);

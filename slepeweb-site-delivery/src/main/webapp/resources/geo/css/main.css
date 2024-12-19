@@ -411,23 +411,24 @@ div.squeeze pre {
 div.twoblock {
 	display: grid;
   grid-template-columns: 50% 50%;
+  margin: 0.75em 0 1.5em 0;
 }
 
-div.twoblock > div {
-	padding: 0 0.5em 0 0.5em;
+div.twoblock > div.ximg, div.twoblock p {
+	margin: 0 0.5em 0 0.5em;
 }
 
 div.ximg {
-	display: flex;
-	align-content: space-evenly;
+	margin: 1em 0 1.5em 0;
 }
 
-div.ximg > figure, div.ximg > p {
-	width: 100%;
+div.ximg > figure {
+	margin: 0 1.0em 0 0;
+	float: left;
 }
 
-figure {
-	margin: 0.5em;
+div.ximg.border {
+	border: 2px solid grey;
 }
 
 figcaption {
@@ -435,6 +436,11 @@ figcaption {
 	padding-bottom: 1em;
 	width: 100%;
 	text-align: center;
+}
+
+p.clearfix {
+	clear: both;
+	margin: 0;
 }
 
 .ui-helper-reset {

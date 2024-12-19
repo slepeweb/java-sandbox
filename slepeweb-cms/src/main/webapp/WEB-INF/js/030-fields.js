@@ -236,7 +236,12 @@ _cms.field.onpageload = function() {
 	})
 
 	$("div#widefield-ximg-icon").click(function(e) {
-		_cms.field.widefieldInsert('<div class="ximg" data-id="123" data-width="100%"></div>')
+		_cms.field.widefieldInsert(`
+<div class="ximg border"	/* Optional 'border' class */
+	data-id="123" 					/* Original id of image item */
+	data-width="50%" 				/* Set to 50% to leave space for optional wrap-around text */
+													/* Optional data-caption attribute */
+	data-caption="Override default caption">Optional wraparound text</div>`)
 	})
 
 $("div#widefield-table-icon").click(function(e) {
