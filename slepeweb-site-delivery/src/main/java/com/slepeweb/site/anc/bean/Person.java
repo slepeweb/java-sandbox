@@ -310,7 +310,7 @@ public class Person {
 
 	public List<Item> getGallery() {
 		if (this.gallery == null) {
-			this.gallery = getResources("Image JPG");
+			this.gallery = getResources(new String[] {"Image JPG", "Photo JPG"});
 		}		
 		return this.gallery;
 	}
@@ -327,6 +327,10 @@ public class Person {
 		return f.filterItems(this.item.getBindings());
 	}
 
+	private List<Item> getResources(String[] itemTypes) {
+		LinkFilter f = new LinkFilter().setItemTypes(itemTypes);
+		return f.filterItems(this.item.getBindings());
+	}
 	public Integer getBirthYear() {
 		if (this.birthYear == null) {
 			this.birthYear = getYearFromSummary(this.birthSummary);

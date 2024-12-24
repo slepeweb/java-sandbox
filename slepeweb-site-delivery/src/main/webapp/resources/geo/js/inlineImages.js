@@ -20,24 +20,30 @@ function _processFigures(div$) {
 		let body = div$.html();
 		let caption = div$.attr('data-caption');
 
-		$.ajax('/rest/passkey/' + origId, {
+		$.ajax('/rest/item/' + origId, {
 			type: 'GET',
 			cache: false,
 			dataType: "json",
 			success: function(resp) {
-				if (! resp.error && resp.data.image) {
-					// resp.data is an Item4Json object
-					// Append img and caption tags to the div
-					if (! caption) {
-						caption = _chooseBestCaption(resp.data);
+				if (! resp.error) {
+					if (resp.data.image) {
+						// resp.data is an Item4Json object
+						// Append img and caption tags to the div
+						if (! caption) {
+							caption = _chooseBestCaption(resp.data);
+						}
+						
+						let path = '/$_' + origId;
+						div$.html(`<figure ${figwidth}>
+								<a href="${path}" target="_blank" title="${title}"><img src="${path}"></a>
+								<figcaption>${caption}</figcaption>
+							</figure>
+							${body}
+							<p class="clearfix"></p>`);
 					}
-					
-					div$.html(`<figure ${figwidth}>
-							<a href="${resp.data.url}" target="_blank" title="${title}"><img src="${resp.data.url}"></a>
-							<figcaption>${caption}</figcaption>
-						</figure>
-						${body}
-						<p class="clearfix"></p>`);
+					else {
+						div$.attr('data-error', 'Not an image item');
+					}
 				}
 				else {
 					div$.attr('data-error', resp.message);

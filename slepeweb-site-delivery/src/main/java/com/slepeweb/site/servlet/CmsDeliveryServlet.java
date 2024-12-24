@@ -3,10 +3,10 @@ package com.slepeweb.site.servlet;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -16,7 +16,6 @@ import org.springframework.ui.ModelMap;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Rerouter;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
@@ -25,10 +24,8 @@ import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteAccessService;
-import com.slepeweb.cms.service.UserService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
-import com.slepeweb.site.service.PasskeyService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,157 +36,125 @@ public class CmsDeliveryServlet {
 	
 	private long defaultPrivateCacheTime, defaultPublicCacheTime;
 	private Map<Long, Long> lastDeliveryTable = new HashMap<Long, Long>(127);
+	private static Pattern PATH_PATTERN_A = Pattern.compile("^(/(\\w\\w))?/\\$_(\\d+)(\\?passkey=([\\w\\d\\$]+))?$");
+	private static Pattern PATH_PATTERN_B = Pattern.compile("^(/(\\w\\w))?(/.*?)$");
 	
 	@Autowired private CmsService cmsService;
 	@Autowired private ItemService itemService;
-	@Autowired private PasskeyService passkeyService;
-	@Autowired private UserService userService;
 
+	private Item identifyItem(HttpServletRequest req) {
+		Item i = null;
+		String language = null;
+		@SuppressWarnings("unused") String passkey = null;
+		String path = getItemPath(req);
+		
+		if (path.equals("/favicon.ico")) {
+			return null;
+		}
+
+		/*
+		 *  This url pattern applies to requests for 'foreign' items, ie on a different site.
+		 *  Let's say site A wants to render an image item on site B, and site B is secured.
+		 *  If you tried to access the item on site B through host B, you'd have to provide
+		 *  login information. So, we let host A retrieve the item on site B, using the
+		 *  same login information for host A. Similar to SSO (single sign-on).
+		 *  
+		 *  NOTE: PasskeyService is NOT required.
+		 */
+		Matcher m = PATH_PATTERN_A.matcher(path);
+		
+		if (m.matches()) {
+			language = m.group(2);
+			passkey = m.group(5);
+			i = this.itemService.getItemByOriginalId(Long.valueOf(m.group(3)));
+		}
+		else {
+			// This url patter is for 'indigenous' items, ie same host.
+			m = PATH_PATTERN_B.matcher(path);
+			
+			if (m.matches()) {
+				language = m.group(2);
+				path = m.group(3);
+				Site site = getSite(req);
+				
+				if (site != null) {
+					path = site.isMultilingual() ? path : m.group(0);
+					i = site.getItem(path);
+				}
+			}
+		}
+		
+		if (i != null) {
+			i.setLanguage(language == null ? i.getSite().getLanguage() : language);
+			i.setUser((User) req.getSession().getAttribute("_user"));
+			req.setAttribute("_item", i);
+			req.setAttribute("_site", i.getSite());
+		}
+
+		return i;
+	}
+	
+	private String getLoginPath(Item i) {
+		return i.getSite().isMultilingual() ? 
+				String.format("/%s%s", i.getLanguage(), SiteAccessService.LOGIN_PATH) :
+					SiteAccessService.LOGIN_PATH;
+	}
+	
 	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		doGet(req, res, model);
 	}
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
-		String path = getItemPath(req);
+		Item item = identifyItem(req);
 		
-		// TODO: make this configurable once we start using favicons.
-		if (path.equals("/favicon.ico")) {
+		if (item == null) {
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 		
-		// Deal with urls like /$_3654
-		if (path.matches("^/\\$_\\d+$")) {
-			if (! respond2ShortUrl(path, req, res)) {
-				notFound(res, "Could not process short-url request further", path);
-			}
-			return;
-		}
-		
-		String trimmedPath = path;
-		long requestTime = System.currentTimeMillis();		
-		Site site = getSite(req);
-		
-		if (site != null) {
-			req.setAttribute("_site", site);
-			LOG.trace(LogUtil.compose("Site ...", site));
-
-			String language = site.getLanguage();				
-			Rerouter rerouter = multilingualPathChecker(site, path, language);
-			language = rerouter.getLanguage();
-			trimmedPath = rerouter.getPath();
-			
-			if (rerouter.isRequired()) {
-				// language is missing on a multilingual site - redirect to default language
-				res.sendRedirect(String.format("/%s%s", language, trimmedPath));
+		if (item.getSite().isSecured() && ! item.isAccessible()) {
+			// Site access rules deny access to this user, OR user is not known
+			if (! item.getPath().equals(getLoginPath(item))) {
+				LOG.warn(String.format("Item [%s] is not accessible by un-identified user", item.getPath()));
+				res.sendRedirect(getLoginPath(item));
 				return;
 			}
-			
-			Item item = site.getItem(trimmedPath);
-			String view = req.getParameter("view");
-			
-			if (item != null) {
-				LOG.info(LogUtil.compose("Requesting", item));
-				String springTemplatePath = getTemplatePath(item, view);
-				item.setLanguage(language);
-				item.setUser(identifyUser(req));
-				rerouter = accessibilityChecker(item, req);
-				
-				if (rerouter.isRequired()) {
-					if (rerouter.getAction() == Rerouter.Action.redirect) {
-						res.sendRedirect(rerouter.getPath());
-					}
-					else if (rerouter.getAction() == Rerouter.Action.error) {
-						res.sendError(rerouter.getHttpError());
-					}
-					return;
-				}
-				
-				logRequestHeaders(req, path);					
-				long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
+		}			
+		
+		long requestTime = System.currentTimeMillis();
+		String view = req.getParameter("view");		
+		String springTemplatePath = getTemplatePath(item, view);
+		
+		long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
 
-				if (isCacheable(item) && isFresh(item, requestTime, ifModifiedSince, req.getMethod())) {
-					res.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-				}
-				else {
-					req.setAttribute("_item", item);
-					setCacheHeaders(item, requestTime, res);
-					
-					if (item.getType().isMedia()) {
-						LOG.debug(LogUtil.compose("Streaming binary content ...", item));
-						String mediaType = item.getType().getShortMimeType();
-						String servletPath = String.format("/stream/item/%s", mediaType);
-						req.getRequestDispatcher(servletPath).forward(req, res);
-					}
-					else {
-						res.setContentType("text/html;charset=utf-8");
-						res.setCharacterEncoding("utf-8");
-						
-						if (springTemplatePath != null) {
-							LOG.debug(LogUtil.compose("Forwarding request to template", springTemplatePath));
-							req.getRequestDispatcher(springTemplatePath).forward(req, res);
-							this.lastDeliveryTable.put(item.getId(), zeroMillis(requestTime));
-						}
-						else {
-							notFound(res, "Item has no template", item);
-						}
-					}
-				}
-			}
-			else {
-				notFound(res, "Item not found", path);
-			}
+		if (isCacheable(item) && isFresh(item, requestTime, ifModifiedSince, req.getMethod())) {
+			res.sendError(HttpServletResponse.SC_NOT_MODIFIED);
 		}
 		else {
-			LOG.error(LogUtil.compose("Site not registered here", req.getServerName()));
-			notFound(res, "Item not found", path);
-		}
-		
-		logResponseHeaders(res, path);
-	}
-	
-	private User identifyUser(HttpServletRequest req) {
-		
-		User u = (User) req.getSession().getAttribute("_user");
-		
-		if (u == null) {
-			/*
-			// Check to see if user credentials have been provided in the request headers
-			String authHeader = req.getHeader("Authorization");
-			String prefix = "Basic ";
-			if (authHeader != null && authHeader.startsWith(prefix)) {
-				String encoded = authHeader.substring(prefix.length());
-				byte[] bytes = Base64.decodeBase64(encoded);
+			setCacheHeaders(item, requestTime, res);
+			
+			if (item.getType().isMedia()) {
+				LOG.debug(LogUtil.compose("Streaming binary content ...", item));
+				String mediaType = item.getType().getShortMimeType();
+				String servletPath = String.format("/stream/item/%s", mediaType);
+				req.getRequestDispatcher(servletPath).forward(req, res);
+			}
+			else {
+				res.setContentType("text/html;charset=utf-8");
+				res.setCharacterEncoding("utf-8");
 				
-				if (bytes != null) {
-					String[] s = new String(bytes).split("___");
-					if (s.length == 2) {
-						u = this.cmsService.getUserService().get(s[0]);
-						if (u != null && ! u.getPassword().equals(s[1])) {
-							// Right username, wrong password
-							u = null;
-						}
-					}
+				if (springTemplatePath != null) {
+					LOG.debug(LogUtil.compose("Forwarding request to template", springTemplatePath));
+					req.getRequestDispatcher(springTemplatePath).forward(req, res);
+					this.lastDeliveryTable.put(item.getId(), zeroMillis(requestTime));
+				}
+				else {
+					LOG.error(LogUtil.compose("Item has no template", item));
+					res.sendError(HttpServletResponse.SC_NOT_FOUND);
 				}
 			}
-			*/
 		}
-		
-		return u;
-	}
-	
-	private boolean respond2ShortUrl(String path, HttpServletRequest req, HttpServletResponse res) throws Exception {
-		Long origId = Long.valueOf(path.substring(3));
-		Item i = this.itemService.getItemByOriginalId(origId);
-		
-		if (i == null) {
-			return false;
-		}
-		
-		LOG.info(String.format("Request for %s (%d) using passkey [%s]", i.getPath(), origId, req.getParameter("passkey")));
-		req.getRequestDispatcher(i.getPath()).forward(req, res);
-		return true;
 	}
 	
 	private String getTemplatePath(Item i, String view) {
@@ -198,43 +163,6 @@ public class CmsDeliveryServlet {
 			return StringUtils.isBlank(view) ? tmplt.getController() : tmplt.getController() + "/" + view;
 		}
 		return null;
-	}
-	
-	private void logRequestHeaders(HttpServletRequest req, String path) {
-		if (LOG.isTraceEnabled()) {
-			LOG.trace(String.format("REQUEST HEADERS (%s) >>>", path));
-			Enumeration<String> enumer = req.getHeaderNames();
-			String name;
-			while (enumer.hasMoreElements()) {
-				name = enumer.nextElement();
-				if (matches(name, "pragma,cache-control,if-modified-since")) {
-					LOG.trace(String.format("   %-20s: [%s]", name, req.getHeader(name)));
-				}
-			}
-		}
-	}
-	
-	private void logResponseHeaders(HttpServletResponse res, String path) {
-		if (LOG.isTraceEnabled()) {
-			LOG.trace(String.format("RESPONSE HEADERS (%s) >>>", path));
-			Iterator<String> enumer = res.getHeaderNames().iterator();
-			String name;
-			while (enumer.hasNext()) {
-				name = enumer.next();
-				if (matches(name, "cache-control,expires,last-modified,content-type")) {
-					LOG.trace(String.format("   %-20s: [%s]", name, res.getHeader(name)));
-				}
-			}
-		}
-	}
-	
-	private boolean matches(String name, String delimited) {
-		for (String target : delimited.split(",")) {
-			if (name.toLowerCase().equals(target.toLowerCase())) {
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	private long zeroMillis(long millis) {
@@ -299,12 +227,6 @@ public class CmsDeliveryServlet {
 		return -1L;
 	}
 	
-	private void notFound(HttpServletResponse res, String msg, Object arg) throws Exception
-    {
-		LOG.error(LogUtil.compose(msg, arg));
-		res.sendError(HttpServletResponse.SC_NOT_FOUND);
-    }
-	
 	private Site getSite(HttpServletRequest req) {
 		Host h = this.cmsService.getHostService().getHost(req.getServerName(), req.getServerPort());
 		if (h != null) {
@@ -321,6 +243,7 @@ public class CmsDeliveryServlet {
 		pathInfo = pathInfo != null ? servletPath + pathInfo : servletPath;
 		return pathInfo;
 	}
+	
 	private boolean isCacheable(Item i) {
 		return 
 				this.cmsService.isDeliveryContext() &&
@@ -376,16 +299,11 @@ public class CmsDeliveryServlet {
 		}
 	}
 	
-	// Returns true if resource is accessible
-	private Rerouter accessibilityChecker(Item i, HttpServletRequest req) {
+	/*
+	private boolean itemIsAccessibleByUser(Item i, HttpServletRequest req) {
 		
 		boolean siteIsSecured = i.getSite().isSecured();
-		String notAuthorisedPath = i.getSite().isMultilingual() ? 
-				String.format("/%s%s", i.getLanguage(), SiteAccessService.LOGIN_PATH) :
-					SiteAccessService.LOGIN_PATH;		
-		
-		boolean passkeyIsValid = false;
-		Rerouter r = new Rerouter();
+		boolean passkeyIsValid = false;	
 		
 		if (siteIsSecured) {
 			User u = i.getUser();
@@ -393,18 +311,19 @@ public class CmsDeliveryServlet {
 			if (u == null) {
 				LOG.info("Request is from user who has not logged in ...");
 				String passkey = req.getParameter("passkey");
+				
 				if (passkey != null) {
 					String[] parts = passkey.split("\\$\\$");
 					if (parts.length != 2) {
-						return r.setRequired(true).setAction(Rerouter.Action.error).setHttpError(500).
-								addMessage(String.format("Badly formed passkey [%s]", passkey));
+						LOG.error(String.format("Badly formed passkey [%s]", passkey));
+						return false;
 					}
 					
 					long userId = Long.parseLong(parts[0]);
 					u = this.userService.get(userId);
 					if (u == null) {
-						return r.setRequired(true).setAction(Rerouter.Action.error).setHttpError(500).
-								addMessage(String.format("User ID not recognised [%d]", userId));
+						LOG.error(String.format("User ID not recognised [%d]", userId));
+						return false;
 					}
 					
 					i.setUser(u);
@@ -414,47 +333,18 @@ public class CmsDeliveryServlet {
 				}
 			}
 			
-			if ((i.getUser() == null || ! i.isAccessible()) && ! passkeyIsValid) {
+			if (i.getSite().isSecured() && ! i.isAccessible() && ! passkeyIsValid && i.getUser() == null) {
 				// Site access rules deny access to this user, AND he has no passkey.
-				if (! i.getPath().equals(notAuthorisedPath)) {
-					// Redirect to not-authorised page
-					return r.setRequired(true).setPath(notAuthorisedPath).
-							setAction(Rerouter.Action.redirect);
+				if (! i.getPath().equals(getLoginPath(i))) {
+					LOG.warn(String.format("Item [%s] is not accessible by un-identified user", i.getPath()));
+					return false;
 				}
 			}			
 		}	
 		
-		return r;
+		return true;
 	}
-	
-	private Rerouter multilingualPathChecker(Site site, String path, String defaultLanguage) {
-		Rerouter r = new Rerouter().setAction(Rerouter.Action.redirect).setPath(path).setLanguage(defaultLanguage);
-		
-		if (site.isMultilingual() && ! path.equals("/favicon.ico")) {
-			if (path.length() > 2) {
-				String[] slugs = path.substring(1).split("/");
-				if (slugs.length > 0 && slugs[0].length() == 2) {
-					r.setLanguage(path.substring(1, 3));
-					r.setPath(path.substring(3));
-					
-					// Special treatment for homepage
-					if (StringUtils.isBlank(r.getPath())) {
-						r.setPath("/");
-					}
-				}
-				else {
-					r.setRequired(true);
-				}
-			}
-			else {
-				// Special treatment for homepage
-				r.setPath("");
-				r.setRequired(true);
-			}
-		}
-		
-		return r;
-	}
+	*/
 	
 	private long toLong(String s) {
 		if (StringUtils.isNumeric(s)) {

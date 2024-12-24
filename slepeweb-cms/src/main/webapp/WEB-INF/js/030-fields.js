@@ -232,16 +232,13 @@ _cms.field.onpageload = function() {
 	})
 
 	$("div#widefield-a-icon").click(function(e) {
-		_cms.field.widefieldInsert('<a href="$_1234"></div>')
+		_cms.field.widefieldInsert('<a href="/$_1234"></a>')
 	})
 
 	$("div#widefield-ximg-icon").click(function(e) {
-		_cms.field.widefieldInsert(`
-<div class="ximg border"	/* Optional 'border' class */
-	data-id="123" 					/* Original id of image item */
-	data-width="50%" 				/* Set to 50% to leave space for optional wrap-around text */
-													/* Optional data-caption attribute */
-	data-caption="Override default caption">Optional wraparound text</div>`)
+		_cms.field.widefieldInsert(`<div class="ximg" data-id="1234">Optional floated text</div>
+			/* Optional attrs: data-width, data-caption
+			   Optional class: border */`)
 	})
 
 $("div#widefield-table-icon").click(function(e) {

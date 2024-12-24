@@ -56,6 +56,7 @@
 			<div class="inputs">
 				<span><i class="fa-solid fa-sitemap itempicker"></i></span>
 				<span id="link-target-identifier"></span>
+				<input id="link-target-origid" type="text" />
 			</div>
 		</div>
 

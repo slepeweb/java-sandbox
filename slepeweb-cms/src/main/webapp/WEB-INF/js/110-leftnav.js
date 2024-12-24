@@ -48,8 +48,9 @@ _cms.leftnav.define.fancytree = function() {
 				_cms.support.renderItemForms(data.node.key, _cms.activeTab);
 			}
 			else if (_cms.leftnav.mode == "link") {
-				$("#link-target-identifier").html("'" + _cms.leftnav.tree.activeNode.title + "'");
-				$("#addlinkdiv input[name=childId]").val(_cms.leftnav.tree.activeNode.key);
+				$(_cms.links.sel.LINK_TARGET_ORIGID).val(null);
+				$(_cms.links.sel.LINK_TARGET_IDENTIFIER).html("'" + _cms.leftnav.tree.activeNode.title + "'");
+				$(_cms.links.sel.CHILDID_INPUT).val(_cms.leftnav.tree.activeNode.key);
 			}
 			else if (_cms.leftnav.mode == "move") {
 				$("#move-target-identifier").html("'" + data.node.title + "'");

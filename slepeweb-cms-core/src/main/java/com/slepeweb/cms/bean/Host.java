@@ -51,18 +51,7 @@ public class Host extends CmsBean {
 	}
 	
 	public String getNameAndPort() {
-		String name = getPublicName();
-		int port = 80;
-		if (getCmsService().isDevDeployment()) {
-			name = getName();
-			port = getPort();
-		}
-		StringBuilder sb = new StringBuilder(name);
-		
-		if (port != 80) {
-			sb.append(":").append(port);
-		}
-		return sb.toString();
+		return getCmsService().isDevDeployment() ? getInternalName() : getPublicName();
 	}
 	
 	public String getNamePortAndProtocol() {
@@ -79,7 +68,11 @@ public class Host extends CmsBean {
 	}
 	
 	public String getPublicName() {
-		return this.publicName == null ? getNameAndPort() : this.publicName;
+		return this.publicName;
+	}
+
+	public String getInternalName() {
+		return String.format("%s:%d", getName(), getPort());
 	}
 
 	public Host setPublicName(String publicName) {

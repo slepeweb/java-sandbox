@@ -41,4 +41,5 @@ public interface CmsService {
 	AccessService getAccessService();
 	SiteAccessService getSiteAccessService();
 	SiteTypeService getSiteTypeService();
+	PasskeyService getPasskeyService();
 }

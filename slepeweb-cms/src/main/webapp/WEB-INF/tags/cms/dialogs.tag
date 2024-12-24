@@ -4,7 +4,7 @@
 <div id="link-not-defined-dialog" class="hide cms-dialog">
   <p>
     <span class="ui-icon ui-icon-circle-check cms-icon"></span>
-    Link data is incomplete. Close this dialog, and click on 'HELP' for guidance.
+    Link data is incomplete. Close this dialog, and click on 'GUIDE' for help.
   </p>
 </div>
 

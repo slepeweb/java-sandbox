@@ -17,7 +17,12 @@ public class Item4Json {
 		this.name = i.getName();
 		this.simplename = i.getSimpleName();
 		this.path = i.getPath();
+		
 		this.hostname = i.getSite().getDeliveryHost().getPublicName();
+		if (this.hostname == null) {
+			this.hostname = i.getSite().getDeliveryHost().getInternalName();
+		}
+		
 		this.type = i.getType().getName();
 		this.dateUpdated = i.getDateUpdated();		
 		this.fieldValues = i.getFieldValueSet().getFields(i.getLanguage());

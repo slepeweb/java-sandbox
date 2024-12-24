@@ -1,10 +1,14 @@
-package com.slepeweb.site.service;
+package com.slepeweb.cms.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
+
+/*
+ * TODO: Think this code is now redundant. But keep anyway, for possible future use.
+ */
 
 @Service("passkeyService")
 public class PasskeyServiceImpl implements PasskeyService {

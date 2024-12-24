@@ -17,7 +17,7 @@
 				<button class="link-linker" data-id="${link.child.id}" title="Navigate to this item"><i class="fas fa-location-arrow"></i></button>
 				<button class="edit-link" title="Edit link"><i class="far fa-edit"></i></button>
 				<button class="remove-link" title="Remove link"><i class="far fa-trash-alt"></i></button>
-				<span class="hide">${link.child.id}|${link.type}|${link.name}|${link.data}|${_stat.index}|1</span>
+				<span class="hide">${link.child.id}|${link.type}|${link.name}|${link.data}|${_stat.index}|1|${link.child.name}</span>
 			</div>
 		</div>
 	</c:forEach>

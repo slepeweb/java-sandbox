@@ -2,7 +2,6 @@ package com.slepeweb.site.anc.service;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
@@ -21,7 +20,7 @@ public class AncCookieServiceImpl extends CookieHelper implements AncCookieServi
 		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);	
 		pushBreadcrumbs(breadcrumbs, targetKey);
 		updateItemNames(breadcrumbs, i.getCmsService()); // We need item names in order to reorder existing matching entries
-		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), StringUtils.join(breadcrumbs, ","), ANC_COOKIE_PATH, res);
+		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), join(breadcrumbs), ANC_COOKIE_PATH, res);
 		return breadcrumbs;
 	}
 	

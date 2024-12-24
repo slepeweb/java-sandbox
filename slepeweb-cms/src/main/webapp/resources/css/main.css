@@ -753,6 +753,12 @@ div#widefield-toolbar div#widefield-close-icon {
 		width: 100%;
 	}
 	
+	input#link-target-origid {
+		width: 5em;
+		display: block;
+		margin-top: 6px;
+	}
+	
 	#item-editor label, #login label {
 		max-width: 150px;
 		width: 100%;

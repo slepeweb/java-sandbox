@@ -1,4 +1,4 @@
-package com.slepeweb.site.service;
+package com.slepeweb.cms.service;
 
 public interface PasskeyService {
 	String issueKey();

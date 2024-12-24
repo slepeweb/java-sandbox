@@ -57,6 +57,8 @@ public class Item extends CmsBean {
 	// would be too disruptive to the code.
 	private Link link4newItem;
 	
+	private boolean foreigner;
+	
 	public Item setAllMedia(List<Media> allMedia) {
 		this.allMedia = allMedia;
 		return this;
@@ -388,6 +390,14 @@ public class Item extends CmsBean {
 	public Item setSimpleName(String simpleName) {
 		this.simpleName = StringUtils.isBlank(simpleName) ? getDefaultSimplename() : simpleName;
 		
+		/*
+		 * If this item's path is set, then this code assumes that it already exists in
+		 * the database, and therefore by changing the simplename, we need to also
+		 * change the path.
+		 * 
+		 * If this item is being newly created, and is no yet bound to a parent, then changing
+		 * the simplename should not attempt to change the path.
+		 */
 		if (getPath() != null && ! isSiteRoot()) {
 			refreshPath();
 		}
@@ -399,12 +409,14 @@ public class Item extends CmsBean {
 		return this.path;
 	}
 	
+	public String getMiniPath() {
+		return String.format("/$_%d", getOrigId());
+	}
+	
 	public String getUrl() {
-		if (getSite().isMultilingual()) {
-			return String.format("/%s%s", getLanguage(), getPath());
-		}
-		
-		return getPath();
+		String path = isForeigner() ? getMiniPath() : getPath();
+		return getSite().isMultilingual() ? 
+				String.format("/%s%s", getLanguage(), path) : path;
 	}
 	
 	public String getUrl(String lang) {
@@ -512,16 +524,12 @@ public class Item extends CmsBean {
 				filterReadableLinks(this.links);
 			}
 			
-			if (getUser() != null) {
-				setUser(this.links);
-			}
-			
-			// Set the language on each linked item
-			setLinkLanguage(this.links, getLanguage());
+			// Embellish linked items with additional data: user, language, foreign site flag, etc.
+			embellishLinkedItems(this.links);
 		}
 		return this.links;
 	}
-
+	
 	public List<Link> getParentLinks() {
 		return getParentLinks(false);
 	}
@@ -535,7 +543,7 @@ public class Item extends CmsBean {
 			this.parentLinks = getLinkService().getParentLinks(getId());
 			
 			// Set the language on each linked item
-			setLinkLanguage(this.parentLinks, getLanguage());
+			embellishLinkedItems(this.parentLinks);
 		}
 		
 		if (! includeBinding) {
@@ -556,12 +564,6 @@ public class Item extends CmsBean {
 		return filterOrthogonalParentLink();
 	}
 	
-	private void setLinkLanguage(List<Link> links, String language) {
-		for (Link l : links) {
-			l.getChild().setLanguage(getLanguage());
-		}
-	}
-
 	public List<Link> getBindings() {
 		return filterLinks(new String[] {LinkType.binding});
 	}
@@ -729,6 +731,15 @@ public class Item extends CmsBean {
 		return false;
 	}
 	
+	public boolean isForeigner() {
+		return foreigner;
+	}
+
+	public Item setForeigner(boolean foreigner) {
+		this.foreigner = foreigner;
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -980,15 +991,21 @@ public class Item extends CmsBean {
 		
 		return links;
 	}
-
-
-	private List<Link> setUser(List<Link> links) {
+	
+	// Applies to both child AND parent links
+	private void embellishLinkedItems(List<Link> links) {
 		if (links != null) {
+			Item i;
+			
 			for (Link l :  links) {
-				l.getChild().setUser(getUser());
+				i = l.getChild();
+				i.setUser(getUser()).setLanguage(getLanguage());
+				
+				if (i.getSite().getId() != this.getSite().getId()) {
+					i.setForeigner(true);
+				}
 			}
 		}
-		
-		return links;
 	}
+
 }

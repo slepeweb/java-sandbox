@@ -7,15 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Item4Json;
 import com.slepeweb.cms.bean.RestResponse;
-import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
-import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.site.service.PasskeyService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -23,10 +19,11 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/rest")
 public class RestController extends BaseController {
 	
-	@Autowired private HostService hostService;
+	//@Autowired private HostService hostService;
 	@Autowired private ItemService itemService;
-	@Autowired private PasskeyService passkeyService;
+	//@Autowired private PasskeyService passkeyService;
 	
+	/*
 	@RequestMapping(value="/passkey/{origId}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public RestResponse issuePasskey(
@@ -73,6 +70,7 @@ public class RestController extends BaseController {
 			return r.setData(data4Json);
 		}
 	}
+	*/
 	
 	@RequestMapping(value="/item/{origId}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
@@ -87,9 +85,9 @@ public class RestController extends BaseController {
 			return r.setError(true).addMessage(String.format("No item matching origId=%d", origId));
 		}
 		
-		User u = null;
 		if (i.getSite().isSecured()) {
-			u = (User) req.getSession().getAttribute(USER);
+			User u = (User) req.getSession().getAttribute(USER);
+			
 			if (u == null) {
 				return r.setError(true).addMessage("Not authorized");
 			}
@@ -107,6 +105,7 @@ public class RestController extends BaseController {
 		return r.setData(new Item4Json(i));
 	}
 	
+	/*
 	private Site getSite(HttpServletRequest req) {
 		if (req.getServerPort() == 80) {
 			return getSiteByPublicName(req.getServerName());
@@ -115,7 +114,9 @@ public class RestController extends BaseController {
 			return getSite(req.getServerName(), req.getServerPort());
 		}
 	}
+	*/
 	
+	/*
 	private Site getSite(String hostname, int port) {
 		Host h = this.hostService.getHost(hostname, port);
 		if (h != null) {
@@ -123,7 +124,9 @@ public class RestController extends BaseController {
 		}
 		return null;
 	}
+	*/
 
+	/*
 	private Site getSiteByPublicName(String hostname) {
 		Host h = this.hostService.getHostByPublicName(hostname);
 		if (h != null) {
@@ -131,4 +134,5 @@ public class RestController extends BaseController {
 		}
 		return null;
 	}
+	*/
 }

@@ -77,7 +77,8 @@ _cms.links = {
 		EDIT_BINDING_LINK_BUTTON: "#edit-binding-link",
 		REMOVE_LINK_BUTTONS: ".remove-link",
 		LINKTO_BUTTONS: ".link-linker",
-		LINK_TARGET_IDENTIFIER: "#link-target-identifier",
+		LINK_TARGET_NAME: "#link-target-identifier",
+		LINK_TARGET_ORIGID: "#link-target-origid",
 	},
 	shortcut: {},
 	ordering: null,
@@ -251,13 +252,13 @@ _cms.links.behaviour.edit = function() {
 		
 		/* 
 			dataparts is an array containing the following elements:
-			0: link.childid (OR the parentid for parent links)
-			1: link.type
-			2: link.name
-			3: ?
-			4: ?
-			5: ?
-			6: text string used to describe/identify link
+			0: link child id	 (OR the parentid for parent links)
+			1: link type		   eg. inline
+			2: link name		   eg. std
+			3: link data		   data associated with this link type & name
+			4: link id			   eg. 0 == first link in set
+			5: link state		   eg, 1 == existing link
+			6: link child name
 		*/
 		var dataparts = span.html().split("\|");
 		
@@ -307,6 +308,13 @@ _cms.links.behaviour.linkguidanceicon = function() {
 _cms.links.behaviour.linknamechange = function() {
 	$(_cms.links.selrel.LINKNAME_SELECT).change(function(e){
 		_cms.links.repopulateGuidance($(this).val());
+	});
+}
+
+_cms.links.behaviour.linktargetorigidchange = function() {
+	$(_cms.links.sel.LINK_TARGET_ORIGID).keyup(function(e) {
+		$(_cms.links.sel.LINK_TARGET_NAME).html('' + $(this).val());
+		$(_cms.links.sel.CHILDID_INPUT).val($(this).val());
 	});
 }
 
@@ -432,16 +440,12 @@ _cms.links.setLinkForm = function(data) {
 	form.find(_cms.links.selrel.STATE_INPUT).val(data[5]);	
 	
 	if (data[0] == "-1") {
-		$(_cms.links.sel.LINK_TARGET_IDENTIFIER).empty();
+		$(_cms.links.sel.LINK_TARGET_NAME).empty();
 	}
 	
-	if (data.length == 7) {
-		var idx = data[6].indexOf(":");
-		var name = "n/a";
-		if (idx > -1) {
-			name = data[6].substring(idx + 2);
-		}
-		$(_cms.links.sel.LINK_TARGET_IDENTIFIER).html("'" + name + "'");
+	if (data.length > 6) {
+		var name = data[6] ? data[6] : "n/a";
+		$(_cms.links.sel.LINK_TARGET_NAME).html(name);
 	}
 };
 
@@ -649,6 +653,7 @@ _cms.links.onrefresh = function(nodeKey) {
 	_cms.links.behaviour.edit();
 	_cms.links.behaviour.editbindinglink();
 	_cms.links.behaviour.navigate();
+	_cms.links.behaviour.linktargetorigidchange();
 	
 	_cms.links.shortcut.settings();	
 }

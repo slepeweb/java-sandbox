@@ -29,7 +29,11 @@ public class CookieHelper {
 		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);	
 		updateItemNames(breadcrumbs, i.getCmsService());
 		pushBreadcrumbs(breadcrumbs, target);
-		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), StringUtils.join(breadcrumbs, ID_SEPARATOR), cookiePath, res);
+		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), join(breadcrumbs), cookiePath, res);
+	}
+	
+	protected String join(List<ItemIdentifier> list) {
+		return StringUtils.join(list, ID_SEPARATOR);
 	}
 	
 	public String getBreadcrumbsCookieName(long siteId) {

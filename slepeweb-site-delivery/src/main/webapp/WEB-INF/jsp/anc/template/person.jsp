@@ -86,7 +86,7 @@
 			});
 			
 			$("#get-full-diagram").click(function() {
-				$.ajax("/" + _language + "?view=diagram/" + _itemId, {
+				$.ajax("/" + _language + "/?view=diagram/" + _itemId, {
 					type: "GET",
 					cache: false,
 					dataType: "html",
