@@ -260,16 +260,13 @@ public class BaseController {
 		 
 		Item i = CmsBeanFactory.makeItem(it.getName()).
 				setSite(parent.getSite()).
-				// It's important to set simplename before path, otherwise you get:
-				// ERROR (bean.Item:642) DB Integrity Error; Child item [-1] has NO parent
-				// Admittedly, no harm is done, except for an annoying log message
-				setSimpleName(simplename).
-				setPath(String.format("%s/%s", parent.getPath(), simplename)).
+				setName(name).
+				setSimpleNameOnly(simplename).
+				setPath(parent).
 				setTemplate(t).
 				setType(it).
 				setLink4newItem(l).
 				setOwnerId(u.getId()).
-				setName(name).
 				setDateCreated(new Timestamp(System.currentTimeMillis())).
 				setDeleted(false);
 		

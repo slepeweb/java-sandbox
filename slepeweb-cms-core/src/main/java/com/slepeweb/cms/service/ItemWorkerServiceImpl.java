@@ -224,7 +224,8 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		else {
 			ni.
 				setName(name).
-				setSimpleName(simplename).
+				setSimpleNameOnly(simplename).
+				setPath(String.format("%s/%s", parent.getPath(), simplename)).
 				setVersion(1);
 		}
 		

@@ -91,10 +91,12 @@ public class RowMapperUtil {
 		 *  depending on the item type name.
 		 */
 		Item item = CmsBeanFactory.makeItem(itemTypeName).
+				setType(mapItemType(rs)).
+				setSite(mapSite(rs, "siteid", "sitename", "site_shortname")).
 				setId(rs.getLong("id")).
 				setOrigId(rs.getLong("origid")).
 				setName(rs.getString("name")).
-				setSimpleName(rs.getString("simplename")).
+				setSimpleNameOnly(rs.getString("simplename")).
 				setPath(rs.getString("path")).
 				setOwnerId(rs.getLong("ownerid")).
 				setDateCreated(rs.getTimestamp("datecreated")).
@@ -104,11 +106,6 @@ public class RowMapperUtil {
 				setPublished(rs.getBoolean("published")).
 				setSearchable(rs.getBoolean("searchable")).
 				setVersion(rs.getInt("version"));
-		
-		item.setType(mapItemType(rs));
-		
-		Site site = mapSite(rs, "siteid", "sitename", "site_shortname");		
-		item.setSite(site);
 		
 		if (! item.isShortcut()) {
 			Template t = null;

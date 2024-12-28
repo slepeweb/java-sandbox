@@ -26,6 +26,7 @@ import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.except.ResourceException;
@@ -36,6 +37,10 @@ import com.slepeweb.cms.service.SiteService;
 import com.slepeweb.common.util.ImageUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+/*
+ * TODO: Use with extreme CAUTION - more testing required.
+ */
 
 @Controller
 public class PhotoSetupController extends BaseController {
@@ -61,7 +66,8 @@ public class PhotoSetupController extends BaseController {
 				setFolderType(this.itemTypeService.getItemType(ItemTypeName.CONTENT_FOLDER)).
 				setPhotoType(this.itemTypeService.getItemType(ItemTypeName.PHOTO_JPG)).
 				setVideoType(this.itemTypeService.getItemType(ItemTypeName.MOVIE_MP4)).
-				setNow(new Timestamp(System.currentTimeMillis()));
+				setNow(new Timestamp(System.currentTimeMillis())).
+				setUser((User) req.getSession().getAttribute(AttrName.USER));
 		
 		if (rootFolder.exists()) {
 			try {

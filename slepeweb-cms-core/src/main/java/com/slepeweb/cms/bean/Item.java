@@ -81,7 +81,7 @@ public class Item extends CmsBean {
 		if (obj instanceof Item) {
 			Item i = (Item) obj;
 			setName(i.getName());
-			setSimpleName(i.getSimpleName());
+			setSimpleNameOnly(i.getSimpleName());
 			setPath(i.getPath());
 			setDateCreated(i.getDateCreated());
 			setDateUpdated(i.getDateUpdated());
@@ -263,11 +263,11 @@ public class Item extends CmsBean {
 	}
 	
 	public boolean isSiteRoot() {
-		return getPath().equals("/");
+		return StringUtils.isNotBlank(this.path) && this.path.equals("/");
 	}
 	
 	public boolean isContentRoot() {
-		return getPath().equals(Item.CONTENT_ROOT_PATH);
+		return StringUtils.isNotBlank(this.path) && this.path.equals(Item.CONTENT_ROOT_PATH);
 	}
 	
 	public boolean isRoot() {
@@ -387,18 +387,28 @@ public class Item extends CmsBean {
 		return this.simpleName;
 	}
 	
-	public Item setSimpleName(String simpleName) {
+	// This requires name property to have previously been set
+	public Item setSimpleNameOnly(String simpleName) {
 		this.simpleName = StringUtils.isBlank(simpleName) ? getDefaultSimplename() : simpleName;
+		return this;
+	}
+	
+	/*
+	 * For a simplename change on an existing item, you also have to consider the affect on the
+	 * item path property.
+	 */
+	public Item setSimpleName(String simpleName) {
+		setSimpleNameOnly(simpleName);
 		
 		/*
-		 * If this item's path is set, then this code assumes that it already exists in
+		 * If this item's id is set, then this code assumes that it already exists in
 		 * the database, and therefore by changing the simplename, we need to also
 		 * change the path.
 		 * 
 		 * If this item is being newly created, and is no yet bound to a parent, then changing
 		 * the simplename should not attempt to change the path.
 		 */
-		if (getPath() != null && ! isSiteRoot()) {
+		if (getId() > 0 && ! isSiteRoot()) {
 			refreshPath();
 		}
 		
@@ -525,7 +535,8 @@ public class Item extends CmsBean {
 			}
 			
 			// Embellish linked items with additional data: user, language, foreign site flag, etc.
-			embellishLinkedItems(this.links);
+			setUserAndLanguage(this.links);
+			identifyForeignItems(this.links);
 		}
 		return this.links;
 	}
@@ -543,7 +554,7 @@ public class Item extends CmsBean {
 			this.parentLinks = getLinkService().getParentLinks(getId());
 			
 			// Set the language on each linked item
-			embellishLinkedItems(this.parentLinks);
+			setUserAndLanguage(this.parentLinks);
 		}
 		
 		if (! includeBinding) {
@@ -807,6 +818,11 @@ public class Item extends CmsBean {
 		return this;
 	}
 
+	public Item setPath(Item parent) {
+		this.path = String.format("%s/%s", parent.isSiteRoot() ? "" : parent.getPath(), getSimpleName());
+		return this;
+	}
+
 	public Template getTemplate() {
 		return template;
 	}
@@ -993,14 +1009,23 @@ public class Item extends CmsBean {
 	}
 	
 	// Applies to both child AND parent links
-	private void embellishLinkedItems(List<Link> links) {
+	private void setUserAndLanguage(List<Link> links) {
 		if (links != null) {
 			Item i;
 			
 			for (Link l :  links) {
 				i = l.getChild();
 				i.setUser(getUser()).setLanguage(getLanguage());
-				
+			}
+		}
+	}
+
+	private void identifyForeignItems(List<Link> links) {
+		if (links != null) {
+			Item i;
+			
+			for (Link l :  links) {
+				i = l.getChild();
 				if (i.getSite().getId() != this.getSite().getId()) {
 					i.setForeigner(true);
 				}

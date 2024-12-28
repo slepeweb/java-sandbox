@@ -161,10 +161,10 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			// Cannot update the simplename of a root item
 			if (dbRecord.isRoot()) {
 				if (dbRecord.isSiteRoot()) {
-					i.setSimpleName("");
+					i.setSimpleNameOnly("");
 				}
 				else if (dbRecord.isContentRoot()) {
-					i.setSimpleName(Item.CONTENT_ROOT_PATH.substring(1));
+					i.setSimpleNameOnly(Item.CONTENT_ROOT_PATH.substring(1));
 				}
 			}
 			

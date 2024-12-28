@@ -136,7 +136,8 @@ public class CmsDeliveryServlet {
 			
 			if (item.getType().isMedia()) {
 				LOG.debug(LogUtil.compose("Streaming binary content ...", item));
-				String mediaType = item.getType().getShortMimeType();
+				String mediaType = view != null && view.equals("thumbnail") ? 
+						"jpg" : item.getType().getShortMimeType();
 				String servletPath = String.format("/stream/item/%s", mediaType);
 				req.getRequestDispatcher(servletPath).forward(req, res);
 			}

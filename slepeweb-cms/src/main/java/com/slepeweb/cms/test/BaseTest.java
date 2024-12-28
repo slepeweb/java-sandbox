@@ -78,7 +78,7 @@ public abstract class BaseTest {
 			Timestamp dateCreated, Timestamp dateUpdated, Site site, ItemType type, Template t) {
 		
 		Item i = CmsBeanFactory.makeItem(type.getName());
-		i.setName(name).setSimpleName(simplename).setPath(getPath(parent, simplename)).
+		i.setName(name).setSimpleNameOnly(simplename).setPath(parent).
 		setDateCreated(dateCreated).setDateUpdated(dateUpdated).
 		setSite(site).setType(type).setTemplate(t);
 	
@@ -101,7 +101,7 @@ public abstract class BaseTest {
 		
 		Product p = CmsBeanFactory.makeProduct();
 		p.setPartNum(partNum).setStock(stock).setPrice(price).setAlphaAxisId(alphaAxisId).setBetaAxisId(betaAxisId);
-		p.setName(name).setSimpleName(simplename).setPath(getPath(parent, simplename)).
+		p.setName(name).setSimpleNameOnly(simplename).setPath(getPath(parent, simplename)).
 		setDateCreated(dateCreated).setDateUpdated(dateUpdated).
 		setSite(site).setType(type).setTemplate(t);
 		p.setParent(parent);
