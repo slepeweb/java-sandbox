@@ -116,7 +116,7 @@ public class ProductServiceImpl extends ItemServiceImpl implements ProductServic
 		
 		// Manipulate source, and use it to save a new copy
 		Item i = source;
-		i.setName(name).setSimpleName(simplename).setId(-1L);
+		i.setName(name).setSimpleNameAndPath(simplename).setId(-1L);
 		source.setPartNum(partNum);
 		
 		Product p = save(source);

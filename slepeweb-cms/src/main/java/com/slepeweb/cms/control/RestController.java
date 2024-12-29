@@ -275,7 +275,7 @@ public class RestController extends BaseController {
 		String oldName = i.getName();
 		
 		i = i.setName(getParam(req, "name")).
-			setSimpleName(getParam(req, "simplename")).
+			setSimpleNameAndPath(getParam(req, "simplename")).
 			setDateUpdated(new Timestamp(System.currentTimeMillis())).
 			setSearchable(getBooleanParam(req, "searchable")).
 			setPublished(getBooleanParam(req, "published")).

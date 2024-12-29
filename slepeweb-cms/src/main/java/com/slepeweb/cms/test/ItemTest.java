@@ -172,7 +172,7 @@ public class ItemTest extends BaseTest {
 				
 				// Change simplename of news section
 				newsSectionItem = site.getItem("/news");
-				newsSectionItem.setSimpleName("newz");
+				newsSectionItem.setSimpleNameAndPath("newz");
 				newsSectionItem.save();
 				
 				// 4070: Assert path of news item has changed
@@ -190,7 +190,7 @@ public class ItemTest extends BaseTest {
 					else {
 						// Revert simplename change
 						newsSectionItem = site.getItem("/newz");
-						newsSectionItem.setSimpleName("news");
+						newsSectionItem.setSimpleNameAndPath("news");
 						newsSectionItem.save();
 						
 						// 4080: Assert path of news item has changed

@@ -75,7 +75,7 @@ public class ItemUpdateUndoServiceImpl implements ItemUpdateUndoService {
 				if (updateRecord.getAction() == Action.core) {							
 					dbRecord.
 						setName(i.getName()).
-						setSimpleName(i.getSimpleName()).
+						setSimpleNameAndPath(i.getSimpleName()).
 						setDateUpdated(i.getDateUpdated()).
 						setPublished(i.isPublished()).
 						setSearchable(i.isSearchable()).

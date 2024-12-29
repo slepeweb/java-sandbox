@@ -314,7 +314,7 @@ public class CommerceSetup {
 				
 				i.
 					setName(StringUtils.isBlank(currentRow.getName()) ? currentRow.getPartNum() : currentRow.getName()).
-					setSimpleName(currentRow.getPartNum()).
+					setSimpleNameAndPath(currentRow.getPartNum()).
 					setFieldValue(FieldName.TITLE, currentRow.getPartNum());
 				
 				if (i.isProduct()) {

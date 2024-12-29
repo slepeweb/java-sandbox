@@ -224,7 +224,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		else {
 			ni.
 				setName(name).
-				setSimpleNameOnly(simplename).
+				setSimpleName(simplename).
 				setPath(parent).
 				setVersion(1);
 		}

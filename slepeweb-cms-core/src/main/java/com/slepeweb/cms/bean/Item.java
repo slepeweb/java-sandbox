@@ -81,7 +81,7 @@ public class Item extends CmsBean {
 		if (obj instanceof Item) {
 			Item i = (Item) obj;
 			setName(i.getName());
-			setSimpleNameOnly(i.getSimpleName());
+			setSimpleName(i.getSimpleName());
 			setPath(i.getPath());
 			setDateCreated(i.getDateCreated());
 			setDateUpdated(i.getDateUpdated());
@@ -388,7 +388,7 @@ public class Item extends CmsBean {
 	}
 	
 	// This requires name property to have previously been set
-	public Item setSimpleNameOnly(String simpleName) {
+	public Item setSimpleName(String simpleName) {
 		this.simpleName = StringUtils.isBlank(simpleName) ? getDefaultSimplename() : simpleName;
 		return this;
 	}
@@ -397,8 +397,8 @@ public class Item extends CmsBean {
 	 * For a simplename change on an existing item, you also have to consider the affect on the
 	 * item path property.
 	 */
-	public Item setSimpleName(String simpleName) {
-		setSimpleNameOnly(simpleName);
+	public Item setSimpleNameAndPath(String simpleName) {
+		setSimpleName(simpleName);
 		
 		/*
 		 * If this item's id is set, then this code assumes that it already exists in

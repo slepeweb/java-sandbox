@@ -148,7 +148,7 @@ public class CmsBeanFactory {
 	private static Item proveItem(Site s, ItemType type, String name, String simpleName, String path) {
 		Item i = makeItem(type.getName()).
 			setName(name).
-			setSimpleNameOnly(simpleName).
+			setSimpleName(simpleName).
 			setPath(path).
 			setSite(s).
 			setType(type).

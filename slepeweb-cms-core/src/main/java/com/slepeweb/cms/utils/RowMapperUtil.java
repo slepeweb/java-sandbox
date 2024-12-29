@@ -96,7 +96,7 @@ public class RowMapperUtil {
 				setId(rs.getLong("id")).
 				setOrigId(rs.getLong("origid")).
 				setName(rs.getString("name")).
-				setSimpleNameOnly(rs.getString("simplename")).
+				setSimpleName(rs.getString("simplename")).
 				setPath(rs.getString("path")).
 				setOwnerId(rs.getLong("ownerid")).
 				setDateCreated(rs.getTimestamp("datecreated")).

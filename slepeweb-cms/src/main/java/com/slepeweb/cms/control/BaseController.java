@@ -261,7 +261,7 @@ public class BaseController {
 		Item i = CmsBeanFactory.makeItem(it.getName()).
 				setSite(parent.getSite()).
 				setName(name).
-				setSimpleNameOnly(simplename).
+				setSimpleName(simplename).
 				setPath(parent).
 				setTemplate(t).
 				setType(it).
