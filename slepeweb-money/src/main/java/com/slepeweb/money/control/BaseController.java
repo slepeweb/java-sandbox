@@ -6,9 +6,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -21,6 +18,7 @@ import com.slepeweb.money.bean.MultiSplitCounter;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.SplitInput;
+import com.slepeweb.money.bean.User;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
@@ -44,9 +42,6 @@ public class BaseController {
 	protected static final String ADHOC_MODE = "adhoc";
 
 	private static Logger LOG = Logger.getLogger(BaseController.class);
-	public static final String USER = "_user";
-	public static final String ADMIN_ROLE = "MONEY_ADMIN";
-	public static final String USER_ROLE = "MONEY_USER";
 	
 	@Autowired protected PayeeService payeeService;
 	@Autowired protected AccountService accountService;
@@ -55,6 +50,10 @@ public class BaseController {
 	@Autowired protected ScheduledTransactionService scheduledTransactionService;
 	@Autowired protected SolrService4Money solrService;
 	@Autowired protected SavedSearchService savedSearchService;
+	
+	protected User getUser(HttpServletRequest req) {
+		return (User) req.getSession().getAttribute(User.USER_ATTR);
+	}
 	
 	protected List<Payee> getAllPayees() {
 		List<Payee> payees = this.payeeService.getAll();
@@ -201,34 +200,6 @@ public class BaseController {
 		}
 		
 		return 0;
-	}
-	
-	@ModelAttribute(value=USER)
-	protected User getUser(@AuthenticationPrincipal User u) {
-		LOG.trace(String.format("Model attribute (_user): [%s]", u));
-		return u;
-	}
-	
-	
-	@ModelAttribute(value="_isUser")
-	protected boolean isUser(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, USER_ROLE);
-	}
-	
-	@ModelAttribute(value="_isAdmin")
-	protected boolean isAdmin(@AuthenticationPrincipal User u) {
-		return hasAuthority(u, ADMIN_ROLE);
-	}
-	
-	protected boolean hasAuthority(User u, String name) {
-		if (u != null) {
-			for (GrantedAuthority auth : u.getAuthorities()) {
-				if (auth.getAuthority().equals(name)) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 	
 	@ModelAttribute(value="_ctxPath")

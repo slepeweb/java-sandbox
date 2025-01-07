@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +14,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.NamedList;
 import com.slepeweb.money.bean.Payee;
+import com.slepeweb.money.bean.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -97,10 +97,10 @@ public class PayeeController extends BaseController {
 	public RedirectView delete(@PathVariable long payeeId, HttpServletRequest req, ModelMap model) {
 		
 		String flash;		
-		User u = (User) model.get(USER);
+		User u = getUser(req);
 		long numDeletables = this.transactionService.getNumTransactionsForPayee(payeeId);
 		
-		if ((u != null && u.getUsername().equals("MONEY_ADMIN")) || numDeletables == 0) {		
+		if ((u != null && u.isAdmin()) || numDeletables == 0) {		
 			try {
 				this.payeeService.delete(payeeId);
 				flash="success|Payee successfully deleted";

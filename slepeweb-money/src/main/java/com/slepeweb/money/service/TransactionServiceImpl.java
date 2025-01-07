@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
@@ -251,16 +252,21 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	}
 
 	public Transaction get(long id) {
-		return get(SELECT + "where t.id = ?", new Object[]{id});
+		return get(SELECT + "where t.id = ?", id);
 	}
 
 	public Transaction getByOrigId(int source, long origId) {
-		return get(SELECT + "where t.source = ? and t.origid = ?", new Object[]{source, origId});
+		return get(SELECT + "where t.source = ? and t.origid = ?", source, origId);
 	}
 	
-	private Transaction get(String sql, Object[] params) {
-		Transaction t = (Transaction) getFirstInList(this.jdbcTemplate.query(
-				sql, params, new RowMapperUtil.TransactionMapper()));
+	private Transaction get(String sql, Object... params) {
+		Transaction t = null;
+		
+		try {
+			t = this.jdbcTemplate.queryForObject(
+				sql, new RowMapperUtil.TransactionMapper(), params);
+		}
+		catch (EmptyResultDataAccessException e) {}
 		
 		if (t != null) {
 			if (t.isSplit()) {
@@ -280,8 +286,9 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				first ? "" : "desc");
 		
 		List<Timestamp> list = this.jdbcTemplate.query(
-				sql,
-				new Object[]{accountId}, new RowMapperUtil.TransactionDateMapper());
+				sql, 
+				new RowMapperUtil.TransactionDateMapper(),
+				new Object[]{accountId});
 		
 		if (list.size() == 1) {
 			return list.get(0);
@@ -293,49 +300,49 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	public List<Transaction> getTransactionsForAccount(long accountId) {
 		return getTransactions(
 				SELECT + "where t.accountid = ? order by t.entered", 
-				new Object[]{accountId});
+				accountId);
 	}
 	
 	public List<Transaction> getTransactionsByDate(Date from, Date to) {
 		return getTransactions(
 				SELECT + "where t.entered >= ? and t.entered <= ? order by t.entered", 
-				new Object[]{from, to});
+				from, to);
 	}
 	
 	public List<Transaction> getAll() {
-		return getTransactions(SELECT + "order by t.entered", new Object[]{});
+		return getTransactions(SELECT + "order by t.entered", 0L);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public long getNumTransactionsForAccount(long accountId) {
-		return this.jdbcTemplate.queryForLong(
+		return this.jdbcTemplate.queryForObject(
 				"select count(*) from transaction where accountid = ?", 
-				new Object[]{accountId});
+				Long.class,
+				accountId);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public long getNumTransactionsForPayee(long payeeId) {
-		return this.jdbcTemplate.queryForLong(
+		return this.jdbcTemplate.queryForObject(
 				"select count(*) from transaction where payeeid = ?", 
-				new Object[]{payeeId});
+				Long.class,
+				payeeId);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public long getNumTransactionsForCategory(long categoryId) {
-		return this.jdbcTemplate.queryForLong(
+		return this.jdbcTemplate.queryForObject(
 				"select count(*) from transaction where categoryid = ?", 
-				new Object[]{categoryId});
+				Long.class,
+				categoryId);
 	}
 	
 	public List<Transaction> getTransactionsForAccount(long accountId, Timestamp from, Timestamp to) {
 		return getTransactions(
 				SELECT + "where t.accountid = ? and t.entered >= ? and t.entered <= ? order by t.entered", 
-				new Object[]{accountId, from, to});
+				accountId, from, to);
 	}
 	
-	private List<Transaction> getTransactions(String sql, Object[] params) {
+	private List<Transaction> getTransactions(String sql, Object... params) {
 		List<Transaction> list = this.jdbcTemplate.query(
-				sql, params, new RowMapperUtil.TransactionMapper());
+				sql, new RowMapperUtil.TransactionMapper(), params);
 		
 		for (Transaction t : list) {
 			if (t.isSplit()) {
@@ -354,7 +361,6 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return getBalance(accountId, null);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public long getBalance(long accountId, Timestamp to) {
 		StringBuilder sb = new StringBuilder("select sum(amount) from transaction where accountid = ? ");
 		int arrlen = 1 + (to != null ? 1 : 0);
@@ -367,7 +373,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			params[index++] = to;
 		}		
 		
-		long sum = this.jdbcTemplate.queryForLong(sb.toString(), params);
+		long sum = this.jdbcTemplate.queryForObject(sb.toString(), Long.class, params);
 		Account a = this.accountService.get(accountId);
 		return a.getOpeningBalance() + sum;
 	}

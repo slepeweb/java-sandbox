@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Account;
@@ -76,20 +77,25 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	}
 
 	public Account get(String name) {
-		return get("select * from account where name = ?", new Object[]{name});
+		return get("select * from account where name = ?", name);
 	}
 
 	public Account get(long id) {
-		return get("select * from account where id = ?", new Object[]{id});
+		return get("select * from account where id = ?", id);
 	}
 	
 	public Account getByOrigId(long id) {
-		return get("select * from account where origid = ?", new Object[]{id});
+		return get("select * from account where origid = ?", id);
 	}
 	
-	private Account get(String sql, Object[] params) {
-		return (Account) getFirstInList(this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.AccountMapper()));
+	private Account get(String sql, Object... params) {
+		try {
+			return this.jdbcTemplate.queryForObject(
+				sql, new RowMapperUtil.AccountMapper(), params);
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public List<Account> getAll() {

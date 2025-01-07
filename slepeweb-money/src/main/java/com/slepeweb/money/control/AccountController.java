@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +13,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.User;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.TransactionService;
 
@@ -93,10 +93,10 @@ public class AccountController extends BaseController {
 	public RedirectView delete(@PathVariable long accountId, HttpServletRequest req, ModelMap model) {
 		
 		String flash;		
-		User u = (User) model.get(USER);
+		User u = getUser(req);
 		long numDeletables = this.transactionService.getNumTransactionsForAccount(accountId);
 		
-		if (hasAuthority(u, ADMIN_ROLE) || numDeletables == 0) {		
+		if (u.isAdmin() || numDeletables == 0) {		
 			try {
 				this.accountService.delete(accountId);
 				flash="success|Account successfully deleted";

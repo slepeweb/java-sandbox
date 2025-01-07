@@ -1,18 +1,29 @@
 package com.slepeweb.money.control;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Dashboard;
 import com.slepeweb.money.bean.DashboardAccountGroup;
+import com.slepeweb.money.bean.LoginResponse;
+import com.slepeweb.money.bean.User;
+import com.slepeweb.money.service.LoginService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class PageController extends BaseController {
+	
+	@Autowired private LoginService loginService;
 	
 	@RequestMapping(value="/")	
 	public String dashboard(ModelMap model) { 
@@ -39,6 +50,7 @@ public class PageController extends BaseController {
 
 	@RequestMapping(value="/login")
 	public String loginForm(
+		HttpServletRequest req,
 		@RequestParam(value="error", required = false) String error,
 		@RequestParam(value="logout", required = false) String logout,
 		ModelMap model) {
@@ -48,10 +60,29 @@ public class PageController extends BaseController {
 		}
  
 		if (logout != null) {
+			req.getSession().removeAttribute(User.USER_ATTR);
 			model.addAttribute("msg", "You've been successfully logged out.");
 		}
  
 		return "loginForm"; 
+	}
+	
+	@RequestMapping(value="/login", method=RequestMethod.POST)
+	public String loginSubmission (
+			HttpServletRequest req,
+			HttpServletResponse res,
+			@RequestParam(value="alias", required = true) String alias,
+			@RequestParam(value="password", required = true) String password,
+			ModelMap model) throws IOException {
+			
+		LoginResponse resp = this.loginService.login(alias, password);
+		if (resp.isSuccess()) {
+			req.getSession().setAttribute(User.USER_ATTR, resp.getUser());
+			return dashboard(model);
+		}
+		
+		res.sendRedirect(String.format("%s/login?error=%s", req.getContextPath(), resp.getErrorMessage()));
+		return null;
 	}
 		
 }

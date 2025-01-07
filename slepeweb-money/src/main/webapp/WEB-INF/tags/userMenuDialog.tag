@@ -7,7 +7,7 @@
 <div id="${_menuDialogId}">
 	<ul>
 		<li class="${_menuCloseClass}"><i class="far fa-window-close"></i></li>
-		<li><a href="${_ctxPath}/j_spring_security_logout"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Logout</a></li>
+		<li><a href="${_ctxPath}/login?logout"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Logout</a></li>
 	</ul>
 </div>
 

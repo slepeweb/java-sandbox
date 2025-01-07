@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.ScheduledTransaction;
@@ -130,27 +131,29 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	}
 
 	public ScheduledTransaction get(long id) {
-		return get(SELECT + "where t.id = ?", new Object[]{id});
+		return get(SELECT + "where t.id = ?", id);
 	}
 
-	private ScheduledTransaction get(String sql, Object[] params) {
-		ScheduledTransaction t = (ScheduledTransaction) getFirstInList(this.jdbcTemplate.query(
-				sql, params, new RowMapperUtil.ScheduledTransactionMapper()));
-		
-		if (t != null && t.isSplit()) {
-			t.setSplits(this.scheduledSplitService);
+	private ScheduledTransaction get(String sql, Object... params) {
+		try {
+			ScheduledTransaction t = this.jdbcTemplate.queryForObject(
+					sql, new RowMapperUtil.ScheduledTransactionMapper(), params);
+			
+			if (t != null && t.isSplit()) {
+				t.setSplits(this.scheduledSplitService);
+			}
+	
+			return t;
 		}
-
-		return t;
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public List<ScheduledTransaction> getAll() {
-		return getTransactions(SELECT + "order by t.label", new Object[]{});
-	}
-	
-	private List<ScheduledTransaction> getTransactions(String sql, Object[] params) {
+		String sql = SELECT + "order by t.label";
 		List<ScheduledTransaction> all = this.jdbcTemplate.query(
-				sql, params, new RowMapperUtil.ScheduledTransactionMapper());
+				sql, new RowMapperUtil.ScheduledTransactionMapper());
 		
 		for (ScheduledTransaction scht : all) {
 			if (scht.isSplit()) {

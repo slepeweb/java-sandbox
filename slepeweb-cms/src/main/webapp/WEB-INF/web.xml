@@ -7,7 +7,6 @@
 	
   <display-name>Slepeweb CMS</display-name>
   
-  <!-- Filter to apply cache times to static resources -->
   <filter>
     <filter-name>loginFilter</filter-name>
     <filter-class>com.slepeweb.cms.filter.LoginFilter</filter-class>

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Property;
@@ -57,10 +58,15 @@ public class PropertyServiceImpl extends BaseServiceImpl implements PropertyServ
 	}
 
 	public Property get(String name) {
-		return (Property) getFirstInList(this.jdbcTemplate.query(
-			"select * from property where name = ?", 
-			new Object[]{name}, 
-			new RowMapperUtil.PropertyMapper()));
+		try {
+			return this.jdbcTemplate.queryForObject(
+				"select * from property where name = ?", 
+				new RowMapperUtil.PropertyMapper(), 
+				name);
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public List<Property> getAll() {

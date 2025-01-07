@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Category;
@@ -100,16 +101,21 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 	}
 
 	public Category get(long id) {
-		return get("select * from category where id = ?", new Object[]{id});
+		return get("select * from category where id = ?", id);
 	}
 	
 	public Category getByOrigId(long id) {
-		return get("select * from category where origid = ?", new Object[]{id});
+		return get("select * from category where origid = ?", id);
 	}
 	
-	private Category get(String sql, Object[] params) {
-		return (Category) getFirstInList(this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.CategoryMapper()));
+	private Category get(String sql, Object... params) {
+		try {
+			return this.jdbcTemplate.queryForObject(
+				sql, new RowMapperUtil.CategoryMapper(), params);
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public List<Category> getAll() {
@@ -124,8 +130,8 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 
 	public List<String> getAllMinorValues(String major) {
 		return this.jdbcTemplate.queryForList(
-			"select distinct minor from category where major = ? order by minor", new Object[]{major}, 
-				java.lang.String.class);
+			"select distinct minor from category where major = ? order by minor", 
+				java.lang.String.class, major);
 	}
 
 	public int delete(long id) {

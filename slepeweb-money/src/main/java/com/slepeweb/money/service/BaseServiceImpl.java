@@ -10,9 +10,8 @@ public class BaseServiceImpl {
 	
 	@Autowired protected JdbcTemplate jdbcTemplate;	
 	
-	@SuppressWarnings("deprecation")
 	protected Long getLastInsertId() {
-		return this.jdbcTemplate.queryForLong("select last_insert_id()");
+		return this.jdbcTemplate.queryForObject("select last_insert_id()", Long.class);
 	}
 	
 	protected <T> Object getFirstInList(List<T> list) {

@@ -18,6 +18,7 @@ import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.Transfer;
+import com.slepeweb.money.bean.User;
 
 public class RowMapperUtil {
 
@@ -229,6 +230,17 @@ public class RowMapperUtil {
 	public static final class PropertyMapper implements RowMapper<Property> {
 		public Property mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new Property(rs.getString("name"), rs.getString("value"));
+		}
+	}
+	
+	public static final class UserMapper implements RowMapper<User> {
+		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new User().
+					setName(rs.getString("name")).
+					setAlias(rs.getString("alias")).
+					setPassword(rs.getString("password")).
+					setEnabled(rs.getBoolean("enabled")).
+					setRoles(rs.getString("roles"));
 		}
 	}
 }

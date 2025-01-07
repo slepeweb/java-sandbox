@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.SplitTransaction;
@@ -67,10 +68,15 @@ public class SplitTransactionServiceImpl extends BaseServiceImpl implements Spli
 	}
 
 	public List<SplitTransaction> get(Transaction t) {
-		return this.jdbcTemplate.query(
-				SELECT + " where st.transactionid = ?", 
-				new Object[]{t.getId()}, 
-				new RowMapperUtil.SplitTransactionMapper());
+		try {
+			return this.jdbcTemplate.query(
+					SELECT + " where st.transactionid = ?", 
+					new RowMapperUtil.SplitTransactionMapper(), 
+					t.getId());
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public Transaction delete(Transaction t) {

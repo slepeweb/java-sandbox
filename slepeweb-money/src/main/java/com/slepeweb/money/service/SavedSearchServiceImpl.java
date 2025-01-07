@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.SavedSearch;
@@ -72,10 +73,15 @@ public class SavedSearchServiceImpl extends BaseServiceImpl implements SavedSear
 	}
 
 	public SavedSearch get(long id) {
-		return (SavedSearch) getFirstInList(this.jdbcTemplate.query(
-				"select * from search where id = ?", 
-				new Object[] {id}, 
-				new RowMapperUtil.SavedSearchMapper()));
+		try {
+			return this.jdbcTemplate.queryForObject(
+					"select * from search where id = ?", 
+					new RowMapperUtil.SavedSearchMapper(), 
+					id);
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 	
 	public List<SavedSearch> getAll() {

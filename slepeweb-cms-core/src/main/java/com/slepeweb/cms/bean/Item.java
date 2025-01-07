@@ -1026,9 +1026,7 @@ public class Item extends CmsBean {
 			
 			for (Link l :  links) {
 				i = l.getChild();
-				if (i.getSite().getId() != this.getSite().getId()) {
-					i.setForeigner(true);
-				}
+				i.setForeigner(i.getSite().getId().longValue() != this.getSite().getId().longValue());
 			}
 		}
 	}

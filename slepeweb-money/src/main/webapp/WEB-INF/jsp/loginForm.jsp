@@ -10,7 +10,7 @@
 	<p>Please enter your login details:</p>
 	
 	<c:if test="${not _isAuthor}">	
-		<form id="login" method="post" action="<c:url value="/j_spring_security_check" />">
+		<form id="login" method="post" action="">
 			<table>
 				<tr>
 					<td class="heading"><label for="alias">User name</label></td>

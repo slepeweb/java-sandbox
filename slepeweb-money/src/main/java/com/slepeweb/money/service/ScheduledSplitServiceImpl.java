@@ -69,8 +69,8 @@ public class ScheduledSplitServiceImpl extends BaseServiceImpl implements Schedu
 	public List<SplitTransaction> get(long id) {
 		return this.jdbcTemplate.query(
 				SELECT + " where st.scheduledtransactionid = ?", 
-				new Object[]{id}, 
-				new RowMapperUtil.ScheduledSplitMapper());
+				new RowMapperUtil.ScheduledSplitMapper(), 
+				id);
 	}
 
 	public ScheduledTransaction delete(ScheduledTransaction t) {

@@ -128,6 +128,7 @@ create table scheduledsplit
 	constraint foreign key (categoryid) references category(id) on delete cascade
 ) ENGINE=InnoDB;
 
+
 create table role
 (
 	id int not null auto_increment,
@@ -143,7 +144,7 @@ create table user
 	alias varchar(32),
 	password varchar(255),
 	enabled smallint,
-	demo_user smallint,
+	roles varchar(255),
 	primary key (id),
 	unique key idx_user_alias (alias)
 ) ENGINE=InnoDB;

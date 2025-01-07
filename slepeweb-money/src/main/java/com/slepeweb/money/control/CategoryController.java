@@ -3,7 +3,6 @@ package com.slepeweb.money.control;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +13,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.NamedList;
+import com.slepeweb.money.bean.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -102,10 +102,10 @@ public class CategoryController extends BaseController {
 	public RedirectView delete(@PathVariable long categoryId, HttpServletRequest req, ModelMap model) {
 		
 		String flash;
-		User u = (User) model.get(USER);
+		User u = getUser(req);
 		long numDeletables = this.transactionService.getNumTransactionsForCategory(categoryId);
 		
-		if ((u != null && u.getUsername().equals("MONEY_ADMIN")) || numDeletables == 0) {		
+		if ((u != null && u.isAdmin()) || numDeletables == 0) {		
 			try {
 				this.categoryService.delete(categoryId);
 				flash="success|Category successfully deleted";

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.bean.Payee;
@@ -91,16 +92,21 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 	}
 
 	public Payee get(long id) {
-		return get("select * from payee where id = ?", new Object[]{id});
+		return get("select * from payee where id = ?", id);
 	}
 	
 	public Payee getByOrigId(long id) {
-		return get("select * from payee where origid = ?", new Object[]{id});
+		return get("select * from payee where origid = ?", id);
 	}
 	
-	private Payee get(String sql, Object[] params) {
-		return (Payee) getFirstInList(this.jdbcTemplate.query(
-			sql, params, new RowMapperUtil.PayeeMapper()));
+	private Payee get(String sql, Object... params) {
+		try {
+		return this.jdbcTemplate.queryForObject(
+			sql, new RowMapperUtil.PayeeMapper(), params);
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public List<Payee> getAll() {
