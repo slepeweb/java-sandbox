@@ -60,12 +60,19 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
 	public Account update(Account dbRecord, Account a) {
 		if (! dbRecord.equals(a)) {
+			boolean nameChanged = ! dbRecord.getName().equals(a.getName());
+			
 			dbRecord.assimilate(a);
 			
 			this.jdbcTemplate.update(
 					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getType(), dbRecord.getOpeningBalance(), dbRecord.isClosed(), 
 					dbRecord.getNote(), dbRecord.getId());
+			
+			if (nameChanged) {
+				// Update transaction documents in solr, which store account name, NOT id.
+				this.solrService4Money.save(this.transactionService.getTransactionsForAccount(dbRecord.getId()));
+			}
 			
 			LOG.info(compose("Updated account", a));
 		}
@@ -124,10 +131,14 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
 	}
 	
+	/*
+	 * It's only possible to delete an account if there are ZERO transactions for the account.
+	 */
 	public int delete(long id) {
-		Account a = get(id);
-		int num = this.jdbcTemplate.update("delete from account where id = ?", id);
-		this.solrService4Money.removeTransactionsByAccount(a.getName());
-		return num;
+		if (this.transactionService.getNumTransactionsForAccount(id) > 0) {
+			return 0;
+		}
+
+		return this.jdbcTemplate.update("delete from account where id = ?", id);
 	}
 }

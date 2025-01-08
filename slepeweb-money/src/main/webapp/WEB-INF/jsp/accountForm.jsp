@@ -63,9 +63,8 @@
 			</table> 
 			
 	    <input type="submit" value="${_buttonLabel}" /> 
-			<c:if test="${_formMode eq 'update'}">
-	    	<input type="button" value="Delete account?" id="delete-button" /> 
-	    </c:if>
+			<mny:deleteButtonEnabler entity="account" />
+
 	    <input type="hidden" name="id" value="${_account.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   
 	</form>		  	

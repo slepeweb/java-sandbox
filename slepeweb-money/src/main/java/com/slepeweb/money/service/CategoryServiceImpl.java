@@ -18,6 +18,8 @@ import com.slepeweb.money.except.MissingDataException;
 public class CategoryServiceImpl extends BaseServiceImpl implements CategoryService {
 	
 	private static Logger LOG = Logger.getLogger(CategoryServiceImpl.class);
+
+	@Autowired private TransactionService transactionService;
 	@Autowired private SolrService4Money solrService4Money;
 	
 	public Category save(Category c) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
@@ -69,6 +71,9 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 			this.jdbcTemplate.update(
 					"update category set major = ?, minor = ?, expense = ? where id = ?", 
 					dbRecord.getMajor(), dbRecord.getMinor(), dbRecord.isExpense(), dbRecord.getId());
+			
+			// Update transaction documents in solr, which store category name, NOT id.
+			this.solrService4Money.save(this.transactionService.getTransactionsForCategory(dbRecord.getId()));
 			
 			LOG.info(compose("Updated category", c));
 		}
@@ -134,10 +139,14 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 				java.lang.String.class, major);
 	}
 
+	/*
+	 * It's only possible to delete a category if there are ZERO transactions for the category.
+	 */
 	public int delete(long id) {
-		Category c = get(id);
-		int num = this.jdbcTemplate.update("delete from category where id = ?", id);
-		this.solrService4Money.removeTransactionsByCategory(c.getMajor(), c.getMinor());
-		return num;
-	}	
+		if (this.transactionService.getNumTransactionsForCategory(id) > 0) {
+			return 0;
+		}
+
+		return this.jdbcTemplate.update("delete from category where id = ?", id);
+	}
 }

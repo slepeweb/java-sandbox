@@ -33,9 +33,8 @@
 			</table> 
 			
 	    <input type="submit" value="${_buttonLabel}" /> 
-			<c:if test="${_formMode eq 'update'}">
-	    	<input type="button" value="Delete payee?" id="delete-button" /> 
-	    </c:if>
+			<mny:deleteButtonEnabler entity="payee" />
+
 	    <input type="hidden" name="id" value="${_payee.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   
 	</form>		  	

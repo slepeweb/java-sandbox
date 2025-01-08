@@ -16,6 +16,8 @@ public interface TransactionService {
 	List<Transaction> getAll();
 	List<Transaction> getTransactionsForAccount(long id);
 	List<Transaction> getTransactionsForAccount(long id, Timestamp from, Timestamp to);
+	List<Transaction> getTransactionsForPayee(long id);
+	List<Transaction> getTransactionsForCategory(long id);
 	List<Transaction> getTransactionsByDate(Date from, Date to);
 	Timestamp getTransactionDateForAccount(long accountId, boolean first);
 	Transaction save(Transaction p) throws MissingDataException, DuplicateItemException, DataInconsistencyException;

@@ -303,6 +303,18 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				accountId);
 	}
 	
+	public List<Transaction> getTransactionsForPayee(long payeeId) {
+		return getTransactions(
+				SELECT + "where t.payeeid = ? order by t.entered", 
+				payeeId);
+	}
+	
+	public List<Transaction> getTransactionsForCategory(long categoryId) {
+		return getTransactions(
+				SELECT + "where t.categoryid = ? order by t.entered", 
+				categoryId);
+	}
+	
 	public List<Transaction> getTransactionsByDate(Date from, Date to) {
 		return getTransactions(
 				SELECT + "where t.entered >= ? and t.entered <= ? order by t.entered", 

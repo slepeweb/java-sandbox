@@ -18,6 +18,8 @@ import com.slepeweb.money.except.MissingDataException;
 public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 	
 	private static Logger LOG = Logger.getLogger(PayeeServiceImpl.class);
+	
+	@Autowired private TransactionService transactionService;
 	@Autowired private SolrService4Money solrService4Money;
 	
 	public Payee save(Payee pe) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
@@ -65,6 +67,9 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 			this.jdbcTemplate.update(
 					"update payee set name = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getId());
+			
+			// Update transaction documents in solr, which store payee name, NOT id.
+			this.solrService4Money.save(this.transactionService.getTransactionsForPayee(dbRecord.getId()));
 			
 			LOG.info(compose("Updated payee", pe));
 		}
@@ -114,10 +119,14 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 			"select * from payee order by name", new RowMapperUtil.PayeeMapper());
 	}
 	
+	/*
+	 * It's only possible to delete a payee if there are ZERO transactions for the payee.
+	 */
 	public int delete(long id) {
-		Payee p = get(id);
-		int num = this.jdbcTemplate.update("delete from payee where id = ?", id);
-		this.solrService4Money.removeTransactionsByPayee(p.getName());
-		return num;
+		if (this.transactionService.getNumTransactionsForPayee(id) > 0) {
+			return 0;
+		}
+		
+		return this.jdbcTemplate.update("delete from payee where id = ?", id);
 	}	
 }

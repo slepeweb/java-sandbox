@@ -54,10 +54,9 @@
 		    </tr>
 			</table> 
 			
-	    <input type="submit" value="${_buttonLabel}" /> 
-			<c:if test="${_formMode eq 'update'}">
-	    	<input type="button" value="Delete category?" id="delete-button" /> 
-	    </c:if>
+	    <input type="submit" value="${_buttonLabel}" /> 	    
+			<mny:deleteButtonEnabler entity="category" />
+	    
 	    <input type="hidden" name="id" value="${_category.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   
 	</form>		  	
