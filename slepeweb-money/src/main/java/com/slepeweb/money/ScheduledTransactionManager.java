@@ -57,18 +57,18 @@ public class ScheduledTransactionManager {
 	        JobDataMap params = new JobDataMap(map);
 
 	        JobDetail job = JobBuilder.newJob(ScheduledTransactionTask.class).
-	        		withIdentity("job1", "group1").
+	        		withIdentity("scheduler", "transactions").
 	        		usingJobData(params).
 	        		build();
 	        LOG.info("Built the job detail");
 
 	        Trigger trigger = TriggerBuilder.newTrigger().
-	        		withIdentity("trigger1", "group1").
+	        		withIdentity("trigger1", "transactions").
 	        		startNow().
 	        		withSchedule(
 	        				SimpleScheduleBuilder.
 	        				simpleSchedule().
-	        				withIntervalInMinutes(60).
+	        				withIntervalInHours(24).
 	        				repeatForever()
 	        		).
 	        		build();

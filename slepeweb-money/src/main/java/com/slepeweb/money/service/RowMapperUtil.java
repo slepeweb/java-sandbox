@@ -177,7 +177,9 @@ public class RowMapperUtil {
 			ScheduledTransaction scht = 
 					new ScheduledTransaction().
 					setLabel(rs.getString("label")).
-					setDay(rs.getInt("dayofmonth"));
+					setNextDate(rs.getTimestamp("nextdate")).
+					setPeriod(rs.getString("period")).
+					setEnabled(rs.getBoolean("enabled"));
 			
 			scht.
 					setAccount(
@@ -194,7 +196,6 @@ public class RowMapperUtil {
 							setMajor(rs.getString("major")).
 							setMinor(rs.getString("minor"))).
 					setSplit(rs.getBoolean("split")).
-					setEntered(rs.getTimestamp("lastentered")).
 					setAmount(rs.getLong("amount")).
 					setReference(rs.getString("reference")).
 					setMemo(rs.getString("memo")).

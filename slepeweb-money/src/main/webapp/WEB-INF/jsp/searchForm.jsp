@@ -13,7 +13,7 @@
 	<c:set var="_formActionUrl" scope="request">/search/save/${_ss.id }</c:set>
 </c:when></c:choose>
 
-<c:set var="_extraCss" scope="request">
+<c:set var="_extraInPageCss" scope="request">
 	.ui-autocomplete {
 		font-size: 1.0em;
 	}

@@ -289,6 +289,10 @@ public class TransactionController extends BaseController {
 			setAmount(Util.parsePounds(req.getParameter("amount")) * multiplier).
 			setSplit(isSplit);
 		
+		if (! isUpdateMode) {
+			t.setSource(3);
+		}
+		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
 			String countersJson = req.getParameter("counterStore");

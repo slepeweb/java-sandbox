@@ -4,7 +4,7 @@
 	
 <mny:flash />
 
-<c:set var="_extraCss" scope="request">
+<c:set var="_extraInPageCss" scope="request">
 	#saved-search-identifier {
 		width: 50%;
 		display: inline;

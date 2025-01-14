@@ -215,6 +215,21 @@ _cms.field.onpageload = function() {
 		_cms.field.widefieldInsert('<p></p>')
 	})
 
+	$("div#widefield-code-icon").click(function(e) {
+		_cms.field.widefieldInsert('<code></code>')
+	})
+
+	$("div#widefield-ul-icon").click(function(e) {
+		_cms.field.widefieldInsert(`<ul>
+	<li></li>
+	<li></li>
+	<li></li>
+	<li></li>
+	<li></li>
+	<li></li>
+</ul>`)
+	})
+
 	$("div#widefield-h2-icon").click(function(e) {
 		_cms.field.widefieldInsert('<h2></h2>')
 	})

@@ -1,6 +1,8 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
+<c:set var="_extraJs" scope="request" value="search.js,datepicker.js" />
+
 <!-- advancedSearchForm.tag -->
 
 <c:set var="_selectedAccountId" value="${_params.accountIdStr}" />
@@ -18,7 +20,6 @@
 <mny:multiCategoryInputSupport />
 <mny:multiCategoryJavascript />
 <mny:minorCategoryUpdatesJavascript />
-<mny:payeeAutocompleterJavascript />
 
 <form id="advanced-search-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">	  
     <table id="multi-category-groupings">
@@ -129,17 +130,4 @@
 
 </form>		  	
 
-<script>
-	$(function() {
-		$(".datepicker").datepicker({
-			dateFormat: "yy-mm-dd",
-			changeMonth: true,
-			changeYear: true
-		});
-		
-		$("#cancel-button").click(function(e){
-			window.location = webContext + "/search/list"
-		});		
-	});
-</script>
 	

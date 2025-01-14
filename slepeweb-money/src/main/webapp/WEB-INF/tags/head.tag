@@ -6,38 +6,35 @@
 
 <link rel="stylesheet" href="${_ctxPath}/resources/css/normalize.css" />
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css" type="text/css">
-<link href="${_ctxPath}/resources/css/colorbox.css" rel="stylesheet" type="text/css">
+<%-- <link href="${_ctxPath}/resources/css/colorbox.css" rel="stylesheet" type="text/css"> --%>
 <link rel="stylesheet" href="${_ctxPath}/resources/css/money.css" />
-
-<script src="${_ctxPath}/resources/js/jquery-1.12.4.min.js"></script>
-<script src="${_ctxPath}/resources/js/jquery-ui-1.12.1.min.js"></script>
-<!-- <script src="//code.jquery.com/jquery-1.12.4.js"></script> -->
-<!-- <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
-
-<!-- <script src="${_ctxPath}/resources/js/jquery.colorbox-min.js"></script> -->
-<!-- <script src="/resources/js/colorbox-impl.js"></script> -->
-
-<script src="${_ctxPath}/resources/js/money.js"></script>
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" 
 	integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" 
 	crossorigin="anonymous">
-	
-<c:if test="${not empty _extraCss}">
+
+<script src="${_ctxPath}/resources/js/jquery-1.12.4.min.js"></script>
+<script src="${_ctxPath}/resources/js/jquery-ui-1.12.1.min.js"></script>
+
+<script>
+	var webContext = '${_ctxPath}';
+</script>
+
+<script src="${_ctxPath}/resources/js/money.js"></script>
+
+<c:if test="${not empty _extraJs}">
+	<c:forTokens items="${_extraJs}" delims="," var="filename">
+		<script src="${_ctxPath}/resources/js/${filename}"></script>
+	</c:forTokens>
+</c:if>
+
+<c:if test="${not empty _extraInPageCss}">
 	<style>
-		${_extraCss}
+		${_extraInPageCss}
 	</style>
 </c:if>
 
-<c:if test="${not empty _extraJs}">
+<c:if test="${not empty _extraInPageJs}">
 	<script>
-		${_extraJs}
+		${_extraInPageJs}
 	</script>
 </c:if>
-
-<c:if test="${not empty _headExtra}">
-	${_headExtra}
-</c:if>
-
-<script>
-	var webContext = "${_ctxPath}";
-</script>

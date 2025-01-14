@@ -36,7 +36,7 @@ public class ScheduledTransactionController extends BaseController {
 		model.addAttribute("_formMode", mode);
 		model.addAttribute("_allAccounts", allAccounts);
 		model.addAttribute("_allPayees", this.payeeService.getAll());		
-		model.addAttribute("_allMajorCategories",allMajors );		
+		model.addAttribute("_allMajorCategories", allMajors );		
 		model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
 		
 		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
@@ -95,7 +95,12 @@ public class ScheduledTransactionController extends BaseController {
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	public RedirectView save(HttpServletRequest req, ModelMap model) {
 		
-		boolean isSplit = req.getParameter("paymenttype").equals("split");
+		// Payment type is set by radio input, and so can only have one value
+		String paymentType = req.getParameter("paymenttype");
+		boolean isSplit = paymentType.equals("split");
+		boolean isTransfer = paymentType.equals("transfer");
+		boolean isStandard = ! (isSplit || isTransfer);
+		
 		long multiplier = req.getParameter("debitorcredit").equals("debit") ? -1L : 1L;
 
 		String flash;	
@@ -104,7 +109,7 @@ public class ScheduledTransactionController extends BaseController {
 		
 		Account m = null;
 		String mirror = req.getParameter("xferaccount");
-		if (StringUtils.isNotBlank(mirror)) {
+		if (isTransfer && StringUtils.isNotBlank(mirror)) {
 			m = this.accountService.get(Long.valueOf(mirror));
 		}
 		
@@ -113,15 +118,21 @@ public class ScheduledTransactionController extends BaseController {
 			p = this.payeeService.get("");
 		}
 		
-		Category c = this.categoryService.get(req.getParameter("major"), req.getParameter("minor"));
+		Category c = null;
+		if (isStandard) {
+			c = this.categoryService.get(req.getParameter("major"), req.getParameter("minor"));
+		}
+
 		if (c == null) {
 			c = this.categoryService.get("", "");
 		}
-		
+
 		ScheduledTransaction scht = new ScheduledTransaction().
 				setLabel(req.getParameter("label")).
-				setDay(Integer.parseInt(req.getParameter("day"))).
-				setMirror(m);
+				setNextDate(Util.parseTimestamp(req.getParameter("nextdate"))).
+				setPeriod(req.getParameter("period")).
+				setMirror(m).
+				setEnabled(StringUtils.isNotBlank(req.getParameter("enabled")));
 
 		scht.
 				setAccount(a).
@@ -168,8 +179,7 @@ public class ScheduledTransactionController extends BaseController {
 				}
 			}
 			while (index > 0);
-		}
-		
+		}		
 		
 		try {
 			scht = this.scheduledTransactionService.save(scht);

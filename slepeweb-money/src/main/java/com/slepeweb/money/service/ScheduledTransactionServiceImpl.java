@@ -32,9 +32,9 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 					"m.id as mirrorid, m.name as mirrorname, " +
 					"p.id as payeeid, p.name as payeename, " +
 					"c.id as categoryid, c.major, c.minor, " +
-					"t.id, t.label, t.dayofmonth, " +
-					"t.lastentered, t.memo, t.reference, t.amount, " +
-					"t.split " + FROM;
+					"t.id, t.label, t.nextdate, t.period, " +
+					"t.memo, t.reference, t.amount, " +
+					"t.split, t.enabled " + FROM;
 	
 	public ScheduledTransaction save(ScheduledTransaction pt) 
 			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
@@ -71,15 +71,15 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into scheduledtransaction (label, dayofmonth, lastentered, accountid, mirrorid, payeeid, " +
-					"categoryid, split, amount, reference, memo) " +
-					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-					scht.getLabel(), scht.getDay(), scht.getEntered(),
+					"insert into scheduledtransaction (label, nextdate, period, accountid, " +
+					"mirrorid, payeeid, categoryid, split, amount, reference, memo, enabled) " +
+					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+					scht.getLabel(), scht.getNextDate(), scht.getPeriod(),
 					scht.getAccount().getId(), 
 					scht.getMirror() != null ? scht.getMirror().getId() : null, 
 					scht.getPayee().getId(), scht.getCategory().getId(), 
 					scht.isSplit(), scht.getAmount(),
-					scht.getReference(), scht.getMemo());
+					scht.getReference(), scht.getMemo(), scht.isEnabled());
 			
 			scht.setId(getLastInsertId());	
 			LOG.info(compose("Added new scheduled transaction", scht));		
@@ -96,17 +96,17 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 			
 			try {
 				this.jdbcTemplate.update(
-						"update scheduledtransaction set label = ?, dayofmonth = ?, " + 
+						"update scheduledtransaction set label = ?, nextdate = ?, period = ?, " + 
 						"accountid = ?, mirrorid = ?, payeeid = ?, categoryid = ?,  " + 
 						"split = ?, amount = ?, " +
-						"memo = ?, reference = ? " +
+						"memo = ?, enabled = ?, reference = ? " +
 						"where id = ?", 
-						dbRecord.getLabel(), dbRecord.getDay(),
+						dbRecord.getLabel(), dbRecord.getNextDate(), dbRecord.getPeriod(),
 						dbRecord.getAccount().getId(), 
 						dbRecord.getMirror() != null ? dbRecord.getMirror().getId() : null, 
 						dbRecord.getPayee().getId(), dbRecord.getCategory().getId(),
 						dbRecord.isSplit(), dbRecord.getAmount(),  
-						dbRecord.getMemo(), dbRecord.getReference(), 
+						dbRecord.getMemo(), dbRecord.isEnabled(), dbRecord.getReference(), 
 						dbRecord.getId());
 				
 				LOG.info(compose("Updated scheduled transaction", dbRecord));
@@ -151,7 +151,7 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	}
 
 	public List<ScheduledTransaction> getAll() {
-		String sql = SELECT + "order by t.label";
+		String sql = SELECT + "order by t.nextdate";
 		List<ScheduledTransaction> all = this.jdbcTemplate.query(
 				sql, new RowMapperUtil.ScheduledTransactionMapper());
 		
@@ -168,9 +168,9 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 		return this.jdbcTemplate.update("delete from scheduledtransaction where id = ?", id);		
 	}	
 	
-	public void updateLastEntered(ScheduledTransaction t) {
-		this.jdbcTemplate.update("update scheduledtransaction set lastentered = ? where id = ?", 
-				t.getEntered(), t.getId());
+	public void updateNextDate(ScheduledTransaction t) {
+		this.jdbcTemplate.update("update scheduledtransaction set nextdate = ? where id = ?", 
+				t.getNextDate(), t.getId());
 		LOG.info(compose("Updated lastentered for scheduled transaction", t));
 	}
 

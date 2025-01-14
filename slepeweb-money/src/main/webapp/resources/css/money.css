@@ -21,11 +21,12 @@ html {
   max-width: 1170px;
 }
 
-/* Row */
+/* Row 
 .row {
   margin-right: -15px;
   margin-left: -15px;
 }
+*/
 
 /* Row Clear Float*/
 .row:after {
@@ -725,7 +726,8 @@ input[type="button"]:disabled,
 table.trn_listing td {
   vertical-align: top;
 }
-table.trn_listing td.date {
+
+/*table.trn_listing td.date {
   width: 10%;
 }
 table.trn_listing td.amount {
@@ -734,6 +736,7 @@ table.trn_listing td.amount {
 table.trn_listing td.memo {
   width: 30%;
 }
+*/
 
 div.dashboard-group {
   margin-bottom: 1em;
@@ -805,7 +808,7 @@ div.dashboard-group table h3 {
 .currency {
   font-family: "Courier New", Courier, monospace;
   text-align: right;
-  width: 100%;
+/*   width: 100%; */
 }
 
 #menu-action-dialog, #user-menu {

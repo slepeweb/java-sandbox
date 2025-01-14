@@ -3,7 +3,10 @@ package com.slepeweb.money;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -18,8 +21,10 @@ import com.slepeweb.money.service.TransactionService;
 public class ScheduledTransactionTask implements Job {
 
 	private static Logger LOG = Logger.getLogger(ScheduledTransactionTask.class);
+	private static Pattern INTERVAL_PTRN = Pattern.compile("^(\\d+)([mdMD])$");
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
+		
 		ScheduledTransactionService scheduledTransactionService = 
 				(ScheduledTransactionService) context.getJobDetail().getJobDataMap().get("scheduledTransactionService");
 		ScheduledSplitService scheduledSplitService = 
@@ -31,61 +36,96 @@ public class ScheduledTransactionTask implements Job {
 		List<ScheduledTransaction> all = scheduledTransactionService.getAll();
 		
 		LOG.info(String.format("There are %d scheduled transactions", all.size()));
-		Calendar threshold = Calendar.getInstance();
 		Calendar scheduled = Calendar.getInstance();
+		Calendar now = Calendar.getInstance();
 		Transaction t;
-		Timestamp lastEntered;
-		long scheduleId;
 		boolean createdTransaction;
 		int count = 0;
 		
 		for (ScheduledTransaction scht : all) {
-			// Keep a record of the scht properties, as we'll be using the scht for 
-			// two different purposes: a) creating a transaction, and b) maintaining the lastEntered date.
-			scheduleId = scht.getId();
-			lastEntered = scht.getEntered();
+			if (! scht.isEnabled()) {
+				LOG.info(String.format("Schedule [%s] is disabled", scht.getLabel()));
+				continue;
+			}
 			
-			// threshold is set to the time the scheduled transaction was last entered
-			threshold.setTime(scht.getEntered());
-			
-			// then roll threshold foward by 1 month
-			threshold.add(Calendar.MONTH, 1);
-			
-			// scheduled is set to the DD-day of this month
-			scheduled.set(Calendar.DATE, scht.getDay());
-			
+			LOG.info(String.format("Processing schedule [%s]", scht.getLabel()));
+			scheduled.setTime(scht.getNextDate());
 			createdTransaction = false;
 			
 			// Populate the splits
 			scht.setSplits(scheduledSplitService.get(scht.getId()));
 			t = Transaction.adapt(scht);
 			
-			while (scheduled.after(threshold)) {
+			if (scheduled.before(now)) {
 				// Use scht properties to save a Transaction
 				t.setId(0);
-				t.setEntered(new Timestamp(scheduled.getTimeInMillis()));
+				t.setEntered(new Timestamp(now.getTimeInMillis()));
+				t.setSource(4);
 				
 				try {
 					transactionService.save(t);
-					lastEntered = t.getEntered();
 					createdTransaction = true;
 					count++;
 				}
 				catch (Exception e) {
 					LOG.error("Failed to save transaction", e);
 				}
-				
-				threshold.add(Calendar.MONTH, 1);	
 			}
 			
 			// Update the scheduled transaction to record lastEntered
 			if (createdTransaction) {
-				scht.setId(scheduleId);
-				scht.setEntered(lastEntered);
-				scheduledTransactionService.updateLastEntered(scht);
+				Calendar nextDate = getNextDate(scheduled, scht.getPeriod());
+				scht.setNextDate(new Timestamp(nextDate.getTimeInMillis()));
+				scheduledTransactionService.updateNextDate(scht);
 			}
 		}
 		
 		LOG.info(String.format("Created %d transactions", count));
 	}
+	
+	private Calendar getNextDate(Calendar lastDate, String intervalStr) {
+		if (StringUtils.isBlank(intervalStr)) {
+			return null;
+		}
+		
+		Matcher m = INTERVAL_PTRN.matcher(intervalStr);
+		if (! m.matches()) {
+			return null;
+		}
+		
+		int dayOfMonth = Math.min(28, lastDate.get(Calendar.DAY_OF_MONTH));
+		Calendar nextDate = (Calendar) lastDate.clone();
+		int value = Integer.valueOf(m.group(1));
+		String units = m.group(2);
+		
+		if (units.equalsIgnoreCase("m")) {
+			// Units are months
+			nextDate.add(Calendar.MONTH, value);
+			nextDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+		}
+		else {
+			// Units must be days
+			nextDate.add(Calendar.DAY_OF_MONTH, value);
+		}
+		
+		Util.zeroTimeOfDay(nextDate);
+		return nextDate;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static void main(String[] args) {
+		Calendar start = Calendar.getInstance();
+		start.set(Calendar.DAY_OF_MONTH, 31);
+		ScheduledTransactionTask task = new ScheduledTransactionTask();
+		out("1m: ", task.getNextDate(start, "1m").getTime().toGMTString());
+		out("28d: ", task.getNextDate(start, "29d").getTime().toGMTString());
+	}
+	
+	public static void out(String... str) {
+		for (String s : str) {
+			System.out.print(s);
+		}
+		System.out.println("");
+	}
 }
+

@@ -4,7 +4,7 @@
 	
 <c:set var="_urlPrefix">${_ctxPath}/transaction/list/${_accountId}</c:set>
 
-<c:set var="_extraCss" scope="request">
+<c:set var="_extraInPageCss" scope="request">
 	.total-amount {
 		border-top: 1px solid black;
 	}

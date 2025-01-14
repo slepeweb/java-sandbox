@@ -15,5 +15,5 @@ public interface ScheduledTransactionService {
 	ScheduledTransaction update(ScheduledTransaction from, ScheduledTransaction to) throws MissingDataException, DuplicateItemException;
 	void updateSplit(ScheduledTransaction t);
 	int delete(long id);
-	void updateLastEntered(ScheduledTransaction t);
+	void updateNextDate(ScheduledTransaction t);
 }

@@ -9,6 +9,8 @@
 			<div id="widefield-div-icon" class="widefield-icon">div</div>
 			<div id="widefield-div2b-icon" class="widefield-icon">div2b</div>
 			<div id="widefield-p-icon" class="widefield-icon">p</div>
+			<div id="widefield-code-icon" class="widefield-icon">code</div>
+			<div id="widefield-ul-icon" class="widefield-icon">ul</div>
 			<div id="widefield-a-icon" class="widefield-icon">a</div>
 			<div id="widefield-ximg-icon" class="widefield-icon">ximg</div>
 			<div id="widefield-table-icon" class="widefield-icon">table</div>

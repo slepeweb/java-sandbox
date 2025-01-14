@@ -2,7 +2,14 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
-<c:set var="_extraCss" scope="request">
+<c:set var="_extraInPageJs" scope="request">
+	_money.context = 'transaction';
+	_money.transaction.accountid = ${_transaction.account.id};
+</c:set>
+
+<c:set var="_extraJs" scope="request" value="transaction.js,transandsched.js,minorcats.js,datepicker.js" />
+
+<c:set var="_extraInPageCss" scope="request">
 	.ui-autocomplete-loading {
 		background: white url("${_ctxPath}/resources/images/progress-indicator.gif") right center no-repeat;
 	}
@@ -20,7 +27,6 @@
 	</c:if>
 	
 	<mny:multiSplitInputSupport />
-	<mny:multiSplitJavascript />
 	
 	<div class="right">
 		<c:if test="${_formMode eq 'update'}">
@@ -96,19 +102,20 @@
 		    <tr class="payee">
 		        <td class="heading"><label for="payee">Payee</label></td>
 		        <td>
-		         	 <input id="payee" type="text" name="payee" value="${_transaction.payee.name}" />
+		         	<input id="payee" type="text" name="payee" value="${_transaction.payee.name}"
+		         	 	placeholder="Begin typing to reveal matching payees" />
 		        </td>
 		    </tr>
 
 		    <tr class="category">
 		        <td class="heading"><label for="major">Category</label></td>
 		        <td>
-					 	<input class="width25 inline" 
-					 		id="major" 
-					 		type="text" 
-					 		name="major" 
-					 		list="majors" 
-					 		value="${_transaction.category.major}" />
+						 	<select id="major" name="major">
+			        	<option value="">Choose ...</option>
+			        	<c:forEach items="${_allMajorCategories}" var="_name">
+			        		<option value="${_name}" <c:if test="${_name eq _transaction.category.major}">selected</c:if>>${_name}</option>
+			        	</c:forEach>
+						 	</select>
 					</td>
 		    </tr>
 
@@ -153,24 +160,18 @@
 			<input id="submit-button" type="submit" value="${_buttonLabel}" /> 
 			<input id="cancel-button" type="button" value="Cancel" /> 
 			
-		<c:if test="${_formMode eq 'update'}">
+			<c:if test="${_formMode eq 'update'}">
 	    	<input type="button" value="Delete transaction?" id="delete-button" /> 
 	    </c:if>
 	    
 	    <input type="hidden" name="id" value="${_transaction.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   
 	    <input type="hidden" name="origxferid" value="${_transaction.transferId}" />   
-		<input id="counter-store" type="hidden" name="counterStore" value="" />
+			<input id="counter-store" type="hidden" name="counterStore" value="" />
 	</form>		  	
 		
-	<div id="splits-error-dialog" title="Splits error">
-		The split amounts do NOT match the total amount. Please correct in
-		order to submit the form. (Total = __totalamount__, Splits = __splitamounts__)
-	</div>
+	<div id="form-error-dialog" title="Form error"></div>
 
 	<mny:entityDeletionDialog entity="transaction" mode="${_formMode}" id="${_transaction.id}"/>
-	<mny:transactionFormJavascript />
-	<mny:minorCategoryUpdatesJavascript />
-	<mny:payeeAutocompleterJavascript autofill="${true}" />
 	
 </mny:standardLayout>

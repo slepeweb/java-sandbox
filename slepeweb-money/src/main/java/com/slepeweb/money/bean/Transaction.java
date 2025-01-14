@@ -63,14 +63,20 @@ public class Transaction extends DbEntity {
 	}
 	
 	public boolean isDefined4Insert() {
-		return  
+		boolean ok =  
 			getAccount() != null &&
 			getAccount().getId() > 0L &&
 			getPayee() != null &&
 			getPayee().getId() > 0L &&
-			getCategory() != null &&
-			getCategory().getId() > 0L &&
 			getEntered() != null;
+			
+		if (isStandard()) {
+			ok = ok &&
+				getCategory() != null &&
+				getCategory().getId() > 0L;
+		}
+		
+		return ok;
 	}
 	
 	@Override
@@ -185,6 +191,10 @@ public class Transaction extends DbEntity {
 	
 	public boolean isTransfer() {
 		return this instanceof Transfer || getTransferId() > 0L;
+	}
+	
+	boolean isStandard() {
+		return ! (isSplit() || isTransfer()); 
 	}
 	
 	public Account getAccount() {

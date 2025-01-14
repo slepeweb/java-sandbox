@@ -16,19 +16,23 @@
 		<table>
 			<thead>
 				<tr>
+					<th>Enabled</th>
 					<th>Name</th>
-					<th>Day of month</th>
-					<th>Last entered</th>
+					<th>Next date</th>
+					<th>Account</th>
+					<th>Amount</th>
 				</tr>
 			</thead>
 			
 			<tbody>
 				<c:forEach items="${_scheduled}" var="_schedule">
 					<tr>
+						<td><input type="checkbox" ${mon:tertiaryOp(_schedule.enabled, 'checked', '')} /></td>
 						<td><a href="${_ctxPath}/schedule/edit/${_schedule.id}"
 							title="Update the details for this scheduled transaction">${_schedule.label}</a></td>
-						<td>${_schedule.day}</td>
-						<td>${_schedule.entered}</td>
+						<td>${mon:formatTimestamp(_schedule.nextDate)}</td>
+						<td>${_schedule.account.name}</td>
+						<td class="currency amount">${mon:displayAmountNS(_schedule.amount)}</td>
 					</tr>
 				</c:forEach>
 			</tbody>		

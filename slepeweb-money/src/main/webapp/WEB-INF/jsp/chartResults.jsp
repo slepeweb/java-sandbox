@@ -4,7 +4,7 @@
 	
 <mny:flash />
 
-<c:set var="_extraCss" scope="request">
+<c:set var="_extraInPageCss" scope="request">
 	#tabs {
 		font-size: 1em;
 	}
