@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

@@ -14,17 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.MonthPager;
-import com.slepeweb.money.bean.MultiSplitCounter;
 import com.slepeweb.money.bean.NormalisedMonth;
 import com.slepeweb.money.bean.Option;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RunningBalance;
-import com.slepeweb.money.bean.SplitInput;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.bean.Transaction;
@@ -222,13 +219,25 @@ public class TransactionController extends BaseController {
 		}
 		
 		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
-		SplitTransactionFormComponent c;
+		SplitTransactionFormComponent fc;
+		int numBlanks = t.getSplits().size() == 0 ? 3 : 2;
 		
 		for (SplitTransaction st : t.getSplits()) {
-			c = new SplitTransactionFormComponent(st).
+			fc = new SplitTransactionFormComponent(st).
 					setAllMajors(allMajors).
 					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor()));
-			arr.add(c);
+			arr.add(fc);
+		}
+		
+		Category noCategory = this.categoryService.getNoCategory();
+		List<String> noMinors = new ArrayList<String>();
+		
+		for (int i = 0; i < numBlanks; i++) {
+			fc = new SplitTransactionFormComponent().
+				setCategory(noCategory).
+				setAllMajors(allMajors).
+				setAllMinors(noMinors);
+			arr.add(fc);
 		}
 		
 		model.addAttribute("_allSplits", arr);
@@ -295,23 +304,7 @@ public class TransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			String countersJson = req.getParameter("counterStore");
-			MultiSplitCounter counters = fromJson(new TypeReference<MultiSplitCounter>() {}, countersJson);
-			SplitTransaction st;
-			
-			for (SplitInput in : readMultiSplitInput(req, counters)) {
-				st = new SplitTransaction().
-					setTransactionId(t.getId()).
-					setCategory(this.categoryService.get(in.getMajor(), in.getMinor())).
-					setMemo(in.getMemo()).
-					// TODO: need to avoid negative amounts on form - use <select> for debit/credit
-					setAmount(t.isDebit() ? -in.getAmount() : in.getAmount());
-				
-				// The transactionId for each SplitTransaction will be assigned within TransactionService.save(t).
-				if (st.isPopulated()) {
-					t.getSplits().add(st);
-				}
-			}
+			t.setSplits(getSplitsSubmission(req, multiplier));
 		}
 		
 		if (save(t) != null) {

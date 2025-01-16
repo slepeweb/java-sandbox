@@ -7,7 +7,7 @@ var _money = {
 	service: {},
 };
 
-_money.shared.isNotEmpty = function(field, sel, errors) {
+_money.shared.isNotEmpty = function(field, sel, errors, isWarning) {
 	let ok = true;
 	
 	if (sel.startsWith('input')) {
@@ -17,7 +17,7 @@ _money.shared.isNotEmpty = function(field, sel, errors) {
 		ok = $(sel).find(':selected').val() !== '';
 	}
 	
-	_money.shared.addFormError(ok, 'Field "' + field + '" is empty', errors)
+	_money.shared.addFormError(ok, 'Field "' + field + '" is empty', errors, isWarning)
 	return ok;
 }
 

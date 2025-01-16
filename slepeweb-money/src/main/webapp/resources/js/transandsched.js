@@ -7,16 +7,17 @@ _money.transandsched.setComponentVisibilities = function() {
 	
 	if (paymentType == "standard") {
 		// Set form for a standard/normal transaction
-		$(".payee td, .category td").css("display", "table-cell");
-		$(".transfer td, .splits-list td").css("display", "none");
+		$("tr.payee td, tr.category td").css("display", "table-cell");
+		$("tr.transfer td, tr.splits-list td").css("display", "none");
 	}
 	else if (paymentType == "transfer") {
-		$(".category td, .splits-list td").css("display", "none");
-		$(".payee td, .transfer td").css("display", "table-cell");
+		$("tr.category td, tr.splits-list td").css("display", "none");
+		$("tr.payee td").css("display", "none");
+		$("tr.transfer td").css("display", "table-cell");
 	}
 	else if (paymentType == "split") {				
-		$(".category td, .transfer td").css("display", "none");
-		$(".payee td, .splits-list td").css("display", "table-cell");
+		$("tr.category td, tr.transfer td").css("display", "none");
+		$("tr.payee td, tr.splits-list td").css("display", "table-cell");
 	}
 }
 
@@ -49,74 +50,13 @@ _money.transandsched.checkCategoryEtc = function(errors) {
 	var paymentType = $("input[name='paymenttype']:checked").val();
 	
 	if (paymentType === 'standard') {
-		_money.shared.isNotEmpty('Category', 'select#major', errors);
+		_money.shared.isNotEmpty('Category', 'select#major', errors, 1);
 	}
 	else if (paymentType === 'transfer') {
 		_money.shared.isNotEmpty('Transfer a/c', 'select#xferaccount', errors);
 	}
 }
 
-
-class SplitService {
-	constructor(templtA, templtB) {
-		this.storageSelector = '#counter-store';
-		this.innerTemplate = templtA;
-		this.minorCategoryOptionsTemplate = templtB;
-		this.splitCounters = null;
-	}
-	
-	addSplit(button) {
-		var counters = this.retrieveCounters();
-		counters.splitCount += 1;
-		counters.lastSplitId += 1;
-		var splitId = counters.lastSplitId;
-		this.storeCounters(counters);
-		
-		var inner = this.innerTemplate.
-			replace(/\[counter\]/g, splitId.toString()).
-			replace(/\[major\]/, "").
-			replace(/\[memo\]/, "").
-			replace(/\[amount\]/, "");
-		
-		$(inner).insertBefore(button);
-		this.resetClickBehaviours();
-		this.resetMajorCategoryChangeBehaviours();
-	}
-
-	
-	resetClickBehaviours() {
-		var fn1 = this.addSplit;
-		var fn2 = this.retrieveCounters;
-		var fn3 = this.storeCounters;
-		
-		$("#add-split-button").off().click(function(e) {
-			fn1($(e.currentTarget));
-		});
-		
-		$(".trash-split").off().click(function(e) {
-			$(this).parent().remove();
-			var counters = fn2();
-			counters.splitCount -= 1;
-			fn3(counters);
-		});
-	}
-	
-	storeCounters(counters) {
-		$(this.storageSelector).val(JSON.stringify(counters));
-	}
-	
-	retrieveCounters() {
-		var objStr = $(this.storageSelector).val();
-		if (objStr) {
-			return JSON.parse(objStr);
-		}
-		
-		return {
-			splitCount: 0,
-			lastSplitId: 0
-		};
-	}
-}
 
 $(function() {
 	// Event handler for when payment type changes
@@ -151,11 +91,5 @@ $(function() {
 	// Run scripts selected functions when page loads
 	_money.transandsched.setComponentVisibilities();
 	
-	/*
-	var num = $(".split-inputs").length;
-	_money.service.splits = new SplitService();
-	_money.service.splits.splitCounters = {splitCount: num, lastSplitId: num};
-	_money.service.splits.resetClickBehaviours();
-	*/
 });
 

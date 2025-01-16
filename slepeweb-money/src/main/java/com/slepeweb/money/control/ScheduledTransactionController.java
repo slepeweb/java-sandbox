@@ -41,6 +41,7 @@ public class ScheduledTransactionController extends BaseController {
 		
 		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
 		SplitTransactionFormComponent fc;
+		int numBlanks = t.getSplits().size() == 0 ? 3 : 2;
 		
 		for (SplitTransaction st : t.getSplits()) {
 			fc = new SplitTransactionFormComponent(st).
@@ -49,22 +50,17 @@ public class ScheduledTransactionController extends BaseController {
 			arr.add(fc);
 		}
 		
-		int len = arr.size();
-		boolean extended = false;
+		Category noCategory = this.categoryService.getNoCategory();
+		List<String> noMinors = new ArrayList<String>();
 		
-		// Do we need to pad out the list?
-		if (len < 3) {
-			for (int i = len; i < 3; i++) {
-				arr.add(new SplitTransactionFormComponent().setAllMajors(allMajors));
-				extended = true;
-			}
+		for (int i = 0; i < numBlanks; i++) {
+			fc = new SplitTransactionFormComponent().
+				setCategory(noCategory).
+				setAllMajors(allMajors).
+				setAllMinors(noMinors);
+			arr.add(fc);
 		}
-		
-		// If we didn'd pad out, that means we had 3 or more splits. In this case, provide 1 empty slot.
-		if (! extended) {
-			arr.add(new SplitTransactionFormComponent().setAllMajors(allMajors));
-		}
-		
+				
 		model.addAttribute("_allSplits", arr);
 	}
 	
@@ -154,32 +150,8 @@ public class ScheduledTransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			int index = 1;
-			SplitTransaction st;
-			Category sc;
-			
-			do {
-				sc = this.categoryService.get(
-						req.getParameter("major_" + index), 
-						req.getParameter("minor_" + index));
-				
-				st = new SplitTransaction().
-					setTransactionId(scht.getId()).
-					setCategory(sc).
-					setMemo(req.getParameter("memo_" + index)).
-					setAmount(Util.parsePounds(req.getParameter("amount_" + index)) * multiplier);
-				
-				// The transactionId for each ScheduledSplit will be assigned within TransactionService.save(t).
-				if (st.isPopulated()) {
-					scht.getSplits().add(st);
-					index++;
-				}
-				else {
-					index = -1;
-				}
-			}
-			while (index > 0);
-		}		
+			scht.setSplits(getSplitsSubmission(req, multiplier));
+		}
 		
 		try {
 			scht = this.scheduledTransactionService.save(scht);

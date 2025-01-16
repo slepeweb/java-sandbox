@@ -514,9 +514,9 @@ table td.menu-icon {
 }
 table th {
   color: #666;
-  font-size: 0.9em;
+  font-size: 0.8em;
   font-weight: bold;
-  padding: 0 0.75em 0.75em 0.75em;
+  padding: 0 0.75em 0 0.75em;
   text-align: left;
   /*width: 25%;*/
 }

@@ -59,7 +59,7 @@ _money.transaction.checkFormComplete = function() {
 	var errors = _money.shared.initFormErrorObject();	
 	_money.shared.isNotEmpty('Date', 'input#entered', errors);
 	_money.shared.isNotEmpty('Account', 'select#account', errors);
-	_money.shared.isNotEmpty('Payee', 'input#payee', errors);
+	_money.shared.isNotEmpty('Payee', 'input#payee', errors, 1);
 	_money.transandsched.checkSplits(errors);
 	_money.transandsched.checkCategoryEtc(errors);
 

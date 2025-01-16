@@ -12,12 +12,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.money.Util;
-import com.slepeweb.money.bean.CategoryInput;
-import com.slepeweb.money.bean.MultiCategoryCounter;
-import com.slepeweb.money.bean.MultiSplitCounter;
+import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
-import com.slepeweb.money.bean.SplitInput;
+import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.User;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
@@ -117,6 +115,7 @@ public class BaseController {
 		return s;
 	}
 	
+	/*
 	protected List<CategoryInput> readMultiCategoryInput(HttpServletRequest req, int groupId, int numCategories) {
 		int m = 0;	
 		String major, minor;
@@ -200,6 +199,37 @@ public class BaseController {
 		}
 		
 		return 0;
+	}
+	*/
+	
+	protected List<SplitTransaction> getSplitsSubmission(HttpServletRequest req, long amountPlusOrMinue) {
+		int index = 1;
+		SplitTransaction st;
+		Category c;
+		String major, minor;
+		List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
+		
+		do {
+			major = req.getParameter("major_" + index);
+			if (StringUtils.isBlank(major)) {
+				break;
+			}
+			
+			minor = req.getParameter("minor_" + index);
+			c = this.categoryService.get(major, minor);
+			
+			st = new SplitTransaction().
+				setCategory(c).
+				setMemo(req.getParameter("memo_" + index)).
+				setAmount(Util.parsePounds(req.getParameter("amount_" + index)) * amountPlusOrMinue);
+			
+			// The transactionId for each ScheduledSplit will be assigned within TransactionService.save(t).
+			splits.add(st);
+			index++;
+		}
+		while (true);
+		
+		return splits;
 	}
 	
 	@ModelAttribute(value="_ctxPath")
