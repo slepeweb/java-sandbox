@@ -13,8 +13,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.CategoryInput;
+import com.slepeweb.money.bean.MultiCategoryCounter;
+import com.slepeweb.money.bean.MultiSplitCounter;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
+import com.slepeweb.money.bean.SplitInput;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.User;
 import com.slepeweb.money.service.AccountService;
@@ -115,7 +119,6 @@ public class BaseController {
 		return s;
 	}
 	
-	/*
 	protected List<CategoryInput> readMultiCategoryInput(HttpServletRequest req, int groupId, int numCategories) {
 		int m = 0;	
 		String major, minor;
@@ -200,9 +203,8 @@ public class BaseController {
 		
 		return 0;
 	}
-	*/
 	
-	protected List<SplitTransaction> getSplitsSubmission(HttpServletRequest req, long amountPlusOrMinue) {
+	protected List<SplitTransaction> readSplitsInput(HttpServletRequest req, long amountPlusOrMinue) {
 		int index = 1;
 		SplitTransaction st;
 		Category c;
