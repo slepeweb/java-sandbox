@@ -22,8 +22,6 @@ import com.slepeweb.money.bean.NormalisedMonth;
 import com.slepeweb.money.bean.Option;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RunningBalance;
-import com.slepeweb.money.bean.SplitTransaction;
-import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.bean.Transfer;
@@ -200,48 +198,15 @@ public class TransactionController extends BaseController {
 	private void populateForm(ModelMap model, Transaction t, String mode) {	
 		
 		List<Account> allAccounts = this.accountService.getAll(false);
+		
+		// Not sure about this logic
 		if (! allAccounts.contains(t.getAccount())) {
 			allAccounts.add(t.getAccount());
 		}
 		
 		model.addAttribute("_transaction", t);
-		model.addAttribute("_formMode", mode);
-		model.addAttribute("_allAccounts", allAccounts);
-		model.addAttribute("_allPayees", this.payeeService.getAll());
-		model.addAttribute("_numDeletableTransactions", 0);
-		
-		
-		List<String> allMajors = this.categoryService.getAllMajorValues();
-		model.addAttribute("_allMajorCategories", allMajors);
-		
-		if (t.getCategory() != null) {
-			model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
-		}
-		
-		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
-		SplitTransactionFormComponent fc;
-		int numBlanks = t.getSplits().size() == 0 ? 3 : 2;
-		
-		for (SplitTransaction st : t.getSplits()) {
-			fc = new SplitTransactionFormComponent(st).
-					setAllMajors(allMajors).
-					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor()));
-			arr.add(fc);
-		}
-		
-		Category noCategory = this.categoryService.getNoCategory();
-		List<String> noMinors = new ArrayList<String>();
-		
-		for (int i = 0; i < numBlanks; i++) {
-			fc = new SplitTransactionFormComponent().
-				setCategory(noCategory).
-				setAllMajors(allMajors).
-				setAllMinors(noMinors);
-			arr.add(fc);
-		}
-		
-		model.addAttribute("_allSplits", arr);
-		
+		populateTransAndSchedForm(model, t, allAccounts, mode);
+				
 		if (t.isTransfer()) {
 			Transfer tt = (Transfer) t;
 			model.addAttribute("_xferAccount", tt.getMirrorAccount());
@@ -304,7 +269,7 @@ public class TransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			t.setSplits(getSplitsSubmission(req, multiplier));
+			t.setSplits(readSplitsInput(req, multiplier));
 		}
 		
 		if (save(t) != null) {

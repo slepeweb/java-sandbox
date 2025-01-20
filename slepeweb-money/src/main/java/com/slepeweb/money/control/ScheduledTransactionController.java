@@ -17,8 +17,6 @@ import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.ScheduledTransaction;
-import com.slepeweb.money.bean.SplitTransaction;
-import com.slepeweb.money.bean.SplitTransactionFormComponent;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -26,42 +24,11 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(value="/schedule")
 public class ScheduledTransactionController extends BaseController {
 	
-	private void populateForm(ModelMap model, ScheduledTransaction t, String mode) {	
-		
+	private void populateForm(ModelMap model, ScheduledTransaction t, String mode) {			
 		List<Account> allAccounts = this.accountService.getAll(false);
-		List<String> allMajors = this.categoryService.getAllMajorValues();
-
 		model.addAttribute("_schedule", t);
 		model.addAttribute("_daysOfMonth", getDaysOfMonth());
-		model.addAttribute("_formMode", mode);
-		model.addAttribute("_allAccounts", allAccounts);
-		model.addAttribute("_allPayees", this.payeeService.getAll());		
-		model.addAttribute("_allMajorCategories", allMajors );		
-		model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
-		
-		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
-		SplitTransactionFormComponent fc;
-		int numBlanks = t.getSplits().size() == 0 ? 3 : 2;
-		
-		for (SplitTransaction st : t.getSplits()) {
-			fc = new SplitTransactionFormComponent(st).
-					setAllMajors(allMajors).
-					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor()));
-			arr.add(fc);
-		}
-		
-		Category noCategory = this.categoryService.getNoCategory();
-		List<String> noMinors = new ArrayList<String>();
-		
-		for (int i = 0; i < numBlanks; i++) {
-			fc = new SplitTransactionFormComponent().
-				setCategory(noCategory).
-				setAllMajors(allMajors).
-				setAllMinors(noMinors);
-			arr.add(fc);
-		}
-				
-		model.addAttribute("_allSplits", arr);
+		populateTransAndSchedForm(model, t, allAccounts, mode);
 	}
 	
 	@RequestMapping(value="/list")	
@@ -150,7 +117,7 @@ public class ScheduledTransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			scht.setSplits(getSplitsSubmission(req, multiplier));
+			scht.setSplits(readSplitsInput(req, multiplier));
 		}
 		
 		try {

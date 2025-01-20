@@ -7,11 +7,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.money.Util;
+import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.MultiCategoryCounter;
@@ -20,6 +22,8 @@ import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.SplitInput;
 import com.slepeweb.money.bean.SplitTransaction;
+import com.slepeweb.money.bean.SplitTransactionFormComponent;
+import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.User;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
@@ -204,34 +208,82 @@ public class BaseController {
 		return 0;
 	}
 	
-	protected List<SplitTransaction> readSplitsInput(HttpServletRequest req, long amountPlusOrMinue) {
+	protected List<SplitTransaction> readSplitsInput(HttpServletRequest req, long amountPlusOrMinus) {
 		int index = 1;
 		SplitTransaction st;
 		Category c;
 		String major, minor;
 		List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
+		int numSplits = Integer.valueOf(req.getParameter("numsplits"));
 		
 		do {
 			major = req.getParameter("major_" + index);
-			if (StringUtils.isBlank(major)) {
-				break;
+			if (StringUtils.isNotBlank(major)) {			
+				minor = req.getParameter("minor_" + index);
+				c = this.categoryService.get(major, minor);
+				
+				st = new SplitTransaction().
+					setCategory(c).
+					setMemo(req.getParameter("memo_" + index)).
+					setAmount(Util.parsePounds(req.getParameter("amount_" + index)) * amountPlusOrMinus);
+				
+				// The transactionId for each ScheduledSplit will be assigned within TransactionService.save(t).
+				// Only attempt to save split IFF category is specified
+				splits.add(st);
 			}
 			
-			minor = req.getParameter("minor_" + index);
-			c = this.categoryService.get(major, minor);
-			
-			st = new SplitTransaction().
-				setCategory(c).
-				setMemo(req.getParameter("memo_" + index)).
-				setAmount(Util.parsePounds(req.getParameter("amount_" + index)) * amountPlusOrMinue);
-			
-			// The transactionId for each ScheduledSplit will be assigned within TransactionService.save(t).
-			splits.add(st);
 			index++;
 		}
-		while (true);
+		while (index <= numSplits);
 		
 		return splits;
+	}
+	
+	protected void populateTransAndSchedForm(ModelMap model, Transaction t, List<Account> allAccounts, String mode) {
+		List<String> allMajors = this.categoryService.getAllMajorValues();
+
+		model.addAttribute("_formMode", mode);
+		model.addAttribute("_allAccounts", allAccounts);
+		model.addAttribute("_allPayees", this.payeeService.getAll());
+		model.addAttribute("_allMajorCategories", allMajors);
+		
+		if (t.getCategory() != null) {
+			model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
+		}
+		
+		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
+		SplitTransactionFormComponent fc;
+		int numVisible = t.getSplits().size();
+		int numBlanks = 6;
+		int count = 0;
+		
+		for (SplitTransaction st : t.getSplits()) {
+			fc = new SplitTransactionFormComponent(st).
+					setAllMajors(allMajors).
+					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor())).
+					setVisible(true);
+			
+			count++;
+			if (count == numVisible) {
+				fc.setLastVisible(true);
+			}
+			
+			arr.add(fc);
+		}
+		
+		Category noCategory = this.categoryService.getNoCategory();
+		List<String> noMinors = new ArrayList<String>();
+		
+		for (int i = 0; i < numBlanks; i++) {
+			fc = new SplitTransactionFormComponent().
+				setCategory(noCategory).
+				setAllMajors(allMajors).
+				setAllMinors(noMinors).
+				setVisible(false);
+			arr.add(fc);
+		}
+				
+		model.addAttribute("_allSplits", arr);
 	}
 	
 	@ModelAttribute(value="_ctxPath")

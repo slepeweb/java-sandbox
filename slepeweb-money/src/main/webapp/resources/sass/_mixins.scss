@@ -1,35 +1,38 @@
+@use 'vars';
+
 @mixin extra-small-only {
-    @media only screen and (max-width : $transition-xsmall-to-small - 0.0625) {
+    @media only screen and (max-width : (vars.$transition-xsmall-to-small - 0.0625)) {
         @content;
     }
 }
 
 @mixin extra-small-and-above {
-    @media only screen and (min-width : $transition-xsmall-to-small) {
+    @media only screen and (min-width : vars.$transition-xsmall-to-small) {
         @content;
     }
 }
 
 @mixin small-only {
-    @media only screen and (max-width : $transition-small-to-medium - 0.0625) {
+    @media only screen and (max-width : (vars.$transition-small-to-medium - 0.0625)) {
         @content;
     }
 }
+
 @mixin small-and-above {
-    @media only screen and (min-width : $transition-small-to-medium) {
+    @media only screen and (min-width : vars.$transition-small-to-medium) {
         @content;
     }
 }
 
 @mixin nav-transition {
-    @media only screen and (max-width : $transition-nav) {
+    @media only screen and (max-width : vars.$transition-nav) {
         @content;
     }
 }
 
 @mixin std-container-padding {
-  padding-left: $std-container-padding;
-  padding-right: $std-container-padding;
+  padding-left: vars.$std-container-padding;
+  padding-right: vars.$std-container-padding;
 }
 
 

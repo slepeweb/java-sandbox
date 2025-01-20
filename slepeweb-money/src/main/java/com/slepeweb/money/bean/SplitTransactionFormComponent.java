@@ -10,6 +10,7 @@ public class SplitTransactionFormComponent {
 	private List<String> allMinors = new ArrayList<String>();
 	private long amount;
 	private String memo = "";
+	private boolean visible, lastVisible;
 	
 	public SplitTransactionFormComponent() {}
 	
@@ -73,6 +74,24 @@ public class SplitTransactionFormComponent {
 
 	public SplitTransactionFormComponent setMemo(String memo) {
 		this.memo = memo;
+		return this;
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public SplitTransactionFormComponent setVisible(boolean visible) {
+		this.visible = visible;
+		return this;
+	}
+
+	public boolean isLastVisible() {
+		return lastVisible;
+	}
+
+	public SplitTransactionFormComponent setLastVisible(boolean lastVisible) {
+		this.lastVisible = lastVisible;
 		return this;
 	}
 }
