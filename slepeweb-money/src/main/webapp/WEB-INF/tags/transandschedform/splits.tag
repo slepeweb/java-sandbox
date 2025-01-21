@@ -15,22 +15,23 @@
    		
    		<c:forEach items="${_allSplits}" var="_split" varStatus="_status">
    			<%--
-   				_split is a SplitTransactionFormComponent. It comprises lists of major categories
-   				and corresponding minor categories
+   				_split is a SplitInput bean. It comprises lists of major categories
+   				and corresponding minor categories, as well as many other category-related properties required
+   				to support this form component.
    			 --%>
     		<div id="split-${_status.count}" ${mon:tertiaryOp(not _split.visible, 'class="hidden"', '')}>
-					<span class="next-category arrow ${mon:tertiaryOp(_split.visible and not _split.lastVisible, 'hidden', '')}" 
+					<span class="next-category arrow ${mon:tertiaryOp(_split.visible and not _split.lastVisible, 'invisible', '')}" 
 						data-id="${_status.count}"><i class="fa-solid fa-chevron-down" title="Add a category"></i></span>					
 
 					<select class="category" name="major_${_status.count}">
 						<c:forEach items="${_split.allMajors}" var="_c">
-							<option value="${_c}" <c:if test="${_c eq _split.category.major}">selected</c:if>>${_c}</option>
+							<option value="${_c}" <c:if test="${_c eq _split.major}">selected</c:if>>${_c}</option>
 						</c:forEach>
 					</select>
 					
 					<select class="sub-category" name="minor_${_status.count}">
 						<c:forEach items="${_split.allMinors}" var="_c">
-							<option value="${_c}" <c:if test="${_c eq _split.category.minor}">selected</c:if>>${_c}</option>
+							<option value="${_c}" <c:if test="${_c eq _split.minor}">selected</c:if>>${_c}</option>
 						</c:forEach>
 					</select>
    					

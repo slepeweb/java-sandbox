@@ -22,7 +22,6 @@ import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.SplitInput;
 import com.slepeweb.money.bean.SplitTransaction;
-import com.slepeweb.money.bean.SplitTransactionFormComponent;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.User;
 import com.slepeweb.money.service.AccountService;
@@ -251,36 +250,39 @@ public class BaseController {
 			model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
 		}
 		
-		List<SplitTransactionFormComponent> arr = new ArrayList<SplitTransactionFormComponent>();
-		SplitTransactionFormComponent fc;
+		List<SplitInput> arr = new ArrayList<SplitInput>();
+		SplitInput split;
 		int numVisible = t.getSplits().size();
 		int numBlanks = 6;
 		int count = 0;
 		
 		for (SplitTransaction st : t.getSplits()) {
-			fc = new SplitTransactionFormComponent(st).
-					setAllMajors(allMajors).
-					setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor())).
-					setVisible(true);
+			split = new SplitInput(st);
+			split.
+				setAllMajors(allMajors).
+				setAllMinors(this.categoryService.getAllMinorValues(st.getCategory().getMajor())).
+				setVisible(true);
 			
 			count++;
 			if (count == numVisible) {
-				fc.setLastVisible(true);
+				split.setLastVisible(true);
 			}
 			
-			arr.add(fc);
+			arr.add(split);
 		}
 		
 		Category noCategory = this.categoryService.getNoCategory();
 		List<String> noMinors = new ArrayList<String>();
 		
 		for (int i = 0; i < numBlanks; i++) {
-			fc = new SplitTransactionFormComponent().
-				setCategory(noCategory).
+			split = new SplitInput();
+			split.assimilate(noCategory);
+			split.
 				setAllMajors(allMajors).
 				setAllMinors(noMinors).
 				setVisible(false);
-			arr.add(fc);
+			
+			arr.add(split);
 		}
 				
 		model.addAttribute("_allSplits", arr);

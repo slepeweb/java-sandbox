@@ -11,6 +11,26 @@ public class SplitInput extends CategoryInput {
 	private String memo;
 	private long amount;
 	
+	public SplitInput() {}
+	
+	public SplitInput(SplitTransaction st) {
+		assimilate(st.getCategory());
+		setAmount(st.getAmount()).
+		setMemo(st.getMemo());
+	}
+	
+	public boolean isDebit() {
+		return getAmount() <= 0L;
+	}
+		
+	public String getAmountInPounds() {
+		return Transaction.DF.format(amount / 100.0);
+	}
+	
+	public long getAmountValue() {
+		return isDebit() ? getAmount() * -1L : getAmount();
+	}
+	
 	public String getMemo() {
 		return memo;
 	}

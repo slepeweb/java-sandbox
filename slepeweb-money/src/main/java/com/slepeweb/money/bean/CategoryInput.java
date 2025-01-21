@@ -6,10 +6,13 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties({"ready", "defined4Insert", "inDatabase", "legacy"})
+@JsonIgnoreProperties({"ready", "defined4Insert", "inDatabase", "legacy", "allMajors", "allMinors", "visible", "lastVisible"})
 public class CategoryInput extends Category {
 	
+	private List<String> allMajors = new ArrayList<String>();
+	private List<String> allMinors = new ArrayList<String>();
 	private List<String> options = new ArrayList<String>();
+	private boolean visible, lastVisible;
 	
 	public List<String> getOptions() {
 		return options;
@@ -47,5 +50,41 @@ public class CategoryInput extends Category {
 	
 	public boolean isReady() {
 		return StringUtils.isNotBlank(getMajor());
+	}
+
+	public List<String> getAllMajors() {
+		return allMajors;
+	}
+
+	public CategoryInput setAllMajors(List<String> allMajors) {
+		this.allMajors = allMajors;
+		return this;
+	}
+
+	public List<String> getAllMinors() {
+		return allMinors;
+	}
+
+	public CategoryInput setAllMinors(List<String> allMinors) {
+		this.allMinors = allMinors;
+		return this;
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public CategoryInput setVisible(boolean visible) {
+		this.visible = visible;
+		return this;
+	}
+
+	public boolean isLastVisible() {
+		return lastVisible;
+	}
+
+	public CategoryInput setLastVisible(boolean lastVisible) {
+		this.lastVisible = lastVisible;
+		return this;
 	}
 }

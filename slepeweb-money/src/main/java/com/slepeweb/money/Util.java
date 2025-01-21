@@ -7,7 +7,6 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.slepeweb.money.bean.CategoryGroup;
 import com.slepeweb.money.bean.CategoryInput;
 import com.slepeweb.money.bean.ChartProperties;
-import com.slepeweb.money.bean.SplitTransactionFormComponent;
 
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
@@ -311,6 +309,7 @@ public class Util {
 		return in.replaceAll("\\n", "").replaceAll("\\r", "");
 	}
 
+	/*
 	public static String buildSplitInputMarkup(List<SplitTransactionFormComponent> splits, 
 			String innerTemplate, String splitOptionsTemplate) {
 		
@@ -335,10 +334,10 @@ public class Util {
 			
 			inner = inner.
 					replace("__splitOptionsTemplate__", splitOptions.toString()).
-					replace("[memo]", comp.getMemo() == null ? "" : comp.getMemo()).
+					replace("[memo]", comp.getMemo() == null ? "" : comp.getMemo()).*/
 					
 					/* Split amounts are always displayed as positive values, but are evaluated
-					 * according to whether the parent transaction is a debit or credit. */
+					 * according to whether the parent transaction is a debit or credit. *//*
 					replace("[amount]", formatPositivePounds(comp.getAmount()));
 			
 			innerBuilder.append(inner);
@@ -346,6 +345,7 @@ public class Util {
 		
 		return innerBuilder.toString();		
 	}
+	*/
 	
 	public static String displayAmountNS(long amount) {
 		return displayAmount(amount, false);
