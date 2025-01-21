@@ -19,7 +19,7 @@
 	
 <mny:standardLayout>
 
-	<mny:tsformLabels entityName="transaction" /> <%-- Defines variables _buttonLabel and _pageHeading --%>
+	<tsf:labels entityName="transaction" /> <%-- Defines variables _buttonLabel and _pageHeading --%>
 	
 	<div class="right">
 		<c:if test="${_formMode eq 'update'}">
@@ -35,7 +35,7 @@
 	<form id="transaction-form" method="post" action="${_ctxPath}/transaction/update">	  
 	    <table id="trn-form">
 	    
-		    <mny:tsformIds entity="${_transaction}" />
+		    <tsf:ids entity="${_transaction}" />
 		    
 		    <tr>
 		        <td class="heading"><label for="entered">Date</label></td>
@@ -43,21 +43,21 @@
 		        	placeholder="Enter transaction date" value="${mon:formatTimestamp(_transaction.entered)}" /></td>
 		    </tr>
 
-		    <mny:tsformAccount entity="${_transaction}" />
-		    <mny:tsformPaymentType entity="${_transaction}" />
-		    <mny:tsformTransfer istransfer="${_transaction.transfer}" mirror="${_transaction.mirrorAccount}" />
-		    <mny:tsformPayee entity="${_transaction}" />
-		    <mny:tsformCategory entity="${_transaction}" />
-		    <mny:tsformSubCategory entity="${_transaction}" />
-		    <mny:tsformSplits />
-		    <mny:tsformNotesAndAmount entity="${_transaction}" />
+		    <tsf:account entity="${_transaction}" />
+		    <tsf:paymentType entity="${_transaction}" />
+		    <tsf:transfer istransfer="${_transaction.transfer}" mirror="${_transaction.mirrorAccount}" />
+		    <tsf:payee entity="${_transaction}" />
+		    <tsf:category entity="${_transaction}" />
+		    <tsf:subCategory entity="${_transaction}" />
+		    <tsf:splits />
+		    <tsf:notesAndAmount entity="${_transaction}" />
 
 		</table> 
 		
-		<mny:tsformTail entity="${_transaction}" label="Delete scheduled transaction?" />	       
+		<tsf:tail entity="${_transaction}" label="Delete scheduled transaction?" />	       
 	    <input type="hidden" name="origxferid" value="${_transaction.transferId}" />   
 	</form>		  	
 		
-	<mny:tsformDialogs entity="${_transaction}" />
+	<tsf:dialogs entity="${_transaction}" />
 	
 </mny:standardLayout>

@@ -13,6 +13,8 @@
 	<c:set var="_formActionUrl" scope="request">/search/save/${_ss.id }</c:set>
 </c:when></c:choose>
 
+<c:set var="_extraJs" scope="request" value="search.js,datepicker.js,minorcats.js" />
+
 <c:set var="_extraInPageCss" scope="request">
 	.ui-autocomplete {
 		font-size: 1.0em;
@@ -38,12 +40,14 @@
 	}
 </c:set>
 
+<c:set var="_extraInPageJs" scope="request">
+	_money.search.formMode = '${_formMode}';
+</c:set>
+
 <mny:standardLayout>
 
 	<h2>${_pageHeading}</h2>
 	<mny:advancedSearchForm />		
 	<mny:entityDeletionDialog entity="search" mode="${_formMode}" id="${_ss.id}"/>
 
-	<mny:searchOptionJavascript />
-	
- </mny:standardLayout>
+</mny:standardLayout>

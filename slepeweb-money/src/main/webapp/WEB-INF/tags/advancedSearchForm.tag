@@ -19,7 +19,7 @@
 
 <mny:multiCategoryInputSupport />
 <mny:multiCategoryJavascript />
-<mny:minorCategoryUpdatesJavascript />
+<%-- <mny:minorCategoryUpdatesJavascript /> --%>
 
 <form id="advanced-search-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">	  
     <table id="multi-category-groupings">

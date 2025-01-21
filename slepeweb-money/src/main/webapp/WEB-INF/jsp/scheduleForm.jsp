@@ -13,11 +13,12 @@
 		background: white url("${_ctxPath}/resources/images/progress-indicator.gif") right center no-repeat;
 	}
 </c:set>
+
 <mny:flash />
 	
 <mny:standardLayout>
 
-	<mny:tsformLabels entityName="schedule" />  <%-- Defines variables _buttonLabel and _pageHeading --%>
+	<tsf:labels entityName="schedule" />  <%-- Defines variables _buttonLabel and _pageHeading --%>
 	
 	<c:if test="${_formMode eq 'update'}">
 		<div class="right">
@@ -31,7 +32,7 @@
 	<form id="schedule-form" method="post" action="${_ctxPath}/schedule/save">	  
 	    <table>
 	    
-		    <mny:tsformIds entity="${_schedule}" />
+		    <tsf:ids entity="${_schedule}" />
 		    
 		    <tr>
 		        <td class="heading"><label for="label">Name</label></td>
@@ -56,14 +57,14 @@
 		        </td>
 		    </tr>
 
-		    <mny:tsformAccount entity="${_schedule}" />
-		    <mny:tsformPaymentType entity="${_schedule}" />
-		    <mny:tsformTransfer istransfer="${_schedule.transfer}" mirror="${_schedule.mirror}" />
-		    <mny:tsformPayee entity="${_schedule}" />
-		    <mny:tsformCategory entity="${_schedule}" />
-		    <mny:tsformSubCategory entity="${_schedule}" />
-		    <mny:tsformSplits />
-		    <mny:tsformNotesAndAmount entity="${_schedule}" />
+		    <tsf:account entity="${_schedule}" />
+		    <tsf:paymentType entity="${_schedule}" />
+		    <tsf:transfer istransfer="${_schedule.transfer}" mirror="${_schedule.mirror}" />
+		    <tsf:payee entity="${_schedule}" />
+		    <tsf:category entity="${_schedule}" />
+		    <tsf:subCategory entity="${_schedule}" />
+		    <tsf:splits />
+		    <tsf:notesAndAmount entity="${_schedule}" />
 		    
 		    <tr>
 		        <td class="heading"><label for="enabled">Enabled</label></td>
@@ -73,10 +74,10 @@
 		    
 		</table> 
 		
-		<mny:tsformTail entity="${_schedule}" label="Delete scheduled transaction?" />
+		<tsf:tail entity="${_schedule}" label="Delete scheduled transaction?" />
 	</form>	
 	
-	<mny:tsformDialogs entity="${_schedule}" />
+	<tsf:dialogs entity="${_schedule}" />
 	
 </mny:standardLayout>
 
