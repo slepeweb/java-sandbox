@@ -32,7 +32,7 @@
 	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
 		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
 	
-	<form id="transaction-form" method="post" action="${_ctxPath}/transaction/update">	  
+	<form id="transaction-form" method="post" action="${_ctxPath}/transaction/update">
 	    <table id="trn-form">
 	    
 		    <tsf:ids entity="${_transaction}" />
@@ -43,14 +43,15 @@
 		        	placeholder="Enter transaction date" value="${mon:formatTimestamp(_transaction.entered)}" /></td>
 		    </tr>
 
-		    <tsf:account entity="${_transaction}" />
+		    <tsf:account accountId="${_transaction.account.id}" />
 		    <tsf:paymentType entity="${_transaction}" />
 		    <tsf:transfer istransfer="${_transaction.transfer}" mirror="${_transaction.mirrorAccount}" />
-		    <tsf:payee entity="${_transaction}" />
+		    <tsf:payee payeeName="${_transaction.payee.name}" />
 		    <tsf:category entity="${_transaction}" />
 		    <tsf:subCategory entity="${_transaction}" />
-		    <tsf:splits />
-		    <tsf:notesAndAmount entity="${_transaction}" />
+				<mny:categoryList heading="Splits" categories="${_transactionSplits}" />
+		    <tsf:notes memo="${_schedule.memo}" />
+		    <tsf:amount value="${_transaction.amountValue}" isdebit="${_transaction.debit}" />
 
 		</table> 
 		

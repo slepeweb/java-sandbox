@@ -1,10 +1,10 @@
 package com.slepeweb.money.control;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +15,12 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.Category_Group;
+import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.ScheduledTransaction;
+import com.slepeweb.money.component.FormSupport;
+import com.slepeweb.money.component.TransactionFormSupport;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -24,11 +28,14 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(value="/schedule")
 public class ScheduledTransactionController extends BaseController {
 	
+	@Autowired private FormSupport formSupport;
+	@Autowired private TransactionFormSupport transactionFormSupport;
+	
 	private void populateForm(ModelMap model, ScheduledTransaction t, String mode) {			
 		List<Account> allAccounts = this.accountService.getAll(false);
 		model.addAttribute("_schedule", t);
-		model.addAttribute("_daysOfMonth", getDaysOfMonth());
-		populateTransAndSchedForm(model, t, allAccounts, mode);
+		model.addAttribute("_daysOfMonth", this.formSupport.getDaysOfMonth());
+		this.transactionFormSupport.populateForm(model, t, allAccounts, mode);
 	}
 	
 	@RequestMapping(value="/list")	
@@ -117,7 +124,9 @@ public class ScheduledTransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			scht.setSplits(readSplitsInput(req, multiplier));
+			Category_GroupSet cgs = this.formSupport.readCategoryInputs(req, 1);
+			Category_Group cg = cgs.getGroups().get(0);
+			scht.setSplits(cg.toSplitTransactions(this.categoryService, multiplier));
 		}
 		
 		try {
@@ -148,11 +157,4 @@ public class ScheduledTransactionController extends BaseController {
 				req.getContextPath(), Util.encodeUrl(flash)));
 	}	
 	
-	private List<Integer> getDaysOfMonth() {
-		List<Integer> list = new ArrayList<Integer>(28);
-		for (int i = 1; i <= 28; i++) {
-			list.add(i);
-		}
-		return list;
-	}
 }

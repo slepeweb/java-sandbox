@@ -1,7 +1,6 @@
 package com.slepeweb.money.control;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -17,30 +16,21 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.Category_Group;
+import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.MonthPager;
 import com.slepeweb.money.bean.NormalisedMonth;
-import com.slepeweb.money.bean.Option;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RunningBalance;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.bean.Transfer;
+import com.slepeweb.money.component.FormSupport;
+import com.slepeweb.money.component.TransactionFormSupport;
 import com.slepeweb.money.service.CookieService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-
-/*
- * TODO: Things to look at:
- * - Need to store the last selected account on the transaction list page, so that
- *   the list menu can refer to it
- * - No way to remove a category from split transactions
- * - If you have 3 splits, then blank out no. 2, then only the first is saved.
- * - Fourth split on form breaks update
- * - Provide option to ignore split errors
- */
-
 
 @Controller
 @RequestMapping(value="/transaction")
@@ -49,6 +39,9 @@ public class TransactionController extends BaseController {
 	private static Logger LOG = Logger.getLogger(TransactionController.class);
 	
 	@Autowired private CookieService cookieService;
+	@Autowired private FormSupport formSupport;
+	@Autowired private TransactionFormSupport transactionFormSupport;
+
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)	
 	public String listNoAccount(HttpServletRequest req, HttpServletResponse res, ModelMap model) { 
@@ -145,33 +138,14 @@ public class TransactionController extends BaseController {
 		model.addAttribute("_tl", tl);
 		model.addAttribute("_accounts", allAccounts);
 		model.addAttribute("_accountId", accountId);
-		model.addAttribute("_yearSelector", buildMonthSelector(pager));
+		model.addAttribute("_yearSelector", this.transactionFormSupport.buildMonthSelector(pager));
 		
 		return "transactionList";
 	}
 	
-	private List<Option> buildMonthSelector(MonthPager pager) {
-		
-		List<Option> yearSelector = new ArrayList<Option>();
-		int numYears = pager.getFirstMonth().distanceBefore(pager.getLastMonth()) / 12;
-		Calendar today = Util.today();
-		int thisYear = today.get(Calendar.YEAR);
-		NormalisedMonth m = new NormalisedMonth(today.getTime());
-		Option o;
-				
-		for (int i = 0; i <= numYears; i++) {
-			o = new Option(m.getIndex(), String.valueOf(thisYear - i));
-			yearSelector.add(o);
-			o.setSelected(m.getYear() == pager.getSelectedMonth().getYear());
-			m.decrement(12);
-		}
-		
-		return yearSelector;
-	}
-
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String addForm(ModelMap model) {		
-		populateForm(model, new Transaction(), "add");
+		this.transactionFormSupport.populateForm(model, new Transaction(), "add");
 		return "transactionForm";
 	}
 	
@@ -180,7 +154,7 @@ public class TransactionController extends BaseController {
 		
 		Timestamp lastEntered = this.cookieService.getLastEntered(req);
 		
-		populateForm(model, 
+		this.transactionFormSupport.populateForm(model, 
 				new Transaction().
 					setAccount(this.accountService.get(accountId)).
 					setEntered(lastEntered != null ? lastEntered : Util.now()), 
@@ -191,29 +165,8 @@ public class TransactionController extends BaseController {
 	
 	@RequestMapping(value="/form/{transactionId}", method=RequestMethod.GET)
 	public String updateForm(@PathVariable long transactionId, ModelMap model) {
-		populateForm(model, this.transactionService.get(transactionId), "update");
+		this.transactionFormSupport.populateForm(model, this.transactionService.get(transactionId), "update");
 		return "transactionForm";
-	}
-	
-	private void populateForm(ModelMap model, Transaction t, String mode) {	
-		
-		List<Account> allAccounts = this.accountService.getAll(false);
-		
-		// Not sure about this logic
-		if (! allAccounts.contains(t.getAccount())) {
-			allAccounts.add(t.getAccount());
-		}
-		
-		model.addAttribute("_transaction", t);
-		populateTransAndSchedForm(model, t, allAccounts, mode);
-				
-		if (t.isTransfer()) {
-			Transfer tt = (Transfer) t;
-			model.addAttribute("_xferAccount", tt.getMirrorAccount());
-			if (! allAccounts.contains(tt.getMirrorAccount())) {
-				allAccounts.add(tt.getMirrorAccount());
-			}
-		}
 	}
 	
 	@RequestMapping(value="/update", method=RequestMethod.POST)
@@ -269,7 +222,9 @@ public class TransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			t.setSplits(readSplitsInput(req, multiplier));
+			Category_GroupSet cgs = this.formSupport.readCategoryInputs(req, 1);
+			Category_Group cg = cgs.getGroups().get(0);
+			t.setSplits(cg.toSplitTransactions(this.categoryService, multiplier));
 		}
 		
 		if (save(t) != null) {
@@ -307,7 +262,7 @@ public class TransactionController extends BaseController {
 	
 	@RequestMapping(value="/copy/{transactionId}", method=RequestMethod.GET)
 	public String copy(@PathVariable long transactionId, HttpServletRequest req, ModelMap model) {
-		populateForm(model, this.transactionService.get(transactionId).
+		this.transactionFormSupport.populateForm(model, this.transactionService.get(transactionId).
 				setId(0L).setOrigId(0L).setEntered(Util.now()), "add");
 		return "transactionForm";
 	}	

@@ -8,16 +8,16 @@ _money.transandsched.setComponentVisibilities = function() {
 	if (paymentType == "standard") {
 		// Set form for a standard/normal transaction
 		$("tr.payee td, tr.category td").css("display", "table-cell");
-		$("tr.transfer td, tr.splits-list td").css("display", "none");
+		$("tr.transfer td, tr.category-list td").css("display", "none");
 	}
 	else if (paymentType == "transfer") {
-		$("tr.category td, tr.splits-list td").css("display", "none");
+		$("tr.category td, tr.category-list td").css("display", "none");
 		$("tr.payee td").css("display", "none");
 		$("tr.transfer td").css("display", "table-cell");
 	}
 	else if (paymentType == "split") {				
 		$("tr.category td, tr.transfer td").css("display", "none");
-		$("tr.payee td, tr.splits-list td").css("display", "table-cell");
+		$("tr.payee td, tr.category-list td").css("display", "table-cell");
 	}
 }
 
@@ -87,25 +87,6 @@ $(function() {
 		}
 	});
 	
-	$('tr.splits-list span.next-category').click(function() {
-		let span$ = $(this)
-		span$.empty()
-		span$.parent().next().removeClass('hidden');
-	})
-	
-	$('tr.splits-list span.trash-category').click(function() {
-		let ele$ = $(this).parent().find('span.next-category')
-		ele$.css('display', 'hidden')
-		ele$ = ele$.next()
-		ele$.val('')
-		ele$ = ele$.next()
-		ele$.val('')
-		ele$ = ele$.next()
-		ele$.val('')
-		ele$ = ele$.next()
-		ele$.val('0.00')
-	})
-
 	// Run scripts selected functions when page loads
 	_money.transandsched.setComponentVisibilities();
 	

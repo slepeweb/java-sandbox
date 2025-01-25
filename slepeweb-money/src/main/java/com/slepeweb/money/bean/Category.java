@@ -9,7 +9,7 @@ public class Category extends DbEntity {
 	public static final String INCOME_TYPE = "income";
 	
 	private String major = "", minor = "";
-	private boolean exclude, expense = true;
+	private boolean expense = true;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Category) {
@@ -67,15 +67,6 @@ public class Category extends DbEntity {
 		return this;
 	}
 	
-	public boolean isExclude() {
-		return exclude;
-	}
-
-	public Category setExclude(boolean exclude) {
-		this.exclude = exclude;
-		return this;
-	}
-
 	public boolean isExpense() {
 		return expense;
 	}

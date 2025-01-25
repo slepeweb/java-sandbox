@@ -122,6 +122,26 @@ $(function() {
 			}
 		]
 	});
+	
+	$('tr.category-list span.next-category').click(function() {
+		let span$ = $(this)
+		span$.empty()
+		span$.parent().next().removeClass('hidden');
+	})
+
+	$('tr.category-list span.trash-category').click(function() {
+		let ele$ = $(this).parent().find('span.next-category')
+		ele$.css('display', 'hidden')
+		ele$ = ele$.next()
+		ele$.val('')
+		ele$ = ele$.next()
+		ele$.val('')
+		ele$ = ele$.next()
+		ele$.val('')
+		ele$ = ele$.next()
+		ele$.val('0.00')
+	})
+
 });
 
 

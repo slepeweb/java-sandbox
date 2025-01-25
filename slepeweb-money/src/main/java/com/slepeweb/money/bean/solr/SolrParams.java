@@ -1,14 +1,13 @@
 package com.slepeweb.money.bean.solr;
 
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
-
 import com.slepeweb.money.Util;
-import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.Category_GroupSet;
 
 @JsonIgnoreProperties({"start", "hrefBase", "accountIdStr", "payeeIdStr", "categoryIdStr"})
 public class SolrParams {
@@ -18,7 +17,7 @@ public class SolrParams {
 	
 	private SolrConfig config;
 	private String memo, majorCategory, minorCategory, payeeName;
-	private List<Category> categories;
+	private Category_GroupSet categories;
 	private Long accountId, payeeId, categoryId;
 	private int pageNum, pageSize;
 	private Date from, to;
@@ -237,11 +236,11 @@ public class SolrParams {
 		return config;
 	}
 
-	public List<Category> getCategories() {
+	public Category_GroupSet getCategories() {
 		return categories;
 	}
 
-	public SolrParams setCategories(List<Category> categories) {
+	public SolrParams setCategories(Category_GroupSet categories) {
 		this.categories = categories;
 		return this;
 	}
@@ -282,7 +281,7 @@ public class SolrParams {
 			if (isDebit()) {
 				pennies = -pennies;
 			}
-			return new Long(pennies);
+			return Long.valueOf(pennies);
 		}
 		return null;
 	}

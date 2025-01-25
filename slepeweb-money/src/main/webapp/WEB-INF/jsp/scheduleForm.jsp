@@ -57,14 +57,15 @@
 		        </td>
 		    </tr>
 
-		    <tsf:account entity="${_schedule}" />
+		    <tsf:account accountId="${_schedule.account.id}" />
 		    <tsf:paymentType entity="${_schedule}" />
 		    <tsf:transfer istransfer="${_schedule.transfer}" mirror="${_schedule.mirror}" />
-		    <tsf:payee entity="${_schedule}" />
+		    <tsf:payee payeeName="${_schedule.payee.name}" />
 		    <tsf:category entity="${_schedule}" />
 		    <tsf:subCategory entity="${_schedule}" />
-		    <tsf:splits />
-		    <tsf:notesAndAmount entity="${_schedule}" />
+				<mny:categoryList heading="Splits" categories="${_transactionSplits}" />
+		    <tsf:notes memo="${_schedule.memo}" />
+		    <tsf:amount value="${_schedule.amountValue}" isdebit="${_schedule.debit}" />
 		    
 		    <tr>
 		        <td class="heading"><label for="enabled">Enabled</label></td>

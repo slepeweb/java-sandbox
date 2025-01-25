@@ -19,5 +19,10 @@ $(function() {
 
 		$("#cancel-button").click(function(e){
 		window.location = webContext + "/search/list"
-	});		
+	});	
+	
+	$("input[id^='major']").off().change(function(e) {	
+		_money.service.minorcats.updateMinorCategories($(this));
+	});	  
+
 });

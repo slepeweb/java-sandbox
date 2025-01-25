@@ -11,10 +11,6 @@ import java.util.Date;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.slepeweb.money.bean.CategoryGroup;
-import com.slepeweb.money.bean.CategoryInput;
-import com.slepeweb.money.bean.ChartProperties;
-
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
@@ -224,6 +220,7 @@ public class Util {
 		return pence / 100;
 	}
 	
+	/*
 	public static String buildChartCategoryInputMarkup(ChartProperties props, String outerTemplate, String innerTemplate, 
 			String categoryOptionsTemplate) {
 		
@@ -233,16 +230,16 @@ public class Util {
 		String outer, inner;
 		int groupId = 0, optionsId;
 		
-		for (CategoryGroup group : props.getGroups()) {
+		for (CategoryInputGroup group : props.getGroups()) {
 			groupId++;
-			outer = outerTemplate.
+			outer = outerTemplate.<SearchCategoryInput>
 					replaceAll("\\[groupId\\]", String.valueOf(groupId)).
 					replace("[label]", group.getLabel());
 			inner = "";
 			innerBuilder = new StringBuilder();
 			optionsId = 0;
 			
-			for (CategoryInput cc : group.getCategories()) {
+			for (SearchCategoryInput cc : group.getCategories()) {
 				optionsId++;
 				inner = innerTemplate.
 						replaceAll("\\[groupId\\]", String.valueOf(groupId)).
@@ -273,8 +270,8 @@ public class Util {
 		
 	}
 	
-	public static String buildMinorCategoryInputMarkup(CategoryGroup group, String innerTemplate, 
-			String categoryOptionsTemplate) {
+	public static String buildMinorCategoryInputMarkup(CategoryInputGroup group, 
+			String innerTemplate, String categoryOptionsTemplate) {
 		
 		StringBuilder minorCategoryOptions = new StringBuilder();
 		StringBuilder innerBuilder = new StringBuilder();
@@ -304,7 +301,7 @@ public class Util {
 		
 		return innerBuilder.toString();		
 	}
-	
+	*/
 	public static String compactMarkup(String in) {
 		return in.replaceAll("\\n", "").replaceAll("\\r", "");
 	}

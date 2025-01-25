@@ -41,7 +41,7 @@ public class SavedSearchServiceImpl extends BaseServiceImpl implements SavedSear
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into search (name, type, description, saved, json) values (?, ?, ?, ?)", 
+					"insert into search (name, type, description, saved, json) values (?, ?, ?, ?, ?)", 
 					ss.getName(), ss.getType(), ss.getDescription(), ss.getSaved(), ss.getJson());
 			
 			ss.setId(getLastInsertId());	

@@ -5,22 +5,6 @@
 
 <!-- advancedSearchForm.tag -->
 
-<c:set var="_selectedAccountId" value="${_params.accountIdStr}" />
-<c:set var="_selectedPayeeId" value="${_params.payeeIdStr}" />
-<c:set var="_selectedPayeeName" value="${_params.payeeName}" />
-<c:set var="_selectedMajorCategory" value="${_params.majorCategory}" />
-<c:set var="_selectedMemoTerms" value="${_params.memo}" />
-<c:set var="_selectedPageSize" value="${_params.pageSize}" />
-<c:set var="_selectedFrom" value="${mon:formatTimestamp(_params.from)}" />
-<c:set var="_selectedTo" value="${mon:formatTimestamp(_params.to)}" />
-<c:set var="_selectedFromAmount" value="${not empty _params.fromAmount ? mon:formatPounds(_params.fromAmount) : ''}" />
-<c:set var="_selectedToAmount" value="${not empty _params.toAmount ? mon:formatPounds(_params.toAmount) : ''}" />
-<c:set var="_selectedDebitOrCredit" value="${_params.debit ? '-1' : '1'}" />
-
-<mny:multiCategoryInputSupport />
-<mny:multiCategoryJavascript />
-<%-- <mny:minorCategoryUpdatesJavascript /> --%>
-
 <form id="advanced-search-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">	  
     <table id="multi-category-groupings">
 	    <c:if test="${_formMode ne 'adhoc'}">
@@ -44,45 +28,20 @@
 	        <td class="heading"><label for="pageSize">Page size</label></td>
 	        <td>
 	        	<input type="text" id="pageSize" name="pageSize"
-    					placeholder="Specify the page size" value="${_selectedPageSize}" />	        	
+    					placeholder="Specify the page size" value="${_params.pageSize}" />	        	
 	        </td>
 	    </tr>
-	    <tr>
-	        <td class="heading"><label for="accountId">Account</label></td>
-	        <td>
-	        	<select id="accountId" name="accountId">
-	        	<option value=""></option>
-	        		<c:forEach items="${_allAccounts}" var="_a">
-	        			<option value="${_a.id}" <c:if test="${_a.id eq _selectedAccountId}">selected</c:if>>${_a.name}</option>
-	        		</c:forEach>
-	        	</select>
-	        </td>
-	    </tr>
-	    
-	    <tr>
-	        <td class="heading"><label for="payee">Payee</label></td>
-	        <td><input id="payee" type="text" name="payee" value="${_selectedPayeeName}" /></td>
-	    </tr>
-	    
-	    <tr class="multi-category-group">
-	        <td class="heading"><label for="category">Category(s)</label></td>
-	        <td>
-	        	${mon:buildMinorCategoryInputMarkup(_categoryGroup, _innerTemplate, _categoryOptionsTemplate)}
-						<button class="add-category-button" type="button" data-groupid="1">+ category</button>
-	        </td>
-	    </tr>
-	    
-	    <tr>
-	        <td class="heading"><label for="memo">Memo</label></td>
-	        <td><input id="memo" type="text" name="memo" placeholder="Terms that might be in the memo field" value="${_selectedMemoTerms}" /></td>
-	    </tr>
-	    
+		  
+		  <tsf:account accountId="${_params.accountIdStr}" />
+		  <tsf:payee payeeName="${_params.payeeName}" />
+			<mny:categoryList heading="Categories" categories="${_categoryGroup}" />
+	    	    
 	    <tr>
 	        <td class="heading"><label for="from">Dates</label></td>
 	        <td>
-	        	From: <input class="datepicker" id="from" type="text" name="from" value="${_selectedFrom}"
+	        	From: <input class="datepicker" id="from" type="text" name="from" value="${mon:formatTimestamp(_params.from)}"
 	        		placeholder="Optional search window start date" />
-	        	To: <input class="datepicker" id="to" type="text" name="to" value="${_selectedTo}"
+	        	To: <input class="datepicker" id="to" type="text" name="to" value="${mon:formatTimestamp(_params.to)}"
 	        		placeholder="Optional search window end date" />
 	        </td>
 	    </tr>
@@ -90,11 +49,14 @@
 	    <tr>
 	        <td class="heading"><label for="from">Amounts</label></td>
 	        <td>
-	        	From: <input class="amount" id="from-amount" type="text" name="from-amount" value="${_selectedFromAmount}"
+	        	From: <input class="amount" id="from-amount" type="text" name="from-amount" 
+	        		value="${not empty _params.fromAmount ? mon:formatPounds(_params.fromAmount) : ''}"
 	        		placeholder="Optional minimum amount" />
-	        	To: <input class="amount" id="to-amount" type="text" name="to-amount" value="${_selectedToAmount}"
+	        	To: <input class="amount" id="to-amount" type="text" name="to-amount" 
+	        		value="${not empty _params.toAmount ? mon:formatPounds(_params.toAmount) : ''}"
 	        		placeholder="Optional maximum amount" />
 	        	
+						<c:set var="_selectedDebitOrCredit" value="${_params.debit ? '-1' : '1'}" />
 	        	<select name="debitorcredit" class="amount">
 	        		<option value="-1" <c:if test="${_selectedDebitOrCredit eq '-1'}">selected</c:if>>Debit</option>
 	        		<option value="1" <c:if test="${_selectedDebitOrCredit eq '1'}">selected</c:if>>Credit</option>
@@ -117,7 +79,6 @@
 	    
 		</table> 
 		
-		<input id="counter-store" type="hidden" name="counterStore" value="" />		
 		<input type="hidden" name="formMode" value="${_formMode}" />		
 
 		<input type="submit" id="submit-button" value="Submit" title="Submit this form" />		

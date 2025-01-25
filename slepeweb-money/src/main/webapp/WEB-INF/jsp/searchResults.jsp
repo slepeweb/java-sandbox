@@ -72,7 +72,5 @@
 			});
 		});
 	</script>
-	
-	<mny:searchOptionJavascript />
-	
+		
 </mny:standardLayout>
