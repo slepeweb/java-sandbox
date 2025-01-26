@@ -8,7 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 public class SavedSearch extends DbEntity {
 	
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd @ HH:mm");
-	
+	public static final int ADHOC_ID = -1;
+		
 	private String name, type, description, json;
 	private Timestamp saved;
 	

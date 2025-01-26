@@ -30,8 +30,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(value="/search")
 public class SearchController extends BaseController {
 		
-	private static final int ADHOC_ID = -1;
-	
 	@Autowired private FormSupport formSupport;
 	@Autowired private SearchFormSupport searchFormSupport;
 	
@@ -135,10 +133,17 @@ public class SearchController extends BaseController {
 		return SearchFormSupport.FORM_VIEW;
 	}
 
-	// Empty search definition form, for adding a new search
+	/* 
+	 * Empty search definition form, for adding a new ad-hoc search
+	 * Ad-hoc searches require an entry in the search db table with id = -1. All ad-hoc searches use and
+	 * update this single row in the table to record the search criteria.
+	 * 
+	 * TODO: As it currently stands, the app is a single-user app. That is, two users would be unable to
+	 * execute ad-hoc searches at the same time.
+	 */
 	@RequestMapping(value="/adhoc", method=RequestMethod.GET)
 	public String adhoc(ModelMap model) {
-		this.searchFormSupport.populateForm(null, null, ADHOC_MODE, model);		
+		this.searchFormSupport.populateForm(null, new SolrParams(new SolrConfig()), ADHOC_MODE, model);		
 		return SearchFormSupport.FORM_VIEW;
 	}
 	
@@ -159,7 +164,7 @@ public class SearchController extends BaseController {
 		SavedSearchSupport supp = processFormSubmission(req, ss);
 		
 		if (supp.isAdhoc()) {
-			ss.setId(ADHOC_ID);
+			ss.setId(SavedSearch.ADHOC_ID);
 			storeSavedSearch(ss);
 			return redirect2Adhoc(supp.setFlash(""));
 		}
@@ -221,7 +226,7 @@ public class SearchController extends BaseController {
 	// Execute an ad-hoc search
 	@RequestMapping(value="/get/adhoc", method=RequestMethod.GET)
 	public String getAdhoc(ModelMap model) {
-		return get(ADHOC_ID, 1, model);
+		return get(SavedSearch.ADHOC_ID, 1, model);
 	}
 	
 	// Execute the search

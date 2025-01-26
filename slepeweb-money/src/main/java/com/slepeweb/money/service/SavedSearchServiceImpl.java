@@ -25,6 +25,9 @@ public class SavedSearchServiceImpl extends BaseServiceImpl implements SavedSear
 					return update(dbRecord, ss);
 				}
 				else {
+					if (ss.getId() == SavedSearch.ADHOC_ID) {
+						LOG.warn("Missing ADHOC_ID record in the search table");
+					}
 					throw new DataInconsistencyException(error(LOG, "SavedSearch does not exist in DB", ss));
 				}
 			}

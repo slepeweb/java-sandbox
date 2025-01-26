@@ -4,6 +4,8 @@
 	
 <mny:flash />
 
+<c:set var="_extraJs" scope="request" value="search.js,datepicker.js,minorcats.js" />
+
 <c:set var="_extraInPageCss" scope="request">
 	#saved-search-identifier {
 		width: 50%;
