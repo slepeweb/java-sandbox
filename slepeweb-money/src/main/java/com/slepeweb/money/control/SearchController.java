@@ -2,6 +2,7 @@ package com.slepeweb.money.control;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +60,13 @@ public class SearchController extends BaseController {
 	}
 	
 	private SavedSearchSupport processFormSubmission(HttpServletRequest req, SavedSearch ss) {
-		Category_GroupSet cgs = this.formSupport.readCategoryInputs(req, 1);
-		cgs.setContext(Category_GroupSet.SEARCH_CTX);
+		List<String> allMajors = this.categoryService.getAllMajorValues();
+		Category_GroupSet cgs = new Category_GroupSet("Splits", Category_GroupSet.SEARCH_CTX, allMajors);
+		this.formSupport.readCategoryInputs(req, 1, cgs);
 		SolrParams params = this.searchFormSupport.readSearchCriteria(req);
-		params.setCategories(cgs);
+		
+		// Search functionality is based on a single group of categories
+		params.setCategoryGroup(cgs.getGroups().get(0));
 				
 		ss = setSavedSearch(
 				ss,
@@ -234,7 +238,7 @@ public class SearchController extends BaseController {
 	public String get(@PathVariable int id, @PathVariable int page, ModelMap model) {
 		SavedSearch ss = this.savedSearchService.get(id);
 		SolrParams params = this.searchFormSupport.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
-		model.addAttribute(SAVED_SEARCH_ATTR, ss);			
+		model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);			
 		this.searchFormSupport.populateForm(ss, params, id == -1 ? ADHOC_MODE : UPDATE_MODE, model);		
 		executeSearch(params, model);
 		return SearchFormSupport.RESULTS_VIEW;

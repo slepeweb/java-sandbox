@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.slepeweb.money.Util;
-import com.slepeweb.money.bean.Category_GroupSet;
+import com.slepeweb.money.bean.Category_Group;
 
 @JsonIgnoreProperties({"start", "hrefBase", "accountIdStr", "payeeIdStr", "categoryIdStr"})
 public class SolrParams {
@@ -17,7 +17,7 @@ public class SolrParams {
 	
 	private SolrConfig config;
 	private String memo, majorCategory, minorCategory, payeeName;
-	private Category_GroupSet categories;
+	private Category_Group categoryGroup;
 	private Long accountId, payeeId, categoryId;
 	private int pageNum, pageSize;
 	private Date from, to;
@@ -236,12 +236,12 @@ public class SolrParams {
 		return config;
 	}
 
-	public Category_GroupSet getCategories() {
-		return categories;
+	public Category_Group getCategoryGroup() {
+		return categoryGroup;
 	}
 
-	public SolrParams setCategories(Category_GroupSet categories) {
-		this.categories = categories;
+	public SolrParams setCategoryGroup(Category_Group categories) {
+		this.categoryGroup = categories;
 		return this;
 	}
 

@@ -222,8 +222,9 @@ public class TransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			Category_GroupSet cgs = this.formSupport.readCategoryInputs(req, 1);
-			Category_Group cg = cgs.getGroups().get(0);
+			List<String> allMajors = this.categoryService.getAllMajorValues();
+			Category_GroupSet cgs = new Category_GroupSet("Splits", Category_GroupSet.TRANSACTION_CTX, allMajors);
+			Category_Group cg = this.formSupport.readCategoryInputs(req, 1, cgs);
 			t.setSplits(cg.toSplitTransactions(this.categoryService, multiplier));
 		}
 		

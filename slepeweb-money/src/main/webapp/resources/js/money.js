@@ -4,6 +4,7 @@ var _money = {
 	transaction: {},
 	transandsched: {},
 	search: {},
+	chart: {},
 	service: {},
 };
 

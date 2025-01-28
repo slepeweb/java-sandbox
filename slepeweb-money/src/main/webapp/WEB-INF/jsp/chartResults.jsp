@@ -1,7 +1,11 @@
 <%@ 
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
-	
+
+<c:set var="_extraJs" scope="request" value="chart.js,search.js,minorcats.js" />
+
+<!-- chartResults.jsp -->
+
 <mny:flash />
 
 <c:set var="_extraInPageCss" scope="request">

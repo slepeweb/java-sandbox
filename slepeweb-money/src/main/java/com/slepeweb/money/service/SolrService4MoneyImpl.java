@@ -19,7 +19,6 @@ import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Category_;
 import com.slepeweb.money.bean.Category_Group;
-import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.Transaction;
@@ -199,7 +198,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 				q.addFilterQuery(String.format("minor:\"%s\"", params.getMinorCategory()));
 			}
 		}
-		else if (params.getCategories() != null && params.getCategories().getSize() > 0) {
+		else if (params.getCategoryGroup() != null && params.getCategoryGroup().getSize() > 0) {
 			// This category-based search is specific to charting functionality.
 			// First, split the category list into included/excluded categories.
 			isCategorySearch = true;
@@ -207,8 +206,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 				includeList = new ArrayList<Category_>(), 
 				excludeList = new ArrayList<Category_>();
 
-			Category_GroupSet cgs = params.getCategories();
-			Category_Group cg = cgs.getGroups().get(0);
+			Category_Group cg = params.getCategoryGroup();
 			
 			for (Category_ c : cg.getCategories()) {
 				if (! c.isExclude()) {

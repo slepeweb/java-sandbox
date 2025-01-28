@@ -24,10 +24,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 public class BaseController {
 
-	protected static final String FORM_MODE_ATTR = "_formMode";
-	protected static final String JSON_ATTR = "_json";
-	protected static final String SAVED_SEARCH_ATTR = "_ss";
-	
 	protected static final String CREATE_MODE = "create";
 	protected static final String UPDATE_MODE = "update";
 	protected static final String EXECUTE_MODE = "execute";

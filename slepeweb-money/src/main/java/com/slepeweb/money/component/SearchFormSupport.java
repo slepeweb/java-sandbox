@@ -10,7 +10,6 @@ import org.springframework.ui.ModelMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.money.Util;
-import com.slepeweb.money.bean.Category_;
 import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.SavedSearch;
@@ -54,33 +53,22 @@ public class SearchFormSupport {
 			SavedSearch ss, SolrParams params, String formMode, ModelMap model) {
 		
 		List<String> allMajors = this.categoryService.getAllMajorValues();
-		Category_GroupSet cgs = null;
+		Category_GroupSet cgs = new Category_GroupSet("Search", Category_GroupSet.SEARCH_CTX, allMajors);
+		Category_Group cg;
 		
-		if (params.getCategories() == null) {
-			cgs = new Category_GroupSet("Search", Category_GroupSet.SEARCH_CTX, allMajors);
-			Category_Group cg = this.formSupport.populateCategory_Group(1, "Categories", null, SearchCategory.class, cgs);
-			cgs.getGroups().add(cg);
-			params.setCategories(cgs);
+		if (params.getCategoryGroup() == null) {
+			cg = this.formSupport.populateCategory_Group(1, "Categories", null, SearchCategory.class, cgs);			
+			params.setCategoryGroup(cg);
 		}
 		else {
-			cgs = params.getCategories();
-			
-			// Only interested in the first group
-			Category_Group cg = cgs.getGroups().get(0);
-			Category_ c;
-			int numCats = cg.getSize();
-			
-			// Ensure all existing categories are visible
-			for (int i = 0; i < numCats; i++) {
-				c = cg.getCategories().get(i);
-				c.setVisible(true);
-				c.setLastVisible(i == numCats - 1);
-			}
-			
-			// Add some blank categories to first group
+			cg = params.getCategoryGroup();
+			cg.setAllCategoriesVisible();
 			this.formSupport.addEmptyCategories(cg);
 		}
 		
+		cg.setVisible(true);
+		cgs.getGroups().add(cg);
+
 		model.addAttribute(SAVED_SEARCH_ATTR, ss);		
 		model.addAttribute(PARAMS_ATTR, params);		
 		model.addAttribute(CATEGORY_GROUP_ATTR, cgs);				

@@ -3,6 +3,8 @@ package com.slepeweb.money.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.slepeweb.money.service.CategoryService;
 
@@ -21,6 +23,21 @@ public class Category_Group {
 		this.id = i;
 		this.label = label;
 		this.root = cgs;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("Category group#%d, %s", this.id, this.label);
+	}
+	
+	public boolean hasCompletedEntries() {
+		for (Category_ c : getCategories()) {
+			if (StringUtils.isNotBlank(c.getMajor())) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public List<SplitTransaction> toSplitTransactions(CategoryService categoryService, long amountPlusOrMinus) {
@@ -69,6 +86,18 @@ public class Category_Group {
 	
 	public Category_Group setVisible(boolean visible) {
 		this.visible = visible;
+		return this;
+	}
+	
+	public Category_Group setAllCategoriesVisible() {
+		Category_ c;
+		int numCats = getSize();
+		
+		for (int i = 0; i < getSize(); i++) {
+			c = getCategories().get(i);
+			c.setVisible(true);
+			c.setLastVisible(i == numCats - 1);
+		}
 		return this;
 	}
 	

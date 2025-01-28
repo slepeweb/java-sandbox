@@ -17,7 +17,7 @@ $(function() {
 		}
 	});
 
-		$("#cancel-button").click(function(e){
+		$("form#advanced-search-form input#cancel-button").click(function(e){
 		window.location = webContext + "/search/list"
 	});	
 	

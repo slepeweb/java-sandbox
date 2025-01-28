@@ -1,7 +1,25 @@
 package com.slepeweb.money.component;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.ModelMap;
+
+import com.slepeweb.money.bean.Category_Group;
+import com.slepeweb.money.bean.Category_GroupSet;
+import com.slepeweb.money.bean.ChartProperties;
+import com.slepeweb.money.bean.SavedSearch;
+import com.slepeweb.money.bean.SearchCategory;
+import com.slepeweb.money.control.CategoryController;
+import com.slepeweb.money.service.CategoryService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Component
 public class ChartFormSupport {
-/*
+
 	public static final String CHART_PROPS_ATTR = "_chartProps";
 	public static final String YEAR_RANGE_ATTR = "_yearRange";
 	public static final String CHART_TYPE = "chart";
@@ -10,30 +28,45 @@ public class ChartFormSupport {
 	public static final String LIST_VIEW = "chartList";
 	public static final String RESULTS_VIEW = "chartResults";
 	
-	private static final int NUM_EMPTY_GROUPS = 3;
-
+	public static final int NUM_EMPTY_GROUPS = 2;
+	
 	@Autowired private CategoryService categoryService;
-
 	@Autowired private FormSupport formSupport;
 	@Autowired private SearchFormSupport searchFormSupport;
 
-	public ChartProperties populateEmptyForm() {
-		ChartProperties props = new ChartProperties().setTitle("No title");
-		props.setInputGroups(populateChartCategoryInputs(null));
+
+	public void populateForm(SavedSearch ss, ChartProperties props, String formMode, ModelMap model) {
+
+		List<String> allMajors = this.categoryService.getAllMajorValues();
+		Category_GroupSet cgs = null;
 		
-		return props;
-	}
-	
-	public void setCommonChartModelAttributes(SavedSearch ss, String formMode, ModelMap model) {
-		ChartProperties props = null;
-		if (! formMode.equals("create") && ss != null) {
-			props = this.searchFormSupport.fromJson(new TypeReference<ChartProperties>() {}, ss.getJson());
-			model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);
+		if (props.getCategories() == null) {
+			cgs = new Category_GroupSet("Chart", Category_GroupSet.CHART_CTX, allMajors);
+			addEmptyGroups(cgs);
+			props.setCategories(cgs);
 		}
 		else {
-			props = populateEmptyForm();
+			cgs = props.getCategories();
+			Category_Group cg;
+			int numGroups = cgs.getSize();
+			
+			// Ensure all existing groups are visible, and append some empty categories
+			for (int i = 0; i < numGroups; i++) {
+				cg = cgs.getGroups().get(i);
+				cg.setId(i + 1);
+				cg.setVisible(true);
+				cg.setLastVisible(i == numGroups - 1);
+				cg.setAllCategoriesVisible();
+				
+				this.formSupport.addEmptyCategories(cg);
+			}
+			
+			// Add some blank groups for user to complete
+			addEmptyGroups(cgs);
 		}
 		
+		model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);
+		model.addAttribute(SearchFormSupport.CATEGORY_GROUP_ATTR, cgs);				
 		model.addAttribute(CHART_PROPS_ATTR, props);
 		model.addAttribute(SearchFormSupport.FORM_MODE_ATTR, formMode);
 		model.addAttribute(YEAR_RANGE_ATTR, this.formSupport.getYearRange());
@@ -41,48 +74,26 @@ public class ChartFormSupport {
 				this.categoryService.getAllMajorValues());
 	}
 	
-	public List<SearchCategoryInputGroup> populateChartCategoryInputs(List<SearchCategoryGroup> groups) {
-		int count = 0;
-		int numVisible = groups != null ? groups.size() : 0;
-		SearchCategoryInputGroup inputGroup;
-		List<SearchCategoryInputGroup> allGroups = new ArrayList<SearchCategoryInputGroup>();
+
+	public void addEmptyGroups(Category_GroupSet cgs) {
+		List<Category_Group> groups = cgs.getGroups();
+		Category_Group cg;
+		int numVisibleGroups = cgs.getSize();
+		int startId = numVisibleGroups + 1;
+		Category_Group previousGroup = numVisibleGroups > 0 ?  groups.get(numVisibleGroups - 1) : null;
 		
-		// In this context, the list holds extended objects, ie SearchCategoryInput's
-		List<CategoryInput> categoryInputs;
-		
-		// For data already stored in the db ...
-		if (groups != null) {
-			for (SearchCategoryGroup group : groups) {
-				inputGroup = new SearchCategoryInputGroup(count);
-				categoryInputs = this.formSupport.populateCategoryInputs(group.getCategories(), SearchCategory.class);				
-				inputGroup.setCategoryInputs(this.searchFormSupport.cast2SearchCategoryInputs(categoryInputs));
-				
-				count++;
-				if (count == numVisible) {
-					inputGroup.setLastVisible(true);
-				}
-				
-				allGroups.add(inputGroup);
-			}
-		}
-		
-		// Now add some empty groups, in case user need to input more ...
 		for (int i = 0; i < NUM_EMPTY_GROUPS; i++) {
-			inputGroup = new SearchCategoryInputGroup(count);
-			inputGroup.setVisible(i == 0 && (groups == null || numVisible == 0));
-			inputGroup.setLastVisible(inputGroup.isVisible());
-			
-			allGroups.add(inputGroup);
+			cg = this.formSupport.populateCategory_Group(startId + i, "Update label", null, SearchCategory.class, cgs);
+			cg.setVisible(previousGroup == null || (i == 0 && ! previousGroup.hasCompletedEntries()));
+			previousGroup = cg;
+			groups.add(cg);
 		}
-				
-		return allGroups;
 	}
-	*/
-	/*
-	public ChartProperties getChartPropertiesFromRequest(HttpServletRequest req) {
+	
+
+	public ChartProperties readSearchCriteria(HttpServletRequest req) {
+		
 		ChartProperties props = new ChartProperties();
-		List<SearchCategoryInputGroup> groups = new ArrayList<SearchCategoryInputGroup>();
-		props.setGroups(groups);
 		props.setTitle(req.getParameter("name"));
 		props.setFromYear(getYear(req, "from", 2015));		
 		props.setToYear(getYear(req, "to", 2019));		
@@ -93,9 +104,9 @@ public class ChartFormSupport {
 			props.setToYear(tmp);
 		}
 		
+		/*
+		Category_Group group;
 		String groupName;
-		SearchCategoryInputGroup group;
-		
 		int numGroups = Integer.valueOf(req.getParameter("numGroups"));
 		int numCategories;
 		int n = 0;
@@ -104,8 +115,8 @@ public class ChartFormSupport {
 			groupName = req.getParameter(String.format("group_%d_name", groupId));
 			
 			if (StringUtils.isNotBlank(groupName)) {
-				group = new SearchCategoryInputGroup().
-						setLabel(groupName);
+				group = this.formSupport.readCategoryInputs(req, groupId);
+				group.setLabel(groupName);
 				
 				props.getGroups().add(group);				
 				group.setCategoryInputs(this.searchFormSupport.readSearchCategoryInputs(req, groupId));
@@ -115,6 +126,7 @@ public class ChartFormSupport {
 				}
 			}
 		}
+		*/
 		
 		return props;
 	}
@@ -128,5 +140,4 @@ public class ChartFormSupport {
 		
 		return dflt;
 	}
-	*/
 }

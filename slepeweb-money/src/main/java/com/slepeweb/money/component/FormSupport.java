@@ -22,12 +22,12 @@ import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class FormSupport {
 	
-	public static final int NUM_EMPTY_CATS = 6;
-	public static final int NUM_EMPTY_GROUPS = 2;
+	public static final int NUM_EMPTY_CATS = 4;
+	
 	@Autowired private CategoryService categoryService;
 	
 	/*
-	 * This method constructs a Category_GroupSet given a list of either 
+	 * This method constructs a Category_Group given a list of either 
 	 * a) SplitTransaction or
 	 * b) SearchCategory objects.
 	 */
@@ -83,66 +83,47 @@ public class FormSupport {
 	}
 	
 	/*
-	 * Empty groups in the set are only required for charts.
-	 */
-	public void addEmptyGroups(Category_GroupSet cgs) {
-		List<Category_Group> groups = cgs.getGroups();
-		Category_Group cg;
-		int numVisible = cgs.getSize();
-		int startId = numVisible + 1;
-		
-		for (int i = 0; i < NUM_EMPTY_GROUPS; i++) {
-			cg = populateCategory_Group(startId + i, "Update label", null, SearchCategory.class, cgs);
-			cg.setVisible(i == 0 && numVisible == 0);
-			groups.add(cg);
-		}
-	}
-	
-	/*
 	 * This method constructs a Category_GroupSet using posted form data 
 	 */
-	public Category_GroupSet readCategoryInputs(HttpServletRequest req, int groupId) {
-		Category_GroupSet cgs = new Category_GroupSet();
-		cgs.setAllMajors(this.categoryService.getAllMajorValues());
-		Category_Group cg;
-		Category_ c;
+	public Category_Group readCategoryInputs(HttpServletRequest req, int groupId, Category_GroupSet cgs) {
 		
-		int numGroups = Integer.valueOf(req.getParameter("numGroups"));
 		String major, minor, memo, amountStr;
 		boolean excluded;		
-		String suffix, name ;
-		int numCategories;
+		String suffix;
 		
-		for (int i = 1; i <= numGroups; i++) {
-			name = "numCategories" + "_" + i;
-			numCategories = Integer.valueOf(req.getParameter(name));
-			cg = new Category_Group(i, "", null);
-			cgs.getGroups().add(cg);
+		String name = "numCategories_" + groupId;
+		int numCategories = Integer.valueOf(req.getParameter(name));
+		Category_Group cg = new Category_Group(groupId, "", null);
+		cg.setLabel(req.getParameter("groupname_" + groupId));
+		Category_ c;
+		
+		for (int j = 1; j <= numCategories; j++) {
+			suffix = String.format("_%d_%d", groupId, j);
+			major = req.getParameter("major" + suffix);
 			
-			for (int j = 1; j <= numCategories; j++) {
-				suffix = String.format("_%d_%d", i, j);
-				major = req.getParameter("major" + suffix);
+			if (StringUtils.isNotBlank(major)) {			
+				minor = req.getParameter("minor" + suffix);
+				excluded = Util.isPositive(req.getParameter("logic" + suffix));
+				memo = req.getParameter("memo" + suffix);
+				amountStr = req.getParameter("amount" + suffix);
 				
-				if (StringUtils.isNotBlank(major)) {			
-					minor = req.getParameter("minor" + suffix);
-					excluded = Util.isPositive(req.getParameter("logic" + suffix));
-					memo = req.getParameter("memo" + suffix);
-					amountStr = req.getParameter("amount" + suffix);
-					
-					c = new Category_().
-						setMajor(major).
-						setMinor(minor).
-						setMemo(memo).
-						setAmount(StringUtils.isBlank(amountStr) ? 0L : Util.parsePounds(amountStr));
-					
-					cgs.addOptions(major, this.categoryService.getAllMinorValues(major));
-					c.setExclude(excluded);
-					cg.getCategories().add(c);
-				}
+				c = new Category_().
+					setMajor(major).
+					setMinor(minor).
+					setMemo(memo).
+					setAmount(StringUtils.isBlank(amountStr) ? 0L : Util.parsePounds(amountStr));
+				
+				cgs.addOptions(major, this.categoryService.getAllMinorValues(major));
+				c.setExclude(excluded);
+				cg.getCategories().add(c);
 			}
-		}		
+		}
 		
-		return cgs;
+		if (cg.hasCompletedEntries()) {
+			cgs.getGroups().add(cg);
+		}
+		
+		return cg;
 	}
 
 	public List<Integer> getDaysOfMonth() {

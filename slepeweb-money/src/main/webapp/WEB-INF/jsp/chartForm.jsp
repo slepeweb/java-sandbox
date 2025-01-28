@@ -4,6 +4,8 @@
 	
 <!-- chartForm.jsp -->
 
+<c:set var="_extraJs" scope="request" value="chart.js,search.js,minorcats.js" />
+
 <mny:flash />
 
 <c:choose><c:when test="${_formMode eq 'create'}">

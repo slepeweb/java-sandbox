@@ -807,21 +807,32 @@ tr.category-list .category, tr.category-list .sub-category, tr.category-params .
   width: 20%;
   display: inline-block;
 }
+tr.category-list .category.wider, tr.category-list .sub-category.wider, tr.category-params .category.wider, tr.category-params .sub-category.wider {
+  width: 30%;
+}
 tr.category-list .memo, tr.category-params .memo {
   width: 30%;
   display: inline-block;
 }
 tr.category-list .amount, tr.category-params .amount {
-  width: 20%;
+  width: 12%;
   display: inline-block;
 }
 tr.category-list .logic, tr.category-params .logic {
-  width: 20%;
+  width: 15%;
   display: inline-block;
+}
+
+tr.category-list.invisible {
+  display: none;
 }
 
 div.category-list-heading {
   color: #24604e;
+}
+
+div.chart-form-buttons {
+  margin-top: 2em;
 }
 
 /*# sourceMappingURL=money.css.map */
