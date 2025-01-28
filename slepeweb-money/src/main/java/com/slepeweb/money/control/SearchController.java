@@ -238,6 +238,7 @@ public class SearchController extends BaseController {
 	public String get(@PathVariable int id, @PathVariable int page, ModelMap model) {
 		SavedSearch ss = this.savedSearchService.get(id);
 		SolrParams params = this.searchFormSupport.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
+		params.setPageNum(page);
 		model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);			
 		this.searchFormSupport.populateForm(ss, params, id == -1 ? ADHOC_MODE : UPDATE_MODE, model);		
 		executeSearch(params, model);

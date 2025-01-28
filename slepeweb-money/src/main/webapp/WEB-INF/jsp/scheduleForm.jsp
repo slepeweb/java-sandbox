@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<!-- scheduleForm.jsp -->
+
 <c:set var="_extraInPageJs" scope="request">
 	_money.context = 'schedule';
 </c:set>
@@ -34,28 +36,19 @@
 	    
 		    <tsf:ids entity="${_schedule}" />
 		    
-		    <tr>
-		        <td class="heading"><label for="label">Name</label></td>
-		        <td>
-		        	<input id="label" type="text" name="label" placeholder="Provide an identifier for this schedule" value="${_schedule.label}">
-		        </td>
-		    </tr>
+	    	<mny:tableRow heading="Name">
+		    	<input id="label" type="text" name="label" placeholder="Provide an identifier for this schedule" value="${_schedule.label}">
+				</mny:tableRow>
 
-		    <tr>
-		        <td class="heading"><label for="period">Interval</label></td>
-		        <td>
-		        	<input id="period" type="text" name="period" placeholder="Specify interval between scheduled transactions" 
+	    	<mny:tableRow heading="Interval">
+		    	<input id="period" type="text" name="period" placeholder="Specify interval between scheduled transactions" 
 		        		value="${mon:tertiaryOp(_schedule.period, _schedule.period, '1m')}">
-		        </td>
-		    </tr>
+				</mny:tableRow>
 
-		    <tr>
-		        <td class="heading"><label for="nextdate">Next date</label></td>
-		        <td>
-		        	<input id="nextdate" type="text" name="nextdate" class="datepicker" placeholder="Next scheduled date" 
+	    	<mny:tableRow heading="Next date">
+		    	<input id="nextdate" type="text" name="nextdate" class="datepicker" placeholder="Next scheduled date" 
 		        		value="${mon:formatTimestamp(_schedule.nextDate)}">
-		        </td>
-		    </tr>
+		    </mny:tableRow>
 
 		    <tsf:account accountId="${_schedule.account.id}" />
 		    <tsf:paymentType entity="${_schedule}" />
@@ -67,11 +60,10 @@
 		    <tsf:notes memo="${_schedule.memo}" />
 		    <tsf:amount value="${_schedule.amountValue}" isdebit="${_schedule.debit}" />
 		    
-		    <tr>
-		        <td class="heading"><label for="enabled">Enabled</label></td>
-		        <td><input id="enabled" type="checkbox" name="enabled"
-		        	${mon:tertiaryOp(_formMode eq 'add' or _schedule.enabled, 'checked=checked', '')}  /></td>
-		    </tr>
+	    	<mny:tableRow heading="Enabled?">
+		    	<input id="enabled" type="checkbox" name="enabled"
+		        	${mon:tertiaryOp(_formMode eq 'add' or _schedule.enabled, 'checked=checked', '')}  />
+		    </mny:tableRow>
 		    
 		</table> 
 		

@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<!-- accountForm.jsp -->
+
 <mny:flash />
 	
 <mny:standardLayout>
@@ -20,46 +22,40 @@
 	<form method="post" action="${_ctxPath}/account/update">	  
 	    <table>
 	    	<c:if test="${_formMode eq 'update'}">
-			    <tr class="opaque50">
-			        <td class="heading"><label for="identifier">Id</label></td>
-			        <td><input type="text" readonly name="identifier" placeholder="Unique id" value="${_account.id}" /></td>
-			    </tr>
+	    		<mny:tableRow heading="Id" trclass="opaque50">
+			       <input type="text" readonly name="identifier" placeholder="Unique id" value="${_account.id}" /></td>
+	    		</mny:tableRow>
 		    </c:if>
 		    
-		    <tr>
-		        <td class="heading"><label for="name">Name</label></td>
-		        <td><input type="text" name="name" placeholder="Enter account name" value="${_account.name}" /></td>
-		    </tr>
-		    <tr>
-		        <td class="heading"><label for="type">Type</label></td>
-		        <td>
-		        	<select name="type">
-		        		<option value=""></option>
-		        		<c:forTokens items="current,savings,credit,pension,other" var="_t" delims=",">
-		        			<option value="${_t}" <c:if test="${_t eq _account.type}">selected</c:if>>${_t}</option>
-		        		</c:forTokens>
-		        	</select>
-		        </td>
-		    </tr>
-		    <tr>
-		        <td class="heading"><label for="status">Status</label></td>
-		        <td>
+	    	<mny:tableRow heading="Name">
+		    	<input type="text" name="name" placeholder="Enter account name" value="${_account.name}" /></td>
+				</mny:tableRow>
+				
+	    	<mny:tableRow heading="Type">
+    			<select name="type">
+        		<option value=""></option>
+        		<c:forTokens items="current,savings,credit,pension,other" var="_t" delims=",">
+        			<option value="${_t}" <c:if test="${_t eq _account.type}">selected</c:if>>${_t}</option>
+        		</c:forTokens>
+        	</select>
+				</mny:tableRow>
+				
+	    	<mny:tableRow heading="Status">
 		        	<select name="status">
 		        			<option value="open" <c:if test="${not _account.closed}">selected</c:if>>open</option>
 		        			<option value="closed" <c:if test="${_account.closed}">selected</c:if>>closed</option>
 		        	</select>
-		        </td>
-		    </tr>
-		    <tr>
-		        <td class="heading"><label for="opening">Opening balance</label></td>
-		        <td><input type="text" name="opening" placeholder="Enter opening balance in pounds and pence" 
-		        	value="${mon:formatPounds(_account.openingBalance)}" /></td>
-		    </tr>
-		    <tr>
-		        <td class="heading"><label for="note">Notes</label></td>
-		        <td><textarea cols="40" rows="3" name="note" 
-		        	placeholder="Enter relevant notes, eg. account number">${_account.note}</textarea></td>
-		    </tr>
+				</mny:tableRow>
+				
+	    	<mny:tableRow heading="Opening balance">
+					<input type="text" name="opening" placeholder="Enter opening balance in pounds and pence" 
+		        	value="${mon:formatPounds(_account.openingBalance)}" />
+				</mny:tableRow>
+
+	    	<mny:tableRow heading="Notes">
+					<textarea cols="40" rows="3" name="note" 
+		        	placeholder="Enter relevant notes, eg. account number">${_account.note}</textarea>
+		    </mny:tableRow>
 			</table> 
 			
 	    <input type="submit" value="${_buttonLabel}" /> 

@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<!-- transactionForm.jsp -->
+
 <c:set var="_extraInPageJs" scope="request">
 	_money.context = 'transaction';
 	_money.transaction.accountid = ${_transaction.account.id};
@@ -37,11 +39,10 @@
 	    
 		    <tsf:ids entity="${_transaction}" />
 		    
-		    <tr>
-		        <td class="heading"><label for="entered">Date</label></td>
-		        <td><input id="entered" type="text" class="datepicker" name="entered" 
-		        	placeholder="Enter transaction date" value="${mon:formatTimestamp(_transaction.entered)}" /></td>
-		    </tr>
+	    	<mny:tableRow heading="Date">
+		    	<input id="entered" type="text" class="datepicker" name="entered" 
+		        	placeholder="Enter transaction date" value="${mon:formatTimestamp(_transaction.entered)}" />
+		    </mny:tableRow>
 
 		    <tsf:account accountId="${_transaction.account.id}" />
 		    <tsf:paymentType entity="${_transaction}" />

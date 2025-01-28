@@ -1,0 +1,7 @@
+>>>	Deploy <mny:tableRow in all forms, where appropriate.
+
+>>>	Search form provides 'Save', 'Save then execute' and 'Execute' buttons.
+		Chart form should provide the same options.
+
+>>>	After executing a chart search, one tab shows the original form, with an 'Update and re-execute' button.
+		The button saves the chart parameters, and returns the user to the 'list' page, and fails to execute the search.

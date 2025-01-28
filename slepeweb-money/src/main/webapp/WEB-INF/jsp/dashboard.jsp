@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
+<!-- dashboard.jsp -->
+
 <mny:standardLayout>
 	<div class="right">
 		<a href="${_ctxPath}/index/by/dates" title="Re-index ALL transactions (for searching)">Re-index</a><br />

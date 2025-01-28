@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<!-- searchForm.jsp -->
+
 <c:choose><c:when test="${_formMode eq 'adhoc'}">
 	<c:set var="_pageHeading" value="Ad-hoc search" scope="request" />
 	<c:set var="_formActionUrl" scope="request">/search/save</c:set>

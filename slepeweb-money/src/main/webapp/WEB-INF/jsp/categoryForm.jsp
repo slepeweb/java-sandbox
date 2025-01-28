@@ -21,10 +21,9 @@
 	<form method="post" action="${_ctxPath}/category/update">	  
 	    <table>
 	    	<c:if test="${_formMode eq 'update'}">
-			    <tr class="opaque50">
-			        <td class="heading"><label>Id</label></td>
-			        <td><input type="text" readonly name="identifier" placeholder="Unique id" value="${_category.id}" /></td>
-			    </tr>
+	    		<mny:tableRow heading="Id" trclass="opaque50">
+						<input type="text" readonly name="identifier" placeholder="Unique id" value="${_category.id}" />
+					</mny:tableRow>
 		    </c:if>
 		    
 		    <tr>
@@ -38,20 +37,19 @@
 		        	</c:forEach>
 		        </select></td>
 		    </tr>
-		    <tr>
-		        <td class="heading"><label>Sub-category</label></td>
-		        <td><input type="text" name="minor" placeholder="Enter sub-category, if required"
-		        	value="${_category.minor}" /></td>
-		    </tr>
-		    <tr>
-		        <td class="heading"><label>Type</label></td>
-		        <td>
-		        	<span class="radio-horiz"><input id="expense_cat" type="radio" name="categorytype" value="expense" 
-		        		${mon:tertiaryOp(_category.expense, 'checked=checked', '')} /> Expense</span>
-		        	<span class="radio-horiz"><input id="income_cat" type="radio" name="categorytype" value="income" 
-		        		${mon:tertiaryOp(not _category.expense, 'checked=checked', '')} /> Income</span>
-						</td>
-		    </tr>
+		    
+	    	<mny:tableRow heading="Sub-category">
+		    	<input type="text" name="minor" placeholder="Enter sub-category, if required"
+		        	value="${_category.minor}" /><
+				</mny:tableRow>
+				
+	    	<mny:tableRow heading="Type">
+					<span class="radio-horiz"><input id="expense_cat" type="radio" name="categorytype" value="expense" 
+        		${mon:tertiaryOp(_category.expense, 'checked=checked', '')} /> Expense</span>
+        	<span class="radio-horiz"><input id="income_cat" type="radio" name="categorytype" value="income" 
+        		${mon:tertiaryOp(not _category.expense, 'checked=checked', '')} /> Income</span>
+				</mny:tableRow>
+				
 			</table> 
 			
 	    <input type="submit" value="${_buttonLabel}" /> 	    

@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<!-- searchResults.jsp -->
+
 <mny:flash />
 
 <c:set var="_extraJs" scope="request" value="search.js,datepicker.js,minorcats.js" />

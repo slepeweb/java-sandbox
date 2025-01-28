@@ -172,10 +172,11 @@ public class ChartController extends BaseController {
 //	@RequestMapping(value="/post/{id}", method=RequestMethod.POST)
 //	public String post(@PathVariable int id, HttpServletRequest req, ModelMap model) {
 //		
+//		ChartProperties props = getSearchCriteriaFromRequest(req);
 //		String flash = save(this.savedSearchService.get(id), req, model);
 //		
 //		if (flash.startsWith("success")) {
-//			model.addAttribute(FORM_MODE_ATTR, EXECUTE_MODE);
+//			model.addAttribute(SearchFormSupport.FORM_MODE_ATTR, EXECUTE_MODE);
 //			return search(props, req, model);
 //		}
 //		

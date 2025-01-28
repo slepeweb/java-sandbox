@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<!-- payeeForm.jsp -->
+
 <mny:flash />
 	
 <mny:standardLayout>
@@ -20,16 +22,15 @@
 	<form method="post" action="${_ctxPath}/payee/update">	  
 	    <table>
 	    	<c:if test="${_formMode eq 'update'}">
-			    <tr class="opaque50">
-			        <td class="heading"><label for="identifier">Id</label></td>
-			        <td><input type="text" readonly name="identifier" placeholder="Unique id" value="${_payee.id}" /></td>
-			    </tr>
+	    		<mny:tableRow heading="Id" trclass="opaque50">
+			    	<input type="text" readonly name="identifier" placeholder="Unique id" value="${_payee.id}" />
+			    </mny:tableRow>
 		    </c:if>
 		    
-		    <tr>
-		        <td class="heading"><label for="name">Name</label></td>
-		        <td><input type="text" name="name" placeholder="Enter payee name" value="${_payee.name}" /></td>
-		    </tr>
+	    	<mny:tableRow heading="Name">
+		    	<input type="text" name="name" placeholder="Enter payee name" value="${_payee.name}" />
+			   </mny:tableRow>
+
 			</table> 
 			
 	    <input type="submit" value="${_buttonLabel}" /> 
