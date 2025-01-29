@@ -1,10 +1,5 @@
 package com.slepeweb.money.control;
 
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -15,14 +10,10 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.slepeweb.money.Util;
-import com.slepeweb.money.bean.Category_GroupSet;
-import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.SavedSearchSupport;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
-import com.slepeweb.money.bean.solr.SolrResponse;
-import com.slepeweb.money.component.FormSupport;
 import com.slepeweb.money.component.SearchFormSupport;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,98 +22,12 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(value="/search")
 public class SearchController extends BaseController {
 		
-	@Autowired private FormSupport formSupport;
 	@Autowired private SearchFormSupport searchFormSupport;
 	
 	/*
 	 * 'Charts' and 'searches' use solr to query data, so the solr
 	 * index needs to be up to date for results to be accurate.
 	 */
-	
-	private SavedSearch setSavedSearch(SavedSearch ss, String name, String description, SolrParams params) {
-		return ss.
-			setType(SearchFormSupport.ADVANCED_TYPE).
-			setName(name).
-			setDescription(description).
-			setJson(this.searchFormSupport.toJson(params)).
-			setSaved(new Timestamp(new Date().getTime()));
-	}
-
-	private void executeSearch(SolrParams params, ModelMap model) {
-		SolrResponse<FlatTransaction> resp = this.solrService.query(params);
-		model.addAttribute(SearchFormSupport.SEARCH_RESPONSE_ATTR, resp);		
-		long credit = 0;
-		for (FlatTransaction ft : resp.getResults()) {
-			credit += ft.getAmount();
-		}
-		
-		model.addAttribute("_totalCredit", credit);		
-	}
-	
-	private SavedSearchSupport processFormSubmission(HttpServletRequest req, SavedSearch ss) {
-		List<String> allMajors = this.categoryService.getAllMajorValues();
-		Category_GroupSet cgs = new Category_GroupSet("Splits", Category_GroupSet.SEARCH_CTX, allMajors);
-		this.formSupport.readCategoryInputs(req, 1, cgs);
-		SolrParams params = this.searchFormSupport.readSearchCriteria(req);
-		
-		// Search functionality is based on a single group of categories
-		params.setCategoryGroup(cgs.getGroups().get(0));
-				
-		ss = setSavedSearch(
-				ss,
-				req.getParameter("name"),
-				req.getParameter("description"),
-				params);
-		
-		SavedSearchSupport sss = new SavedSearchSupport().
-				setRequest(req).
-				setSavedSearch(ss).
-				setSolrParams(params).
-				setMode(req.getParameter("formMode"));
-		
-		if (sss.getMode().equals(ADHOC_MODE) ||
-				sss.getMode().equals(CREATE_MODE) && isOption("execute", req)) {
-			
-			sss.setAdhoc(true);
-		}
-		else {
-			sss.
-				setSave(isOption("save", req)).
-				setExecute(isOption("execute", req));
-		}
-		
-		return sss;
-	}
-	
-	private RedirectView redirect2Execute(SavedSearchSupport supp) {
-		return redirect(
-				String.format(
-						"/search/get/%d?flash=%s", 
-						supp.getSavedSearch().getId(),
-						Util.encodeUrl(supp.getFlash())));
-	}
-	
-	private RedirectView redirect2Adhoc(SavedSearchSupport supp) {
-		return redirect(
-				String.format(
-						"/search/get/adhoc?flash=%s", 
-						Util.encodeUrl(supp.getFlash())));
-	}
-	
-	private RedirectView redirect2List(SavedSearchSupport supp) {
-		return redirect(
-				String.format("/search/list?flash=%s", 
-						Util.encodeUrl(supp.getFlash())));
-	}
-	
-	private RedirectView redirect(String url) {
-		return new RedirectView(url, true, true, false);
-	}
-	
-	private boolean isOption(String option, HttpServletRequest req) {
-		String p = req.getParameter("submit-option");
-		return p != null && StringUtils.containsIgnoreCase(p, option);
-	}
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public String list(ModelMap model) {
@@ -133,7 +38,7 @@ public class SearchController extends BaseController {
 	// Empty search definition form, for adding a new search
 	@RequestMapping(value="/create", method=RequestMethod.GET)
 	public String create(ModelMap model) {
-		this.searchFormSupport.populateForm(null, new SolrParams(new SolrConfig()), CREATE_MODE, model);		
+		this.searchFormSupport.populateForm(null, new SolrParams(new SolrConfig()), SearchFormSupport.CREATE_MODE, model);		
 		return SearchFormSupport.FORM_VIEW;
 	}
 
@@ -147,7 +52,7 @@ public class SearchController extends BaseController {
 	 */
 	@RequestMapping(value="/adhoc", method=RequestMethod.GET)
 	public String adhoc(ModelMap model) {
-		this.searchFormSupport.populateForm(null, new SolrParams(new SolrConfig()), ADHOC_MODE, model);		
+		this.searchFormSupport.populateForm(null, new SolrParams(new SolrConfig()), SearchFormSupport.ADHOC_MODE, model);		
 		return SearchFormSupport.FORM_VIEW;
 	}
 	
@@ -165,12 +70,12 @@ public class SearchController extends BaseController {
 
 	private RedirectView save(HttpServletRequest req, SavedSearch ss) {
 		
-		SavedSearchSupport supp = processFormSubmission(req, ss);
+		SavedSearchSupport supp = this.searchFormSupport.processFormSubmission(req, ss);
 		
 		if (supp.isAdhoc()) {
 			ss.setId(SavedSearch.ADHOC_ID);
 			storeSavedSearch(ss);
-			return redirect2Adhoc(supp.setFlash(""));
+			return this.searchFormSupport.redirect2Adhoc(supp.setFlash(""));
 		}
 		else {
 			if (supp.isSave()) {
@@ -184,11 +89,11 @@ public class SearchController extends BaseController {
 				if (! supp.isSave()) {
 					supp.setFlash("");
 				}
-				return redirect2Execute(supp);
+				return this.searchFormSupport.redirect2Execute(supp);
 			}
 		}
 		
-		return redirect2List(supp);
+		return this.searchFormSupport.redirect2List(supp);
 	}
 	
 	// Form to edit an existing search
@@ -199,7 +104,7 @@ public class SearchController extends BaseController {
 		SolrParams params = this.searchFormSupport.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
 		
 		model.addAttribute("_numDeletableTransactions", 0);
-		this.searchFormSupport.populateForm(ss, params, UPDATE_MODE, model);	
+		this.searchFormSupport.populateForm(ss, params, SearchFormSupport.UPDATE_MODE, model);	
 		return SearchFormSupport.FORM_VIEW;
 	}
 	
@@ -240,8 +145,8 @@ public class SearchController extends BaseController {
 		SolrParams params = this.searchFormSupport.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
 		params.setPageNum(page);
 		model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);			
-		this.searchFormSupport.populateForm(ss, params, id == -1 ? ADHOC_MODE : UPDATE_MODE, model);		
-		executeSearch(params, model);
+		this.searchFormSupport.populateForm(ss, params, id == -1 ? SearchFormSupport.ADHOC_MODE : SearchFormSupport.UPDATE_MODE, model);		
+		this.searchFormSupport.executeSearch(params, model);
 		return SearchFormSupport.RESULTS_VIEW;
 	}	
 }

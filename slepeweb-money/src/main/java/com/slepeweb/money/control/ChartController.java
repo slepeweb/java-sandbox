@@ -58,7 +58,7 @@ public class ChartController extends BaseController {
 	// Empty chart definition form, for adding a new chart
 	@RequestMapping(value="/create", method=RequestMethod.GET)
 	public String create(HttpServletRequest req, ModelMap model) {
-		this.chartFormSupport.populateForm(null, new ChartProperties(), CREATE_MODE, model);
+		this.chartFormSupport.populateForm(null, new ChartProperties(), SearchFormSupport.CREATE_MODE, model);
 		return ChartFormSupport.FORM_VIEW;
 	}
 	
@@ -70,7 +70,7 @@ public class ChartController extends BaseController {
 		ChartProperties props = this.searchFormSupport.fromJson(new TypeReference<ChartProperties>() {}, ss.getJson());
 
 		model.addAttribute("_numDeletableTransactions", 0);		
-		this.chartFormSupport.populateForm(ss, props, UPDATE_MODE, model);
+		this.chartFormSupport.populateForm(ss, props, SearchFormSupport.UPDATE_MODE, model);
 		return ChartFormSupport.FORM_VIEW;
 	}
 	
@@ -161,9 +161,9 @@ public class ChartController extends BaseController {
 
 		SavedSearch ss = this.savedSearchService.get(id);
 		ChartProperties props = this.searchFormSupport.fromJson(new TypeReference<ChartProperties>() {}, ss.getJson());
-		this.chartFormSupport.populateForm(ss, props, EXECUTE_MODE, model);
+		this.chartFormSupport.populateForm(ss, props, SearchFormSupport.EXECUTE_MODE, model);
 
-		model.addAttribute(SearchFormSupport.FORM_MODE_ATTR, EXECUTE_MODE);
+		model.addAttribute(SearchFormSupport.FORM_MODE_ATTR, SearchFormSupport.EXECUTE_MODE);
 		model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);
 		return search(props, req, model);
 	}	

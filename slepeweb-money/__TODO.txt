@@ -1,5 +1,3 @@
->>>	Deploy <mny:tableRow in all forms, where appropriate.
-
 >>>	Search form provides 'Save', 'Save then execute' and 'Execute' buttons.
 		Chart form should provide the same options.
 

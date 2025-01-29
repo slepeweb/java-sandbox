@@ -2,6 +2,8 @@
 	attribute name="entity" required="true" rtexprvalue="true" type="com.slepeweb.money.bean.Transaction" %><%@ 
 	attribute name="label" required="true" rtexprvalue="true" %>
 
+<!-- transandschedform/tail.tag -->
+
 <input id="submit-button" type="submit" value="${_buttonLabel}" /> 
 <input id="cancel-button" type="button" value="Cancel" />
 

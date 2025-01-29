@@ -4,6 +4,10 @@
 	attribute name="id" required="true" rtexprvalue="true" %><%@ 
 	attribute name="level" required="false" rtexprvalue="true" %>
 
+<!-- entityDeletionDialog.tag -->
+
+<%-- Decided to leave this javascript in a jsp, as it uses ${jsp} expressions --%>
+
 <script>
 $(function() {
 	$("#delete-dialog").dialog({

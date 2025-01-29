@@ -1,6 +1,8 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
-	
+
+<!-- chartData.tag -->
+
 <c:choose><c:when test="${not empty noCategoriesSpecified}">
 	<p>No categories specified - please <a href="${_ctxPath}/chart/by/categories${queryString}">try again</a>.</p>
 </c:when><c:otherwise>

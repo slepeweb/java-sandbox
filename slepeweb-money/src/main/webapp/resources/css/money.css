@@ -778,8 +778,8 @@ span.flash {
   vertical-align: bottom;
 }
 
-.add-category-button {
-  margin-top: 1em;
+button#add-category-button, button#add-group-button {
+  margin: 2em 0 2em 0;
 }
 
 input[type=submit] {
@@ -833,6 +833,13 @@ div.category-list-heading {
 
 div.chart-form-buttons {
   margin-top: 2em;
+}
+
+tr.form-submission-options td {
+  background-color: #bce1d6;
+}
+tr.form-submission-options td span.radio-option {
+  margin-right: 3em;
 }
 
 /*# sourceMappingURL=money.css.map */

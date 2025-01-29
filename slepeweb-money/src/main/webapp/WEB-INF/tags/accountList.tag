@@ -2,6 +2,8 @@
 	attribute name="heading" required="true" rtexprvalue="true" %><%@ 
 	attribute name="list" required="true" rtexprvalue="true" type="java.util.List" %>
 
+<!-- accountList.tag -->
+
 <c:if test="${not empty list}">
 	<h2>${heading}</h2>	
 	<div>

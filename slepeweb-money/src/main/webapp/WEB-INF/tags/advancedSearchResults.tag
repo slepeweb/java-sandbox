@@ -1,6 +1,8 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
+<!-- advancedSearchResults.tag -->
+
 <c:set var="_urlPrefix">${_ctxPath}/search/action/${_ss.id}</c:set>
 
 <c:if test="${not empty _response}">

@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="pager" type="com.slepeweb.money.bean.solr.SolrPager" required="true" rtexprvalue="true" %>
 
+<!-- flatTransactionTable.tag -->
+
 <table class="trn_listing">
 	<tr>
 		<th>Date</th>

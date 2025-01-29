@@ -27,10 +27,6 @@
 		background-color: #d99;
 	}
 	
-	.radio-option {
-		margin-right: 3em;
-	}
-	
 	input.datepicker, input.amount {
 		width: 30%;
 		display: inline;

@@ -2,6 +2,8 @@
 	attribute name="target" required="true" rtexprvalue="true" %><%@ 
 	attribute name="disable" required="false" rtexprvalue="true" %>
 	
+<!-- menuActionDialog.tag -->
+
 <%--
 	This tag was used to provide a menu for each item in a list, offering 'Edit' and 'Delete' (etc) menu options.
 	It is currently redundant, but is being retained for reference.

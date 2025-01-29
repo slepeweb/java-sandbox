@@ -41,22 +41,26 @@
 	        </td>
 	    </tr>
 	
-			<mny:categoryList heading="Categories" categories="${_categoryGroup}" />
+			<mny:categoryList heading="Categories" categories="${_categoryGroup}" />			
+			<tr><td><button id="add-group-button" type="button" title="Add a group" ><i class="fa-solid fa-chevron-down" ></i> set</button></td></tr>
+			<mny:searchAndExecuteOptions />
 			
 	</table>
+		
+	<mny:standardFormFooter />
 	
-	<button id="add-group-button" type="button" title="Add a group" ><i class="fa-solid fa-chevron-down" ></i> set</button>
-	
+	<%--
 	<div class="chart-form-buttons">
 		<c:choose><c:when test="${_formMode eq 'create'}">
 			<input type="submit" value="Save" />
 			<input id="cancel-button" type="button" value="Cancel" />
 		</c:when><c:when test="${_formMode eq 'update'}">
-			<input type="submit" value="Update" />
+			<input type="submit" value="Submit" />
 			<input type="button" value="Cancel" id="cancel-button" />
 			<input type="button" value="Delete chart?" id="delete-button" />
 		</c:when><c:when test="${_formMode eq 'execute'}">
 			<input type="submit" value="Update and re-execute" /> 
 		</c:when></c:choose>
 	</div>
+	 --%>
 </form>			

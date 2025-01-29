@@ -1,5 +1,7 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
+<!-- userMenuDialog.tag -->
+
 <c:set var="_menuOpener" value="user-welcome" />    <%-- Where to click to open the menu --%>
 <c:set var="_menuDialogId" value="user-menu" />     <%-- The menu dialog --%>
 <c:set var="_menuCloseClass" value="menu-close" />  <%-- The class of the element containing the close icon --%>

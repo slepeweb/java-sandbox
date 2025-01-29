@@ -1,5 +1,7 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
+<!-- standardFormFooter.tag -->
+
 <input type="hidden" name="formMode" value="${_formMode}" />		
 <input type="submit" id="submit-button" value="Submit" title="Submit this form" />		
 

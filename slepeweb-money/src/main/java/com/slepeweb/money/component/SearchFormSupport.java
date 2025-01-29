@@ -1,25 +1,33 @@
 package com.slepeweb.money.component;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.Category_GroupSet;
+import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.SavedSearch;
+import com.slepeweb.money.bean.SavedSearchSupport;
 import com.slepeweb.money.bean.SearchCategory;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
+import com.slepeweb.money.bean.solr.SolrResponse;
 import com.slepeweb.money.control.CategoryController;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
 import com.slepeweb.money.service.PayeeService;
+import com.slepeweb.money.service.SolrService4Money;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -27,6 +35,12 @@ import jakarta.servlet.http.HttpServletRequest;
 public class SearchFormSupport {
 	
 	public static Logger LOG = Logger.getLogger(SearchFormSupport.class);
+	
+	public static final String CREATE_MODE = "create";
+	public static final String UPDATE_MODE = "update";
+	public static final String EXECUTE_MODE = "execute";
+	public static final String ADHOC_MODE = "adhoc";
+
 	public static final String ALL_ACCOUNTS_ATTR = "_allAccounts";
 	public static final String ALL_PAYEES_ATTR = "_allPayees";
 	public static final String CATEGORY_GROUP_ATTR = "_categoryGroup";
@@ -48,6 +62,7 @@ public class SearchFormSupport {
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
 	@Autowired private CategoryService categoryService;
+	@Autowired private SolrService4Money solrService4Money;
 
 	public void populateForm(
 			SavedSearch ss, SolrParams params, String formMode, ModelMap model) {
@@ -57,7 +72,7 @@ public class SearchFormSupport {
 		Category_Group cg;
 		
 		if (params.getCategoryGroup() == null) {
-			cg = this.formSupport.populateCategory_Group(1, "Categories", null, SearchCategory.class, cgs);			
+			cg = this.formSupport.populateCategory_Group(1, "Categories", null, SearchCategory.class, cgs);	
 			params.setCategoryGroup(cg);
 		}
 		else {
@@ -80,6 +95,49 @@ public class SearchFormSupport {
 	}
 	
 	
+	public SavedSearchSupport processFormSubmission(HttpServletRequest req, SavedSearch ss) {
+		List<String> allMajors = this.categoryService.getAllMajorValues();
+		Category_GroupSet cgs = new Category_GroupSet("Splits", Category_GroupSet.SEARCH_CTX, allMajors);
+		
+		// Create a new Category_Group using the submitted form data, and add it to the set
+		this.formSupport.readCategoryInputs(req, 1, cgs);
+		
+		// Read the remaining search parameters from the submitted form
+		SolrParams params = readSearchCriteria(req);
+		
+		/*
+		 *  Search functionality is based on a single group of categories.
+		 *  Combine the the first Category_Group into the SolrParams. It 
+		 *  is the SolrParams object that will get stored in the db as a json string.
+		 */
+		params.setCategoryGroup(cgs.getGroups().get(0));
+				
+		ss = setSavedSearch(
+				ss,
+				req.getParameter("name"),
+				req.getParameter("description"),
+				params);
+		
+		SavedSearchSupport sss = new SavedSearchSupport().
+				setRequest(req).
+				setSavedSearch(ss).
+				setSolrParams(params).
+				setMode(req.getParameter("formMode"));
+		
+		if (sss.getMode().equals(ADHOC_MODE) ||
+				sss.getMode().equals(CREATE_MODE) && isOption("execute", req)) {
+			
+			sss.setAdhoc(true);
+		}
+		else {
+			sss.
+				setSave(isOption("save", req)).
+				setExecute(isOption("execute", req));
+		}
+		
+		return sss;
+	}
+	
 	public SolrParams readSearchCriteria(HttpServletRequest req) {
 		// Payee may be specified by either name or id, but not both!
 		return 
@@ -97,6 +155,56 @@ public class SearchFormSupport {
 			setPageNum(1);
 	}	
 
+	private SavedSearch setSavedSearch(SavedSearch ss, String name, String description, SolrParams params) {
+		return ss.
+			setType(SearchFormSupport.ADVANCED_TYPE).
+			setName(name).
+			setDescription(description).
+			setJson(toJson(params)).
+			setSaved(new Timestamp(new Date().getTime()));
+	}
+
+	public void executeSearch(SolrParams params, ModelMap model) {
+		SolrResponse<FlatTransaction> resp = this.solrService4Money.query(params);
+		model.addAttribute(SearchFormSupport.SEARCH_RESPONSE_ATTR, resp);		
+		long credit = 0;
+		for (FlatTransaction ft : resp.getResults()) {
+			credit += ft.getAmount();
+		}
+		
+		model.addAttribute("_totalCredit", credit);		
+	}
+	
+	public RedirectView redirect2Execute(SavedSearchSupport supp) {
+		return redirect(
+				String.format(
+						"/search/get/%d?flash=%s", 
+						supp.getSavedSearch().getId(),
+						Util.encodeUrl(supp.getFlash())));
+	}
+	
+	public RedirectView redirect2Adhoc(SavedSearchSupport supp) {
+		return redirect(
+				String.format(
+						"/search/get/adhoc?flash=%s", 
+						Util.encodeUrl(supp.getFlash())));
+	}
+	
+	public RedirectView redirect2List(SavedSearchSupport supp) {
+		return redirect(
+				String.format("/search/list?flash=%s", 
+						Util.encodeUrl(supp.getFlash())));
+	}
+	
+	private RedirectView redirect(String url) {
+		return new RedirectView(url, true, true, false);
+	}
+	
+	private boolean isOption(String option, HttpServletRequest req) {
+		String p = req.getParameter("submit-option");
+		return p != null && StringUtils.containsIgnoreCase(p, option);
+	}
+	
 
 	/*
 	 * This method allows us to de-serialize a json string into a list of objects. This is a neater way

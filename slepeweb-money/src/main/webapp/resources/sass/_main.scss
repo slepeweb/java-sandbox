@@ -729,8 +729,8 @@ span.flash {
 	vertical-align: bottom;
 }
 
-.add-category-button {
-	margin-top: 1.0em;
+button#add-category-button, button#add-group-button {
+	margin: 2.0em 0 2.0em 0;
 }
 
 input[type="submit"] {
@@ -795,4 +795,12 @@ div.category-list-heading {
 
 div.chart-form-buttons {
 	margin-top: 2em;
+}
+
+tr.form-submission-options td {
+	background-color: #bce1d6;
+	
+	span.radio-option {
+		margin-right: 3em;
+	}
 }
