@@ -16,7 +16,7 @@
 			<table>
 			
 	    	<mny:tableRow heading="User name">
-					<input type="text" name="alias" size="32" />
+					<input type="text" name="alias" size="32" autocomplete="off" />
 				</mny:tableRow>
 				
 	    	<mny:tableRow heading="Password">

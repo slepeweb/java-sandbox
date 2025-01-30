@@ -13,7 +13,7 @@
 	<c:set var="_formActionUrl" scope="request">/chart/save</c:set>
 </c:when><c:when test="${_formMode eq 'update'}">
 	<c:set var="_pageHeading" value="Update chart" scope="request" />
-	<c:set var="_formActionUrl" scope="request">/chart/update/${_ss.id }</c:set>
+	<c:set var="_formActionUrl" scope="request">/chart/save/${_ss.id }</c:set>
 </c:when></c:choose>
 
 <mny:standardLayout>

@@ -1,21 +1,14 @@
 package com.slepeweb.money.bean;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties({"size"})
 public class Category_GroupSet {
-	public static final String TRANSACTION_CTX = "transaction";
-	public static final String SEARCH_CTX = "search";
-	public static final String CHART_CTX = "chart";
-
 	private String title = "Title";
 	private List<String> allMajors = new ArrayList<String>();
-	private Map<String,List<String>> options = new HashMap<String,List<String>>();
 	private List<Category_Group> groups = new ArrayList<Category_Group>();
 	private String context;
 	
@@ -27,10 +20,9 @@ public class Category_GroupSet {
 		this.allMajors = majors;
 	}
 	
-	public void addOptions(String major, List<String> allMinors) {
-		if (! this.options.containsKey(major)) {
-			this.options.put(major, allMinors);
-		}
+	public void addGroup(Category_Group cg) {
+		this.groups.add(cg);
+		cg.setRoot(this);
 	}
 	
 	public int getSize() {
@@ -52,15 +44,6 @@ public class Category_GroupSet {
 	
 	public Category_GroupSet setAllMajors(List<String> allMajors) {
 		this.allMajors = allMajors;
-		return this;
-	}
-	
-	public Map<String, List<String>> getOptions() {
-		return options;
-	}
-	
-	public Category_GroupSet setOptions(Map<String, List<String>> options) {
-		this.options = options;
 		return this;
 	}
 	

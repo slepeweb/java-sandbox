@@ -51,7 +51,7 @@
 					</select>
 					
 					<select class="sub-category ${_wider}" name="minor_${ident}">
-						<c:forEach items="${categories.options[_cat.major]}" var="_c">
+						<c:forEach items="${_group.options[_cat.major]}" var="_c">
 							<option value="${_c}" <c:if test="${_c eq _cat.minor}">selected</c:if>>${_c}</option>
 						</c:forEach>
 					</select>

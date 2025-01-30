@@ -1,7 +1,9 @@
 package com.slepeweb.money.bean;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,14 +17,14 @@ public class Category_Group {
 	private String label = "";
 	private List<Category_> categories = new ArrayList<Category_>();
 	private boolean visible, lastVisible;
+	private Map<String,List<String>> options = new HashMap<String,List<String>>();
 	private Category_GroupSet root;
 	
 	public Category_Group() {}
 	
-	public Category_Group(int i, String label, Category_GroupSet cgs) {
+	public Category_Group(int i, String label) {
 		this.id = i;
 		this.label = label;
-		this.root = cgs;
 	}
 	
 	@Override
@@ -38,6 +40,12 @@ public class Category_Group {
 		}
 		
 		return false;
+	}
+	
+	public void addOptions(String major, List<String> allMinors) {
+		if (! this.options.containsKey(major)) {
+			this.options.put(major, allMinors);
+		}
 	}
 	
 	public List<SplitTransaction> toSplitTransactions(CategoryService categoryService, long amountPlusOrMinus) {
@@ -119,6 +127,15 @@ public class Category_Group {
 		return this;
 	}
 
+	public Map<String, List<String>> getOptions() {
+		return options;
+	}
+	
+	public Category_Group setOptions(Map<String, List<String>> options) {
+		this.options = options;
+		return this;
+	}
+	
 	public Category_GroupSet getRoot() {
 		return root;
 	}

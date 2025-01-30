@@ -51,7 +51,7 @@
 		    <tsf:category entity="${_transaction}" />
 		    <tsf:subCategory entity="${_transaction}" />
 				<mny:categoryList heading="Splits" categories="${_transactionSplits}" />
-		    <tsf:notes memo="${_schedule.memo}" />
+		    <tsf:notes memo="${_transaction.memo}" />
 		    <tsf:amount value="${_transaction.amountValue}" isdebit="${_transaction.debit}" />
 
 		</table> 

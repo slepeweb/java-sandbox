@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class FormSupport {
 	
+	public static final String TRANSACTION_CTX = "transaction";
 	public static final int NUM_EMPTY_CATS = 4;
 	
 	@Autowired private CategoryService categoryService;
@@ -32,10 +33,10 @@ public class FormSupport {
 	 * b) SearchCategory objects.
 	 */
 	public Category_Group populateCategory_Group(int groupId, String label, 
-			List<?> categoryLikeObjects, Class<?> clazz, Category_GroupSet cgs) {
+			List<?> categoryLikeObjects, Class<?> clazz) {
 		
 		boolean isTransactionMode = clazz.equals(SplitTransaction.class);
-		Category_Group cg = new Category_Group(groupId, label, cgs);		
+		Category_Group cg = new Category_Group(groupId, label);		
 		Category_ c;
 		int count = 0;
 		int numVisible = categoryLikeObjects != null ? categoryLikeObjects.size() : 0;
@@ -53,7 +54,7 @@ public class FormSupport {
 					c.setLastVisible(true);
 				}
 				
-				cgs.addOptions(c.getMajor(), this.categoryService.getAllMinorValues(c.getMajor()));
+				cg.addOptions(c.getMajor(), this.categoryService.getAllMinorValues(c.getMajor()));
 				
 				if (! isTransactionMode) {
 					c.setExclude(((SearchCategory) in).isExclude());
@@ -93,7 +94,7 @@ public class FormSupport {
 		
 		String name = "numCategories_" + groupId;
 		int numCategories = Integer.valueOf(req.getParameter(name));
-		Category_Group cg = new Category_Group(groupId, "", null);
+		Category_Group cg = new Category_Group(groupId, "");
 		cg.setLabel(req.getParameter("groupname_" + groupId));
 		Category_ c;
 		
@@ -113,14 +114,14 @@ public class FormSupport {
 					setMemo(memo).
 					setAmount(StringUtils.isBlank(amountStr) ? 0L : Util.parsePounds(amountStr));
 				
-				cgs.addOptions(major, this.categoryService.getAllMinorValues(major));
+				cg.addOptions(major, this.categoryService.getAllMinorValues(major));
 				c.setExclude(excluded);
 				cg.getCategories().add(c);
 			}
 		}
 		
 		if (cg.hasCompletedEntries()) {
-			cgs.getGroups().add(cg);
+			cgs.addGroup(cg);
 		}
 		
 		return cg;

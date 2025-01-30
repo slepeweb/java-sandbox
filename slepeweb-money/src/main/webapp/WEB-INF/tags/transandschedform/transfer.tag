@@ -4,7 +4,7 @@
 
 <!-- transandschedform/transfer.tag -->
 
-<mny:tableRow heading="Transfer a/c" tclass="transfer">
+<mny:tableRow heading="Transfer a/c" trclass="transfer">
 	<select id="xferaccount" name="xferaccount">
    	<option value="">Choose ...</option>
    	<c:forEach items="${_allAccounts}" var="_a">

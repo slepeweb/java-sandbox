@@ -26,7 +26,7 @@
 	}
 </c:set>
 
-<c:set var="_formActionUrl" scope="request">/chart/post/${_ss.id }</c:set>
+<c:set var="_formActionUrl" scope="request">/chart/save/${_ss.id }</c:set>
 
 <mny:standardLayout>
 

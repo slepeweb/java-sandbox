@@ -97,10 +97,10 @@ public class TransactionFormSupport {
 			model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
 		}
 		
-		Category_GroupSet cgs = new Category_GroupSet("Transaction Splits", Category_GroupSet.TRANSACTION_CTX, allMajors);
-		Category_Group cg = this.formSupport.populateCategory_Group(1, "Splits", t.getSplits(), SplitTransaction.class, cgs);
+		Category_GroupSet cgs = new Category_GroupSet("Transaction Splits", FormSupport.TRANSACTION_CTX, allMajors);
+		Category_Group cg = this.formSupport.populateCategory_Group(1, "Splits", t.getSplits(), SplitTransaction.class);
 		cg.setVisible(true).setLastVisible(true);
-		cgs.getGroups().add(cg);
+		cgs.addGroup(cg);
 		
 		model.addAttribute("_transactionSplits", cgs);
 	}

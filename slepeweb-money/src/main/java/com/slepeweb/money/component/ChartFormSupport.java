@@ -1,5 +1,7 @@
 package com.slepeweb.money.component;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +13,7 @@ import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.ChartProperties;
 import com.slepeweb.money.bean.SavedSearch;
+import com.slepeweb.money.bean.SavedSearchSupport;
 import com.slepeweb.money.bean.SearchCategory;
 import com.slepeweb.money.control.CategoryController;
 import com.slepeweb.money.service.CategoryService;
@@ -22,7 +25,6 @@ public class ChartFormSupport {
 
 	public static final String CHART_PROPS_ATTR = "_chartProps";
 	public static final String YEAR_RANGE_ATTR = "_yearRange";
-	public static final String CHART_TYPE = "chart";
 	
 	public static final String FORM_VIEW = "chartForm";
 	public static final String LIST_VIEW = "chartList";
@@ -41,7 +43,7 @@ public class ChartFormSupport {
 		Category_GroupSet cgs = null;
 		
 		if (props.getCategories() == null) {
-			cgs = new Category_GroupSet("Chart", Category_GroupSet.CHART_CTX, allMajors);
+			cgs = new Category_GroupSet("Chart", SearchFormSupport.CHART_CTX, allMajors);
 			addEmptyGroups(cgs);
 			props.setCategories(cgs);
 		}
@@ -83,11 +85,48 @@ public class ChartFormSupport {
 		Category_Group previousGroup = numVisibleGroups > 0 ?  groups.get(numVisibleGroups - 1) : null;
 		
 		for (int i = 0; i < NUM_EMPTY_GROUPS; i++) {
-			cg = this.formSupport.populateCategory_Group(startId + i, "Update label", null, SearchCategory.class, cgs);
+			cg = this.formSupport.populateCategory_Group(startId + i, "Update label", null, SearchCategory.class);
 			cg.setVisible(previousGroup == null || (i == 0 && ! previousGroup.hasCompletedEntries()));
 			previousGroup = cg;
-			groups.add(cg);
+			cgs.addGroup(cg);
 		}
+	}
+	
+
+	public SavedSearchSupport processFormSubmission(HttpServletRequest req, SavedSearch ss) {
+		List<String> allMajors = this.categoryService.getAllMajorValues();
+		Category_GroupSet cgs = new Category_GroupSet(req.getParameter("title"), SearchFormSupport.CHART_CTX, allMajors);
+		int numGroups = Integer.parseInt(req.getParameter("numGroups"));
+		
+		// Create new Category_Group's using the submitted form data, and add them to the set IFF populated
+		for (int i = 1; i <= numGroups; i++) {
+			this.formSupport.readCategoryInputs(req, i, cgs);
+		}
+		
+		// Read the remaining search parameters from the submitted form
+		ChartProperties props = readSearchCriteria(req);
+		
+		// Merge the Category_GroupSet object into ChartProperties
+		props.setCategories(cgs);
+		
+		// Update the SavedSearch object, which gets saved to the db
+		ss.
+			setType(SearchFormSupport.CHART_CTX).
+			setName(req.getParameter("name")).
+			setDescription(req.getParameter("description")).
+			setJson(this.searchFormSupport.toJson(props)).
+			setSaved(new Timestamp(new Date().getTime()));
+		
+		// This support object simplifies matters ???
+		SavedSearchSupport sss = new SavedSearchSupport().
+				setRequest(req).
+				setSavedSearch(ss).
+				setChartProperties(props).
+				setMode(req.getParameter("formMode")).
+				setSave(this.searchFormSupport.isOption("save", req)).
+				setExecute(this.searchFormSupport.isOption("execute", req));
+
+		return sss;
 	}
 	
 

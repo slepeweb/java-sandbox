@@ -49,18 +49,4 @@
 		
 	<mny:standardFormFooter />
 	
-	<%--
-	<div class="chart-form-buttons">
-		<c:choose><c:when test="${_formMode eq 'create'}">
-			<input type="submit" value="Save" />
-			<input id="cancel-button" type="button" value="Cancel" />
-		</c:when><c:when test="${_formMode eq 'update'}">
-			<input type="submit" value="Submit" />
-			<input type="button" value="Cancel" id="cancel-button" />
-			<input type="button" value="Delete chart?" id="delete-button" />
-		</c:when><c:when test="${_formMode eq 'execute'}">
-			<input type="submit" value="Update and re-execute" /> 
-		</c:when></c:choose>
-	</div>
-	 --%>
 </form>			

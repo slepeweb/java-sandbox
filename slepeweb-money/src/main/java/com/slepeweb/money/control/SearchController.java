@@ -31,7 +31,7 @@ public class SearchController extends BaseController {
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public String list(ModelMap model) {
-		model.addAttribute(SearchFormSupport.SEARCH_LIST_ATTR, filterSavedSearches(SearchFormSupport.ADVANCED_TYPE));
+		model.addAttribute(SearchFormSupport.SEARCH_LIST_ATTR, filterSavedSearches(SearchFormSupport.SEARCH_CTX));
 		return SearchFormSupport.LIST_VIEW;
 	}
 

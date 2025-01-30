@@ -1,10 +1,8 @@
 package com.slepeweb.money.control;
 
 import java.awt.geom.Rectangle2D;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +24,11 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category_Group;
-import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.ChartData;
 import com.slepeweb.money.bean.ChartProperties;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.SavedSearch;
+import com.slepeweb.money.bean.SavedSearchSupport;
 import com.slepeweb.money.bean.solr.SolrConfig;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
@@ -75,12 +73,10 @@ public class ChartController extends BaseController {
 	}
 	
 	// Handle form submission for updating an existing chart
-	@RequestMapping(value="/update/{id}", method=RequestMethod.POST)
-	public RedirectView update(@PathVariable int id, HttpServletRequest req, ModelMap model) {
+	@RequestMapping(value="/save/{id}", method=RequestMethod.POST)
+	public RedirectView save(@PathVariable int id, HttpServletRequest req, ModelMap model) {
 
-		String flash = save(this.savedSearchService.get(id), req, model);
-		return new RedirectView(String.format("%s/chart/list?flash=%s", 
-				req.getContextPath(), Util.encodeUrl(flash)));
+		return save(req, this.savedSearchService.get(id));
 	}
 	
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.GET)
@@ -111,49 +107,29 @@ public class ChartController extends BaseController {
 	@RequestMapping(value="/save", method=RequestMethod.POST)
 	public RedirectView save(HttpServletRequest req, ModelMap model) {
 
-		String flash = save(new SavedSearch(), req, model);
-		return new RedirectView(String.format("%s/chart/list?flash=%s", 
-				req.getContextPath(), Util.encodeUrl(flash)));
+		return save(req, new SavedSearch().setType(SearchFormSupport.CHART_CTX));
 	}	
 	
-	private String save(SavedSearch ss, HttpServletRequest req, ModelMap model) {
+	private RedirectView save(HttpServletRequest req, SavedSearch ss) {
 		
-		ChartProperties props = processFormSubmission(req);
+		SavedSearchSupport supp = this.chartFormSupport.processFormSubmission(req, ss);
 		
-		ss.
-				setType(ChartFormSupport.CHART_TYPE).
-				setName(req.getParameter("name")).
-				setDescription(req.getParameter("description")).
-				setJson(this.searchFormSupport.toJson(props)).
-				setSaved(new Timestamp(new Date().getTime()));
-		
-		try {
-			ss = this.savedSearchService.save(ss);
-			model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);
-			return "success|Chart successfully saved";
+		if (supp.isSave()) {
+			supp.setFlash(storeSavedSearch(ss));
 		}
-		catch (Exception e) {
-			return "failure|Failed to save chart";
+		else {
+			supp.setFlash("success|Search NOT saved");
 		}
+		
+		if (supp.isExecute()) {
+			if (! supp.isSave()) {
+				supp.setFlash("");
+			}
+			return this.searchFormSupport.redirect2Execute(supp);
+		}
+		
+		return this.searchFormSupport.redirect2List(supp);
 	}	
-	
-	private ChartProperties processFormSubmission(HttpServletRequest req) {
-		List<String> allMajors = this.categoryService.getAllMajorValues();
-		Category_GroupSet cgs = new Category_GroupSet(req.getParameter("title"), Category_GroupSet.CHART_CTX, allMajors);
-		@SuppressWarnings("unused")
-		Category_Group cg;
-		int numGroups = Integer.parseInt(req.getParameter("numGroups"));
-		
-		for (int i = 1; i <= numGroups; i++) {
-			// The Category_Group is only added to the set if it contains Category_ instances
-			cg = this.formSupport.readCategoryInputs(req, i, cgs);
-		}
-		
-		ChartProperties props = this.chartFormSupport.readSearchCriteria(req);
-		props.setCategories(cgs);
-		
-		return props;
-	}
 	
 	// Produces a chart from a GET request (ie a link)
 	@RequestMapping(value="/get/{id}", method=RequestMethod.GET)
@@ -167,22 +143,6 @@ public class ChartController extends BaseController {
 		model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);
 		return search(props, req, model);
 	}	
-	
-	// Updates chart properties, then reproduces the chart
-//	@RequestMapping(value="/post/{id}", method=RequestMethod.POST)
-//	public String post(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-//		
-//		ChartProperties props = getSearchCriteriaFromRequest(req);
-//		String flash = save(this.savedSearchService.get(id), req, model);
-//		
-//		if (flash.startsWith("success")) {
-//			model.addAttribute(SearchFormSupport.FORM_MODE_ATTR, EXECUTE_MODE);
-//			return search(props, req, model);
-//		}
-//		
-//		return "";
-//	}
-
 	
 	private String search(ChartProperties props, HttpServletRequest req, ModelMap model) {
 		model.addAttribute(ChartFormSupport.YEAR_RANGE_ATTR, this.formSupport.getYearRange());

@@ -125,7 +125,7 @@ public class ScheduledTransactionController extends BaseController {
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
 			List<String> allMajors = this.categoryService.getAllMajorValues();
-			Category_GroupSet cgs = new Category_GroupSet("Splits", Category_GroupSet.TRANSACTION_CTX, allMajors);
+			Category_GroupSet cgs = new Category_GroupSet("Splits", FormSupport.TRANSACTION_CTX, allMajors);
 			Category_Group cg = this.formSupport.readCategoryInputs(req, 1, cgs);
 			scht.setSplits(cg.toSplitTransactions(this.categoryService, multiplier));
 		}

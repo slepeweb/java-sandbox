@@ -41,14 +41,15 @@ public class SearchFormSupport {
 	public static final String EXECUTE_MODE = "execute";
 	public static final String ADHOC_MODE = "adhoc";
 
+	public static final String SEARCH_CTX = "search";
+	public static final String CHART_CTX = "chart";
+
 	public static final String ALL_ACCOUNTS_ATTR = "_allAccounts";
 	public static final String ALL_PAYEES_ATTR = "_allPayees";
 	public static final String CATEGORY_GROUP_ATTR = "_categoryGroup";
 	public static final String PARAMS_ATTR = "_params";
 	public static final String SEARCH_LIST_ATTR = "_searches";
 	public static final String SEARCH_RESPONSE_ATTR = "_response";
-	
-	public static final String ADVANCED_TYPE = "advanced";
 	
 	public static final String FORM_VIEW = "searchForm";
 	public static final String LIST_VIEW = "searchList";
@@ -68,11 +69,11 @@ public class SearchFormSupport {
 			SavedSearch ss, SolrParams params, String formMode, ModelMap model) {
 		
 		List<String> allMajors = this.categoryService.getAllMajorValues();
-		Category_GroupSet cgs = new Category_GroupSet("Search", Category_GroupSet.SEARCH_CTX, allMajors);
+		Category_GroupSet cgs = new Category_GroupSet("Search", SearchFormSupport.SEARCH_CTX, allMajors);
 		Category_Group cg;
 		
 		if (params.getCategoryGroup() == null) {
-			cg = this.formSupport.populateCategory_Group(1, "Categories", null, SearchCategory.class, cgs);	
+			cg = this.formSupport.populateCategory_Group(1, "Categories", null, SearchCategory.class);	
 			params.setCategoryGroup(cg);
 		}
 		else {
@@ -82,7 +83,7 @@ public class SearchFormSupport {
 		}
 		
 		cg.setVisible(true);
-		cgs.getGroups().add(cg);
+		cgs.addGroup(cg);
 
 		model.addAttribute(SAVED_SEARCH_ATTR, ss);		
 		model.addAttribute(PARAMS_ATTR, params);		
@@ -97,9 +98,9 @@ public class SearchFormSupport {
 	
 	public SavedSearchSupport processFormSubmission(HttpServletRequest req, SavedSearch ss) {
 		List<String> allMajors = this.categoryService.getAllMajorValues();
-		Category_GroupSet cgs = new Category_GroupSet("Splits", Category_GroupSet.SEARCH_CTX, allMajors);
+		Category_GroupSet cgs = new Category_GroupSet("Splits", SEARCH_CTX, allMajors);
 		
-		// Create a new Category_Group using the submitted form data, and add it to the set
+		// Create a new Category_Group using the submitted form data, and add it to the set IFF populated
 		this.formSupport.readCategoryInputs(req, 1, cgs);
 		
 		// Read the remaining search parameters from the submitted form
@@ -111,13 +112,16 @@ public class SearchFormSupport {
 		 *  is the SolrParams object that will get stored in the db as a json string.
 		 */
 		params.setCategoryGroup(cgs.getGroups().get(0));
-				
-		ss = setSavedSearch(
-				ss,
-				req.getParameter("name"),
-				req.getParameter("description"),
-				params);
+			
+		// Update the SavedSearch object, which gets saved to the db
+		ss.
+			setType(SEARCH_CTX).
+			setName(req.getParameter("name")).
+			setDescription(req.getParameter("description")).
+			setJson(toJson(params)).
+			setSaved(new Timestamp(new Date().getTime()));
 		
+		// This support object simplifies matters ???
 		SavedSearchSupport sss = new SavedSearchSupport().
 				setRequest(req).
 				setSavedSearch(ss).
@@ -155,15 +159,6 @@ public class SearchFormSupport {
 			setPageNum(1);
 	}	
 
-	private SavedSearch setSavedSearch(SavedSearch ss, String name, String description, SolrParams params) {
-		return ss.
-			setType(SearchFormSupport.ADVANCED_TYPE).
-			setName(name).
-			setDescription(description).
-			setJson(toJson(params)).
-			setSaved(new Timestamp(new Date().getTime()));
-	}
-
 	public void executeSearch(SolrParams params, ModelMap model) {
 		SolrResponse<FlatTransaction> resp = this.solrService4Money.query(params);
 		model.addAttribute(SearchFormSupport.SEARCH_RESPONSE_ATTR, resp);		
@@ -178,7 +173,8 @@ public class SearchFormSupport {
 	public RedirectView redirect2Execute(SavedSearchSupport supp) {
 		return redirect(
 				String.format(
-						"/search/get/%d?flash=%s", 
+						"/%s/get/%d?flash=%s", 
+						supp.getSavedSearch().getType(),
 						supp.getSavedSearch().getId(),
 						Util.encodeUrl(supp.getFlash())));
 	}
@@ -186,13 +182,15 @@ public class SearchFormSupport {
 	public RedirectView redirect2Adhoc(SavedSearchSupport supp) {
 		return redirect(
 				String.format(
-						"/search/get/adhoc?flash=%s", 
+						"/%s/get/adhoc?flash=%s", 
+						supp.getSavedSearch().getType(),
 						Util.encodeUrl(supp.getFlash())));
 	}
 	
 	public RedirectView redirect2List(SavedSearchSupport supp) {
 		return redirect(
-				String.format("/search/list?flash=%s", 
+				String.format("/%s/list?flash=%s", 
+						supp.getSavedSearch().getType(),
 						Util.encodeUrl(supp.getFlash())));
 	}
 	
@@ -200,7 +198,7 @@ public class SearchFormSupport {
 		return new RedirectView(url, true, true, false);
 	}
 	
-	private boolean isOption(String option, HttpServletRequest req) {
+	public boolean isOption(String option, HttpServletRequest req) {
 		String p = req.getParameter("submit-option");
 		return p != null && StringUtils.containsIgnoreCase(p, option);
 	}
