@@ -5,12 +5,10 @@
 <!-- dashboard.jsp -->
 
 <mny:standardLayout>
-	<div class="right">
-		<a href="${_ctxPath}/index/by/dates" title="Re-index ALL transactions (for searching)">Re-index</a><br />
-		<a href="${_ctxPath}/asset/history" title="Calculate growth/decline of all assets over complete data set">Asset history</a><br />
-	</div>
-	
-	<h2>Dashboard</h2>
+	<mny:pageHeading heading="Dashboard">
+		<a href="${_ctxPath}/index/by/dates" title="Re-index ALL transactions (for searching)">Re-index</a>
+		<a href="${_ctxPath}/asset/history" title="Calculate growth/decline of all assets over complete data set">Asset history</a>	
+	</mny:pageHeading>			
 					
 	<c:choose><c:when test="${not empty _dash.groups}">
 		

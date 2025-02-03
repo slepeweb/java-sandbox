@@ -7,7 +7,7 @@
 <c:choose><c:when test="${_formMode eq 'adhoc'}">
 	<c:set var="_pageHeading" value="Ad-hoc search" scope="request" />
 	<c:set var="_formActionUrl" scope="request">/search/save</c:set>
-</c:when><c:when test="${_formMode eq 'create'}">
+</c:when><c:when test="${_formMode eq 'add'}">
 	<c:set var="_pageHeading" value="Create new search" scope="request" />
 	<c:set var="_formActionUrl" scope="request">/search/save</c:set>
 </c:when><c:when test="${_formMode eq 'update'}">
@@ -44,8 +44,12 @@
 
 <mny:standardLayout>
 
-	<h2>${_pageHeading}</h2>
-	<mny:advancedSearchForm />		
+	<mny:pageHeading heading="${_pageHeading}">
+		<mny:standardFormMenu entity="search" many="searches" />
+	</mny:pageHeading>
+
+	<mny:advancedSearchForm />	
+	
 	<mny:entityDeletionDialog entity="search" mode="${_formMode}" id="${_ss.id}"/>
 
 </mny:standardLayout>

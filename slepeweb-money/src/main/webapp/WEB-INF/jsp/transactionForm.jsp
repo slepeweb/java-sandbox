@@ -17,22 +17,19 @@
 	}
 </c:set>
 
-<mny:flash />
-	
 <mny:standardLayout>
 
 	<tsf:labels entityName="transaction" /> <%-- Defines variables _buttonLabel and _pageHeading --%>
 	
-	<div class="right">
-		<c:if test="${_formMode eq 'update'}">
-			<a href="../add/${_transaction.account.id}">New transaction</a><br />
-			<a href="../copy/${_transaction.id}">Copy this transaction</a><br />
-		</c:if>
-		<a href="../list/${_transaction.account.id}">List transactions</a>
-	</div>
-	
-	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
+	<mny:pageHeading heading="${_pageHeading}">
+		<ul>
+			<c:if test="${_formMode eq 'update'}">
+				<li><a href="../add/${_transaction.account.id}">New transaction</a></li>
+				<li><a href="../copy/${_transaction.id}">Copy this transaction</a><li>
+			</c:if>
+			<li><a href="../list/${_transaction.account.id}">List transactions</a></li>
+		</ul>
+	</mny:pageHeading>
 	
 	<form id="transaction-form" method="post" action="${_ctxPath}/transaction/update">
 	    <table id="trn-form">
@@ -56,8 +53,8 @@
 
 		</table> 
 		
-		<tsf:tail entity="${_transaction}" label="Delete scheduled transaction?" />	       
-	    <input type="hidden" name="origxferid" value="${_transaction.transferId}" />   
+		<tsf:tail entity="${_transaction}" label="Delete transaction?" />	       
+	  <input type="hidden" name="origxferid" value="${_transaction.transferId}" />   
 	</form>		  	
 		
 	<tsf:dialogs entity="${_transaction}" />

@@ -8,12 +8,6 @@
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css" type="text/css">
 <link rel="stylesheet" href="${_ctxPath}/resources/css/money.css" />
 
-<!-- 
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" 
-	integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" 
-	crossorigin="anonymous">
- -->
-
 <script src="${_ctxPath}/resources/js/jquery-1.12.4.min.js"></script>
 <script src="${_ctxPath}/resources/js/jquery-ui-1.12.1.min.js"></script>
 <script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>

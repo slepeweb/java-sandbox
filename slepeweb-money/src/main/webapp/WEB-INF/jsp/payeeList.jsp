@@ -4,13 +4,11 @@
 	
 <!-- payeeList.jsp -->
 
-<mny:flash />
-
 <mny:standardLayout>
-	<h2 class="inline-block">Payees <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
-					
-	<div class="right"><a href="add" title="Create a new payee">New payee</a></div>
+
+	<mny:pageHeading heading="Payees">
+		<a href="add" title="Create a new payee">New payee</a>
+	</mny:pageHeading>
 	
 	<p><strong>Total no. of payees = ${_count}</strong></p>
 

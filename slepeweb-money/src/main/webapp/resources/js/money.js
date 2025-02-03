@@ -168,16 +168,14 @@ $(function() {
 	
 	$("#accordion").accordion({
 		active: false,
-		collapsible: true /*,
-		heightStyle: content */
+		collapsible: true,
+		heightStyle: 'content'
 	});
 	
 	$("#accordion-accounts").accordion({
 		active: 0,
-		collapsible: true /*,
-		heightStyle: content
-		*/
+		collapsible: true,
+		heightStyle: 'content'
 	});
-		
 	
 });	

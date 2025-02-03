@@ -4,12 +4,6 @@
 
 <!-- transandschedform/tail.tag -->
 
-<input id="submit-button" type="submit" value="${_buttonLabel}" /> 
-<input id="cancel-button" type="button" value="Cancel" />
-
-<c:if test="${_formMode eq 'update'}">
-  		<input type="button" value="${label}" id="delete-button" /> 
-</c:if>
+<mny:standardFormActionButtons submit="${_buttonLabel}" cancel="Cancel" delete="${label}" />
 
 <input type="hidden" name="id" value="${entity.id}" />   
-<input type="hidden" name="formMode" value="${_formMode}" />   

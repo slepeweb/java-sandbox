@@ -1,5 +1,8 @@
 package com.slepeweb.money.service;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +32,10 @@ public class LoginServiceImpl implements LoginService {
 				resp.setUser(u);
 				
 				if (u.getPassword() != null) {
-					StandardPasswordEncoder encoder = new StandardPasswordEncoder();					
-					if (encoder.matches(password, u.getPassword())) {
+					String unspunPassword = unspinPassword(password);
+					StandardPasswordEncoder encoder = new StandardPasswordEncoder();
+					
+					if (encoder.matches(unspunPassword, u.getPassword())) {
 						if (u.isEnabled()) {
 							resp.setSuccess(true);
 							LOG.info(String.format("Successful login [%s]", alias));
@@ -61,6 +66,29 @@ public class LoginServiceImpl implements LoginService {
 		}
 		
 		return resp;
+	}
+	
+	private String unspinPassword(String spun) {
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
+		int hour = cal.get(Calendar.HOUR_OF_DAY);
+		char[] chars = spun.toCharArray();
+		int len = chars.length;
+		int offset = hour % len;
+		
+		char[] unspun = new char[len];
+		int cursor;
+		
+		for (int i = 0; i < len; i++) {
+			cursor = (i + offset) % len;			
+			unspun[cursor] = chars[i];
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (char c : unspun) {
+			sb.append(c);
+		}
+		
+		return sb.toString();
 	}
 	
 	public void logout(HttpServletRequest req) {

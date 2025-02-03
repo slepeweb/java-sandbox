@@ -4,19 +4,9 @@
 	
 <!-- categoryForm.jsp -->
 
-<mny:flash />
-	
 <mny:standardLayout>
 
-	<c:set var="_buttonLabel" value="Add category" />
-	<c:set var="_pageHeading" value="Add new category" />
-	<c:if test="${_formMode eq 'update'}">
-		<c:set var="_buttonLabel" value="Update category" />
-	<c:set var="_pageHeading" value="Update category" />
-	</c:if>
-	
-	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
+	<mny:standardFormPageHeading entity="category" many="categories" />	
 	
 	<form method="post" action="${_ctxPath}/category/update">	  
 	    <table>
@@ -40,7 +30,7 @@
 		    
 	    	<mny:tableRow heading="Sub-category">
 		    	<input type="text" name="minor" placeholder="Enter sub-category, if required"
-		        	value="${_category.minor}" /><
+		        	value="${_category.minor}" />
 				</mny:tableRow>
 				
 	    	<mny:tableRow heading="Type">
@@ -52,8 +42,7 @@
 				
 			</table> 
 			
-	    <input type="submit" value="${_buttonLabel}" /> 	    
-			<mny:deleteButtonEnabler entity="category" />
+			<mny:cautiousFormActionButtons label="${_buttonLabel}" entity="category" />
 	    
 	    <input type="hidden" name="id" value="${_category.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   

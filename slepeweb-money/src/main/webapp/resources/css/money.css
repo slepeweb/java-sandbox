@@ -565,9 +565,9 @@ input[type=button].disabled,
 input[type=button]:disabled,
 .button.disabled,
 .button:disabled {
-  background-color: #292929 !important;
+  /* 			background-color: vars.$color-fg !important; */
   box-shadow: inset 0 -0.15em 0 0 rgba(0, 0, 0, 0.15);
-  color: #fff !important;
+  /* 			color: vars.$color-bg !important; */
   cursor: default;
   opacity: 0.25;
 }
@@ -575,14 +575,13 @@ input[type=button]:disabled,
 /* Main */
 #main-wrapper {
   background: #fff;
-  padding: 2em 0 2em 0;
+  padding: 1em 0;
 }
 
 #main .container {
   padding: 40px 0px;
 }
 
-/* Footer */
 #header-wrapper {
   padding-left: 0em;
   padding-right: 0em;
@@ -717,40 +716,34 @@ div.dashboard-group table h3 {
   margin-right: 2em;
 }
 
+header {
+  line-height: 2em;
+}
+
 #year-selector {
   width: 6em;
   margin-right: 2em;
 }
 
-.flash {
-  margin-left: 3em;
+div.flash {
   background-color: lightgrey;
   border: 2px solid black;
   border-radius: 5px;
   padding: 0.5em;
 }
-.flash.success {
+div.flash.success {
   color: green;
 }
-.flash.failure {
+div.flash.failure {
   color: red;
 }
 
 #delete-button {
   background-color: red;
-  float: right;
 }
 
 #cancel-button {
   background-color: #54937f;
-}
-
-span.flash {
-  font-size: smaller;
-}
-
-.right {
-  float: right;
 }
 
 .opaque50 {
@@ -840,6 +833,72 @@ tr.form-submission-options td {
 }
 tr.form-submission-options td span.radio-option {
   margin-right: 3em;
+}
+
+div.std-form-buttons, div.cautious-form-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+div.std-form-buttons input[type=submit], div.cautious-form-buttons input[type=submit] {
+  margin-top: 0;
+}
+div.std-form-buttons div.right input, div.cautious-form-buttons div.right input {
+  float: right;
+}
+
+div.page-heading {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 1em;
+}
+div.page-heading h2 {
+  margin-bottom: 0.5em;
+}
+div.page-heading div.flash {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+div.page-heading div.menu {
+  display: grid;
+  justify-items: right;
+}
+div.page-heading div.menu ul {
+  list-style: none;
+  margin-top: 0;
+}
+
+@media only screen and (max-width: 52em) {
+  body, input, select, textarea {
+    font-size: 15px;
+  }
+  td.memo, td.balance, th.memo, th.balance {
+    display: none;
+  }
+  #account-selector {
+    width: 90%;
+  }
+  ul#navigation {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+  }
+  span.radio-horiz {
+    display: block;
+  }
+  div.std-form-buttons, div.cautious-form-buttons {
+    display: block;
+  }
+  div.std-form-buttons input, div.cautious-form-buttons input {
+    display: block;
+    margin-bottom: 0.5em;
+  }
+  div.std-form-buttons input#delete-button, div.cautious-form-buttons input#delete-button {
+    margin-top: 2em;
+    color: red;
+  }
+  div.std-form-buttons div.right input, div.cautious-form-buttons div.right input {
+    float: none;
+  }
 }
 
 /*# sourceMappingURL=money.css.map */

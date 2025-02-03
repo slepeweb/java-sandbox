@@ -3,7 +3,7 @@
 
 <!-- transandschedform/category.tag -->
 
-<mny:tableRow heading="Category">
+<mny:tableRow heading="Category" trclass="category">
 	<select id="major" name="major">
    	<option value="">Choose ...</option>
    	<c:forEach items="${_allMajorCategories}" var="_name">

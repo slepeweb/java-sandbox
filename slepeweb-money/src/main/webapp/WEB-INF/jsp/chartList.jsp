@@ -2,14 +2,12 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
-<mny:flash />
-		
 <mny:standardLayout>
-	<div class="right"><a href="${_ctxPath}/chart/create">New chart</a></div>
-	
-	<h2>Chart list <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
-		
+
+	<mny:pageHeading heading="Chart list">
+		<a href="${_ctxPath}/chart/add" title="Define and save new chart critera">New chart</a>
+	</mny:pageHeading>
+
 	<c:choose><c:when test="${not empty _charts}">
 		<table>
 			<thead>

@@ -10,7 +10,7 @@ public class PasswordGenerator {
 		@SuppressWarnings("resource")
 		ApplicationContext context = new ClassPathXmlApplicationContext("passwordGeneratorContext.xml");		
 		StandardPasswordEncoder encoder = (StandardPasswordEncoder) context.getBean("passwordEncoder");		
-		String readable = "8utt1GG!ga50ft";
+		String readable = "xxx";
 		System.out.println(String.format("User [%s] has password [%s]", readable, encoder.encode(readable)));
 	}
 }

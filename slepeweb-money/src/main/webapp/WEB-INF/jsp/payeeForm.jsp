@@ -4,20 +4,9 @@
 	
 <!-- payeeForm.jsp -->
 
-<mny:flash />
-	
 <mny:standardLayout>
 
-	<c:set var="_buttonLabel" value="Add payee" />
-	<c:set var="_pageHeading" value="Add new payee" />
-	<c:if test="${_formMode eq 'update'}">
-		<c:set var="_buttonLabel" value="Update payee" />
-	<c:set var="_pageHeading" value="Update payee" />
-	</c:if>
-	
-
-	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
+	<mny:standardFormPageHeading entity="payee" />
 	
 	<form method="post" action="${_ctxPath}/payee/update">	  
 	    <table>
@@ -33,8 +22,7 @@
 
 			</table> 
 			
-	    <input type="submit" value="${_buttonLabel}" /> 
-			<mny:deleteButtonEnabler entity="payee" />
+			<mny:cautiousFormActionButtons label="${_buttonLabel}" entity="payee" />
 
 	    <input type="hidden" name="id" value="${_payee.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   

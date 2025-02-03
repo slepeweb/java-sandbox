@@ -23,7 +23,7 @@ public class SendMailServiceImpl implements SendMailService {
 			    .buildEmail();
 
 		Mailer mailer = MailerBuilder
-          .withSMTPServer("smtp.gmail.com", 587, "george.buttigieg56", "g1gaL0ftgma15L")
+          .withSMTPServer("smtp.gmail.com", 587, "george.buttigieg56", "kaeyfkbofiuszwbc")
           .withTransportStrategy(TransportStrategy.SMTP_TLS)
           .withSessionTimeout(10 * 1000)
           .clearEmailAddressCriteria() // turns off email validation

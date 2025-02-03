@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.slepeweb.common.service.SendMailService;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Dashboard;
 import com.slepeweb.money.bean.DashboardAccountGroup;
@@ -24,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class PageController extends BaseController {
 	
 	@Autowired private LoginService loginService;
+	@Autowired private SendMailService sendMailService;
 	
 	@RequestMapping(value="/")	
 	public String dashboard(ModelMap model) { 
@@ -76,10 +78,25 @@ public class PageController extends BaseController {
 			ModelMap model) throws IOException {
 			
 		LoginResponse resp = this.loginService.login(alias, password);
+		String from = "george.buttigieg56@gmail.com";
+		String to = "george@buttigieg.org.uk";
+		String name = "George Buttigieg";
+		
 		if (resp.isSuccess()) {
+			this.sendMailService.sendMail(from, to, name,
+					"Successful login to Money",
+					"(No body)");
+			
 			req.getSession().setAttribute(User.USER_ATTR, resp.getUser());
 			return dashboard(model);
 		}
+		
+		String msg = String.format("A user failed to login, using the following details:\n\nusername: %s\npassword: %s", 
+				alias, password);
+		
+		this.sendMailService.sendMail(from, to, name,
+				"***Failed*** login to Money",
+				msg);
 		
 		res.sendRedirect(String.format("%s/login?error=%s", req.getContextPath(), resp.getErrorMessage()));
 		return null;

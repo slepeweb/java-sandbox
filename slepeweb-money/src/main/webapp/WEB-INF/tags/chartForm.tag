@@ -47,6 +47,6 @@
 			
 	</table>
 		
-	<mny:standardFormFooter />
+	<mny:standardFormActionButtons submit="Submit selected action" cancel="Cancel" delete="Delete chart definition?" />
 	
 </form>			

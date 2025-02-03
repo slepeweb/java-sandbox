@@ -20,7 +20,7 @@
 				</mny:tableRow>
 				
 	    	<mny:tableRow heading="Password">
-					<input type="password" name="password" size="32" />
+					<input type="password" name="password" size="32" autocomplete="off" />
 				</mny:tableRow>
 
 			</table>

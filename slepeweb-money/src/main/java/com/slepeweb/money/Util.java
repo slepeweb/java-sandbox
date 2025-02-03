@@ -220,130 +220,10 @@ public class Util {
 		return pence / 100;
 	}
 	
-	/*
-	public static String buildChartCategoryInputMarkup(ChartProperties props, String outerTemplate, String innerTemplate, 
-			String categoryOptionsTemplate) {
-		
-		StringBuilder allGroups = new StringBuilder();
-		StringBuilder optionsForGroup = new StringBuilder();
-		StringBuilder innerBuilder;
-		String outer, inner;
-		int groupId = 0, optionsId;
-		
-		for (CategoryInputGroup group : props.getGroups()) {
-			groupId++;
-			outer = outerTemplate.<SearchCategoryInput>
-					replaceAll("\\[groupId\\]", String.valueOf(groupId)).
-					replace("[label]", group.getLabel());
-			inner = "";
-			innerBuilder = new StringBuilder();
-			optionsId = 0;
-			
-			for (SearchCategoryInput cc : group.getCategories()) {
-				optionsId++;
-				inner = innerTemplate.
-						replaceAll("\\[groupId\\]", String.valueOf(groupId)).
-						replaceAll("\\[counter\\]", String.valueOf(optionsId)).
-						replace("[major]", cc.getMajor()).
-						replace("[exclude-selected]", cc.isExclude() ? "selected" : "").
-						replace("[include-selected]", ! cc.isExclude() ? "selected" : "");
-				
-				optionsForGroup = new StringBuilder();
-				
-				for (String minor : cc.getOptions()) {
-					optionsForGroup.append(categoryOptionsTemplate.
-							replace("[minor]", minor).
-							replace("[selected]", minor.equals(cc.getMinor()) ? "selected" : "" ));
-				}
-				
-				inner = inner.replace("__categoryOptionsTemplate__", optionsForGroup.toString());
-				innerBuilder.append(inner);
-			}
-			
-			outer = outer.replace("__innerTemplate__", 
-					buildMinorCategoryInputMarkup(group, innerTemplate, categoryOptionsTemplate));
-			
-			allGroups.append(outer);
-		}
-		
-		return allGroups.toString();
-		
-	}
-	
-	public static String buildMinorCategoryInputMarkup(CategoryInputGroup group, 
-			String innerTemplate, String categoryOptionsTemplate) {
-		
-		StringBuilder minorCategoryOptions = new StringBuilder();
-		StringBuilder innerBuilder = new StringBuilder();
-		String inner;
-		int optionsId = 0;
-		
-		for (CategoryInput cc : group.getCategories()) {
-			optionsId++;
-			inner = innerTemplate.
-					replaceAll("\\[groupId\\]", String.valueOf(group.getId())).
-					replaceAll("\\[counter\\]", String.valueOf(optionsId)).
-					replace("[major]", cc.getMajor()).
-					replace("[exclude-selected]", cc.isExclude() ? "selected" : "").
-					replace("[include-selected]", ! cc.isExclude() ? "selected" : "");
-			
-			minorCategoryOptions = new StringBuilder();
-			
-			for (String minor : cc.getOptions()) {
-				minorCategoryOptions.append(categoryOptionsTemplate.
-						replace("[minor]", minor).
-						replace("[selected]", minor.equals(cc.getMinor()) ? "selected" : "" ));
-			}
-			
-			inner = inner.replace("__categoryOptionsTemplate__", minorCategoryOptions.toString());
-			innerBuilder.append(inner);
-		}
-		
-		return innerBuilder.toString();		
-	}
-	*/
 	public static String compactMarkup(String in) {
 		return in.replaceAll("\\n", "").replaceAll("\\r", "");
 	}
 
-	/*
-	public static String buildSplitInputMarkup(List<SplitTransactionFormComponent> splits, 
-			String innerTemplate, String splitOptionsTemplate) {
-		
-		StringBuilder splitOptions = new StringBuilder();
-		StringBuilder innerBuilder = new StringBuilder();
-		String inner;
-		int optionsId = 0;
-		
-		for (SplitTransactionFormComponent comp : splits) {
-			optionsId++;
-			inner = innerTemplate.
-					replaceAll("\\[counter\\]", String.valueOf(optionsId)).
-					replace("[major]", comp.getCategory().getMajor());
-			
-			splitOptions = new StringBuilder();
-			
-			for (String minor : comp.getAllMinors()) {
-				splitOptions.append(splitOptionsTemplate.
-						replace("[minor]", minor).
-						replace("[selected]", minor.equals(comp.getCategory().getMinor()) ? "selected" : "" ));
-			}
-			
-			inner = inner.
-					replace("__splitOptionsTemplate__", splitOptions.toString()).
-					replace("[memo]", comp.getMemo() == null ? "" : comp.getMemo()).*/
-					
-					/* Split amounts are always displayed as positive values, but are evaluated
-					 * according to whether the parent transaction is a debit or credit. *//*
-					replace("[amount]", formatPositivePounds(comp.getAmount()));
-			
-			innerBuilder.append(inner);
-		}
-		
-		return innerBuilder.toString();		
-	}
-	*/
-	
 	public static String displayAmountNS(long amount) {
 		return displayAmount(amount, false);
 	}
@@ -366,4 +246,5 @@ public class Util {
 					formatPounds(amount));
 		}
 	}
+	
 }

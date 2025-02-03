@@ -36,7 +36,7 @@ public class SearchController extends BaseController {
 	}
 
 	// Empty search definition form, for adding a new search
-	@RequestMapping(value="/create", method=RequestMethod.GET)
+	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String create(ModelMap model) {
 		this.searchFormSupport.populateForm(null, new SolrParams(new SolrConfig()), SearchFormSupport.CREATE_MODE, model);		
 		return SearchFormSupport.FORM_VIEW;

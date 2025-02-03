@@ -54,7 +54,7 @@ public class ChartController extends BaseController {
 	 */
 	
 	// Empty chart definition form, for adding a new chart
-	@RequestMapping(value="/create", method=RequestMethod.GET)
+	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String create(HttpServletRequest req, ModelMap model) {
 		this.chartFormSupport.populateForm(null, new ChartProperties(), SearchFormSupport.CREATE_MODE, model);
 		return ChartFormSupport.FORM_VIEW;

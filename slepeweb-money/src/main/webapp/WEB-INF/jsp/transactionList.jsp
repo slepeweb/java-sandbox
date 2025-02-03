@@ -2,6 +2,8 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<!-- transactionList.jsp -->
+
 <c:set var="_urlPrefix">${_ctxPath}/transaction/list/${_accountId}</c:set>
 
 <c:set var="_extraInPageCss" scope="request">
@@ -17,10 +19,12 @@
 	
 <mny:standardLayout>
 	<div class="transaction-list-header">
-		<div class="right">
-			<a href="${_ctxPath}/transaction/add/${_tl.account.id}" title="Create a new transaction record">New transaction</a><br />
-			<a href="${_ctxPath}/index/by/account/${_tl.account.id}" title="Re-index all transactions for this account (for searching)">Re-index</a><br />
-		</div>
+		<mny:pageHeading heading="Transactions by account">
+			<ul>
+				<li><a href="${_ctxPath}/transaction/add/${_tl.account.id}" title="Create a new transaction record">New transaction</a></li>
+				<li><a href="${_ctxPath}/index/by/account/${_tl.account.id}" title="Re-index all transactions for this account (for searching)">Re-index</a></li>
+			</ul>
+		</mny:pageHeading>			
 		
 		<div class="inline-block">
 			<form>
@@ -78,26 +82,29 @@
 				<th>Payee</th>
 				<th>Category</th>
 				<th>Amount</th>
-				<th>Memo</th>
-				<th>Balance</th>
+				<th class="memo">Memo</th>
+				<th class="balance">Balance</th>
 			</tr>
 		</thead>
 		
 		<tbody>
 			<c:forEach items="${_tl.runningBalances}" var="_trn">
+				<c:set var="_payee" value="${_trn.payee.name}" />
+				<c:if test="${_trn.transfer}">
+					<c:set var="_payee">${_trn.credit ? 'From' : 'To'}: ${_trn.mirror.name}</c:set>
+				</c:if>
+				
 				<tr>
 					<td class="date"><a href="${_ctxPath}/transaction/form/${_trn.id}"
 						title="Update this transaction">${_trn.enteredStr}</a></td>
-					<td class="payee">${_trn.payee.name}</td>
+					<td class="payee">${_payee}</td>
 					
 					<c:choose><c:when test="${not _trn.split and not _trn.transfer}">
 						<td class="category">${_trn.category}</td>
 						<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 						<td class="memo">${_trn.memo}</td>
 					</c:when><c:when test="${_trn.transfer}">
-						<c:set var="_info">${mon:tertiaryOp(_trn.credit, 'From', 'To')}: ${_trn.mirror.name}</c:set>
-						<td class="category">Transfer <span class="tooltipinfo"><i 
-							class="fas fa-info-circle" title="${_info}"></i></span></td>
+						<td class="category">Transfer</td>
 						<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 						<td class="memo">${_trn.memo}</td>
 					</c:when><c:when test="${_trn.split}">
@@ -120,7 +127,7 @@
 						</td>
 					</c:when></c:choose>
 					
-					<td class="currency amount">${mon:displayAmountNS(_trn.balance)}</td>
+					<td class="currency amount balance">${mon:displayAmountNS(_trn.balance)}</td>
 				</tr>
 			</c:forEach>
 		</tbody>

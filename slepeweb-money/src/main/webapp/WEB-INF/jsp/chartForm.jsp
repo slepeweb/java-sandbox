@@ -6,9 +6,7 @@
 
 <c:set var="_extraJs" scope="request" value="chart.js,search.js,minorcats.js" />
 
-<mny:flash />
-
-<c:choose><c:when test="${_formMode eq 'create'}">
+<c:choose><c:when test="${_formMode eq 'add'}">
 	<c:set var="_pageHeading" value="Create new chart" scope="request" />
 	<c:set var="_formActionUrl" scope="request">/chart/save</c:set>
 </c:when><c:when test="${_formMode eq 'update'}">
@@ -18,9 +16,10 @@
 
 <mny:standardLayout>
 	
-	<h2 class="inline-block">${_pageHeading} <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
-			
+	<mny:pageHeading heading="${_pageHeading}">
+		<mny:standardFormMenu entity="chart" />
+	</mny:pageHeading>
+
 	<mny:chartForm />	
 
 	<mny:entityDeletionDialog entity="chart" mode="${_formMode}" id="${_ss.id}"/>

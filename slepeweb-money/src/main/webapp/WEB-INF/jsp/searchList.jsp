@@ -2,16 +2,14 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
-<mny:flash />
-		
 <mny:standardLayout>
-	<div class="right">
-		<a href="${_ctxPath}/search/create" title="Define and save new search critera">New search</a><br />
-		<a href="${_ctxPath}/search/adhoc" title="Define an ad-hoc search that won't get saved in the database">Ad-hoc</a>
-	</div>
-	
-	<h2>Saved searches <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
+
+	<mny:pageHeading heading="Saved searches">
+		<ul>
+			<li><a href="${_ctxPath}/search/add" title="Define and save new search critera">New search</a></li>
+			<li><a href="${_ctxPath}/search/adhoc" title="Define an ad-hoc search that won't get saved in the database">Ad-hoc</a><li>
+		</ul>
+	</mny:pageHeading>
 	
 	<c:choose><c:when test="${not empty _searches}">
 		<table>

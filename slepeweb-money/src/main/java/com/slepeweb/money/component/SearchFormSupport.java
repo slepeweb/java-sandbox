@@ -36,7 +36,7 @@ public class SearchFormSupport {
 	
 	public static Logger LOG = Logger.getLogger(SearchFormSupport.class);
 	
-	public static final String CREATE_MODE = "create";
+	public static final String CREATE_MODE = "add";
 	public static final String UPDATE_MODE = "update";
 	public static final String EXECUTE_MODE = "execute";
 	public static final String ADHOC_MODE = "adhoc";

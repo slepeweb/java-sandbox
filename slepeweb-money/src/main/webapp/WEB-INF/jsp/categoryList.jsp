@@ -3,9 +3,10 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <mny:standardLayout>
-	<h2 class="inline-block">Categories</h2>			
-	
-	<div class="right"><a href="add" title="Create a new category">New category</a></div>
+
+	<mny:pageHeading heading="Categories">
+		<a href="add" title="Create a new category">New category</a>
+	</mny:pageHeading>
 	
 	<p><strong>Total no. of categories = ${_count}</strong></p>
 	

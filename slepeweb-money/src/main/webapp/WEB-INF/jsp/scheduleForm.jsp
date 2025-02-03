@@ -16,20 +16,13 @@
 	}
 </c:set>
 
-<mny:flash />
-	
 <mny:standardLayout>
 
 	<tsf:labels entityName="schedule" />  <%-- Defines variables _buttonLabel and _pageHeading --%>
 	
-	<c:if test="${_formMode eq 'update'}">
-		<div class="right">
-			<a href="${_ctxPath}/schedule/add" title="Define a new scheduled transaction">New schedule</a><br />
-		</div>
-	</c:if>
-	
-	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
+	<mny:pageHeading heading="${_pageHeading}">
+		<mny:standardFormMenu entity="schedule" />
+	</mny:pageHeading>
 	
 	<form id="schedule-form" method="post" action="${_ctxPath}/schedule/save">	  
 	    <table>

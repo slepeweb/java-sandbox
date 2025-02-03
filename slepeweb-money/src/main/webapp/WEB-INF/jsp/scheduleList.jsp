@@ -2,16 +2,12 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
-<mny:flash />
-		
 <mny:standardLayout>
-	<div class="right">
-		<a href="${_ctxPath}/schedule/add" title="Define a new scheduled transaction">New schedule</a>
-	</div>
 
-	<h2>Scheduled Transactions <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
-	
+	<mny:pageHeading heading="Scheduled transactions ">
+		<a href="${_ctxPath}/schedule/add" title="Define a new scheduled transaction">New schedule</a>
+	</mny:pageHeading>
+
 	<c:choose><c:when test="${fn:length(_scheduled) > 0}">
 		<table>
 			<thead>

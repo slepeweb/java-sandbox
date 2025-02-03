@@ -4,20 +4,9 @@
 	
 <!-- accountForm.jsp -->
 
-<mny:flash />
-	
 <mny:standardLayout>
 
-	<c:set var="_buttonLabel" value="Add account" />
-	<c:set var="_pageHeading" value="Add new account" />
-	<c:if test="${_formMode eq 'update'}">
-		<c:set var="_buttonLabel" value="Update account" />
-	<c:set var="_pageHeading" value="Update account" />
-	</c:if>
-	
-
-	<h2>${_pageHeading} <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>	
+	<mny:standardFormPageHeading entity="account" />
 	
 	<form method="post" action="${_ctxPath}/account/update">	  
 	    <table>
@@ -58,8 +47,7 @@
 		    </mny:tableRow>
 			</table> 
 			
-	    <input type="submit" value="${_buttonLabel}" /> 
-			<mny:deleteButtonEnabler entity="account" />
+			<mny:cautiousFormActionButtons label="${_buttonLabel}" entity="account" />
 
 	    <input type="hidden" name="id" value="${_account.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   
