@@ -1,3 +1,11 @@
+>>> Check manually entered transaction have unique identifier (source)
+
+>>> Db backup strategy
+
+>>> Deploy to coello
+
+>>> Deployment notes
+
 >>> Re-map categories
 
 >>> Improve security (hhssg1..) + spin - configurable

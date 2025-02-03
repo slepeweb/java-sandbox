@@ -23,11 +23,11 @@
 			<table>
 				<tr>
 					<td class="heading"><label>Email</label></td>
-					<td><input type="text" name="email" /></td>
+					<td><input type="text" name="email" autocomplete="off" /></td>
 				</tr>
 				<tr>
 					<td class="heading"><label>Password</label></td>
-					<td><input type="password" name="password" /></td>
+					<td><input type="password" name="password" autocomplete="off" /></td>
 				</tr>
 			</table>
 			<input class="button special small" type="submit" value="Login" />

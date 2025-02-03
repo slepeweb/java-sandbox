@@ -18,11 +18,11 @@
 		
 		<form id="login" method="post" action="">
 			<div>
-				<label>Email: </label><input name="email" size="128" />
+				<label>Email: </label><input name="email" size="128" autocomplete="off" />
 			</div>
 			
 			<div>
-				<label>Password: </label><input type="password" name="password" size="32" />
+				<label>Password: </label><input type="password" name="password" size="32" autocomplete="off" />
 			</div>
 			
 			<button class="action" type="submit">Login</button>
