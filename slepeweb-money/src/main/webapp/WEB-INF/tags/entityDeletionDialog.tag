@@ -42,8 +42,9 @@ $(function() {
 </script>
 
 <div id="delete-dialog" title="Delete ${entity}">
+	Please NOTE that ALL deletions are FINAL, and CANNOT be undone.<br />
 	<c:choose><c:when test="${entity eq 'transaction'}">
-		Are you sure you wish to delete this transaction? NOTE: that this action can NOT be un-done.
+		Are you sure you wish to delete this transaction?
 	</c:when><c:when test="${entity eq 'chart'}">
 		Are you sure you wish to delete this chart?
 	</c:when><c:when test="${entity eq 'search'}">

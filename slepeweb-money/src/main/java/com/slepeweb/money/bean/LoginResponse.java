@@ -5,6 +5,7 @@ public class LoginResponse {
 	private User user;
 	private boolean success;
 	private String errorMessage;
+	private boolean sendEmail = false;
 	
 	public String getErrorMessage() {
 		return errorMessage;
@@ -30,6 +31,15 @@ public class LoginResponse {
 	
 	public LoginResponse setSuccess(boolean status) {
 		this.success = status;
+		return this;
+	}
+
+	public boolean isSendEmail() {
+		return sendEmail;
+	}
+
+	public LoginResponse setSendEmail(boolean sendEmail) {
+		this.sendEmail = sendEmail;
 		return this;
 	}
 }

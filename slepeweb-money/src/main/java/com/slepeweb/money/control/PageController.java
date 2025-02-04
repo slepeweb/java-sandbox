@@ -81,21 +81,23 @@ public class PageController extends BaseController {
 		String from = "george.buttigieg56@gmail.com";
 		String to = "george@buttigieg.org.uk";
 		String name = "George Buttigieg";
+		String msg;
 		
 		if (resp.isSuccess()) {
-			this.sendMailService.sendMail(from, to, name,
-					"Successful login to Money",
-					"(No body)");
+			if (resp.isSendEmail()) {
+				msg = String.format("User %s successfully logged in to Money", alias);
+				this.sendMailService.sendMail(from, to, name, "Successful login", msg);
+			}
 			
 			req.getSession().setAttribute(User.USER_ATTR, resp.getUser());
 			return dashboard(model);
 		}
 		
-		String msg = String.format("A user failed to login, using the following details:\n\nusername: %s\npassword: %s", 
+		msg = String.format("A user failed to login to the Money app. Credentials:\n\nusername: %s\npassword: %s", 
 				alias, password);
 		
 		this.sendMailService.sendMail(from, to, name,
-				"***Failed*** login to Money",
+				"***Failed*** login",
 				msg);
 		
 		res.sendRedirect(String.format("%s/login?error=%s", req.getContextPath(), resp.getErrorMessage()));

@@ -23,9 +23,14 @@
 	
 <script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>
 
+<script>
+	var _origId = ${_item.origId};
+</script>
+	
+<script src="/resources/geo/js/glj.js"></script>
 <script src="/resources/geo/js/nav.js"></script>
 <script src="/resources/geo/js/inlineImages.js"></script>
-	
+
 <gen:extraCSS />
 <gen:extraInpageCSS />
 <gen:extraJS />

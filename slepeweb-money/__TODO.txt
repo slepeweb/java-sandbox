@@ -2,12 +2,8 @@
 
 >>> Db backup strategy
 
->>> Deploy to coello
-
 >>> Deployment notes
 
 >>> Re-map categories
-
->>> Improve security (hhssg1..) + spin - configurable
 
 >>> Create user with browse-only permission

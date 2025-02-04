@@ -85,6 +85,10 @@ public class Transaction extends DbEntity {
 				getAccount(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
+	public String getTypeIdentifier() {
+		return "transaction";
+	}
+	
 	// This is overriden by Transfer class
 	public Account getMirrorAccount() {
 		return null;

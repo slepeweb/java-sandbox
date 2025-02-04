@@ -6,4 +6,4 @@
 <div id="form-error-dialog" title="Form error"></div>
 <div id="form-warning-dialog" title="Form error"></div>
 
-<mny:entityDeletionDialog entity="schedule" mode="${_formMode}" id="${entity.id}"/>
+<mny:entityDeletionDialog entity="${entity.typeIdentifier}" mode="${_formMode}" id="${entity.id}"/>

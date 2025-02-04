@@ -43,6 +43,8 @@ public class ScheduledTransaction extends Transaction {
 		ScheduledTransaction source = (ScheduledTransaction) obj;
 		setLabel(source.getLabel());
 		setMirror(source.getMirror());
+		setEnabled(source.isEnabled());
+		setNextDate(source.getNextDate());
 		
 		assimilateSplits(source);
 	}
@@ -63,6 +65,12 @@ public class ScheduledTransaction extends Transaction {
 			StringUtils.isNotBlank(this.period);
 	}
 	
+	@Override
+	public String getTypeIdentifier() {
+		return "schedule";
+	}
+	
+
 	public boolean isTransfer() {
 		return getMirror() != null && getMirror().getId() > 0L;
 	}

@@ -20,6 +20,7 @@ public class LoginServiceImpl implements LoginService {
 	private static Logger LOG = Logger.getLogger(LoginServiceImpl.class);
 	
 	@Autowired private UserService userService;
+	private String security;
 	
 	public LoginResponse login(String alias, String password) {
 		
@@ -32,10 +33,20 @@ public class LoginServiceImpl implements LoginService {
 				resp.setUser(u);
 				
 				if (u.getPassword() != null) {
-					String unspunPassword = unspinPassword(password);
+					String testPassword = password;
+
+					if (this.security.equals("high")) {
+						resp.setSendEmail(! StringUtils.contains(password, "^"));
+						if (! resp.isSendEmail()) {
+							testPassword = testPassword.replace("^", "");
+						}
+						
+						testPassword = unspinPassword(testPassword);
+					}
+					
 					StandardPasswordEncoder encoder = new StandardPasswordEncoder();
 					
-					if (encoder.matches(unspunPassword, u.getPassword())) {
+					if (encoder.matches(testPassword, u.getPassword())) {
 						if (u.isEnabled()) {
 							resp.setSuccess(true);
 							LOG.info(String.format("Successful login [%s]", alias));
@@ -99,5 +110,13 @@ public class LoginServiceImpl implements LoginService {
 	
 	private User getUser(HttpServletRequest req) {
 		return (User) req.getSession().getAttribute(User.USER_ATTR);
+	}
+
+	public String getSecurity() {
+		return security;
+	}
+
+	public void setSecurity(String security) {
+		this.security = security;
 	}
 }
