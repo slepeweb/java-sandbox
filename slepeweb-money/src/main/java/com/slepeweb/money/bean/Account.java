@@ -4,6 +4,8 @@ import com.slepeweb.money.Util;
 
 public class Account extends Payee {
 	
+	private static long DFLT_ACCOUNT = 20l;
+	
 	private long openingBalance = 0L;
 	private boolean closed;
 	private String note, type;
@@ -19,6 +21,15 @@ public class Account extends Payee {
 			setNote(a.getNote()).
 			setType(a.getType());
 		}
+	}
+	
+	// TODO: the idea is to configure the default using a spring bean
+	protected void setDefault(long id) {
+		DFLT_ACCOUNT = id;
+	}
+	
+	public static long getDefault() {
+		return DFLT_ACCOUNT;
 	}
 		
 	@Override

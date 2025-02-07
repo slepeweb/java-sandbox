@@ -9,4 +9,5 @@
    		<option value="${_c}" <c:if test="${_c eq entity.category.minor}">selected</c:if>>${_c}</option>
    	</c:forEach>
   </select>
+ 	<i class="fa-solid fa-paint-roller"></i>
 </mny:tableRow>

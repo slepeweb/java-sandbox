@@ -69,9 +69,11 @@ public class TransactionFormSupport {
 		List<Account> allAccounts = this.accountService.getAll(false);
 		
 		// Not sure about this logic
+		/*
 		if (! allAccounts.contains(t.getAccount())) {
 			allAccounts.add(t.getAccount());
 		}
+		*/
 		
 		model.addAttribute("_transaction", t);
 		populateForm(model, t, allAccounts, mode);

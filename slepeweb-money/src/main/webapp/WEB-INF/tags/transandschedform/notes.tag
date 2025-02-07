@@ -3,6 +3,7 @@
 
 <!-- transandschedform/notes.tag -->
 
-<mny:tableRow heading="Notes">
+<mny:tableRow heading="Notes" trclass="notes">
 	<input id="memo" type="text" name="memo" placeholder="Enter any relevant notes" value="${memo}" />
+	<i class="fa-solid fa-paint-roller"></i>
 </mny:tableRow>

@@ -281,6 +281,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return t;
 	}
 
+	// TODO: review call to this method
 	public Timestamp getTransactionDateForAccount(long accountId, boolean first) {
 		String sql = String.format("select entered from transaction where accountid = ? order by entered %s limit 1", 
 				first ? "" : "desc");

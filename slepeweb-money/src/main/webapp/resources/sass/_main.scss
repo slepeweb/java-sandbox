@@ -717,6 +717,17 @@ div.flash {
 	}
 }
 
+form#transaction-form {
+	#payee, #major, #minor, #memo {
+		width: 95%;
+		display: inline;
+	} 
+	
+	i.fa-paint-roller {
+		color: vars.$color-fg-bold;
+	}
+}
+
 .trash-category-cell {
 	vertical-align: bottom;
 }
@@ -875,4 +886,11 @@ div.page-heading {
   		float: none;
   	}
   }
+  
+  form#transaction-form {
+		#payee, #major, #minor, #memo {
+			width: 92%;
+		} 
+	}
+  
 }

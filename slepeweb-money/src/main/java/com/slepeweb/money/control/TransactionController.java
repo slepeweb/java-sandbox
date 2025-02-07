@@ -27,7 +27,6 @@ import com.slepeweb.money.bean.TransactionList;
 import com.slepeweb.money.bean.Transfer;
 import com.slepeweb.money.component.FormSupport;
 import com.slepeweb.money.component.TransactionFormSupport;
-import com.slepeweb.money.service.CookieService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,34 +35,32 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping(value="/transaction")
 public class TransactionController extends BaseController {
 	
+	public static final String TRANSACTION_FORM = "transactionForm";
+	public static final String TRANSACTION_LIST = "transactionList";
+
 	private static Logger LOG = Logger.getLogger(TransactionController.class);
 	
-	@Autowired private CookieService cookieService;
 	@Autowired private FormSupport formSupport;
 	@Autowired private TransactionFormSupport transactionFormSupport;
 
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)	
 	public String listNoAccount(HttpServletRequest req, HttpServletResponse res, ModelMap model) { 
-		Long accountId = this.cookieService.getAccountId(req);
-		if (accountId != null) {
-			return listNoMonth(accountId.longValue(), req, res, model);
+		
+		Account a = getHistory(req).getLastAccount();
+		
+		if (a.getId() > 0) {
+			return listNoMonth(a.getId(), req, res, model);
 		}
 		
-		List<Account> allAccounts = this.accountService.getAll(false);
-		if (allAccounts.size() > 0) {
-			return listNoMonth(allAccounts.get(0).getId(), req, res, model);
-		}
-		
-		return null;
+		return listNoMonth(Account.getDefault(), req, res, model);
 	}
 	
 	@RequestMapping(value="/list/{accountId}")	
 	public String listNoMonth(@PathVariable long accountId, HttpServletRequest req, HttpServletResponse res, ModelMap model) { 
 		
-		this.cookieService.updateAccountCookie(accountId, req, res);
-		
-		Timestamp end = this.transactionService.getTransactionDateForAccount(accountId, false);		
+		getHistory(req).getLastAccount().setId(accountId);
+		Timestamp end = getHistory(req).getLastTransaction().getEntered();
 		NormalisedMonth endMonth = new NormalisedMonth(end);
 		return list(accountId, endMonth.getIndex(), model);
 	}
@@ -140,35 +137,38 @@ public class TransactionController extends BaseController {
 		model.addAttribute("_accountId", accountId);
 		model.addAttribute("_yearSelector", this.transactionFormSupport.buildMonthSelector(pager));
 		
-		return "transactionList";
+		return TRANSACTION_LIST;
 	}
 	
 	@RequestMapping(value="/add", method=RequestMethod.GET)
-	public String addForm(ModelMap model) {		
-		this.transactionFormSupport.populateForm(model, new Transaction(), "add");
-		return "transactionForm";
+	public String addForm(HttpServletRequest req, ModelMap model) {
+		this.transactionFormSupport.populateForm(model, new Transaction(), "add");		
+		return TRANSACTION_FORM;
 	}
 	
 	@RequestMapping(value="/add/{accountId}", method=RequestMethod.GET)
-	public String addFormForAccount(@PathVariable long accountId, HttpServletRequest req, ModelMap model) {
-		
-		Timestamp lastEntered = this.cookieService.getLastEntered(req);
-		
-		this.transactionFormSupport.populateForm(model, 
-				new Transaction().
-					setAccount(this.accountService.get(accountId)).
-					setEntered(lastEntered != null ? lastEntered : Util.now()), 
-				"add");
-		
-		return "transactionForm";
+	public String addFormForAccount(@PathVariable long accountId, HttpServletRequest req, ModelMap model) {		
+		Transaction t = new Transaction();
+		Transaction last = getHistory(req).getLastTransaction();
+		Account a = this.accountService.get(accountId);
+		t.setAccount(a).setEntered(last.getEntered());		
+		this.transactionFormSupport.populateForm(model, t, "add");		
+		return TRANSACTION_FORM;
 	}
 	
 	@RequestMapping(value="/form/{transactionId}", method=RequestMethod.GET)
-	public String updateForm(@PathVariable long transactionId, ModelMap model) {
-		this.transactionFormSupport.populateForm(model, this.transactionService.get(transactionId), "update");
-		return "transactionForm";
+	public String updateForm(@PathVariable long transactionId, HttpServletRequest req, ModelMap model) {
+		Transaction t = this.transactionService.get(transactionId);
+		getHistory(req).setLastTransaction(t);
+		this.transactionFormSupport.populateForm(model, t, "update");
+		return TRANSACTION_FORM;
 	}
 	
+	/*
+	 * This method only saves new transactions; it does NOT update existing ones.
+	 * The reason is that it would be quite feasible to make 2 transactions with identical
+	 * parameters, eg, two separate visits to the same supermarket, for the same amounts.
+	 */
 	@RequestMapping(value="/update", method=RequestMethod.POST)
 	public RedirectView update(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		
@@ -195,8 +195,8 @@ public class TransactionController extends BaseController {
 				setCategory(noCategory);
 		}
 		else {
-			t = new Transaction().
-				setPayee(this.payeeService.get(req.getParameter("payee")));
+			Payee p = identifyPayee(req.getParameter("payee"));		
+			t = new Transaction().setPayee(p);
 			
 			if (isSplit) {
 				t.setCategory(noCategory);
@@ -228,9 +228,11 @@ public class TransactionController extends BaseController {
 			t.setSplits(cg.toSplitTransactions(this.categoryService, multiplier));
 		}
 		
-		if (save(t) != null) {
+		t = save(t);
+		if (t != null) {
+			getHistory(req).setLastTransaction(t);
 			flash = String.format("success|Transaction successfully %s", isUpdateMode ? "updated" : "added");
-			this.cookieService.updateLastEnteredCookie(t.getEntered(), req, res);
+			//this.cookieService.updateLastEnteredCookie(t.getEntered(), req, res);
 		
 			return new RedirectView(String.format("%s/transaction/form/%d?flash=%s", 
 				req.getContextPath(), t.getId(), Util.encodeUrl(flash)));
@@ -239,8 +241,24 @@ public class TransactionController extends BaseController {
 			flash = "failure|Failed to save transaction";
 		}
 	
-		return new RedirectView(String.format("%s/transaction/list/%d?flash=%s", 
-				req.getContextPath(), t.getAccount().getId(), Util.encodeUrl(flash)));
+		return new RedirectView(String.format("%s/transaction/list?flash=%s", 
+				req.getContextPath(), Util.encodeUrl(flash)));
+	}
+	
+	private Payee identifyPayee(String name) {
+		Payee p = this.payeeService.get(name);
+		if (p.isNoPayee()) {
+			p = new Payee().setName(name);
+			try {
+				p = this.payeeService.save(p);
+				LOG.info(String.format("Created new payee: %s", name));
+			}
+			catch (Exception e) {
+				throw new RuntimeException("Failed to create new Payee");
+			}
+		}
+		
+		return p;
 	}
 	
 	@RequestMapping(value="/delete/{transactionId}", method=RequestMethod.GET)
@@ -263,9 +281,10 @@ public class TransactionController extends BaseController {
 	
 	@RequestMapping(value="/copy/{transactionId}", method=RequestMethod.GET)
 	public String copy(@PathVariable long transactionId, HttpServletRequest req, ModelMap model) {
-		this.transactionFormSupport.populateForm(model, this.transactionService.get(transactionId).
-				setId(0L).setOrigId(0L).setEntered(Util.now()), "add");
-		return "transactionForm";
+		Transaction t = this.transactionService.get(transactionId).setId(0L).setOrigId(0L).setEntered(Util.now());		
+		this.transactionFormSupport.populateForm(model, t, "add");
+		
+		return TRANSACTION_FORM;
 	}	
 	
 	private Transaction save(Transaction t) {

@@ -10,4 +10,5 @@
    		<option value="${_name}" <c:if test="${_name eq entity.category.major}">selected</c:if>>${_name}</option>
    	</c:forEach>
  	</select>
+ 	<i class="fa-solid fa-paint-roller"></i>
 </mny:tableRow>

@@ -22,6 +22,10 @@ public class Payee extends DbEntity {
 			getName() != null;
 	}
 	
+	public boolean isNoPayee() {
+		return StringUtils.isBlank(getName());
+	}
+	
 	@Override
 	public String toString() {
 		return StringUtils.isNotBlank(getName()) ? getName() : "[blank]";

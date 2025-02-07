@@ -23,7 +23,7 @@ _money.transaction.fillLastPaymentDetails = function() {
 			dataType: "json",
 			success: function(trn) {
 				majorEle.val(trn.majorCategory);
-				var promet = _updateMinorCategories(majorEle);
+				var promet = _money.service.minorcats.updateMinorCategories(majorEle);
 				promet.done(function(res) {						  
 					if (! memo) {
 						$("input[name='memo']").val(trn.memo);
@@ -69,4 +69,8 @@ _money.transaction.checkFormComplete = function() {
 
 $(function() {
 	_money.shared.getAllPayees(_money.transaction.fillLastPaymentDetails);
+	
+	$('form#transaction-form i.fa-paint-roller').click(function() {
+		$(this).prev().val('');
+	});
 });

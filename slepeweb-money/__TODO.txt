@@ -1,9 +1,3 @@
->>> Check manually entered transaction have unique identifier (source)
-
->>> Db backup strategy
-
->>> Deployment notes
-
 >>> Re-map categories
 
 >>> Create user with browse-only permission

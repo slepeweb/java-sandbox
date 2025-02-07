@@ -767,6 +767,14 @@ div.flash.failure {
   width: 50%;
 }
 
+form#transaction-form #payee, form#transaction-form #major, form#transaction-form #minor, form#transaction-form #memo {
+  width: 95%;
+  display: inline;
+}
+form#transaction-form i.fa-paint-roller {
+  color: #666;
+}
+
 .trash-category-cell {
   vertical-align: bottom;
 }
@@ -898,6 +906,9 @@ div.page-heading div.menu ul {
   }
   div.std-form-buttons div.right input, div.cautious-form-buttons div.right input {
     float: none;
+  }
+  form#transaction-form #payee, form#transaction-form #major, form#transaction-form #minor, form#transaction-form #memo {
+    width: 92%;
   }
 }
 

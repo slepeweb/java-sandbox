@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.slepeweb.money.bean.History;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.User;
@@ -25,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class BaseController {
 
 	//private static Logger LOG = Logger.getLogger(BaseController.class);
+	protected static final String HISTORY_ATTR = "history";
 	
 	@Autowired protected PayeeService payeeService;
 	@Autowired protected AccountService accountService;
@@ -72,6 +74,14 @@ public class BaseController {
 		return flash;
 	}
 	
+	protected History getHistory(HttpServletRequest req) {
+		History h = (History) req.getSession().getAttribute(HISTORY_ATTR);
+		if (h == null) {
+			h = new History();
+			req.getSession().setAttribute(HISTORY_ATTR, h);
+		}
+		return h;
+	}	
 	
 	@ModelAttribute(value="_ctxPath")
 	protected String getWebContextPath(HttpServletRequest req) {
