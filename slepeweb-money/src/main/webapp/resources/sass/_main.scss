@@ -717,13 +717,19 @@ div.flash {
 	}
 }
 
-form#transaction-form {
+form#transaction-form, form#advanced-search-form, form#schedule-form {
 	#payee, #major, #minor, #memo {
 		width: 95%;
 		display: inline;
 	} 
 	
-	i.fa-paint-roller {
+	#amount {
+		width: 15%;
+		display: inline;
+		margin-right: 0.5em;
+	}
+	
+	i.fa-eraser {
 		color: vars.$color-fg-bold;
 	}
 }
@@ -846,6 +852,11 @@ div.page-heading {
 	}
 }
 
+span.spacer2 {
+	display: inline-block;
+	width: 2em;
+}
+
 @media only screen and (max-width: vars.$transition-nav) {
 	body, input, select, textarea {
 		font-size: 15px;
@@ -887,10 +898,14 @@ div.page-heading {
   	}
   }
   
-  form#transaction-form {
+  form#transaction-form, form#advanced-search-form, form#schedule-form {
 		#payee, #major, #minor, #memo {
 			width: 92%;
-		} 
+		}
+		 
+		#amount {
+			width: 25%;
+		}
 	}
   
 }

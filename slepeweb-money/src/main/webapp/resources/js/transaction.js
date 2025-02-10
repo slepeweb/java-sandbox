@@ -70,7 +70,7 @@ _money.transaction.checkFormComplete = function() {
 $(function() {
 	_money.shared.getAllPayees(_money.transaction.fillLastPaymentDetails);
 	
-	$('form#transaction-form i.fa-paint-roller').click(function() {
-		$(this).prev().val('');
+	$('form#transaction-form i.fa-eraser').click(function() {
+		_money.shared.eraseFormField($(this));
 	});
 });

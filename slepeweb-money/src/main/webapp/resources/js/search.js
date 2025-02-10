@@ -25,4 +25,8 @@ $(function() {
 		_money.service.minorcats.updateMinorCategories($(this));
 	});	  
 
+	$('form#advanced-search-form i.fa-eraser').click(function() {
+		_money.shared.eraseFormField($(this));
+	});
+
 });

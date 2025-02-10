@@ -5,8 +5,8 @@
 <!-- transandschedform/amount.tag -->
 
 <mny:tableRow heading="Total amount">
-	<span class="inline-block radio-horiz"><input id="amount" type="text" name="amount" placeholder="Enter amount" 
- 		value="${mon:formatPounds(value)}" /></span>
+	<input id="amount" type="text" name="amount" placeholder="Enter amount" 
+ 		value="${mon:formatPounds(value)}" /><i class="fa-solid fa-eraser"></i><span class="spacer2"></span>
  	<span class="radio-horiz"><input id="debit" type="radio" name="debitorcredit" value="debit" 
  		${mon:tertiaryOp(_formMode eq 'add' or isdebit, 'checked=checked', '')} /> Debit</span>
  	<span class="radio-horiz"><input id="credit" type="radio" name="debitorcredit" value="credit" 

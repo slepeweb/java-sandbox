@@ -310,6 +310,13 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				payeeId);
 	}
 	
+	public Transaction getLastTransactionsForPayee(long payeeId) {
+		return this.jdbcTemplate.queryForObject(
+				SELECT + "where t.payeeid = ? order by t.entered desc limit 1", 
+				new RowMapperUtil.TransactionMapper(),
+				payeeId);
+	}
+	
 	public List<Transaction> getTransactionsForCategory(long categoryId) {
 		return getTransactions(
 				SELECT + "where t.categoryid = ? order by t.entered", 

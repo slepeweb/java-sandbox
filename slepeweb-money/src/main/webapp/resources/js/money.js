@@ -84,6 +84,9 @@ _money.shared.getAllPayees = function(andThenExecute) {
 	});
 }
 
+_money.shared.eraseFormField = function(ele$) {
+	ele$.prev().val('')
+}
 
 $(function() {
 	// Dialog common to most/all forms, display when forms contain errors

@@ -55,8 +55,11 @@
 	    </c:if>
 	    
 		</table> 
-		
-		<mny:standardFormActionButtons submit="Submit selected action" cancel="Cancel" delete="Delete search definition?" />
+				
+		<mny:standardFormActionButtons 
+			submit="${_formMode eq 'adhoc' ? 'Submit' : 'Submit selected action'}" 
+			cancel="Cancel" 
+			delete="Delete search definition?" />
 
 </form>		  	
 

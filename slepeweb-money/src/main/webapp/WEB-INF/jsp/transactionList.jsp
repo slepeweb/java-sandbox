@@ -66,11 +66,14 @@
 				<span class="pager <c:if test="${_option.selected}">selected</c:if>"><a href="${_urlPrefix}/${_option.value}">${_option.name}</a></span>
 			</c:forEach>
 			
-			<c:if test="${_tl.pager.next}"><span 
-				class="pager arrow"><a href="${_urlPrefix}/${_tl.pager.nextMonth.index}"
-					title="Step 1 month later">Next<i class="fas fa-angle-right"></i></a></span><span 
-				class="pager arrow"><a href="${_urlPrefix}/${_tl.pager.nextBlock.index}"><i 
-					class="fas fa-angle-double-right" title="Jump ${_tl.pager.blocksize} months later"></i></a></span></c:if>
+			<c:if test="${_tl.pager.next}">
+				<span class="pager arrow"><a href="${_urlPrefix}/${_tl.pager.nextMonth.index}"
+					title="Step 1 month later">Next<i class="fas fa-angle-right"></i></a></span>
+				<span class="pager arrow"><a href="${_urlPrefix}/${_tl.pager.nextBlock.index}"><i 
+					class="fas fa-angle-double-right" title="Jump ${_tl.pager.blocksize} months later"></i></a></span>
+				<span class="pager"><a href="${_urlPrefix}/1"><i 
+					class="fa-regular fa-clock fa-2x" title="Today"></i></a></span>
+			</c:if>
 		</p>
 	</div>
 	

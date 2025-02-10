@@ -26,6 +26,20 @@ public class FlatTransaction {
 	 */
 	@Field("type") private int type;
 	
+	public FlatTransaction() {}
+	
+	public FlatTransaction(Transaction t) {
+		setId(String.valueOf(t.getId()));
+		setEntered(t.getEntered());
+		setAmount(t.getAmount());
+		setAccount(t.getAccount().getName());
+		setPayee(t.getPayee().getName());
+		setMajorCategory(t.getCategory().getMajor());
+		setMinorCategory(t.getCategory().getMinor());
+		setMemo(t.getMemo());
+		setType(0);
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("%s | %s: %s (%4$td/%4$tm/%4$tY)", 

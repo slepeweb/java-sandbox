@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.RestResponse;
+import com.slepeweb.money.bean.Transaction;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -43,7 +44,9 @@ public class RestController extends BaseController {
 	
 	@RequestMapping(value="/transaction/latest/bypayee/{payeeName}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
-	public FlatTransaction getRecentTransaction(@PathVariable String payeeName, ModelMap model) {	
-		return this.solrService.queryLatestTransactionByPayee(payeeName);
+	public FlatTransaction getRecentTransaction(@PathVariable String payeeName, ModelMap model) {
+		Payee p = this.payeeService.get(payeeName);
+		Transaction t = this.transactionService.getLastTransactionsForPayee(p.getId());
+		return new FlatTransaction(t);
 	}
 }

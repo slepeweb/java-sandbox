@@ -13,6 +13,7 @@ import com.slepeweb.money.except.MissingDataException;
 public interface TransactionService {
 	Transaction get(long id);
 	Transaction getByOrigId(int source, long id);
+	Transaction getLastTransactionsForPayee(long payeeId);
 	List<Transaction> getAll();
 	List<Transaction> getTransactionsForAccount(long id);
 	List<Transaction> getTransactionsForAccount(long id, Timestamp from, Timestamp to);

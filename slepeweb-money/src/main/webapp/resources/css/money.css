@@ -767,11 +767,16 @@ div.flash.failure {
   width: 50%;
 }
 
-form#transaction-form #payee, form#transaction-form #major, form#transaction-form #minor, form#transaction-form #memo {
+form#transaction-form #payee, form#transaction-form #major, form#transaction-form #minor, form#transaction-form #memo, form#advanced-search-form #payee, form#advanced-search-form #major, form#advanced-search-form #minor, form#advanced-search-form #memo, form#schedule-form #payee, form#schedule-form #major, form#schedule-form #minor, form#schedule-form #memo {
   width: 95%;
   display: inline;
 }
-form#transaction-form i.fa-paint-roller {
+form#transaction-form #amount, form#advanced-search-form #amount, form#schedule-form #amount {
+  width: 15%;
+  display: inline;
+  margin-right: 0.5em;
+}
+form#transaction-form i.fa-eraser, form#advanced-search-form i.fa-eraser, form#schedule-form i.fa-eraser {
   color: #666;
 }
 
@@ -875,6 +880,11 @@ div.page-heading div.menu ul {
   margin-top: 0;
 }
 
+span.spacer2 {
+  display: inline-block;
+  width: 2em;
+}
+
 @media only screen and (max-width: 52em) {
   body, input, select, textarea {
     font-size: 15px;
@@ -907,8 +917,11 @@ div.page-heading div.menu ul {
   div.std-form-buttons div.right input, div.cautious-form-buttons div.right input {
     float: none;
   }
-  form#transaction-form #payee, form#transaction-form #major, form#transaction-form #minor, form#transaction-form #memo {
+  form#transaction-form #payee, form#transaction-form #major, form#transaction-form #minor, form#transaction-form #memo, form#advanced-search-form #payee, form#advanced-search-form #major, form#advanced-search-form #minor, form#advanced-search-form #memo, form#schedule-form #payee, form#schedule-form #major, form#schedule-form #minor, form#schedule-form #memo {
     width: 92%;
+  }
+  form#transaction-form #amount, form#advanced-search-form #amount, form#schedule-form #amount {
+    width: 25%;
   }
 }
 

@@ -6,5 +6,5 @@
 <mny:tableRow heading="Payee" trclass="payee">
  	<input id="payee" type="text" name="payee" value="${payeeName}"
  	 	placeholder="Begin typing to reveal matching payees" />
- 	<i class="fa-solid fa-paint-roller"></i>
+ 	<i class="fa-solid fa-eraser"></i>
 </mny:tableRow>

@@ -128,15 +128,12 @@ public class SearchFormSupport {
 				setSolrParams(params).
 				setMode(req.getParameter("formMode"));
 		
-		if (sss.getMode().equals(ADHOC_MODE) ||
-				sss.getMode().equals(CREATE_MODE) && isOption("execute", req)) {
-			
+		if (sss.getMode().equals(ADHOC_MODE)) {			
 			sss.setAdhoc(true);
 		}
 		else {
-			sss.
-				setSave(isOption("save", req)).
-				setExecute(isOption("execute", req));
+			sss.setSave(isOption("save", req) || isOption("save-execute", req));
+			sss.setExecute(isOption("execute", req) || isOption("save-execute", req));
 		}
 		
 		return sss;

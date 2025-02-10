@@ -14,4 +14,8 @@ _money.schedule.checkFormComplete = function() {
 
 $(function(){
 	_money.shared.getAllPayees();
+
+	$('form#schedule-form i.fa-eraser').click(function() {
+		_money.shared.eraseFormField($(this));
+	});
 });

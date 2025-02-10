@@ -5,5 +5,5 @@
 
 <mny:tableRow heading="Notes" trclass="notes">
 	<input id="memo" type="text" name="memo" placeholder="Enter any relevant notes" value="${memo}" />
-	<i class="fa-solid fa-paint-roller"></i>
+	<i class="fa-solid fa-eraser"></i></i>
 </mny:tableRow>
