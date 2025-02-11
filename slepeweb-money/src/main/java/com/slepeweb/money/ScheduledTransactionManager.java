@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
-import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
@@ -65,12 +65,7 @@ public class ScheduledTransactionManager {
 	        Trigger trigger = TriggerBuilder.newTrigger().
 	        		withIdentity("trigger1", "transactions").
 	        		startNow().
-	        		withSchedule(
-	        				SimpleScheduleBuilder.
-	        				simpleSchedule().
-	        				withIntervalInHours(24).
-	        				repeatForever()
-	        		).
+	        		withSchedule(CronScheduleBuilder.cronSchedule("0 6 0 * * ?")).
 	        		build();
 	        LOG.info("Built the trigger");
 

@@ -85,7 +85,9 @@ _money.shared.getAllPayees = function(andThenExecute) {
 }
 
 _money.shared.eraseFormField = function(ele$) {
-	ele$.prev().val('')
+	let input$ = ele$.prev();
+	input$.val('');
+	input$.focus();
 }
 
 $(function() {

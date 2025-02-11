@@ -11,7 +11,7 @@
 	
 	<div class="right">
 		<c:if test="${_formMode eq 'update'}">
-			<c:if test="${not (_isAdmin or _numDeletableTransactions eq 0)}">
+			<c:if test="${_isAdmin or _numDeletableTransactions eq 0}">
 				<c:set var="disabler" value="" />
 				<c:if test="${not (_isAdmin or _numDeletableTransactions eq 0)}"><c:set var="disabler">disabled="true"</c:set></c:if>
 		 		<input type="button" value="Delete ${entity}?" id="delete-button" ${disabler} /> 

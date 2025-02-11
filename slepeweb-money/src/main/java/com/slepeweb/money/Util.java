@@ -109,6 +109,13 @@ public class Util {
 		c.set(Calendar.MILLISECOND, 0);
 	}
 	
+	public static Timestamp zeroTimeOfDay(Timestamp ts) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(ts);
+		zeroTimeOfDay(c);
+		return new Timestamp(c.getTimeInMillis());
+	}
+	
 	public static void startOfYear(Calendar c) {
 		c.set(Calendar.DATE, 1);
 		c.set(Calendar.MONTH, 0);
