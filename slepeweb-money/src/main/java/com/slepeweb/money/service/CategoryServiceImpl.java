@@ -66,16 +66,16 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 
 	public Category update(Category dbRecord, Category c) {
 		if (! dbRecord.equals(c)) {
-			dbRecord.assimilate(c);
-			
-			this.jdbcTemplate.update(
-					"update category set major = ?, minor = ?, expense = ? where id = ?", 
-					dbRecord.getMajor(), dbRecord.getMinor(), dbRecord.isExpense(), dbRecord.getId());
-			
-			// Update transaction documents in solr, which store category name, NOT id.
-			this.solrService4Money.save(this.transactionService.getTransactionsForCategory(dbRecord.getId()));
-			
+			String oldMajor = dbRecord.getMajor();
+			dbRecord.assimilate(c);			
+			update(c);
 			LOG.info(compose("Updated category", c));
+			
+			if (c.isRoot()) {
+				// Update all categories that share the same 'major' value
+				updateAllSubCategories(oldMajor, c.getMajor());
+			}
+			
 		}
 		else {
 			LOG.debug(compose("Category not modified", c));
@@ -84,13 +84,18 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 		return dbRecord;
 	}
 
+	public List<Category> getByMajor(String major) {
+		return this.jdbcTemplate.query(
+				"select * from category where major=?", new RowMapperUtil.CategoryMapper(), major);
+	}
+
 	public Category get(String major, String minor) {
 		// Form submission will offer a null value for minor if <select> hasn't been populated.
 		if (minor == null) {
 			minor = "";
 		}
 		
-		Category c = get("select * from category where major = ? and minor = ?", new Object[]{major, minor});
+		Category c = get("select * from category where major = ? and minor = ?", major, minor);
 		if (c != null) {
 			return c;
 		}
@@ -148,5 +153,27 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 		}
 
 		return this.jdbcTemplate.update("delete from category where id = ?", id);
+	}
+	
+	private void update(Category c) {
+		this.jdbcTemplate.update(
+				"update category set major = ?, minor = ?, expense = ? where id = ?", 
+				c.getMajor(), c.getMinor(), c.isExpense(), c.getId());
+		
+		// Update transaction documents in solr, which store category name, NOT id.
+		this.solrService4Money.save(this.transactionService.getTransactionsForCategory(c.getId()));
+	}
+	
+	private void updateAllSubCategories(String from, String to) {
+		int count = 0;
+		for (Category c : getByMajor(from)) {
+			if (! c.isRoot()) {
+				c.setMajor(to);
+				update(c);
+				count++;
+			}
+		}
+		
+		LOG.info(compose("Updated all sub-categories", from, to, count));
 	}
 }

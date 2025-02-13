@@ -35,8 +35,8 @@ public class CategoryController extends BaseController {
 				continue;
 			}
 			
-			if (c.getMinor().length() == 0) {
-				c.setMinor("(no sub-category)");
+			if (c.isRoot()) {
+				c.setMinor("(root)");
 			}
 			
 			nextName = c.getMajor();

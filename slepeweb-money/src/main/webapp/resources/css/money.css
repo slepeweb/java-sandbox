@@ -885,6 +885,10 @@ span.spacer2 {
   width: 2em;
 }
 
+form#category-form tr td.extra {
+  width: 40%;
+}
+
 @media only screen and (max-width: 52em) {
   body, input, select, textarea {
     font-size: 15px;

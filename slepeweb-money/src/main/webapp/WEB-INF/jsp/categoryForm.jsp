@@ -8,7 +8,9 @@
 
 	<mny:standardFormPageHeading entity="category" many="categories" />	
 	
-	<form method="post" action="${_ctxPath}/category/update">	  
+	<c:set var="_formModeTest" value="${_formMode ne 'update' or not _category.root}" />
+	
+	<form id="category-form" method="post" action="${_ctxPath}/category/update">	  
 	    <table>
 	    	<c:if test="${_formMode eq 'update'}">
 	    		<mny:tableRow heading="Id" trclass="opaque50">
@@ -18,20 +20,32 @@
 		    
 		    <tr>
 		        <td class="heading"><label>Category</label></td>
-		        <td><input type="text" name="major" placeholder="Enter category, or choose from selection"
+		        <td><input type="text" name="major" placeholder="Enter a category"
 		        	value="${_category.major}" /></td>
-		        <td><select id="all-major-categories-list">
-		        	<option value="">Choose an existing value ...</option>
-		        	<c:forEach items="${_allMajorCategories}" var="_name">
-		        		<option value="">${_name}</option>
-		        	</c:forEach>
-		        </select></td>
+		        	
+		        <td class="extra">
+			        <c:choose><c:when test="${_formModeTest}">
+				        <select id="all-major-categories-list">
+				        	<option value="">Choose an existing value ...</option>
+				        	<c:forEach items="${_allMajorCategories}" var="_name">
+				        		<option value="">${_name}</option>
+				        	</c:forEach>
+				        </select>
+			        </c:when><c:when test="${_category.root}">
+			        		<u>This is a root category.</u>
+			        		Changing this value will update all sub-categories too.
+			        	</c:when></c:choose>
+		        </td>
 		    </tr>
 		    
-	    	<mny:tableRow heading="Sub-category">
-		    	<input type="text" name="minor" placeholder="Enter sub-category, if required"
-		        	value="${_category.minor}" />
-				</mny:tableRow>
+		    <c:choose><c:when test="${_formModeTest}">
+		    	<mny:tableRow heading="Sub-category">
+			    	<input type="text" name="minor" placeholder="Leave empty if this is a root category"
+			        	value="${_category.minor}" />
+					</mny:tableRow>
+				</c:when><c:otherwise>
+					<input type="hidden" name="minor" value="" />
+				</c:otherwise></c:choose>
 				
 	    	<mny:tableRow heading="Type">
 					<span class="radio-horiz"><input id="expense_cat" type="radio" name="categorytype" value="expense" 

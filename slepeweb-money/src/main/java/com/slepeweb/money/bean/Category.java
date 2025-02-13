@@ -1,5 +1,7 @@
 package com.slepeweb.money.bean;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties({"defined4Insert", "inDatabase", "legacy", "expense"})
@@ -23,6 +25,10 @@ public class Category extends DbEntity {
 	
 	public boolean isDefined4Insert() {
 		return true; 
+	}
+	
+	public boolean isRoot() {
+		return StringUtils.isBlank(this.minor);
 	}
 	
 	@Override
