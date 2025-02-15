@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.common.service.SendMailService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -18,24 +19,34 @@ public class LoginServiceImpl implements LoginService {
 	private static final String USER_ATTR = "_user";
 	
 	@Autowired private UserService userService;
+	@Autowired private SendMailService sendMailService;
 	
-	public LoginSupport login(String email, String password, HttpServletRequest req) {
-		return login(email, password, false, req);
+	public LoginSupport login(String alias, String password, HttpServletRequest req) {
+		return login(alias, password, false, req);
 	}
 	
-	public LoginSupport login(String email, String password, boolean asContentEditor, HttpServletRequest req) {
+	public LoginSupport login(String alias, String password, boolean asContentEditor, HttpServletRequest req) {
 		
-		LoginSupport supp = new LoginSupport();
+		LoginSupport supp = new LoginSupport().setAlias(alias).setPassword(password);
+		String msg = "";
 		
-		if (StringUtils.isNotBlank(email) && StringUtils.isNotBlank(password)) {
-			User u = this.userService.get(email);
+		if (StringUtils.isNotBlank(alias) && StringUtils.isNotBlank(password)) {
+			// Look for secret flag
+			if (StringUtils.contains(password, "^")) {
+				password = StringUtils.replace(password, "^", "");
+			}
+			else {
+				supp.setSendmailFlag(true);
+			}
+			
+			User u = this.userService.get(alias);
 			
 			if (u != null) {
 				supp.setUser(u);
 				
 				if (asContentEditor && ! u.isEditor()) {
-					String s = String.format("'%s' does not have permission to use the content editor", email);
-					supp.setErrorMessage(s);
+					String s = String.format("'%s' does not have permission to use the content editor", alias);
+					supp.setUserMessage(s);
 					LOG.info(s);
 				}
 				else if (u.getPassword() != null) {
@@ -44,35 +55,48 @@ public class LoginServiceImpl implements LoginService {
 						if (u.isEnabled()) {
 							supp.setSuccess(true);
 							req.getSession().setAttribute(USER_ATTR, supp.getUser().setLoggedIn(true));				
-							LOG.info(String.format("Successful login [%s]", email));
+							LOG.info(msg = String.format("Successful login [%s]", alias));
 						}
 						else {
-							supp.setErrorMessage("The user account is disabled right now.");
-							LOG.info(String.format("Failed attempt to login to disabled account [%s]", email));
+							supp.setUserMessage("The user account is disabled right now.");
+							LOG.info(msg = String.format("Failed attempt to login to disabled account [%s]", alias));
 						}
 					}
 					else {
-						supp.setErrorMessage("Invalid account details!");
-						LOG.info(String.format("Failed login [%s]", email));
+						supp.setUserMessage("Invalid account details!");
+						LOG.info(msg = String.format("Failed login [%s]/[%s]", alias, password));
 					}
 				}
 				else {
-					supp.setErrorMessage("Account availability error!");
-					LOG.warn(String.format("Account setup not complete [%s]", u));
+					supp.setUserMessage("Account availability error!");
+					LOG.warn(msg = String.format("Account setup not complete [%s]", u));
 				}
 			}
 			else {
-				supp.setErrorMessage("Invalid username and/or password!");
-				LOG.info(String.format("Failed login [%s]", email));
+				supp.setUserMessage("Invalid username and/or password!");
+				LOG.info(msg = String.format("Failed login [%s]/[%s]", alias, password));
 			}
 		}
 		else {
-			supp.setErrorMessage("All form fields must be populated!");
-			LOG.warn("Form data incomplete]");
+			supp.setUserMessage("All form fields must be populated!");
+			LOG.warn(msg = "Form data incomplete]");
 		}
 		
+		sendMailIf(supp.setEmailMessage(msg));
 		return supp;
 	}
+	
+	private void sendMailIf(LoginSupport supp) {
+		String from = "george.buttigieg56@gmail.com";
+		String to = "george@buttigieg.org.uk";
+		String name = "George Buttigieg";
+		
+		if (! supp.isSuccess() || supp.isSendmailFlag()) {
+			String msg = supp.getUserMessage() + "\n\n" + supp.getEmailMessage();
+			this.sendMailService.sendMail(from, to, name, "CMS login", msg);
+		}		
+	}
+
 	
 	public void logout(HttpServletRequest req) {
 		User u = (User) req.getSession().getAttribute(USER_ATTR);

@@ -51,6 +51,7 @@ _money.transandsched.checkCategoryEtc = function(errors) {
 	
 	if (paymentType === 'standard') {
 		_money.shared.isNotEmpty('Category', 'select#major', errors, 1);
+		_money.shared.isNotEmpty('Payee', 'input#payee', errors, 1);
 	}
 	else if (paymentType === 'transfer') {
 		_money.shared.isNotEmpty('Transfer a/c', 'select#xferaccount', errors);

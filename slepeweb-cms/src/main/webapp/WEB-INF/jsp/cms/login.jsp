@@ -18,7 +18,7 @@
 		
 		<form id="login" method="post" action="">
 			<div>
-				<label>Email: </label><input name="email" size="128" autocomplete="off" />
+				<label>Alias: </label><input name="alias" size="128" autocomplete="off" />
 			</div>
 			
 			<div>

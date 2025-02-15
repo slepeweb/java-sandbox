@@ -1,6 +1,9 @@
 package com.slepeweb.money.control;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +12,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.common.service.SendMailService;
+import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Dashboard;
 import com.slepeweb.money.bean.DashboardAccountGroup;
@@ -53,24 +58,24 @@ public class PageController extends BaseController {
 	@RequestMapping(value="/login")
 	public String loginForm(
 		HttpServletRequest req,
-		@RequestParam(value="error", required = false) String error,
+		@RequestParam(value="flash", required = false) String flash,
 		@RequestParam(value="logout", required = false) String logout,
 		ModelMap model) {
  
-		if (error != null) {
-			model.addAttribute("error", "Invalid username and password!");
-		}
- 
 		if (logout != null) {
 			req.getSession().removeAttribute(User.USER_ATTR);
-			model.addAttribute("msg", "You've been successfully logged out.");
 		}
  
+		LocalDateTime d = LocalDateTime.now();
+		DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+		String s = d.format(dtf);
+		model.addAttribute("_now", s);
+		
 		return "loginForm"; 
 	}
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
-	public String loginSubmission (
+	public RedirectView loginSubmission (
 			HttpServletRequest req,
 			HttpServletResponse res,
 			@RequestParam(value="alias", required = true) String alias,
@@ -89,8 +94,9 @@ public class PageController extends BaseController {
 				this.sendMailService.sendMail(from, to, name, "Successful login", msg);
 			}
 			
-			req.getSession().setAttribute(User.USER_ATTR, resp.getUser());
-			return dashboard(model);
+			req.getSession().setAttribute(User.USER_ATTR, resp.getUser());			
+			return new RedirectView(String.format("%s/dashboard", req.getContextPath()));
+
 		}
 		
 		msg = String.format("A user failed to login to the Money app. Credentials:\n\nusername: %s\npassword: %s", 
@@ -100,8 +106,8 @@ public class PageController extends BaseController {
 				"***Failed*** login",
 				msg);
 		
-		res.sendRedirect(String.format("%s/login?error=%s", req.getContextPath(), resp.getErrorMessage()));
-		return null;
+		return new RedirectView(String.format("%s/login?flash=%s", req.getContextPath(), 
+				Util.encodeUrl("failure|" + resp.getErrorMessage())));
 	}
 		
 }

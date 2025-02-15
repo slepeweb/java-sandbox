@@ -29,6 +29,13 @@ public class Category_GroupSet {
 		return this.groups.size();
 	}
 	
+	public Category_Group getFirstGroup() {
+		if (getSize() > 0) {
+			return this.groups.get(0);
+		}
+		return null;
+	}
+	
 	public String getTitle() {
 		return title;
 	}

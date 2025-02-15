@@ -31,12 +31,12 @@ public class LoginController extends BaseController {
 			ModelMap model) throws IOException {					
 		
 		if (req.getMethod().equalsIgnoreCase("post")) {
-			String email = req.getParameter("email");
-			StringBuffer msg = new StringBuffer(String.format("User '%s' logging in ... ", email));
+			String alias = req.getParameter("alias");
+			StringBuffer msg = new StringBuffer(String.format("User '%s' logging in ... ", alias));
 			
 			String password = req.getParameter("password");
 			String originalPath = req.getParameter("originalPath");
-			LoginSupport supp = this.loginService.login(email, password, req);
+			LoginSupport supp = this.loginService.login(alias, password, req);
 			
 			if (supp.isSuccess()) {
 				msg.append("success!");
@@ -47,8 +47,8 @@ public class LoginController extends BaseController {
 				res.sendRedirect(path);
 			}
 			else {
-				model.addAttribute("error", supp.getErrorMessage());
-				msg.append("FAILED: " + supp.getErrorMessage());
+				model.addAttribute("error", supp.getUserMessage());
+				msg.append("FAILED: " + supp.getUserMessage());
 			}
 			
 			LOG.info(msg);

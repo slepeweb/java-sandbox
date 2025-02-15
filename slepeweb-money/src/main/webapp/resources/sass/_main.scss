@@ -861,6 +861,12 @@ form#category-form tr td.extra {
 	width: 40%;
 }
 
+p.datetimenow {
+	font-size: 0.9em;
+	color: vars.$color-accent-bg;
+	margin-bottom: 0.5em;
+}
+
 @media only screen and (max-width: vars.$transition-nav) {
 	body, input, select, textarea {
 		font-size: 15px;

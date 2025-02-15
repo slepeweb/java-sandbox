@@ -22,8 +22,8 @@
 		<form method="post" action="">
 			<table>
 				<tr>
-					<td class="heading"><label>Email</label></td>
-					<td><input type="text" name="email" autocomplete="off" /></td>
+					<td class="heading"><label>Alias</label></td>
+					<td><input type="text" name="alias" autocomplete="off" /></td>
 				</tr>
 				<tr>
 					<td class="heading"><label>Password</label></td>

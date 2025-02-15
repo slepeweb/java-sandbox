@@ -6,8 +6,11 @@
 
 <mny:standardLayout>
 	<mny:pageHeading heading="Dashboard">
-		<a href="${_ctxPath}/index/by/dates" title="Re-index ALL transactions (for searching)">Re-index</a>
-		<a href="${_ctxPath}/asset/history" title="Calculate growth/decline of all assets over complete data set">Asset history</a>	
+		<ul>
+			<li><a href="${_ctxPath}/index/by/dates" title="Re-index ALL transactions (for searching)">Re-index</a></li>
+			<li><a href="${_ctxPath}/asset/history" title="Calculate growth/decline of all assets over complete data set">Asset history</a></li>	
+			<li><a href="${_ctxPath}/login?logout" title="Logout">Logout</a></li>	
+		</ul>
 	</mny:pageHeading>			
 					
 	<c:choose><c:when test="${not empty _dash.groups}">

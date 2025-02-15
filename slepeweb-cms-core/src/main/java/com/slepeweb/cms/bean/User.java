@@ -12,13 +12,14 @@ public class User extends CmsBean {
 	
 	private static final long serialVersionUID = 1L;
 	private Long id;
-	private String firstName, lastName, email, phone, password, secret;
+	private String alias, firstName, lastName, email, phone, password, secret;
 	private boolean enabled, loggedIn, editor;
 	private Map<Long, List<String>> roles;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof User) {
 			User u = (User) obj;
+			setAlias(u.getAlias());
 			setFirstName(u.getFirstName());
 			setLastName(u.getLastName());
 			setEmail(u.getEmail());
@@ -32,6 +33,7 @@ public class User extends CmsBean {
 	
 	public boolean isDefined4Insert() {
 		return 
+			StringUtils.isNotBlank(getAlias()) &&
 			StringUtils.isNotBlank(getFirstName()) &&
 			StringUtils.isNotBlank(getLastName()) &&
 			StringUtils.isNotBlank(getEmail()) &&
@@ -137,6 +139,15 @@ public class User extends CmsBean {
 		return this;
 	}
 
+	public String getAlias() {
+		return alias;
+	}
+
+	public User setAlias(String alias) {
+		this.alias = alias;
+		return this;
+	}
+
 	public boolean isLoggedIn() {
 		return loggedIn;
 	}
@@ -187,6 +198,7 @@ public class User extends CmsBean {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (editor ? 1231 : 1237);
+		result = prime * result + ((alias == null) ? 0 : alias.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
 		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
@@ -205,6 +217,11 @@ public class User extends CmsBean {
 			return false;
 		User other = (User) obj;
 		if (editor != other.editor)
+			return false;
+		if (alias == null) {
+			if (other.alias != null)
+				return false;
+		} else if (!alias.equals(other.alias))
 			return false;
 		if (email == null) {
 			if (other.email != null)

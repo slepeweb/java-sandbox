@@ -113,12 +113,12 @@ public class PageController extends BaseController {
 		ModelMap model) throws IOException {
  		
 		if (req.getMethod().equalsIgnoreCase("post")) {
-			String email = req.getParameter("email");
+			String alias = req.getParameter("alias");
 			String pwd = req.getParameter("password");
-			LoginSupport supp = this.loginService.login(email, pwd, true, req);
+			LoginSupport supp = this.loginService.login(alias, pwd, true, req);
 			
 			if (! supp.isSuccess()) {
-				model.addAttribute("error", supp.getErrorMessage());
+				model.addAttribute("error", supp.getUserMessage());
 			}
 			else {
 				res.sendRedirect(req.getContextPath() + "/page/editor");

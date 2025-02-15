@@ -299,6 +299,7 @@ create table access
 create table user
 (
 	id int not null auto_increment,
+	alias varchar(24) not null,
 	firstname varchar(128) not null,
 	lastname varchar(128) not null,
 	email varchar(128) not null,
@@ -307,7 +308,7 @@ create table user
 	editor boolean,
 	enabled boolean,
 	secret varchar(256),
-	unique key idx_user_email (email),
+	unique key idx_user_alias (alias),
 	index idx_user_secret (secret),
 	primary key (id)
 ) ENGINE=InnoDB;

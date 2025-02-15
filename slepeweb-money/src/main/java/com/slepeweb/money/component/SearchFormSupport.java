@@ -111,7 +111,7 @@ public class SearchFormSupport {
 		 *  Combine the the first Category_Group into the SolrParams. It 
 		 *  is the SolrParams object that will get stored in the db as a json string.
 		 */
-		params.setCategoryGroup(cgs.getGroups().get(0));
+		params.setCategoryGroup(cgs.getFirstGroup());
 			
 		// Update the SavedSearch object, which gets saved to the db
 		ss.

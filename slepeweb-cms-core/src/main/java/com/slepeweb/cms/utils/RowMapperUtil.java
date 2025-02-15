@@ -322,6 +322,7 @@ public class RowMapperUtil {
 		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return CmsBeanFactory.makeUser().
 					setId(rs.getLong("id")).
+					setAlias(rs.getString("alias")).
 					setFirstName(rs.getString("firstname")).
 					setLastName(rs.getString("lastname")).
 					setEmail(rs.getString("email")).

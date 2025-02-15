@@ -54,10 +54,10 @@ public class UserAccountController extends BaseController {
 			ModelMap model) throws IOException {	
 				
 		if (req.getMethod().equalsIgnoreCase("post")) {
-			String email = req.getParameter("email");
+			String alias = req.getParameter("alias");
 			String password = req.getParameter("password");
 			String originalPath = req.getParameter("originalPath");
-			LoginSupport supp = this.loginService.login(email, password, req);
+			LoginSupport supp = this.loginService.login(alias, password, req);
 			
 			if (supp.isSuccess()) {
 				String path = originalPath;
@@ -73,7 +73,7 @@ public class UserAccountController extends BaseController {
 				res.sendRedirect(path);
 			}
 			else {
-				model.addAttribute("error", supp.getErrorMessage());
+				model.addAttribute("error", supp.getUserMessage());
 			}
 			
 		}

@@ -64,8 +64,10 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 	}
 	
 	private User insert(User u) {		
-		this.jdbcTemplate.update( "insert into user (firstname, lastname, email, phone, password, editor, enabled, secret) values (?, ?, ?, ?, ?, ?, ?)", 
-				u.getFirstName(), u.getLastName(), u.getEmail(), u.getPhone(), u.getPassword(), u.isEditor(), u.isEnabled(), u.getSecret());	
+		this.jdbcTemplate.update( 
+				"insert into user (alias, firstname, lastname, email, phone, password, editor, enabled, secret) values (?, ?, ?, ?, ?, ?, ?, ?)", 
+				u.getAlias(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getPhone(), u.getPassword(), u.isEditor(), 
+				u.isEnabled(), u.getSecret());	
 		
 		u.setId(getLastInsertId());			
 		LOG.info(compose("Added new user", u));		
@@ -77,8 +79,8 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 			dbRecord.assimilate(u);
 			
 			this.jdbcTemplate.update(
-					"update user set firstname=?, lastname=?, phone=?, password=?, editor=?, enabled=?, secret=? where id=?", 
-					dbRecord.getFirstName(), dbRecord.getLastName(), dbRecord.getPhone(),  
+					"update user set alias=?, firstname=?, lastname=?, phone=?, password=?, editor=?, enabled=?, secret=? where id=?", 
+					dbRecord.getAlias(), dbRecord.getFirstName(), dbRecord.getLastName(), dbRecord.getPhone(),  
 					dbRecord.getPassword(), dbRecord.isEditor(), dbRecord.isEnabled(), dbRecord.getSecret(), dbRecord.getId());
 			
 			LOG.info(compose("Updated user", u));
@@ -103,8 +105,8 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 		}
 	}
 
-	public User get(String email) {
-		return get(String.format(SELECT_TEMPLATE, " email = ?"), email);
+	public User get(String alias) {
+		return get(String.format(SELECT_TEMPLATE, " alias = ?"), alias);
 	}
 
 	public User get(Long id) {

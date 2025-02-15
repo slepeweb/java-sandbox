@@ -3,18 +3,9 @@ package com.slepeweb.cms.bean;
 public class LoginSupport {
 
 	private User user;
-	private boolean success;
-	private String errorMessage;
+	private boolean success, sendmailFlag;
+	private String alias, password, userMessage, emailMessage;
 	
-	public String getErrorMessage() {
-		return errorMessage;
-	}
-
-	public LoginSupport setErrorMessage(String message) {
-		this.errorMessage = message;
-		return this;
-	}
-
 	public User getUser() {
 		return user;
 	}
@@ -32,4 +23,50 @@ public class LoginSupport {
 		this.success = status;
 		return this;
 	}
+
+	public boolean isSendmailFlag() {
+		return sendmailFlag;
+	}
+
+	public LoginSupport setSendmailFlag(boolean sendmailFlag) {
+		this.sendmailFlag = sendmailFlag;
+		return this;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public LoginSupport setAlias(String alias) {
+		this.alias = alias;
+		return this;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public LoginSupport setPassword(String password) {
+		this.password = password;
+		return this;
+	}
+
+	public String getUserMessage() {
+		return userMessage;
+	}
+
+	public LoginSupport setUserMessage(String message) {
+		this.userMessage = message;
+		return this;
+	}
+
+	public String getEmailMessage() {
+		return emailMessage;
+	}
+
+	public LoginSupport setEmailMessage(String emailMessage) {
+		this.emailMessage = emailMessage;
+		return this;
+	}
+
 }
