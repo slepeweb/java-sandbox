@@ -42,3 +42,9 @@
 	</div>
 	
 </anc:pageLayout>
+
+<script>
+$(function() {
+	$('input[name=alias]').focus();
+})
+</script>

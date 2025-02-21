@@ -21,7 +21,7 @@
 					<c:forEach items="${_group.accounts}" var="_a">
 						<tr>
 							<td class="name"><a href="${_ctxPath}/transaction/list/${_a.id}"
-								title="List transactions for this account">${_a.name}</a></td>
+								title="${_a.note}">${_a.name}</a></td>
 							<td class="type ${_a.type}">${_a.type}</td>
 							<td class="currency amount">${mon:displayAmountWS(_a.balance)}</td>
 						</tr>

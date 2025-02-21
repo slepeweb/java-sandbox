@@ -36,3 +36,9 @@
 	</div>
 	
 </pho:pageLayout>
+
+<script>
+$(function() {
+	$('input[name=alias]').focus();
+})
+</script>

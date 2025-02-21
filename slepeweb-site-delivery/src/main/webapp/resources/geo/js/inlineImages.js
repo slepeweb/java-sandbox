@@ -19,6 +19,7 @@ function _processFigures(div$) {
 		let title = 'Click to see image in new tab';
 		let body = div$.html();
 		let caption = div$.attr('data-caption');
+		let floatAttr = div$.attr('data-float');
 
 		$.ajax('/rest/item/' + origId, {
 			type: 'GET',
@@ -34,7 +35,13 @@ function _processFigures(div$) {
 						}
 						
 						let path = '/$_' + origId;
-						div$.html(`<figure ${figwidth}>
+						let figclass = floatAttr ? 'class="right"' : '';
+						
+						div$.removeAttr('data-width');
+						div$.removeAttr('data-caption');
+						div$.removeAttr('data-float');
+						
+						div$.html(`<figure ${figclass} ${figwidth}>
 								<a href="${path}" target="_blank" title="${title}"><img src="${path}"></a>
 								<figcaption>${caption}</figcaption>
 							</figure>

@@ -30,4 +30,9 @@
 	</div>
 	
 </cms:basicLayout>
-	
+
+<script>
+$(function() {
+	$('input[name=alias]').focus();
+})
+</script>

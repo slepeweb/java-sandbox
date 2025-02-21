@@ -36,3 +36,9 @@
 	</div>
 	
 </geo:pageLayout>
+
+<script>
+$(function() {
+	$('input[name=alias]').focus();
+})
+</script>

@@ -427,6 +427,11 @@ div.ximg > figure {
 	float: left;
 }
 
+div.ximg > figure.right {
+	margin: 0 0 0 1.0em;
+	float: right;
+}
+
 div.ximg.border {
 	border: 2px solid grey;
 }
