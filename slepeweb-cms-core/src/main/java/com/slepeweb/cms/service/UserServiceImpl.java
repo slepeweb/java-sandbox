@@ -117,6 +117,10 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 		return get(String.format(SELECT_TEMPLATE, " secret = ?"), secret);
 	}
 
+	public User getByPassword(String pwd) {
+		return get(String.format(SELECT_TEMPLATE, " password = ?"), pwd);
+	}
+
 	private User get(String sql, Object... params) {
 		return (User) getFirstInList(this.jdbcTemplate.query(
 			sql, new RowMapperUtil.UserMapper(), params));

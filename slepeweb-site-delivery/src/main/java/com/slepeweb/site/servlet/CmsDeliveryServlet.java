@@ -20,6 +20,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.ItemService;
@@ -86,9 +87,9 @@ public class CmsDeliveryServlet {
 		
 		if (i != null) {
 			i.setLanguage(language == null ? i.getSite().getLanguage() : language);
-			i.setUser((User) req.getSession().getAttribute("_user"));
-			req.setAttribute("_item", i);
-			req.setAttribute("_site", i.getSite());
+			i.setUser((User) req.getSession().getAttribute(AttrName.USER));
+			req.setAttribute(AttrName.ITEM, i);
+			req.setAttribute(AttrName.SITE, i.getSite());
 		}
 
 		return i;

@@ -16,6 +16,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.site.anc.bean.MenuItem;
@@ -52,7 +53,7 @@ public class AncestryPageController extends BaseController {
 	@ModelAttribute(value="_languageUrlPrefix")
 	public String setLanguageAttr(HttpServletRequest req) {
 		// CmsDeliveryServlet will have created this request attribute earlier in the request/response cycle
-		Item i = (Item) req.getAttribute(ITEM);
+		Item i = (Item) req.getAttribute(AttrName.ITEM);
 		
 		String langPrefix = "";		
 		if (i.getSite().isMultilingual()) {
@@ -68,16 +69,16 @@ public class AncestryPageController extends BaseController {
 
 	@ModelAttribute(value=HISTORY)
 	public List<ItemIdentifier> breadcrumbTrail(HttpServletRequest req) {
-		Item i = (Item) req.getAttribute(ITEM);
+		Item i = (Item) req.getAttribute(AttrName.ITEM);
 		List<ItemIdentifier> list = this.ancCookieService.getBreadcrumbsCookieValue(i.getSite(), req);
 		return list;
 	}
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(SITE) Site site, 
+			@ModelAttribute(AttrName.SITE) Site site, 
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "homepage", model);
@@ -96,9 +97,9 @@ public class AncestryPageController extends BaseController {
 
 	@RequestMapping(value="/notfound")	
 	public String notfound(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(SITE) Site site, 
+			@ModelAttribute(AttrName.SITE) Site site, 
 			ModelMap model) {	
 		
 		return error(i, shortSitename, site, model);
@@ -106,9 +107,9 @@ public class AncestryPageController extends BaseController {
 
 	@RequestMapping(value="/error")	
 	public String error(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(SITE) Site site, 
+			@ModelAttribute(AttrName.SITE) Site site, 
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "error", model);
@@ -117,7 +118,7 @@ public class AncestryPageController extends BaseController {
 
 	@RequestMapping(value="/boy")	
 	public String boy(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,
@@ -153,7 +154,7 @@ public class AncestryPageController extends BaseController {
 	
 	@RequestMapping(value="/girl")	
 	public String girl(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,
@@ -164,7 +165,7 @@ public class AncestryPageController extends BaseController {
 	
 	@RequestMapping(value="/document")	
 	public String history(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			ModelMap model) {	
 		
@@ -182,7 +183,7 @@ public class AncestryPageController extends BaseController {
 
 	@RequestMapping(value="/boy/gallery/{targetId}")	
 	public String boyGallery(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
@@ -200,7 +201,7 @@ public class AncestryPageController extends BaseController {
 
 	@RequestMapping(value="/boy/record/{targetId}")	
 	public String boyRecord(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
@@ -212,7 +213,7 @@ public class AncestryPageController extends BaseController {
 	
 	@RequestMapping(value="/girl/gallery/{targetId}")	
 	public String girlGallery(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
@@ -222,7 +223,7 @@ public class AncestryPageController extends BaseController {
 
 	@RequestMapping(value="/girl/record/{targetId}")	
 	public String girlRecord(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable long targetId,
 			ModelMap model) {	
@@ -232,7 +233,7 @@ public class AncestryPageController extends BaseController {
 	
 	@RequestMapping(value="/search", method=RequestMethod.POST)	
 	public String search(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest request,
 			ModelMap model) {	

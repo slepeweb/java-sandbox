@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -22,7 +23,9 @@ import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.LoginService;
+import com.slepeweb.cms.service.XPasskeyService;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -30,9 +33,10 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/page")
 public class PageController extends BaseController {
 	
-	//private static Logger LOG = Logger.getLogger(PageController.class);
+	private static Logger LOG = Logger.getLogger(PageController.class);
 	@Autowired private CookieService cookieService;
 	@Autowired private LoginService loginService;
+	@Autowired private XPasskeyService xPasskeyService;
 	
 	@RequestMapping(value="/editor")	
 	public String doMain(HttpServletRequest req, HttpServletResponse res, ModelMap model) 
@@ -110,7 +114,7 @@ public class PageController extends BaseController {
 	public String login(
 		HttpServletRequest req,
 		HttpServletResponse res,
-		ModelMap model) throws IOException {
+		ModelMap model) throws ServletException, IOException {
  		
 		if (req.getMethod().equalsIgnoreCase("post")) {
 			String alias = req.getParameter("alias");
@@ -125,6 +129,29 @@ public class PageController extends BaseController {
 			}
 		}
 		else if (req.getMethod().equalsIgnoreCase("get")) {
+			/* This request is for the login form page.
+			 * However, if the xpass parameter is provided, as in the following example path:
+			 * 	/cms/page/login?xpass=MGDEBYtUVmlRmLPigICCGWoSQTlJMQjIGIhbeRUVNlKkOJkhIHIIaWRWVPTPKhPIeigeBsUrOnQPmIII&origid=4138
+			 * 
+			 * then log in as the corresponding user,
+			 * and forward to the url identified by the origid parameter.
+			 */
+			String passkey = req.getParameter("xpass");
+			if (StringUtils.isNotBlank(passkey)) {
+				User u = this.xPasskeyService.identifyUser(passkey);
+				if (u != null) {
+					req.getSession().setAttribute(AttrName.USER, u);
+					LOG.info(String.format("User %s signed in using passkey", u.getFullName()));
+					
+					String idStr = req.getParameter("origid");
+					if (StringUtils.isNotBlank(idStr)) {
+						String path = String.format("/cms/page/editor/%s", idStr);
+						res.sendRedirect(path);
+						return null;
+					}
+				}
+			}
+			
 			if (req.getParameter("logout") != null) {
 				this.loginService.logout(req);
 				model.addAttribute("msg", "You've been successfully logged out.");

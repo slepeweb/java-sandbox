@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.site.control.LoginController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +20,7 @@ public class GeoLoginController extends LoginController {
 	
 	@RequestMapping(value="/login")
 	public String login (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,

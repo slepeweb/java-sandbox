@@ -22,6 +22,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.LoginService;
 import com.slepeweb.cms.service.UserService;
 import com.slepeweb.common.service.SendMailService;
@@ -47,7 +48,7 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/login")
 	public String login (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,
@@ -93,7 +94,7 @@ public class UserAccountController extends BaseController {
 	 */
 	@RequestMapping(value="/register/form")	
 	public String registerForm (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	
@@ -163,7 +164,7 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/profile")	
 	public String profileUpdate (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	
@@ -210,7 +211,7 @@ public class UserAccountController extends BaseController {
 	 */
 	@RequestMapping(value="/register/approve/{userId}")	
 	public String registerApprove (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable Long userId,
 			HttpServletResponse res,
@@ -271,7 +272,7 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/password/reset/{secret}")	
 	public String forgottenReset (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable String secret,
 			HttpServletRequest req,
@@ -283,7 +284,7 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/register/password/{secret}")	
 	public String registerPassword (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@PathVariable String secret,
 			HttpServletRequest req,
@@ -331,7 +332,7 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/password/forgotten")	
 	public String forgottenPassword (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	
@@ -400,7 +401,7 @@ public class UserAccountController extends BaseController {
 	
 	@RequestMapping(value="/changepwd")	
 	public String changePasswordForm (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			ModelMap model) throws IOException {	

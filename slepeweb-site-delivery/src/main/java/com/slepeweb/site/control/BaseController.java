@@ -16,6 +16,7 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.LoglevelUpdateService;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.ComponentService;
@@ -26,9 +27,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 public class BaseController {
 	public static Logger LOG = Logger.getLogger(BaseController.class);
-	public static final String USER = "_user";
-	public static final String ITEM = "_item";
-	public static final String SITE = "_site";
 	public static final String SHORT_SITENAME = "_shortSitename";
 	
 	@Autowired private ComponentService componentService;
@@ -58,32 +56,32 @@ public class BaseController {
 	 */
 	
 	
-	@ModelAttribute(value=ITEM)
+	@ModelAttribute(value=AttrName.ITEM)
 	public Item getRequestItem(HttpServletRequest req) {
-		Item i = (Item) req.getAttribute(ITEM);
-		//LOG.info(String.format("Model attribute retrieved by BaseController (%s): [%s]", ITEM, i));
+		Item i = (Item) req.getAttribute(AttrName.ITEM);
+		//LOG.info(String.format("Model attribute retrieved by BaseController (%s): [%s]", AttrName.ITEM, i));
 		return i;
 	}
 	
-	@ModelAttribute(value=SITE)
+	@ModelAttribute(value=AttrName.SITE)
 	public Site getRequestSite(HttpServletRequest req) {
-		Site s = (Site) req.getAttribute(SITE);
-		LOG.trace(String.format("Model attribute (%s): [%s]", SITE, s));
+		Site s = (Site) req.getAttribute(AttrName.SITE);
+		LOG.trace(String.format("Model attribute (%s): [%s]", AttrName.SITE, s));
 		return s;
 	}
 	
 	@ModelAttribute(value=SHORT_SITENAME)
 	protected String getShortSitename(HttpServletRequest req) {
-		Site s = (Site) req.getAttribute(SITE);
+		Site s = (Site) req.getAttribute(AttrName.SITE);
 		String shortName = s != null ? s.getShortname() : "";
 		LOG.trace(String.format("Model attribute (%s): [%s]", SHORT_SITENAME, shortName));
 		return shortName;
 	}
 	
-	@ModelAttribute(value=USER)
+	@ModelAttribute(value=AttrName.USER)
 	protected User getUser(HttpServletRequest req) {
-		User u = (User) req.getSession().getAttribute(USER);
-		LOG.trace(String.format("Model attribute (%s): [%s]", USER, u));
+		User u = (User) req.getSession().getAttribute(AttrName.USER);
+		LOG.trace(String.format("Model attribute (%s): [%s]", AttrName.USER, u));
 		return u;
 	}
 

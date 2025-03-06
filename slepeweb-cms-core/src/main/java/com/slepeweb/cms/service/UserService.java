@@ -10,6 +10,7 @@ public interface UserService {
 	void delete(Long id);
 	User get(String name);
 	User getBySecret(String secret);
+	User getByPassword(String pwd);
 	User get(Long id);
 	User save(User u);
 	User save(User u, Site s, boolean doRoles);

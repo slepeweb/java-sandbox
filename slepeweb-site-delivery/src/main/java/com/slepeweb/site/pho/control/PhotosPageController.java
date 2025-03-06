@@ -17,6 +17,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.TagList;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.TagService;
@@ -44,9 +45,9 @@ public class PhotosPageController extends BaseController {
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(SITE) Site site, 
+			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
 			ModelMap model) {	
 		
@@ -63,7 +64,7 @@ public class PhotosPageController extends BaseController {
 
 	@RequestMapping(value="/search", method=RequestMethod.POST)	
 	public String searchPost(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -74,7 +75,7 @@ public class PhotosPageController extends BaseController {
 	
 	@RequestMapping(value="/search/get", method=RequestMethod.GET)	
 	public String searchGet(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -85,7 +86,7 @@ public class PhotosPageController extends BaseController {
 	
 	@RequestMapping(value="/search/related", method=RequestMethod.GET)	
 	public String related(
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@RequestParam(value="id", required=true) Long id,
 			HttpServletRequest request,

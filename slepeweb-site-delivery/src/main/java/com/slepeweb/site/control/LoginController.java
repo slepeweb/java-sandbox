@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LoginSupport;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.LoginService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ public class LoginController extends BaseController {
 	@Autowired private LoginService loginService;
 	
 	public String login (
-			@ModelAttribute(ITEM) Item i, 
+			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,

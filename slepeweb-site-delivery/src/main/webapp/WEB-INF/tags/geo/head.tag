@@ -27,6 +27,7 @@
 	var _origId = ${_item.origId};
 </script>
 	
+<script src="/resources/js/site.js"></script>
 <script src="/resources/geo/js/glj.js"></script>
 <script src="/resources/geo/js/nav.js"></script>
 <script src="/resources/geo/js/inlineImages.js"></script>

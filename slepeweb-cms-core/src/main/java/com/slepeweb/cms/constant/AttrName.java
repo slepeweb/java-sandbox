@@ -8,4 +8,6 @@ public class AttrName {
 	public static final String TAG_INPUT_SUPPORT = "_tis";
 	public static final String OWNERSHIP = "_ownership";
 	public static final String USER = "_user";
+	public static final String ITEM = "_item";
+	public static final String SITE = "_site";
 }
