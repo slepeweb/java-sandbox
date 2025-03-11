@@ -133,15 +133,15 @@ public class RowMapperUtil {
 	}
 	
 	private static Account makeAccount(ResultSet rs) throws SQLException {
-		return makeAccount(rs, "id", "origid", "name", "type");
+		return makeAccount(rs, "id", "origid", "name", "type", "reconciled");
 	}
 	
 	private static Account makeAccountX(ResultSet rs) throws SQLException {
-		return makeAccount(rs, "accountid", "accountorigid", "accountname", "accounttype");
+		return makeAccount(rs, "accountid", "accountorigid", "accountname", "accounttype", "accountreconciled");
 	}
 	
 	private static Account makeAccount(ResultSet rs, String idStr, String origIdStr, 
-			String name, String type) throws SQLException {
+			String name, String type, String reconciled) throws SQLException {
 		
 		return new Account().
 			setId(rs.getLong(idStr)).
@@ -150,7 +150,8 @@ public class RowMapperUtil {
 			setType(rs.getString(type)).
 			setOpeningBalance(rs.getLong("openingbalance")).
 			setClosed(rs.getBoolean("closed")).
-			setNote(rs.getString("note"));
+			setNote(rs.getString("note")).
+			setReconciled(rs.getLong(reconciled));
 	}
 	
 	private static Category makeCategory(ResultSet rs) throws SQLException {

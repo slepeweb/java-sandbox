@@ -4,24 +4,17 @@
 	
 <!-- transactionList.jsp -->
 
+<%-- Styling for reconcile asterisk --%>
+<c:set var="_extraCss" scope="request" value="reconcile.css" />
+
 <c:set var="_urlPrefix">${_ctxPath}/transaction/list/${_accountId}</c:set>
 
-<c:set var="_extraInPageCss" scope="request">
-	.total-amount {
-		border-top: 1px solid black;
-	}
-	
-	.transaction-list-header p, .transaction-list-header form {
-		margin: 0 0 1em 0;
-	}
-</c:set>
-
-	
 <mny:standardLayout>
-	<div class="transaction-list-header">
+	<div class="transaction-list">
 		<mny:pageHeading heading="Transactions by account">
 			<ul>
-				<li><a href="${_ctxPath}/transaction/add/${_tl.account.id}" title="Create a new transaction record">New transaction</a></li>
+				<li><a href="${_ctxPath}/transaction/add/${_tl.account.id}" title="Create a new transaction">New transaction</a></li>
+				<li><a href="${_ctxPath}/transaction/reconcile/form/${_tl.account.id}" title="Reconcile recent transactions">Reconcile</a></li>
 				<li><a href="${_ctxPath}/index/by/account/${_tl.account.id}" title="Re-index all transactions for this account (for searching)">Re-index</a></li>
 			</ul>
 		</mny:pageHeading>			
@@ -131,6 +124,7 @@
 					</c:when></c:choose>
 					
 					<td class="currency amount balance">${mon:displayAmountNS(_trn.balance)}</td>
+					<c:if test="${not _trn.reconciled}"><td><span class="asterisk">*</span></td></c:if>
 				</tr>
 			</c:forEach>
 		</tbody>

@@ -18,5 +18,6 @@ public interface AccountService {
 	List<Account> getAssets();
 	Account save(Account f) throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	Account update(Account existing, Account with);
+	void updateReconciled(Account a);
 	int delete(long id);
 }

@@ -37,6 +37,7 @@ public class TransactionController extends BaseController {
 	
 	public static final String TRANSACTION_FORM = "transactionForm";
 	public static final String TRANSACTION_LIST = "transactionList";
+	public static final String RECONCILE_LIST = "reconcileList";
 
 	private static Logger LOG = Logger.getLogger(TransactionController.class);
 	
@@ -140,6 +141,37 @@ public class TransactionController extends BaseController {
 		return TRANSACTION_LIST;
 	}
 	
+	@RequestMapping(value="/reconcile/form/{accountId}")	
+	public String reconcileForm(@PathVariable long accountId, ModelMap model) {
+		
+		Account a = this.accountService.get(accountId);
+		List<Transaction> transactions = this.transactionService.getUnreconciled(accountId);
+		model.addAttribute("_tl", transactions);
+		model.addAttribute("_account", a);
+		
+		return RECONCILE_LIST;
+	}
+	
+	@RequestMapping(value="/reconcile/submit/{accountId}", method=RequestMethod.POST)	
+	public RedirectView reconcileSubmit(@PathVariable long accountId, HttpServletRequest req, ModelMap model) {
+		
+		Account a = this.accountService.get(accountId);
+		a.setReconciled(Long.parseLong(req.getParameter("reconciledAmount")));
+		this.accountService.updateReconciled(a);
+		
+		Transaction t;
+		String[] ids = req.getParameter("transactionIds").split(",");
+		for (String idStr : ids) {
+			t = this.transactionService.get(Long.parseLong(idStr));
+			t.setReconciled(true);
+			this.transactionService.updateReconciled(t.getId());
+		}
+		
+		String flash = Util.encodeUrl(String.format("success|%d transactions reconciled", ids.length));
+		return new RedirectView(String.format("%s/transaction/list/%d?flash=%s", 
+				req.getContextPath(), a.getId(), flash));
+	}
+	
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String addForm(HttpServletRequest req, ModelMap model) {
 		this.transactionFormSupport.populateForm(model, new Transaction(), "add");		
@@ -178,6 +210,7 @@ public class TransactionController extends BaseController {
 		long mirrorAccountId = Util.toLong(req.getParameter("xferaccount"));
 		boolean isSplit = req.getParameter("paymenttype").equals("split");
 		long multiplier = req.getParameter("debitorcredit").equals("debit") ? -1L : 1L;
+		boolean isReconciled = req.getParameter("reconciled") != null;
 		
 		Account a = this.accountService.get(Util.toLong(req.getParameter("account")));
 		Payee noPayee = this.payeeService.getNoPayee();
@@ -214,7 +247,8 @@ public class TransactionController extends BaseController {
 			setEntered(Util.parseTimestamp(req.getParameter("entered"))).
 			setMemo(req.getParameter("memo")).
 			setAmount(Util.parsePounds(req.getParameter("amount")) * multiplier).
-			setSplit(isSplit);
+			setSplit(isSplit).
+			setReconciled(isReconciled);
 		
 		if (! isUpdateMode) {
 			t.setSource(3);

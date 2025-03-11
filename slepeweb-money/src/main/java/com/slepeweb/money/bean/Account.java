@@ -9,6 +9,9 @@ public class Account extends Payee {
 	private long openingBalance = 0L;
 	private boolean closed;
 	private String note, type;
+	private long reconciled;
+	
+	// This field is not stored in the db - it is calculated by TransactionService
 	private long balance;
 	
 	public void assimilate(Object obj) {
@@ -19,7 +22,8 @@ public class Account extends Payee {
 			setOpeningBalance(a.getOpeningBalance()).
 			setClosed(a.isClosed()).
 			setNote(a.getNote()).
-			setType(a.getType());
+			setType(a.getType()).
+			setReconciled(a.getReconciled());
 		}
 	}
 	
@@ -37,6 +41,18 @@ public class Account extends Payee {
 		return super.equals(obj) && accountEquals((Account) obj);
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + (int) (openingBalance ^ (openingBalance >>> 32));
+		result = prime * result + (closed ? 1231 : 1237);
+		result = prime * result + ((note == null) ? 0 : note.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + (int) (reconciled ^ (reconciled >>> 32));
+		return result;
+	}
+
 	private boolean accountEquals(Account a) {
 		if (closed != a.isClosed()) {
 			return false;
@@ -57,6 +73,10 @@ public class Account extends Payee {
 				return false;
 		} else if (!type.equals(a.getType()))
 			return false;
+		
+		if (reconciled != a.getReconciled()) {
+			return false;
+		}
 		
 		return true;
 	}
@@ -129,6 +149,15 @@ public class Account extends Payee {
 
 	public Account setType(String type) {
 		this.type = type;
+		return this;
+	}
+
+	public long getReconciled() {
+		return reconciled;
+	}
+
+	public Account setReconciled(long reconciled) {
+		this.reconciled = reconciled;
 		return this;
 	}
 }

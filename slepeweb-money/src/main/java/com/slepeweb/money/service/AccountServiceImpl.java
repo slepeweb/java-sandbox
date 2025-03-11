@@ -45,8 +45,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into account (origid, name, type, openingbalance, closed, note) values (?, ?, ?, ?, ?, ?)", 
-					a.getOrigId(), a.getName(), a.getType(), a.getOpeningBalance(), a.isClosed(), a.getNote());
+					"insert into account (origid, name, type, openingbalance, closed, note, reconciled) values (?, ?, ?, ?, ?, ?, ?)", 
+					a.getOrigId(), a.getName(), a.getType(), a.getOpeningBalance(), a.isClosed(), a.getNote(), a.getReconciled());
 			
 			a.setId(getLastInsertId());	
 			
@@ -65,9 +65,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 			dbRecord.assimilate(a);
 			
 			this.jdbcTemplate.update(
-					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ? where id = ?", 
+					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ?, reconciled = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getType(), dbRecord.getOpeningBalance(), dbRecord.isClosed(), 
-					dbRecord.getNote(), dbRecord.getId());
+					dbRecord.getNote(), dbRecord.getReconciled(), dbRecord.getId());
 			
 			if (nameChanged) {
 				// Update transaction documents in solr, which store account name, NOT id.
@@ -81,6 +81,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		}
 		
 		return dbRecord;
+	}
+	
+	public void updateReconciled(Account a) {
+		this.jdbcTemplate.update("update account set reconciled = ? where id = ?", a.getReconciled(), a.getId());
 	}
 
 	public Account get(String name) {

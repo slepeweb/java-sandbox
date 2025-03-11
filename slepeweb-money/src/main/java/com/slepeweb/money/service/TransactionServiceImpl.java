@@ -36,7 +36,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	private static final String SELECT = 
 			"select " +
 					"a.id as accountid, a.origid as accountorigid, a.name as accountname, " +
-					"a.type as accounttype, a.openingbalance, a.closed, a.note, " + 
+					"a.type as accounttype, a.openingbalance, a.closed, a.note, a.reconciled as accountreconciled, " + 
 					"p.id as payeeid, p.origid as payeeorigid, p.name as payeename, " + 
 					"c.id as categoryid, c.origid as categoryorigid, c.major, c.minor, c.expense, " + 
 					"t.id, t.origid, t.entered, t.memo, t.reference, t.amount, t.reconciled, " +
@@ -251,6 +251,10 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		LOG.info(compose("Updated transfer details", id, mirrorId));
 	}
 
+	public void updateReconciled(long id) {
+		this.jdbcTemplate.update("update transaction set reconciled = 1 where id = ?", id);
+	}
+
 	public Transaction get(long id) {
 		return get(SELECT + "where t.id = ?", id);
 	}
@@ -302,6 +306,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return getTransactions(
 				SELECT + "where t.accountid = ? order by t.entered", 
 				accountId);
+	}
+	
+	public List<Transaction> getUnreconciled(long accountId) {
+		return getTransactions(
+				SELECT + "where t.accountid = ? and t.reconciled = ? order by t.entered desc limit 500", 
+				accountId, false);
 	}
 	
 	public List<Transaction> getTransactionsForPayee(long payeeId) {

@@ -1,0 +1,66 @@
+form#reconcile-form {
+	display: none;
+}
+
+p.reconcile-dashboard {
+	margin-bottom: 0.5em;
+}
+	
+p.reconcile-dashboard span {
+	margin-right: 3em;
+}
+
+p.reconcile-dashboard span.blockable {
+	margin-right: 0em;
+}
+
+p.dimmed, td.dimmed, button.dimmed {
+	opacity: 30%;
+}
+
+tr.reconciled {
+	display: none;
+}
+
+td.reconcile-switch {
+	cursor: pointer;
+}
+
+input#balance-now {
+	width: 6em;
+}
+
+button#commit {
+	margin-bottom: 0.5em;
+	margin-right: 2.0em;
+	background-color:  #04AA6D;
+	color: #fff;
+	padding: 0.3em 0.5em;
+	cursor: pointer;
+}
+
+span.asterisk {
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+input.debit-amount {
+	color: red;
+}
+
+span#undo {
+	color: #666;
+	font-size: 1.5em;
+	opacity: 20%;
+}
+
+span#undo.opacity-full {
+	opacity: 100%;
+}
+
+@media only screen and (max-width: 52em) {
+	p.reconcile-dashboard span.blockable {
+		display: block;
+		margin-right: 0em;
+	}
+}

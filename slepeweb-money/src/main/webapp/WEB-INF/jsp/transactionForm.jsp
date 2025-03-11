@@ -7,6 +7,10 @@
 <c:set var="_extraInPageJs" scope="request">
 	_money.context = 'transaction';
 	_money.transaction.accountid = ${_transaction.account.id};
+	
+	$(function(){
+		$('input#payee').focus();
+	});
 </c:set>
 
 <c:set var="_extraJs" scope="request" value="transaction.js,transandsched.js,minorcats.js,datepicker.js" />
@@ -51,6 +55,10 @@
 		    <tsf:notes memo="${_transaction.memo}" />
 		    <tsf:amount value="${_transaction.amountValue}" isdebit="${_transaction.debit}" />
 
+	    	<mny:tableRow heading="Reconciled">
+		    	<input type="checkbox" name="reconciled" 
+		        	placeholder="Check if transaction has been reconciled" ${_transaction.reconciled ? "checked" : ""} />
+		    </mny:tableRow>
 		</table> 
 		
 		<tsf:tail entity="${_transaction}" label="Delete transaction?" />	       

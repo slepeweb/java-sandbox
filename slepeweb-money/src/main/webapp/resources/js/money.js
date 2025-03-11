@@ -6,6 +6,7 @@ var _money = {
 	search: {},
 	chart: {},
 	service: {},
+	reconcile: {},
 };
 
 _money.shared.isNotEmpty = function(field, sel, errors, isWarning) {
@@ -150,6 +151,28 @@ $(function() {
 
 });
 
+_money.shared.ajax = function(method, url, data, success, fail) {
+	let params = {
+		type: method,
+		cache: false,
+		xhr: data.xhr,
+		data: data.data,
+		contentType: data.contentType,
+		dataType: data.dataType,
+		mimeType: data.mimeType,
+		success: success,
+		processData: data.processData,
+		error: fail
+	}
+	
+	if (! params.error) {
+		params.error = function(a, b, c) {
+			console.log("Server error:", '\na:', a, '\nb:', b, '\nc:', c);
+		}
+	}
+	
+	$.ajax(webContext + url, params);
+}
 
 
 

@@ -43,6 +43,7 @@ create table account
 	sortcode varchar(6),
 	accountno varchar(8),
 	rollno varchar(16),
+	reconciled int,
 	primary key (id),
 	index idx_account_origid (origid),
 	unique key idx_account_name (name),

@@ -41,6 +41,11 @@
 		        	value="${mon:formatPounds(_account.openingBalance)}" />
 				</mny:tableRow>
 
+	    	<mny:tableRow heading="Reconciled balance">
+					<input type="text" name="reconciled" placeholder="Enter last reconciled balance, in pounds and pence" 
+		        	value="${mon:formatPounds(_account.reconciled)}" />
+				</mny:tableRow>
+
 	    	<mny:tableRow heading="Notes">
 					<textarea cols="40" rows="3" name="note" 
 		        	placeholder="Enter relevant notes, eg. account number">${_account.note}</textarea>

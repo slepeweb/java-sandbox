@@ -17,6 +17,7 @@ public interface TransactionService {
 	List<Transaction> getAll();
 	List<Transaction> getTransactionsForAccount(long id);
 	List<Transaction> getTransactionsForAccount(long id, Timestamp from, Timestamp to);
+	List<Transaction> getUnreconciled(long accountId);
 	List<Transaction> getTransactionsForPayee(long id);
 	List<Transaction> getTransactionsForCategory(long id);
 	List<Transaction> getTransactionsByDate(Date from, Date to);
@@ -25,6 +26,7 @@ public interface TransactionService {
 	Transaction update(Transaction from, Transaction to) throws MissingDataException, DuplicateItemException;
 	void updateTransfer(Long from, Long to) throws MissingDataException, DuplicateItemException;
 	void updateSplit(Transaction t);
+	void updateReconciled(long id);
 	long getBalance(long accountId);
 	long getBalance(long accountId, Timestamp to);
 	long getNumTransactionsForAccount(long accountId);

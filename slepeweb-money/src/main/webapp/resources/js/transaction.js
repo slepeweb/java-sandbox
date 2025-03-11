@@ -16,12 +16,10 @@ _money.transaction.fillLastPaymentDetails = function() {
 	var memo = $("input[name='memo']").val();
 	
 	if (payeeName && ! major) {
-		$.ajax({
-			url: webContext + "/rest/transaction/latest/bypayee/" + payeeName,
-			type: "GET",
-			contentType: "application/json",
-			dataType: "json",
-			success: function(trn) {
+		_money.shared.ajax('GET', webContext + '/rest/transaction/latest/bypayee/' + payeeName,
+			{dataType: 'json', contentType: 'application/json'}, 
+			
+			function(trn) {
 				majorEle.val(trn.majorCategory);
 				var promet = _money.service.minorcats.updateMinorCategories(majorEle);
 				promet.done(function(res) {						  
@@ -46,11 +44,7 @@ _money.transaction.fillLastPaymentDetails = function() {
 					}
 					$("#amount").val(amountStr);
 				});
-			},
-			error: function(x, t, m) {
-				console.trace();
-			}
-		});
+			});
 	}
 }
 
