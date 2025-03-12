@@ -141,7 +141,7 @@ public class TransactionController extends BaseController {
 		return TRANSACTION_LIST;
 	}
 	
-	@RequestMapping(value="/reconcile/form/{accountId}")	
+	@RequestMapping(value="/reconcile/form/{accountId}", method=RequestMethod.GET)	
 	public String reconcileForm(@PathVariable long accountId, ModelMap model) {
 		
 		Account a = this.accountService.get(accountId);

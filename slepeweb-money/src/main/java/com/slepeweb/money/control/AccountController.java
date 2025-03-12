@@ -75,7 +75,8 @@ public class AccountController extends BaseController {
 				setType(req.getParameter("type")).
 				setClosed(! req.getParameter("status").equals("open")).
 				setOpeningBalance(Util.parsePounds(req.getParameter("opening"))).
-				setNote(req.getParameter("note"));
+				setNote(req.getParameter("note")).
+				setReconciled(Util.parsePounds(req.getParameter("reconciled")));
 		
 		try {
 			this.accountService.save(a);

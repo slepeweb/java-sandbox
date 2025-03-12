@@ -95,7 +95,7 @@ public class PageController extends BaseController {
 			}
 			
 			req.getSession().setAttribute(User.USER_ATTR, resp.getUser());			
-			return new RedirectView(String.format("%s/dashboard", req.getContextPath()));
+			return new RedirectView(String.format("%s/", req.getContextPath()));
 
 		}
 		

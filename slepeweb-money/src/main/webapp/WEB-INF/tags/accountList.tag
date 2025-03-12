@@ -13,6 +13,7 @@
 					<td class="name"><a href="${_ctxPath}/account/form/${_a.id}" 
 						title="Update details of this account">${_a.name}</a></td>
 					<td class="type">${_a.type}</td>
+					<td>${_a.note}</td>
 				</tr>
 			</c:forEach>
 		</table>

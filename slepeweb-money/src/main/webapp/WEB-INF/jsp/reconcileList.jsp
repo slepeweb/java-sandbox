@@ -2,7 +2,7 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
-<!-- reconcile.jsp -->
+<!-- reconcileList.jsp -->
 
 <c:set var="_extraJs" scope="request" value="reconcile.js" />
 <c:set var="_extraCss" scope="request" value="reconcile.css" />
@@ -16,10 +16,10 @@
 		</mny:pageHeading>
 					
 		<p class="reconcile-dashboard">
-			<span class="blockable">Balance b/f: £<span id="balance-bf" 
+			<span class="blockable">Balance b/f: £<span id="balance-bf"
 				<c:if test="${_account.reconciled < 0}">class="debit-amount"</c:if>>
 					${mon:formatPounds(_account.reconciled)}</span></span>
-			<span class="blockable">Balance now: £<input id="balance-now" value="" /></span>
+			<span class="blockable">Balance now: £<input id="balance-now" value="0" /></span>
 		</p>
 
 		<p class="reconcile-dashboard monitor dimmed">
@@ -54,10 +54,10 @@
 			<c:forEach items="${_tl}" var="_trn">
 				<c:set var="_payee" value="${_trn.payee.name}" />
 				<c:if test="${_trn.transfer}">
-					<c:set var="_payee">${_trn.credit ? 'From' : 'To'}: ${_trn.mirror.name}</c:set>
+					<c:set var="_payee">${_trn.credit ? 'From' : 'To'}: ${_trn.mirrorAccount.name}</c:set>
 				</c:if>
 				
-				<tr>
+				<tr data-id="${_trn.id}" data-pence="${_trn.amount}">
 					<td class="date"><a href="${_ctxPath}/transaction/form/${_trn.id}"
 						title="Update this transaction">${_trn.enteredStr}</a></td>
 					<td class="payee">${_payee}</td>
@@ -90,7 +90,7 @@
 						</td>
 					</c:when></c:choose>
 					
-					<c:if test="${not _trn.reconciled}"><td class="reconcile-switch dimmed" data-id="${_trn.id}"><span class="asterisk">*</span></td></c:if>
+					<c:if test="${not _trn.reconciled}"><td class="reconcile-switch dimmed"><span class="asterisk">*</span></td></c:if>
 				</tr>
 			</c:forEach>
 		</tbody>
