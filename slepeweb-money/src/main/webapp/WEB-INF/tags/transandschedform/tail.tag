@@ -4,6 +4,7 @@
 
 <!-- transandschedform/tail.tag -->
 
-<mny:standardFormActionButtons submit="${_buttonLabel}" cancel="Cancel" delete="${label}" />
+<mny:standardFormActionButtons submit="${_buttonLabel}" cancel="Cancel" delete="${label}" 
+	deleteable="${not entity.reconciled ? 'yes' : 'no'}" />
 
 <input type="hidden" name="id" value="${entity.id}" />   

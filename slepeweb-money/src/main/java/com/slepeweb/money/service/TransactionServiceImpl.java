@@ -311,7 +311,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	public List<Transaction> getUnreconciled(long accountId) {
 		LOG.info("Getting un-reconciled transactions");
 		return getTransactions(
-				SELECT + "where t.accountid = ? and t.reconciled = 0 order by t.entered desc limit 500", 
+				SELECT + "where t.accountid = ? and t.reconciled = 0 order by t.entered limit 500", 
 				accountId);
 	}
 	

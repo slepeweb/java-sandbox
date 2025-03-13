@@ -16,7 +16,7 @@ _money.transaction.fillLastPaymentDetails = function() {
 	var memo = $("input[name='memo']").val();
 	
 	if (payeeName && ! major) {
-		_money.shared.ajax('GET', webContext + '/rest/transaction/latest/bypayee/' + payeeName,
+		_money.shared.ajax('GET', '/rest/transaction/latest/bypayee/' + payeeName,
 			{dataType: 'json', contentType: 'application/json'}, 
 			
 			function(trn) {

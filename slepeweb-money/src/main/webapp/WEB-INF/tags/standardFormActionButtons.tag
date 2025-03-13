@@ -1,7 +1,8 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="submit" required="true" rtexprvalue="true" %><%@ 
 	attribute name="cancel" required="true" rtexprvalue="true" %><%@ 
-	attribute name="delete" required="true" rtexprvalue="true" %>
+	attribute name="delete" required="true" rtexprvalue="true" %><%@ 
+	attribute name="deleteable" required="false" rtexprvalue="true" %>
 
 <!-- standardFormActionButtons.tag -->
 
@@ -12,8 +13,10 @@
 	</div>
 
 	<c:if test="${_formMode eq 'update'}">
+		
 		<div class="right">
-			<input id="delete-button" type="button" value="${delete}" />
+			<input id="delete-button" type="button" value="${delete}" 
+				<c:if test="${not empty deleteable and deleteable eq 'no'}">disabled</c:if> />
 		</div>
 	</c:if>
 </div>
