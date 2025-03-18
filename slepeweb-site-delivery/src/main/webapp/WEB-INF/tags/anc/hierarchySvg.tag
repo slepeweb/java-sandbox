@@ -1,7 +1,7 @@
 <%@ tag %><%@ 
 	attribute name="svgdata" required="true" rtexprvalue="true" type="com.slepeweb.site.anc.bean.svg.SvgSupport" %><%@ 
 	attribute name="index" required="true" rtexprvalue="true" type="java.lang.Integer" %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %><!DOCTYPE html>
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %><!DOCTYPE html>
 
 <div class="hierarchy-diagram">
 	<svg 

@@ -1,6 +1,6 @@
 <%@ 
-	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <%-- TODO: de-couple magnify.js from commerce.js --%>
 <c:set var="_extraJs" scope="request" value="/resources/sws/js/commerce.js,/resources/js/jquery.magnify.js" />

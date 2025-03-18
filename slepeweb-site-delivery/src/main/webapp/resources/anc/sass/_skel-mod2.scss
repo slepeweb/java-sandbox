@@ -2,28 +2,32 @@
 
 /* Basic */
 
+@use 'vars';
+@use 'mixins';
+@use 'sass:color';
+
 	body {
-		/*background: $color-bg-shade url('images/bg1.png');	*/
+		/*background: vars.$color-bg-shade url('images/bg1.png');	*/
 		
-		@include extra-small-only {
+		@include mixins.extra-small-only {
 			min-width: 320px;
 		}
 	}
 
 	body, input, select, textarea {
-		color: $color-fg;
-		font-family: $font-family;
+		color: vars.$color-fg;
+		font-family: vars.$font-family;
 		font-size: 16px;
-		font-weight: $font-weight;
+		font-weight: vars.$font-weight;
 		line-height: 1.65em;
 		
-		@include extra-small-only {
+		@include mixins.extra-small-only {
 			font-size: 12pt;
 		}
 	}
 
 	a {
-		color: $color-accent-bg;
+		color: vars.$color-accent-bg;
 		text-decoration: underline;
 
 		&:hover {
@@ -31,13 +35,13 @@
 		}
 		
 		i.fa {
-			color: $color-button;
+			color: vars.$color-button;
 		}
 	}
 
 	strong, b {
-		color: $color-fg-bold;
-		font-weight: $font-weight-bold;
+		color: vars.$color-fg-bold;
+		font-weight: vars.$font-weight-bold;
 	}
 
 	em, i {
@@ -45,14 +49,14 @@
 	}
 
 	p {
-		margin: 0 0 $size-element-margin 0;
+		margin: 0 0 vars.$size-element-margin 0;
 	}
 
 	h1, h2, h3, h4, h5, h6 {
-		color: $color-fg-bold;
-		font-weight: $font-weight-bold;
+		color: vars.$color-fg-bold;
+		font-weight: vars.$font-weight-bold;
 		line-height: 1em;
-		margin: 0 0 ($size-element-margin * 0.5) 0;
+		margin: 0 0 (vars.$size-element-margin * 0.5) 0;
 
 		a {
 			color: inherit;
@@ -106,28 +110,28 @@
 
 	hr {
 		border: 0;
-		border-bottom: solid $size-border-width $color-border;
+		border-bottom: solid vars.$size-border-width vars.$color-border;
 
 		// This is the *only* instance where we need to rely on margin collapse.
-		margin: $size-element-margin 0;
+		margin: vars.$size-element-margin 0;
 
 		&.major {
-			margin: ($size-element-margin * 1.5) 0;
+			margin: (vars.$size-element-margin * 1.5) 0;
 		}
 	}
 
 	blockquote {
-		border-left: solid ($size-border-width * 4) $color-border;
+		border-left: solid (vars.$size-border-width * 4) vars.$color-border;
 		font-style: italic;
-		margin: 0 0 $size-element-margin 0;
+		margin: 0 0 vars.$size-element-margin 0;
 		padding: 0.5em 0 0.5em 2em;
 	}
 
 	code {
-		background: $color-border-bg;
-		border-radius: $size-border-radius;
-		border: solid $size-border-width $color-border;
-		font-family: $font-family-fixed;
+		background: vars.$color-border-bg;
+		border-radius: vars.$size-border-radius;
+		border: solid vars.$size-border-width vars.$color-border;
+		font-family: vars.$font-family-fixed;
 		font-size: 0.9em;
 		margin: 0 0.25em;
 		padding: 0.25em 0.65em;
@@ -135,9 +139,9 @@
 
 	pre {
 		-webkit-overflow-scrolling: touch;
-		font-family: $font-family-fixed;
+		font-family: vars.$font-family-fixed;
 		font-size: 0.9em;
-		margin: 0 0 $size-element-margin 0;
+		margin: 0 0 vars.$size-element-margin 0;
 
 		code {
 			display: block;
@@ -149,20 +153,20 @@
 
 	header {
 		p {
-			color: $color-fg-light;
+			color: vars.$color-fg-light;
 			position: relative;
-			margin: 0 0 ($size-element-margin * 0.75) 0;
+			margin: 0 0 (vars.$size-element-margin * 0.75) 0;
 		}
 		
 		h2 + p {
 			font-size: 1.25em;
-			margin-top: ($size-element-margin * -0.5);
+			margin-top: (vars.$size-element-margin * -0.5);
 			line-height: 1.5em;
 		}
 
 		h3 + p {
 			font-size: 1.1em;
-			margin-top: ($size-element-margin * -0.4);
+			margin-top: (vars.$size-element-margin * -0.4);
 			line-height: 1.5em;
 		}
 
@@ -170,7 +174,7 @@
 		h5 + p,
 		h6 + p {
 			font-size: 0.9em;
-			margin-top: ($size-element-margin * -0.3);
+			margin-top: (vars.$size-element-margin * -0.3);
 			line-height: 1.5em;
 		}
 	}
@@ -181,15 +185,15 @@
 /* Form */
 
 	form {
-		margin: 0 0 $size-element-margin 0;
+		margin: 0 0 vars.$size-element-margin 0;
 	}
 
 	label {
-		color: $color-fg-bold;
+		color: vars.$color-fg-bold;
 		display: block;
 		/*font-size: 0.9em;*/
-		font-weight: $font-weight-bold;
-		/*margin: 0 0 ($size-element-margin * 0.5) 0;*/
+		font-weight: vars.$font-weight-bold;
+		/*margin: 0 0 (vars.$size-element-margin * 0.5) 0;*/
 	}
 
 	input[type="text"],
@@ -197,11 +201,11 @@
 	input[type="email"],
 	select,
 	textarea {
-		@include vendor-property('appearance', 'none');
-		background: $color-border-bg;
-		border-radius: $size-border-radius;
+		@include mixins.vendor-property('appearance', 'none');
+		background: vars.$color-border-bg;
+		border-radius: vars.$size-border-radius;
 		border: none;
-		border: solid $size-border-width $color-border;
+		border: solid vars.$size-border-width vars.$color-border;
 		color: inherit;
 		display: block;
 		outline: 0;
@@ -214,27 +218,27 @@
 		}
 
 		&:focus {
-			border-color: $color-accent-bg;
-			box-shadow: 0 0 0 $size-border-width $color-accent-bg;
+			border-color: vars.$color-accent-bg;
+			box-shadow: 0 0 0 vars.$size-border-width vars.$color-accent-bg;
 		}
 	}
 
 	.select-wrapper {
-		@include icon('\f078');
+		@include mixins.icon('\f078');
 		display: block;
 		position: relative;
 
 		&:before {
-			color: $color-border;
+			color: vars.$color-border;
 			display: block;
-			height: $size-element-height;
-			line-height: $size-element-height;
+			height: vars.$size-element-height;
+			line-height: vars.$size-element-height;
 			pointer-events: none;
 			position: absolute;
 			right: 0;
 			text-align: center;
 			top: 0;
-			width: $size-element-height;
+			width: vars.$size-element-height;
 		}
 
 		select::-ms-expand {
@@ -246,7 +250,7 @@
 	input[type="password"],
 	input[type="email"],
 	select {
-		height: $size-element-height;
+		height: vars.$size-element-height;
 	}
 
 	textarea {
@@ -255,36 +259,36 @@
 
 
 	::-webkit-input-placeholder {
-		color: $color-fg-light !important;
+		color: vars.$color-fg-light !important;
 		opacity: 1.0;
 	}
 
 	:-moz-placeholder {
-		color: $color-fg-light !important;
+		color: vars.$color-fg-light !important;
 		opacity: 1.0;
 	}
 
 	::-moz-placeholder {
-		color: $color-fg-light !important;
+		color: vars.$color-fg-light !important;
 		opacity: 1.0;
 	}
 
 	:-ms-input-placeholder {
-		color: $color-fg-light !important;
+		color: vars.$color-fg-light !important;
 		opacity: 1.0;
 	}
 
 	.formerize-placeholder {
-		color: $color-fg-light !important;
+		color: vars.$color-fg-light !important;
 		opacity: 1.0;
 	}
 
 /* Box */
 
 	.box {
-		border-radius: $size-border-radius;
-		border: solid $size-border-width $color-border;
-		margin-bottom: $size-element-margin;
+		border-radius: vars.$size-border-radius;
+		border: solid vars.$size-border-width vars.$color-border;
+		margin-bottom: vars.$size-element-margin;
 		padding: 1.5em;
 
 		> :last-child,
@@ -303,7 +307,7 @@
 /* Icon */
 
 	.icon {
-		@include icon;
+		@include mixins.icon;
 		border-bottom: none;
 		position: relative;
 
@@ -315,13 +319,13 @@
 /* Image */
 
 	.image {
-		border-radius: $size-border-radius;
+		border-radius: vars.$size-border-radius;
 		border: 0;
 		display: inline-block;
 		position: relative;
 
 		img {
-			border-radius: $size-border-radius;
+			border-radius: vars.$size-border-radius;
 			display: block;
 		}
 
@@ -348,7 +352,7 @@
 
 		&.fit {
 			display: block;
-			margin: 0 0 $size-element-margin 0;
+			margin: 0 0 vars.$size-element-margin 0;
 			width: 100%;
 
 			img {
@@ -365,17 +369,17 @@
 	}
 
 	table {
-		margin: 0 0 $size-element-margin 0;
+		margin: 0 0 vars.$size-element-margin 0;
 		width: 100%;
 
 		tbody {
 			tr {
-				border: solid $size-border-width $color-border;
+				border: solid vars.$size-border-width vars.$color-border;
 				border-left: 0;
 				border-right: 0;
 
 				&:nth-child(2n + 1) {
-					background-color: $color-border2-bg;
+					background-color: vars.$color-border2-bg;
 				}
 			}
 		}
@@ -386,20 +390,20 @@
 		}
 
 		th {
-			color: $color-fg-bold;
+			color: vars.$color-fg-bold;
 			font-size: 0.9em;
-			font-weight: $font-weight-bold;
+			font-weight: vars.$font-weight-bold;
 			padding: 0 0.75em 0.75em 0.75em;
 			text-align: left;
 			width: 25%;
 		}
 
 		thead {
-			border-bottom: solid ($size-border-width * 2) $color-border;
+			border-bottom: solid (vars.$size-border-width * 2) vars.$color-border;
 		}
 
 		tfoot {
-			border-top: solid ($size-border-width * 2) $color-border;
+			border-top: solid (vars.$size-border-width * 2) vars.$color-border;
 		}
 
 		&.alt {
@@ -408,18 +412,18 @@
 			tbody {
 				tr {
 					td {
-						border: solid $size-border-width $color-border;
+						border: solid vars.$size-border-width vars.$color-border;
 						border-left-width: 0;
 						border-top-width: 0;
 
 						&:first-child {
-							border-left-width: $size-border-width;
+							border-left-width: vars.$size-border-width;
 						}
 					}
 
 					&:first-child {
 						td {
-							border-top-width: $size-border-width;
+							border-top-width: vars.$size-border-width;
 						}
 					}
 				}
@@ -441,15 +445,15 @@
 	input[type="reset"],
 	input[type="button"],
 	.button {
-		@include vendor-property('appearance', 'none');
-		@include vendor-property('transition', 'background-color #{$duration-transition} ease-in-out, color #{$duration-transition} ease-in-out');
-		background-color: $color-accent2-bg;
-		border-radius: $size-border-radius;
+		@include mixins.vendor-property('appearance', 'none');
+		@include mixins.vendor-property('transition', 'background-color #{vars.$duration-transition} ease-in-out, color #{vars.$duration-transition} ease-in-out');
+		background-color: vars.$color-accent2-bg;
+		border-radius: vars.$size-border-radius;
 		border: 0;
-		color: $color-accent2-fg-bold !important;
+		color: vars.$color-accent2-fg-bold !important;
 		cursor: pointer;
 		display: inline-block;
-		font-weight: $font-weight-bold;
+		font-weight: vars.$font-weight-bold;
 		height: 2.85em;
 		line-height: 2.95em;
 		padding: 0 1.5em;
@@ -458,11 +462,11 @@
 		white-space: nowrap;
 
 		&:hover {
-			background-color: lighten($color-accent2-bg, 5);
+			background-color: color.adjust(vars.$color-accent2-bg, $lightness: 5%);
 		}
 
 		&:active {
-			background-color: darken($color-accent2-bg, 5);
+			background-color: color.adjust(vars.$color-accent2-bg, $lightness: -5%);
 		}
 		
 		&.spacer {
@@ -476,10 +480,10 @@
 				margin-right: 0.5em;
 			}
 		}
-
+ 
 		&.fit {
 			display: block;
-			margin: 0 0 ($size-element-margin * 0.5) 0;
+			margin: 0 0 (vars.$size-element-margin * 0.5) 0;
 			width: 100%;
 		}
 
@@ -493,47 +497,47 @@
 
 		&.alt {
 			background-color: transparent;
-			box-shadow: inset 0 0 0 ($size-border-width * 2) $color-border;
-			color: $color-fg-bold !important;
+			box-shadow: inset 0 0 0 (vars.$size-border-width * 2) vars.$color-border;
+			color: vars.$color-fg-bold !important;
 
 			&:hover {
-				background-color: $color-border-bg;
+				background-color: vars.$color-border-bg;
 			}
 
 			&:active {
-				background-color: $color-border2-bg;
+				background-color: vars.$color-border2-bg;
 			}
 
 			&.icon {
 				&:before {
-					color: $color-fg-light;
+					color: vars.$color-fg-light;
 				}
 			}
 			
-			@include extra-small-only {
+			@include mixins.extra-small-only {
 				padding: 0;
 			}
 		}
 
 		&.special {
-			/*background-color: $color-accent-bg;*/
-			background-color: $color-button;
-			color: $color-accent-fg-bold !important;
+			/*background-color: vars.$color-accent-bg;*/
+			background-color: vars.$color-button;
+			color: vars.$color-accent-fg-bold !important;
 
 			&:hover {
-				background-color: lighten($color-button, 10);
+				background-color: color.adjust(vars.$color-button, $lightness: 10%);
 			}
 
 			&:active {
-				background-color: darken($color-accent-bg, 5);
+				background-color: color.adjust(vars.$color-accent-bg, $lightness: -5%);
 			}
 		}
 
 		&.disabled,
 		&:disabled {
-			background-color: $color-fg !important;
+			background-color: vars.$color-fg !important;
 			box-shadow: inset 0 -0.15em 0 0 rgba(0,0,0,0.15);
-			color: $color-bg !important;
+			color: vars.$color-bg !important;
 			cursor: default;
 			opacity: 0.25;
 		}

@@ -36,6 +36,6 @@ _site.support.openEditor = function(origid) {
 
 $(function() {
 	$('i#open-editor').click(function() {
-		_site.support.openEditor($(this).attr('data-id'));
+		_site.support.openEditor($(this).attr('title'));
 	})
 })

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LoginSupport;
@@ -18,12 +19,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
+@RequestMapping("/spring/common")
 public class LoginController extends BaseController {
 	
 	private static Logger LOG = Logger.getLogger(LoginController.class);
 	
 	@Autowired private LoginService loginService;
 	
+	@RequestMapping(value="/login")
 	public String login (
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
@@ -36,12 +39,12 @@ public class LoginController extends BaseController {
 			StringBuffer msg = new StringBuffer(String.format("User '%s' logging in ... ", alias));
 			
 			String password = req.getParameter("password");
-			String originalPath = req.getParameter("originalPath");
+			String redirectPath = req.getParameter("redirectPath");
 			LoginSupport supp = this.loginService.login(alias, password, req);
 			
 			if (supp.isSuccess()) {
 				msg.append("success!");
-				String path = originalPath;
+				String path = redirectPath;
 				if (StringUtils.isBlank(path)) {
 					path = "/";
 				}

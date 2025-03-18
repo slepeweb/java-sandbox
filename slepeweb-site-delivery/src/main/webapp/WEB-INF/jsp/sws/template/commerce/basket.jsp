@@ -1,6 +1,6 @@
 <%@ 
-	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <gen:debug><!-- jsp/sws/commerce/basket.jsp --></gen:debug>
 	

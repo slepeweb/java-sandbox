@@ -1,4 +1,4 @@
-<%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+<%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div class="sidebar-wrapper">
 	<div class="sidebar">

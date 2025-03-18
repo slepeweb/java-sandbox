@@ -1,4 +1,4 @@
-<%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+<%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 var _simpleDialogCreator = function(selector, title) {
 	var _dialog = $(selector).dialog({

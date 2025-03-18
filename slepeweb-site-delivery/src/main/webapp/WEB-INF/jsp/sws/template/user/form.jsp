@@ -1,6 +1,6 @@
 <%@ 
-	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <%-- Assume we're adding a new user --%>
 <c:set var="submitAction" value="/spring/user/add" scope="request" />

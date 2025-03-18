@@ -1,6 +1,6 @@
 <%@ 
-	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 		
 <anc:pageLayout type="std">
 	<gen:debug><!-- jsp/anc/error.jsp --></gen:debug>

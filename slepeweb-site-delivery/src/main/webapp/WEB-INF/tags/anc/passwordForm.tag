@@ -1,7 +1,7 @@
 <%@ tag %><%@ 
 	attribute name="context" required="true" rtexprvalue="true" %><%@ 
 	attribute name="showFormIf" required="true" rtexprvalue="true" %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <%-- 
 	This tag file is used in3 different use cases:

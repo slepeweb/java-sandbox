@@ -1,4 +1,4 @@
-<%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+<%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <c:set var="componentId" value="component-${_comp.id}" />
 <c:set var="clazz" value="section" />

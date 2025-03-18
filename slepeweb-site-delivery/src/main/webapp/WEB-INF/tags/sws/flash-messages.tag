@@ -1,4 +1,4 @@
-<%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+<%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
   
 <c:choose><c:when test="${empty _flashMsg and empty _flashError}">
 	<c:if test="${not _isGuest and not _isAdmin}">

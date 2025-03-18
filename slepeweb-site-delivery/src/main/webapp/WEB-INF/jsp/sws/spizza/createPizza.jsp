@@ -1,6 +1,6 @@
 <%@ 
-	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <sw:spizzaLayout mainCols="col-3-4">
 	<gen:debug><!-- jsp/sws/spizza/createPizza.jsp --></gen:debug>

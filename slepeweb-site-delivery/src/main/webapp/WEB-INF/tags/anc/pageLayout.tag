@@ -1,6 +1,6 @@
 <%@ tag %><%@ 
 	attribute name="type" required="true" rtexprvalue="true" %><%@ include 
-	file="/WEB-INF/jsp/common/tagDirectives.jsp" %><!DOCTYPE html>
+	file="/WEB-INF/jsp/tagDirectives.jsp" %><!DOCTYPE html>
 
 <html lang="${_item.language}">
 	<head>
@@ -11,7 +11,7 @@
 		<div class="layout-${type}">
 			<anc:header />
 			<jsp:doBody />
-			<anc:footer />
+			<gen:footer />
 		</div>
 	</body>
 </html>

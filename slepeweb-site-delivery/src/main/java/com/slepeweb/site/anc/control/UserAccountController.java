@@ -19,15 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.slepeweb.cms.bean.CmsBeanFactory;
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.ItemIdentifier;
-import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.LoginService;
 import com.slepeweb.cms.service.UserService;
 import com.slepeweb.common.service.SendMailService;
 import com.slepeweb.common.util.HttpUtil;
-import com.slepeweb.site.anc.service.AncCookieService;
 import com.slepeweb.site.control.BaseController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,49 +41,7 @@ public class UserAccountController extends BaseController {
 	@Autowired private UserService userService;
 	@Autowired private SendMailService sendMailService;
 	@Autowired private LoginService loginService;
-	@Autowired private AncCookieService ancCookieService;
 	
-	@RequestMapping(value="/login")
-	public String login (
-			@ModelAttribute(AttrName.ITEM) Item i, 
-			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			HttpServletRequest req,
-			HttpServletResponse res,
-			ModelMap model) throws IOException {	
-				
-		if (req.getMethod().equalsIgnoreCase("post")) {
-			String alias = req.getParameter("alias");
-			String password = req.getParameter("password");
-			String originalPath = req.getParameter("originalPath");
-			LoginSupport supp = this.loginService.login(alias, password, req);
-			
-			if (supp.isSuccess()) {
-				String path = originalPath;
-				if (StringUtils.isBlank(path)) {
-					ItemIdentifier iid = this.ancCookieService.getLatestBreadcrumb(i.getSite(), req);
-					if (iid != null) {
-						path = iid.getPath();
-					}
-					else {
-						path = "/";
-					}
-				}
-				res.sendRedirect(path);
-			}
-			else {
-				model.addAttribute("error", supp.getUserMessage());
-			}
-			
-		}
-		else if (req.getMethod().equalsIgnoreCase("get")) {
-			if (req.getParameter("logout") != null) {
-				this.loginService.logout(req);
-			}
-		}
-		
-		return composeJspPath(shortSitename, "login"); 
-	}
-		
 	/*
 	 * A GET request renders a blank form. A POST request 
 	 * a) returns an error message if the user is already registered

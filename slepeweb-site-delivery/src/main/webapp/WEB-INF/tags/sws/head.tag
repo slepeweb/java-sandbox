@@ -1,4 +1,4 @@
-<%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+<%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <title>slepe web solutions | ${_page.title}</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />

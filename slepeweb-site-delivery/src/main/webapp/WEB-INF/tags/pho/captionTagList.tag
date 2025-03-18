@@ -1,5 +1,5 @@
 <%@ tag %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="list" required="true" rtexprvalue="true" %>
 
 <gen:debug><!-- tags/pho/captionTagList.tag --></gen:debug>

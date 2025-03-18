@@ -1,0 +1,7 @@
+.smaller {
+	font-size: 0.8em;
+}
+
+i#open-editor {
+	cursor: pointer;
+}

@@ -1,4 +1,4 @@
-<%@ tag %><%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %><%@ 
+<%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="list" required="true" rtexprvalue="true" type="java.util.List" %><%@ 
 	attribute name="level" required="false" rtexprvalue="true" type="java.lang.Integer" %>
 

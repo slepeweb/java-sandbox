@@ -1,4 +1,4 @@
-<%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+<%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div<c:if test="${not empty _comp.cssClass}"> class="${_comp.cssClass}"</c:if>>
 

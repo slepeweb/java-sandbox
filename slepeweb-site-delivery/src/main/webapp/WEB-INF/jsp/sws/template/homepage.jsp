@@ -1,3 +1,3 @@
-<%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+<%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <jsp:forward page="/about" />

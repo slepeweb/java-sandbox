@@ -1,5 +1,5 @@
 <%@ tag %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="items" required="true" rtexprvalue="true" type="java.util.List" %>
 
 <gen:debug><!-- tags/pho/relatedMedia.tag --></gen:debug>

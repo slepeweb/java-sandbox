@@ -1,4 +1,4 @@
-<%@ include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+<%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <gen:debug><!-- jsp/sws/component/logozer.jsp --></gen:debug>
 

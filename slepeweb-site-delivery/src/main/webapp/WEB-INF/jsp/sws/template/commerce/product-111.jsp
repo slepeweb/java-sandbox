@@ -1,6 +1,6 @@
 <%@ 
-	include file="/WEB-INF/jsp/common/pageDirectives.jsp" %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
 <c:set var="_extraJs" scope="request" value="/resources/sws/js/commerce.js,/resources/js/jquery.magnify.js" />
 <c:set var="_extraCss" scope="request" value="/resources/css/magnify.css" />

@@ -1,5 +1,8 @@
+@use 'vars';
+@use 'mixins';
+
 body {
-  max-width: $max-page-width;
+  max-width: vars.$max-page-width;
   /* This centres the page horizontally */
   margin: auto;
 }
@@ -10,17 +13,17 @@ footer {
 	font-size: 0.85em;
 	opacity: 0.6;
 	line-height: 1.3em;
-	@include std-container-padding{}
+	@include mixins.std-container-padding;
 }
 
 .main {
 	grid-area: main;
-	@include std-container-padding{}
+	@include mixins.std-container-padding;
 }
 
 .leftside {
 	grid-area: side;
-	@include std-container-padding{}
+	@include mixins.std-container-padding;
 }
 
 .menu {
@@ -28,7 +31,7 @@ footer {
 	display: grid;
 	grid-gap: 6px;
 	grid-area: menu;
-	padding: $std-container-padding;
+	padding: vars.$std-container-padding;
 	padding-bottom: 0;
 }
 
@@ -38,7 +41,7 @@ footer {
 }
 
 #person-svg, #diagram-svg {
-	@include std-container-padding{}
+	@include mixins.std-container-padding;
 }
 
 #diagram-svg {
@@ -67,10 +70,6 @@ details {
 	font-size: 0.9em;
 }
 
-.smaller {
-	font-size: 0.8em;
-}
-
 .error-message {
 	color: red;
 	font-size: 1.5em;
@@ -97,7 +96,7 @@ details {
 }
 
 .fa-angle-double-right {
-	color: $color-accent-bg;
+	color: vars.$color-accent-bg;
 }
 
 input[readonly='true'] {

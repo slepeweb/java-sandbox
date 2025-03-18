@@ -2,6 +2,13 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
+<c:set var="_extraInPageCss" scope="request">
+	td.enabled-flag {
+		font-weight: bold;
+		font-size: 1.2em;
+	}
+</c:set>
+
 <mny:standardLayout>
 
 	<mny:pageHeading heading="Scheduled transactions ">
@@ -23,7 +30,7 @@
 			<tbody>
 				<c:forEach items="${_scheduled}" var="_schedule">
 					<tr>
-						<td><input type="checkbox" ${mon:tertiaryOp(_schedule.enabled, 'checked', '')} /></td>
+						<td class="enabled-flag">${mon:tertiaryOp(_schedule.enabled, '*', '')}</td>
 						<td><a href="${_ctxPath}/schedule/edit/${_schedule.id}"
 							title="Update the details for this scheduled transaction">${_schedule.label}</a></td>
 						<td>${mon:formatTimestamp(_schedule.nextDate)}</td>
@@ -45,14 +52,6 @@
 				var type = $(this).attr("data-type");
 				window.location = webContext + "/search/save/repeat?type=" + type + "&json=" + params;
 			});	
-			
-			/*
-			$("#accordion-ss").accordion({
-				active: false,
-				collapsible: true,
-				heightStyle: content
-			});
-			*/
 		});
 	</script>
 	

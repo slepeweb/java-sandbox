@@ -1,5 +1,5 @@
 <%@ tag %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="urlPrefix" required="true" rtexprvalue="true" %>
 
 <gen:debug><!-- tags/anc/searchResults.tag --></gen:debug>

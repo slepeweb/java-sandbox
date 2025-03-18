@@ -1,6 +1,6 @@
 <%@ tag %><%@ 
 	attribute name="svgdata" required="true" rtexprvalue="true" type="com.slepeweb.site.anc.bean.svg.AncestryDiagram" %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <svg 
 	xmlns="http://www.w3.org/2000/svg"

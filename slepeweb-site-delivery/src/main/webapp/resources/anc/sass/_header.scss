@@ -1,3 +1,6 @@
+@use 'vars';
+@use 'mixins';
+
 header {
 	grid-area: hdr;
 	display: grid;
@@ -8,12 +11,12 @@ header {
 		"hb"
 		"br";
 		
-	@include std-container-padding{}
+	@include mixins.std-container-padding; 
   background-color: #e4ddd0;
   
 	.user-block {
 		padding-left: 1em;
-		color: $color-fg-bold;
+		color: vars.$color-fg-bold;
 		position: relative;
 		display: inline-block;
 	}
@@ -22,7 +25,7 @@ header {
 		width: 200px;
 		background-color: #eee;
 		position: absolute;
-		box-shadow: 5px 10px $color-fg-bold;
+		box-shadow: 5px 10px vars.$color-fg-bold;
 		left: 15px;
 		top: 15px;
 		
@@ -32,7 +35,7 @@ header {
 		}
 		
 		p {
-			color: $color-fg-bold;
+			color: vars.$color-fg-bold;
 			background-color: #ef9d9d;
 			padding: 0em 1em 0 1em;
 			margin-bottom: 0;

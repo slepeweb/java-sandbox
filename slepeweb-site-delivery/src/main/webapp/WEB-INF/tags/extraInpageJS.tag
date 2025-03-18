@@ -1,5 +1,5 @@
 <%@ tag %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <gen:debug><!-- tags/extraInpageJS.tag --></gen:debug>
 

@@ -1,5 +1,5 @@
 <%@ tag %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="result" type="com.slepeweb.cms.bean.SolrDocument4Cms" required="true" rtexprvalue="true" %>
 
 <gen:debug><!-- tags/pho/searchResult.tag --></gen:debug>

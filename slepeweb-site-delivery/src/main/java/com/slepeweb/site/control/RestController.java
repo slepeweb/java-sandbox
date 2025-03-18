@@ -24,60 +24,10 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/rest")
 public class RestController extends BaseController {
 	
-	//@Autowired private HostService hostService;
 	@Autowired private ItemService itemService;
 	@Autowired private XPasskeyService xPasskeyService;
 	@Autowired private HostService hostService;
 
-	
-	/*
-	@RequestMapping(value="/passkey/{origId}", method=RequestMethod.GET, produces="application/json")
-	@ResponseBody
-	public RestResponse issuePasskey(
-			@PathVariable long origId,
-			HttpServletRequest req) {
-		RestResponse r = new RestResponse();
-		
-		Site thisSite = getSite(req);
-		User u = null;
-		
-		if (thisSite.isSecured()) {
-			u = (User) req.getSession().getAttribute(USER);
-		}
-		
-		Item targetItem = this.itemService.getItemByOriginalId(origId);
-		if (targetItem == null) {
-			return r.setError(true).addMessage(String.format("Item with origId = [%d] not recognised", origId));
-		}
-		
-		Item4Json data4Json = new Item4Json(targetItem);
-		
-		Site targetSite = targetItem.getSite();
-		if (thisSite.getId() == targetSite.getId()) {
-			return r.setData(data4Json);
-		}
-			
-		if (targetSite.isSecured()) {
-			// You must be logged into this site in order to be able to get a passkey for a secured site.
-			if (u == null) {
-				return r.setError(true).addMessage("Failed attempt to access item on secured site");
-			}
-			else {
-				String passkey = this.passkeyService.issueKey();
-				data4Json.setPath(String.format("%s?passkey=%s$$%s", data4Json.getPath(), u.getId(), passkey));
-
-				if (req.getServerPort() != 80) {
-					data4Json.setHostname(targetItem.getSite().getDeliveryHost().getNameAndPort());
-				}
-
-				return r.setData(data4Json);
-			}
-		}
-		else {
-			return r.setData(data4Json);
-		}
-	}
-	*/
 	
 	@RequestMapping(value="/passkey", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
@@ -91,7 +41,7 @@ public class RestController extends BaseController {
 		 */
 		User u = getUser(req);
 		if (u == null) {
-			return null;
+			return resp.setError(true).addMessage("User is not logged in");
 		}
 		
 		// Need to return the editorial host:port too, in case it's different to the delivery host
@@ -135,35 +85,4 @@ public class RestController extends BaseController {
 
 		return r.setData(new Item4Json(i));
 	}
-	
-	/*
-	private Site getSite(HttpServletRequest req) {
-		if (req.getServerPort() == 80) {
-			return getSiteByPublicName(req.getServerName());
-		}
-		else {
-			return getSite(req.getServerName(), req.getServerPort());
-		}
-	}
-	*/
-	
-	/*
-	private Site getSite(String hostname, int port) {
-		Host h = this.hostService.getHost(hostname, port);
-		if (h != null) {
-			return h.getSite();
-		}
-		return null;
-	}
-	*/
-
-	/*
-	private Site getSiteByPublicName(String hostname) {
-		Host h = this.hostService.getHostByPublicName(hostname);
-		if (h != null) {
-			return h.getSite();
-		}
-		return null;
-	}
-	*/
 }

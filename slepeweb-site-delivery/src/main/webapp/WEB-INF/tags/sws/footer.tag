@@ -1,5 +1,5 @@
 <%@ tag %><%@ 
-	include file="/WEB-INF/jsp/common/tagDirectives.jsp" %>
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <div id="copyright">
 	<span>&copy; Slepe Web Solutions Ltd. All rights reserved.</span><br />
