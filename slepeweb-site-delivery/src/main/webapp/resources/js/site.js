@@ -34,8 +34,32 @@ _site.support.openEditor = function(origid) {
 	});
 }
 
+_site.support.checkSession = function() {
+	_site.support.ajax('GET', '/rest/session', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+		if (! resp.error) {
+			let isExpiring = resp.data[0]
+			let secondsRemaining = resp.data[1]
+			
+			if (isExpiring) {
+				$('div#session-expiry-warning span').text('' + secondsRemaining)
+				$('div#session-expiry-warning').removeClass('hidden')
+				
+				let audio = $("#bell");
+				if (audio && audio.get(0)) {
+					audio.get(0).play()
+					window.setTimeout(function() {
+						audio.get(0).play()
+						}, 500);
+				}
+			}
+		}
+	});
+}
+
 $(function() {
 	$('i#open-editor').click(function() {
 		_site.support.openEditor($(this).attr('title'));
 	})
+	
+	window.setInterval(_site.support.checkSession, 60 * 1000)
 })

@@ -13,5 +13,7 @@
 			<jsp:doBody />
 			<gen:footer />
 		</div>
+		
+		<gen:sessionExpiry />
 	</body>
 </html>

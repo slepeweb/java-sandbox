@@ -2,8 +2,9 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
+<gen:debug><!-- jsp/geo/standard3col.jsp --></gen:debug>
+
 <geo:pageLayout type="std">
-	<gen:debug><!-- jsp/geo/standard3col.jsp --></gen:debug>
 		
 	<div class="main standard-3col">
 		<div class="leftside">
@@ -27,4 +28,5 @@
 			</c:if>
 		</div>
 	</div>
+	
 </geo:pageLayout>

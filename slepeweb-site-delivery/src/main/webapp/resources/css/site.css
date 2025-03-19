@@ -5,3 +5,19 @@
 i#open-editor {
 	cursor: pointer;
 }
+
+div#session-expiry-warning {
+	display: block;
+	position: fixed;
+	z-index: 100;
+	top: 30%;
+	left: 30%;
+	width: 30%;
+	border: 2px solid blue;
+	background-color: lightblue;
+	padding: 2em;
+}
+
+div#session-expiry-warning.hidden {
+	display: none;
+}

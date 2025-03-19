@@ -85,4 +85,20 @@ public class RestController extends BaseController {
 
 		return r.setData(new Item4Json(i));
 	}
+	
+	@RequestMapping(value="/session", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse sessionTimeout(HttpServletRequest req) {
+		
+		RestResponse resp = new RestResponse();
+		
+		long lastAccessed = (long) req.getSession().getAttribute(AttrName.PAGE_LAST_ACCESSED);
+		long maxInterval = req.getSession().getMaxInactiveInterval() * 1000;
+		long expires =  lastAccessed + maxInterval;
+		long now = System.currentTimeMillis();
+		long remaining = expires - now;
+		
+		return resp.setData(new Object[] {remaining < (180 * 1000), Math.floor(remaining / 1000)});
+	}
+
 }
