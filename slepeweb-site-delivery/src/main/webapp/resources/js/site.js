@@ -48,7 +48,7 @@ _site.support.checkSession = function() {
 				else {				
 					$('div#session-expiry-warning span').text('' + secondsRemaining)
 					$('div#session-expiry-warning').removeClass('hidden')
-					$('audio#bell')[0].play()
+					$('audio#session-bell')[0].play()
 				}
 			}
 		}

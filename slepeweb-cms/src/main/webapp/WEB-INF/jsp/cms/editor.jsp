@@ -4,4 +4,5 @@
 
 <cms:stdLayout>
 	<div id="item-editor"></div>
+	<cms:sessionExpiry />
 </cms:stdLayout>

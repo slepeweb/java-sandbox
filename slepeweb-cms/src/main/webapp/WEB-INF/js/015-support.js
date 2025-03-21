@@ -318,6 +318,32 @@ _cms.support.toOptionHtml = function(option, choice) {
 	return `<option value="${option}" ${flag}>${option}</option>`;
 }
 
+_cms.support.checkSession = function() {
+	_cms.support.ajax('GET', '/rest/session/check', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+		if (! resp.error) {
+			let isExpiring = resp.data[0]
+			let secondsRemaining = resp.data[1]
+			
+			if (isExpiring) {
+				if (secondsRemaining <= 0) {
+					_cms.support.ajax('GET', '/rest/session/logout', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+						if (resp.error) {
+							console.log('Failed to end session cleanly')
+						}
+						window.open('/cms/page/login', '_self')
+					})
+				}
+				else {				
+					$('div#session-expiry-warning span').text('' + secondsRemaining)
+					$('div#session-expiry-warning').removeClass('hidden')
+					$('audio#session-bell')[0].play()
+				}
+			}
+		}
+	});
+}
+
+
 /*
 	Re-calculates content according to a newly selected item. This applies to
 	both editor tabs, and to page-level controls. (Remember, editor tabs get updated
@@ -366,6 +392,9 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 			
 			// Disable forms if user doesn't have access to update
 			_cms.support.disableFormsIfReadonly();
+			
+			// Ensure there is no session expiry warning on the page
+			$('div#session-expiry-warning').addClass('hidden');
 			
 			// Optional callback function call
 			if (callback) {

@@ -10,5 +10,5 @@ public class AttrName {
 	public static final String USER = "_user";
 	public static final String ITEM = "_item";
 	public static final String SITE = "_site";
-	public static final String PAGE_LAST_ACCESSED = "_pageLastAccessed";
+	public static final String LAST_INTERACTION = "_lastInteraction";
 }

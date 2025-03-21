@@ -105,6 +105,9 @@
 		
 		// Set the behaviour of the trash button
 		_cms.misc.behaviour.trash.trash(_cms.editingItemId);		
+		
+		// Keep tabs on session expiry
+		window.setInterval(_cms.support.checkSession, 60 * 1000);
 	});
 </script>
 

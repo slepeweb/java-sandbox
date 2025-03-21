@@ -124,7 +124,7 @@ public class CmsDeliveryServlet {
 		}			
 		
 		long requestTime = System.currentTimeMillis();
-		req.getSession().setAttribute(AttrName.PAGE_LAST_ACCESSED, requestTime);
+		req.getSession().setAttribute(AttrName.LAST_INTERACTION, requestTime);
 		
 		String view = req.getParameter("view");		
 		String springTemplatePath = getTemplatePath(item, view);

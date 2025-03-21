@@ -95,7 +95,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/rest")
 public class RestController extends BaseController {
-	private static Logger LOG = Logger.getLogger(RestController.class);
+	private static Logger LOG = Logger.getLogger(SessionController.class);
 	
 	@Autowired private ItemService itemService;
 	@Autowired private LinkService linkService;

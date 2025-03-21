@@ -701,16 +701,21 @@ div#widefield-toolbar div#widefield-close-icon {
 	font-weight: bold;
 }
 
-.ql-container {
-	font-size: 16px;
+div#session-expiry-warning {
+	display: block;
+	position: fixed;
+	z-index: 100;
+	top: 30%;
+	left: 30%;
+	width: 30%;
+	border: 6px solid blue;
+	border-style: outset;
+	background-color: lightblue;
+	padding: 2em;
 }
 
-.ql-editor {
-	background-color: antiquewhite;
-}
-
-.ql-toolbar {
-	background-color: aquamarine;
+div#session-expiry-warning.hidden {
+	display: none;
 }
 
 @media (min-width: 700px) {

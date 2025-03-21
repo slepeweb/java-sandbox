@@ -68,6 +68,12 @@ public class BaseController {
 	
 	@ModelAttribute(value=AttrName.USER)
 	protected User getUser(HttpServletRequest req) {
+		
+		// Take this opportunity to reset the LAST_INTERACTION attribute
+		if (! req.getServletPath().endsWith("/rest/session/check")) {
+			req.getSession().setAttribute(AttrName.LAST_INTERACTION, System.currentTimeMillis());
+		}
+		
 		return (User) req.getSession().getAttribute(AttrName.USER);
 	}
 	
