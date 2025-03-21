@@ -16,7 +16,7 @@
 
 <script>
 $(function() {
-	_site.support.ajax('GET', '/rest/anc/login/redirect/' + _origId, {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+	_site.support.ajax('GET', '/rest/anc/login/redirect/' + _site.origId, {dataType: 'json', mimeType: 'application/json'}, function(resp) {
 		if (! resp.error) {
 			$('input[name=redirectPath]').val(resp.data)
 		}

@@ -13,7 +13,11 @@
 <script src="https://kit.fontawesome.com/130710974e.js" crossorigin="anonymous"></script>
 
 <script>
-	var _origId = ${_item.origId};
+	let _site = {
+		support: {},
+		origId: ${_item.origId},
+		isSecured: ${_item.site.secured ? 'true' : 'false'},
+	}
 </script>
 
 <script src="/resources/js/site.js"></script>

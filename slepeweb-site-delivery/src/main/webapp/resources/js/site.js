@@ -1,7 +1,3 @@
-let _site = {
-	support: {},
-}
-
 _site.support.ajax = function(method, url, data, success, fail) {
 	let params = {
 		type: method,
@@ -35,21 +31,24 @@ _site.support.openEditor = function(origid) {
 }
 
 _site.support.checkSession = function() {
-	_site.support.ajax('GET', '/rest/session', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+	_site.support.ajax('GET', '/rest/session/check', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
 		if (! resp.error) {
 			let isExpiring = resp.data[0]
 			let secondsRemaining = resp.data[1]
 			
 			if (isExpiring) {
-				$('div#session-expiry-warning span').text('' + secondsRemaining)
-				$('div#session-expiry-warning').removeClass('hidden')
-				
-				let audio = $("#bell");
-				if (audio && audio.get(0)) {
-					audio.get(0).play()
-					window.setTimeout(function() {
-						audio.get(0).play()
-						}, 500);
+				if (secondsRemaining <= 0) {
+					_site.support.ajax('GET', '/rest/session/logout', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+						if (resp.error) {
+							console.log('Failed to end session cleanly')
+						}
+						window.open('/login', '_self')
+					})
+				}
+				else {				
+					$('div#session-expiry-warning span').text('' + secondsRemaining)
+					$('div#session-expiry-warning').removeClass('hidden')
+					$('audio#bell')[0].play()
 				}
 			}
 		}
@@ -61,5 +60,7 @@ $(function() {
 		_site.support.openEditor($(this).attr('title'));
 	})
 	
-	window.setInterval(_site.support.checkSession, 60 * 1000)
+	if (_site.isSecured) {
+		window.setInterval(_site.support.checkSession, 60 * 1000)
+	}
 })

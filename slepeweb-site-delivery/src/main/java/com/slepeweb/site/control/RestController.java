@@ -86,7 +86,7 @@ public class RestController extends BaseController {
 		return r.setData(new Item4Json(i));
 	}
 	
-	@RequestMapping(value="/session", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value="/session/check", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public RestResponse sessionTimeout(HttpServletRequest req) {
 		
@@ -95,10 +95,17 @@ public class RestController extends BaseController {
 		long lastAccessed = (long) req.getSession().getAttribute(AttrName.PAGE_LAST_ACCESSED);
 		long maxInterval = req.getSession().getMaxInactiveInterval() * 1000;
 		long expires =  lastAccessed + maxInterval;
-		long now = System.currentTimeMillis();
+		long now = System.currentTimeMillis() /*+ (26 * 60000)*/;
 		long remaining = expires - now;
 		
-		return resp.setData(new Object[] {remaining < (180 * 1000), Math.floor(remaining / 1000)});
+		return resp.setData(new Object[] {remaining <= (180 * 1000), Math.floor(remaining / 1000)});
 	}
 
+	@RequestMapping(value="/session/logout", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse sessionLogout(HttpServletRequest req) {
+		
+		req.getSession().removeAttribute(AttrName.USER);		
+		return new RestResponse().setData("/login");
+	}
 }

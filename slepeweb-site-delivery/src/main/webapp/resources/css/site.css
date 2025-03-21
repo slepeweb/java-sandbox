@@ -13,7 +13,8 @@ div#session-expiry-warning {
 	top: 30%;
 	left: 30%;
 	width: 30%;
-	border: 2px solid blue;
+	border: 6px solid blue;
+	border-style: outset;
 	background-color: lightblue;
 	padding: 2em;
 }
