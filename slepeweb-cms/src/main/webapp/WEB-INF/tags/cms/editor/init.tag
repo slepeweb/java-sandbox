@@ -74,6 +74,8 @@
 			shortcut: ${_linkTypeNameOptions.shortcut}
 	};
 	
+	_cms.alertSound = new Audio("/cms/resources/doorbell.mp3");
+	
 	$(function() {
 		/* 
 			The leftnav is built once only per page request. Subsequent UI actions
@@ -108,6 +110,13 @@
 		
 		// Keep tabs on session expiry
 		window.setInterval(_cms.support.checkSession, 60 * 1000);
+		
+		$(document).one('mousemove click keydown', function() {
+			console.log('Alerter bound to user event')
+			_cms.alertSound.volume = 0
+			_cms.alertSound.play().catch(() => console.log("Autoplay prevented, but now user interaction allows it."));
+		});
+
 	});
 </script>
 

@@ -17,6 +17,7 @@
 		support: {},
 		origId: ${_item.origId},
 		isSecured: ${_item.site.secured ? 'true' : 'false'},
+		alertSound: new Audio("/resources/doorbell.mp3"),
 	}
 </script>
 

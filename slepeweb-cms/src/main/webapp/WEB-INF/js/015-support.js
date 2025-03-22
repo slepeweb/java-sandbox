@@ -336,7 +336,8 @@ _cms.support.checkSession = function() {
 				else {				
 					$('div#session-expiry-warning span').text('' + secondsRemaining)
 					$('div#session-expiry-warning').removeClass('hidden')
-					$('audio#session-bell')[0].play()
+					_cms.alertSound.volume = 1
+					_cms.alertSound.play()
 				}
 			}
 		}

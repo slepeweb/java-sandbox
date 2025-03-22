@@ -48,12 +48,14 @@ _site.support.checkSession = function() {
 				else {				
 					$('div#session-expiry-warning span').text('' + secondsRemaining)
 					$('div#session-expiry-warning').removeClass('hidden')
-					$('audio#session-bell')[0].play()
+					_site.alertSound.volume = 1
+					_site.alertSound.play()
 				}
 			}
 		}
 	});
 }
+
 
 $(function() {
 	$('i#open-editor').click(function() {
@@ -63,4 +65,11 @@ $(function() {
 	if (_site.isSecured) {
 		window.setInterval(_site.support.checkSession, 60 * 1000)
 	}
+	
+	$(document).one('mousemove click keydown', function() {
+		console.log('Alerter bound to user event')
+		_site.alertSound.volume = 0
+		_site.alertSound.play().catch(() => console.log("Autoplay prevented, but now user interaction allows it."));
+	});
+
 })
