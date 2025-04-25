@@ -1,13 +1,3 @@
-_money.reconcile.transactionIds = []
-_money.reconcile.ready = false
-
-// All monetary amounts stored in (integer) pence
-_money.reconcile.broughtForward = 0
-_money.reconcile.balanceNow = 0
-_money.reconcile.reconcileTarget = 0
-_money.reconcile.aggregatedAmount = 0
-_money.reconcile.outstanding = 0
-
 _money.reconcile.loseCommas = function(s) {
 	return s.replace(/,/g, '')
 }
@@ -20,38 +10,72 @@ _money.reconcile.displayPounds = function(pence) {
 	return (pence / 100).toFixed(2)
 }
 
-_money.reconcile.updateReconciled = function(penceStr) {
-	_money.reconcile.aggregatedAmount += Number(penceStr)
-	$('span#amount-reconciled').text(_money.reconcile.displayPounds(_money.reconcile.aggregatedAmount))
+_money.reconcile.transactionIds = []
+_money.reconcile.ready = false
+
+// All monetary amounts stored in (integer) pence
+_money.reconcile.initialiseData = function(balanceNow) {
+	_money.reconcile.balanceNow = _money.reconcile.toPence(balanceNow)
+	_money.reconcile.broughtForward = _money.reconcile.toPence($('span#balance-bf').text())
+	_money.reconcile.toReconcile = _money.reconcile.balanceNow - _money.reconcile.broughtForward
+	_money.reconcile.reconciled = 0
+	_money.reconcile.outstanding = _money.reconcile.toReconcile - _money.reconcile.reconciled
+}
+
+_money.reconcile.updateDashboard = function(penceStr) {
+	_money.reconcile.reconciled += Number(penceStr)
+	$('span#amount-reconciled').text(_money.reconcile.displayPounds(_money.reconcile.reconciled))
 	
-	_money.reconcile.outstanding = _money.reconcile.reconcileTarget - _money.reconcile.aggregatedAmount
+	_money.reconcile.outstanding = _money.reconcile.toReconcile - _money.reconcile.reconciled
 	$('span#amount-outstanding').text(_money.reconcile.displayPounds(_money.reconcile.outstanding))
 }
 
-$(function() {
-	$('input#balance-now').val(0)
-	let trim = _money.reconcile.loseCommas
-	let toPence = _money.reconcile.toPence
-	let displayPounds = _money.reconcile.displayPounds
+_money.reconcile.processReconciliation = function(tr$) {
+	_money.reconcile.updateDashboard(tr$.attr('data-pence'))
+	_money.reconcile.transactionIds.push(Number(tr$.attr('data-id')))
 	
-	$('input#balance-now').keyup(function() {
-		//$('tr.reconciled').removeClass('reconciled')
+	// Hide row in table
+	tr$.addClass('reconciled')
+	
+	// Ensure undo, pause and restart buttons are enabled
+	$('div#menu-icons span').addClass("opacity-full")
+	
+	// Have we reached our reconciliation target?
+	if (Math.abs(_money.reconcile.outstanding) < 0.001) {
+		// Enable the commit button
+		$('button#commit').removeClass('dimmed')
 		
+		// Flag indicating that the reconciliation target has been reached, and db can be updated.
+		_money.reconcile.ready = true
+	}
+}
+
+_money.reconcile.submitForm = function() {
+	$('input[name=reconciledAmount]').val(_money.reconcile.balanceNow)
+	$('input[name=transactionIds]').val(_money.reconcile.transactionIds.join())
+	$('form#reconcile-form').submit()		
+}
+
+$(function() {
+
+	let displayPounds = _money.reconcile.displayPounds
+	_money.reconcile.initialiseData($('input#balance-now').val())
+
+	// When user updates the current balance on the statement ...
+	$('input#balance-now').keyup(function() {		
 		let input$ = $(this)
 		if (input$.val().length < 2) {
 			return
 		}
 		
-		_money.reconcile.balanceNow = toPence(input$.val())
+		// Statement balance has been updated; re-initialise the page
+		$('tr.reconciled').removeClass('reconciled')
+		_money.reconcile.initialiseData(input$.val())
 		
-		let p$ = input$.parent().parent()
-		_money.reconcile.broughtForward = toPence(p$.find('span#balance-bf').text())
-		_money.reconcile.reconcileTarget = _money.reconcile.balanceNow - _money.reconcile.broughtForward
-		_money.reconcile.outstanding = _money.reconcile.reconcileTarget
-		
-		$('span#reconcile-target').text(displayPounds(_money.reconcile.reconcileTarget))
-		$('span#amount-outstanding').text(displayPounds(_money.reconcile.reconcileTarget))
-		$('p.dimmed, td.dimmed').removeClass('dimmed')
+		// Display updates on page
+		$('span#reconcile-target').text(displayPounds(_money.reconcile.toReconcile))
+		$('span#amount-reconciled').text(displayPounds(_money.reconcile.reconciled))
+		$('span#amount-outstanding').text(displayPounds(_money.reconcile.outstanding))
 		
 		// Display debit amounts in red
 		let clazz = 'debit-amount'
@@ -63,27 +87,14 @@ $(function() {
 		}
 	})
 	
-	$('td.reconcile-switch').click(function() {
-		
+	// When user reconciles a transaction ...
+	$('td.reconcile-switch').click(function() {		
 		if ($('input#balance-now').val().length < 2) {
 			// Ignore event
 			return
 		}
 		
-		let tr$ = $(this).parent()
-		_money.reconcile.updateReconciled(tr$.attr('data-pence'))
-		_money.reconcile.transactionIds.push(Number(tr$.attr('data-id')))
-
-		tr$.addClass('reconciled')	
-		$('span#undo').addClass("opacity-full")
-		
-		// Have we reached our reconciliation target?
-		if (Math.abs(_money.reconcile.outstanding) < 0.001) {
-			$('button#commit').removeClass('dimmed')
-			$('table tr.reconciled').removeClass('reconciled')
-			$('table tbody td').addClass('dimmed').off('click')
-			_money.reconcile.ready = true
-		}
+		_money.reconcile.processReconciliation($(this).parent())
 	})
 	
 	$('button#commit').click(function() {
@@ -91,9 +102,7 @@ $(function() {
 			return
 		}
 		
-		$('input[name=reconciledAmount]').val(_money.reconcile.balanceNow)
-		$('input[name=transactionIds]').val(_money.reconcile.transactionIds.join())
-		$('form#reconcile-form').submit()		
+		_money.reconcile.submitForm()
 	})
 	
 	$('span#undo').click(function() {
@@ -105,10 +114,35 @@ $(function() {
 		let tr$ = $(`tr[data-id=${id}]`)
 		tr$.removeClass('reconciled')
 		
-		_money.reconcile.updateReconciled(-1 * tr$.attr('data-pence'))
+		_money.reconcile.updateDashboard(-1 * tr$.attr('data-pence'))
 		
 		if (_money.reconcile.transactionIds.length == 0) {
-			$('span#undo').removeClass('opacity-full');
+			$('div#menu-icons span').removeClass('opacity-full');
 		}
+	})
+	
+	$('span#pause').click(function() {
+		if (_money.reconcile.transactionIds.length == 0) {
+			return;
+		}
+		
+		let href = $('form#reconcile-form').attr('action')
+		$('form#reconcile-form').attr('action', href.replace('submit', 'pause'))
+		_money.reconcile.submitForm()		
+	})
+
+	$('span#restart').click(function() {
+		if (_money.reconcile.transactionIds.length == 0) {
+			return;
+		}
+		
+		_money.shared.ajax('GET', '/transaction/reconcile/clear', {dataType: 'json', contentType: 'application/json'}, function() {
+			window.location.reload()
+		})
+	})
+
+	// Hide provisionally reconciled transactions
+	$('tr[data-provisional=yes]').each(function() {
+		_money.reconcile.processReconciliation($(this))
 	})
 })

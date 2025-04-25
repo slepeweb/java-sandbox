@@ -3,7 +3,6 @@ TODO: This is the main todo file:
 HIGH
 - Is there a case to update item ownership in bulk?
 - Can user access control to cms-d be made global? (ie not specific to anc site).
-- Need better handling on session expiry
 - implement cron job to backup cms db on desktop
 
 MEDIUM

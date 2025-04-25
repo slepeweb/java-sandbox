@@ -25,6 +25,7 @@ public class Transaction extends DbEntity {
 	private Category category;
 	private Timestamp entered = new Timestamp(new Date().getTime());
 	private boolean split, reconciled;
+	private boolean provisionallyReconciled; /* This property is NOT stored in the db */
 	private long amount;
 	private String reference = "", memo = "";
 	private List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
@@ -286,6 +287,14 @@ public class Transaction extends DbEntity {
 		return this;
 	}
 	
+
+	public boolean isProvisionallyReconciled() {
+		return provisionallyReconciled;
+	}
+
+	public void setProvisionallyReconciled(boolean stagedReconcile) {
+		this.provisionallyReconciled = stagedReconcile;
+	}
 
 	public String getMemo() {
 		return this.memo;

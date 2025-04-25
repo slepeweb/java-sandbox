@@ -48,13 +48,15 @@ input.debit-amount {
 	color: red;
 }
 
-span#undo {
+div#reconcile-list div#menu-icons span {
 	color: #666;
 	font-size: 1.5em;
 	opacity: 20%;
+	margin-right: 2em;
+	cursor: pointer;
 }
 
-span#undo.opacity-full {
+div#reconcile-list div#menu-icons span.opacity-full {
 	opacity: 100%;
 }
 

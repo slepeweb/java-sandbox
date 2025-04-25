@@ -37,7 +37,6 @@ public class TransactionController extends BaseController {
 	
 	public static final String TRANSACTION_FORM = "transactionForm";
 	public static final String TRANSACTION_LIST = "transactionList";
-	public static final String RECONCILE_LIST = "reconcileList";
 
 	private static Logger LOG = Logger.getLogger(TransactionController.class);
 	
@@ -139,37 +138,6 @@ public class TransactionController extends BaseController {
 		model.addAttribute("_yearSelector", this.transactionFormSupport.buildMonthSelector(pager));
 		
 		return TRANSACTION_LIST;
-	}
-	
-	@RequestMapping(value="/reconcile/form/{accountId}", method=RequestMethod.GET)	
-	public String reconcileForm(@PathVariable long accountId, ModelMap model) {
-		
-		Account a = this.accountService.get(accountId);
-		List<Transaction> transactions = this.transactionService.getUnreconciled(accountId);
-		model.addAttribute("_tl", transactions);
-		model.addAttribute("_account", a);
-		
-		return RECONCILE_LIST;
-	}
-	
-	@RequestMapping(value="/reconcile/submit/{accountId}", method=RequestMethod.POST)	
-	public RedirectView reconcileSubmit(@PathVariable long accountId, HttpServletRequest req, ModelMap model) {
-		
-		Account a = this.accountService.get(accountId);
-		a.setReconciled(Long.parseLong(req.getParameter("reconciledAmount")));
-		this.accountService.updateReconciled(a);
-		
-		Transaction t;
-		String[] ids = req.getParameter("transactionIds").split(",");
-		for (String idStr : ids) {
-			t = this.transactionService.get(Long.parseLong(idStr));
-			t.setReconciled(true);
-			this.transactionService.updateReconciled(t.getId());
-		}
-		
-		String flash = Util.encodeUrl(String.format("success|%d transactions reconciled", ids.length));
-		return new RedirectView(String.format("%s/transaction/list/%d?flash=%s", 
-				req.getContextPath(), a.getId(), flash));
 	}
 	
 	@RequestMapping(value="/add", method=RequestMethod.GET)
@@ -315,7 +283,12 @@ public class TransactionController extends BaseController {
 	
 	@RequestMapping(value="/copy/{transactionId}", method=RequestMethod.GET)
 	public String copy(@PathVariable long transactionId, HttpServletRequest req, ModelMap model) {
-		Transaction t = this.transactionService.get(transactionId).setId(0L).setOrigId(0L).setEntered(Util.now());		
+		Transaction t = this.transactionService.get(transactionId).
+				setId(0L).
+				setOrigId(0L).
+				setEntered(Util.now()).
+				setReconciled(false);
+		
 		this.transactionFormSupport.populateForm(model, t, "add");
 		
 		return TRANSACTION_FORM;
@@ -329,5 +302,5 @@ public class TransactionController extends BaseController {
 			LOG.error("Failed to save transaction", e);
 			return null;
 		}
-	}	
+	}
 }
