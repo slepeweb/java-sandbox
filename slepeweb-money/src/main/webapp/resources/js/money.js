@@ -87,8 +87,10 @@ _money.shared.getAllPayees = function(andThenExecute) {
 
 _money.shared.eraseFormField = function(ele$) {
 	let input$ = ele$.prev();
-	input$.val('');
-	input$.focus();
+	if (input$.attr('id') !== 'amount' || ! _money.transaction.reconciled) {
+		input$.val('');
+		input$.focus();
+	}
 }
 
 $(function() {

@@ -159,16 +159,19 @@ public class TransactionController extends BaseController {
 	@RequestMapping(value="/form/{transactionId}", method=RequestMethod.GET)
 	public String updateForm(@PathVariable long transactionId, HttpServletRequest req, ModelMap model) {
 		Transaction t = this.transactionService.get(transactionId);
+		if (t.isTransfer()) {
+			Transaction mirror = this.transactionService.get(t.getTransferId());
+			t.setPartReconciled(t.isReconciled() || mirror.isReconciled());
+		}
+		else {
+			t.setPartReconciled(t.isReconciled());
+		}
+		
 		getHistory(req).setLastTransaction(t);
 		this.transactionFormSupport.populateForm(model, t, "update");
 		return TRANSACTION_FORM;
 	}
 	
-	/*
-	 * This method only saves new transactions; it does NOT update existing ones.
-	 * The reason is that it would be quite feasible to make 2 transactions with identical
-	 * parameters, eg, two separate visits to the same supermarket, for the same amounts.
-	 */
 	@RequestMapping(value="/update", method=RequestMethod.POST)
 	public RedirectView update(HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		
@@ -178,7 +181,6 @@ public class TransactionController extends BaseController {
 		long mirrorAccountId = Util.toLong(req.getParameter("xferaccount"));
 		boolean isSplit = req.getParameter("paymenttype").equals("split");
 		long multiplier = req.getParameter("debitorcredit").equals("debit") ? -1L : 1L;
-		boolean isReconciled = req.getParameter("reconciled") != null;
 		
 		Account a = this.accountService.get(Util.toLong(req.getParameter("account")));
 		Payee noPayee = this.payeeService.getNoPayee();
@@ -215,8 +217,7 @@ public class TransactionController extends BaseController {
 			setEntered(Util.parseTimestamp(req.getParameter("entered"))).
 			setMemo(req.getParameter("memo")).
 			setAmount(Util.parsePounds(req.getParameter("amount")) * multiplier).
-			setSplit(isSplit).
-			setReconciled(isReconciled);
+			setSplit(isSplit);
 		
 		if (! isUpdateMode) {
 			t.setSource(3);
@@ -231,6 +232,7 @@ public class TransactionController extends BaseController {
 		}
 		
 		t = save(t);
+		
 		if (t != null) {
 			getHistory(req).setLastTransaction(t);
 			flash = String.format("success|Transaction successfully %s", isUpdateMode ? "updated" : "added");

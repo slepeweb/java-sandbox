@@ -25,11 +25,14 @@ public class Transaction extends DbEntity {
 	private Category category;
 	private Timestamp entered = new Timestamp(new Date().getTime());
 	private boolean split, reconciled;
-	private boolean provisionallyReconciled; /* This property is NOT stored in the db */
 	private long amount;
 	private String reference = "", memo = "";
 	private List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
 	private Transaction previous;
+	
+	/* These properties iare NOT stored in the db */
+	private boolean provisionallyReconciled; /* true if reconciled before pausing the (reconciliation) process temporarily. */
+	private boolean partReconciled; /* true if this transaction, or its mirror (in the case of a transfer) has been reconciled. */
 	
 	public void assimilate(Object obj) {
 		Transaction source = (Transaction) obj;
@@ -294,6 +297,22 @@ public class Transaction extends DbEntity {
 
 	public void setProvisionallyReconciled(boolean stagedReconcile) {
 		this.provisionallyReconciled = stagedReconcile;
+	}
+
+	/* 
+	 * This transaction might be part of a transfer, which is represented 
+	 * by 2 transaction records in the db. Whilst this transaction might not 
+	 * have been reconciled, the linked one might, and so this transaction
+	 * should be treated as 'reconciled' for the purposed of which properties
+	 * can be updated.
+	 */
+	public boolean isPartReconciled() {
+		return partReconciled;
+	}
+
+	public Transaction setPartReconciled(boolean partReconciled) {
+		this.partReconciled = partReconciled;
+		return this;
 	}
 
 	public String getMemo() {

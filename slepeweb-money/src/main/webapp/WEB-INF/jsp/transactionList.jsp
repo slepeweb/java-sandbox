@@ -100,7 +100,7 @@
 						<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 						<td class="memo">${_trn.memo}</td>
 					</c:when><c:when test="${_trn.transfer}">
-						<td class="category">Transfer</td>
+						<td class="category"><a href="${_ctxPath}/transaction/form/${_trn.transferId}">Transfer</a></td>
 						<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 						<td class="memo">${_trn.memo}</td>
 					</c:when><c:when test="${_trn.split}">

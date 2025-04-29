@@ -165,7 +165,10 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			 throws MissingDataException, DuplicateItemException, DataInconsistencyException { 
 		
 		// Create new mirror transaction
-		Transaction mirror = base.
+		Transaction mirror = base;
+		
+		if (! t.isReconciled()) {
+			mirror.
 				setXferId(t.getId()).
 				setAccount(transferAccount).
 				setPayee(t.getPayee()).
@@ -173,6 +176,16 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				setEntered(t.getEntered()).
 				setMemo(t.getMemo()).
 				setAmount(- t.getAmount());
+		}
+		else {
+			// Only certain properties an be updated on reconciled transactions
+			
+			mirror.
+				setPayee(t.getPayee()).
+				setCategory(t.getCategory()).
+				setEntered(t.getEntered()).
+				setMemo(t.getMemo());
+		}
 		
 		return mirror;
 	}
@@ -190,7 +203,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 					t.getAccount().getId(), t.getPayee().getId(), t.getCategory().getId(), 
 					t.isSplit(), t.getSource(), t.getOrigId(), t.getEntered(), t.getAmount(),
-					t.isReconciled(), t.getTransferId(), t.getReference(), t.getMemo());
+					false, t.getTransferId(), t.getReference(), t.getMemo());
 			
 			t.setId(getLastInsertId());	
 			LOG.info(compose("Added new transaction", t));		
@@ -206,17 +219,26 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			dbRecord.assimilate(t);
 			
 			try {
-				this.jdbcTemplate.update(
-						"update transaction set entered = ?, " + 
-						"accountid = ?, payeeid = ?, categoryid = ?, " + 
-						"split = ?, amount = ?, reconciled = ?, " +
-						"memo = ?, reference = ?, transferid = ? " +
-						"where id = ?", 
-						dbRecord.getEntered(), 
-						dbRecord.getAccount().getId(), dbRecord.getPayee().getId(), dbRecord.getCategory().getId(), 
-						dbRecord.isSplit(), dbRecord.getAmount(), dbRecord.isReconciled(), 
-						dbRecord.getMemo(), dbRecord.getReference(), dbRecord.getTransferId(),
-						dbRecord.getId());
+				if (! t.isReconciled()) {
+					this.jdbcTemplate.update(
+							"update transaction set entered = ?, " + 
+							"accountid = ?, payeeid = ?, categoryid = ?, " + 
+							"split = ?, amount = ?, " +
+							"memo = ?, reference = ?, transferid = ? " +
+							"where id = ?", 
+							dbRecord.getEntered(), 
+							dbRecord.getAccount().getId(), dbRecord.getPayee().getId(), dbRecord.getCategory().getId(), 
+							dbRecord.isSplit(), dbRecord.getAmount(), 
+							dbRecord.getMemo(), dbRecord.getReference(), dbRecord.getTransferId(),
+							dbRecord.getId());
+				}
+				else {
+					this.jdbcTemplate.update(
+							"update transaction set payeeid = ?, categoryid = ?, memo = ? " +
+							"where id = ?", 
+							dbRecord.getPayee().getId(), dbRecord.getCategory().getId(), 
+							dbRecord.getMemo(), dbRecord.getId());
+				}
 				
 				LOG.info(compose("Updated transaction", dbRecord));
 			}

@@ -7,13 +7,15 @@
 <c:set var="_extraInPageJs" scope="request">
 	_money.context = 'transaction';
 	_money.transaction.accountid = ${_transaction.account.id};
+	_money.transaction.reconciled = ${_transaction.partReconciled ? 'true' : 'false'};
 	
 	$(function(){
 		$('input#payee').focus();
 	});
 </c:set>
 
-<c:set var="_extraJs" scope="request" value="transaction.js,transandsched.js,minorcats.js,datepicker.js" />
+<c:set var="_extraJs" scope="request" value="transaction.js,transandsched.js,minorcats.js" />
+<c:if test="${not _transaction.partReconciled}"><c:set var="_extraJs" value="${_extraJs},datepicker.js" scope="request" /></c:if>
 
 <c:set var="_extraInPageCss" scope="request">
 	.ui-autocomplete-loading {
@@ -21,11 +23,17 @@
 	}
 </c:set>
 
+<c:set var="_readonlyAttr" value="${_transaction.partReconciled ? 'readonly' : ''}" scope="request" />
+<c:set var="_readonlyClass" value="${_readonlyAttr}" scope="request" />
+<c:set var="_hiddenDivClass" value="${_transaction.partReconciled ? 'hidden' : ''}" scope="request" />
+
 <mny:standardLayout>
 
 	<tsf:labels entityName="transaction" /> <%-- Defines variables _buttonLabel and _pageHeading --%>
 	
-	<mny:pageHeading heading="${_pageHeading}">
+	<mny:pageHeading heading="${_pageHeading}" 
+			intro="${_transaction.partReconciled ? 'Updates/deletions of partly/wholly reconciled transactions are restricted' : ''}">
+			
 		<ul>
 			<c:if test="${_formMode eq 'update'}">
 				<li><a href="../add/${_transaction.account.id}">New transaction</a></li>
@@ -41,7 +49,7 @@
 		    <tsf:ids entity="${_transaction}" />
 		    
 	    	<mny:tableRow heading="Date">
-		    	<input id="entered" type="text" class="datepicker" name="entered" 
+		    	<input id="entered" class="datepicker ${_readonlyClass}" type="text"name="entered" ${_readonlyAttr}
 		        	placeholder="Enter transaction date" value="${mon:formatTimestamp(_transaction.entered)}" />
 		    </mny:tableRow>
 
@@ -55,10 +63,6 @@
 		    <tsf:notes memo="${_transaction.memo}" />
 		    <tsf:amount value="${_transaction.amountValue}" isdebit="${_transaction.debit}" />
 
-	    	<mny:tableRow heading="Reconciled">
-		    	<input type="checkbox" name="reconciled" 
-		        	placeholder="Check if transaction has been reconciled" ${_transaction.reconciled ? "checked" : ""} />
-		    </mny:tableRow>
 		</table> 
 		
 		<tsf:tail entity="${_transaction}" label="Delete transaction?" />	       

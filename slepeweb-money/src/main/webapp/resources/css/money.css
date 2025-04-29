@@ -799,12 +799,18 @@ span .fa-info-circle {
   color: #645e55;
 }
 
-tr.category-list div.hidden, tr.category-list span.hidden, tr.category-params div.hidden, tr.category-params span.hidden {
+input.readonly {
+  opacity: 0.5;
+}
+
+div.hidden, span.hidden {
   display: none;
 }
-tr.category-list div.invisible, tr.category-list span.invisible, tr.category-params div.invisible, tr.category-params span.invisible {
+
+div.invisible, span.invisible {
   visibility: hidden;
 }
+
 tr.category-list .arrow, tr.category-params .arrow {
   width: 3%;
   display: inline-block;
