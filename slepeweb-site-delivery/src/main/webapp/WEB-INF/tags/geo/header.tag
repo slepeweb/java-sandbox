@@ -42,16 +42,23 @@
     </div>
 	</nav>		
     
-	<div id="breadcrumbs">
-		<ul>
-			<c:set var="first" value="${true}" />
-		 	<c:forEach items="${_page.header.breadcrumbs}" var="i">
-		 		<c:if test="${i.href ne '/'}">
-			 		<c:if test="${not first}"><li><i class="fa-solid fa-arrow-right"></i></li></c:if> 
-			 		<li><a href="${i.href}">${i.title}</a></li>
-					<c:set var="first" value="${false}" />
-				</c:if>
-		 	</c:forEach>
-		</ul>
+  <div id="below-nav">
+		<div id="breadcrumbs">
+			<ul>
+				<c:set var="first" value="${true}" />
+			 	<c:forEach items="${_page.header.breadcrumbs}" var="i">
+			 		<c:if test="${i.href ne '/'}">
+				 		<c:if test="${not first}"><li><i class="fa-solid fa-arrow-right"></i></li></c:if> 
+				 		<li><a href="${i.href}">${i.title}</a></li>
+						<c:set var="first" value="${false}" />
+					</c:if>
+			 	</c:forEach>
+			</ul>
+		</div>
+		
+		<div id="search-input">
+			<input value="" placeholder="Enter search terms" />
+			<button type="button"><span><i class="fa fa-search" aria-hidden="true"></i></span></button>
+		</div>
 	</div>
 </header>

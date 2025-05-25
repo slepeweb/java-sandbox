@@ -109,16 +109,13 @@ div.submenu-2 a {
 }
 
 div#breadcrumbs {
-	margin: 6px 0 6px 0;
+/* 	margin: 6px 0 6px 0; */
 	font-size: 0.9em;
 }
 
 div#breadcrumbs ul {
 	display: flex;
 	color: #666;
-}
-
-div#breadcrumbs ul {
 	list-style: none;
 }
 

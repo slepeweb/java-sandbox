@@ -350,6 +350,7 @@ body {
 
 div.main h2 {
   text-align: center;
+  margin-top: 0;
 }
 
 footer {
@@ -422,6 +423,23 @@ figcaption {
 p.clearfix {
 	clear: both;
 	margin: 0;
+}
+
+div#below-nav {
+	display: grid;
+  grid-template-columns: 50% 50%;
+  margin: 6px 0 0 0;
+}
+
+div.searchresults {
+	width: 80%;
+	margin: auto;
+}
+
+div#search-input {
+	grid-column: 2;
+	display: inline-block;
+	justify-self: right;
 }
 
 .ui-helper-reset {

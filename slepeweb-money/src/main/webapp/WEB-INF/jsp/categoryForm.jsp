@@ -74,5 +74,6 @@ $(function() {
 		$("input[name=major]").val(value);
 	});
 
+	$('input[name=major]').focus()
 });
 </script>

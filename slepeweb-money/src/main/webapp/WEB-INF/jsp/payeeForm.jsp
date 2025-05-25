@@ -30,4 +30,10 @@
 		
 </mny:standardLayout>
 
+<script>
+$(function() {
+	$('input[name=name]').focus()
+})
+</script>
+
 <mny:entityDeletionDialog entity="payee" mode="${_formMode}" id="${_payee.id}"/>

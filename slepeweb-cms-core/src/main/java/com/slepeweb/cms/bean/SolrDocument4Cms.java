@@ -18,7 +18,10 @@ public class SolrDocument4Cms {
 	@Field("title") private String title;
 	@Field("subtitle") private String subtitle;
 	@Field("teaser") private String teaser;
+	
+	// bodytext is indexed, but NOT stored
 	@Field("bodytext") private String bodytext;
+	
 	@Field("tags") private String tags;
 	@Field("path") private String path;
 	@Field("editable") private boolean editable;
