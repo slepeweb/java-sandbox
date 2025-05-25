@@ -116,7 +116,7 @@ public class TransactionFormSupport {
 		NormalisedMonth m = new NormalisedMonth(today.getTime());
 		Option o;
 				
-		for (int i = 0; i <= numYears; i++) {
+		for (int i = 0; i <= numYears + 1; i++) {
 			o = new Option(m.getIndex(), String.valueOf(thisYear - i));
 			yearSelector.add(o);
 			o.setSelected(m.getYear() == pager.getSelectedMonth().getYear());

@@ -25,7 +25,39 @@ public class Util {
 	}
 	
 	public static String formatPounds(Long pence) {
-		return pence != null ? String.format("%,.2f", pence / 100.0F) : "";
+		long value = pence.longValue();
+		boolean debit = value < 0;
+		String sign = debit ? "-" : "";
+		long abs = debit ? -value : value;
+		String str = String.valueOf(abs);
+		
+		if (value == 0) {
+			return "0.00";
+		}
+		else if (abs < 10) {
+			return sign + "0.0" + str;
+		}
+		else if (abs < 100) {
+			return sign + "0." + str;
+		}
+		else if (abs < 100000) {
+			return sign + 
+					str.substring(0, str.length() - 2) + "." + 
+					str.substring(str.length() - 2);
+		}
+		else if (abs < 100000000) {
+			return sign + 
+					str.substring(0, str.length() - 5) + "," + 
+					str.substring(str.length() - 5, str.length() - 2) + "." + 
+					str.substring(str.length() - 2);
+		}
+		else {
+			return sign + 
+					str.substring(0, str.length() - 8) + "," + 
+					str.substring(str.length() - 8, str.length() - 5) + "," + 
+					str.substring(str.length() - 5, str.length() - 2) + "." + 
+					str.substring(str.length() - 2);
+		}
 	}
 	
 	public static long parsePounds(String value) {
