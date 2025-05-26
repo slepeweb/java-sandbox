@@ -24,6 +24,10 @@ public class Util {
 		return pence != null ? formatPounds(pence < 0 ? -pence : pence) : "";
 	}
 	
+	/*
+	 * Tried using String.format for this, but errors arose on large floating point numbers, ie lots
+	 * of significant places, eg. £212,345.72
+	 */
 	public static String formatPounds(Long pence) {
 		long value = pence.longValue();
 		boolean debit = value < 0;

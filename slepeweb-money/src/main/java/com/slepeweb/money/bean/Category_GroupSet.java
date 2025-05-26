@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties({"size"})
+@JsonIgnoreProperties({"size", "firstGroup"})
 public class Category_GroupSet {
 	private String title = "Title";
 	private List<String> allMajors = new ArrayList<String>();
