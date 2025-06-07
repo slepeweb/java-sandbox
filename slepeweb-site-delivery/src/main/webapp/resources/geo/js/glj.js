@@ -14,4 +14,12 @@ $(function() {
 			$doSearchAction($(this).val().trim())
 		}
 	})
+	
+	$("div#history select").change(function(){
+		var path = $(this).val();
+		if (path != 'unset') {
+			window.location = path;
+		}
+	});
+
 })

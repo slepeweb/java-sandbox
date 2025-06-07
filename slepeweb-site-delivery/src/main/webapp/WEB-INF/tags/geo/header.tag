@@ -56,6 +56,15 @@
 			</ul>
 		</div>
 		
+		<div id="history">
+			<select>
+				<option value="unset" selected>Recent pages ...</option>
+				<c:forEach items="${_history}" var="_idf">
+					<option value="${_idf.path}">${_idf.name}</option>
+				</c:forEach>
+			</select>
+		</div>
+		
 		<div id="search-input">
 			<input value="" placeholder="Enter search terms" />
 			<button type="button"><span><i class="fa fa-search" aria-hidden="true"></i></span></button>

@@ -13,16 +13,21 @@ import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.site.bean.SolrParams4Site;
 import com.slepeweb.site.control.BaseController;
 import com.slepeweb.site.geo.bean.SectionMenu;
+import com.slepeweb.site.geo.service.GeoCookieService;
 import com.slepeweb.site.geo.service.SolrService4Geo;
 import com.slepeweb.site.model.Page;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/spring/geo")
 public class GeoPageController extends BaseController {
 	
+	public static final String HISTORY = "_history";
+	
 	@Autowired SolrService4Geo solrService4Geo;
+	@Autowired GeoCookieService geoCookieService;
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
@@ -60,9 +65,12 @@ public class GeoPageController extends BaseController {
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
+			HttpServletResponse res,
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "standardWide", model);
+		addInThisSection(i, model);
+		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
 		return page.getView();
 	}
 
@@ -72,10 +80,12 @@ public class GeoPageController extends BaseController {
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
+			HttpServletResponse res,
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "standard3Col", model);
 		addInThisSection(i, model);
+		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
 		return page.getView();
 	}
 

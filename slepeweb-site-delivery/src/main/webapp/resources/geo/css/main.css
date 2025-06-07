@@ -16,7 +16,7 @@
 body, input, select, textarea {
   color: #292929;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: normal;
   line-height: 1.65em;
 }
@@ -427,7 +427,7 @@ p.clearfix {
 
 div#below-nav {
 	display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 50% 25% 25%;
   margin: 6px 0 0 0;
 }
 
@@ -436,8 +436,18 @@ div.searchresults {
 	margin: auto;
 }
 
-div#search-input {
+div#history {
 	grid-column: 2;
+	display: inline-block;
+	justify-self: right;
+}
+
+div#history select {
+	padding: 6px;
+}
+
+div#search-input {
+	grid-column: 3;
 	display: inline-block;
 	justify-self: right;
 }
@@ -446,3 +456,31 @@ div#search-input {
 	font-size: 14px;
 	line-height: 1.65em;
 }
+
+@media only screen and (max-width: 1000px) {
+	div#below-nav {
+	  grid-template-columns: 50% 50%;
+	}
+	
+	div#search-input {
+		grid-column: 2;
+	}
+
+}
+
+@media only screen and (max-width: 400px) {
+	div#below-nav {
+	  grid-template-columns: 100%;
+	}
+	
+	div#history, div#search-input {
+		grid-column: 1;
+		justify-self: left;
+	}
+
+	div.standard-3col {
+	  display: block;
+	}
+
+}
+

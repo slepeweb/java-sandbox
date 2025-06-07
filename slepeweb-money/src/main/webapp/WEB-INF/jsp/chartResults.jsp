@@ -35,7 +35,7 @@
 		<c:set var="_help"><span>&nbsp;<i class="far fa-question-circle" title="${_ss.description}"></i></span></c:set>
 	</c:if>
 	
-	<mny:pageHeading heading="Chart list ${_help}">
+	<mny:pageHeading heading="Chart results ${_help}">
 		<a href="${_ctxPath}/chart/list" title="List saved charts">List charts</a>
 	</mny:pageHeading>
 			
