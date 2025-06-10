@@ -48,7 +48,7 @@ public class ScheduledTransactionTask implements Job {
 				continue;
 			}
 			
-			LOG.info(String.format("Processing schedule [%s]", scht.getLabel()));
+			LOG.info(String.format("Considering schedule [%s], due [%s] ... ", scht.getLabel(), scht.getNextDate().toLocalDateTime()));
 			scheduled.setTime(scht.getNextDate());
 			createdTransaction = false;
 			
@@ -57,6 +57,8 @@ public class ScheduledTransactionTask implements Job {
 			t = Transaction.adapt(scht);
 			
 			if (scheduled.before(now)) {
+				LOG.info(String.format("... processing scheduled transaction [%s]", scht.getLabel()));
+
 				// Use scht properties to save a Transaction
 				t.setId(0);
 				t.setEntered(new Timestamp(now.getTimeInMillis()));

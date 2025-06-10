@@ -65,9 +65,9 @@ public class ScheduledTransactionManager {
 	        Trigger trigger = TriggerBuilder.newTrigger().
 	        		withIdentity("trigger1", "transactions").
 	        		startNow().
-	        		withSchedule(CronScheduleBuilder.cronSchedule("0 6 0 * * ?")).
+	        		withSchedule(CronScheduleBuilder.cronSchedule("0 0 6 * * ?")).
 	        		build();
-	        LOG.info("Built the trigger");
+	        LOG.info("Built the trigger, to run at 6:00am, every day");
 
 	        this.scheduler.scheduleJob(job, trigger);
 
