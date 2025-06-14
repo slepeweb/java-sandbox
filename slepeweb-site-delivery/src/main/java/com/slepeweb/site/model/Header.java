@@ -29,8 +29,8 @@ public class Header implements Serializable {
 		this.breadcrumbItems = new ArrayList<Item>();
 		Item i = getPage().getItem();
 		
-		while (! i.getPath().equals("/")) {
-			if (i.isAccessible()) {
+		while (! i.isSiteRoot()) {
+			if (! i.isHiddenFromNav() && i.isAccessible()) {
 				this.breadcrumbItems.add(i);
 			}
 			i = i.getOrthogonalParent();

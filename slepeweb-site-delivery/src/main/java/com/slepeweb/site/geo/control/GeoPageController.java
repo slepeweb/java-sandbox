@@ -35,9 +35,11 @@ public class GeoPageController extends BaseController {
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
+			HttpServletResponse res,
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "homepage", model);
+		addGeoExtras(i, req, res, model);
 		return page.getView();
 	}
 
@@ -47,6 +49,7 @@ public class GeoPageController extends BaseController {
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
+			HttpServletResponse res,
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "searchresults", model);
@@ -56,6 +59,7 @@ public class GeoPageController extends BaseController {
 		params.setSearchText(terms).setUser(i.getUser());
 		model.addAttribute("_searchResponse", this.solrService4Geo.query(params));
 		
+		addGeoExtras(i, req, res, model);
 		return page.getView();
 	}
 
@@ -69,8 +73,7 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "standardWide", model);
-		addInThisSection(i, model);
-		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
+		addGeoExtras(i, req, res, model);
 		return page.getView();
 	}
 
@@ -84,12 +87,26 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "standard3Col", model);
-		addInThisSection(i, model);
-		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
+		addGeoExtras(i, req, res, model);
 		return page.getView();
 	}
 
-	private void addInThisSection(Item i, ModelMap model) {
+	@RequestMapping(value="/notfound")	
+	public String notfound(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			@ModelAttribute(AttrName.SITE) Site site, 
+			HttpServletRequest req,
+			HttpServletResponse res,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "standard3Col", model);
+		addGeoExtras(i, req, res, model);
+		return page.getView();
+	}
+
+	private void addGeoExtras(Item i, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		model.addAttribute("_inThisSection", new SectionMenu(i));
+		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
 	}
 }

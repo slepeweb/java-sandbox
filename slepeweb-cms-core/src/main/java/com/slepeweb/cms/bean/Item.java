@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.CmsUtil;
 
@@ -915,6 +916,11 @@ public class Item extends CmsBean {
 
 	public boolean isSearchable() {
 		return this.searchable;
+	}
+	
+	public boolean isHiddenFromNav() {
+		String fv = this.getFieldValue(FieldName.HIDE_FROM_NAV);		
+		return fv != null && fv.equalsIgnoreCase("yes");
 	}
 
 	public Item setSearchable(boolean searchable) {

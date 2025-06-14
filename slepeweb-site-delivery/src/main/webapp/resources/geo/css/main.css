@@ -342,6 +342,10 @@ div.standard-3col div.leftside, div.standard-3col div.rightside {
 	padding: 0.5em;
 }
 
+div.mainbody li {
+	margin-bottom: 1em;
+}
+
 body {
   max-width: 1170px;
   /* This centres the page horizontally */

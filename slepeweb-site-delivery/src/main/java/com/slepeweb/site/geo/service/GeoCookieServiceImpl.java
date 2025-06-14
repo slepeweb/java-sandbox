@@ -16,9 +16,13 @@ public class GeoCookieServiceImpl extends CookieHelper implements GeoCookieServi
 	
 	public List<ItemIdentifier> updateBreadcrumbsCookie(Item i, HttpServletRequest req, HttpServletResponse res) {
 		
-		ItemIdentifier targetKey = new ItemIdentifier(i.getOrigId());
-		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);	
-		pushBreadcrumbs(breadcrumbs, targetKey);
+		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);
+		
+		if (! i.isHiddenFromNav()) {
+			ItemIdentifier targetKey = new ItemIdentifier(i.getOrigId());
+			pushBreadcrumbs(breadcrumbs, targetKey);
+		}
+		
 		updateItemNames(breadcrumbs, i.getCmsService()); // We need item names in order to reorder existing matching entries
 		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), join(breadcrumbs), GEO_COOKIE_PATH, res);
 		return breadcrumbs;
