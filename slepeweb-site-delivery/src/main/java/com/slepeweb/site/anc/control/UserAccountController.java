@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -416,7 +415,7 @@ public class UserAccountController extends BaseController {
 		String[] parts;
 		
 		for (String line : s.split("[\\n\\r]")) {
-			if (! StringUtil.isBlank(line) && ! line.startsWith("//")) {
+			if (! StringUtils.isBlank(line) && ! line.startsWith("//")) {
 				parts = line.split("\\.");
 				if (parts.length == 2) {
 					map.put(parts[1].trim(), composeMultiblockFieldNames(Integer.valueOf(parts[0])));

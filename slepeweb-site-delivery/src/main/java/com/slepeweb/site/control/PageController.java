@@ -2,6 +2,7 @@ package com.slepeweb.site.control;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteConfigService;
 import com.slepeweb.commerce.bean.Basket;
 import com.slepeweb.common.solr.bean.SolrConfig;
@@ -19,6 +21,7 @@ import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.site.bean.SolrParams4Site;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.model.SiblingItemPager;
+import com.slepeweb.site.service.PdfService;
 import com.slepeweb.site.service.SolrService4Site;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
 
@@ -32,6 +35,8 @@ public class PageController extends BaseController {
 	@Autowired private CmsDeliveryServlet cmsDeliveryServlet;
 	@Autowired private SiteConfigService siteConfigService;
 	@Autowired private SolrService4Site solrService4Site;
+	@Autowired private ItemService itemService;
+	@Autowired private PdfService pdfService;
 	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
@@ -210,6 +215,25 @@ public class PageController extends BaseController {
 		return page.getView();
 	}
 	
+	@RequestMapping(value="/spring/toPDF")	
+	public String toPDF(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			@ModelAttribute("_site") Site site, 
+			HttpServletRequest req,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "toPDF", model);
+		
+		String path = req.getParameter("path");
+		if (StringUtils.isNotBlank(path)) {
+			Item target = this.itemService.getItem(i.getSite().getId(), path);
+			model.addAttribute("pageview", this.pdfService.build(target, getUser(req)));
+		}
+		
+		return page.getView();
+	}
+
 	@SuppressWarnings("unused")
 	private SiblingItemPager getSiblings(Item i, String[] typesOfInterest, int max) {
 		LinkFilter f = new LinkFilter().setItemTypes(typesOfInterest);

@@ -81,7 +81,7 @@ public class BaseController {
 	@ModelAttribute(value=AttrName.USER)
 	protected User getUser(HttpServletRequest req) {
 		User u = (User) req.getSession().getAttribute(AttrName.USER);
-		LOG.trace(String.format("Model attribute (%s): [%s]", AttrName.USER, u));
+		LOG.trace(String.format("User attribute is [%s] from session %s", u,req.getSession().getId()));
 		return u;
 	}
 

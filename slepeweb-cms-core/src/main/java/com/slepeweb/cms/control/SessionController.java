@@ -20,10 +20,12 @@ public class SessionController {
 		
 		RestResponse resp = new RestResponse();
 		
-		long lastAccessed = (long) req.getSession().getAttribute(AttrName.LAST_INTERACTION);
 		long maxInterval = req.getSession().getMaxInactiveInterval() * 1000;
-		long expires =  lastAccessed + maxInterval;
 		long now = System.currentTimeMillis() /*+ (26 * 60000)*/;
+		
+		Object attr = req.getSession().getAttribute(AttrName.LAST_INTERACTION);
+		long lastAccessed = attr != null ? (long) attr : now;
+		long expires =  lastAccessed + maxInterval;
 		long remaining = expires - now;
 		
 		return resp.setData(new Object[] {remaining <= (180 * 1000), Math.floor(remaining / 1000)});

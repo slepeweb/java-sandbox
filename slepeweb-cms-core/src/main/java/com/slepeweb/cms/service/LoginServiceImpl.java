@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.common.service.SendMailService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,6 @@ import jakarta.servlet.http.HttpServletRequest;
 public class LoginServiceImpl implements LoginService {
 	
 	private static Logger LOG = Logger.getLogger(LoginServiceImpl.class);
-	private static final String USER_ATTR = "_user";
 	
 	@Autowired private UserService userService;
 	@Autowired private SendMailService sendMailService;
@@ -54,8 +54,9 @@ public class LoginServiceImpl implements LoginService {
 					if (encoder.matches(password, u.getPassword())) {
 						if (u.isEnabled()) {
 							supp.setSuccess(true);
-							req.getSession().setAttribute(USER_ATTR, supp.getUser().setLoggedIn(true));				
-							LOG.info(msg = String.format("Successful login [%s]", alias));
+							req.getSession().setAttribute(AttrName.USER, supp.getUser().setLoggedIn(true));				
+							LOG.info(msg = String.format("Successful login [%s], session %s, for site %s", alias, 
+									req.getSession().getId(), req.getAttribute(AttrName.SITE)));
 						}
 						else {
 							supp.setUserMessage("The user account is disabled right now.");
@@ -99,7 +100,7 @@ public class LoginServiceImpl implements LoginService {
 
 	
 	public void logout(HttpServletRequest req) {
-		User u = (User) req.getSession().getAttribute(USER_ATTR);
+		User u = (User) req.getSession().getAttribute(AttrName.USER);
 		
 		if (u != null) {
 			// Attribute removal doesn't seem to happen immediately, so user object now has a 'loggedIn' property
@@ -107,6 +108,6 @@ public class LoginServiceImpl implements LoginService {
 			LOG.info(String.format("User logout [%s]", u.getEmail()));
 		}
 		
-		req.getSession().removeAttribute(USER_ATTR);
+		req.getSession().removeAttribute(AttrName.USER);
 	}
 }

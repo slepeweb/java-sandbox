@@ -65,13 +65,21 @@ function _processFigures(div$) {
 $(function() {
 	/*
 		Insert img + caption given an item origId that corresponds to an image item
-		User must add to content, eg: <div class="ximg" data-id="4230" />
+		User must add to content, eg: 
+		
+		<div class="ximg" data-id="4230" data-caption="Newington Green U11s" />
+		
 		This will get converted to :
-			<div class="ximg" data-id="4230">
-				<img src="[//optional hostname]/path[?optional-passskey]"
-				<caption>Text content from image item</caption>
-			</div>
+			
+		<div class="ximg" data-id="3324">
+			<figure>
+				<a href="/$_3324" target="_blank" title="Click to see image in new tab"><img src="/$_3324"></a>
+				<figcaption>Newington Green U11s</figcaption>
+			</figure>									
+			<p class="clearfix"></p>
+		</div>	
 	*/
+	
 	$('div.ximg').each(function() {
 		_processFigures($(this));
 	})

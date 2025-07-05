@@ -37,7 +37,8 @@ public class RestController extends BaseController {
 		
 		/* 
 		 * User must be signed into this site in order to get a passkey for the editorial app.
-		 * Not signed in ? Cannot get a pass to cms-e.
+		 * This passkey would allow user to login to cms-e.
+		 * Not signed in to cms-d? Then, cannot access cms-e.
 		 */
 		User u = getUser(req);
 		if (u == null) {

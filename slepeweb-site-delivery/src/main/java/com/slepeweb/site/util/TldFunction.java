@@ -12,6 +12,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.commerce.bean.Product;
+import com.slepeweb.site.service.XimgService;
 
 public class TldFunction {
 
@@ -53,5 +54,9 @@ public class TldFunction {
 	
 	public static String compress(String s) {
 		return com.slepeweb.common.util.StringUtil.compress(s);
+	}
+	
+	public static String parseXimg(String html, XimgService service, String passkey) {
+		return service.parse(html, passkey);
 	}
 }

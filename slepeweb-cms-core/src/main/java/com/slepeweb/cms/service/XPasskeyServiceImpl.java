@@ -8,12 +8,15 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.User;
 
 /*
- * This class encrypts a passkey, that can be used to log into the editorial app (from
+ * DO NOT CONFUSE THIS CLASS WITH PasskeyService, which provides cms-d with access to
+ * items on different sites, for item sharing between sites.
+ * 
+ * This class (XPasskeyServiceImpl) encrypts a passkey, that can be used to log into the editorial app (from
  * a delivery app) without having to re-login. The passkey is a combination of hex
  * characters (0-9, a-f).
  * 
- * The X (first char) is for 'Cross'. That is , we use this service to cross-login, from
- * a delivery app to it's editorial equivalent.
+ * The X (first char) in XPasskeyService is for 'Cross'. That is , we use this service 
+ * to cross-login, from a delivery app to it's editorial equivalent.
  * 
  */
 

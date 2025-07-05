@@ -20,10 +20,12 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.component.Passkey;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.ItemService;
+import com.slepeweb.cms.service.PasskeyService;
 import com.slepeweb.cms.service.SiteAccessService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
@@ -37,16 +39,16 @@ public class CmsDeliveryServlet {
 	
 	private long defaultPrivateCacheTime, defaultPublicCacheTime;
 	private Map<Long, Long> lastDeliveryTable = new HashMap<Long, Long>(127);
-	private static Pattern PATH_PATTERN_A = Pattern.compile("^(/(\\w\\w))?/\\$_(\\d+)(\\?passkey=([\\w\\d\\$]+))?$");
+	private static Pattern PATH_PATTERN_A = Pattern.compile("^(/(\\w\\w))?/\\$_(\\d+)$");
 	private static Pattern PATH_PATTERN_B = Pattern.compile("^(/(\\w\\w))?(/.*?)$");
 	
 	@Autowired private CmsService cmsService;
 	@Autowired private ItemService itemService;
+	@Autowired private PasskeyService passkeyService;
 
 	private Item identifyItem(HttpServletRequest req) {
 		Item i = null;
 		String language = null;
-		@SuppressWarnings("unused") String passkey = null;
 		String path = getItemPath(req);
 		
 		if (path.equals("/favicon.ico")) {
@@ -54,19 +56,19 @@ public class CmsDeliveryServlet {
 		}
 
 		/*
-		 *  This url pattern applies to requests for 'foreign' items, ie on a different site.
+		 *  PATH_PATTERN_A applies to requests for 'foreign' items, ie on a different site.
+		 *  This requirement was originally intended for sharing media items across secured sites,
+		 *  but little testing has been given to sharing item data.
+		 *  
 		 *  Let's say site A wants to render an image item on site B, and site B is secured.
 		 *  If you tried to access the item on site B through host B, you'd have to provide
 		 *  login information. So, we let host A retrieve the item on site B, using the
 		 *  same login information for host A. Similar to SSO (single sign-on).
-		 *  
-		 *  NOTE: PasskeyService is NOT required.
 		 */
 		Matcher m = PATH_PATTERN_A.matcher(path);
 		
 		if (m.matches()) {
 			language = m.group(2);
-			passkey = m.group(5);
 			i = this.itemService.getItemByOriginalId(Long.valueOf(m.group(3)));
 		}
 		else {
@@ -85,6 +87,12 @@ public class CmsDeliveryServlet {
 			}
 		}
 		
+		String encodedPasskey = req.getParameter(AttrName.PASSKEY);
+		if (encodedPasskey != null) {
+			// Need this info later, when checking item access rights
+			req.setAttribute(AttrName.PASSKEY, encodedPasskey);
+		}
+
 		if (i != null) {
 			i.setLanguage(language == null ? i.getSite().getLanguage() : language);
 			i.setUser((User) req.getSession().getAttribute(AttrName.USER));
@@ -108,26 +116,30 @@ public class CmsDeliveryServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
 		Item item = identifyItem(req);
-		
 		if (item == null) {
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 		
-		if (item.getSite().isSecured() && ! item.isAccessible()) {
-			// Site access rules deny access to this user, OR user is not known
-			if (! item.getPath().equals(getLoginPath(item))) {
-				LOG.warn(String.format("Item [%s] is not accessible by un-identified user", item.getPath()));
-				res.sendRedirect(getLoginPath(item));
-				return;
+		if (item.getSite().isSecured()) {
+			String encodedPasskey = (String) req.getAttribute(AttrName.PASSKEY);
+			boolean isValidPasskey = encodedPasskey != null ? this.passkeyService.validateKey(new Passkey(encodedPasskey)) : false;
+			
+			if (! isValidPasskey && ! item.isAccessible()) {
+				// Site access rules deny access to this user, AND no suitable passkey provided
+				if (! item.getPath().equals(getLoginPath(item))) {
+					LOG.warn(String.format("Item [%s] is not accessible", item.getPath()));
+					res.sendRedirect(getLoginPath(item));
+					return;
+				}
 			}
 		}			
 		
+		String view = req.getParameter("view");		
+		String springTemplatePath = updateControllerIf(item, view);
+		
 		long requestTime = System.currentTimeMillis();
 		req.getSession().setAttribute(AttrName.LAST_INTERACTION, requestTime);
-		
-		String view = req.getParameter("view");		
-		String springTemplatePath = getTemplatePath(item, view);
 		
 		long ifModifiedSince = getDateHeader(req, "If-Modified-Since");
 
@@ -161,10 +173,13 @@ public class CmsDeliveryServlet {
 		}
 	}
 	
-	private String getTemplatePath(Item i, String view) {
+	private String updateControllerIf(Item i, String view) {
 		Template tmplt = i.getTemplate();
 		if (tmplt != null) {
-			return StringUtils.isBlank(view) ? tmplt.getController() : tmplt.getController() + "/" + view;
+			if (StringUtils.isNotBlank(view)) {
+				tmplt.setController(tmplt.getController() + "/" + view);
+			}
+			return tmplt.getController();
 		}
 		return null;
 	}

@@ -103,4 +103,10 @@
 		<function-signature>java.lang.String compress(java.lang.String)</function-signature>
 	</function>
 	
+	<function>
+		<name>parseXimg</name>
+		<function-class>com.slepeweb.site.util.TldFunction</function-class>
+		<function-signature>java.lang.String parseXimg(java.lang.String, com.slepeweb.site.service.XimgService, java.lang.String)</function-signature>
+	</function>
+	
 </taglib>

@@ -16,6 +16,7 @@ import com.slepeweb.site.geo.bean.SectionMenu;
 import com.slepeweb.site.geo.service.GeoCookieService;
 import com.slepeweb.site.geo.service.SolrService4Geo;
 import com.slepeweb.site.model.Page;
+import com.slepeweb.site.service.XimgService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,9 +26,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class GeoPageController extends BaseController {
 	
 	public static final String HISTORY = "_history";
+	public static final String XIMG_SERVICE = "_ximgService";
 	
 	@Autowired SolrService4Geo solrService4Geo;
 	@Autowired GeoCookieService geoCookieService;
+	@Autowired XimgService ximgService;
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
@@ -77,6 +80,20 @@ public class GeoPageController extends BaseController {
 		return page.getView();
 	}
 
+	@RequestMapping(value="/pagewide/pdf")	
+	public String standardWidePdf(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			@ModelAttribute(AttrName.SITE) Site site, 
+			HttpServletRequest req,
+			HttpServletResponse res,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "pdf/standardWide", model);
+		addPdfExtras(i, req, res, model);
+		return page.getView();
+	}
+
 	@RequestMapping(value="/page3col")	
 	public String standard3Col(
 			@ModelAttribute(AttrName.ITEM) Item i, 
@@ -88,6 +105,20 @@ public class GeoPageController extends BaseController {
 		
 		Page page = getStandardPage(i, shortSitename, "standard3Col", model);
 		addGeoExtras(i, req, res, model);
+		return page.getView();
+	}
+
+	@RequestMapping(value="/page3col/pdf")	
+	public String standard3ColPdf(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			@ModelAttribute(AttrName.SITE) Site site, 
+			HttpServletRequest req,
+			HttpServletResponse res,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "pdf/standard3Col", model);
+		addPdfExtras(i, req, res, model);
 		return page.getView();
 	}
 
@@ -108,5 +139,10 @@ public class GeoPageController extends BaseController {
 	private void addGeoExtras(Item i, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		model.addAttribute("_inThisSection", new SectionMenu(i));
 		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
+	}
+
+	private void addPdfExtras(Item i, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+		model.addAttribute(XIMG_SERVICE, this.ximgService);
+		model.addAttribute(AttrName.PASSKEY, req.getAttribute(AttrName.PASSKEY));
 	}
 }
