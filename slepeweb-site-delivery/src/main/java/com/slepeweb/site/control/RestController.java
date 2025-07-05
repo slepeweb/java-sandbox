@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.slepeweb.cms.bean.Host;
+import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Item4Json;
+import com.slepeweb.cms.bean.RequestPack;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.User;
-import com.slepeweb.cms.bean.Host.HostType;
-import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.XPasskeyService;
@@ -61,20 +61,24 @@ public class RestController extends BaseController {
 	public RestResponse getItem(@PathVariable long origId, HttpServletRequest req) {
 	
 		RestResponse r = new RestResponse();
-
 		Item i = this.itemService.getItemByOriginalId(origId);
+		
 		if (i == null) {
 			return r.setError(true).addMessage(String.format("No item matching origId=%d", origId));
 		}
 		
+		i.setRequestPack(new RequestPack(req));
+		if (! i.isAccessible()) {
+			return r.setError(true).addMessage("No access to requested item");
+		}
+		
 		if (i.getSite().isSecured()) {
-			User u = (User) req.getSession().getAttribute(AttrName.USER);
+			User u = i.getUser();
 			
 			if (u == null) {
 				return r.setError(true).addMessage("Not authorized");
 			}
 			else {
-				i.setUser(u);
 				if (i.isAccessible()) {
 					return r.setData(new Item4Json(i));
 				}

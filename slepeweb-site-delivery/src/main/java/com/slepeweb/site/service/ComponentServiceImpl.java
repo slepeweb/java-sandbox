@@ -45,7 +45,7 @@ public class ComponentServiceImpl implements ComponentService {
 						target = (SimpleComponent) obj;
 						target.setComponentService(this).setup(link);
 						components.add(target);
-						LOG.info(String.format("Component: %s() [%s]", componentData[0], i.getPath()));
+						LOG.trace(String.format("Component: %s() [%s]", componentData[0], i.getPath()));
 					} 
 					catch (NoSuchMethodException e) {
 						LOG.warn(LogUtil.compose("Method not found", componentData[0]));

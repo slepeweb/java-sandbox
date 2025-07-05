@@ -1,5 +1,8 @@
 package com.slepeweb.site.geo.control;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -15,6 +18,7 @@ import com.slepeweb.site.control.BaseController;
 import com.slepeweb.site.geo.bean.SectionMenu;
 import com.slepeweb.site.geo.service.GeoCookieService;
 import com.slepeweb.site.geo.service.SolrService4Geo;
+import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.XimgService;
 
@@ -90,7 +94,11 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "pdf/standardWide", model);
+<<<<<<< Upstream, based on branch 'master' of https://github.com/slepeweb/java-sandbox.git
 		addPdfExtras(i, req, res, model);
+=======
+		addPdfExtras(page, req, res, model);
+>>>>>>> 5c146fe cms-d: pdf gen, stage 1
 		return page.getView();
 	}
 
@@ -118,7 +126,11 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "pdf/standard3Col", model);
+<<<<<<< Upstream, based on branch 'master' of https://github.com/slepeweb/java-sandbox.git
 		addPdfExtras(i, req, res, model);
+=======
+		addPdfExtras(page, req, res, model);
+>>>>>>> 5c146fe cms-d: pdf gen, stage 1
 		return page.getView();
 	}
 
@@ -141,8 +153,41 @@ public class GeoPageController extends BaseController {
 		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
 	}
 
+<<<<<<< Upstream, based on branch 'master' of https://github.com/slepeweb/java-sandbox.git
 	private void addPdfExtras(Item i, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		model.addAttribute(XIMG_SERVICE, this.ximgService);
 		model.addAttribute(AttrName.PASSKEY, req.getAttribute(AttrName.PASSKEY));
+=======
+	private void addPdfExtras(Page p, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+		Item i = p.getItem();
+		model.addAttribute(XIMG_SERVICE, this.ximgService);
+		model.addAttribute(AttrName.PASSKEY, i.getRequestPack().getPasskey().encode());
+		
+		List<LinkTarget> crumbs = p.getHeader().getBreadcrumbs();
+		// Remove root item from breadcrumbs
+		crumbs.remove(0);
+		int len = crumbs.size();
+		List<String> topRow = new ArrayList<String>();
+		String bottomRow = null;
+		
+		if (len > 0) {
+			if (len == 1) {
+				bottomRow = crumbs.get(0).getTitle();
+			}
+			else if (len == 2) {
+				topRow.add(crumbs.get(0).getTitle());
+				bottomRow = crumbs.get(1).getTitle();
+			}
+			else {
+				for (int n = 0; n < (len - 1); n++) {
+					topRow.add(crumbs.get(n).getTitle());
+				}
+				bottomRow = crumbs.get(len - 1).getTitle();
+			}
+		}
+		
+		model.addAttribute("toptitle", topRow);
+		model.addAttribute("bottomtitle", bottomRow);
+>>>>>>> 5c146fe cms-d: pdf gen, stage 1
 	}
 }

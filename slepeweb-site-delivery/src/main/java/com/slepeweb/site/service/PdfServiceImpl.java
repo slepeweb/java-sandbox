@@ -41,6 +41,7 @@ public class PdfServiceImpl implements PdfService {
 					<link rel="stylesheet" href="%s/resources/geo/css/main.css" type="text/css" />
 					
 					<style>
+<<<<<<< Upstream, based on branch 'master' of https://github.com/slepeweb/java-sandbox.git
 					    @page {
 					      size: A4;
 					      margin: 2cm;
@@ -80,6 +81,55 @@ public class PdfServiceImpl implements PdfService {
 			PdfRendererBuilder builder = new PdfRendererBuilder();
 			builder.useFastMode();
 			builder.withHtmlContent(html, "file:///home/photos/");
+=======
+						body {
+						    font-family: 'DejaVuSans', sans-serif;
+						}
+						
+					    @page {
+					      size: A4;
+					      margin: 2cm;
+	
+					      @bottom-center {
+					        content: "Page " counter(page) " of " counter(pages);
+					        font-size: 10pt;
+					        color: #666;
+					      }
+					    }
+	
+					    h1, h2 {
+					      page-break-before: always;
+					    }
+					</style>
+				</head>
+				<body>
+				""", hostname, hostname);
+
+		String footer = """
+				</body>
+				</html>
+				""";
+
+		StringBuilder body = new StringBuilder();
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		
+		drillDown(host, u, root, httpclient, body);
+		final String html = header + body.toString() + footer;
+		output(html);
+		
+		return html;
+	}
+	
+	private void output(String html) {
+		try (OutputStream os = new BufferedOutputStream(new FileOutputStream("/tmp/html2.pdf"))) {
+			PdfRendererBuilder builder = new PdfRendererBuilder();
+			
+			// Need to use a font like this in order to render special html entities, such as &diams; aka &#9830;
+			builder.useFont(() -> getClass().getClassLoader().getResourceAsStream("DejaVuSans.ttf"), "DejaVuSans");
+			
+			builder.useFastMode();
+			builder.withHtmlContent(html, null);
+>>>>>>> 5c146fe cms-d: pdf gen, stage 1
 			builder.toStream(os);
 			builder.run();
 		} 

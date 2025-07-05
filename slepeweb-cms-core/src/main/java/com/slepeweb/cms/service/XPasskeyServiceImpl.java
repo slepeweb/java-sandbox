@@ -34,6 +34,8 @@ public class XPasskeyServiceImpl implements XPasskeyService {
 	public User identifyUser(String key) {
 		int offs = getInterval();
 		String decoded =  undoTransform(key, offs);
+		
+		// NOTE!!! This strategy assumes that passwords are unique!
 		User u = this.userService.getByPassword(decoded);
 		
 		// In case the second-hand has just gone past 0 ...

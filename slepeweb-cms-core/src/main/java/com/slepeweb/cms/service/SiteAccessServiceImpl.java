@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,23 +17,43 @@ import com.slepeweb.cms.bean.User;
 @Repository
 public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccessService {
 	
+	private static Logger LOG = Logger.getLogger(SiteAccessServiceImpl.class);
+	
 	@Autowired private CmsService cmsService;
 	@Autowired private AccessService accessService;
+	@Autowired private PasskeyService passkeyService;
+	@Autowired private UserService userService;
 
 	private Map<Long, List<AccessRule>> readRules = new HashMap<Long, List<AccessRule>>();
 	private Map<Long, List<AccessRule>> writeRules = new HashMap<Long, List<AccessRule>>();
 	
 	public boolean isAccessible(Item i) {
 		if (this.cmsService.isEditorialContext()) {
+			if (i.getUser() == null) {
+				return false;
+			}
 			return isAccessible(i, getWriteRules(i.getSite().getId()));
 		}
 		else {
-			if (i.getSite().isSecured()) {
-				return isAccessible(i, getReadRules(i.getSite().getId()));
-			}
-			else {
+			if (! i.getSite().isSecured()) {
+				// site is not secured, so all items are accessible
 				return true;
 			}
+			
+			if (i.getUser() == null && i.getRequestPack().hasPasskey()) {
+				// User is not logged in. If valid passkey is offered, log him in
+				if (this.passkeyService.validateKey(i.getRequestPack().getPasskey())) {
+					String alias = i.getRequestPack().getPasskey().getAlias();
+					i.getRequestPack().setUser(this.userService.get(alias));
+					LOG.info(String.format("User %s logged in with valid passkey", i.getRequestPack().getUser().getAlias()));
+				}
+			}
+
+			if (i.getUser() == null) {
+				return false;
+			}
+			
+			return isAccessible(i, getReadRules(i.getSite().getId()));
 		}
 	}
 	

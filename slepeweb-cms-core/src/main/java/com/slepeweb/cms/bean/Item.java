@@ -36,7 +36,8 @@ public class Item extends CmsBean {
 	private boolean deleted, editable = true, published, searchable;
 	
 	// These properties pertain to access control
-	private User user, owner;
+	private RequestPack requestPack;
+	private User owner;
 	private Boolean accessible;
 	
 	private Long id = -1L, origId;
@@ -45,9 +46,6 @@ public class Item extends CmsBean {
 	private List<Tag> tags;
 	private Item parent;
 	private int version = 1;
-	
-	// NOTE: language is not saved in the database; it is assigned on item creation
-	private String language = "en";
 	
 	protected List<Media> allMedia;
 	
@@ -147,7 +145,7 @@ public class Item extends CmsBean {
 			Link l = getOrthogonalParentLink();
 			if (l != null) {
 				this.parent = l.getChild();
-				this.parent.setUser(getUser()).setLanguage(getLanguage());
+				this.parent.setRequestPack(getRequestPack());
 			}
 		}
 		return this.parent;
@@ -158,7 +156,7 @@ public class Item extends CmsBean {
 	public Item getItem(String path) {
 		Item i = getCmsService().getItemService().getItem(getSite().getId(), path);
 		if (i != null) {
-			i.setUser(getUser());
+			i.setRequestPack(getRequestPack());
 		}
 		return i;
 	}
@@ -435,7 +433,7 @@ public class Item extends CmsBean {
 	}
 	
 	public String getLanguagePath() {
-		return String.format("/%s%s", this.language, this.path);
+		return String.format("/%s%s", this.requestPack.getLanguage(), this.path);
 	}
 	
 	public String refreshPath() {
@@ -929,11 +927,13 @@ public class Item extends CmsBean {
 	}
 
 	public String getLanguage() {
-		return language;
+		return this.requestPack != null ? this.requestPack.getLanguage() : "en";
 	}
 
 	public Item setLanguage(String language) {
-		this.language = language;
+		if (this.requestPack != null) {
+			this.requestPack.setLanguage(language);
+		}
 		return this;
 	}
 	
@@ -942,11 +942,25 @@ public class Item extends CmsBean {
 	}
 	
 	public User getUser() {
-		return user;
+		if (this.requestPack != null) {
+			return this.requestPack.getUser();
+		}
+		return null;
 	}
 
 	public Item setUser(User user) {
-		this.user = user;
+		if (this.requestPack != null) {
+			this.requestPack.setUser(user);
+		}
+		return this;
+	}
+
+	public RequestPack getRequestPack() {
+		return this.requestPack;
+	}
+
+	public Item setRequestPack(RequestPack r) {
+		this.requestPack = r;
 		return this;
 	}
 
@@ -1003,7 +1017,7 @@ public class Item extends CmsBean {
 				
 				while (iter.hasNext()) {
 					l = iter.next();
-					l.getChild().setUser(getUser());
+					l.getChild().setRequestPack(getRequestPack());
 					if (! l.getChild().isAccessible()) {
 						iter.remove();
 					}
@@ -1021,7 +1035,7 @@ public class Item extends CmsBean {
 			
 			for (Link l :  links) {
 				i = l.getChild();
-				i.setUser(getUser()).setLanguage(getLanguage());
+				i.setRequestPack(getRequestPack());
 			}
 		}
 	}

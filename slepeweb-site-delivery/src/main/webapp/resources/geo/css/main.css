@@ -461,6 +461,11 @@ div#search-input {
 	line-height: 1.65em;
 }
 
+span.top-pdf-title {
+	font-size: 0.7em;
+	color: #a6a6a6;
+}
+
 @media only screen and (max-width: 1000px) {
 	div#below-nav {
 	  grid-template-columns: 50% 50%;
