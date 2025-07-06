@@ -20,16 +20,10 @@ import com.slepeweb.cms.bean.RequestPack;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
-<<<<<<< Upstream, based on branch 'master' of https://github.com/slepeweb/java-sandbox.git
-import com.slepeweb.cms.bean.User;
-import com.slepeweb.cms.component.Passkey;
-=======
->>>>>>> 5c146fe cms-d: pdf gen, stage 1
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.cms.service.PasskeyService;
 import com.slepeweb.cms.service.SiteAccessService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
@@ -48,7 +42,6 @@ public class CmsDeliveryServlet {
 	
 	@Autowired private CmsService cmsService;
 	@Autowired private ItemService itemService;
-	@Autowired private PasskeyService passkeyService;
 
 	private Item identifyItem(HttpServletRequest req) {
 		Item i = null;
@@ -91,12 +84,6 @@ public class CmsDeliveryServlet {
 			}
 		}
 		
-		String encodedPasskey = req.getParameter(AttrName.PASSKEY);
-		if (encodedPasskey != null) {
-			// Need this info later, when checking item access rights
-			req.setAttribute(AttrName.PASSKEY, encodedPasskey);
-		}
-
 		if (i != null) {
 			RequestPack r = new RequestPack(req);
 			r.setLanguage(language == null ? i.getSite().getLanguage() : language);
@@ -127,31 +114,14 @@ public class CmsDeliveryServlet {
 			return;
 		}
 		
-<<<<<<< Upstream, based on branch 'master' of https://github.com/slepeweb/java-sandbox.git
-		if (item.getSite().isSecured()) {
-			String encodedPasskey = (String) req.getAttribute(AttrName.PASSKEY);
-			boolean isValidPasskey = encodedPasskey != null ? this.passkeyService.validateKey(new Passkey(encodedPasskey)) : false;
-			
-			if (! isValidPasskey && ! item.isAccessible()) {
-				// Site access rules deny access to this user, AND no suitable passkey provided
-				if (! item.getPath().equals(getLoginPath(item))) {
-					LOG.warn(String.format("Item [%s] is not accessible", item.getPath()));
-					res.sendRedirect(getLoginPath(item));
-					return;
-				}
-=======
 		if (! item.isAccessible()) {
 			// Site access rules deny access to this user, AND no suitable passkey provided
 			if (! item.getPath().equals(getLoginPath(item))) {
 				LOG.warn(String.format("Item [%s] is not accessible", item.getPath()));
 				res.sendRedirect(getLoginPath(item));
 				return;
->>>>>>> 5c146fe cms-d: pdf gen, stage 1
 			}
 		}
-		
-		String view = req.getParameter("view");		
-		String springTemplatePath = updateControllerIf(item, view);
 		
 		String view = req.getParameter("view");		
 		String springTemplatePath = updateControllerIf(item, view);

@@ -38,6 +38,7 @@ public class RequestPack {
 	
 	public RequestPack setUser(User user) {
 		this.user = user;
+		this.httpRequest.getSession().setAttribute(AttrName.USER, user);
 		return this;
 	}
 

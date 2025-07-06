@@ -94,11 +94,7 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "pdf/standardWide", model);
-<<<<<<< Upstream, based on branch 'master' of https://github.com/slepeweb/java-sandbox.git
-		addPdfExtras(i, req, res, model);
-=======
 		addPdfExtras(page, req, res, model);
->>>>>>> 5c146fe cms-d: pdf gen, stage 1
 		return page.getView();
 	}
 
@@ -126,11 +122,7 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "pdf/standard3Col", model);
-<<<<<<< Upstream, based on branch 'master' of https://github.com/slepeweb/java-sandbox.git
-		addPdfExtras(i, req, res, model);
-=======
 		addPdfExtras(page, req, res, model);
->>>>>>> 5c146fe cms-d: pdf gen, stage 1
 		return page.getView();
 	}
 
@@ -153,11 +145,6 @@ public class GeoPageController extends BaseController {
 		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
 	}
 
-<<<<<<< Upstream, based on branch 'master' of https://github.com/slepeweb/java-sandbox.git
-	private void addPdfExtras(Item i, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
-		model.addAttribute(XIMG_SERVICE, this.ximgService);
-		model.addAttribute(AttrName.PASSKEY, req.getAttribute(AttrName.PASSKEY));
-=======
 	private void addPdfExtras(Page p, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		Item i = p.getItem();
 		model.addAttribute(XIMG_SERVICE, this.ximgService);
@@ -188,6 +175,5 @@ public class GeoPageController extends BaseController {
 		
 		model.addAttribute("toptitle", topRow);
 		model.addAttribute("bottomtitle", bottomRow);
->>>>>>> 5c146fe cms-d: pdf gen, stage 1
 	}
 }
