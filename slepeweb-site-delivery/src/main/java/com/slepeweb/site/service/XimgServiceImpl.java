@@ -2,6 +2,7 @@ package com.slepeweb.site.service;
 
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,10 +12,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.ItemService;
 
 @Service
 public class XimgServiceImpl implements XimgService {
+	
+	/*
+	 * This class is required in the process of converting web pages to PDF.
+	 * The client that reads the HTML input requires public access to the content, but
+	 * this content might be from a secured site (ie requires login). So, a solution
+	 * requiring passkeys is needed.
+	 * 
+	 * If the page contains images (eg) that reference a foreign site, using div.ximg elements,
+	 * then the corresponding img src attributes must be amended server site to include a suitable passkey.
+	 * Otherwise, the image would not be served up.
+	 * 
+	 * Javascript is used on the live web pages to perform this conversion, but the 
+	 * PDF producer is unable to execute this code, so a server-side solution is required.
+	 */
 	
 	@Autowired private ItemService itemService;
 
@@ -27,9 +43,8 @@ public class XimgServiceImpl implements XimgService {
     	
     	Elements divs = doc.getElementsByClass("ximg");
     	String id, url, width, body, caption, cssfloat;
-    	String template;
+    	String template, hostname;
     	Item i;
-    	String hostname;
     	 
     	for (Element e : divs) {
     		if (! e.is("div.ximg")) {
@@ -42,29 +57,29 @@ public class XimgServiceImpl implements XimgService {
     			continue;
     		}
     		
-    		/*
-    		Media m = i.getMedia();
-    		if (m == null) {
-    			continue;
-    		}
-    		
-    		m.getFolder();
-    		path = String.format("%s/%s", m.getFolder(), id);
-    		*/
-    		
     		hostname = i.getSite().getDeliveryHost().getNamePortAndProtocol();
     		url = String.format("%s/$_%d%s", hostname, i.getId(), 
     				passkey != null ? String.format("?_passkey=%s", passkey) : "");
     		
     		width = e.attr("data-width");
-    		if (width != null) {
+    		if (StringUtils.isNotBlank(width)) {
     			width = String.format("style=\"width: %s\"", width); 
     		}
     		
     		cssfloat = e.attr("data-float");    		
-    		cssfloat = cssfloat != null ? "class=\"right\"" : "";
+    		cssfloat = StringUtils.isNotBlank(cssfloat) ? "class=\"right\"" : "";
 
     		caption = e.attr("data-caption");
+    		if (StringUtils.isBlank(caption)) {
+    			caption = i.getFieldValue(FieldName.CAPTION);
+        		if (StringUtils.isBlank(caption)) {
+        			caption = i.getFieldValue(FieldName.TEASER);
+            		if (StringUtils.isBlank(caption)) {
+            			caption = i.getName();
+            		}
+        		}
+    		}
+    		
     		body = e.html();
     		
     		e.removeAttr("data-width");

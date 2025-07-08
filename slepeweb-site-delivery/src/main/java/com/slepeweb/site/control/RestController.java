@@ -67,52 +67,18 @@ public class RestController extends BaseController {
 			return r.setError(true).addMessage(String.format("No item matching origId=%d", origId));
 		}
 		
+		/*
+		 * This request will have come from an ajax request in inlineImages.js, which does not
+		 * need to provide a passkey to gain access to the item. Access will be based on user
+		 * credentials, stored in the session for THIS request.
+		 */
 		i.setRequestPack(new RequestPack(req));
+		
 		if (! i.isAccessible()) {
-			return r.setError(true).addMessage("No access to requested item");
+			return r.setError(true).addMessage("Target item is not accessible to this user");
 		}
 		
-		if (i.getSite().isSecured()) {
-			User u = i.getUser();
-			
-			if (u == null) {
-				return r.setError(true).addMessage("Not authorized");
-			}
-			else {
-				if (i.isAccessible()) {
-					return r.setData(new Item4Json(i));
-				}
-				else {
-					return r.setError(true).addMessage("Target item is not accessible to this user");
-				}
-			}
-		}
-
 		return r.setData(new Item4Json(i));
 	}
 	
-	/*
-	@RequestMapping(value="/session/check", method=RequestMethod.GET, produces="application/json")
-	@ResponseBody
-	public RestResponse sessionTimeout(HttpServletRequest req) {
-		
-		RestResponse resp = new RestResponse();
-		
-		long lastAccessed = (long) req.getSession().getAttribute(AttrName.LAST_INTERACTION);
-		long maxInterval = req.getSession().getMaxInactiveInterval() * 1000;
-		long expires =  lastAccessed + maxInterval;
-		long now = System.currentTimeMillis() /*+ (26 * 60000)*//*;
-		long remaining = expires - now;
-		
-		return resp.setData(new Object[] {remaining <= (180 * 1000), Math.floor(remaining / 1000)});
-	}
-
-	@RequestMapping(value="/session/logout", method=RequestMethod.GET, produces="application/json")
-	@ResponseBody
-	public RestResponse sessionLogout(HttpServletRequest req) {
-		
-		req.getSession().removeAttribute(AttrName.USER);		
-		return new RestResponse().setData("/login");
-	}
-	*/
 }

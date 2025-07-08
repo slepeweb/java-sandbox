@@ -47,26 +47,33 @@ public class CmsDeliveryServlet {
 		Item i = null;
 		String language = null;
 		String path = getItemPath(req);
+		RequestPack r = new RequestPack(req);
 		
 		if (path.equals("/favicon.ico")) {
 			return null;
 		}
 
 		/*
-		 *  PATH_PATTERN_A applies to requests for 'foreign' items, ie on a different site.
-		 *  This requirement was originally intended for sharing media items across secured sites,
-		 *  but little testing has been given to sharing item data.
+		 *  PATH_PATTERN_A applies to requests for 'foreign' items, ie on a different site,
+		 *  most commonly media items that you want to share between sites.
 		 *  
-		 *  Let's say site A wants to render an image item on site B, and site B is secured.
-		 *  If you tried to access the item on site B through host B, you'd have to provide
-		 *  login information. So, we let host A retrieve the item on site B, using the
-		 *  same login information for host A. Similar to SSO (single sign-on).
+		 *  Let's say a page on site A wants to render an image item on site B, and site B is secured.
+		 *  If the imgs src was to //<site B>/path/to/item, the user on site A would have to login to retrieve it.
+		 *  This is because the session on site B doesn't know about the user on site A.
+		 *  
+		 *  Alternatively, if the img src was //<site A>/$_123, then item 123 can be retrieved,
+		 *  without referring to the session data on site B for the request user's id. Instead,
+		 *  it uses site A's user details to check for accessibility to item 123.
+		 *  
+		 *  THEREFORE, the img src does NOT need a passkey in order to reference an item on
+		 *  a foreign site, at least one managed by this CMS!
 		 */
 		Matcher m = PATH_PATTERN_A.matcher(path);
 		
 		if (m.matches()) {
 			language = m.group(2);
 			i = this.itemService.getItemByOriginalId(Long.valueOf(m.group(3)));
+			r.setXrequest(true);
 		}
 		else {
 			// This url patter is for 'indigenous' items, ie same host.
@@ -85,7 +92,6 @@ public class CmsDeliveryServlet {
 		}
 		
 		if (i != null) {
-			RequestPack r = new RequestPack(req);
 			r.setLanguage(language == null ? i.getSite().getLanguage() : language);
 			i.setRequestPack(r);
 			

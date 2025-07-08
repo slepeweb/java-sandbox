@@ -52,7 +52,7 @@ public class NavigationController extends BaseController {
 			}
 		}
 		
-		List<Navigation.Node> children = dive(getEditableVersion(origId, getUser(req)), 1).getChildren();
+		List<Navigation.Node> children = dive(getEditableVersion(origId, req), 1).getChildren();
 		return children != null ? children : new ArrayList<Navigation.Node>(0);		
 	}
 	
@@ -77,8 +77,7 @@ public class NavigationController extends BaseController {
 			return doLazyNavOneLevel(origId, siteId, req);
 		}
 		
-		User u = getUser(req);
-		Item item = this.getEditableVersion(origId, u);
+		Item item = this.getEditableVersion(origId, req);
 		String[] parts = item.getPath().substring(1).split("/");
 		final Vector<String> pathComponents = new Vector<String>(parts.length);
 		for (String s : parts) {
@@ -86,10 +85,10 @@ public class NavigationController extends BaseController {
 		}
 		
 		List<Navigation.Node> level0 = new ArrayList<Navigation.Node>();
-		Site site = item.getSite();
+		//Site site = item.getSite();
 		
 		// pathComponents is relative to the pseudo root item, which in this case is '/'
-		level0.add(dive(site.getItem("/").setUser(u), pathComponents, null));
+		level0.add(dive(item.getItem("/"), pathComponents, null));
 		
 		// The pseudo root for items in the 'Content' section is /content, so this
 		// component should NOT be in the pathComponents list, otherwise the main navigation
@@ -98,7 +97,7 @@ public class NavigationController extends BaseController {
 			pathComponents.remove(0);
 		}
 		
-		level0.add(dive(site.getItem(Item.CONTENT_ROOT_PATH).setUser(u), pathComponents, null));
+		level0.add(dive(item.getItem(Item.CONTENT_ROOT_PATH), pathComponents, null));
 		
 		return level0;		
 	}
@@ -112,7 +111,7 @@ public class NavigationController extends BaseController {
 	@RequestMapping(value="/breadcrumbs/{origId}", method=RequestMethod.GET, produces="application/json")	
 	@ResponseBody
 	public String[] breadcrumbs(@PathVariable long origId, HttpServletRequest req) {	
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		List<Long> trail = new ArrayList<Long>();
 		String[] result = null;
 		

@@ -1,11 +1,17 @@
 TODO: This is the main todo file:
 
 HIGH
+- Site A now CAN potentially display a page on site B, using mini-paths like /$_1234,
+	-	but not everything will work on the delivered page - more development is required, eg:
+		-	search function (anc)
+		-	breadcrumb links (anc)
+		- language-switcher (anc)
+		- etc.
+	- Haven't tested the pho site
 - Is there a case to update item ownership in bulk?
-- Can user access control to cms-d be made global? (ie not specific to anc site).
-- implement cron job to backup cms db on desktop
 
 MEDIUM
+- When an item is inaccessible in cms-e, the delete icon in the header should also be disabled
 - Thumbnails sometimes have wrong orientation - will take a lot of work to rectify. See ImageUtil.
 - re-test registration process
 - force media items to have appropriate simplename extensions, esp. video, pdf, etc. (???)

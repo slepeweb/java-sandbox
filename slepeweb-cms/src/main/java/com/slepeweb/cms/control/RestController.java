@@ -122,7 +122,7 @@ public class RestController extends BaseController {
 			HttpServletRequest req, HttpServletResponse res) {	
 		
 		User u = getUser(req);
-		Item i = this.getEditableVersion(origId, u);
+		Item i = this.getEditableVersion(origId, req);
 		
 		if (i != null) {
 			String lang = chooseLanguage(i.getSite().isMultilingual(), requestedLanguage, i.getSite().getLanguage());
@@ -258,11 +258,11 @@ public class RestController extends BaseController {
 				
 		// Keep a copy of the item being edited 
 		User u = getUser(req);
-		Item before = getEditableVersion(origId, u, true);
+		Item before = getEditableVersion(origId, req, true);
 		before.getTags();
 
 		// Get the item again, and update this instance
-		Item i = getEditableVersion(origId, u, true);	
+		Item i = getEditableVersion(origId, req, true);	
 		
 		RestResponse resp = new RestResponse();
 		Long templateId = getLongParam(req, "template");
@@ -371,7 +371,7 @@ public class RestController extends BaseController {
 		}
 		
 		if (file != null) {
-			Item i = getEditableVersion(origId, getUser(req), true);
+			Item i = getEditableVersion(origId, req, true);
 			
 			if (i != null) {
 				saveTempMedia(i);
@@ -434,14 +434,13 @@ public class RestController extends BaseController {
 		RestResponse resp = new RestResponse();
 		
 		// Keep a copy of the item being edited
-		User u = getUser(request);
-		Item before = getEditableVersion(origId, u, true);
+		Item before = getEditableVersion(origId, request, true);
 		
 		// Populate 'before' with field values
 		before.getFieldValueSet();
 
 		// Get the item again, and update this instance
-		Item i = getEditableVersion(origId, u, true);		
+		Item i = getEditableVersion(origId, request, true);		
 
 		String variable, stringValue, dateValueStr = null, timeValueStr = null;
 		FieldType ft;
@@ -677,7 +676,7 @@ public class RestController extends BaseController {
 		this.cookieService.saveCookie(CookieService.STICKY_ADDNEW_CONTROLS, stick.toString(), CookieService.CMS_COOKIE_PATH, res);
 		
 		User u = getUser(req);
-		Item parent = getEditableVersion(parentOrigId, u, true);
+		Item parent = getEditableVersion(parentOrigId, req, true);
 		if (relativePosition.equals("alongside") && ! parent.isRoot()) {
 			parent = parent.getOrthogonalParent();
 		}
@@ -744,7 +743,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		
 		try {
 			Item c = this.cmsService.getItemWorkerService().copy(i, name, simplename);	
@@ -774,7 +773,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getEditableVersion(origId, getUser(req), true);
+		Item i = getEditableVersion(origId, req, true);
 		
 		try {
 			Item c = this.cmsService.getItemWorkerService().version(i);			
@@ -796,7 +795,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		
 		if (i != null) {
 			try {
@@ -816,7 +815,7 @@ public class RestController extends BaseController {
 	public RestResponse trashItem(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();
-		Item i = getEditableVersion(origId, getUser(req), true);
+		Item i = getEditableVersion(origId, req, true);
 		
 		// First, remove item from flagged list, if present
 		flagItem(i.getOrigId(), req, true);
@@ -839,7 +838,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();		
-		Item i = getEditableVersion(origId, getUser(req), true);
+		Item i = getEditableVersion(origId, req, true);
 		int count = 0;
 		
 		if (i != null) {
@@ -862,7 +861,7 @@ public class RestController extends BaseController {
 			ModelMap model) {	
 		
 		RestResponse resp = new RestResponse();		
-		Item i = getEditableVersion(origId, getUser(req), true);
+		Item i = getEditableVersion(origId, req, true);
 		int count = 0;
 		
 		if (i != null) {
@@ -1023,7 +1022,7 @@ public class RestController extends BaseController {
 			@RequestParam(value="mode", required=true) String mode,
 			HttpServletRequest req) {	
 		
-		Item i = getEditableVersion(moverId, getUser(req), true);
+		Item i = getEditableVersion(moverId, req, true);
 		Item[] movers = moveItem(i, mode, targetId);
 				
 		RestResponse resp =  new RestResponse();
@@ -1073,12 +1072,11 @@ public class RestController extends BaseController {
 		RestResponse resp = new RestResponse();
 		
 		// Keep a copy of the item being edited 
-		User u = getUser(req);
-		Item before = getEditableVersion(parentId, u, true);
+		Item before = getEditableVersion(parentId, req, true);
 		before.getLinks();
 
 		// Get the item again, and update this instance
-		Item parent = getEditableVersion(parentId, u, true);
+		Item parent = getEditableVersion(parentId, req, true);
 		Item child;
 		List<Link> links = new ArrayList<Link>();
 		Link l;
@@ -1112,7 +1110,7 @@ public class RestController extends BaseController {
 				catch (UnsupportedEncodingException e) {}
 			}
 			
-			child = getEditableVersion(lp.getChildId(), u);
+			child = getEditableVersion(lp.getChildId(), req);
 			i = CmsBeanFactory.makeItem(null).setId(child.getId());			
 			l.setChild(i);			
 			links.add(l);
@@ -1215,7 +1213,7 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/item/{origId}/name", method=RequestMethod.POST, produces="text/text")
 	@ResponseBody
 	public String getItemName(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		if (i != null) {
 			return i.getName();
 		}
@@ -1292,7 +1290,7 @@ public class RestController extends BaseController {
 			@RequestParam(value="searchtext", required=true) String searchtext,
 			HttpServletRequest req) {	
 		
-		Item i = this.getEditableVersion(origId, getUser(req));
+		Item i = this.getEditableVersion(origId, req);
 		
 		if (i != null) {
 			SolrParams4Cms params = new SolrParams4Cms(new SolrConfig().setPageSize(20)).
@@ -1314,7 +1312,7 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/item/{origId}/flag/siblings", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public int flagSiblings(@PathVariable long origId, HttpServletRequest request) {
-		Item i = this.getEditableVersion(origId, getUser(request));
+		Item i = this.getEditableVersion(origId, request);
 		Item parent = i.getOrthogonalParent();
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
 		Date now = new Date();
@@ -1362,7 +1360,7 @@ public class RestController extends BaseController {
 		
 		while (iter.hasNext()) {
 			origId = iter.next();
-			i = getEditableVersion(origId, getUser(request));
+			i = getEditableVersion(origId, request);
 			if (i != null) {
 				count += this.itemService.trashItemAndDirectChildren(i);
 			}
@@ -1390,7 +1388,7 @@ public class RestController extends BaseController {
 		
 		while (iter.hasNext()) {
 			origId = iter.next();
-			i = getEditableVersion(origId, getUser(req));
+			i = getEditableVersion(origId, req);
 			
 			if (i != null) {
 				movers = moveItem(i, mode, targetId);
@@ -1479,7 +1477,7 @@ public class RestController extends BaseController {
 				currentItemAffected = true;
 			}
 			
-			i = getEditableVersion(origId, getUser(request));
+			i = getEditableVersion(origId, request);
 			if (i != null) {
 				last = i;
 				
@@ -1557,7 +1555,7 @@ public class RestController extends BaseController {
 
 	
 	private boolean flagItem(long origId, HttpServletRequest request, boolean reverse) {
-		Item i = this.getEditableVersion(origId, getUser(request));
+		Item i = this.getEditableVersion(origId, request);
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(request);
 		ItemGist ig = flaggedItems.get(i.getOrigId());
 		Date now = new Date();

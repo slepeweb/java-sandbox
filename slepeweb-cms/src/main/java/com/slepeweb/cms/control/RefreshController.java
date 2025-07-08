@@ -31,7 +31,7 @@ public class RefreshController extends BaseController {
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
 		User u = getUser(req);
-		Item i = getEditableVersion(origId, u);
+		Item i = getEditableVersion(origId, req);
 		model.addAttribute("editingItem", i);
 		model.addAttribute("site", i.getSite());
 		model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
@@ -53,7 +53,7 @@ public class RefreshController extends BaseController {
 	public String refreshFieldTab(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		model.addAttribute("editingItem", i);
 		model.addAttribute("_fieldSupport", fieldEditorSupport(i));
 
@@ -64,7 +64,7 @@ public class RefreshController extends BaseController {
 	public String refreshLinksTab(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		model.addAttribute("editingItem", i);
 
 		return "refresh/links";		
@@ -74,7 +74,7 @@ public class RefreshController extends BaseController {
 	public String refreshVersionTab(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		model.addAttribute("editingItem", i);
 		model.addAttribute("allVersions", i.getAllVersions());
 		return "refresh/version";		
@@ -84,7 +84,7 @@ public class RefreshController extends BaseController {
 	public String refreshMediaTab(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		model.addAttribute("editingItem", i);
 		model.addAttribute("allVersions", i.getAllVersions());
 		
@@ -103,7 +103,7 @@ public class RefreshController extends BaseController {
 	public String refreshMoveTab(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		model.addAttribute("editingItem", i);
 		return "refresh/move";		
 	}
@@ -112,7 +112,7 @@ public class RefreshController extends BaseController {
 	public String refreshAddTab(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		model.addAttribute("editingItem", i);
 		
 		// Last relative position selection for 'addnew'
@@ -125,7 +125,7 @@ public class RefreshController extends BaseController {
 	public String refreshCopyTab(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		model.addAttribute("editingItem", i);
 		return "refresh/copy";		
 	}
@@ -134,7 +134,7 @@ public class RefreshController extends BaseController {
 	public String refreshFlaggedItems(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		Map<Long, ItemGist> flaggedItems = getFlaggedItems(req);
 		
 		model.put("editingItem", i);
@@ -148,7 +148,7 @@ public class RefreshController extends BaseController {
 	public String refreshCopyFlaggedForm(
 			@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = getEditableVersion(origId, getUser(req));
+		Item i = getEditableVersion(origId, req);
 		model.put("editingItem", i);
 		model.addAttribute("_fieldSupport", fieldEditorSupport(i));
 		return "refresh/copyFlaggedForm";		

@@ -6,8 +6,6 @@ public class Passkey {
 
 	private String id, alias, key;
 	
-	public Passkey() {}
-	
 	public Passkey(String encoded) {
 		String[] parts = encoded.split("\\$");
 		if (parts.length == 3) {

@@ -16,7 +16,12 @@ public class RequestPack {
 	private User user;
 	private HttpServletRequest httpRequest;
 	private Map<String, String[]> params = new HashMap<String, String[]>();
+	private boolean xrequest;
 		
+	public RequestPack(User u) {
+		this.user = u;
+	}
+	
 	public RequestPack(HttpServletRequest req) {
 		this.httpRequest = req;
 		this.user = (User) req.getSession().getAttribute(AttrName.USER);
@@ -67,6 +72,14 @@ public class RequestPack {
 		return getPasskey() != null;
 	}
 	
+	public boolean isXrequest() {
+		return xrequest;
+	}
+
+	public void setXrequest(boolean xrequest) {
+		this.xrequest = xrequest;
+	}
+
 	private String getParameter(String name) {
 		String[] values = (String[]) this.params.get(name);
 		if (values != null && values.length > 0) {

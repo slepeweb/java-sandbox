@@ -16,6 +16,7 @@ import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.LoginSupport;
+import com.slepeweb.cms.bean.RequestPack;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.UndoRedoStatus;
@@ -50,16 +51,15 @@ public class PageController extends BaseController {
 			
 			if (s != null) {
 				Item i = null;
-				User u = getUser(req);
 				List<ItemIdentifier> history = this.cookieService.getBreadcrumbsCookieValue(s, req);
 				
 				if (history.size() > 0) {
-					i = getEditableVersion(history.get(0).getItemId(), u);
+					i = getEditableVersion(history.get(0).getItemId(), req);
 				}
 				else {
 					i = s.getItem("/");
 					if (i != null) {
-						i.setUser(getUser(req));
+						i.setRequestPack(new RequestPack(req));
 					}
 				}
 				
@@ -75,7 +75,7 @@ public class PageController extends BaseController {
 	@RequestMapping(value="/editor/{origId}")	
 	public String doWithItem(@PathVariable long origId, HttpServletRequest req, ModelMap model) {	
 		
-		Item i = this.getEditableVersion(origId, getUser(req));
+		Item i = this.getEditableVersion(origId, req);
 		
 		if (i == null) {
 			throw new RuntimeException("Item doesn't exist!");

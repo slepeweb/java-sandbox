@@ -36,7 +36,7 @@ public class Item extends CmsBean {
 	private boolean deleted, editable = true, published, searchable;
 	
 	// These properties pertain to access control
-	private RequestPack requestPack;
+	private RequestPack requestPack = new RequestPack((User) null);
 	private User owner;
 	private Boolean accessible;
 	
@@ -55,8 +55,6 @@ public class Item extends CmsBean {
 	// It would have been neater to extend the Item class, but on investigation, that
 	// would be too disruptive to the code.
 	private Link link4newItem;
-	
-	private boolean foreigner;
 	
 	public Item setAllMedia(List<Media> allMedia) {
 		this.allMedia = allMedia;
@@ -423,7 +421,7 @@ public class Item extends CmsBean {
 	}
 	
 	public String getUrl() {
-		String path = isForeigner() ? getMiniPath() : getPath();
+		String path = isXrequest() ? getMiniPath() : getPath();
 		return getSite().isMultilingual() ? 
 				String.format("/%s%s", getLanguage(), path) : path;
 	}
@@ -534,8 +532,7 @@ public class Item extends CmsBean {
 			}
 			
 			// Embellish linked items with additional data: user, language, foreign site flag, etc.
-			setUserAndLanguage(this.links);
-			identifyForeignItems(this.links);
+			setRequestPack(this.links);
 		}
 		return this.links;
 	}
@@ -553,7 +550,7 @@ public class Item extends CmsBean {
 			this.parentLinks = getLinkService().getParentLinks(getId());
 			
 			// Set the language on each linked item
-			setUserAndLanguage(this.parentLinks);
+			setRequestPack(this.parentLinks);
 		}
 		
 		if (! includeBinding) {
@@ -741,12 +738,12 @@ public class Item extends CmsBean {
 		return false;
 	}
 	
-	public boolean isForeigner() {
-		return foreigner;
+	public boolean isXrequest() {
+		return this.requestPack.isXrequest();
 	}
 
-	public Item setForeigner(boolean foreigner) {
-		this.foreigner = foreigner;
+	public Item setXrequest(boolean foreigner) {
+		this.requestPack.setXrequest(foreigner);
 		return this;
 	}
 
@@ -927,13 +924,11 @@ public class Item extends CmsBean {
 	}
 
 	public String getLanguage() {
-		return this.requestPack != null ? this.requestPack.getLanguage() : "en";
+		return this.requestPack.getLanguage();
 	}
 
 	public Item setLanguage(String language) {
-		if (this.requestPack != null) {
-			this.requestPack.setLanguage(language);
-		}
+		this.requestPack.setLanguage(language);
 		return this;
 	}
 	
@@ -942,16 +937,11 @@ public class Item extends CmsBean {
 	}
 	
 	public User getUser() {
-		if (this.requestPack != null) {
-			return this.requestPack.getUser();
-		}
-		return null;
+		return this.requestPack.getUser();
 	}
 
 	public Item setUser(User user) {
-		if (this.requestPack != null) {
-			this.requestPack.setUser(user);
-		}
+		this.requestPack.setUser(user);
 		return this;
 	}
 
@@ -1029,24 +1019,13 @@ public class Item extends CmsBean {
 	}
 	
 	// Applies to both child AND parent links
-	private void setUserAndLanguage(List<Link> links) {
+	private void setRequestPack(List<Link> links) {
 		if (links != null) {
 			Item i;
 			
 			for (Link l :  links) {
 				i = l.getChild();
 				i.setRequestPack(getRequestPack());
-			}
-		}
-	}
-
-	private void identifyForeignItems(List<Link> links) {
-		if (links != null) {
-			Item i;
-			
-			for (Link l :  links) {
-				i = l.getChild();
-				i.setForeigner(i.getSite().getId().longValue() != this.getSite().getId().longValue());
 			}
 		}
 	}

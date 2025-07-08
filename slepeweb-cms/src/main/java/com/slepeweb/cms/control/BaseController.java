@@ -12,8 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldEditorSupport;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
@@ -21,10 +21,11 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.bean.ItemType;
 import com.slepeweb.cms.bean.ItemUpdateHistory;
-import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.ItemUpdateRecord.Action;
+import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.bean.RequestPack;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.TagInputSupport;
@@ -150,15 +151,15 @@ public class BaseController {
 		return fieldSupport;
 	}
 	
-	protected Item getEditableVersion(Long origId, User u) throws RuntimeException {
-		return getEditableVersion(origId, u, false);
+	protected Item getEditableVersion(Long origId, HttpServletRequest req) throws RuntimeException {
+		return getEditableVersion(origId, req, false);
 	}
 	
-	protected Item getEditableVersion(Long origId, User u, boolean throwable) throws RuntimeException {
+	protected Item getEditableVersion(Long origId, HttpServletRequest req, boolean throwable) throws RuntimeException {
 		Item i = this.cmsService.getItemService().getEditableVersion(origId);
 		
 		if (i != null) {
-			i.setUser(u);
+			i.setRequestPack(new RequestPack(req));
 			checkAccess(i, throwable);
 		}
 		return i;
