@@ -14,8 +14,11 @@ import com.slepeweb.cms.bean.Item4Json;
 import com.slepeweb.cms.bean.RequestPack;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.component.Passkey;
+import com.slepeweb.cms.component.PasskeyModel;
 import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
+import com.slepeweb.cms.service.PasskeyService;
 import com.slepeweb.cms.service.XPasskeyService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,12 +29,13 @@ public class RestController extends BaseController {
 	
 	@Autowired private ItemService itemService;
 	@Autowired private XPasskeyService xPasskeyService;
+	@Autowired private PasskeyService passkeyService;
 	@Autowired private HostService hostService;
 
 	
-	@RequestMapping(value="/passkey", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value="/xpasskey", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
-	public RestResponse issuePasskey(HttpServletRequest req) {
+	public RestResponse issueXPasskey(HttpServletRequest req) {
 		
 		RestResponse resp = new RestResponse();
 		
@@ -45,13 +49,34 @@ public class RestController extends BaseController {
 			return resp.setError(true).addMessage("User is not logged in");
 		}
 		
-		// Need to return the editorial host:port too, in case it's different to the delivery host
 		Host deliveryHost = this.hostService.getHost(req.getServerName(), req.getServerPort());
 		Host editorialHost = this.hostService.getHost(deliveryHost.getSite().getId(), HostType.editorial);
 
 		String passkey = this.xPasskeyService.issueKey(u);
 		resp.setError(passkey == null);
 		resp.setData(new Object[] {editorialHost.getNameAndPort(), passkey});
+		return resp;
+	}
+
+	
+	@RequestMapping(value="/passkey", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse issuePasskey(HttpServletRequest req) {
+		
+		RestResponse resp = new RestResponse();
+		
+		/* 
+		 * User must be signed into this site in order to get a passkey for a page on
+		 * a different site managed by this cms.
+		 * Not signed in to cms-d? Then, cannot link to a page on a secured-site.
+		 */
+		User u = getUser(req);
+		if (u == null) {
+			return resp.setError(true).addMessage("User is not logged in");
+		}
+		
+		Passkey passkey = this.passkeyService.issueKey(PasskeyModel.SHORT_TTL, u);
+		resp.setData(new Object[] {passkey.encode()});
 		return resp;
 	}
 

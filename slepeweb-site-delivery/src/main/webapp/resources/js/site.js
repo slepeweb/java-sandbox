@@ -22,7 +22,7 @@ _site.support.ajax = function(method, url, data, success, fail) {
 }
 
 _site.support.openEditor = function(origid) {
-	_site.support.ajax('GET', '/rest/passkey', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+	_site.support.ajax('GET', '/rest/xpasskey', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
 		if (! resp.error) {
 			let url = `//${resp.data[0]}/cms/page/login?xpass=${resp.data[1]}&origid=${origid}`;
 			window.open(url, '_blank');

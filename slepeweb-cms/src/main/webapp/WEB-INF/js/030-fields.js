@@ -247,7 +247,7 @@ _cms.field.onpageload = function() {
 	})
 
 	$("div#widefield-a-icon").click(function(e) {
-		_cms.field.widefieldInsert('<a href="/$_1234"></a>')
+		_cms.field.widefieldInsert('<a class="xlink" href="/$_1234"></a>')
 	})
 
 	$("div#widefield-ximg-icon").click(function(e) {

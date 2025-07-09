@@ -54,29 +54,18 @@ public class CmsDeliveryServlet {
 		}
 
 		/*
-		 *  PATH_PATTERN_A applies to requests for 'foreign' items, ie on a different site,
-		 *  most commonly media items that you want to share between sites.
-		 *  
-		 *  Let's say a page on site A wants to render an image item on site B, and site B is secured.
-		 *  If the imgs src was to //<site B>/path/to/item, the user on site A would have to login to retrieve it.
-		 *  This is because the session on site B doesn't know about the user on site A.
-		 *  
-		 *  Alternatively, if the img src was //<site A>/$_123, then item 123 can be retrieved,
-		 *  without referring to the session data on site B for the request user's id. Instead,
-		 *  it uses site A's user details to check for accessibility to item 123.
-		 *  
-		 *  THEREFORE, the img src does NOT need a passkey in order to reference an item on
-		 *  a foreign site, at least one managed by this CMS!
+		 *  PATH_PATTERN_A is used in requests for 'foreign' items, ie on a different site,
+		 *  most commonly media items that you want to share between sites, but also pages 
+		 *  to link to.
 		 */
 		Matcher m = PATH_PATTERN_A.matcher(path);
 		
 		if (m.matches()) {
 			language = m.group(2);
 			i = this.itemService.getItemByOriginalId(Long.valueOf(m.group(3)));
-			r.setXrequest(true);
+			r.setMiniPath(true);
 		}
 		else {
-			// This url patter is for 'indigenous' items, ie same host.
 			m = PATH_PATTERN_B.matcher(path);
 			
 			if (m.matches()) {
@@ -115,11 +104,34 @@ public class CmsDeliveryServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
 		Item item = identifyItem(req);
+		
 		if (item == null) {
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 		
+		/*
+		 * This might be a request for a page/item on a secured site that the user does not have access to,
+		 * simply because he hasn't (yet) logged into that site.
+		 */
+		if (
+				item.getSite().isSecured() &&
+				item.isPage() && 
+				item.getRequestPack().isMiniPath() &&
+				item.getRequestPack().hasPasskey()) {
+			
+			/*
+			 * Add a passkey to the url, and specify the delivery host for the site that this item belongs to,
+			 * before redirecting to the modified item url.
+			 */
+			String url = String.format("//%s%s?_passkey=%s", 
+					item.getSite().getDeliveryHost().getNameAndPort(), item.getUrl(), item.getRequestPack().getPasskey().encode());
+			
+			res.sendRedirect(url);
+			return;
+		}
+
+		// Redirect request to login page if user does not have access to item
 		if (! item.isAccessible()) {
 			// Site access rules deny access to this user, AND no suitable passkey provided
 			if (! item.getPath().equals(getLoginPath(item))) {

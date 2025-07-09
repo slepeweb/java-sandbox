@@ -8,4 +8,5 @@
 	<script src="/resources/geo/js/glj.js"></script>
 	<script src="/resources/geo/js/nav.js"></script>
 	<script src="/resources/geo/js/inlineImages.js"></script>
+	<script src="/resources/geo/js/xlinks.js"></script>
 </gen:head>

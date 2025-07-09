@@ -8,12 +8,13 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.User;
 
 /*
- * DO NOT CONFUSE THIS CLASS WITH PasskeyService, which provides cms-d with access to
- * items on different sites, for item sharing between sites.
+ * DO NOT CONFUSE THIS CLASS WITH PasskeyService, which provides public-user access to
+ * items on different cms-d sites. This functionality is required by PdfService, which 
+ * produces a PDF from given html input.
  * 
- * This class (XPasskeyServiceImpl) encrypts a passkey, that can be used to log into the editorial app (from
- * a delivery app) without having to re-login. The passkey is a combination of hex
- * characters (0-9, a-f).
+ * This class (XPasskeyServiceImpl) encrypts the user's password, to be used as a passkey
+ * that can be used to log into the editorial app (from a delivery app) without having 
+ * to re-login. The passkey is a combination of hex characters (0-9, a-f).
  * 
  * The X (first char) in XPasskeyService is for 'Cross'. That is , we use this service 
  * to cross-login, from a delivery app to it's editorial equivalent.
@@ -33,16 +34,14 @@ public class XPasskeyServiceImpl implements XPasskeyService {
 	
 	public User identifyUser(String key) {
 		int offs = getInterval();
-		String decoded =  undoTransform(key, offs);
 		
-		// NOTE!!! This strategy assumes that passwords are unique!
-		User u = this.userService.getByPassword(decoded);
+		User u = this.userService.getByPassword(undoTransform(key, offs));
 		
 		// In case the second-hand has just gone past 0 ...
 		if (u == null) {
 			// In case the minute-hand has rolled over the hour ...
 			offs = offs == 0 ? 59 : offs - 1;
-			u = this.userService.getByPassword(transform(key, offs));
+			u = this.userService.getByPassword(undoTransform(key, offs));
 		}
 		
 		return u;

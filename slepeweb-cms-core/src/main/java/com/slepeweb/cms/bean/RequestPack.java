@@ -16,7 +16,7 @@ public class RequestPack {
 	private User user;
 	private HttpServletRequest httpRequest;
 	private Map<String, String[]> params = new HashMap<String, String[]>();
-	private boolean xrequest;
+	private boolean miniPath;
 		
 	public RequestPack(User u) {
 		this.user = u;
@@ -72,12 +72,13 @@ public class RequestPack {
 		return getPasskey() != null;
 	}
 	
-	public boolean isXrequest() {
-		return xrequest;
+	public RequestPack setMiniPath(boolean b) {
+		this.miniPath = b;
+		return this;
 	}
 
-	public void setXrequest(boolean xrequest) {
-		this.xrequest = xrequest;
+	public boolean isMiniPath() {
+		return this.miniPath;
 	}
 
 	private String getParameter(String name) {

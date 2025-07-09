@@ -421,7 +421,7 @@ public class Item extends CmsBean {
 	}
 	
 	public String getUrl() {
-		String path = isXrequest() ? getMiniPath() : getPath();
+		String path = /*isMiniPath() ? getMiniPath() :*/ getPath();
 		return getSite().isMultilingual() ? 
 				String.format("/%s%s", getLanguage(), path) : path;
 	}
@@ -738,12 +738,12 @@ public class Item extends CmsBean {
 		return false;
 	}
 	
-	public boolean isXrequest() {
-		return this.requestPack.isXrequest();
+	public boolean isMiniPath() {
+		return this.requestPack.isMiniPath();
 	}
 
-	public Item setXrequest(boolean foreigner) {
-		this.requestPack.setXrequest(foreigner);
+	public Item setMiniPath(boolean b) {
+		this.requestPack.setMiniPath(b);
 		return this;
 	}
 
