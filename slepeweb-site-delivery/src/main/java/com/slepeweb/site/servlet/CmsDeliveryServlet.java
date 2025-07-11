@@ -134,7 +134,7 @@ public class CmsDeliveryServlet {
 		// Redirect request to login page if user does not have access to item
 		if (! item.isAccessible()) {
 			// Site access rules deny access to this user, AND no suitable passkey provided
-			if (! item.getPath().equals(getLoginPath(item))) {
+			if (! item.getPath().equals(SiteAccessService.LOGIN_PATH)) {
 				LOG.warn(String.format("Item [%s] is not accessible", item.getPath()));
 				res.sendRedirect(getLoginPath(item));
 				return;
