@@ -246,7 +246,7 @@ _cms.field.onpageload = function() {
 		_cms.field.widefieldInsert('<div class="twoblock"></div>')
 	})
 
-	$("div#widefield-a-icon").click(function(e) {
+	$("div#widefield-xlink-icon").click(function(e) {
 		_cms.field.widefieldInsert('<a class="xlink" href="/$_1234"></a>')
 	})
 
@@ -254,6 +254,10 @@ _cms.field.onpageload = function() {
 		_cms.field.widefieldInsert(`<div class="ximg" data-id="1234">Optional floated text</div>
 			/* Optional attrs: data-width, data-caption
 			   Optional class: border */`)
+	})
+
+	$("div#widefield-xcomp-icon").click(function(e) {
+		_cms.field.widefieldInsert('<div class="xcomp" data-id="1234"></a> <!-- origId -->')
 	})
 
 $("div#widefield-table-icon").click(function(e) {

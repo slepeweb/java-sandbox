@@ -33,12 +33,13 @@ public class PdfServiceImpl implements PdfService {
 	
 	public String build(Item root, User u) {
 		Host host = root.getSite().getDeliveryHost();
-		String hostname = root.getSite().getDeliveryHost().getNameAndPort();
+		String hostname = root.getSite().getDeliveryHost().getNamePortAndProtocol();
 		
 		String header = String.format("""
 				<html>
 				<head>					
-					<link rel="stylesheet" href="//%s/resources/geo/css/main.css" type="text/css" />
+					<link rel="stylesheet" href="%s/resources/geo/css/main.css" type="text/css" />
+					<link rel="stylesheet" href="%s/resources/geo/css/pdf.css" type="text/css" />
 					
 					<style>
 						body {

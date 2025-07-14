@@ -12,5 +12,7 @@
 </div>
 
 <script>
-${_comp.js}
+if ($) {
+	${_comp.js}
+}
 </script>

@@ -17,7 +17,9 @@
 </div>
 
 <script>
-$(function() {
-	$("#${componentId}").accordion({active: false, collapsible: true, heightStyle: 'content'});
-});
+if ($) {
+	$(function() {
+		$("#${componentId}").accordion({active: false, collapsible: true, heightStyle: 'content'});
+	})
+}
 </script>

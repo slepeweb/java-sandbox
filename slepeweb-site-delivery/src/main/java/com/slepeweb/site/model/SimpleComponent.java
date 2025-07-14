@@ -25,7 +25,7 @@ public class SimpleComponent implements NestableComponent, Serializable {
 
 	public SimpleComponent setup(Link l) {
 		Item i = l.getChild();
-		setId(i.getId());
+		setId(i.getOrigId());
 		setType(i);
 		setCssClass(i.getFieldValue(FieldName.CSS));	
 		setJs(i.getFieldValue(FieldName.JS));

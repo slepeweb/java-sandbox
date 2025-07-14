@@ -20,6 +20,7 @@ import com.slepeweb.site.geo.service.GeoCookieService;
 import com.slepeweb.site.geo.service.SolrService4Geo;
 import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.model.Page;
+import com.slepeweb.site.service.XcompService;
 import com.slepeweb.site.service.XimgService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,10 +32,12 @@ public class GeoPageController extends BaseController {
 	
 	public static final String HISTORY = "_history";
 	public static final String XIMG_SERVICE = "_ximgService";
+	public static final String XCOMP_SERVICE = "_xcompService";
 	
 	@Autowired SolrService4Geo solrService4Geo;
 	@Autowired GeoCookieService geoCookieService;
 	@Autowired XimgService ximgService;
+	@Autowired XcompService xcompService;
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
@@ -93,7 +96,7 @@ public class GeoPageController extends BaseController {
 			HttpServletResponse res,
 			ModelMap model) {	
 		
-		Page page = getStandardPage(i, shortSitename, "pdf/standardWide", model);
+		Page page = getStandardPage(i, shortSitename, "standardPdf", model);
 		addPdfExtras(page, req, res, model);
 		return page.getView();
 	}
@@ -121,7 +124,7 @@ public class GeoPageController extends BaseController {
 			HttpServletResponse res,
 			ModelMap model) {	
 		
-		Page page = getStandardPage(i, shortSitename, "pdf/standard3Col", model);
+		Page page = getStandardPage(i, shortSitename, "standardPdf", model);
 		addPdfExtras(page, req, res, model);
 		return page.getView();
 	}
@@ -148,6 +151,7 @@ public class GeoPageController extends BaseController {
 	private void addPdfExtras(Page p, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		Item i = p.getItem();
 		model.addAttribute(XIMG_SERVICE, this.ximgService);
+		model.addAttribute(XCOMP_SERVICE, this.xcompService);
 		model.addAttribute(AttrName.PASSKEY, i.getRequestPack().getPasskey().encode());
 		
 		List<LinkTarget> crumbs = p.getHeader().getBreadcrumbs();

@@ -56,8 +56,23 @@ _site.support.checkSession = function() {
 	});
 }
 
+_site.support.moveComponent = function(parent$) {
+	let origId = parent$.attr('data-id')
+	let comp$ = $(`div#component-${origId}`)
+	
+	if (! comp$) {
+		return
+	}
+	
+	parent$.append(comp$)
+}
+
 
 $(function() {
+	$('div.xcomp').each(function() {
+		_site.support.moveComponent($(this));
+	})
+	
 	$('i#open-editor').click(function() {
 		_site.support.openEditor($(this).attr('title'));
 	})

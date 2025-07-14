@@ -24,7 +24,9 @@
 </div>
 
 <script>
-$(function() {
-	$("#${componentId}").tabs();
-});
+if ($) {
+	$(function() {
+		$("#${componentId}").tabs();
+	})
+}
 </script>

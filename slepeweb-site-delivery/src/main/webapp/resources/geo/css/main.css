@@ -395,6 +395,25 @@ div.twoblock {
   margin: 0.75em 0 1.5em 0;
 }
 
+div.threeblock {
+	display: grid;
+  grid-template-columns: 33% 33% 33%;
+  margin: 0.75em 0 1.5em 0;
+  justify-items: center;
+}
+
+div.threeblock img {
+	height: 200px;
+	width: auto;
+	display: block;
+	object-fit: contain;
+}
+
+div.threeblock caption {
+	font-size: 0.9em;
+}
+
+
 div.twoblock > div.ximg, div.twoblock p {
 	margin: 0 0.5em 0 0.5em;
 }
@@ -461,11 +480,6 @@ div#search-input {
 	line-height: 1.65em;
 }
 
-span.top-pdf-title {
-	font-size: 0.7em;
-	color: #a6a6a6;
-}
-
 @media only screen and (max-width: 1000px) {
 	div#below-nav {
 	  grid-template-columns: 50% 50%;
@@ -477,7 +491,7 @@ span.top-pdf-title {
 
 }
 
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 600px) {
 	div#below-nav {
 	  grid-template-columns: 100%;
 	}
@@ -489,6 +503,10 @@ span.top-pdf-title {
 
 	div.standard-3col {
 	  display: block;
+	}
+
+	div.threeblock img {
+		height: 150px;
 	}
 
 }

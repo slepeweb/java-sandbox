@@ -109,4 +109,10 @@
 		<function-signature>java.lang.String parseXimg(java.lang.String, com.slepeweb.site.service.XimgService, java.lang.String)</function-signature>
 	</function>
 	
+	<function>
+		<name>parseXcomp</name>
+		<function-class>com.slepeweb.site.util.TldFunction</function-class>
+		<function-signature>java.lang.String parseXcomp(java.lang.String, com.slepeweb.site.service.XcompService)</function-signature>
+	</function>
+	
 </taglib>
