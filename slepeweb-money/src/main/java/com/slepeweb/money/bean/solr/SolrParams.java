@@ -1,6 +1,8 @@
 package com.slepeweb.money.bean.solr;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,12 +10,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category_Group;
+import com.slepeweb.money.bean.StringOption;
 
 @JsonIgnoreProperties({"start", "hrefBase", "accountIdStr", "payeeIdStr", "categoryIdStr"})
 public class SolrParams {
 
 	public static final String START_OF_DAY = "T00:00:00Z";
 	public static final String END_OF_DAY = "T23:59:59Z";
+	public static final String WEEK = "week";
+	public static final String MONTH = "month";
+	public static final String YEAR = "year";
 	
 	private SolrConfig config;
 	private String memo, majorCategory, minorCategory, payeeName;
@@ -23,12 +29,26 @@ public class SolrParams {
 	private Date from, to;
 	private Long fromAmount, toAmount;
 	private boolean debit;
+	private int periodValue;
+	private String periodUnits = "week";
+	private List<StringOption> periodUnitOptions;
+
+	public List<StringOption> getPeriodUnitOptions() {
+		return periodUnitOptions;
+	}
+
 
 	// For Jackson
-	public SolrParams() {}
+	public SolrParams() {
+		this.periodUnitOptions = new ArrayList<StringOption>();
+		this.periodUnitOptions.add(new StringOption(WEEK, "Weeks"));
+		this.periodUnitOptions.add(new StringOption(MONTH, "Months"));
+		this.periodUnitOptions.add(new StringOption(YEAR, "Years"));
+	}
 	
 	
 	public SolrParams(SolrConfig config) {
+		this();
 		this.config = config;
 	}
 	
@@ -90,6 +110,37 @@ public class SolrParams {
 		}
 		return this;
 	}
+
+	public int getPeriodValue() {
+		return periodValue;
+	}
+
+
+	public SolrParams setPeriodValue(String periodValue) {
+		return setPeriodValue(Integer.valueOf(periodValue));
+	}
+	
+	public SolrParams setPeriodValue(int periodValue) {
+		this.periodValue = periodValue;
+		return this;
+	}
+
+
+	public String getPeriodUnits() {
+		return periodUnits;
+	}
+
+
+	public SolrParams setPeriodUnits(String periodUnit) {
+		this.periodUnits = periodUnit;
+		
+		for (StringOption o : this.periodUnitOptions) {
+			o.setSelected(o.getValue().equals(periodUnit));
+		}
+		
+		return this;
+	}
+
 
 	public String getMemo() {
 		return this.memo == null ? "" : this.memo;

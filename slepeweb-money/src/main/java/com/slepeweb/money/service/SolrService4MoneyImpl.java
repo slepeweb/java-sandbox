@@ -1,6 +1,7 @@
 package com.slepeweb.money.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.common.solr.service.SolrServiceBase;
+import com.slepeweb.common.util.DateUtil;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
@@ -240,9 +242,32 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			q.setQuery("*:*");
 		}
 		
-		if (params.getFrom() != null || params.getTo() != null) {
-			String from = params.getFrom() == null ? "*" : Util.formatSolrDate(params.getFrom());
-			String to = params.getTo() == null ? "*" : Util.formatSolrDate(params.getTo());
+		// Date ranges
+		String from = null, to = null;
+		
+		if (params.getPeriodValue() > 0) {
+			Calendar today = DateUtil.today();
+			Calendar past = DateUtil.today();
+			to = Util.formatSolrDate(today.getTime());
+			
+			if (params.getPeriodUnits().equals(SolrParams.WEEK)) {
+				past.add(Calendar.DAY_OF_YEAR, -7 * params.getPeriodValue());
+			}
+			else if (params.getPeriodUnits().equals(SolrParams.MONTH)) {
+				past.add(Calendar.MONTH, - params.getPeriodValue());
+			}
+			else if (params.getPeriodUnits().equals(SolrParams.YEAR)) {
+				past.add(Calendar.YEAR, - params.getPeriodValue());
+			}
+			
+			from = Util.formatSolrDate(past.getTime());
+		}
+		else if (params.getFrom() != null || params.getTo() != null) {
+			from = params.getFrom() == null ? "*" : Util.formatSolrDate(params.getFrom());
+			to = params.getTo() == null ? "*" : Util.formatSolrDate(params.getTo());
+		}
+		
+		if (from != null && to != null) {
 			q.addFilterQuery(String.format("entered:[%s TO %s]", from, to));
 			isCriteriaSet = true;
 		}

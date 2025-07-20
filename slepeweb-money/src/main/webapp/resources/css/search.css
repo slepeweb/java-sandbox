@@ -1,0 +1,56 @@
+.ui-autocomplete {
+	font-size: 1.0em;
+}
+
+input[name="submit-option"] {
+	border: 2px solid red;
+	background-color: #d99;
+}
+
+input.datepicker, input.amount {
+	width: 30%;
+	display: inline;
+}
+
+input#periodvalue {
+	width: 10%;
+	display: inline;
+}
+
+select.amount, select#periodunits {
+	width: 20%;
+	display: inline;
+}
+
+p.or-spacer {
+	margin: 0.2em 0 0.2em 0;
+	color: #24604e;
+}
+
+#saved-search-identifier {
+	width: 50%;
+	display: inline;
+}
+
+#tabs {
+	font-size: 1em;
+}
+
+#form-tab, #results-tab {
+	padding: 0.5em;
+}
+
+.table-summary {
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+input[name="submit-option"] {
+	border: 2px solid red;
+	background-color: #d99;
+}
+
+.radio-option {
+	margin-right: 3em;
+}
+

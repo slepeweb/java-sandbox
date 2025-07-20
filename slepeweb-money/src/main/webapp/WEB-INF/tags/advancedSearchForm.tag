@@ -29,10 +29,24 @@
 			<mny:categoryList heading="Categories" categories="${_categoryGroup}" />
 	    	    
 	    <mny:tableRow heading="Dates">
-       	From: <input class="datepicker" id="from" type="text" name="from" value="${mon:formatTimestamp(_params.from)}"
-       		placeholder="Optional search window start date" />
-       	To: <input class="datepicker" id="to" type="text" name="to" value="${mon:formatTimestamp(_params.to)}"
-       		placeholder="Optional search window end date" />
+	    	<div id="period-box">
+	       	Within the last: <input type="number" id="periodvalue" type="text" name="periodvalue" value="${_params.periodValue}" />
+
+	       		<select id="periodunits" name="periodunits">
+	       			<c:forEach items="${_params.periodUnitOptions}" var="_option">
+	       				<option value="${_option.value}" <c:if test="${_option.selected}">selected</c:if>>${_option.name}</option>
+	       			</c:forEach>
+	       		</select>
+       	</div>
+
+				<p class="or-spacer">OR</p>
+				
+	    	<div id="date-box">
+	       	From: <input class="datepicker" id="from" type="text" name="from" value="${mon:formatTimestamp(_params.from)}"
+	       		placeholder="Optional search window start date" />
+	       	To: <input class="datepicker" id="to" type="text" name="to" value="${mon:formatTimestamp(_params.to)}"
+	       		placeholder="Optional search window end date" />
+	    	</div>
 			</mny:tableRow>
 	    
 	    <mny:tableRow heading="Amounts">

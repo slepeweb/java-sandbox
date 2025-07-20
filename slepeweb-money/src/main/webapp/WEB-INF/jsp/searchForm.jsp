@@ -16,27 +16,7 @@
 </c:when></c:choose>
 
 <c:set var="_extraJs" scope="request" value="search.js,datepicker.js,minorcats.js" />
-
-<c:set var="_extraInPageCss" scope="request">
-	.ui-autocomplete {
-		font-size: 1.0em;
-	}
-	
-	input[name="submit-option"] {
-		border: 2px solid red;
-		background-color: #d99;
-	}
-	
-	input.datepicker, input.amount {
-		width: 30%;
-		display: inline;
-	}
-	
-	select.amount {
-		width: 20%;
-		display: inline;
-	}
-</c:set>
+<c:set var="_extraCss" scope="request" value="search.css "/>
 
 <c:set var="_extraInPageJs" scope="request">
 	_money.search.formMode = '${_formMode}';

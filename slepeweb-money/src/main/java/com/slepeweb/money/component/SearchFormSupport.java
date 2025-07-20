@@ -147,6 +147,8 @@ public class SearchFormSupport {
 			setPayeeId(req.getParameter("payeeId")).
 			setPayeeName(req.getParameter("payee")).
 			setMemo(req.getParameter("memo")).
+			setPeriodValue(req.getParameter("periodvalue")).
+			setPeriodUnits(req.getParameter("periodunits")).
 			setFrom(req.getParameter("from")).
 			setTo(req.getParameter("to")).
 			setDebit(req.getParameter("debitorcredit")).

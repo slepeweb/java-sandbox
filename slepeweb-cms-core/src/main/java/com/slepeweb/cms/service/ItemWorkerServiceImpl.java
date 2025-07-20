@@ -288,9 +288,9 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		List<Link> nll = new ArrayList<Link>(origLinks.size());
 		Link nl;
 		for (Link l : origLinks) {
-			// DO NOT copy bindings, only relations, inlines and shortcuts UNLESS
+			// DO NOT copy bindings OR components, only relations, inlines and shortcuts UNLESS
 			// this is a new version of an existing item.
-			if (isNewVersion || ! l.getType().equals(LinkType.binding)) {
+			if (isNewVersion || ! (l.getType().equals(LinkType.binding) || l.getType().equals(LinkType.component))) {
 				nl = CmsBeanFactory.makeLink();
 				nl.assimilate(l);
 				nl.

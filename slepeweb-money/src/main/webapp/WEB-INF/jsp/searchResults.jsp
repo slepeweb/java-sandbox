@@ -7,45 +7,7 @@
 <mny:flash />
 
 <c:set var="_extraJs" scope="request" value="search.js,datepicker.js,minorcats.js" />
-
-<c:set var="_extraInPageCss" scope="request">
-	#saved-search-identifier {
-		width: 50%;
-		display: inline;
-	}
-	
-	#tabs {
-		font-size: 1em;
-	}
-	
-	#form-tab, #results-tab {
-		padding: 0.5em;
-	}
-	
-	.table-summary {
-		font-weight: bold;
-		font-size: 1.2em;
-	}
-	
-	input[name="submit-option"] {
-		border: 2px solid red;
-		background-color: #d99;
-	}
-	
-	.radio-option {
-		margin-right: 3em;
-	}
-	
-	input.datepicker, input.amount {
-		width: 30%;
-		display: inline;
-	}
-	
-	select.amount {
-		width: 20%;
-		display: inline;
-	}
-</c:set>
+<c:set var="_extraCss" scope="request" value="search.css" />
 
 <c:choose><c:when test="${_formMode eq 'adhoc'}">
 	<c:set var="_pageHeading" value="Ad-hoc search" scope="request" />

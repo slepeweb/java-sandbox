@@ -400,9 +400,11 @@ div.threeblock {
   grid-template-columns: 33% 33% 33%;
   margin: 0.75em 0 1.5em 0;
   justify-items: center;
+  padding: 1em 1em 0 1em;
+  border: 1px solid #ccc;
 }
 
-div.threeblock img {
+div.threeblock.photo-strip img {
 	height: 200px;
 	width: auto;
 	display: block;
