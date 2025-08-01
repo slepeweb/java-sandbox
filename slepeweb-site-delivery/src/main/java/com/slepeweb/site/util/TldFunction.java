@@ -10,10 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.cms.bean.Dateish;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
-import com.slepeweb.cms.bean.StringWrapper;
+import com.slepeweb.cms.component.Passkey;
 import com.slepeweb.commerce.bean.Product;
-import com.slepeweb.site.service.XcompService;
-import com.slepeweb.site.service.XimgService;
+import com.slepeweb.site.service.MagicMarkupService;
 
 public class TldFunction {
 
@@ -24,10 +23,6 @@ public class TldFunction {
 	
 	public static Item getMatchingHifiImage(Product product, Item testImg) {
 		return product.getMatchingHifiImage(testImg);
-	}
-	
-	public static String resolveMarkupFieldValue(Item i, String variable, String dflt) {
-		return i.getFieldValueResolved(variable, new StringWrapper(dflt));
 	}
 	
 	public static Item resolveOrderItemThumbnail(Product p, String qualifier) {
@@ -56,12 +51,13 @@ public class TldFunction {
 	public static String compress(String s) {
 		return com.slepeweb.common.util.StringUtil.compress(s);
 	}
-	
-	public static String parseXimg(String html, XimgService service, String passkey) {
-		return service.parse(html, passkey);
+		
+	public static String transformMagicMarkup(String html, MagicMarkupService service) {
+		return service.transform(html);
 	}
 	
-	public static String parseXcomp(String html, XcompService service) {
-		return service.parse(html);
+	public static String transformMagicMarkup4Pdf(String html, String localHostname, Passkey passkey, MagicMarkupService service) {
+		return service.transform4Pdf(html, localHostname, passkey);
 	}
+	
 }

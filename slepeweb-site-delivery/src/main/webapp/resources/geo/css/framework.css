@@ -1,0 +1,39 @@
+@import url(./base/framework.css);
+
+div.layout-std {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas: "hdr" "main" "ftr";
+}
+
+div.standard-3col {
+  display: grid;
+  grid-template-columns: 20% 80%;
+}
+
+div.standard-3col div.leftside {
+	grid-column: 1;
+}
+
+
+div.standard-3col div.rightside {
+	display: flex;
+	grid-column: 2;
+	justify-content: space-between;
+}
+
+div.standard-3col div.rightside > div.mainbody.full-width {
+	flex-basis: 100%;
+}
+
+div.standard-3col div.rightside > div.mainbody.nearly-full-width {
+	flex-basis: 85%;
+}
+
+div.standard-3col div.leftside, div.standard-3col div.rightside {
+	padding: 0.5em;
+}
+
+div.mainbody li {
+	margin-bottom: 1em;
+}

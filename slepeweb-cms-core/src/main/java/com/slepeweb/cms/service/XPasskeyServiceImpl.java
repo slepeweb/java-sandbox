@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.cms.bean.User;
 
 /*
- * DO NOT CONFUSE THIS CLASS WITH PasskeyService, which provides public-user access to
- * items on different cms-d sites. This functionality is required by PdfService, which 
- * produces a PDF from given html input.
+ * DO NOT CONFUSE THIS CLASS WITH PasskeyService, which is required by . 
+ * PdfService produces a PDF from given html input, and requires public access to images,
+ * which it can achieve using passkeys issued by PasskeyService.
  * 
  * This class (XPasskeyServiceImpl) encrypts the user's password, to be used as a passkey
  * that can be used to log into the editorial app (from a delivery app) without having 

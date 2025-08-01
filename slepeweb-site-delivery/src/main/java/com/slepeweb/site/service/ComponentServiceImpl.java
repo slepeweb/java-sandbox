@@ -30,9 +30,11 @@ public class ComponentServiceImpl implements ComponentService {
 		String[] componentData;
 		Constructor<?> constructor;
 		Class<?> clazz;
+		int count = 0;
 
 		if (componentLinks != null && componentLinks.size() > 0) {
 			for (final Link link : componentLinks) {
+				count++;
 				i = link.getChild();
 				
 				if (targetLinkName == null || link.getName().equals(targetLinkName)) {
@@ -43,6 +45,7 @@ public class ComponentServiceImpl implements ComponentService {
 						constructor = clazz.getDeclaredConstructor();
 						obj = constructor.newInstance();
 						target = (SimpleComponent) obj;
+						target.setEnumerator(count);
 						target.setComponentService(this).setup(link);
 						components.add(target);
 						LOG.trace(String.format("Component: %s() [%s]", componentData[0], i.getPath()));

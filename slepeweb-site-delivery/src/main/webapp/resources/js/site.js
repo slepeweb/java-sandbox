@@ -57,8 +57,8 @@ _site.support.checkSession = function() {
 }
 
 _site.support.moveComponent = function(parent$) {
-	let origId = parent$.attr('data-id')
-	let comp$ = $(`div#component-${origId}`)
+	let id = parent$.attr('data-enum')
+	let comp$ = $(`div#component-${id}`)
 	
 	if (! comp$) {
 		return
@@ -69,9 +69,11 @@ _site.support.moveComponent = function(parent$) {
 
 
 $(function() {
+	/*
 	$('div.xcomp').each(function() {
 		_site.support.moveComponent($(this));
 	})
+	*/
 	
 	$('i#open-editor').click(function() {
 		_site.support.openEditor($(this).attr('title'));

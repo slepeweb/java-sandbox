@@ -17,10 +17,8 @@
 		
 		<div class="rightside">
 			<div class="mainbody ${mainBodyClass}">
-				<h2 id="page-title">${_item.fields.title}</h2>
-				<div>${_item.fields.bodytext}</div>
-				
-				<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" />
+				<geo:title />
+				<gen:bodyFieldMagic />
 			</div>
 		
 			<c:if test="${sidebarIsPresent}">

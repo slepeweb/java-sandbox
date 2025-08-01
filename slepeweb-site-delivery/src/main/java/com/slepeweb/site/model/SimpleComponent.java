@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
-import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.site.service.ComponentService;
@@ -22,6 +21,7 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	private String identifier;
 	private List<SimpleComponent> components;
 	private ComponentService componentService;
+	private int enumerator;
 
 	public SimpleComponent setup(Link l) {
 		Item i = l.getChild();
@@ -31,7 +31,7 @@ public class SimpleComponent implements NestableComponent, Serializable {
 		setJs(i.getFieldValue(FieldName.JS));
 		setData(i.getFieldValue(FieldName.DATA));
 		setHeading(i.getFieldValue(FieldName.HEADING));
-		setBody(i.getFieldValueResolved(FieldName.BODYTEXT, new StringWrapper("")));
+		setBody(i.getFieldValue(FieldName.BODYTEXT));
 		setIdentifier(i.getFieldValue("identifier"));
 
 		
@@ -135,6 +135,14 @@ public class SimpleComponent implements NestableComponent, Serializable {
 
 	public void setData(String data) {
 		this.data = data;
+	}
+
+	public int getEnumerator() {
+		return enumerator;
+	}
+
+	public void setEnumerator(int enumerator) {
+		this.enumerator = enumerator;
 	}
 
 	public ComponentService getComponentService() {

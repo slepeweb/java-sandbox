@@ -1,0 +1,61 @@
+.main {
+	min-height: 600px;
+}
+
+div.main h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+footer {
+  text-align: center;
+  font-size: 0.85em;
+  line-height: 1.3em;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
+}
+
+.hide {
+  display: none;
+}
+
+img {
+	width: 100%;
+}
+
+div.squeeze p {
+	margin-bottom: 0;
+}
+
+div.squeeze pre {
+	margin-bottom: 1em;
+}
+
+p.clearfix {
+	clear: both;
+	margin: 0;
+}
+
+
+
+/*          view = pdf          */
+/* ---------------------------- */
+
+div.main.pdf {
+	font-size: 12px;
+}
+
+div.main.pdf h2 {
+  text-align: left;
+}
+
+div.main.pdf div.accordion {
+	border: 2px grey solid;
+	padding: 2em;
+}
+
+div.main.pdf span.top-pdf-title {
+	font-size: 0.7em;
+	color: #a6a6a6;
+}

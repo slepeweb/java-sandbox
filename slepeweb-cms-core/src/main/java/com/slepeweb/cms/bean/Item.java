@@ -307,26 +307,10 @@ public class Item extends CmsBean {
 		return getFieldValue(variable, new StringWrapper(""));
 	}
 	
-	public String getFieldValueResolved(String variable) {
-		return getFieldValueResolved(variable, new StringWrapper(""));
-	}
-	
 	public String getFieldValue(String variable, StringWrapper dflt) {
 		FieldValue fv = getFieldValueObj(variable);
 		if (fv != null) {
 			return fv.getStringValue();
-		}
-		else if (dflt != null) {
-			return dflt.getValue();
-		}
-		return null;
-	}
-	
-	// TODO: redundant functionality, HOWEVER, lots of old code is using it.
-	public String getFieldValueResolved(String variable, StringWrapper dflt) {
-		FieldValue fv = getFieldValueObj(variable);
-		if (fv != null) {
-			return fv.getStringValueResolved();
 		}
 		else if (dflt != null) {
 			return dflt.getValue();

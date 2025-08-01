@@ -15,6 +15,7 @@ import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.SiteConfigService;
+import com.slepeweb.cms.utils.CookieHelper;
 import com.slepeweb.commerce.bean.Basket;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.util.HttpUtil;
@@ -37,6 +38,7 @@ public class PageController extends BaseController {
 	@Autowired private SolrService4Site solrService4Site;
 	@Autowired private ItemService itemService;
 	@Autowired private PdfService pdfService;
+	//@Autowired private PasskeyService passkeyService;
 	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
@@ -228,7 +230,10 @@ public class PageController extends BaseController {
 		String path = req.getParameter("path");
 		if (StringUtils.isNotBlank(path)) {
 			Item target = this.itemService.getItem(i.getSite().getId(), path);
-			model.addAttribute("pageview", this.pdfService.build(target, getUser(req)));
+			CookieHelper h = new CookieHelper();
+
+			String html = this.pdfService.assemble(target, getUser(req), h.getCookieValue("JSESSIONID", req));
+			model.addAttribute("_aggregatedMarkup", html);
 		}
 		
 		return page.getView();

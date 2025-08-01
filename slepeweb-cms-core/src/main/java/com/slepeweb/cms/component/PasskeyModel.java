@@ -55,7 +55,7 @@ public class PasskeyModel {
 		}
 		
 		// Shuffle model twice, for good measure!
-		LOG.info("Built data model");
+		LOG.info("Built data model for TTL = " + this.ttl);
 		return shuffle(shuffle(model));
 	}
 	

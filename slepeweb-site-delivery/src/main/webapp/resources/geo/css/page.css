@@ -1,0 +1,82 @@
+@import url(./base/page.css);
+
+footer {
+  grid-area: ftr;
+  opacity: 0.6;
+}
+
+figcaption {
+	font-size: 0.9em;
+	font-style: italic;
+	padding-bottom: 1em;
+	width: 100%;
+	text-align: center;
+}
+
+.main {
+  grid-area: main;
+}
+
+
+div#below-nav {
+	display: grid;
+  grid-template-columns: 50% 25% 25%;
+  margin: 6px 0 0 0;
+}
+
+div.searchresults {
+	width: 80%;
+	margin: auto;
+}
+
+div#history {
+	grid-column: 2;
+	display: inline-block;
+	justify-self: right;
+}
+
+div#history select {
+	padding: 6px;
+}
+
+div#search-input {
+	grid-column: 3;
+	display: inline-block;
+	justify-self: right;
+}
+
+.ui-helper-reset {
+	font-size: 14px;
+	line-height: 1.65em;
+}
+
+@media only screen and (max-width: 1000px) {
+	div#below-nav {
+	  grid-template-columns: 50% 50%;
+	}
+	
+	div#search-input {
+		grid-column: 2;
+	}
+
+}
+
+@media only screen and (max-width: 600px) {
+	div#below-nav {
+	  grid-template-columns: 100%;
+	}
+	
+	div#history, div#search-input {
+		grid-column: 1;
+		justify-self: left;
+	}
+
+	div.standard-3col {
+	  display: block;
+	}
+
+	div.threeblock img {
+		height: 150px;
+	}
+
+}

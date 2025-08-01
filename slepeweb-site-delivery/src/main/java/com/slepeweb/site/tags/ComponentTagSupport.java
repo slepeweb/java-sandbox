@@ -1,5 +1,6 @@
 package com.slepeweb.site.tags;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.site.model.SimpleComponent;
@@ -16,6 +17,7 @@ public abstract class ComponentTagSupport extends TagSupport {
 	private static Logger LOG = Logger.getLogger(ComponentTagSupport.class);
 
 	private String site;
+	private String view;
 	private Object poppedComponent;
 	
 	public abstract void delegate();
@@ -51,14 +53,22 @@ public abstract class ComponentTagSupport extends TagSupport {
 	}
 
 	private String identifyJspPath(SimpleComponent c) {
-		return new StringBuilder(TEMPLATES_BASE).
-				append(this.site).append("/component/").
-				append(c.getType()).append(".jsp").
-				toString();
+		StringBuilder sb = new StringBuilder(TEMPLATES_BASE).
+			append(this.site).append("/component/");
+		
+		if (StringUtils.isNotBlank(view)) {
+			sb.append("/").append(this.view).append("/");
+		}
+
+		return sb.append(c.getType()).append(".jsp").toString();
 	}
 
 	public void setSite(String site) {
 		this.site = site;
+	}
+
+	public void setView(String view) {
+		this.view = view;
 	}
 
 }

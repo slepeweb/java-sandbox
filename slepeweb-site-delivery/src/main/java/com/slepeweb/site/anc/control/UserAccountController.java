@@ -191,7 +191,7 @@ public class UserAccountController extends BaseController {
 						i.getLanguage(), 
 						secret);
 				
-				String [] values = pickBlockFields(i, legend, "validationEmailContent", false, model);
+				String [] values = pickBlockFields(i, legend, "validationEmailContent", model);
 				values[1] = updateBodyField(model, values[1].
 						replaceAll("__user__", u.getFullName()).
 						replaceAll("__href__", href));
@@ -309,7 +309,7 @@ public class UserAccountController extends BaseController {
 					String href = String.format("http://ancestry.slepeweb.com:8081/%s/login/forgotten?view=reset/%s", 
 							i.getLanguage(), secret);
 					
-					String[] fieldValues = pickBlockFields(i, legend, "validationEmailContent", false, model);
+					String[] fieldValues = pickBlockFields(i, legend, "validationEmailContent", model);
 					String msg = updateBodyField(model, fieldValues[1].replaceAll("__href__", href));
 					
 					// Disable user record, and store secret
@@ -427,16 +427,12 @@ public class UserAccountController extends BaseController {
 	}
 	
 	private String[] pickBlockFields(Item i, Map<String, String[]> legend, String key, ModelMap model) {
-		return pickBlockFields(i, legend, key, true, model);
-	}
-	
-	private String[] pickBlockFields(Item i, Map<String, String[]> legend, String key, boolean resolve, ModelMap model) {
 		String[] fields = legend.get(key);
 		String[] values = new String[] {"", ""};
 		
 		if (fields != null && fields.length == 2) {
 			values[0] = i.getFieldValue(fields[0]);
-			values[1] = resolve ? i.getFieldValueResolved(fields[1]) : i.getFieldValue(fields[1]);
+			values[1] = i.getFieldValue(fields[1]);
 			model.addAttribute("_heading", values[0]);
 			model.addAttribute("_body", values[1]);
 			model.addAttribute("_block", key);

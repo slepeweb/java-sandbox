@@ -257,7 +257,7 @@ _cms.field.onpageload = function() {
 	})
 
 	$("div#widefield-xcomp-icon").click(function(e) {
-		_cms.field.widefieldInsert('<div class="xcomp" data-id="1234"></a> <!-- origId -->')
+		_cms.field.widefieldInsert('<div class="xcomp" data-enum="1"></div>')
 	})
 
 $("div#widefield-table-icon").click(function(e) {

@@ -20,8 +20,7 @@ import com.slepeweb.site.geo.service.GeoCookieService;
 import com.slepeweb.site.geo.service.SolrService4Geo;
 import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.model.Page;
-import com.slepeweb.site.service.XcompService;
-import com.slepeweb.site.service.XimgService;
+import com.slepeweb.site.service.MagicMarkupService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,13 +30,13 @@ import jakarta.servlet.http.HttpServletResponse;
 public class GeoPageController extends BaseController {
 	
 	public static final String HISTORY = "_history";
-	public static final String XIMG_SERVICE = "_ximgService";
-	public static final String XCOMP_SERVICE = "_xcompService";
+	public static final String MAGIC_MARKUP_SERVICE = "_magicMarkupService";
+	public static final String LOCAL_HOSTNAME = "_localHostname";
+	public static final String PASSKEY = "_passkey";
 	
 	@Autowired SolrService4Geo solrService4Geo;
 	@Autowired GeoCookieService geoCookieService;
-	@Autowired XimgService ximgService;
-	@Autowired XcompService xcompService;
+	@Autowired MagicMarkupService magicMarkupService;
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
@@ -144,15 +143,16 @@ public class GeoPageController extends BaseController {
 	}
 
 	private void addGeoExtras(Item i, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+		model.addAttribute(MAGIC_MARKUP_SERVICE, this.magicMarkupService);
 		model.addAttribute("_inThisSection", new SectionMenu(i));
 		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
 	}
 
 	private void addPdfExtras(Page p, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
-		Item i = p.getItem();
-		model.addAttribute(XIMG_SERVICE, this.ximgService);
-		model.addAttribute(XCOMP_SERVICE, this.xcompService);
-		model.addAttribute(AttrName.PASSKEY, i.getRequestPack().getPasskey().encode());
+
+		model.addAttribute(LOCAL_HOSTNAME, p.getItem().getSite().getDeliveryHost().getNamePortAndProtocol());
+		model.addAttribute(PASSKEY, p.getItem().getRequestPack().getPasskey());
+		model.addAttribute(MAGIC_MARKUP_SERVICE, this.magicMarkupService);
 		
 		List<LinkTarget> crumbs = p.getHeader().getBreadcrumbs();
 		// Remove root item from breadcrumbs
@@ -177,7 +177,7 @@ public class GeoPageController extends BaseController {
 			}
 		}
 		
-		model.addAttribute("toptitle", topRow);
-		model.addAttribute("bottomtitle", bottomRow);
+		model.addAttribute("_toptitle", topRow);
+		model.addAttribute("_bottomtitle", bottomRow);
 	}
 }

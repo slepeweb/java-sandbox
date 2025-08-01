@@ -17,6 +17,7 @@ public class RequestPack {
 	private HttpServletRequest httpRequest;
 	private Map<String, String[]> params = new HashMap<String, String[]>();
 	private boolean miniPath;
+	private String view;
 		
 	public RequestPack(User u) {
 		this.user = u;
@@ -25,7 +26,8 @@ public class RequestPack {
 	public RequestPack(HttpServletRequest req) {
 		this.httpRequest = req;
 		this.user = (User) req.getSession().getAttribute(AttrName.USER);
-		this.params = req.getParameterMap();
+		this.params = req.getParameterMap();		
+		this.view = getParameter("view");
 	}
 	
 	public Map<String, String[]> getParams() {
@@ -88,5 +90,9 @@ public class RequestPack {
 		}
 		
 		return null;
+	}
+
+	public String getView() {
+		return view;
 	}
 }

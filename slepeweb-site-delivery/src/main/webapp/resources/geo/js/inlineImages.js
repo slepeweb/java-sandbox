@@ -78,10 +78,10 @@ $(function() {
 			</figure>									
 			<p class="clearfix"></p>
 		</div>	
-	*/
 	
 	$('div.ximg').each(function() {
 		_processFigures($(this));
 	})
+	*/
 	
 });
