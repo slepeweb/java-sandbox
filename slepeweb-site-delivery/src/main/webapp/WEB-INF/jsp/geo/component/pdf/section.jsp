@@ -12,4 +12,4 @@
 		
 </div>
 
-<site:insertComponents site="${_item.site.shortname}" list="${_comp.components}" />
+<site:insertComponents site="${_item.site.shortname}" list="${_comp.components}" view="${_item.requestPack.view}" />

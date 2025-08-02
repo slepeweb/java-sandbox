@@ -14,7 +14,7 @@
 	<c:forEach items="${_comp.components}" var="subComp">
 		<h3>${subComp.identifier}</h3>
 		<div>
-			<site:insertComponent site="${_item.site.shortname}" component="${subComp}" />
+			<site:insertComponent site="${_item.site.shortname}" component="${subComp}" view="${_item.requestPack.view}" />
 		</div>
 	</c:forEach>	
 </div>

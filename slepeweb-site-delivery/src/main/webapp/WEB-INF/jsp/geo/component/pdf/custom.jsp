@@ -7,7 +7,7 @@
 	<c:if test="${not empty _comp.body}"><div>${_comp.body}</div></c:if>	
 	
 	<c:if test="${fn:length(_comp.components) > 0}">
-		<site:insertComponents site="${_item.site.shortname}" list="${_comp.components}" /> 
+		<site:insertComponents site="${_item.site.shortname}" list="${_comp.components}" view="${_item.requestPack.view}" /> 
 	</c:if>
 </div>
 

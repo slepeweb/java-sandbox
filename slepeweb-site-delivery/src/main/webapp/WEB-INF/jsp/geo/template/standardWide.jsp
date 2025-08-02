@@ -9,6 +9,6 @@
 		<h2 id="page-title">${_item.fields.title}</h2>
 		<div>${_item.fields.bodytext}</div>
 		
-		<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" />
+		<site:insertComponents site="${_item.site.shortname}" list="${_page.components}" view="${_item.requestPack.view}" />
 	</div>
 </geo:pageLayout>
