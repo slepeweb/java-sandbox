@@ -56,7 +56,7 @@ public abstract class ComponentTagSupport extends TagSupport {
 		StringBuilder sb = new StringBuilder(TEMPLATES_BASE).
 			append(this.site).append("/component/");
 		
-		if (StringUtils.isNotBlank(view)) {
+		if (StringUtils.isNotBlank(view) && c.isAltViews()) {
 			sb.append("/").append(this.view).append("/");
 		}
 

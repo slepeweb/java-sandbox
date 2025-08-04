@@ -1,8 +1,12 @@
 package com.slepeweb.site.service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,13 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.component.Passkey;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.service.ItemService;
 
 @Service
 public class MagicMarkupServiceImpl implements MagicMarkupService {
 
+	public static Pattern MINIPATH_PATTERN = Pattern.compile("^/\\$_(\\d+).*");
+	private static Logger LOG = Logger.getLogger(MagicMarkupServiceImpl.class);
+	
 	@Autowired private ItemService itemService;
 	
 	public String transform(String html) {
@@ -30,11 +36,10 @@ public class MagicMarkupServiceImpl implements MagicMarkupService {
 	}
 	
 	
-	public String transform4Pdf(String html, String localHostname, Passkey passkey) {
+	public String transform4Pdf(String html, String localHostname) {
 		Document doc = createDocument(html);
-		transformMinipathImages(doc, localHostname, passkey);
 		transformXImages(doc);
-		transformMinipathImages(doc, localHostname, passkey);
+		transformMinipathImages4Pdf(doc, localHostname);
 		transformXComponents(doc);
 		
 		return doc.body().html();
@@ -51,28 +56,55 @@ public class MagicMarkupServiceImpl implements MagicMarkupService {
     	return doc;
 	}
 	
-	private void transformMinipathImages(Document doc, String localHostnamePortAndProtocol, Passkey passkey) {
+	private void transformMinipathImages4Pdf(Document doc, String localHostnamePortAndProtocol) {
 		String src = null;
-		boolean srcHasParams;
 		
     	for (Element e : doc.getElementsByTag("img")) {
     		src = e.attr("src");
-    		srcHasParams = src.indexOf('?') > -1;
     		
     		if (src.matches("^/\\$_\\d+.*")) {
     			src = localHostnamePortAndProtocol + src;
-    			if (passkey != null) {
-        			src += (srcHasParams ? "&" : "?") + "_passkey=" + passkey.encode();
-    			}
-    			
     			e.attr("src", src);
     		}
     	}
  	}
 	
+	@SuppressWarnings("unused")
+	private void embedMinipathImages4Pdf(Document doc) {
+		String src = null;
+		Matcher m;
+		long origId;
+		Item i;
+		byte[] bytes;
+		
+    	for (Element e : doc.getElementsByTag("img")) {
+    		src = e.attr("src");
+    		m = MINIPATH_PATTERN.matcher(src);
+    		
+    		if (m.matches()) {
+    			origId = Long.parseLong(m.group(1));
+           		i = this.itemService.getItem(Long.valueOf(origId));
+    			
+           		if (i == null) {
+           			LOG.error(String.format("Item with origId %d not found", origId));
+           			continue;
+           		}
+           		
+           		try {
+           			bytes = i.getMedia().getDownloadStream().readAllBytes();
+        			src = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(bytes);
+        			e.attr("src", src);
+           		}
+           		catch (Exception ex) {
+           			LOG.error(String.format("Empty media for item with origId %d", origId));
+           		}
+    		}
+    	}
+	}
+	
 	private void transformXImages(Document doc) {
     	
-    	String id, url, width, body, caption, cssfloat;
+    	String origId, url, width, body, caption, cssfloat;
     	String template;
     	Item i;
     	 
@@ -81,8 +113,8 @@ public class MagicMarkupServiceImpl implements MagicMarkupService {
     			continue;
     		}
     		
-    		id = e.attr("data-id");
-    		i = this.itemService.getItem(Long.valueOf(id));
+    		origId = e.attr("data-id");
+    		i = this.itemService.getItem(Long.valueOf(origId));
     		if (i == null) {
     			continue;
     		}

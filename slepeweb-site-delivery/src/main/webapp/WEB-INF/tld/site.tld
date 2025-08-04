@@ -118,7 +118,7 @@
 	<function>
 		<name>transformMagicMarkup4Pdf</name>
 		<function-class>com.slepeweb.site.util.TldFunction</function-class>
-		<function-signature>java.lang.String transformMagicMarkup4Pdf(java.lang.String, java.lang.String, com.slepeweb.cms.component.Passkey, com.slepeweb.site.service.MagicMarkupService)</function-signature>
+		<function-signature>java.lang.String transformMagicMarkup4Pdf(java.lang.String, java.lang.String, com.slepeweb.site.service.MagicMarkupService)</function-signature>
 	</function>
 	
 	

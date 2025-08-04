@@ -218,14 +218,14 @@ public class PageController extends BaseController {
 	}
 	
 	@RequestMapping(value="/spring/toPDF")	
-	public String toPDF(
+	public String pdfCompiler(
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			@ModelAttribute("_site") Site site, 
 			HttpServletRequest req,
 			ModelMap model) {	
 		
-		Page page = getStandardPage(i, shortSitename, "toPDF", model);
+		Page page = getStandardPage(i, shortSitename, "pdfCompiler", model);
 		
 		String path = req.getParameter("path");
 		if (StringUtils.isNotBlank(path)) {
@@ -234,6 +234,7 @@ public class PageController extends BaseController {
 
 			String html = this.pdfService.assemble(target, getUser(req), h.getCookieValue("JSESSIONID", req));
 			model.addAttribute("_aggregatedMarkup", html);
+			model.addAttribute("_localHostname", i.getSite().getDeliveryHost().getNamePortAndProtocol());
 		}
 		
 		return page.getView();

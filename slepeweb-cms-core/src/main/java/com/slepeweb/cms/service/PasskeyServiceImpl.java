@@ -12,6 +12,14 @@ import com.slepeweb.cms.component.PasskeyModel;
 @Service("passkeyService")
 public class PasskeyServiceImpl implements PasskeyService {
 	
+	/*
+	 * This service issues temporary passkeys that allow non-logged-in users to
+	 * access secure content via CmsDeliveryServlet.
+	 * 
+	 * The requirement for this service has cycled on/off for a while now. As of today,
+	 * this service is not in use, but who knows when it might be needed?
+	 */
+	
 	private Map<String, PasskeyModel> models = new HashMap<String, PasskeyModel>();
 	
 	public PasskeyServiceImpl() {

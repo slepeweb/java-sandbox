@@ -1,4 +1,62 @@
-@import url(./base/component.css);
+div.threeblock.photo-strip img {
+	height: 200px;
+	display: inline-block;
+}
+
+div.nblock caption {
+	font-size: 0.9em;
+}
+
+
+div.nblock > div.ximg, div.nblock p {
+	margin: 0 0.5em 0 0.5em;
+}
+
+div.ximg > figure {
+	margin: 0 1.0em 0 0;
+	float: left;
+}
+
+div.ximg > figure.right {
+	margin: 0 0 0 1.0em;
+	float: right;
+}
+
+div.ximg.border {
+	border: 2px solid grey;
+}
+
+
+
+/*          view = pdf          */
+/* ---------------------------- */
+
+div.main.pdf div.nblock {
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+div.main.pdf div.nblock table {
+	margin: 0;
+}
+
+div.main.pdf div.nblock td {
+	text-align: center;
+}
+
+div.main.pdf div.threeblock td {
+	width: 33%;
+}
+
+div.main.pdf div.twoblock td {
+	width: 50%;
+}
+
+div.main.pdf div.ximg > figure,
+div.main.pdf div.ximg > figure.right {
+    float: none;
+}
 
 div.nblock {
 	display: grid;

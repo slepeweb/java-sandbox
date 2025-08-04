@@ -8,6 +8,7 @@ public class TwoBlockComponent extends SimpleComponent {
 
 	public TwoBlockComponent setup(Link l) {
 		super.setup(l);
+		setAltViews(true);
 		
 		this.left = l.getChild().getFieldValue("left");
 		this.right = l.getChild().getFieldValue("right");

@@ -8,6 +8,7 @@ public class ThreeBlockComponent extends SimpleComponent {
 
 	public ThreeBlockComponent setup(Link l) {
 		super.setup(l);
+		setAltViews(true);
 		
 		this.left = l.getChild().getFieldValue("left");
 		this.middle = l.getChild().getFieldValue("middle");

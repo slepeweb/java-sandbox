@@ -242,9 +242,9 @@ _cms.field.onpageload = function() {
 		_cms.field.widefieldInsert('<div></div>')
 	})
 
-	$("div#widefield-div2b-icon").click(function(e) {
-		_cms.field.widefieldInsert('<div class="twoblock"></div>')
-	})
+//	$("div#widefield-div2b-icon").click(function(e) {
+//		_cms.field.widefieldInsert('<div class="twoblock"></div>')
+//	})
 
 	$("div#widefield-xlink-icon").click(function(e) {
 		_cms.field.widefieldInsert('<a class="xlink" href="/$_1234"></a>')

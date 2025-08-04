@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slepeweb.cms.bean.Dateish;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
-import com.slepeweb.cms.component.Passkey;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.site.service.MagicMarkupService;
 
@@ -56,8 +55,8 @@ public class TldFunction {
 		return service.transform(html);
 	}
 	
-	public static String transformMagicMarkup4Pdf(String html, String localHostname, Passkey passkey, MagicMarkupService service) {
-		return service.transform4Pdf(html, localHostname, passkey);
+	public static String transformMagicMarkup4Pdf(String html, String localHostname, MagicMarkupService service) {
+		return service.transform4Pdf(html, localHostname);
 	}
 	
 }

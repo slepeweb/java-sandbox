@@ -22,6 +22,7 @@ public class SimpleComponent implements NestableComponent, Serializable {
 	private List<SimpleComponent> components;
 	private ComponentService componentService;
 	private int enumerator;
+	private boolean altViews;
 
 	public SimpleComponent setup(Link l) {
 		Item i = l.getChild();
@@ -143,6 +144,14 @@ public class SimpleComponent implements NestableComponent, Serializable {
 
 	public void setEnumerator(int enumerator) {
 		this.enumerator = enumerator;
+	}
+
+	public boolean isAltViews() {
+		return altViews;
+	}
+
+	public void setAltViews(boolean b) {
+		this.altViews = b;
 	}
 
 	public ComponentService getComponentService() {

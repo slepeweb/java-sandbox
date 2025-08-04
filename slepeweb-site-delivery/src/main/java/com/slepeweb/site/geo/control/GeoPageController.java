@@ -151,13 +151,13 @@ public class GeoPageController extends BaseController {
 	private void addPdfExtras(Page p, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 
 		model.addAttribute(LOCAL_HOSTNAME, p.getItem().getSite().getDeliveryHost().getNamePortAndProtocol());
-		model.addAttribute(PASSKEY, p.getItem().getRequestPack().getPasskey());
 		model.addAttribute(MAGIC_MARKUP_SERVICE, this.magicMarkupService);
 		
 		List<LinkTarget> crumbs = p.getHeader().getBreadcrumbs();
 		// Remove root item from breadcrumbs
 		crumbs.remove(0);
 		int len = crumbs.size();
+		
 		List<String> topRow = new ArrayList<String>();
 		String bottomRow = null;
 		

@@ -6,7 +6,7 @@
 </c:set>
 
 <c:choose><c:when test="${_item.requestPack.view eq 'pdf'}">
-	${site:transformMagicMarkup4Pdf(_assembly, _localHostname, _passkey, _magicMarkupService)}
+	${site:transformMagicMarkup4Pdf(_assembly, _localHostname, _magicMarkupService)}
 </c:when><c:otherwise>
 	${site:transformMagicMarkup(_assembly, _magicMarkupService)}
 </c:otherwise></c:choose>

@@ -1,4 +1,49 @@
-@import url(./base/framework.css);
+div.layout-std {
+  padding: 1em;
+}
+
+div.standard-3col div.leftside, div.standard-3col div.rightside {
+	padding: 0.5em;
+}
+
+div.standard-3col div.leftside div.in-this-section,
+div.standard-3col div.rightside div.sidebar {
+	background-color: #eee;
+	min-height: 200px;
+	padding: 0.5em;
+}
+
+div.sidebar-wrapper {
+	padding-left: 0.5em;
+}
+
+div.in-this-section, div.sidebar {
+	min-width: 124px;
+}
+
+div.in-this-section > div, div.sidebar > div {
+	padding: 0.4em 0 0.4em 0;
+	line-height: 1.0em;
+}
+
+div.in-this-section a, div.sidebar a {
+	text-decoration: none;
+	font-size: 0.95em;
+}
+
+div.in-this-section a:hover, div.sidebar a:hover {
+	text-decoration: underline;
+}
+
+div.in-this-section div.selected {
+	background-color: #c8d9b1;
+}
+
+div.in-this-section div.selected-child {
+	background-color: #81b9ca;
+	padding: 0.4em 0 0.4em 1.0em;
+}
+
 
 div.layout-std {
   display: grid;
