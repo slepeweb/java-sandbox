@@ -16,15 +16,17 @@ footer {
   padding-bottom: 15px;
 }
 
+div.main img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+	object-fit: contain;
+}
+
 .hide {
   display: none;
 }
-
-/* img { */
-/* 	width: 100%; */
-/* 	width: auto; */
-/* 	object-fit: contain;	 */
-/* } */
 
 div.squeeze p {
 	margin-bottom: 0;
@@ -50,13 +52,6 @@ div.main.pdf {
 
 div.main.pdf h2 {
   text-align: left;
-}
-
-div.main.pdf img {
-  display: block;
-  margin: 0 auto;
-  max-width: 100%;
-  height: auto;
 }
 
 div.main.pdf div.accordion {

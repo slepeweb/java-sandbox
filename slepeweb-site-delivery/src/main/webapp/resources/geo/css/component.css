@@ -12,6 +12,19 @@ div.nblock > div.ximg, div.nblock p {
 	margin: 0 0.5em 0 0.5em;
 }
 
+div.nblock {
+	display: grid;
+  grid-template-columns: 33% 33% 33%;
+  margin: 0.75em 0 1.5em 0;
+  justify-items: center;
+  padding: 1em 0 0 1em;
+  border: 1px solid #ccc;
+}
+
+div.twoblock {
+  grid-template-columns: 50% 50%;
+}
+
 div.ximg > figure {
 	margin: 0 1.0em 0 0;
 	float: left;
@@ -58,19 +71,3 @@ div.main.pdf div.ximg > figure.right {
     float: none;
 }
 
-div.nblock {
-	display: grid;
-  grid-template-columns: 33% 33% 33%;
-  margin: 0.75em 0 1.5em 0;
-  justify-items: center;
-  padding: 1em 1em 0 1em;
-  border: 1px solid #ccc;
-}
-
-div.twoblock {
-  grid-template-columns: 50% 50%;
-}
-
-div.threeblock.photo-strip img {
-	object-fit: contain;
-}
