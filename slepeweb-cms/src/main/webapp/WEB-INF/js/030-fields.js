@@ -238,16 +238,20 @@ _cms.field.onpageload = function() {
 		_cms.field.widefieldInsert('<h3></h3>')
 	})
 
+	$("div#widefield-h4-icon").click(function(e) {
+		_cms.field.widefieldInsert('<h4></h4>')
+	})
+
 	$("div#widefield-div-icon").click(function(e) {
 		_cms.field.widefieldInsert('<div></div>')
 	})
 
-//	$("div#widefield-div2b-icon").click(function(e) {
-//		_cms.field.widefieldInsert('<div class="twoblock"></div>')
-//	})
+	$("div#widefield-aside-icon").click(function(e) {
+		_cms.field.widefieldInsert('<aside></aside>')
+	})
 
-	$("div#widefield-xlink-icon").click(function(e) {
-		_cms.field.widefieldInsert('<a class="xlink" href="/$_1234"></a>')
+	$("div#widefield-link-icon").click(function(e) {
+		_cms.field.widefieldInsert('<a href="/$_1234"></a>')
 	})
 
 	$("div#widefield-ximg-icon").click(function(e) {

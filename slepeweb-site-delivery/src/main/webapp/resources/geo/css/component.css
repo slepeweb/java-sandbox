@@ -62,6 +62,10 @@ div.main.pdf div.threeblock td {
 	width: 33%;
 }
 
+div.main.pdf div.photo-strip td {
+	padding: 1em;
+}
+
 div.main.pdf div.twoblock td {
 	width: 50%;
 }
