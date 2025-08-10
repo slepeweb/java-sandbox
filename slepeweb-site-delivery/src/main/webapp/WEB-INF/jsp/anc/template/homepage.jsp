@@ -7,7 +7,7 @@
 	
 	<div class="main">
 		<h2>${_item.fields.title}</h2>
-		${site:resolveMarkupFieldValue(_item, 'bodytext', '')}
+		${_item.fields.bodytext}
 		
 		<ul>
 			<c:forEach items="${_rootEntries}" var="child">

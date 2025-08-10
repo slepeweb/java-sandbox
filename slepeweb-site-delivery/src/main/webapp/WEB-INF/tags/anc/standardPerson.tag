@@ -26,5 +26,5 @@
 	</div>
 </c:if>
 
-<p>${site:resolveMarkupFieldValue(_item, "overview", "")}</p>
+<p>${_item.fields.overview}</p>
 		

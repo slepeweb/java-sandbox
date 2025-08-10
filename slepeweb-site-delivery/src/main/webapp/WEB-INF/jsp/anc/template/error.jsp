@@ -7,7 +7,7 @@
 	
 	<div class="main">	
 		<h2>${_item.fields.heading}</h2>
-		${site:resolveMarkupFieldValue(_item, 'bodytext', '')}
+		${_item.fields.bodytext}
 	</div>
 			
 </anc:pageLayout>
