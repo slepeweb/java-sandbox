@@ -12,7 +12,10 @@
 <mny:standardLayout>
 
 	<mny:pageHeading heading="Scheduled transactions ">
-		<a href="${_ctxPath}/schedule/add" title="Define a new scheduled transaction">New schedule</a>
+		<ul>
+			<li><a href="${_ctxPath}/schedule/add" title="Define a new scheduled transaction">New schedule</a></li>
+			<li><a href="${_ctxPath}/schedule/trigger" title="Trigger scheduled transaction manager">Trigger now</a></li>
+		</ul>
 	</mny:pageHeading>
 
 	<c:choose><c:when test="${fn:length(_scheduled) > 0}">

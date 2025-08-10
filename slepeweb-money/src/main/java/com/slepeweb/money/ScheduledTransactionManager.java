@@ -10,7 +10,9 @@ import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
@@ -31,6 +33,10 @@ import jakarta.annotation.PreDestroy;
 public class ScheduledTransactionManager {
 	
 	private static Logger LOG = Logger.getLogger(ScheduledTransactionManager.class);
+	private static final String JOB_NAME = "jobName";
+	private static final String JOB_GROUP = "transactions";
+	private static final String TRIGGER_NAME = "daily6amTrigger";
+	
 	private Scheduler scheduler;
 	@Autowired private ScheduledTransactionService scheduledTransactionService;
 	@Autowired private ScheduledSplitService scheduledSplitService;
@@ -57,13 +63,13 @@ public class ScheduledTransactionManager {
 	        JobDataMap params = new JobDataMap(map);
 
 	        JobDetail job = JobBuilder.newJob(ScheduledTransactionTask.class).
-	        		withIdentity("scheduler", "transactions").
+	        		withIdentity(JOB_NAME, JOB_GROUP).
 	        		usingJobData(params).
 	        		build();
 	        LOG.info("Built the job detail");
 
 	        Trigger trigger = TriggerBuilder.newTrigger().
-	        		withIdentity("trigger1", "transactions").
+	        		withIdentity(TRIGGER_NAME, JOB_GROUP).
 	        		startNow().
 	        		withSchedule(CronScheduleBuilder.cronSchedule("0 0 6 * * ?")).
 	        		build();
@@ -76,6 +82,15 @@ public class ScheduledTransactionManager {
 			LOG.error("Failed to initialise the quartz scheduler", e);
 		}
 
+	}
+	
+	public void triggerNow() {
+		try {
+			this.scheduler.triggerJob(new JobKey(JOB_NAME, JOB_GROUP));
+		}
+		catch (SchedulerException e) {
+			LOG.error("Failed to trigger the scheduled transaction job (on-demand)", e);
+		}
 	}
 	
 	@PreDestroy

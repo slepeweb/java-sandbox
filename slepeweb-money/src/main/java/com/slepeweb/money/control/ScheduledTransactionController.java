@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.slepeweb.money.ScheduledTransactionManager;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
@@ -30,6 +31,7 @@ public class ScheduledTransactionController extends BaseController {
 	
 	@Autowired private FormSupport formSupport;
 	@Autowired private TransactionFormSupport transactionFormSupport;
+	@Autowired private ScheduledTransactionManager scheduledTransactionManager;
 	
 	private void populateForm(ModelMap model, ScheduledTransaction t, String mode) {			
 		List<Account> allAccounts = this.accountService.getAll(false);
@@ -42,6 +44,12 @@ public class ScheduledTransactionController extends BaseController {
 	public String list(ModelMap model) { 
 		model.addAttribute("_scheduled", this.scheduledTransactionService.getAll());
 		return "scheduleList";
+	}
+	
+	@RequestMapping(value="/trigger")	
+	public String trigger(ModelMap model) { 
+		this.scheduledTransactionManager.triggerNow();
+		return list(model);
 	}
 	
 	@RequestMapping(value="/add", method=RequestMethod.GET)
