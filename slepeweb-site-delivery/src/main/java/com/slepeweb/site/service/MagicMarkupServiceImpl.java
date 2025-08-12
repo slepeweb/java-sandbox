@@ -157,7 +157,7 @@ public class MagicMarkupServiceImpl implements MagicMarkupService {
     			<p class="clearfix"></p>
     		""";
     		
-    		e.append(String.format(template, cssfloat, width, url, url, caption, body));
+    		e.html(String.format(template, cssfloat, width, url, url, caption, body));
     	}
     }
 
