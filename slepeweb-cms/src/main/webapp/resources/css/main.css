@@ -363,12 +363,12 @@ div.button-set {
 	grid-template-columns: repeat(2, 1fr);
 }
 
-#item-editor button.action {
+#item-editor button.action, #user-form button.action {
 	justify-self: left;
 	background-color: #6eac2c;
 }
 
-#item-editor button.reset {
+#item-editor button.reset, #user-form button.reset {
 	justify-self: right;
 	background-color: #d27e00;
 }
@@ -378,7 +378,7 @@ div.action-reset-combo {
 }
 
 						/* >>>>> Buttons */
-							#item-editor button, #login button {
+							#item-editor button, #login button, #user-form button {
 								background-color: #6eac2c;
 								border: 1px solid #acdd4a;
 								border-radius: 6px;
@@ -716,6 +716,10 @@ div#session-expiry-warning {
 
 div#session-expiry-warning.hidden {
 	display: none;
+}
+
+#login, #user-form {
+	font-size: 1.1em;
 }
 
 @media (min-width: 700px) {

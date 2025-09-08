@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.slepeweb.common.util.JsonUtil;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.SavedSearchSupport;
@@ -101,7 +102,7 @@ public class SearchController extends BaseController {
 	public String edit(@PathVariable int id, HttpServletRequest req, ModelMap model) {
 		
 		SavedSearch ss = this.savedSearchService.get(id);
-		SolrParams params = this.searchFormSupport.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
+		SolrParams params = JsonUtil.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
 		
 		model.addAttribute("_numDeletableTransactions", 0);
 		this.searchFormSupport.populateForm(ss, params, SearchFormSupport.UPDATE_MODE, model);	
@@ -142,7 +143,7 @@ public class SearchController extends BaseController {
 	@RequestMapping(value="/get/{id}/{page}", method=RequestMethod.GET)
 	public String get(@PathVariable int id, @PathVariable int page, ModelMap model) {
 		SavedSearch ss = this.savedSearchService.get(id);
-		SolrParams params = this.searchFormSupport.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
+		SolrParams params = JsonUtil.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
 		params.setPageNum(page);
 		model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);			
 		this.searchFormSupport.populateForm(ss, params, id == -1 ? SearchFormSupport.ADHOC_MODE : SearchFormSupport.UPDATE_MODE, model);		

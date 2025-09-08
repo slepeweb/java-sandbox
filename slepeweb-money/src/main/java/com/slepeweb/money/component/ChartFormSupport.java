@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 
+import com.slepeweb.common.util.JsonUtil;
 import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.ChartProperties;
@@ -114,7 +115,7 @@ public class ChartFormSupport {
 			setType(SearchFormSupport.CHART_CTX).
 			setName(req.getParameter("name")).
 			setDescription(req.getParameter("description")).
-			setJson(this.searchFormSupport.toJson(props)).
+			setJson(JsonUtil.toJson(props)).
 			setSaved(new Timestamp(new Date().getTime()));
 		
 		// This support object simplifies matters ???

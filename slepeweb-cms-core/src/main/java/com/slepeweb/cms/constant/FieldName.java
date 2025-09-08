@@ -27,6 +27,8 @@ public class FieldName {
 	public static final String DATEISH = "dateish";
 	public static final String FIRSTNAME = "firstname";
 	public static final String LASTNAME = "lastname";
+	public static final String EMAIL = "email";
+	public static final String PHONE = "phone";
 	public static final String MIDDLENAMES = "middlenames";
 	public static final String CSS = "css";
 	public static final String JS = "js";

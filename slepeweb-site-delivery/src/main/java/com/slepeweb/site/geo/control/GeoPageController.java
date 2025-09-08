@@ -1,5 +1,6 @@
 package com.slepeweb.site.geo.control;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.QandAList;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
+import com.slepeweb.cms.service.QandAService;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.site.bean.SolrParams4Site;
 import com.slepeweb.site.control.BaseController;
@@ -37,12 +40,12 @@ public class GeoPageController extends BaseController {
 	@Autowired SolrService4Geo solrService4Geo;
 	@Autowired GeoCookieService geoCookieService;
 	@Autowired MagicMarkupService magicMarkupService;
+	@Autowired QandAService qandAService;
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
@@ -56,7 +59,6 @@ public class GeoPageController extends BaseController {
 	public String searchResults(
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
@@ -76,7 +78,6 @@ public class GeoPageController extends BaseController {
 	public String standardWide(
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
@@ -90,7 +91,6 @@ public class GeoPageController extends BaseController {
 	public String standardWidePdf(
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
@@ -104,7 +104,6 @@ public class GeoPageController extends BaseController {
 	public String standard3Col(
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
@@ -118,7 +117,6 @@ public class GeoPageController extends BaseController {
 	public String standard3ColPdf(
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
@@ -128,11 +126,71 @@ public class GeoPageController extends BaseController {
 		return page.getView();
 	}
 
+	@RequestMapping(value="/topsecret")	
+	public String topSecret(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			HttpServletRequest req,
+			HttpServletResponse res,
+			ModelMap model) throws Exception {	
+		
+		// Does this user have top-secret access?
+		if (! isSuperUser(req, res, i.getPath())) {
+			return null;
+		}
+		
+		Page page = getStandardPage(i, shortSitename, "standard3Col", model);
+		addGeoExtras(i, req, res, model);
+		return page.getView();
+	}
+
+	@RequestMapping(value="/superlogin")	
+	public String superLogin(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			HttpServletRequest req,
+			HttpServletResponse res,
+			ModelMap model) throws Exception {	
+		
+		User u = getUser(req);
+		QandAList qal = this.qandAService.getQandAList(u);
+		String success = req.getParameter("success");
+		
+		if (req.getMethod().equalsIgnoreCase("get")) {
+			model.addAttribute("_qal", qal);
+			model.addAttribute("_success", success);
+			Page page = getStandardPage(i, shortSitename, "superLogin", model);
+			addGeoExtras(i, req, res, model);
+			return page.getView();
+		}
+		
+		// Form data submission: check answers
+		String answerStoredInDb, answerProvidedInForm;
+		boolean failure = false;
+		
+		for (int j = 0; j < qal.getList().size(); j++) {
+			answerStoredInDb = qal.getList().get(j).getAnswer().toLowerCase();
+			answerProvidedInForm = req.getParameter("answer" + j).toLowerCase();
+			
+			if (! answerProvidedInForm.equals(answerStoredInDb)) {
+				failure = true;
+			}
+		}
+		
+		if (! failure) {
+			req.getSession().setAttribute(AttrName.SUPER_USER, u);
+			res.sendRedirect(success);
+			return null;
+		}
+		
+		res.sendRedirect("/superlogin?success=" + success);
+		return null;
+	}
+
 	@RequestMapping(value="/notfound")	
 	public String notfound(
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
-			@ModelAttribute(AttrName.SITE) Site site, 
 			HttpServletRequest req,
 			HttpServletResponse res,
 			ModelMap model) {	
@@ -146,6 +204,18 @@ public class GeoPageController extends BaseController {
 		model.addAttribute(MAGIC_MARKUP_SERVICE, this.magicMarkupService);
 		model.addAttribute("_inThisSection", new SectionMenu(i));
 		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
+	}
+	
+	private boolean isSuperUser(HttpServletRequest req, HttpServletResponse res, String targetItemPath) throws IOException {
+		// Does this user have top-secret access?
+		User superUser = (User) req.getSession().getAttribute(AttrName.SUPER_USER);
+		
+		if (superUser == null) {
+			res.sendRedirect("/superlogin?success=" + targetItemPath);
+			return false;
+		}
+		
+		return true;
 	}
 
 	private void addPdfExtras(Page p, HttpServletRequest req, HttpServletResponse res, ModelMap model) {

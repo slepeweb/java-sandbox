@@ -204,6 +204,7 @@ public class User extends CmsBean {
 		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
 		result = prime * result + ((phone == null) ? 0 : phone.hashCode());
+		result = prime * result + ((secret == null) ? 0 : secret.hashCode());
 		return result;
 	}
 
@@ -247,6 +248,11 @@ public class User extends CmsBean {
 			if (other.phone != null)
 				return false;
 		} else if (!phone.equals(other.phone))
+			return false;
+		if (secret == null) {
+			if (other.secret != null)
+				return false;
+		} else if (!secret.equals(other.secret))
 			return false;
 		return true;
 	}

@@ -5,7 +5,7 @@
 <cms:basicLayout loadjs="${false}">
 
 	<div id="main-wrapper">
-		<h2>CMS Login</h2>
+		<h1>CMS Login</h1>
 		
 		<c:if test="${not empty error}">
 			<div class="underline red"><p>${error}</p></div>
@@ -14,15 +14,17 @@
 			<div class="underline green"><p>${msg}</p></div>
 		</c:if>	
 		
-		<p>Please enter your login details to gain access to the CMS:</p>
+		<p class="x1pt2em">Please enter your login details to gain access to the CMS:</p>
 		
 		<form id="login" method="post" action="">
-			<div>
-				<label>Alias: </label><input name="alias" size="128" autocomplete="off" />
+			<div class="ff">
+				<label>Alias: </label>
+				<div class="inputs"><input name="alias" size="128" autocomplete="off" /></div>
 			</div>
 			
-			<div>
-				<label>Password: </label><input type="password" name="password" size="32" autocomplete="off" />
+			<div class="ff">
+				<label>Password: </label>
+				<div class="inputs"><input type="password" name="password" size="32" autocomplete="off" /></div>
 			</div>
 			
 			<button class="action" type="submit">Login</button>

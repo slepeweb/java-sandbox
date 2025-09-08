@@ -25,7 +25,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 	
 	public User save(User u, Site s, boolean doRoles) {
 		if (u.isDefined4Insert()) {
-			User dbRecord = get(u.getEmail());		
+			User dbRecord = get(u.getId());		
 			if (dbRecord != null) {
 				update(dbRecord, u);
 				return dbRecord;
@@ -65,7 +65,7 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 	
 	private User insert(User u) {		
 		this.jdbcTemplate.update( 
-				"insert into user (alias, firstname, lastname, email, phone, password, editor, enabled, secret) values (?, ?, ?, ?, ?, ?, ?, ?)", 
+				"insert into user (alias, firstname, lastname, email, phone, password, editor, enabled, secret) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 				u.getAlias(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getPhone(), u.getPassword(), u.isEditor(), 
 				u.isEnabled(), u.getSecret());	
 		

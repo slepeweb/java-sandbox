@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.slepeweb.common.util.JsonUtil;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.Category_GroupSet;
@@ -90,7 +89,7 @@ public class SearchFormSupport {
 		model.addAttribute(CATEGORY_GROUP_ATTR, cgs);				
 		model.addAttribute(ALL_ACCOUNTS_ATTR, this.accountService.getAll(true));
 		model.addAttribute(ALL_PAYEES_ATTR, this.payeeService.getAll());
-		model.addAttribute(JSON_ATTR, Util.encodeUrl(toJson(params)));		
+		model.addAttribute(JSON_ATTR, Util.encodeUrl(JsonUtil.toJson(params)));		
 		model.addAttribute(FORM_MODE_ATTR, formMode);
 		model.addAttribute(CategoryController.ALL_MAJOR_CATEGORIES_ATTR, allMajors);
 	}
@@ -118,7 +117,7 @@ public class SearchFormSupport {
 			setType(SEARCH_CTX).
 			setName(req.getParameter("name")).
 			setDescription(req.getParameter("description")).
-			setJson(toJson(params)).
+			setJson(JsonUtil.toJson(params)).
 			setSaved(new Timestamp(new Date().getTime()));
 		
 		// This support object simplifies matters ???
@@ -202,32 +201,4 @@ public class SearchFormSupport {
 		return p != null && StringUtils.containsIgnoreCase(p, option);
 	}
 	
-
-	/*
-	 * This method allows us to de-serialize a json string into a list of objects. This is a neater way
-	 * than returning a convenience object with a single property that is the list we are after.
-	 * 
-	 * (I don't know how this works, but it does!)
-	 */
-	public <T> T fromJson(final TypeReference<T> type, final String jsonPacket) {
-
-		T data = null;
-		try {
-			data = new ObjectMapper().readValue(jsonPacket, type);
-		} catch (Exception e) {
-			LOG.error("json de-serialisation error: ", e);
-		}
-		return data;
-	}
-	
-	public String toJson(Object o) {
-
-		String s = null;
-		try {
-			s = new ObjectMapper().writeValueAsString(o);
-		} catch (Exception e) {
-			LOG.error("Jackson marshalling error", e);
-		}
-		return s;
-	}
 }

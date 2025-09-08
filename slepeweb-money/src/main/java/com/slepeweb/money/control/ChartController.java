@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.slepeweb.common.util.JsonUtil;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.ChartData;
@@ -65,7 +66,7 @@ public class ChartController extends BaseController {
 	public String edit(@PathVariable int id, HttpServletRequest req, ModelMap model) {
 		
 		SavedSearch ss = this.savedSearchService.get(id);
-		ChartProperties props = this.searchFormSupport.fromJson(new TypeReference<ChartProperties>() {}, ss.getJson());
+		ChartProperties props = JsonUtil.fromJson(new TypeReference<ChartProperties>() {}, ss.getJson());
 
 		model.addAttribute("_numDeletableTransactions", 0);		
 		this.chartFormSupport.populateForm(ss, props, SearchFormSupport.UPDATE_MODE, model);
@@ -136,7 +137,7 @@ public class ChartController extends BaseController {
 	public String get(@PathVariable int id, HttpServletRequest req, ModelMap model) {
 
 		SavedSearch ss = this.savedSearchService.get(id);
-		ChartProperties props = this.searchFormSupport.fromJson(new TypeReference<ChartProperties>() {}, ss.getJson());
+		ChartProperties props = JsonUtil.fromJson(new TypeReference<ChartProperties>() {}, ss.getJson());
 		this.chartFormSupport.populateForm(ss, props, SearchFormSupport.EXECUTE_MODE, model);
 
 		model.addAttribute(SearchFormSupport.FORM_MODE_ATTR, SearchFormSupport.EXECUTE_MODE);
