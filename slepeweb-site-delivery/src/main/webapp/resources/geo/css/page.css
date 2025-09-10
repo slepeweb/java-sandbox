@@ -130,6 +130,11 @@ div#search-input {
 	justify-self: right;
 }
 
+div.in-this-section p.warning {
+	color: red;
+	font-size: 1.2em;
+}
+
 .ui-helper-reset {
 	font-size: 14px;
 	line-height: 1.65em;

@@ -6,6 +6,12 @@
 
 	<div id="main-wrapper">
 		<h1>User account details</h1>
+		
+		<div class="user-update-msg">
+			<c:if test="${not empty param.flash}">
+				<p>${param.flash}</p>
+			</c:if>
+		</div>
 				
 		<p class="x1pt2em">These are your account details, for you to update as required.</p>
 
@@ -36,27 +42,29 @@
 				<div class="inputs"><input name="phone" autocomplete="off" value="${_user.phone}" /></div>
 			</div>
 			
-			<hr />
-			
-			<p class="x1pt2em">OPTIONAL: Some sites will ask for additional user information, to increase security. If this applies to you,
-			please supply up to 3 question/answers</p>
-		
-			<c:forEach begin="0" end="2" var="_i">
-				<c:set var="_j" value="${_i + 1}" />
-				<c:set var="_qa" value="${_qandA.list[_i]}" />
-				
-				<div class="ff">
-					<label>Question #${_j}:</label>
-					<div class="inputs"><input name="q${_i}" autocomplete="off" value="${not empty _qa.question ? _qa.question : ''}" /></div>
-				</div>
-				
-				<div class="ff">
-					<label>Answer #${_j}:</label>
-					<div class="inputs"><input name="a${_i}" autocomplete="off" value="${not empty _qa.answer ? _qa.answer : ''}" /></div>
-				</div>
-				
+			<c:if test="${not empty _qandA}">
 				<hr />
-			</c:forEach>
+				
+				<p class="x1pt2em">OPTIONAL: Some sites will ask for additional user information, to increase security. If this applies to you,
+				please supply up to 3 question/answers</p>
+			
+				<c:forEach begin="0" end="2" var="_i">
+					<c:set var="_j" value="${_i + 1}" />
+					<c:set var="_qa" value="${_qandA.list[_i]}" />
+					
+					<div class="ff">
+						<label>Question #${_j}:</label>
+						<div class="inputs"><input name="q${_i}" autocomplete="off" value="${not empty _qa.question ? _qa.question : ''}" /></div>
+					</div>
+					
+					<div class="ff">
+						<label>Answer #${_j}:</label>
+						<div class="inputs"><input name="a${_i}" autocomplete="off" value="${not empty _qa.answer ? _qa.answer : ''}" /></div>
+					</div>
+					
+					<hr />
+				</c:forEach>
+			</c:if>
 						
 			<div class="button-set">
 					<button class="action" type="submit">Submit</button>

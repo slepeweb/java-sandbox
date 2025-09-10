@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -153,37 +154,39 @@ public class GeoPageController extends BaseController {
 			ModelMap model) throws Exception {	
 		
 		User u = getUser(req);
-		QandAList qal = this.qandAService.getQandAList(u);
-		String success = req.getParameter("success");
+		QandAList qalStoredInDb = this.qandAService.getQandAList(u);
+		
+		String targetOnSuccess = req.getParameter("success");
 		
 		if (req.getMethod().equalsIgnoreCase("get")) {
-			model.addAttribute("_qal", qal);
-			model.addAttribute("_success", success);
+			model.addAttribute("_qal", qalStoredInDb);
+			model.addAttribute("_success", targetOnSuccess);
 			Page page = getStandardPage(i, shortSitename, "superLogin", model);
 			addGeoExtras(i, req, res, model);
 			return page.getView();
 		}
 		
-		// Form data submission: check answers
-		String answerStoredInDb, answerProvidedInForm;
-		boolean failure = false;
-		
-		for (int j = 0; j < qal.getList().size(); j++) {
-			answerStoredInDb = qal.getList().get(j).getAnswer().toLowerCase();
-			answerProvidedInForm = req.getParameter("answer" + j).toLowerCase();
-			
-			if (! answerProvidedInForm.equals(answerStoredInDb)) {
-				failure = true;
+		// Dealing with form submission ...
+		String q, a;
+		QandAList qalProvidedInForm = new QandAList();
+		for (int j = 0; j < 3; j++) {
+			q = req.getParameter("question" + j);
+			a = req.getParameter("answer" + j);
+			if (StringUtils.isNotBlank(q) && StringUtils.isNotBlank(a)) {
+				qalProvidedInForm.add(q, a.trim());
 			}
-		}
+		}		
 		
-		if (! failure) {
+		if (qalProvidedInForm.equals(qalStoredInDb)) {
 			req.getSession().setAttribute(AttrName.SUPER_USER, u);
-			res.sendRedirect(success);
+			res.sendRedirect(targetOnSuccess);
+			LOG.info(String.format("User '%s' correctly answered %d security questions", u.getFullName(), qalStoredInDb.getList().size()));
 			return null;
 		}
 		
-		res.sendRedirect("/superlogin?success=" + success);
+		LOG.info(String.format("User '%s' FAILED to correctly answer %d security questions", u.getFullName(), qalStoredInDb.getList().size()));
+		String loginFormUrl = String.format("/superlogin?warning=%s&success=%s", "***+Invalid+credentials+***", targetOnSuccess);
+		res.sendRedirect(loginFormUrl);
 		return null;
 	}
 

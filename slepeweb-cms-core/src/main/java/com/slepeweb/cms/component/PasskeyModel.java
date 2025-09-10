@@ -37,10 +37,10 @@ public class PasskeyModel {
 	
 	public PasskeyModel(String id, int ttl) {
 		this.id = id;
+		this.ttl = ttl;
 		this.issues = new ArrayList<int[]>();
 		this.issues.add(this.model = build());
 		this.lastIssuedMillis = System.currentTimeMillis();
-		this.ttl = ttl;
 	}
 	
 	private long toSeconds(long millis) {

@@ -114,12 +114,16 @@ public class BaseController {
 		
 		ICmsHook hook = this.cmsHooker.getHook(i.getSite().getShortname());
 		IGuidance guidance = null;
+		FieldType ft;
+		boolean accessible = i.isAccessible();
 		
 		for (String language : i.getSite().getAllLanguages()) {
 			languageValuesMap = i.getFieldValueSet().getFieldValues(language);
 			list = new ArrayList<FieldEditorSupport>();
 			
 			for (FieldForType fft : i.getType().getFieldsForType(false)) {
+				ft = fft.getField().getType();
+				
 				if (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual()) {
 					variable = fft.getField().getVariable();
 					guidance = hook.getFieldGuidance(variable);
@@ -136,6 +140,11 @@ public class BaseController {
 							fes.setInputTag(fft.getField().getInputTag(guidance));
 						}
 						else {
+							// Hide text field values for inaccessible items
+							if (! accessible && (ft == FieldType.markup || ft == FieldType.text)) {
+								fv.setValue("");
+							}
+							
 							fes.setFieldValue(fv);
 							fes.setInputTag(fv.getInputTag(guidance));
 						}

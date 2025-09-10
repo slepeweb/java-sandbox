@@ -11,6 +11,13 @@ import com.slepeweb.cms.except.ResourceException;
 public class User extends CmsBean {
 	
 	private static final long serialVersionUID = 1L;
+	
+	// User roles
+	public static final String VISITOR = "visitor";
+	public static final String EDITOR = "editor";
+	public static final String ADMIN = "admin";
+	public static final String MI6 = "mi6";
+	
 	private Long id;
 	private String alias, firstName, lastName, email, phone, password, secret;
 	private boolean enabled, loggedIn, editor;

@@ -32,7 +32,7 @@ public class Ownership {
 		if (this.siteContributors.size() > 1) {
 			return 
 				this.owner.getId().equals(this.contributor.getId()) ||
-				this.contributor.hasRole(this.site.getId(), "admin");
+				this.contributor.hasRole(this.site.getId(), User.ADMIN);
 		}
 		
 		return false;

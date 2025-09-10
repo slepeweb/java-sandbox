@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.AccessRule;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.User;
 
@@ -32,7 +34,22 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 			if (i.getUser() == null) {
 				return false;
 			}
-			return isAccessible(i, getWriteRules(i.getSite().getId()));
+			
+			Long siteId = i.getSite().getId();
+			boolean accessible = isAccessible(i, getWriteRules(siteId));
+			
+			/*
+			 *  Is item a component? If so, for it to be accessible, ancestor page item must
+			 *  also be accessible.
+			 */			
+			if (accessible) {
+				Item pageOwningComponent = getOwningPage(i);
+				if (pageOwningComponent != null) {
+					accessible = isAccessible(pageOwningComponent, getWriteRules(siteId));
+				}
+			}
+			
+			return accessible;
 		}
 		else {
 			if (! i.getSite().isSecured()) {
@@ -55,6 +72,21 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 			
 			return isAccessible(i, getReadRules(i.getSite().getId()));
 		}
+	}
+	
+	
+	private Item getOwningPage(Item child) {
+		// Ignore root item, and first level items
+		if (child.getPath().split("\\/").length <= 2) {
+			return null;
+		}
+		
+		Link parentLink = child.getOrthogonalParentLink();
+		if (parentLink.getType().equals(LinkType.component)) {
+			return getOwningPage(parentLink.getChild());
+		}
+		
+		return child;
 	}
 	
 	private boolean isAccessible(Item i, List<AccessRule> rules) {		
@@ -82,7 +114,7 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 			
 		return false; 
 	}
-
+	
 	private List<AccessRule> getReadRules(Long siteId) {
 		List<AccessRule> list = this.readRules.get(siteId);
 		if (list == null) {

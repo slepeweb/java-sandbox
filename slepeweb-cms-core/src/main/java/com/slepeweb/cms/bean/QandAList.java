@@ -18,6 +18,31 @@ public class QandAList {
 	public void setList(List<QandA> list) {
 		this.list = list;
 	}
+	
+	public QandAList add(String q, String a) {
+		getList().add(new QandA(q, a));
+		return this;
+	}
+	
+	public boolean equals(QandAList other) {
+		int size = getList().size();
+		
+		if (size == 0) {
+			return false;
+		}
+		
+		if (size != other.getList().size()) {
+			return false;
+		}
+		
+		for (int j = 0; j < size; j++) {
+			if (! getList().get(j).equals(other.getList().get(j))) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
 
 	public static class QandA {
 		private String question, answer;
@@ -32,6 +57,18 @@ public class QandAList {
 		@Override
 		public String toString() {
 			return String.format("[\"%s\": \"%s\"]", this.question, this.answer);
+		}
+		
+		public boolean equals(QandA other) {
+			if (! getQuestion().equals(other.getQuestion())) {
+				return false;
+			}
+			
+			if (! getAnswer().toLowerCase().equals(other.getAnswer().toLowerCase())) {
+				return false;
+			}
+			
+			return true;
 		}
 		
 		@JsonIgnore
