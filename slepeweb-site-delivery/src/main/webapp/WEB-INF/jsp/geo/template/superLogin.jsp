@@ -4,19 +4,33 @@
 
 <gen:debug><!-- jsp/geo/topSecret.jsp --></gen:debug>
 
+<script>
+	let _flash = '${param.error}';
+	let _focus = 'answer0';
+</script>
+
+<c:set var="_extraJs" scope="request">/resources/geo/js/flasher.js</c:set>
+
+<c:set var="_extraInpageCss" scope="request">
+	form#user-form table {
+		background: pink;
+	}
+	
+	form#user-form input[type=submit] {
+		margin-top: 1em;
+	}
+</c:set>
+
 <geo:pageLayout type="std">
 		
 	<div class="main standard-3col">
-		<div class="leftside">
-			<div class="in-this-section">
-				<c:if test="${not empty param.warning}"><p class="warning">${param.warning}</p>
-				</c:if>
-			</div>
-		</div>
+		<geo:emptyLeftside />
 		
 		<div class="rightside">
 			<div class="mainbody full-width">
 			
+				<div class="flash-error">${param.error}</div>
+
 				<h2 id="page-title">${_item.fields.title}</h2>				
 				<p>The page you requested requires you to have the appropriate security clearance.</p>
 				
@@ -39,9 +53,11 @@
 									</tr>
 								</c:if>						
 							</c:forEach>
+							
 					</table>
 								
-					<button class="action" type="submit">Submit</button>					
+					<button class="action" type="submit">Submit</button>
+						
 				</form>	
 				
 			</c:when><c:otherwise>
@@ -55,9 +71,8 @@
 </geo:pageLayout>
 
 <script>
-$(function() {
-	$('form#user-form').click(function() {
-		$('div.in-this-section p').html('');
+	$(function() {
+		$('input[name=answer0]').focus()
 	})
-})
-</script>
+</script>		
+

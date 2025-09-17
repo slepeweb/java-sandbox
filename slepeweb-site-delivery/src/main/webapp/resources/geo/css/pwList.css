@@ -1,0 +1,36 @@
+form#pwg-login-form table {
+	background: red;
+}
+
+form#pwg-login-form input[type=submit] {
+	margin-top: 1em;
+}
+
+table.password-list td.auth-details {
+  font-family: Courier, sans-serif;
+  font-size: 14px;
+  position: relative;
+}
+
+table.password-list div.notes {
+  border: rgb(179, 2, 2) solid 2px;
+  background-color: rgb(255, 0, 0);
+  color: white;
+  padding: 1em;
+  visibility: hidden;
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  z-index: 10;
+  font-weight: bold;
+}
+
+/* table.password-list .hideable { */
+/* 	display: visible; */
+/* } */
+
+@media only screen and (max-width: 600px) {
+	table.password-list .hideable {
+		display: none;
+	}
+}

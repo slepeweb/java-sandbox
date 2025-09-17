@@ -2,14 +2,14 @@ package com.slepeweb.cms.bean;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class SiteConfig extends CmsBean {
+public class SiteConfigProperty extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private long siteId;
 	private String name, value;
 	
 	public void assimilate(Object obj) {
-		if (obj instanceof SiteConfig) {
-			SiteConfig t = (SiteConfig) obj;
+		if (obj instanceof SiteConfigProperty) {
+			SiteConfigProperty t = (SiteConfigProperty) obj;
 			setName(t.getName());
 			setValue(t.getValue());
 		}
@@ -21,7 +21,7 @@ public class SiteConfig extends CmsBean {
 			StringUtils.isNotBlank(getValue());
 	}
 	
-	public SiteConfig save() {
+	public SiteConfigProperty save() {
 		return getCmsService().getSiteConfigService().save(this);
 	}
 	
@@ -31,7 +31,7 @@ public class SiteConfig extends CmsBean {
 	
 	@Override
 	public String toString() {
-		return String.format("%s -> [%s]", getName(), getValue());
+		return String.format("%d: %s -> [%s]", getSiteId(), getName(), getValue());
 	}
 	
 	public void delete() {
@@ -41,7 +41,7 @@ public class SiteConfig extends CmsBean {
 		return siteId;
 	}
 	
-	public SiteConfig setSiteId(long siteId) {
+	public SiteConfigProperty setSiteId(long siteId) {
 		this.siteId = siteId;
 		return this;
 	}
@@ -50,7 +50,7 @@ public class SiteConfig extends CmsBean {
 		return name;
 	}
 	
-	public SiteConfig setName(String key) {
+	public SiteConfigProperty setName(String key) {
 		this.name = key;
 		return this;
 	}
@@ -59,7 +59,7 @@ public class SiteConfig extends CmsBean {
 		return value;
 	}
 	
-	public SiteConfig setValue(String value) {
+	public SiteConfigProperty setValue(String value) {
 		this.value = value;
 		return this;
 	}
@@ -82,7 +82,7 @@ public class SiteConfig extends CmsBean {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SiteConfig other = (SiteConfig) obj;
+		SiteConfigProperty other = (SiteConfigProperty) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;

@@ -2,19 +2,14 @@ package com.slepeweb.cms.service;
 
 import java.util.List;
 
-import com.slepeweb.cms.bean.SiteConfig;
+import com.slepeweb.cms.bean.SiteConfigProperty;
 
 
 public interface SiteConfigService {
-	void deleteSiteConfig(SiteConfig sc);
-	SiteConfig getSiteConfig(Long siteId, String key);
-	String getProperty(Long siteId, String key);
-	String getProperty(Long siteId, String key, String dflt);
-	Integer getIntegerProperty(Long siteId, String key);
-	Integer getIntegerProperty(Long siteId, String key, Integer dflt);
-	Boolean getBooleanProperty(Long siteId, String key);
-	Boolean getBooleanProperty(Long siteId, String key, Boolean dflt);
-	List<SiteConfig> getSiteConfigs(Long siteId);
-	SiteConfig save(SiteConfig sc);
+	void deleteSiteConfig(SiteConfigProperty sc);
+	SiteConfigProperty getSiteConfig(Long siteId, String key);
+	List<SiteConfigProperty> getAll();
+	List<SiteConfigProperty> getSiteConfigs(Long siteId);
+	SiteConfigProperty save(SiteConfigProperty sc);
 	int getCount();
 }

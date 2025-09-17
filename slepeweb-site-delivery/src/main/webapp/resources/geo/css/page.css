@@ -130,10 +130,14 @@ div#search-input {
 	justify-self: right;
 }
 
-div.in-this-section p.warning {
+div.flash-error {
 	color: red;
-	font-size: 1.2em;
+	font-size: 1.5em;
+	border: 2px solid red;
+	padding: 1em;
+	display: none;
 }
+
 
 .ui-helper-reset {
 	font-size: 14px;

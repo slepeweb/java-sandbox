@@ -2,23 +2,40 @@ package com.slepeweb.site.geo.control;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.QandAList;
+import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.QandAService;
 import com.slepeweb.common.solr.bean.SolrConfig;
+import com.slepeweb.common.util.HttpUtil;
+import com.slepeweb.common.util.JsonUtil;
 import com.slepeweb.site.bean.SolrParams4Site;
 import com.slepeweb.site.control.BaseController;
+import com.slepeweb.site.geo.bean.PasswordList;
+import com.slepeweb.site.geo.bean.PasswordList.Account;
+import com.slepeweb.site.geo.bean.PasswordList.Group;
 import com.slepeweb.site.geo.bean.SectionMenu;
 import com.slepeweb.site.geo.service.GeoCookieService;
 import com.slepeweb.site.geo.service.SolrService4Geo;
@@ -42,6 +59,7 @@ public class GeoPageController extends BaseController {
 	@Autowired GeoCookieService geoCookieService;
 	@Autowired MagicMarkupService magicMarkupService;
 	@Autowired QandAService qandAService;
+	@Autowired SiteConfigCache siteConfigCache;
 	
 	@RequestMapping(value="/homepage")	
 	public String homepage(
@@ -185,9 +203,82 @@ public class GeoPageController extends BaseController {
 		}
 		
 		LOG.info(String.format("User '%s' FAILED to correctly answer %d security questions", u.getFullName(), qalStoredInDb.getList().size()));
-		String loginFormUrl = String.format("/superlogin?warning=%s&success=%s", "***+Invalid+credentials+***", targetOnSuccess);
+		String loginFormUrl = String.format("/superlogin?error=%s&success=%s", "Invalid+credentials", targetOnSuccess);
 		res.sendRedirect(loginFormUrl);
 		return null;
+	}
+
+	@RequestMapping(value="/pwlist")	
+	public String pwgLogin(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			HttpServletRequest req,
+			HttpServletResponse res,
+			ModelMap model) throws Exception {	
+		
+		if (! isSuperUser(req, res, i.getPath())) {
+			return null;
+		}
+		
+		if (req.getMethod().equalsIgnoreCase("get")) {
+			Page page = getStandardPage(i, shortSitename, "pwForm", model);
+			addGeoExtras(i, req, res, model);
+			return page.getView();
+		}
+		
+		// Dealing with form submission ...
+		String alias = req.getParameter("alias");
+		String key = req.getParameter("password");
+		boolean important = req.getParameter("important") != null;
+		
+		Calendar now = Calendar.getInstance();
+		String prefix = "" + zeroPad(now.get(Calendar.MINUTE)) + zeroPad(now.get(Calendar.HOUR_OF_DAY));
+		String password = prefix + key + "^";
+		String remotePath = "/list/passwords";		
+		String remoteHost = this.siteConfigCache.getValue(i.getSite().getId(), "host.pwg", "http://localhost:8083");
+		
+		String json = httpPostMultipart(remoteHost + remotePath, alias, key, password);
+		PasswordList pwl = json != null ? 
+				JsonUtil.fromJson(new TypeReference<PasswordList>() {}, json) :
+					new PasswordList();
+		
+		if (pwl.isError()) {
+			res.sendRedirect(String.format("%s?error=%s", i.getPath(), HttpUtil.encodeUrl(pwl.getError())));
+			return null;
+		}
+		
+		if (important) {
+			Iterator<Group> groupIter = pwl.getGroups().iterator();
+			Iterator<Account> accountIter;
+			Group g;
+			Account a;
+			boolean empty;
+			
+			while (groupIter.hasNext()) {
+				g = groupIter.next();
+				accountIter = g.getAccounts().iterator();
+				empty = true;
+				
+				while (accountIter.hasNext()) {
+					a = accountIter.next();
+					if (! a.isImportant()) {
+						accountIter.remove();
+					}
+					else {
+						empty = false;
+					}
+				}
+				
+				if (empty) {
+					groupIter.remove();
+				}
+			}
+		}
+		
+		Page page = getStandardPage(i, shortSitename, "pwList", model);
+		model.addAttribute("_pwl", pwl);
+		model.addAttribute("_important", important);
+		return page.getView();
 	}
 
 	@RequestMapping(value="/notfound")	
@@ -253,4 +344,37 @@ public class GeoPageController extends BaseController {
 		model.addAttribute("_toptitle", topRow);
 		model.addAttribute("_bottomtitle", bottomRow);
 	}
+	
+	private String zeroPad(int i) {
+		if (i < 10) {
+			return "0" + i;
+		}
+		
+		return String.valueOf(i);
+	}
+	
+    private String httpPostMultipart(String url, String alias, String key, String password) {
+    	
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+    	HttpEntity multipart = MultipartEntityBuilder.create()
+    	        .addTextBody("alias", alias, ContentType.TEXT_PLAIN)
+    	        .addTextBody("password", password, ContentType.TEXT_PLAIN)
+    	        .addTextBody("key", key, ContentType.TEXT_PLAIN)
+    	        .build();
+
+    	HttpPost post = new HttpPost(url);
+    	post.setEntity(multipart);
+
+    	try (@SuppressWarnings("deprecation")
+		CloseableHttpResponse response = httpclient.execute(post)) {
+    	    String json = EntityUtils.toString(response.getEntity());
+    	    return json;
+    	}
+    	catch (Exception e) {
+    		System.err.println("httpPost error: " + e.getMessage());
+    	}
+    	
+		return null;
+    }
 }
+

@@ -23,7 +23,7 @@ import com.slepeweb.cms.bean.LoggerBean;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Shortcut;
 import com.slepeweb.cms.bean.Site;
-import com.slepeweb.cms.bean.SiteConfig;
+import com.slepeweb.cms.bean.SiteConfigProperty;
 import com.slepeweb.cms.bean.SiteType;
 import com.slepeweb.cms.bean.Tag;
 import com.slepeweb.cms.bean.TagCount;
@@ -270,8 +270,8 @@ public class RowMapperUtil {
 		}
 	}
 	
-	public static final class SiteConfigMapper implements RowMapper<SiteConfig> {
-		public SiteConfig mapRow(ResultSet rs, int rowNum) throws SQLException {
+	public static final class SiteConfigMapper implements RowMapper<SiteConfigProperty> {
+		public SiteConfigProperty mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return CmsBeanFactory.makeSiteConfig().
 					setSiteId(rs.getLong("siteid")).
 					setName(rs.getString("name")).

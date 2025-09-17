@@ -1,6 +1,5 @@
 package com.slepeweb.cms.service;
 
-import com.slepeweb.cms.component.SiteConfiguration;
 import com.slepeweb.commerce.service.AxisService;
 import com.slepeweb.commerce.service.AxisValueService;
 import com.slepeweb.commerce.service.ProductService;
@@ -36,7 +35,6 @@ public interface CmsService {
 	AxisService getAxisService();
 	AxisValueService getAxisValueService();
 	VariantService getVariantService();
-	SiteConfiguration getSiteConfiguration();
 	UserService getUserService();
 	AccessService getAccessService();
 	SiteAccessService getSiteAccessService();

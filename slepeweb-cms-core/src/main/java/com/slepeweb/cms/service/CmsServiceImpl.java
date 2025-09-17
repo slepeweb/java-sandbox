@@ -3,7 +3,6 @@ package com.slepeweb.cms.service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
-import com.slepeweb.cms.component.SiteConfiguration;
 import com.slepeweb.commerce.service.AxisService;
 import com.slepeweb.commerce.service.AxisValueService;
 import com.slepeweb.commerce.service.ProductService;
@@ -40,7 +39,6 @@ public class CmsServiceImpl implements CmsService {
 	@Autowired protected AccessService accessService;
 	@Autowired protected SiteAccessService siteAccessService;
 	@Autowired protected SiteTypeService siteTypeService;
-	@Autowired protected SiteConfiguration siteConfiguration;
 	@Autowired protected PasskeyService passkeyService;
 	
 	/* 
@@ -212,10 +210,6 @@ public class CmsServiceImpl implements CmsService {
 
 	public VariantService getVariantService() {
 		return variantService;
-	}
-
-	public SiteConfiguration getSiteConfiguration() {
-		return siteConfiguration;
 	}
 
 	public UserService getUserService() {

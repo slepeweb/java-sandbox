@@ -108,8 +108,8 @@ public class CmsBeanFactory {
 		return fv;
 	}
 	
-	public static SiteConfig makeSiteConfig() {
-		SiteConfig sc = new SiteConfig();
+	public static SiteConfigProperty makeSiteConfig() {
+		SiteConfigProperty sc = new SiteConfigProperty();
 		sc.setCmsService(CMS);
 		return sc;
 	}
