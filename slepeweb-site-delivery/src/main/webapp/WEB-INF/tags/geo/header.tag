@@ -6,7 +6,23 @@
 -->
 <header>
 	<nav class="navbar">
-		<div class="brand-title"><a href="/">GeorgieB</a></div>
+		<div class="brand-title">
+			<span id="user-icon" class="${_isSuperUser ? 'super-user' : ''}"><i class="fa-regular fa-user"></i></span> 
+			<a href="/">GeorgieB</a>
+
+			<c:if test="${not empty _user}">
+				<div id="user-menu" class="hidden">
+					<u>${_user.fullName}</u>
+					<ul>
+						<li id="logout-link">> Logout</li>
+						<c:if test="${_isSuperUser}">
+							<li id="super-logout-link">> Super-logout</li>
+						</c:if>
+					</ul>
+				</div>
+			</c:if>
+		</div>
+		
 		<a href="#" class="menu-bars">
 			<span class="bar"></span>
 			<span class="bar"></span>

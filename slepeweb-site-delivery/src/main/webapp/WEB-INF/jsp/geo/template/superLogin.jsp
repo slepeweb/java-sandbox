@@ -32,11 +32,11 @@
 				<div class="flash-error">${param.error}</div>
 
 				<h2 id="page-title">${_item.fields.title}</h2>				
-				<p>The page you requested requires you to have the appropriate security clearance.</p>
+				${_item.fields.bodytext}
 				
 				<c:choose><c:when test="${fn:length(_qal.list) gt 0}">
 					
-					<p>Please answer the following questions to prove your identity:</p>
+					<p>Please answer the following questions:</p>
 					
 					<form id="user-form" method="post" action="">
 						<input type="hidden" name="success" value="${_success}" />
@@ -61,7 +61,7 @@
 				</form>	
 				
 			</c:when><c:otherwise>
-				<p>Please consult your documentation for further details.</p>
+				<p>You have not yet recorded any personal questions & answers. Please consult your documentation for further details.</p>
 			</c:otherwise></c:choose>
 				
 			</div>		

@@ -76,7 +76,28 @@ $(function() {
 	*/
 	
 	$("div.main").on('mouseenter', function(e) {
-		_menu.deactivateAllSubmenus('Moused over main page area');	
+		_menu.deactivateAllSubmenus('Moused over main page area');
+		$('div#user-menu').addClass('hidden')		
 	});
 	
+	$('span#user-icon').hover(function() {
+		$('div#user-menu').removeClass('hidden')
+	})
+	
+	$('div#user-menu li#logout-link').click(function() {
+		_site.support.ajax('GET', '/rest/logout/' + _site.siteId, {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+			if (! resp.error) {
+				window.location = `${resp.data}`;
+			}
+		})
+	})
+	
+	$('div#user-menu li#super-logout-link').click(function() {
+		_site.support.ajax('GET', '/rest/superlogout', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+			if (! resp.error) {
+				window.location.reload();
+			}
+		})
+	})
+
 });

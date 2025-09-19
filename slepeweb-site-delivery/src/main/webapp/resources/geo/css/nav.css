@@ -22,6 +22,10 @@ header {
     height: 5em;
 }
 
+.navbar .hidden {
+	visibility: hidden;
+}
+
 .brand-title {
     font-size: 1.5em;
     align-content: center;
@@ -41,7 +45,6 @@ header {
 .navbar a {
     text-decoration: none;
     color: white;
-    padding: 8px 15px;
     transition: background 0.3s;
 }
 
@@ -106,6 +109,39 @@ div.submenu-2 a {
     width: 25px;
     background-color: white;
     margin: 4px 0;
+}
+
+div.brand-title {
+	position: relative;
+}
+
+span#user-icon {
+	cursor: pointer;
+	font-size: 0.8em;
+	margin-right: 0.5em;
+}
+
+span#user-icon.super-user {
+	background-color: red;
+	padding: 0.3em;
+}
+
+div#user-menu {
+    position: absolute;
+    top: 0;
+    background-color: #ac4747;
+    z-index: 1;
+    font-size: 0.65em;
+    padding: 0.25em;
+}
+
+div#user-menu ul {
+	flex-direction: column;
+}
+
+div#user-menu li {
+	margin-left: -2em;
+	cursor: pointer;
 }
 
 div#breadcrumbs {

@@ -14,6 +14,7 @@
 
 <script>
 	let _site = {
+		siteId: ${_item.site.id},
 		support: {},
 		origId: ${_item.origId},
 		isSecured: ${_item.site.secured ? 'true' : 'false'},

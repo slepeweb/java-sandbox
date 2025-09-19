@@ -27,6 +27,7 @@ import com.slepeweb.cms.bean.QandAList;
 import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
+import com.slepeweb.cms.constant.SiteConfigKey;
 import com.slepeweb.cms.service.QandAService;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.util.HttpUtil;
@@ -52,6 +53,7 @@ public class GeoPageController extends BaseController {
 	
 	public static final String HISTORY = "_history";
 	public static final String MAGIC_MARKUP_SERVICE = "_magicMarkupService";
+	public static final String SITE_CONFIG_SERVICE = "_siteConfigService";
 	public static final String LOCAL_HOSTNAME = "_localHostname";
 	public static final String PASSKEY = "_passkey";
 	
@@ -235,7 +237,7 @@ public class GeoPageController extends BaseController {
 		String prefix = "" + zeroPad(now.get(Calendar.MINUTE)) + zeroPad(now.get(Calendar.HOUR_OF_DAY));
 		String password = prefix + key + "^";
 		String remotePath = "/list/passwords";		
-		String remoteHost = this.siteConfigCache.getValue(i.getSite().getId(), "host.pwg", "http://localhost:8083");
+		String remoteHost = this.siteConfigCache.getValue(i.getSite().getId(), SiteConfigKey.PWG_HOST, "http://localhost:8083");
 		
 		String json = httpPostMultipart(remoteHost + remotePath, alias, key, password);
 		PasswordList pwl = json != null ? 
@@ -298,6 +300,7 @@ public class GeoPageController extends BaseController {
 		model.addAttribute(MAGIC_MARKUP_SERVICE, this.magicMarkupService);
 		model.addAttribute("_inThisSection", new SectionMenu(i));
 		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
+		model.addAttribute("_isSuperUser", Boolean.valueOf(req.getSession().getAttribute(AttrName.SUPER_USER) != null));
 	}
 	
 	private boolean isSuperUser(HttpServletRequest req, HttpServletResponse res, String targetItemPath) throws IOException {

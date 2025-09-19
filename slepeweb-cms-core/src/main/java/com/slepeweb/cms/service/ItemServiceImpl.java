@@ -351,7 +351,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 			this.solrService4Cms.remove(i);
 			
 			// Now attend to any child items
-			List<Link> list = this.linkService.getBindings(i.getId());
+			List<Link> list = i.getOrthogonalLinks();
 				
 			for (Link l : list) {
 				count += trashItemAndDirectChildren(l.getChild());

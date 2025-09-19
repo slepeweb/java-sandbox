@@ -121,5 +121,10 @@
 		<function-signature>java.lang.String transformMagicMarkup4Pdf(java.lang.String, java.lang.String, com.slepeweb.site.service.MagicMarkupService)</function-signature>
 	</function>
 	
+	<function>
+		<name>resolveConfig</name>
+		<function-class>com.slepeweb.site.util.TldFunction</function-class>
+		<function-signature>java.lang.String resolveConfig(java.lang.Long, java.lang.String, com.slepeweb.cms.bean.SiteConfigCache)</function-signature>
+	</function>
 	
 </taglib>

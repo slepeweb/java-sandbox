@@ -13,9 +13,12 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Item4Json;
 import com.slepeweb.cms.bean.RequestPack;
 import com.slepeweb.cms.bean.RestResponse;
+import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.component.Passkey;
 import com.slepeweb.cms.component.PasskeyModel;
+import com.slepeweb.cms.constant.AttrName;
+import com.slepeweb.cms.constant.SiteConfigKey;
 import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.PasskeyService;
@@ -31,6 +34,7 @@ public class RestController extends BaseController {
 	@Autowired private XPasskeyService xPasskeyService;
 	@Autowired private PasskeyService passkeyService;
 	@Autowired private HostService hostService;
+	@Autowired private SiteConfigCache siteConfigCache;
 
 	
 	@RequestMapping(value="/xpasskey", method=RequestMethod.GET, produces="application/json")
@@ -106,4 +110,18 @@ public class RestController extends BaseController {
 		return r.setData(new Item4Json(i));
 	}
 	
+	@RequestMapping(value="/logout/{siteId}", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse logout(@PathVariable long siteId, HttpServletRequest req) {
+		req.getSession().removeAttribute(AttrName.USER);
+		String loginPath = this.siteConfigCache.getValue(siteId, SiteConfigKey.LOGIN_PATH, "/login");
+		return new RestResponse().addMessage("Done").setData(loginPath);
+	}
+	
+	@RequestMapping(value="/superlogout", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse superlogout(HttpServletRequest req) {
+		req.getSession().removeAttribute(AttrName.SUPER_USER);
+		return new RestResponse().addMessage("Done");
+	}
 }
