@@ -210,7 +210,7 @@ public class GeoPageController extends BaseController {
 		return null;
 	}
 
-	@RequestMapping(value="/pwlist")	
+	@RequestMapping(value="/remotepwg")	
 	public String pwgLogin(
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
@@ -280,6 +280,7 @@ public class GeoPageController extends BaseController {
 		Page page = getStandardPage(i, shortSitename, "pwList", model);
 		model.addAttribute("_pwl", pwl);
 		model.addAttribute("_important", important);
+		addGeoExtras(i, req, res, model);
 		return page.getView();
 	}
 
@@ -297,6 +298,7 @@ public class GeoPageController extends BaseController {
 	}
 
 	private void addGeoExtras(Item i, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+		model.addAttribute(SITE_CONFIG_SERVICE, this.siteConfigCache);
 		model.addAttribute(MAGIC_MARKUP_SERVICE, this.magicMarkupService);
 		model.addAttribute("_inThisSection", new SectionMenu(i));
 		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));

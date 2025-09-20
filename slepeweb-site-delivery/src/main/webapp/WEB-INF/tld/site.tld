@@ -127,4 +127,10 @@
 		<function-signature>java.lang.String resolveConfig(java.lang.Long, java.lang.String, com.slepeweb.cms.bean.SiteConfigCache)</function-signature>
 	</function>
 	
+	<function>
+		<name>substitute</name>
+		<function-class>com.slepeweb.site.util.TldFunction</function-class>
+		<function-signature>java.lang.String substitute(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+	
 </taglib>

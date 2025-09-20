@@ -64,4 +64,8 @@ public class TldFunction {
 		return cache.getValue(siteId, key);
 	}
 	
+	public static String substitute(String original, String placeholder, String replacement) {		
+		return original.replaceAll(placeholder, replacement);
+	}
+	
 }

@@ -25,6 +25,10 @@ table.password-list div.notes {
   font-weight: bold;
 }
 
+details {
+	margin-bottom: 2em;
+}
+
 @media only screen and (max-width: 600px) {
 	table.password-list .hideable {
 		display: none;

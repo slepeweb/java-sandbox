@@ -30,7 +30,7 @@
 				<div class="flash-error">${param.error}</div>
 		
 				<geo:title />
-				<p>${_item.fields.bodytext}</p>
+				<p>${_item.fields.body_1}</p>
 				
 				<form id="pwg-login-form" method="post" action="">
 					<input type="hidden" name="alias" value="george" />

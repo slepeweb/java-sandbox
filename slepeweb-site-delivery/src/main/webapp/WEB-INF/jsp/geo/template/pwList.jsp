@@ -15,14 +15,17 @@
 		<c:choose><c:when test="${not empty _pwl.groups}">
 		
 			<p>
+				<c:set var="_backlink"><a href="${_item.path}">Re-submit the form</a></c:set>
+				<c:set var="_placeholder">__link__</c:set>
+				
 				<c:choose><c:when test="${_important}">
-					This list contains the more important accounts. <a href="${_item.path}">Re-submit the form</a> if
-					you need to see ALL accounts.
+					${site:substitute(_item.fields.body_2, _placeholder, _backlink)}
 				</c:when><c:otherwise>
-					This list contains ALL accounts. <a href="${_item.path}">Re-submit the form</a> if
-					you need to see only the more important accounts.
+					${site:substitute(_item.fields.body_3, _placeholder, _backlink)}
 				</c:otherwise></c:choose>
 			</p>
+			
+			${_item.fields.body_4}
 					
 			<c:forEach items="${_pwl.groups}" var="_group">
 				<h3>${_group.category}</h3>
@@ -49,11 +52,8 @@
 		
 		</c:when><c:otherwise>
 		
-			<p>No results to display.</p>
-			<ul>
-				<li>Is the remote server down?</li>
-				<li>Otherwise, please check the root password you entered.</li>
-			</ul>
+			<c:set var="_url" value="${site:resolveConfig(_item.site.id, 'host.pwg', _siteConfigService)}" />
+			${site:substitute(_item.fields.body_5, '__url__', _url)}
 			
 		</c:otherwise></c:choose>
 		
