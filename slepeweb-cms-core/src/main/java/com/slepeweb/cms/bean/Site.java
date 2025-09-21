@@ -1,6 +1,7 @@
 package com.slepeweb.cms.bean;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -73,6 +74,32 @@ public class Site extends CmsBean {
 	
 	public List<Template> getAvailableTemplates(Long itemTypeId) {
 		return getCmsService().getTemplateService().getAvailableTemplates(getId(), itemTypeId);
+	}
+
+	public List<Template> getAvailableTemplates(User u) {
+		List<Template> list = getAvailableTemplates();
+		filterAdminTemplates(list, u);
+		return list;
+	}
+	
+	public List<Template> getAvailableTemplates(Long itemTypeId, User u) {
+		List<Template> list = getAvailableTemplates(itemTypeId);
+		filterAdminTemplates(list, u);
+		return list;
+	}
+	
+	private void filterAdminTemplates(List<Template> list, User u) {
+		if (! u.getRoles(getId()).contains(User.ADMIN)) {
+			Iterator<Template> iter = list.iterator();
+			Template t;
+			
+			while (iter.hasNext()) {
+				t = iter.next();
+				if (t.isAdmin()) {
+					iter.remove();
+				}
+			}
+		}
 	}
 	
 	public List<SiteType> getAvailableItemTypes() {

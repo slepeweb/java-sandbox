@@ -19,17 +19,16 @@ import org.springframework.stereotype.Service;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.slepeweb.cms.bean.Item;
-import com.slepeweb.cms.bean.User;
 
 @Service
 public class PdfServiceImpl implements PdfService {
 	
-	public String assemble(Item root, User u, String sessionId) {
+	public String assemble(Item root, String sessionId) {
 		String localHostname = root.getSite().getDeliveryHost().getNamePortAndProtocol();
 		StringBuilder body = new StringBuilder();
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		
-		drillDown(root, u, localHostname, httpclient, sessionId, body);	
+		drillDown(root, localHostname, httpclient, sessionId, body);	
 		return body.toString();
 	}
 	
@@ -51,14 +50,16 @@ public class PdfServiceImpl implements PdfService {
 		}		
 	}
 	
-	private void drillDown(Item parent, User u, String localHostname, CloseableHttpClient httpclient, 
+	private void drillDown(Item parent, String localHostname, CloseableHttpClient httpclient, 
 			String sessionId, StringBuilder body) {
 
-		String url = String.format("%s%s?view=pdf", localHostname, parent.getPath());
-		appendPage(httpclient, url, localHostname, sessionId, body);
-		
-		for (Item child : parent.getBoundPages()) {
-			drillDown(child, u, localHostname, httpclient, sessionId, body);
+		if (parent.isAccessible()) {
+			String url = String.format("%s%s?view=pdf", localHostname, parent.getPath());
+			appendPage(httpclient, url, localHostname, sessionId, body);
+			
+			for (Item child : parent.getBoundPages()) {
+				drillDown(child, localHostname, httpclient, sessionId, body);
+			}
 		}
 	}
 	

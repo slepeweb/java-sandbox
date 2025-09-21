@@ -34,7 +34,7 @@ public class RefreshController extends BaseController {
 		Item i = getEditableVersion(origId, req);
 		model.addAttribute("editingItem", i);
 		model.addAttribute("site", i.getSite());
-		model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId()));
+		model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId(), u));
 		
 		if (i.isProduct()) {
 			model.addAttribute("availableAxes", this.cmsService.getAxisService().get());

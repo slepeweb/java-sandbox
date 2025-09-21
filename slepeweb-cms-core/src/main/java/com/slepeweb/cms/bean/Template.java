@@ -1,5 +1,7 @@
 package com.slepeweb.cms.bean;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class Template extends CmsBean {
@@ -7,6 +9,7 @@ public class Template extends CmsBean {
 	private String name, controller;
 	private Long id, siteId, itemTypeId;
 	private ItemType itemType;
+	private boolean admin;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Template) {
@@ -80,18 +83,29 @@ public class Template extends CmsBean {
 		return this;
 	}
 	
+	public boolean isAdmin() {
+		return admin;
+	}
+
+	public Template setAdmin(boolean admin) {
+		this.admin = admin;
+		return this;
+	}
+
 	public ItemType getItemType() {
 		if (this.itemType == null) {
 			this.itemType = getItemTypeService().getItemType(getItemTypeId());
 		}
 		return this.itemType;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (admin ? 1231 : 1237);
 		result = prime * result + ((controller == null) ? 0 : controller.hashCode());
+		result = prime * result + ((itemTypeId == null) ? 0 : itemTypeId.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -105,10 +119,17 @@ public class Template extends CmsBean {
 		if (getClass() != obj.getClass())
 			return false;
 		Template other = (Template) obj;
+		if (admin != other.admin)
+			return false;
 		if (controller == null) {
 			if (other.controller != null)
 				return false;
 		} else if (!controller.equals(other.controller))
+			return false;
+		if (itemTypeId == null) {
+			if (other.itemTypeId != null)
+				return false;
+		} else if (!itemTypeId.equals(other.itemTypeId))
 			return false;
 		if (name == null) {
 			if (other.name != null)

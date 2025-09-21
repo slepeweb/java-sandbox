@@ -4,5 +4,5 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.User;
 
 public interface PdfService {
-	String assemble(Item root, User u, String sessionId);
+	String assemble(Item root, String sessionId);
 }

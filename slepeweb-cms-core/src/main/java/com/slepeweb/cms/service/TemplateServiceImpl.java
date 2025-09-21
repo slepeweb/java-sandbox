@@ -33,8 +33,8 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 	
 	private void insertTemplate(Template t) {
 		this.jdbcTemplate.update(
-				"insert into template (name, forward, siteid, typeid) values (?, ?, ?, ?)", 
-				t.getName(), t.getController(), t.getSiteId(), t.getItemTypeId());
+				"insert into template (name, forward, siteid, typeid, admin) values (?, ?, ?, ?, ?)", 
+				t.getName(), t.getController(), t.getSiteId(), t.getItemTypeId(), t.isAdmin());
 
 		t.setId(getLastInsertId());
 		LOG.info(compose("Added new template", t));
@@ -45,8 +45,8 @@ public class TemplateServiceImpl extends BaseServiceImpl implements TemplateServ
 			dbRecord.assimilate(t);
 			
 			this.jdbcTemplate.update(
-					"update template set name = ?, forward = ? where id = ?", 
-					t.getName(), t.getController(), t.getId());
+					"update template set name = ?, forward = ?, admin = ? where id = ?", 
+					t.getName(), t.getController(), t.isAdmin(), t.getId());
 			
 			LOG.info(compose("Updated template", t));
 		}

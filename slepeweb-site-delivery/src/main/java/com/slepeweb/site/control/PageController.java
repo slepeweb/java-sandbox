@@ -229,9 +229,10 @@ public class PageController extends BaseController {
 		String path = req.getParameter("path");
 		if (StringUtils.isNotBlank(path)) {
 			Item target = this.itemService.getItem(i.getSite().getId(), path);
+			target.setRequestPack(i.getRequestPack());
 			CookieHelper h = new CookieHelper();
 
-			String html = this.pdfService.assemble(target, getUser(req), h.getCookieValue("JSESSIONID", req));
+			String html = this.pdfService.assemble(target, h.getCookieValue("JSESSIONID", req));
 			model.addAttribute("_aggregatedMarkup", html);
 			model.addAttribute("_localHostname", i.getSite().getDeliveryHost().getNamePortAndProtocol());
 		}
