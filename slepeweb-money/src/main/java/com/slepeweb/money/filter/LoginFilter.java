@@ -15,10 +15,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class LoginFilter implements Filter {
 	
-	private String loginPath;
+	private String loginPath, summaryPath;
 	
 	public void init(FilterConfig config) throws ServletException {
 		this.loginPath = config.getInitParameter("loginPath");
+		this.summaryPath = config.getInitParameter("summaryPath");
 	}
 
 	public void destroy() {
@@ -33,6 +34,7 @@ public class LoginFilter implements Filter {
 		
 		if (	u == null && 
 				! req.getServletPath().equals(this.loginPath) &&
+				! req.getServletPath().startsWith(this.summaryPath) &&
 				! req.getServletPath().startsWith("/resources")) {
 			
 			res.sendRedirect(req.getContextPath() + this.loginPath);

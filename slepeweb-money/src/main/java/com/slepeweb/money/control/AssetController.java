@@ -83,7 +83,7 @@ public class AssetController extends BaseController {
 			openingBalance = yearlyOpeningBalance.get(openingYear);
 			
 			if (openingBalance == null) {
-				openingBalance = new Long(0L);	
+				openingBalance = Long.valueOf(0);	
 			}
 			
 			// Note that there could be more than one account that was opened in a given year
@@ -94,7 +94,7 @@ public class AssetController extends BaseController {
 				closingBalance = yearlyClosingBalance.get(closingYear);
 				
 				if (closingBalance == null) {
-					closingBalance = new Long(0L);	
+					closingBalance = Long.valueOf(0);	
 				}
 				
 				// Note that there could be more than one account that was closed in a given year

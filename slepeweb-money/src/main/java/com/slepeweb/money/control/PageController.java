@@ -12,8 +12,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.slepeweb.common.bean.MoneyDashboard;
 import com.slepeweb.common.service.SendMailService;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
@@ -33,7 +35,12 @@ public class PageController extends BaseController {
 	@Autowired private SendMailService sendMailService;
 	
 	@RequestMapping(value="/")	
-	public String dashboard(ModelMap model) { 
+	public String dashboard(ModelMap model) { 		
+		model.addAttribute("_dash", buildDashboard());
+		return "dashboard";
+	}
+	
+	private Dashboard buildDashboard() {
 		Dashboard dash = new Dashboard();
 		DashboardAccountGroup group;
 		List<Account> all = this.accountService.getAllWithBalances();
@@ -46,9 +53,26 @@ public class PageController extends BaseController {
 			}
 		}
 		
-		model.addAttribute("_dash", dash);
-		return "dashboard";
+		return dash;
 	}
+	
+	@RequestMapping(value="/summary", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public MoneyDashboard summary( 
+			@RequestParam(value="alias", required = true) String alias,
+			@RequestParam(value="password", required = true) String password,
+			ModelMap model) {
+		
+		LoginResponse login = this.loginService.login(alias, password);
+		
+		if (login.isSuccess()) {			
+			Dashboard dash = buildDashboard();
+			return dash.adapt();
+		}
+		
+		return new MoneyDashboard().setError(login.getErrorMessage());
+	}
+	
 
 	@RequestMapping(value="/notfound")	
 	public String notfound(ModelMap model) { 

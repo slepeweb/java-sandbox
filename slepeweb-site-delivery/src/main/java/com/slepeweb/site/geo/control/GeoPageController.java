@@ -12,9 +12,12 @@ import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -29,6 +32,7 @@ import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.SiteConfigKey;
 import com.slepeweb.cms.service.QandAService;
+import com.slepeweb.common.bean.MoneyDashboard;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.common.util.JsonUtil;
@@ -211,7 +215,7 @@ public class GeoPageController extends BaseController {
 	}
 
 	@RequestMapping(value="/remotepwg")	
-	public String pwgLogin(
+	public String remotePwg(
 			@ModelAttribute(AttrName.ITEM) Item i, 
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
@@ -242,10 +246,11 @@ public class GeoPageController extends BaseController {
 		String json = httpPostMultipart(remoteHost + remotePath, alias, key, password);
 		PasswordList pwl = json != null ? 
 				JsonUtil.fromJson(new TypeReference<PasswordList>() {}, json) :
-					new PasswordList();
+					new PasswordList().setError("Failed to process response from remote server");
 		
-		if (pwl.isError()) {
-			res.sendRedirect(String.format("%s?error=%s", i.getPath(), HttpUtil.encodeUrl(pwl.getError())));
+		if (pwl == null || pwl.isError()) {
+			res.sendRedirect(String.format("%s?error=%s", i.getPath(), 
+					HttpUtil.encodeUrl(pwl != null ? pwl.getError() : "Un-specified error")));
 			return null;
 		}
 		
@@ -282,6 +287,61 @@ public class GeoPageController extends BaseController {
 		model.addAttribute("_important", important);
 		addGeoExtras(i, req, res, model);
 		return page.getView();
+	}
+
+	@RequestMapping(value="/remotemoney")	
+	public String remoteMoney(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			HttpServletRequest req,
+			HttpServletResponse res,
+			ModelMap model) throws Exception {	
+		
+		if (! isSuperUser(req, res, i.getPath())) {
+			return null;
+		}
+		
+		// Request for form
+		if (req.getMethod().equalsIgnoreCase("get")) {
+			Page page = getStandardPage(i, shortSitename, "moneyForm", model);
+			addGeoExtras(i, req, res, model);
+			return page.getView();
+		}
+		
+		// Dealing with form submission ...
+		Calendar now = Calendar.getInstance();
+		int rotation = now.get(Calendar.HOUR_OF_DAY) % 8;
+		String alias = req.getParameter("alias");
+		String password = rotate(req.getParameter("password"), rotation) + "^";
+		
+		String remotePath = "/summary";		
+		String remoteHost = this.siteConfigCache.getValue(i.getSite().getId(), SiteConfigKey.MONEY_HOST, "http://localhost:8080/money");
+		
+		String json = httpPostUrlEncoded(remoteHost + remotePath, alias, password);
+		MoneyDashboard dashboard = json != null ?
+				JsonUtil.fromJson(new TypeReference<MoneyDashboard>() {}, json) :
+					new MoneyDashboard().setError("Failed to process response from remote server");
+		
+		if (dashboard == null || dashboard.isError()) {
+			res.sendRedirect(String.format("%s?error=%s", i.getPath(), 
+					HttpUtil.encodeUrl(dashboard != null ? dashboard.getError() : "Un-specified error")));
+			return null;
+		}
+				
+		Page page = getStandardPage(i, shortSitename, "moneyList", model);
+		model.addAttribute("_dashboard", dashboard);
+		addGeoExtras(i, req, res, model);
+		return page.getView();
+	}
+	
+	private String rotate(String s, int n) {
+		if (s != null) {
+			if (s.length() >= n) {
+				return s.substring(n) + s.substring(0, n);
+			}
+			return s;
+		}
+		return "";
 	}
 
 	@RequestMapping(value="/notfound")	
@@ -381,5 +441,32 @@ public class GeoPageController extends BaseController {
     	
 		return null;
     }
-}
+    
+    private String httpPostUrlEncoded(String url, String alias, String password) {
+    	
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
 
+            ClassicHttpRequest httpPost = ClassicRequestBuilder.post(url)
+                    .addParameter("alias", alias)
+                    .addParameter("password", password)
+                    .build();
+
+            // Explicit type for response avoids IDE warnings
+            return httpclient.execute(httpPost, (ClassicHttpResponse response) -> {
+                int status = response.getCode();
+                if (status >= 200 && status < 300) {
+                    HttpEntity entity = response.getEntity();
+                    return entity != null ? EntityUtils.toString(entity) : null;
+                } else {
+                    LOG.error("Unexpected response status: " + status);
+                    return null;
+                }
+            });
+
+        } catch (Exception e) {
+            LOG.error("HTTP POST request failed", e);
+        }
+        
+        return null;
+    }
+}

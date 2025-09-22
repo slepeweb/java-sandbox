@@ -3,6 +3,9 @@ package com.slepeweb.money.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.slepeweb.common.bean.MoneyDashboard;
+import com.slepeweb.money.Util;
+
 public class Dashboard {
 	private List<DashboardAccountGroup> groups = new ArrayList<DashboardAccountGroup>();
 	
@@ -37,4 +40,33 @@ public class Dashboard {
 		return t;
 	}
 	
+	public MoneyDashboard adapt() {
+		MoneyDashboard adapted = new MoneyDashboard().
+				setTotal(Util.formatPounds(getTotal()));
+		
+		MoneyDashboard.Group mdg;
+		MoneyDashboard.Account mda;
+		
+		for (DashboardAccountGroup dag : getGroups()) {
+			mdg = adapted.findGroup(dag.getType());
+			if (mdg == null) {
+				mdg = new MoneyDashboard.Group().
+						setName(dag.getType()).
+						setTotal(Util.formatPounds(dag.getTotal()));
+				
+				adapted.getGroups().add(mdg);
+			}
+			
+			for (Account a : dag.getAccounts()) {
+				mda = new MoneyDashboard.Account().
+						setName(a.getName()).
+						setBalance(a.getBalanceStr()).
+						setNotes(a.getNote());
+				
+				mdg.getAccounts().add(mda);
+			}
+		}
+		
+		return adapted;
+	}
 }

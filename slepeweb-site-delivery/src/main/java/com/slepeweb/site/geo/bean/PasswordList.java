@@ -15,14 +15,20 @@ public class PasswordList {
 		return groups;
 	}
 
-	public void setGroups(List<Group> groups) {
+	public PasswordList setGroups(List<Group> groups) {
 		this.groups = groups;
+		return this;
 	}
 	
 	public String getError() {
 		return error;
 	}
 	
+	public PasswordList setError(String error) {
+		this.error = error;
+		return this;
+	}
+
 	public boolean isError() {
 		return StringUtils.isNotBlank(this.error);
 	}

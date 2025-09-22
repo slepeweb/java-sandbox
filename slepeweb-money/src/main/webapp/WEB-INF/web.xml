@@ -31,6 +31,10 @@
       <param-name>loginPath</param-name>
       <param-value>/login</param-value>
     </init-param>
+    <init-param>
+      <param-name>summaryPath</param-name>
+      <param-value>/summary</param-value>
+    </init-param>
   </filter>
 
   <filter-mapping>

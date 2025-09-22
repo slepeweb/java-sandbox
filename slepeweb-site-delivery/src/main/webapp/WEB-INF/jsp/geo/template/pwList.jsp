@@ -72,9 +72,5 @@ $(function() {
 		e.stopPropagation()
 		$(this).css('visibility', 'hidden')
 	})
-
-	$('input[name=filter]').change(function() {
-		
-	})
 })
 </script>
