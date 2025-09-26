@@ -15,7 +15,7 @@ import com.slepeweb.site.util.StringUtil;
 public class SimpleComponent implements NestableComponent, Serializable {
 	private static final long serialVersionUID = 1L;
 	private String heading, body;
-	private String type;
+	private String type, location;
 	private String cssClass, js, data;
 	private Long id;
 	private String identifier;
@@ -34,7 +34,7 @@ public class SimpleComponent implements NestableComponent, Serializable {
 		setHeading(i.getFieldValue(FieldName.HEADING));
 		setBody(i.getFieldValue(FieldName.BODYTEXT));
 		setIdentifier(i.getFieldValue("identifier"));
-
+		setLocation(l.getName());
 		
 		if (this.componentService != null) {
 			this.components = this.componentService.getComponents(i.getComponents());
@@ -128,6 +128,14 @@ public class SimpleComponent implements NestableComponent, Serializable {
 
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 	public String getData() {

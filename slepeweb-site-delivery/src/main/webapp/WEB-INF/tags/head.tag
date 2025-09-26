@@ -26,7 +26,9 @@
 
 <gen:extraCSS />
 <gen:extraInpageCSS />
+<gen:extraInContentCSS />
 <gen:extraJS />
 <gen:extraInpageJS />
+<gen:extraInContentJS />
 
 <jsp:doBody />

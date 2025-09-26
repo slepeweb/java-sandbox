@@ -18,11 +18,13 @@ public class Header implements Serializable {
 	private List<LinkTarget> globalNavigation, topNavigation;
 	private List<Item> breadcrumbItems;
 	private Page page;
+	private List<SimpleComponent> components;
 	
 	public Header(Page page) {
 		this.stylesheets = new ArrayList<String>();
 		this.javascripts = new ArrayList<String>();
 		this.page = page;
+		this.components = new ArrayList<SimpleComponent>();
 	}
 	
 	private void populateBreadcrumbs() {
@@ -93,5 +95,13 @@ public class Header implements Serializable {
 			populateBreadcrumbs();
 		}
 		return breadcrumbItems;
+	}
+
+	public List<SimpleComponent> getComponents() {
+		return components;
+	}
+
+	public void setComponents(List<SimpleComponent> components) {
+		this.components = components;
 	}
 }

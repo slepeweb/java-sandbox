@@ -7,6 +7,7 @@ public class LinkName extends CmsBean {
 	public static final String std = "std";
 	public static final String RIGHT_SIDE = "rightside";
 	public static final String LEFT_SIDE = "leftside";
+	public static final String HEAD = "head";
 
 	private Long id;
 	private Long siteId;

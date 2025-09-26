@@ -15,7 +15,7 @@ public class InsertComponentsTag extends ComponentTagSupport {
 	public void delegate() {
 		if (this.list != null) {
 			for (SimpleComponent c : this.list) {
-				if (matchesFilter(c)) {
+				if (matchesFilter(c)) {					
 					this.render(c);
 				}
 			}

@@ -80,7 +80,7 @@ $(function() {
 		$('div#user-menu').addClass('hidden')		
 	});
 	
-	$('span#user-icon').hover(function() {
+	$('span#user-icon').click(function() {
 		$('div#user-menu').removeClass('hidden')
 	})
 	
