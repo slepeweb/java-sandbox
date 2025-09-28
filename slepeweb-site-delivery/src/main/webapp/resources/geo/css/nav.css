@@ -137,6 +137,7 @@ div#user-menu {
 
 div#user-menu ul {
 	flex-direction: column;
+	list-style: none;
 }
 
 div#user-menu li {

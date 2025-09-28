@@ -4,13 +4,8 @@
   taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <header>
-		<div class="ha">
-			<h1 class="main-heading">slepe web solutions CMS</h1>
-			<c:if test="${not empty _user}"><p class="main-heading">You are logged in as  
-								'${_user.fullName}'&nbsp;&nbsp;&nbsp;[<a href="/cms/page/login?logout">Logout</a>]</p>
-						</c:if>
-		</div>
-		
+		<cms:userCorner />
+				
 		<!-- History -->
 		<div id="history-div">
 			<span>Breadcrumbs: </span>

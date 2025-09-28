@@ -127,18 +127,7 @@ _cms.add.behaviour.changelinktype = function() {
 	//Add behaviour to linktype selector
 	$(_cms.add.sel.LINK_TYPE_SELECTOR).change(function (e) {
 		var linkTypeOption$ = $(e.target);
-		cms.add.setLinkNames(linkTypeOption$.val());
-		/*
-		var linkNameDropdown$ = $(_cms.add.sel.LINK_NAME_SELECTOR);		
-		var nameOptions = _cms.linkNameOptions[linkTypeOption$.val()]
-		
-		var h = ''; 
-		for (var s of nameOptions) {
-			h += _cms.support.toOptionHtml(s);
-		}
-		
-		linkNameDropdown$.empty().html(h);
-		*/
+		_cms.add.setLinkNames(linkTypeOption$.val());
 	});
 }
 

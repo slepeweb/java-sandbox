@@ -2,6 +2,7 @@ package com.slepeweb.cms.control;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,7 +59,14 @@ public class UserController extends BaseController {
 		u.setFirstName(req.getParameter(FieldName.FIRSTNAME));
 		u.setLastName(req.getParameter(FieldName.LASTNAME));
 		u.setEmail(req.getParameter(FieldName.EMAIL));
-		u.setPhone(req.getParameter(FieldName.PHONE));		
+		u.setPhone(req.getParameter(FieldName.PHONE));
+		
+		String password = req.getParameter("password");
+		if (StringUtils.isNotBlank(password)) {
+			// Update password too
+			StandardPasswordEncoder encoder = new StandardPasswordEncoder();
+			u.setPassword(encoder.encode(password));
+		}
 				
 		Long siteId = getSiteId(req);
 		boolean qaUpdated = false;
