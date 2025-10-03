@@ -11,4 +11,4 @@
 	varStatus="status"><a 
 		class="tag-link" 
 		data-value="${tag}" 
-		href="/searchresults?view=get&searchtext=${tag}">${tag}</a><c:if test="${not status.last}">, </c:if></c:forTokens></p>
+		href="${site:resolveConfig(_site.id, 'path.searchresults', _siteConfigService)}?view=get&searchtext=${tag}">${tag}</a><c:if test="${not status.last}">, </c:if></c:forTokens></p>

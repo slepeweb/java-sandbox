@@ -13,4 +13,5 @@ public class AttrName {
 	public static final String SITE = "_site";
 	public static final String LAST_INTERACTION = "_lastInteraction";
 	public static final String PASSKEY = "_passkey";
+	public static final String SITE_CONFIG_SERVICE = "_siteConfigService";
 }

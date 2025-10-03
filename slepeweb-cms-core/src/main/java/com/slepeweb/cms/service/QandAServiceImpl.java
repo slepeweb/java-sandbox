@@ -21,18 +21,18 @@ public class QandAServiceImpl implements QandAService {
 	public void update(User u, QandAList list) throws Exception {
 		String json = JsonUtil.toJson(list);
 		String encrypted = this.cryptoService.encrypt(json);
-		u.setSecret(encrypted);
+		u.setQandA(encrypted);
 	}
 	
 	public boolean validate(User u, QandAList list) throws Exception {
 		String json = JsonUtil.toJson(list);
 		String encrypted = this.cryptoService.encrypt(json);
-		return StringUtils.isNotBlank(u.getSecret()) && u.getSecret().equals(encrypted);
+		return StringUtils.isNotBlank(u.getQandA()) && u.getQandA().equals(encrypted);
 	}
 	
 	public QandAList getQandAList(User u) throws Exception {
-		if (StringUtils.isNotBlank(u.getSecret())) {
-			String json = this.cryptoService.decrypt(u.getSecret());
+		if (StringUtils.isNotBlank(u.getQandA())) {
+			String json = this.cryptoService.decrypt(u.getQandA());
 			return JsonUtil.fromJson(new TypeReference<QandAList>() {}, json);
 		}
 		

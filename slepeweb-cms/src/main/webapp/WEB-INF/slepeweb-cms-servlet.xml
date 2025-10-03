@@ -30,6 +30,8 @@
 		<property name="commerceEnabled" value="false" />
 		<property name="staticSiteRoot" value="/var/www/html" />
 		<property name="productionDeployment" value="false" /> <!-- __DEPLOYMENT -->
+		<property name="devEditorialHost" value="http://glj.editorial.net:8080" />
+		<property name="prodEditorialHost" value="https://glj.buttigieg.org.uk" />
 	</bean>
 	
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">

@@ -19,7 +19,7 @@ public class User extends CmsBean {
 	public static final String MI6 = "mi6";
 	
 	private Long id;
-	private String alias, firstName, lastName, email, phone, password, secret;
+	private String alias, firstName, lastName, email, phone, password, qandA, secret;
 	private boolean enabled, loggedIn, editor;
 	private Map<Long, List<String>> roles;
 	
@@ -34,6 +34,7 @@ public class User extends CmsBean {
 			setPassword(u.getPassword());
 			setEditor(u.isEditor());
 			setEnabled(u.isEnabled());
+			setQandA(u.getQandA());
 			setSecret(u.getSecret());
 		}
 	}
@@ -164,6 +165,15 @@ public class User extends CmsBean {
 		return this;
 	}
 
+	public String getQandA() {
+		return qandA;
+	}
+
+	public User setQandA(String qanda) {
+		this.qandA = qanda;
+		return this;
+	}
+
 	public String getSecret() {
 		return secret;
 	}
@@ -211,6 +221,7 @@ public class User extends CmsBean {
 		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
 		result = prime * result + ((phone == null) ? 0 : phone.hashCode());
+		result = prime * result + ((qandA == null) ? 0 : qandA.hashCode());
 		result = prime * result + ((secret == null) ? 0 : secret.hashCode());
 		return result;
 	}
@@ -256,6 +267,13 @@ public class User extends CmsBean {
 				return false;
 		} else if (!phone.equals(other.phone))
 			return false;
+
+		if (qandA == null) {
+			if (other.qandA != null)
+				return false;
+		} else if (!qandA.equals(other.qandA))
+			return false;
+
 		if (secret == null) {
 			if (other.secret != null)
 				return false;

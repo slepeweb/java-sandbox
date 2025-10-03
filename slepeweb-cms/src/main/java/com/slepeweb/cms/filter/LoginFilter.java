@@ -16,10 +16,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class LoginFilter implements Filter {
 	
-	private String loginPath;
+	private String loginPath, forgotPasswordPath, passwordResetPath;
 	
 	public void init(FilterConfig config) throws ServletException {
 		this.loginPath = config.getInitParameter("loginPath");
+		this.forgotPasswordPath = config.getInitParameter("forgotPasswordPath");
+		this.passwordResetPath = config.getInitParameter("passwordResetPath");
 	}
 
 	public void destroy() {
@@ -33,8 +35,10 @@ public class LoginFilter implements Filter {
 		User u = (User) req.getSession().getAttribute(AttrName.USER);
 		
 		if (	u == null && 
-				! req.getServletPath().equals(this.loginPath) &&
-				! req.getServletPath().startsWith("/resources")) {
+				! (	req.getServletPath().equals(this.loginPath) ||
+					req.getServletPath().equals(this.forgotPasswordPath) ||
+					req.getServletPath().equals(this.passwordResetPath) ||
+					req.getServletPath().startsWith("/resources"))) {
 			
 			req.getRequestDispatcher(this.loginPath).forward(req, res);
 			return;

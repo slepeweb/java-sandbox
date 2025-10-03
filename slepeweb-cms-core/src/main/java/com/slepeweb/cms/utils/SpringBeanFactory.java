@@ -56,13 +56,13 @@ public class SpringBeanFactory {
 	
 	@Bean
 	public SiteConfigCache siteConfigCache() {
-		SiteConfigCache mng = new SiteConfigCache();
+		SiteConfigCache cache = new SiteConfigCache();
 		
 		for (SiteConfigProperty scp : this.siteConfigService.getAll()) {
 			LOG.info(scp);
-			mng.put(scp.getSiteId(), scp);
+			cache.put(scp.getSiteId(), scp);
 		}
 		
-		return mng;
+		return cache;
 	}
 }

@@ -11,7 +11,9 @@ public interface UserService {
 	User get(String name);
 	User getBySecret(String secret);
 	User getByPassword(String pwd);
+	User getByEmail(String email);
 	User get(Long id);
+	List<User> getAll();
 	User save(User u);
 	User save(User u, Site s, boolean doRoles);
 	void saveRoles(User u, Site s);

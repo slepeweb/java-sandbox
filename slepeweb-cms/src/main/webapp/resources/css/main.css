@@ -762,6 +762,15 @@ div#user-menu a {
 	text-decoration: none;
 }
 
+div#user-update-header {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+
+div#user-update-header p {
+	justify-self: right;
+}
+
 
 div.user-update-msg {
 	color: green;

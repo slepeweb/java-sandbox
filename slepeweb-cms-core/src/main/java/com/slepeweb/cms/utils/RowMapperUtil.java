@@ -330,6 +330,7 @@ public class RowMapperUtil {
 					setPassword(rs.getString("password")).
 					setEditor(rs.getBoolean("editor")).
 					setEnabled(rs.getBoolean("enabled")).
+					setQandA(rs.getString("qanda")).
 					setSecret(rs.getString("secret"));
 		}
 	}

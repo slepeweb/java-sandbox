@@ -1,0 +1,94 @@
+#user-form button.action {
+	justify-self: left;
+	background-color: #6eac2c;
+}
+
+#user-form button.reset {
+	justify-self: right;
+	background-color: #d27e00;
+}
+
+#user-form button {
+	background-color: #6eac2c;
+	border: 1px solid #acdd4a;
+	border-radius: 6px;
+	color: #fff;
+	padding: 6px;
+	margin-top: 1.5em;
+	cursor: pointer;
+}
+							
+#user-form {
+	font-size: 1.1em;
+}
+
+div#user-corner {
+	font-size: 1.25em;
+	position: relative;
+}
+
+div#user-corner i {
+	font-size: 1.25em;
+	color: green;
+	margin-right: 0.5em;
+	cursor: pointer;
+}
+
+div#user-menu {
+    position: absolute;
+    top: 1.5em;
+    background-color: pink;
+    z-index: 1;
+    padding: 0.25em;
+		border: 2px solid red;
+}
+
+div#user-menu.hidden {
+	visibility: hidden;
+}
+
+div#user-menu ul {
+	list-style: none;
+	line-height: 1.5em;
+	margin: 0;
+}
+
+div#user-menu li {
+	margin-left: -2.5em;
+	cursor: pointer;
+}
+
+div#user-menu a {
+	text-decoration: none;
+}
+
+div#user-update-header {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+
+div#user-update-header p {
+	justify-self: right;
+}
+
+
+div.user-update-msg {
+	color: green;
+	width: 100%;
+	border: 2px solid green;
+	font-size: 1.5em;
+	padding: 0 1em 0 1em;
+}
+
+div.user-update-msg.error {
+	color: purple;
+	border: 2px solid purple;
+	padding: 1em;
+	width: 90%;
+}
+	
+div.forgot-password, div.password-reset {
+	border: 2px solid red; 
+	padding: 2em; 
+	background: #f7e2e6;
+}

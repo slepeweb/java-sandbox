@@ -2,6 +2,8 @@
 	taglib prefix="c" uri="jakarta.tags.core" %><%@ 
 	taglib prefix="fn" uri="jakarta.tags.functions"%>
 
-<%-- <c:forEach items="${_page.header.stylesheets}" var="href"> --%>
-<%-- 	<link rel="stylesheet" href="${href}" type="text/css"> --%>
-<%-- </c:forEach> --%>
+<c:if test="${not empty _extraCSS}">
+	<c:forTokens items="${_extraCSS}" delims=", " var="href">
+		<link rel="stylesheet" href="${href}" type="text/css">
+	</c:forTokens>
+</c:if>

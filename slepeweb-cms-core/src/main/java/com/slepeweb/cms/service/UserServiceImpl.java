@@ -65,9 +65,9 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 	
 	private User insert(User u) {		
 		this.jdbcTemplate.update( 
-				"insert into user (alias, firstname, lastname, email, phone, password, editor, enabled, secret) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+				"insert into user (alias, firstname, lastname, email, phone, password, editor, enabled, qanda, secret) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 				u.getAlias(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getPhone(), u.getPassword(), u.isEditor(), 
-				u.isEnabled(), u.getSecret());	
+				u.isEnabled(), u.getQandA(), u.getSecret());	
 		
 		u.setId(getLastInsertId());			
 		LOG.info(compose("Added new user", u));		
@@ -79,9 +79,9 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 			dbRecord.assimilate(u);
 			
 			this.jdbcTemplate.update(
-					"update user set alias=?, firstname=?, lastname=?, phone=?, password=?, editor=?, enabled=?, secret=? where id=?", 
-					dbRecord.getAlias(), dbRecord.getFirstName(), dbRecord.getLastName(), dbRecord.getPhone(),  
-					dbRecord.getPassword(), dbRecord.isEditor(), dbRecord.isEnabled(), dbRecord.getSecret(), dbRecord.getId());
+					"update user set alias=?, firstname=?, lastname=?, email=?, phone=?, password=?, editor=?, enabled=?, qanda=?, secret=? where id=?", 
+					dbRecord.getAlias(), dbRecord.getFirstName(), dbRecord.getLastName(), dbRecord.getEmail(), dbRecord.getPhone(),  
+					dbRecord.getPassword(), dbRecord.isEditor(), dbRecord.isEnabled(), dbRecord.getQandA(), dbRecord.getSecret(), dbRecord.getId());
 			
 			LOG.info(compose("Updated user", u));
 		}
@@ -113,12 +113,21 @@ public class UserServiceImpl extends BaseServiceImpl implements UserService {
 		return get(String.format(SELECT_TEMPLATE, " id = ?"), id);
 	}
 	
+	public List<User> getAll() {
+		return this.jdbcTemplate.query(
+				"select * from user", new RowMapperUtil.UserMapper());
+	}
+	
 	public User getBySecret(String secret) {
 		return get(String.format(SELECT_TEMPLATE, " secret = ?"), secret);
 	}
 
 	public User getByPassword(String pwd) {
 		return get(String.format(SELECT_TEMPLATE, " password = ?"), pwd);
+	}
+
+	public User getByEmail(String email) {
+		return get(String.format(SELECT_TEMPLATE, " email = ?"), email);
 	}
 
 	private User get(String sql, Object... params) {

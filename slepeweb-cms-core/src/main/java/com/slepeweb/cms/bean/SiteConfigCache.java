@@ -7,7 +7,11 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
 public class SiteConfigCache {
-
+	
+	public static final String PATH_LOGIN = "path.login";
+	public static final String PATH_SUPER_LOGIN = "path.superlogin";
+	public static final String NUM_QANDA_MIN = "num.qanda.min";
+	
 	private Map<Long, SiteConfig> map = new HashMap<Long, SiteConfig>();
 	
 	public void put(Long siteId, SiteConfigProperty scp) {
@@ -21,23 +25,25 @@ public class SiteConfigCache {
 		sc.put(scp.getName(), scp);
 	}
 
-	public String get(Long siteId, String name) {
-		
-		SiteConfig sc = this.map.get(siteId);
-		if (sc != null) {
-			return sc.get(name);
-		}
-		
-		return null;
-	}
-	
 	public String getValue(Long siteId, String name) {		
 		return getValue(siteId, name, null);
 	}
 	
 	public String getValue(Long siteId, String name, String dflt) {	
-		String s = get(siteId, name);
-		return s != null ? s : dflt;
+		SiteConfig sc = get(siteId);
+		String value = null;
+		
+		if (sc != null) {
+			value = sc.get(name);
+		}
+		
+		// siteId == 0 represents global configs
+		if (value == null && siteId.longValue() != 0L) {
+			sc = get(0L);
+			value = sc.get(name);
+		}
+		
+		return value != null ? value : dflt;
 	}
 	
 	public Integer getIntValue(Long siteId, String name, Integer dflt) {

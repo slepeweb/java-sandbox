@@ -7,10 +7,36 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 public class QandAList {
 	
 	private List<QandA> list = new ArrayList<QandA>();
+	
+	public QandAList fillFromRequest(HttpServletRequest req) {
+		String q, a;
+		
+		for (int i = 0; i < 3; i++) {
+			q = req.getParameter("q" + i);
+			if (q == null) {
+				q = "";
+			}
+			a = req.getParameter("a" + i);
+			
+			if (StringUtils.isNotBlank(a)) {
+				add(q.trim().replaceAll("[\"<>]", "_"), a.trim().replaceAll("[\"<>]", "_"));
+			}
+		}
+		
+		return this;
+	}
 
+
+	@JsonIgnore
+	public int getSize() {
+		return this.list.size();
+	}
+	
 	public List<QandA> getList() {
 		return list;
 	}
@@ -20,18 +46,20 @@ public class QandAList {
 	}
 	
 	public QandAList add(String q, String a) {
-		getList().add(new QandA(q, a));
+		QandA qa = new QandA(q, a);
+		qa.setId(getSize());
+		getList().add(qa);
 		return this;
 	}
 	
 	public boolean equals(QandAList other) {
-		int size = getList().size();
+		int size = getSize();
 		
 		if (size == 0) {
 			return false;
 		}
 		
-		if (size != other.getList().size()) {
+		if (size != other.getSize()) {
 			return false;
 		}
 		
@@ -45,6 +73,7 @@ public class QandAList {
 	}
 
 	public static class QandA {
+		private int id;
 		private String question, answer;
 		
 		public QandA() {}
@@ -56,7 +85,7 @@ public class QandAList {
 		
 		@Override
 		public String toString() {
-			return String.format("[\"%s\": \"%s\"]", this.question, this.answer);
+			return String.format("[%d: \"%s\": \"%s\"]", this.id, this.question, this.answer);
 		}
 		
 		public boolean equals(QandA other) {
@@ -91,6 +120,15 @@ public class QandAList {
 	
 		public QandA setAnswer(String answer) {
 			this.answer = answer;
+			return this;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public QandA setId(int id) {
+			this.id = id;
 			return this;
 		}
 	}

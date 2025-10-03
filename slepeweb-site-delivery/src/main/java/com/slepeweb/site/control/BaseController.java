@@ -14,6 +14,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.LoglevelUpdateService;
@@ -31,6 +32,7 @@ public class BaseController {
 	@Autowired private ComponentService componentService;
 	@Autowired private LoglevelUpdateService loglevelUpdateService;
 	@Autowired private NavigationService navigationService;	
+	@Autowired private SiteConfigCache siteConfigCache;	
 
 	@ModelAttribute(value="_loglevel")
 	protected boolean getLogLevelTrigger(@RequestParam(value="loglevel", required=false) String trigger) {
@@ -84,6 +86,10 @@ public class BaseController {
 		return u;
 	}
 
+	@ModelAttribute(value=AttrName.SITE_CONFIG_SERVICE)
+	public SiteConfigCache getSiteConfigCache(HttpServletRequest req) {
+		return this.siteConfigCache;
+	}
 	
 	protected String composeJspPath(String shortHostName, String viewNameSuffix) {
 		String view = shortHostName + "/template/" + viewNameSuffix;

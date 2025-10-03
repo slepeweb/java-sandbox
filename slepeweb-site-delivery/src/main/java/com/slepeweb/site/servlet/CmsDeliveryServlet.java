@@ -19,6 +19,7 @@ import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.RequestPack;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.constant.AttrName;
@@ -43,6 +44,7 @@ public class CmsDeliveryServlet {
 	
 	@Autowired private CmsService cmsService;
 	@Autowired private ItemService itemService;
+	@Autowired private SiteConfigCache siteConfigCache;
 
 	private Item identifyItem(HttpServletRequest req) {
 		Item i = null;
@@ -93,9 +95,17 @@ public class CmsDeliveryServlet {
 	}
 	
 	private String getLoginPath(Item i) {
+		
+		String path = this.siteConfigCache.getValue(i.getSite().getId(), SiteConfigCache.PATH_LOGIN);
+		
+		if (StringUtils.isNotBlank(path)) {
+			return path;
+		}
+		
 		return i.getSite().isMultilingual() ? 
 				String.format("/%s%s", i.getLanguage(), SiteAccessService.LOGIN_PATH) :
 					SiteAccessService.LOGIN_PATH;
+
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
@@ -135,9 +145,11 @@ public class CmsDeliveryServlet {
 		// Redirect request to login page if user does not have access to item
 		if (! item.isAccessible()) {
 			// Site access rules deny access to this user, AND no suitable passkey provided
-			if (! item.getPath().equals(SiteAccessService.LOGIN_PATH)) {
+			String loginPath = getLoginPath(item);
+			
+			if (! (item.getMiniPath().equals(loginPath) || item.getPath().equals(SiteAccessService.LOGIN_PATH))) {
 				LOG.warn(String.format("Item [%s] is not accessible", item.getPath()));
-				res.sendRedirect(getLoginPath(item));
+				res.sendRedirect(loginPath);
 				return;
 			}
 		}

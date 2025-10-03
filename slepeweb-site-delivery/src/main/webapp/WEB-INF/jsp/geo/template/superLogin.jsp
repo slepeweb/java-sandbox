@@ -5,7 +5,7 @@
 <gen:debug><!-- jsp/geo/topSecret.jsp --></gen:debug>
 
 <script>
-	let _flash = '${param.error}';
+	let _flash = '${param.error}${error}';
 	let _focus = 'answer0';
 </script>
 
@@ -29,7 +29,7 @@
 		<div class="rightside">
 			<div class="mainbody full-width">
 			
-				<div class="flash-error">${param.error}</div>
+				<div class="flash-error">${param.error}${error}</div>
 
 				<h2 id="page-title">${_item.fields.title}</h2>				
 				${_item.fields.bodytext}
@@ -42,13 +42,13 @@
 						<input type="hidden" name="success" value="${_success}" />
 	
 						<table>
-							<c:forEach items="${_qal.list}" var="_qa" varStatus="_stat">
+							<c:forEach items="${_qal.list}" var="_qa">
 								<c:if test="${not empty _qa.question}">
 									<tr>
 										<td><label>${_qa.question}:</label></td>
 										<td>
-											<input type="hidden" name="question${_stat.count - 1}" value="${_qa.question}" />
-											<input type="text" name="answer${_stat.count - 1}" autocomplete="off" value="" />
+											<input type="hidden" name="q${_qa.id}" value="${_qa.question}" />
+											<input type="text" name="a${_qa.id}" autocomplete="off" value="" />
 										</td>
 									</tr>
 								</c:if>						

@@ -19,6 +19,7 @@
 		origId: ${_item.origId},
 		isSecured: ${_item.site.secured ? 'true' : 'false'},
 		alertSound: new Audio("/resources/doorbell.mp3"),
+		searchresultsItemPath: '${site:resolveConfig(_site.id, 'path.searchresults', _siteConfigService)}',
 	}
 </script>
 

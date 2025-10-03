@@ -70,7 +70,7 @@
   
   <error-page>
   	<error-code>404</error-code>
-  	<location>/notfound</location>
+  	<location>/$_4365</location>
   </error-page>
   
   <!-- 

@@ -128,8 +128,10 @@ span#user-icon.super-user {
 
 div#user-menu {
     position: absolute;
-    top: 0;
-    background-color: #ac4747;
+    top: 2.0em;
+    background-color: pink;
+    border: 2px solid red;
+    color: #292929;
     z-index: 1;
     font-size: 0.65em;
     padding: 0.25em;

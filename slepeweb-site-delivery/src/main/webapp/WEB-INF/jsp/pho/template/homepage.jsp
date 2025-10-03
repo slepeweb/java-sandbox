@@ -47,7 +47,7 @@
 				</details>
 				
 				<div id="search-form">
-					<form action="/searchresults" method="post" 
+					<form action="${site:resolveConfig(_item.site.id, 'path.searchresults', _siteConfigService)}" method="post" 
 							enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
 							
 						<label>Search terms*</label><input name="searchtext" type="text" value="${_latestCookieValues.text}" />

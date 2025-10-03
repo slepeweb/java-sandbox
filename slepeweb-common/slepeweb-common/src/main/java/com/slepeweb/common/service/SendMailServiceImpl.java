@@ -19,7 +19,7 @@ public class SendMailServiceImpl implements SendMailService {
 			    .from(from)
 			    .to(name, to)
 			    .withSubject(subject)
-			    .withPlainText(message)
+			    .withHTMLText(message)
 			    .buildEmail();
 
 		Mailer mailer = MailerBuilder

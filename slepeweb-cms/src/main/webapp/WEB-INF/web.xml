@@ -10,9 +10,20 @@
   <filter>
     <filter-name>loginFilter</filter-name>
     <filter-class>com.slepeweb.cms.filter.LoginFilter</filter-class>
+    
     <init-param>
       <param-name>loginPath</param-name>
       <param-value>/page/login</param-value>
+    </init-param>
+    
+    <init-param>
+      <param-name>forgotPasswordPath</param-name>
+      <param-value>/user/forgot/password</param-value>
+    </init-param>
+    
+    <init-param>
+      <param-name>passwordResetPath</param-name>
+      <param-value>/user/password/reset</param-value>
     </init-param>
   </filter>
 

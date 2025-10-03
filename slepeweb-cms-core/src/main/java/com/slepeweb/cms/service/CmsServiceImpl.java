@@ -106,6 +106,28 @@ public class CmsServiceImpl implements CmsService {
 	public void setProductionDeployment(boolean b) {
 		this.productionDeployment = b;
 	}
+	
+	private String devEditorialHost, prodEditorialHost;
+
+	public void setDevEditorialHost(String devEditorialHost) {
+		this.devEditorialHost = devEditorialHost;
+	}
+
+	public void setProdEditorialHost(String prodEditorialHost) {
+		this.prodEditorialHost = prodEditorialHost;
+	}
+
+	private String getDevEditorialHost() {
+		return devEditorialHost;
+	}
+
+	private String getProdEditorialHost() {
+		return prodEditorialHost;
+	}
+
+	public String getEditorialHost() {
+		return isProductionDeployment() ? getProdEditorialHost() : getDevEditorialHost();
+	}
 
 	@PostConstruct
 	public void initialiseCmsBeanFactory() {

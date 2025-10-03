@@ -12,8 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LoginSupport;
+import com.slepeweb.cms.bean.QandAList;
+import com.slepeweb.cms.bean.SiteConfigCache;
+import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.service.LoginService;
+import com.slepeweb.cms.service.QandAService;
+import com.slepeweb.site.model.Page;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +30,8 @@ public class LoginController extends BaseController {
 	private static Logger LOG = Logger.getLogger(LoginController.class);
 	
 	@Autowired private LoginService loginService;
+	@Autowired private SiteConfigCache siteConfigCache;
+	@Autowired private QandAService qandAService;
 	
 	@RequestMapping(value="/login")
 	public String login (
@@ -59,6 +66,10 @@ public class LoginController extends BaseController {
 			
 		}
 		else if (req.getMethod().equalsIgnoreCase("get")) {
+			
+			model.addAttribute("_forgottenPasswordFormHref", 
+					i.getSite().getEditorialHost().getNamePortAndProtocol() + "/cms/user/forgot/password");
+			
 			if (req.getParameter("logout") != null) {
 				this.loginService.logout(req);
 			}
@@ -67,4 +78,48 @@ public class LoginController extends BaseController {
 		return composeJspPath(shortSitename, "login"); 
 	}
 		
+	@RequestMapping(value="/superlogin")	
+	public String superLogin(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			HttpServletRequest req,
+			HttpServletResponse res,
+			ModelMap model) throws Exception {	
+		
+		User u = getUser(req);
+		QandAList qalStoredInDb = this.qandAService.getQandAList(u);
+		String targetOnSuccess = req.getParameter("success");
+		int minQandA = this.siteConfigCache.getIntValue(i.getSite().getId(), "num.min.qanda", 2);
+				
+		if (req.getMethod().equalsIgnoreCase("get")) {
+			if (qalStoredInDb.getSize() < minQandA) {
+				model.addAttribute("error", 
+						String.format("User '%s' has not recorded sufficient security answers - abort", u.getFullName()));
+			}
+			else {
+				model.addAttribute("_qal", qalStoredInDb);
+				model.addAttribute("_success", targetOnSuccess);
+			}
+			
+			Page page = getStandardPage(i, shortSitename, "superLogin", model);
+			return page.getView();
+		}
+		
+		// Dealing with form submission ...
+		QandAList qalProvidedInForm = new QandAList().fillFromRequest(req);
+		
+		if (qalProvidedInForm.equals(qalStoredInDb)) {
+			req.getSession().setAttribute(AttrName.SUPER_USER, u);
+			res.sendRedirect(targetOnSuccess);
+			LOG.info(String.format("User '%s' correctly answered %d security questions", u.getFullName(), qalStoredInDb.getSize()));
+			return null;
+		}
+		
+		LOG.info(String.format("User '%s' FAILED to correctly answer %d security questions", u.getFullName(), qalStoredInDb.getSize()));
+		String path = this.siteConfigCache.getValue(i.getSite().getId(), "path.superlogin", "superlogin");
+		String loginFormUrl = String.format("%s?error=%s&success=%s", path, "Invalid+credentials", targetOnSuccess);
+		res.sendRedirect(loginFormUrl);
+		return null;
+	}
+
 }

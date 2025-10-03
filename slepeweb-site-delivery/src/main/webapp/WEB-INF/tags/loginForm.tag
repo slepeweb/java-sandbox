@@ -24,9 +24,13 @@
 				<td><input type="password" name="password" autocomplete="off" /></td>
 			</tr>
 		</table>
-		<input class="button special small" type="submit" value="Login" />
+		<input class="button special small" type="submit" value="Login" />		
 		<input type="hidden" name="redirectPath" value="" />
 	</form>	
+	
+	<p style="margin-top: 1em;">
+		<a href="${_forgottenPasswordFormHref}" target="_blank">Forgotten password?</a>
+	</p>
 	
 	<jsp:doBody />
 </div>

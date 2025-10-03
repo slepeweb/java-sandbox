@@ -1,6 +1,6 @@
 let $doSearchAction = function(terms) {
 	if (terms !== '') {
-		window.location = `/searchresults?terms=${encodeURIComponent(terms)}`
+		window.location = `${_site.searchresultsItemPath}?terms=${encodeURIComponent(terms)}`
 	}
 }
 

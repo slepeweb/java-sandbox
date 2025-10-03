@@ -31,7 +31,7 @@ $(function() {
 	$('select#top50-tags-selector').change(function() {
 		let tagPlusNumber = $(this).find('option:selected').html();
 		let tagValue = tagPlusNumber.split(" ")[0]
-		window.location = '/searchresults?view=get&searchtext=' + tagValue
+		window.location = `${_site.searchresultsItemPath}?view=get&searchtext=` + tagValue
 	});
 	
 	$('div#search-button-container input').click(function(e){
