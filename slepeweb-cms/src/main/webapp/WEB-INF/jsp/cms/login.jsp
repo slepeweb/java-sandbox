@@ -29,6 +29,11 @@
 			
 			<button class="action" type="submit">Login</button>
 		</form>	
+		
+		<p style="margin-top: 1em;">
+			<a href="/cms/user/forgot/password" target="_blank">Forgot password?</a>
+		</p>
+
 	</div>
 	
 </cms:basicLayout>

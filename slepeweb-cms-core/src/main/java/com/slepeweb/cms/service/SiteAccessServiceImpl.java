@@ -19,6 +19,40 @@ import com.slepeweb.cms.bean.User;
 @Repository
 public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccessService {
 	
+	/*
+	 * The columns in the 'access' table in the database are:
+	 * 
+	 * siteid	: self-explanatory
+	 * mode		: r (read/site delivery access) or w (write/editorial access)
+	 * name		: rule name, used to sort rules in order, which is VERY significant ^^
+	 * 
+	 * Then we have a set of columns that hold item properties to match against. Each
+	 * of these columns may contain a regular expression (re), otherwise NULL. For an item to 
+	 * match a rule, ALL non-NULL rules must match the item's properties. (If an re is NULL,
+	 * then the corresponding item property is ignored when considering the match.)
+	 * 
+	 * tag		: re (regular expression) to match item's tag values (ie a string of values)
+	 * template	: re to match item's spring template (ie its 'forward' property)
+	 * path		: re to match the item's path
+	 * ownerid	: re to match item's owner
+	 * 
+	 * If ALL non-NULL rules match this item, then the next 2 columns are considered.
+	 * 
+	 * access	: 1 (access IS granted), or 0 (access is subject to the user having a
+	 * 			  role that matches the re in the 'role' column)
+	 * role		: re to match the user's roles
+	 * 
+	 * Finally, the last column can be used to enable/disable the rule.
+	 * 
+	 * enabled	: 1 (yes) or 0 (no)
+	 * 
+	 * ^^
+	 * Rules are grouped by mode, and for each mode, ordered by name, in alphabetical order.
+	 * When an item is considered for accessibility, in either 'r' or 'w' mode, the first 
+	 * rule in the list that matches the item determines the outcome. In other words, the
+	 * remaining rules in the list are IGNORED. So rule naming is VERY IMPORTANT.
+	 */
+	
 	private static Logger LOG = Logger.getLogger(SiteAccessServiceImpl.class);
 	
 	@Autowired private CmsService cmsService;

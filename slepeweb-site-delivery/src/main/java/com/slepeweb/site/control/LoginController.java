@@ -16,6 +16,7 @@ import com.slepeweb.cms.bean.QandAList;
 import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
+import com.slepeweb.cms.constant.SiteConfigKey;
 import com.slepeweb.cms.service.LoginService;
 import com.slepeweb.cms.service.QandAService;
 import com.slepeweb.site.model.Page;
@@ -89,7 +90,7 @@ public class LoginController extends BaseController {
 		User u = getUser(req);
 		QandAList qalStoredInDb = this.qandAService.getQandAList(u);
 		String targetOnSuccess = req.getParameter("success");
-		int minQandA = this.siteConfigCache.getIntValue(i.getSite().getId(), "num.min.qanda", 2);
+		int minQandA = this.siteConfigCache.getIntValue(i.getSite().getId(), SiteConfigKey.NUM_QANDA_MIN, 2);
 				
 		if (req.getMethod().equalsIgnoreCase("get")) {
 			if (qalStoredInDb.getSize() < minQandA) {
@@ -106,7 +107,7 @@ public class LoginController extends BaseController {
 		}
 		
 		// Dealing with form submission ...
-		QandAList qalProvidedInForm = new QandAList().fillFromRequest(req);
+		QandAList qalProvidedInForm = new QandAList().fillFromRequest(req, qalStoredInDb.getSize());
 		
 		if (qalProvidedInForm.equals(qalStoredInDb)) {
 			req.getSession().setAttribute(AttrName.SUPER_USER, u);

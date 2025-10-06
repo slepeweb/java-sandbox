@@ -28,8 +28,8 @@
 		<input type="hidden" name="redirectPath" value="" />
 	</form>	
 	
-	<p style="margin-top: 1em;">
-		<a href="${_forgottenPasswordFormHref}" target="_blank">Forgotten password?</a>
+	<p style="margin-top: 1em; font-size: smaller;">
+		<a href="${_forgottenPasswordFormHref}" target="_blank">Forgot password?</a>
 	</p>
 	
 	<jsp:doBody />

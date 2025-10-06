@@ -1,29 +1,24 @@
 TODO: This is the main todo file:
 
 HIGH
-- Site A now CAN potentially display a page on site B, using mini-paths like /$_1234,
-	-	but not everything will work on the delivered page - more development is required, eg:
-		-	search function (anc)
-		-	breadcrumb links (anc)
-		- language-switcher (anc)
-		- etc.
-	- Haven't tested the pho site
-- Is there a case to update item ownership in bulk?
+- utility requests to refresh caches, eg SiteConfigCache and SiteAccess cache
+
 
 MEDIUM
 - When an item is inaccessible in cms-e, the delete icon in the header should also be disabled
 - Thumbnails sometimes have wrong orientation - will take a lot of work to rectify. See ImageUtil.
-- re-test registration process
+- re-test registration process (anc)
+- store preferred language in cookie (Ancestry)
+
+LOW
+- Is there a case to update item ownership in bulk?
+- app to remove redundant media files from file store
+- write test: cannot move item to one of it's children, OR descendants
+- write test: cannot move item to one of it's linked parents (ie via relations, inlines, etc)
 - force media items to have appropriate simplename extensions, esp. video, pdf, etc. (???)
 - PDFs not viewable on my android phone (chrome)
 - PDFs not rendered with scrollbars on iPad
 - need to protect against injection attacks
-- store preferred language in cookie (Ancestry)
 - resource bundles (Ancestry)
 - documents need to be nest-able (Ancestry)
 - also, solr indexing needs to recognise nesting nature
-
-LOW
-- app to remove redundant media files from file store
-- write test: cannot move item to one of it's children, OR descendants
-- write test: cannot move item to one of it's linked parents (ie via relations, inlines, etc)

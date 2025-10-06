@@ -2,7 +2,7 @@
 	page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="false"%><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
-<c:set var="_extraCSS" scope="request">${applicationContextPath}/resources/css/user.css</c:set>
+<c:set var="_extraCSS" scope="request">${applicationContextPath}/resources/css/forgotPassword.css</c:set>
 
 <cms:basicLayout loadjs="${false}">
 
@@ -20,13 +20,14 @@
 				<p class="x1pt2em">Please enter your email address, and we'll send you a link in an email
 				that will allow you to reset your password.</p>
 				
-				<form id="login" method="post" action="">
+				<form method="post" action="">
 					<div class="ff">
 						<label>Email: </label>
-						<div class="inputs"><input name="email" size="128" autocomplete="off" /></div>
+						<div class="inputs"><input name="email" size="128" autocomplete="off" 
+							value="${not empty _emailSubmitted ? _emailSubmitted : ''}" /></div>
 					</div>
 								
-					<button class="action" type="submit">Submit</button>
+					<button class="action" type="submit" style="margin-top: 2em;">Submit</button>
 				</form>
 			</c:when><c:otherwise>
 			
@@ -41,5 +42,9 @@
 <script>
 $(function() {
 	$('input[name=email]').focus();
+
+	$('input').click(function() {
+		$('div.user-update-msg').addClass('hidden')
+	})
 })
 </script>

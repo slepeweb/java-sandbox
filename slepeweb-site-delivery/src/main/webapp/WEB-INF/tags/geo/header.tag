@@ -16,7 +16,7 @@
 					<ul>
 						<li id="logout-link">> Logout</li>
 						<c:if test="${_isSuperUser}">
-							<li id="super-logout-link">> Super-logout</li>
+							<li id="superlogout-link">> Super-logout</li>
 						</c:if>
 					</ul>
 				</div>

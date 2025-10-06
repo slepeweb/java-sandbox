@@ -1,6 +1,7 @@
 package com.slepeweb.cms.bean;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,18 +14,27 @@ public class QandAList {
 	
 	private List<QandA> list = new ArrayList<QandA>();
 	
-	public QandAList fillFromRequest(HttpServletRequest req) {
+	public QandAList fillFromRequest(HttpServletRequest req, int expectedSize) {
 		String q, a;
 		
-		for (int i = 0; i < 3; i++) {
-			q = req.getParameter("q" + i);
-			if (q == null) {
-				q = "";
-			}
-			a = req.getParameter("a" + i);
-			
-			if (StringUtils.isNotBlank(a)) {
-				add(q.trim().replaceAll("[\"<>]", "_"), a.trim().replaceAll("[\"<>]", "_"));
+		for (int i = 0; i < expectedSize; i++) {
+			q = processInput(req.getParameter("q" + i));
+			a = processInput(req.getParameter("a" + i));
+			add(q, a);
+		}
+		
+		return this;
+	}
+	
+	private String processInput(String s) {
+		return s != null ? s.trim().replaceAll("[\"<>]", "_") : "";
+	}
+	
+	public QandAList trim() {
+		Iterator <QandA> iter = getList().iterator();
+		while (iter.hasNext()) {
+			if (StringUtils.isBlank(iter.next().getAnswer())) {
+				iter.remove();
 			}
 		}
 		

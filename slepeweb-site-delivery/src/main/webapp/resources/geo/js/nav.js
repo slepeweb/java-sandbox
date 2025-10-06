@@ -51,6 +51,16 @@ class MenuHandler {
 
 let _menu = new MenuHandler();
 
+let userLogoutBehaviour = function(action) {
+	$(`div#user-menu li#${action}-link`).click(function() {
+		_site.support.ajax('GET', `/rest/${action}/${_site.siteId}`, {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+			if (! resp.error) {
+				window.location = `${resp.data}`;
+			}
+		})
+	})
+}
+
 $(function() {
 	// Mouse pointer is over a top-level menu option
 	$("div.navbar a.toplevel").on('mouseenter', function(e) {
@@ -84,20 +94,6 @@ $(function() {
 		$('div#user-menu').removeClass('hidden')
 	})
 	
-	$('div#user-menu li#logout-link').click(function() {
-		_site.support.ajax('GET', '/rest/logout/' + _site.siteId, {dataType: 'json', mimeType: 'application/json'}, function(resp) {
-			if (! resp.error) {
-				window.location = `${resp.data}`;
-			}
-		})
-	})
-	
-	$('div#user-menu li#super-logout-link').click(function() {
-		_site.support.ajax('GET', '/rest/superlogout', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
-			if (! resp.error) {
-				window.location.reload();
-			}
-		})
-	})
-
+	userLogoutBehaviour('logout');
+	userLogoutBehaviour('superlogout');
 });

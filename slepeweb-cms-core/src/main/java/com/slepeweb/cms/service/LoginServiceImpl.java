@@ -93,7 +93,9 @@ public class LoginServiceImpl implements LoginService {
 		String name = "George Buttigieg";
 		
 		if (! supp.isSuccess() || supp.isSendmailFlag()) {
-			String msg = supp.getUserMessage() + "\n\n" + supp.getEmailMessage();
+			String msg = (StringUtils.isNotBlank(supp.getUserMessage()) ?  supp.getUserMessage() + "\n\n" : "") + 
+					supp.getEmailMessage();
+			
 			this.sendMailService.sendMail(from, to, name, "CMS login", msg);
 		}		
 	}

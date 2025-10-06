@@ -114,14 +114,15 @@ public class RestController extends BaseController {
 	@ResponseBody
 	public RestResponse logout(@PathVariable long siteId, HttpServletRequest req) {
 		req.getSession().removeAttribute(AttrName.USER);
+		req.getSession().removeAttribute(AttrName.SUPER_USER);
 		String loginPath = this.siteConfigCache.getValue(siteId, SiteConfigKey.LOGIN_PATH, "/login");
 		return new RestResponse().addMessage("Done").setData(loginPath);
 	}
 	
-	@RequestMapping(value="/superlogout", method=RequestMethod.GET, produces="application/json")
+	@RequestMapping(value="/superlogout/{siteId}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
-	public RestResponse superlogout(HttpServletRequest req) {
+	public RestResponse superlogout(@PathVariable long siteId, HttpServletRequest req) {
 		req.getSession().removeAttribute(AttrName.SUPER_USER);
-		return new RestResponse().addMessage("Done");
+		return new RestResponse().addMessage("Done").setData("/");
 	}
 }

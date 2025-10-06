@@ -17,6 +17,7 @@ import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
+import com.slepeweb.cms.constant.SiteConfigKey;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.QandAService;
@@ -108,7 +109,7 @@ public class UserController extends BaseController {
 		}
 				
 		// Now update secret Q and A's
-		QandAList qal = new QandAList().fillFromRequest(req);
+		QandAList qal = new QandAList().fillFromRequest(req, 3).trim();
 		this.qandAService.update(u, qal);
 		this.userService.save(u);
 
@@ -134,17 +135,17 @@ public class UserController extends BaseController {
 		if (req.getMethod().equalsIgnoreCase("post")) {
 			
 			String email = req.getParameter("email");
+			model.addAttribute("_emailSubmitted", email);
 			LOG.info(String.format("Forgotten password notification received from '%s' ... ", email));
 			
-			User u = this.userService.getByEmail(email);
-			if (u != null) {
+			User dbRecord = this.userService.getByEmail(email);
+			
+			if (dbRecord != null) {
 				// Update 'secret' info for user, and email this to him/her
-				StandardPasswordEncoder encoder = new StandardPasswordEncoder();
-				String encoded = encoder.encode(u.getEmail());
-				u.setSecret(encoded);
+				User u = updateSecretAndSaveUser(dbRecord);
 
 				String href = String.format("%s%s/user/password/reset?email=%s&code=%s", 
-						this.cmsService.getEditorialHost(), req.getContextPath(), u.getEmail(), encoded);
+						this.cmsService.getEditorialHost(), req.getContextPath(), u.getEmail(), u.getSecret());
 				
 				String message = String.format(
 						"You have requested a password reset on your account. Please <a href=\"%s\" target=\"_blank\">click here</a> to proceed.", href);
@@ -158,14 +159,22 @@ public class UserController extends BaseController {
 			}
 			else {
 				model.addAttribute("error", true);
-				model.addAttribute("msg", "No such user: " + email);
+				model.addAttribute("msg", "No such user with email: " + email);
 				LOG.error("No such user for password reset request");
 			}
 		}
 		
 		return "user/forgotPassword";
 	}
-
+	
+	private User updateSecretAndSaveUser(User u) {
+		StandardPasswordEncoder encoder = new StandardPasswordEncoder();
+		String encoded = encoder.encode(u.getEmail());
+		u.setSecret(encoded);
+		u = this.userService.save(u);
+		return u;
+	}
+	
 	private Long getSiteId(HttpServletRequest req) {
 		Host h = this.cmsService.getHostService().getHost(req.getServerName(), req.getServerPort());
 		Site s = null;
@@ -183,63 +192,75 @@ public class UserController extends BaseController {
 			HttpServletRequest req,
 			ModelMap model) throws Exception {
 		
+		QandAList qalStored = null;
+		User u = null;
+		boolean error = false;
+		
 		String email = req.getParameter("email");
 		String code = req.getParameter("code");
+		model.addAttribute("_code", code);
+		
+		model.addAttribute("completed", false);
 		model.addAttribute("error", false);
-
+		
 		try {
 			if (StringUtils.isBlank(email) || StringUtils.isBlank(code)) {
 				throw new ResourceException("Bad request");
 			}
 			
-			User u = this.userService.getByEmail(email);
+			u = this.userService.getByEmail(email);
 			if (u == null) {
 				throw new ResourceException("No such user");
 			}
-					
-			if (! (u.getEmail().equalsIgnoreCase(email)) && u.getSecret().equals(code)) {
-				throw new ResourceException("Bad user credentials");
-			}
-			
-			QandAList qalStored = this.qandAService.getQandAList(u);
-			if (qalStored.getSize() == 0) {
-				throw new ResourceException("No secret information available for user");
-			}
-			
-			model.addAttribute("_code", code);
 			model.addAttribute("_u", u);
-			model.addAttribute("_qandA", qalStored);
 					
-			if (req.getMethod().equalsIgnoreCase("get")) {
-				return "user/passwordResetForm";
+			if (! (u.getEmail().equalsIgnoreCase(email) && u.getSecret().equals(code))) {
+				throw new ResourceException("Bad user credentials - maybe the link in the email has expired");
 			}
 			
-			// This is a post request
-			String password = req.getParameter("password");
-			String password2 = req.getParameter("password2");
+			qalStored = this.qandAService.getQandAList(u);
+			int min = this.siteConfigCache.getIntValue(0L, SiteConfigKey.NUM_QANDA_MIN, 2);
+			if (qalStored.getSize() < min) {
+				throw new ResourceException("Cannot proceed - insufficient secret information recorded for user");
+			}
+			model.addAttribute("_qandA", qalStored);
 			
-			if (
-					StringUtils.isBlank(password) ||
-					StringUtils.isBlank(password2) ||
-					! password.equals(password2)) {
+		}
+		catch (ResourceException e) {
+			error = true;
+			model.addAttribute("error", error);
+			model.addAttribute("msg", e.getMessage());
+		}
+			
 				
-				throw new ResourceException("Passwords must be the same, and not blanks");
-			}
+		if (error || req.getMethod().equalsIgnoreCase("get")) {
+			return "user/passwordResetForm";
+		}
+		
+		// This is a post request
+		String password = req.getParameter("password");
+		model.addAttribute("_passwordSubmitted", password);
 			
+		try {
 			// NOTE: form doesn't provide the questions - get these from the db
-			QandAList qalSubmitted = new QandAList().fillFromRequest(req);
+			QandAList qalSubmitted = new QandAList().fillFromRequest(req, qalStored.getSize());
+			model.addAttribute("_qandASubmitted", qalSubmitted);
+			
+			// The questions are not submitted by the form, but instead copied from the db
 			for (int i = 0; i < qalStored.getSize(); i++) {
 				qalSubmitted.getList().get(i).setQuestion(qalStored.getList().get(i).getQuestion());
 			}
 			
 			if (! qalSubmitted.equals(qalStored)) {
-				throw new ResourceException("Failed security checks");
+				throw new ResourceException("Failed security checks - please check your answers");
 			}
 			
-			StandardPasswordEncoder encoder = new StandardPasswordEncoder();
-			u.setPassword(encoder.encode(password));
-			this.userService.save(u);
+			if (StringUtils.isBlank(password)) {				
+				throw new ResourceException("No password offered");
+			}
 			
+			updateSecretAndSaveUser(u);			
+			model.addAttribute("completed", true);
 			model.addAttribute("msg", "Password successfully updated");
 		}
 		catch (ResourceException e) {
