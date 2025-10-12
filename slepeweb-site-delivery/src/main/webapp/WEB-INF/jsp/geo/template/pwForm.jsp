@@ -38,11 +38,12 @@
 					<table>
 						<tr>
 							<td><label>Important accounts only?: </label></td>
-							<td><input type="checkbox" name="important" checked autocomplete="off" /></td>
+							<td><input type="checkbox" name="important" checked autocomplete="off" 
+							style="margin: 8px 0 8px 0;" /></td>
 						</tr>
 						
 						<tr>
-							<td><label>Root password: </label></td>
+							<td><label>Master password: </label></td>
 							<td><input type="password" name="password" autocomplete="off" /></td>
 						</tr>
 						

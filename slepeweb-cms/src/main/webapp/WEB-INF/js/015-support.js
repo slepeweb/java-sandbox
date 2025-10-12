@@ -405,37 +405,39 @@ _cms.support.renderItemForms = function(nodeKey, activeTab, callback, args) {
 		});
 };
 
-console.log('Defining jquery function: insertAtCaret')
+// Defining jquery function: wrapSelection
 
 jQuery.fn.extend({
-	insertAtCaret: function(myValue) {
-		console.log('insertAtCaret called')
+  wrapSelection: function(template) {
+		var delim = '$$$';
+		var cursor = template.indexOf(delim);
+		var before = template, after = '';
+		if (cursor > -1) {
+			before = template.substr(0, cursor);
+			after = template.substr(cursor + delim.length);
+		}
 		
-	  return this.each(function(i) {
-			console.log(`Iterating through jquery selections [${i}]`)
-			
-	    if (document.selection) {
-	      //For browsers like Internet Explorer
-	      this.focus();
-	      var sel = document.selection.createRange();
-	      sel.text = myValue;
-	      this.focus();
-	    }
-	    else if (this.selectionStart || this.selectionStart == '0') {
-	      //For browsers like Firefox and Webkit based
-	      var startPos = this.selectionStart;
-	      var endPos = this.selectionEnd;
-	      var scrollTop = this.scrollTop;
-	      this.value = this.value.substring(0, startPos)+myValue+this.value.substring(endPos,this.value.length);
-	      this.focus();
-	      this.selectionStart = startPos + myValue.length;
-	      this.selectionEnd = startPos + myValue.length;
-	      this.scrollTop = scrollTop;
-	    } else {
-	      this.value += myValue;
-	      this.focus();
-	    }
-	  });
-	}
-});
+    return this.each(function() {
+      if (document.selection) {
+        // Old IE support
+        this.focus();
+        var sel = document.selection.createRange();
+        var selectedText = sel.text;
+        sel.text = before + selectedText + after;
+        this.focus();
+      } else if (this.selectionStart || this.selectionStart === 0) {
+        // Modern browsers
+        var startPos = this.selectionStart;
+        var endPos = this.selectionEnd;
+        var selectedText = this.value.substring(startPos, endPos);
+        var wrapped = before + selectedText + after;
 
+        this.value = this.value.substring(0, startPos) + wrapped + this.value.substring(endPos);
+        this.selectionStart = this.selectionEnd = startPos + wrapped.length;
+				this.focus();
+      } else {
+        this.value += before + after;
+      }
+    });
+  }
+});

@@ -13,6 +13,7 @@ body {
 	font-family: Verdana, Arial, sans-serif;
 	padding-left: 1.0em;
 	padding-right: 1.0em;
+	position: relative;
 }
 
 header {
@@ -111,10 +112,6 @@ div.hf {
 #searchresults li, #flagged-items-dialog li {
 	margin-bottom: 0.5em;
 	margin-left: -2em;
-}
-
-#main-wrapper {
-	position: relative;
 }
 
 #footer-wrapper {
@@ -653,12 +650,12 @@ div.cms-icon-component {background-position: -48px -80px; background-image: url(
 div#widefield-wrapper {
 	visibility: hidden;
 	z-index: 100;
-	height: 120%;
+	height: 100%;
 	width: 100%;
 	position: absolute;
-	top: 6%;
-	left: 0px;
-	margin-top: 12px;
+	top: 0;
+	left: 0;
+/* 	margin-top: 12px; */
 }
 
 textarea#widefield-editor {
@@ -667,16 +664,31 @@ textarea#widefield-editor {
 	max-width: none;
 	background-color: pink;
 	border: grey 4px solid;
+	margin: 0;
+	padding: 1em;
 }
 
 div#widefield-toolbar {
 	display: grid;
-	grid-template-columns: 4fr 1fr;
+	grid-template-columns: 1fr 1fr;
 	background-color: grey;
-	padding: 6px;
-	width: 99%;
+	margin: 0;
+	padding: 1em;
+	width: 100%;
 }
 
+div#widefield-toolbar textarea {
+	margin: 0;
+	border: none;
+}
+
+div#widefield-toolbar label {
+	color: white;
+	font-size: larger;
+	font-weight: bold;
+	margin-right: 1em;
+}
+	
 div#widefield-toolbar div.left {
 	grid-column: 1;
 }

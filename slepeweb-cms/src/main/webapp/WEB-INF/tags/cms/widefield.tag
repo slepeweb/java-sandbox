@@ -4,18 +4,22 @@
 <div id="widefield-wrapper">
 	<div id="widefield-toolbar">
 		<div class="left">
-			<div id="widefield-h2-icon" class="widefield-icon">h2</div>
-			<div id="widefield-h3-icon" class="widefield-icon">h3</div>
-			<div id="widefield-h4-icon" class="widefield-icon">h4</div>
-			<div id="widefield-div-icon" class="widefield-icon">div</div>
-			<div id="widefield-p-icon" class="widefield-icon">p</div>
-			<div id="widefield-aside-icon" class="widefield-icon">aside</div>
-			<div id="widefield-code-icon" class="widefield-icon">code</div>
-			<div id="widefield-ul-icon" class="widefield-icon">ul</div>
-			<div id="widefield-ximg-icon" class="widefield-icon">ximg</div>
-			<div id="widefield-link-icon" class="widefield-icon">a</div>
-			<div id="widefield-xcomp-icon" class="widefield-icon">xcomp</div>
-			<div id="widefield-table-icon" class="widefield-icon">table</div>
+			<label>Insert markup:</label>
+			<select id="widefield-menu">
+				<option value="">Choose ...</option>
+				<option value="h2">heading 2 (h2)</option>
+				<option value="h3">heading 3 (h3)</option>
+				<option value="h4">heading 4 (h4)</option>
+				<option value="div">div</option>
+				<option value="p">para (p)</option>
+				<option value="aside">aside</option>
+				<option value="code">code</option>
+				<option value="ul">list (ul)</option>
+				<option value="ximg">ximg (custom)</option>
+				<option value="link">link (a)</option>
+				<option value="xcomp">xcomp (custom)</option>
+				<option value="table">table</option>
+			</select>
 		</div>
 		
 		<div class="right">

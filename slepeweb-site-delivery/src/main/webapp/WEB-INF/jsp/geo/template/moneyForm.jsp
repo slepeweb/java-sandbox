@@ -39,7 +39,7 @@
 					
 					<table>
 						<tr>
-							<td><label>Root password: </label></td>
+							<td><label>Master password: </label></td>
 							<td><input type="password" name="password" autocomplete="off" /></td>
 						</tr>						
 					</table>

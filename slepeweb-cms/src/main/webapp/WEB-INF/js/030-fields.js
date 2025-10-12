@@ -211,75 +211,73 @@ _cms.field.onpageload = function() {
 		$('#widefield-wrapper').css('visibility', 'hidden')
 	})
 	
-	$("div#widefield-p-icon").click(function(e) {
-		_cms.field.widefieldInsert('<p></p>')
-	})
-
-	$("div#widefield-code-icon").click(function(e) {
-		_cms.field.widefieldInsert('<code></code>')
-	})
-
-	$("div#widefield-ul-icon").click(function(e) {
-		_cms.field.widefieldInsert(`<ul>
-	<li></li>
-	<li></li>
-	<li></li>
-	<li></li>
-	<li></li>
-	<li></li>
+	$('select#widefield-menu option').mousedown(function () {
+		var option$ = $(this)
+		var value = option$.val();
+		
+		if (value !== "") {
+			if (value === 'p') {
+				_cms.field.widefieldInsert('<p>$$$</p>')
+			}
+			else if (value === 'code') {
+				_cms.field.widefieldInsert('<code>$$$</code>')
+			}
+			else if (value === 'ul') {
+				_cms.field.widefieldInsert(`<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
 </ul>`)
-	})
-
-	$("div#widefield-h2-icon").click(function(e) {
-		_cms.field.widefieldInsert('<h2></h2>')
-	})
-
-	$("div#widefield-h3-icon").click(function(e) {
-		_cms.field.widefieldInsert('<h3></h3>')
-	})
-
-	$("div#widefield-h4-icon").click(function(e) {
-		_cms.field.widefieldInsert('<h4></h4>')
-	})
-
-	$("div#widefield-div-icon").click(function(e) {
-		_cms.field.widefieldInsert('<div></div>')
-	})
-
-	$("div#widefield-aside-icon").click(function(e) {
-		_cms.field.widefieldInsert('<aside></aside>')
-	})
-
-	$("div#widefield-link-icon").click(function(e) {
-		_cms.field.widefieldInsert('<a href="/$_1234"></a>')
-	})
-
-	$("div#widefield-ximg-icon").click(function(e) {
-		_cms.field.widefieldInsert(`<div class="ximg" data-id="1234">Optional floated text</div>
-			/* Optional attrs: data-width, data-caption
-			   Optional class: border */`)
-	})
-
-	$("div#widefield-xcomp-icon").click(function(e) {
-		_cms.field.widefieldInsert('<div class="xcomp" data-enum="1"></div>')
-	})
-
-$("div#widefield-table-icon").click(function(e) {
-	_cms.field.widefieldInsert(`<table>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-</table>`)
-})
+			}
+			else if (value === 'h2') {
+				_cms.field.widefieldInsert('<h2>$$$</h2>')
+			}
+			else if (value === 'h3') {
+				_cms.field.widefieldInsert('<h3>$$$</h3>')
+			}
+			else if (value === 'h4') {
+				_cms.field.widefieldInsert('<h4>$$$</h4>')
+			}
+			else if (value === 'div') {
+				_cms.field.widefieldInsert('<div>$$$</div>')
+			}
+			else if (value === 'aside') {
+				_cms.field.widefieldInsert('<aside>$$$</aside>')
+			}
+			else if (value === 'link') {
+				_cms.field.widefieldInsert('<a href="/$_1234">$$$</a>')
+			}
+			else if (value === 'ximg') {
+				_cms.field.widefieldInsert(`<div class="ximg" data-id="1234">Optional floated text</div>
+/* 
+Optional attrs: data-width, data-caption
+Optional class: border
+*/`)
+			}
+			else if (value === 'xcomp') {
+				_cms.field.widefieldInsert('<div class="xcomp" data-enum="1"></div>')
+			}
+			else if (value === 'table') {
+				_cms.field.widefieldInsert(`<table>
+<tr><th></th><th></th><th></th></tr>
+<tr><td></td><td></td><td></td></tr>
+</table>`
+)
+			}
+			
+			// Re-set the select element
+			option$.parent().val('')
+			
+		}
+	});
+	
 }
 
 _cms.field.widefieldInsert = function(str) {
-	$('textarea#widefield-editor').insertAtCaret(str)
+	$('textarea#widefield-editor').wrapSelection(str)
 }
 
 /*
