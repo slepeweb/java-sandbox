@@ -70,13 +70,22 @@ public class Util {
 			long multiplier = val.startsWith("-") ? -1L : 1L;
 
 			String[] parts = val.split("\\.");
+			
+			// Cater for pence value like '24'
 			if (parts.length == 1) {
 				return Long.valueOf(cleanAmount(parts[0])).longValue() * 100;
 			}
-			else if (parts.length == 2){
+			else if (parts.length == 2) {
+				// Cater for figure like '.24'
+				if (parts[0].length() == 0) {
+					parts[0] = "0";
+				}
+				
+				// Cater for value like '2.4'
 				if (parts[1].length() == 1) {
 					parts[1] = parts[1] + "0";
 				}
+				// Ignore fractions of pennies
 				else if (parts[1].length() > 2) {
 					parts[1] = parts[1].substring(0, 2);
 				}
