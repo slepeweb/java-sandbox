@@ -126,7 +126,7 @@ public class CmsDeliveryServlet {
 		
 		// Avoid displaying minipaths, if possible, by redirecting requests
 		if (r.isMiniPath() && r.getSite().getId().equals(item.getSite().getId())) {
-			res.sendRedirect(item.getUrl());
+			res.sendRedirect(replaceMinipath(item));
 			return;
 		}
 		
@@ -394,6 +394,29 @@ public class CmsDeliveryServlet {
 		return true;
 	}
 	*/
+	
+	private String replaceMinipath(Item item) {
+		String url = item.getUrl();
+		Map<String, String[]> map = item.getRequestPack().getParams();
+		
+		if (! map.isEmpty()) {
+			StringBuffer sb = new StringBuffer("?");
+			String continuation = "";
+			String[] values;
+			
+			for (String name : map.keySet()) {
+				values = map.get(name);
+				for (int i = 0; i < values.length; i++) {
+					sb.append(String.format("%s%s=%s", continuation, name, HttpUtil.encodeUrl(values[i])));
+					continuation = "&";
+				}
+			}
+			
+			url += sb.toString();
+		}
+		
+		return url;
+	}
 	
 	private long toLong(String s) {
 		if (StringUtils.isNumeric(s)) {
