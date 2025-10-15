@@ -51,15 +51,17 @@ public class CmsDeliveryServlet {
 		String language = null;
 		String path = getItemPath(req);
 		RequestPack r = new RequestPack(req);
+		r.setSite(getSite(req));
 		
 		if (path.equals("/favicon.ico")) {
 			return null;
 		}
 
 		/*
-		 *  PATH_PATTERN_A is used in requests for 'foreign' items, ie on a different site,
-		 *  most commonly media items that you want to share between sites, but also pages 
-		 *  to link to.
+		 *  PATH_PATTERN_A is used in requests for items by their origid, in the form of a 'minipath',
+		 *  such as '/$_4023'. This is particularly useful when the item belongs to a 'foreign' site, 
+		 *  enabling 'this' site to render it. Minipaths are also useful when you want to create a link
+		 *  in the body of some content, and you don't want that link to break should the item get moved.
 		 */
 		Matcher m = PATH_PATTERN_A.matcher(path);
 		
@@ -74,11 +76,10 @@ public class CmsDeliveryServlet {
 			if (m.matches()) {
 				language = m.group(2);
 				path = m.group(3);
-				Site site = getSite(req);
 				
-				if (site != null) {
-					path = site.isMultilingual() ? path : m.group(0);
-					i = site.getItem(path);
+				if (r.getSite() != null) {
+					path = r.getSite().isMultilingual() ? path : m.group(0);
+					i = r.getSite().getItem(path);
 				}
 			}
 		}
@@ -118,6 +119,14 @@ public class CmsDeliveryServlet {
 		
 		if (item == null) {
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		
+		RequestPack r = item.getRequestPack();
+		
+		// Avoid displaying minipaths, if possible, by redirecting requests
+		if (r.isMiniPath() && r.getSite().getId().equals(item.getSite().getId())) {
+			res.sendRedirect(item.getUrl());
 			return;
 		}
 		
@@ -270,6 +279,8 @@ public class CmsDeliveryServlet {
 		if (h != null) {
 			return h.getSite();
 		}
+		
+		LOG.warn(String.format("Failed to identify host '%s[:%d]' from request", req.getServerName(), req.getServerPort()));
 		return null;
 	}
 

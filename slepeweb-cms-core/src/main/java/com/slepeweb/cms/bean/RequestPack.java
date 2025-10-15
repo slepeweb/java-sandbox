@@ -14,6 +14,7 @@ public class RequestPack {
 
 	private String language = "en";
 	private User user;
+	private Site site;
 	private HttpServletRequest httpRequest;
 	private Map<String, String[]> params = new HashMap<String, String[]>();
 	private boolean miniPath;
@@ -81,6 +82,15 @@ public class RequestPack {
 
 	public boolean isMiniPath() {
 		return this.miniPath;
+	}
+
+	public Site getSite() {
+		return site;
+	}
+
+	public RequestPack setSite(Site site) {
+		this.site = site;
+		return this;
 	}
 
 	private String getParameter(String name) {

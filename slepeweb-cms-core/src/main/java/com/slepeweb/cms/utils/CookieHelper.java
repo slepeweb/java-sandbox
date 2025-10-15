@@ -75,7 +75,9 @@ public class CookieHelper {
 			List<ItemIdentifier> list = new ArrayList<ItemIdentifier>();
 			
 			for (String s : cookieValue.split(ID_REGEX)) {
-				list.add(new ItemIdentifier(s));
+				if (StringUtils.isNumeric(s)) {
+					list.add(new ItemIdentifier(s));
+				}
 			}
 			
 			updateItemNames(list, cmsService);
