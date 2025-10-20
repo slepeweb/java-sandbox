@@ -113,15 +113,19 @@ public class CmsDeliveryServlet {
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
-		Item item = identifyItem(req);
-		
+		Item item = identifyItem(req);		
 		if (item == null) {
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 		
+		// identifyItem() will have assigned a RequestPack to item
 		RequestPack r = item.getRequestPack();
-		
+		if (r.getSite() == null) {
+			res.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+
 		// Avoid displaying minipaths, if possible, by redirecting requests
 		if (r.isMiniPath() && r.getSite().getId().equals(item.getSite().getId())) {
 			res.sendRedirect(item.getUrl() + r.getQueryString());

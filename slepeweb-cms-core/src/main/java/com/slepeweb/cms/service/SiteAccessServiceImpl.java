@@ -100,10 +100,6 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 				}
 			}
 
-			if (i.getUser() == null) {
-				return false;
-			}
-			
 			return isAccessible(i, getReadRules(i.getSite().getId()));
 		}
 	}
