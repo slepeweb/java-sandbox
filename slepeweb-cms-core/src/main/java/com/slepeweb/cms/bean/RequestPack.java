@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.component.Passkey;
 import com.slepeweb.cms.constant.AttrName;
+import com.slepeweb.common.util.HttpUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -38,6 +39,27 @@ public class RequestPack {
 	public RequestPack setParams(Map<String, String[]> params) {
 		this.params = params;
 		return this;
+	}
+	
+	public String getQueryString() {
+
+		if (! this.params.isEmpty()) {
+			StringBuffer sb = new StringBuffer("?");
+			String continuation = "";
+			String[] values;
+			
+			for (String name : this.params.keySet()) {
+				values = this.params.get(name);
+				for (int i = 0; i < values.length; i++) {
+					sb.append(String.format("%s%s=%s", continuation, name, HttpUtil.encodeUrl(values[i])));
+					continuation = "&";
+				}
+			}
+			
+			return sb.toString();
+		}
+		
+		return "";
 	}
 	
 	public User getUser() {

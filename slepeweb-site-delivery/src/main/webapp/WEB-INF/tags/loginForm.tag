@@ -25,7 +25,7 @@
 			</tr>
 		</table>
 		<input class="button special small" type="submit" value="Login" />		
-		<input type="hidden" name="redirectPath" value="" />
+		<input type="hidden" name="redirectPath" value="${_redirectPath}" />
 	</form>	
 	
 	<p style="margin-top: 1em; font-size: smaller;">

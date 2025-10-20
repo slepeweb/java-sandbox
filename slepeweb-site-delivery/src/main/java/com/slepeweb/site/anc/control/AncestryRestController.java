@@ -11,8 +11,8 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.site.anc.service.AncCookieService;
 import com.slepeweb.site.control.BaseController;
+import com.slepeweb.site.service.SiteCookieService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AncestryRestController extends BaseController {
 	
 	@Autowired private ItemService itemService;
-	@Autowired private AncCookieService ancCookieService;
+	@Autowired private SiteCookieService siteCookieService;
 
 	@RequestMapping(value="/login/redirect/{origId}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
@@ -36,7 +36,7 @@ public class AncestryRestController extends BaseController {
 			return r.setError(true).addMessage("Item not found");
 		}
 		
-		ItemIdentifier iid = this.ancCookieService.getLatestBreadcrumb(i.getSite(), req);
+		ItemIdentifier iid = this.siteCookieService.getLatestBreadcrumb(i.getSite(), req);
 		if (iid != null) {
 			r.setData(iid.getPath());
 		}

@@ -40,11 +40,11 @@ import com.slepeweb.site.geo.bean.PasswordList;
 import com.slepeweb.site.geo.bean.PasswordList.Account;
 import com.slepeweb.site.geo.bean.PasswordList.Group;
 import com.slepeweb.site.geo.bean.SectionMenu;
-import com.slepeweb.site.geo.service.GeoCookieService;
 import com.slepeweb.site.geo.service.SolrService4Geo;
 import com.slepeweb.site.model.LinkTarget;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.service.MagicMarkupService;
+import com.slepeweb.site.service.SiteCookieService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -59,7 +59,7 @@ public class GeoPageController extends BaseController {
 	public static final String PASSKEY = "_passkey";
 	
 	@Autowired SolrService4Geo solrService4Geo;
-	@Autowired GeoCookieService geoCookieService;
+	@Autowired SiteCookieService siteCookieService;
 	@Autowired MagicMarkupService magicMarkupService;
 	@Autowired QandAService qandAService;
 	@Autowired SiteConfigCache siteConfigCache;
@@ -312,7 +312,7 @@ public class GeoPageController extends BaseController {
 	private void addGeoExtras(Item i, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		model.addAttribute(MAGIC_MARKUP_SERVICE, this.magicMarkupService);
 		model.addAttribute("_inThisSection", new SectionMenu(i));
-		model.addAttribute(HISTORY, this.geoCookieService.updateBreadcrumbsCookie(i, req, res));
+		model.addAttribute(HISTORY, this.siteCookieService.updateBreadcrumbsCookie(i, req, res));
 		model.addAttribute("_isSuperUser", Boolean.valueOf(req.getSession().getAttribute(AttrName.SUPER_USER) != null));
 	}
 	

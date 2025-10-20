@@ -38,7 +38,7 @@ _site.support.checkSession = function() {
 			
 			if (isExpiring) {
 				if (secondsRemaining <= 0) {
-					_site.support.ajax('GET', '/rest/session/logout', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+					_site.support.ajax('GET', `/rest/session/logout/${_site.siteId}`, {dataType: 'json', mimeType: 'application/json'}, function(resp) {
 						if (resp.error) {
 							console.log('Failed to end session cleanly')
 						}
@@ -69,12 +69,7 @@ _site.support.moveComponent = function(parent$) {
 
 
 $(function() {
-	/*
-	$('div.xcomp').each(function() {
-		_site.support.moveComponent($(this));
-	})
-	*/
-	
+
 	$('i#open-editor').click(function() {
 		_site.support.openEditor($(this).attr('title'));
 	})

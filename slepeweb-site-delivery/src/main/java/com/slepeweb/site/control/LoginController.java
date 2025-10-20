@@ -42,12 +42,14 @@ public class LoginController extends BaseController {
 			HttpServletResponse res,
 			ModelMap model) throws IOException {					
 		
+		String redirectPath = null;
+		
 		if (req.getMethod().equalsIgnoreCase("post")) {
 			String alias = req.getParameter("alias");
 			StringBuffer msg = new StringBuffer(String.format("User '%s' logging in ... ", alias));
 			
 			String password = req.getParameter("password");
-			String redirectPath = req.getParameter("redirectPath");
+			redirectPath = req.getParameter("redirectPath");
 			LoginSupport supp = this.loginService.login(alias, password, req);
 			
 			if (supp.isSuccess()) {
@@ -68,6 +70,11 @@ public class LoginController extends BaseController {
 		}
 		else if (req.getMethod().equalsIgnoreCase("get")) {
 			
+			redirectPath = req.getParameter("redirectPath");
+			if (redirectPath == null) {
+				redirectPath = "";
+			}
+			model.addAttribute("_redirectPath", redirectPath);
 			model.addAttribute("_forgottenPasswordFormHref", 
 					i.getSite().getEditorialHost().getNamePortAndProtocol() + "/cms/user/forgot/password");
 			

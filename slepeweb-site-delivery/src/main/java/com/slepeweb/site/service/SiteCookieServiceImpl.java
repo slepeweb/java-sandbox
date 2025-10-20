@@ -1,4 +1,4 @@
-package com.slepeweb.site.anc.service;
+package com.slepeweb.site.service;
 
 import java.util.List;
 
@@ -12,15 +12,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service
-public class AncCookieServiceImpl extends CookieHelper implements AncCookieService {
+public class SiteCookieServiceImpl extends CookieHelper implements SiteCookieService {
 	
 	public List<ItemIdentifier> updateBreadcrumbsCookie(Item i, HttpServletRequest req, HttpServletResponse res) {
 		
-		ItemIdentifier targetKey = new ItemIdentifier(i.getOrigId());
-		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);	
-		pushBreadcrumbs(breadcrumbs, targetKey);
+		List<ItemIdentifier> breadcrumbs = getBreadcrumbsCookieValue(i.getSite(), req);
+		
+		if (! i.isHiddenFromNav()) {
+			ItemIdentifier targetKey = new ItemIdentifier(i.getOrigId());
+			pushBreadcrumbs(breadcrumbs, targetKey);
+		}
+		
 		updateItemNames(breadcrumbs, i.getCmsService()); // We need item names in order to reorder existing matching entries
-		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), join(breadcrumbs), ANC_COOKIE_PATH, res);
+		saveCookie(getBreadcrumbsCookieName(i.getSite().getId()), join(breadcrumbs), SITE_COOKIE_PATH, res);
 		return breadcrumbs;
 	}
 	

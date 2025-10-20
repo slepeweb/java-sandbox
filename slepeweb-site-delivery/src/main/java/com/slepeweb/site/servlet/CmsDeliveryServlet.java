@@ -17,6 +17,7 @@ import org.springframework.ui.ModelMap;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.ItemIdentifier;
 import com.slepeweb.cms.bean.RequestPack;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfigCache;
@@ -24,11 +25,12 @@ import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
+import com.slepeweb.cms.constant.SiteConfigKey;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.ItemService;
-import com.slepeweb.cms.service.SiteAccessService;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
+import com.slepeweb.site.service.SiteCookieService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,6 +47,7 @@ public class CmsDeliveryServlet {
 	@Autowired private CmsService cmsService;
 	@Autowired private ItemService itemService;
 	@Autowired private SiteConfigCache siteConfigCache;
+	@Autowired private SiteCookieService siteCookieService;
 
 	private Item identifyItem(HttpServletRequest req) {
 		Item i = null;
@@ -96,17 +99,12 @@ public class CmsDeliveryServlet {
 	}
 	
 	private String getLoginPath(Item i) {
-		
-		String path = this.siteConfigCache.getValue(i.getSite().getId(), SiteConfigCache.PATH_LOGIN);
-		
-		if (StringUtils.isNotBlank(path)) {
+		String path = this.siteConfigCache.getValue(i.getSite().getId(), SiteConfigKey.LOGIN_PATH, "/login");		
+		if (! i.getSite().isMultilingual()) {
 			return path;
 		}
 		
-		return i.getSite().isMultilingual() ? 
-				String.format("/%s%s", i.getLanguage(), SiteAccessService.LOGIN_PATH) :
-					SiteAccessService.LOGIN_PATH;
-
+		return String.format("/%s%s", i.getLanguage(), path);
 	}
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
@@ -126,7 +124,7 @@ public class CmsDeliveryServlet {
 		
 		// Avoid displaying minipaths, if possible, by redirecting requests
 		if (r.isMiniPath() && r.getSite().getId().equals(item.getSite().getId())) {
-			res.sendRedirect(replaceMinipath(item));
+			res.sendRedirect(item.getUrl() + r.getQueryString());
 			return;
 		}
 		
@@ -137,28 +135,28 @@ public class CmsDeliveryServlet {
 		if (
 				item.getSite().isSecured() &&
 				item.isPage() && 
-				item.getRequestPack().isMiniPath() &&
-				item.getRequestPack().hasPasskey()) {
+				r.isMiniPath() &&
+				r.hasPasskey()) {
 			
 			/*
 			 * Add a passkey to the url, and specify the delivery host for the site that this item belongs to,
 			 * before redirecting to the modified item url.
 			 */
 			String url = String.format("//%s%s?_passkey=%s", 
-					item.getSite().getDeliveryHost().getNameAndPort(), item.getUrl(), item.getRequestPack().getPasskey().encode());
+					item.getSite().getDeliveryHost().getNameAndPort(), item.getUrl(), r.getPasskey().encode());
 			
 			res.sendRedirect(url);
 			return;
 		}
 
-		// Redirect request to login page if user does not have access to item
+		// Redirect request to login page if user does not have access to item. 
+		// This check also makes sure user is logged in on secured sites
 		if (! item.isAccessible()) {
 			// Site access rules deny access to this user, AND no suitable passkey provided
-			String loginPath = getLoginPath(item);
-			
-			if (! (item.getMiniPath().equals(loginPath) || item.getPath().equals(SiteAccessService.LOGIN_PATH))) {
-				LOG.warn(String.format("Item [%s] is not accessible", item.getPath()));
-				res.sendRedirect(loginPath);
+			// Redirect to login page, UNLESS this IS a request for the login page
+			String loginUrl = getLoginRedirectionUrl(item, req);
+			if (loginUrl != null) {
+				res.sendRedirect(loginUrl);
 				return;
 			}
 		}
@@ -199,6 +197,29 @@ public class CmsDeliveryServlet {
 				}
 			}
 		}
+	}
+	
+	private String getLoginRedirectionUrl(Item item, HttpServletRequest req) {
+
+		String loginPath = getLoginPath(item);
+		
+		if (! (item.getMiniPath().equals(loginPath) || item.getPath().equals(SiteConfigKey.LOGIN_PATH))) {
+			// On successful login, redirect to original target page UNLESS target was the homepage
+			String redirectUrl = item.getUrl();
+			
+			if (item.isRoot()) {
+				// Redirect to latest breadcrumb on successful login
+				ItemIdentifier id = this.siteCookieService.getLatestBreadcrumb(item.getSite(), req);
+				redirectUrl = id != null ? id.getPath() : "/";
+			}
+
+			LOG.warn(String.format("Item [%s] is not accessible - redirecting to %s, then on successful login to %s", 
+					item.getUrl(), loginPath, redirectUrl));
+			
+			return String.format("%s?redirectPath=%s", loginPath, redirectUrl);
+		}
+		
+		return null;
 	}
 	
 	private String updateControllerIf(Item i, String view) {
@@ -348,75 +369,6 @@ public class CmsDeliveryServlet {
 		}
 	}
 	
-	/*
-	private boolean itemIsAccessibleByUser(Item i, HttpServletRequest req) {
-		
-		boolean siteIsSecured = i.getSite().isSecured();
-		boolean passkeyIsValid = false;	
-		
-		if (siteIsSecured) {
-			User u = i.getUser();
-			
-			if (u == null) {
-				LOG.info("Request is from user who has not logged in ...");
-				String passkey = req.getParameter("passkey");
-				
-				if (passkey != null) {
-					String[] parts = passkey.split("\\$\\$");
-					if (parts.length != 2) {
-						LOG.error(String.format("Badly formed passkey [%s]", passkey));
-						return false;
-					}
-					
-					long userId = Long.parseLong(parts[0]);
-					u = this.userService.get(userId);
-					if (u == null) {
-						LOG.error(String.format("User ID not recognised [%d]", userId));
-						return false;
-					}
-					
-					i.setUser(u);
-					if (passkeyIsValid = this.passkeyService.validateKey(parts[1])) {
-						i.setUser(u);
-					}
-				}
-			}
-			
-			if (i.getSite().isSecured() && ! i.isAccessible() && ! passkeyIsValid && i.getUser() == null) {
-				// Site access rules deny access to this user, AND he has no passkey.
-				if (! i.getPath().equals(getLoginPath(i))) {
-					LOG.warn(String.format("Item [%s] is not accessible by un-identified user", i.getPath()));
-					return false;
-				}
-			}			
-		}	
-		
-		return true;
-	}
-	*/
-	
-	private String replaceMinipath(Item item) {
-		String url = item.getUrl();
-		Map<String, String[]> map = item.getRequestPack().getParams();
-		
-		if (! map.isEmpty()) {
-			StringBuffer sb = new StringBuffer("?");
-			String continuation = "";
-			String[] values;
-			
-			for (String name : map.keySet()) {
-				values = map.get(name);
-				for (int i = 0; i < values.length; i++) {
-					sb.append(String.format("%s%s=%s", continuation, name, HttpUtil.encodeUrl(values[i])));
-					continuation = "&";
-				}
-			}
-			
-			url += sb.toString();
-		}
-		
-		return url;
-	}
 	
 	private long toLong(String s) {
 		if (StringUtils.isNumeric(s)) {

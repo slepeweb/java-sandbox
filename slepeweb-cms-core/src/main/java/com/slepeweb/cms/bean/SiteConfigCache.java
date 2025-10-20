@@ -7,11 +7,7 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
 public class SiteConfigCache {
-	
-	public static final String PATH_LOGIN = "path.login";
-	public static final String PATH_SUPER_LOGIN = "path.superlogin";
-	public static final String NUM_QANDA_MIN = "num.qanda.min";
-	
+		
 	private Map<Long, SiteConfig> map = new HashMap<Long, SiteConfig>();
 	
 	public void put(Long siteId, SiteConfigProperty scp) {

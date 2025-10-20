@@ -716,7 +716,7 @@ div#widefield-toolbar div#widefield-close-icon {
 div#session-expiry-warning {
 	display: block;
 	position: fixed;
-	z-index: 100;
+	z-index: 1000;
 	top: 30%;
 	left: 30%;
 	width: 30%;

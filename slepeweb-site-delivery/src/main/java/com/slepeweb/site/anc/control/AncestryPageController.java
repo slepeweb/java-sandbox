@@ -23,11 +23,11 @@ import com.slepeweb.site.anc.bean.MenuItem;
 import com.slepeweb.site.anc.bean.Person;
 import com.slepeweb.site.anc.bean.svg.AncestryDiagram;
 import com.slepeweb.site.anc.bean.svg.SvgSupport;
-import com.slepeweb.site.anc.service.AncCookieService;
 import com.slepeweb.site.anc.service.SolrService4Ancestry;
 import com.slepeweb.site.bean.SolrParams4Site;
 import com.slepeweb.site.control.BaseController;
 import com.slepeweb.site.model.Page;
+import com.slepeweb.site.service.SiteCookieService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,7 +48,7 @@ public class AncestryPageController extends BaseController {
 	
 	@Autowired private ItemService itemService;
 	@Autowired private SolrService4Ancestry solrService4Ancestry;
-	@Autowired private AncCookieService ancCookieService;
+	@Autowired private SiteCookieService siteCookieService;
 	
 	@ModelAttribute(value="_languageUrlPrefix")
 	public String setLanguageAttr(HttpServletRequest req) {
@@ -70,7 +70,7 @@ public class AncestryPageController extends BaseController {
 	@ModelAttribute(value=HISTORY)
 	public List<ItemIdentifier> breadcrumbTrail(HttpServletRequest req) {
 		Item i = (Item) req.getAttribute(AttrName.ITEM);
-		List<ItemIdentifier> list = this.ancCookieService.getBreadcrumbsCookieValue(i.getSite(), req);
+		List<ItemIdentifier> list = this.siteCookieService.getBreadcrumbsCookieValue(i.getSite(), req);
 		return list;
 	}
 	
@@ -147,7 +147,7 @@ public class AncestryPageController extends BaseController {
 		
 		// Whereas these 'proper' breadcrumbs identify the boy/girl click history !!!
 		// See also breadcrumbTrail() method, which sets the _history attribute for all other pages.
-		model.addAttribute(HISTORY, this.ancCookieService.updateBreadcrumbsCookie(i, req, res));
+		model.addAttribute(HISTORY, this.siteCookieService.updateBreadcrumbsCookie(i, req, res));
 		
 		return page.getView();
 	}

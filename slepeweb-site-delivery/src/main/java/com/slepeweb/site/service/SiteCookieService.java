@@ -1,4 +1,4 @@
-package com.slepeweb.site.anc.service;
+package com.slepeweb.site.service;
 
 import java.util.List;
 
@@ -9,8 +9,8 @@ import com.slepeweb.cms.bean.Site;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public interface AncCookieService {
-	String ANC_COOKIE_PATH = "/";	
+public interface SiteCookieService {
+	String SITE_COOKIE_PATH = "/";	
 	
 	List<ItemIdentifier> updateBreadcrumbsCookie(Item i, HttpServletRequest req, HttpServletResponse res);
 	List<ItemIdentifier> getBreadcrumbsCookieValue(Site s, HttpServletRequest req);

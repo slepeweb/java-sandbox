@@ -326,7 +326,7 @@ _cms.support.checkSession = function() {
 			
 			if (isExpiring) {
 				if (secondsRemaining <= 0) {
-					_cms.support.ajax('GET', '/rest/session/logout', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+					_cms.support.ajax('GET', `/rest/session/logout/${_cms.siteId}`, {dataType: 'json', mimeType: 'application/json'}, function(resp) {
 						if (resp.error) {
 							console.log('Failed to end session cleanly')
 						}
@@ -433,7 +433,7 @@ jQuery.fn.extend({
         var wrapped = before + selectedText + after;
 
         this.value = this.value.substring(0, startPos) + wrapped + this.value.substring(endPos);
-        this.selectionStart = this.selectionEnd = startPos + wrapped.length;
+        this.selectionStart = this.selectionEnd = startPos + wrapped.length - after.length;
 				this.focus();
       } else {
         this.value += before + after;
