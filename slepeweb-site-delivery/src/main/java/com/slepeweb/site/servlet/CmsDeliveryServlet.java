@@ -1,11 +1,8 @@
 package com.slepeweb.site.servlet;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +37,6 @@ public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
 	
 	private long defaultPrivateCacheTime, defaultPublicCacheTime;
-	private Map<Long, Long> lastDeliveryTable = new HashMap<Long, Long>(127);
 	private static Pattern PATH_PATTERN_A = Pattern.compile("^(/(\\w\\w))?/\\$_(\\d+)$");
 	private static Pattern PATH_PATTERN_B = Pattern.compile("^(/(\\w\\w))?(/.*?)$");
 	
@@ -193,7 +189,6 @@ public class CmsDeliveryServlet {
 				if (springTemplatePath != null) {
 					LOG.debug(LogUtil.compose("Forwarding request to template", springTemplatePath));
 					req.getRequestDispatcher(springTemplatePath).forward(req, res);
-					this.lastDeliveryTable.put(item.getId(), zeroMillis(requestTime));
 				}
 				else {
 					LOG.error(LogUtil.compose("Item has no template", item));
@@ -256,26 +251,12 @@ public class CmsDeliveryServlet {
 				LOG.trace(String.format("Media> isFresh: %s, lastModified: %d, ifModifiedSince: %d, requestTime: %d", 
 						flag, lastModified, ifModifiedSince, requestTime));
 			}
-			else {
-				/*
-				long pageLastDelivered = getPageLastDeliveredDate(i, requestTime);
-				long pageExpiry = pageLastDelivered + (i.getType().getPublicCache() * 1000);
-				
-				if (pageLastDelivered > -1L) {
-					ttl = (pageExpiry - requestTime) / 1000;
-					flag = requestTime < pageExpiry;
-				}
-				
-				LOG.trace(String.format("Page> isFresh: %s, pageLastDelivered: %d, pageExpiry: %d, requestTime: %d", 
-						flag, pageLastDelivered, pageExpiry, requestTime));
-				*/
-				
-				/* 
-				 * A page can never be considered fresh, since it's nigh-impossible to easily determine whether
-				 * all its components are fresh.
-				 */
-				flag = false;
-			}
+			
+			/* 
+			 * Pages will always be deemed to be stale. The browser typically caches pages for 10 minutes,
+			 * so this servlet will only come into play when the page is removed from the cache.
+			 */
+			flag = false;
 		}
 		
 		StringBuilder sb = new StringBuilder("Content [%s] is ").append(flag ? "fresh" : "stale");
@@ -288,15 +269,6 @@ public class CmsDeliveryServlet {
 		}
 
 		return flag;
-	}
-	
-	@SuppressWarnings("unused")
-	private long getPageLastDeliveredDate(Item i, long requestTime) {
-		Long l = this.lastDeliveryTable.get(i.getId());
-		if (l != null) {
-			return new Timestamp(l).getTime();
-		}
-		return -1L;
 	}
 	
 	private Site getSite(HttpServletRequest req) {
