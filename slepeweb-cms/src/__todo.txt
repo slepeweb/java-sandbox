@@ -1,6 +1,9 @@
 TODO: This is the main todo file:
 
 HIGH
+- check static site generator still works
+- consider pages on pho that render specific searches (for static sites)
+- consider links that allow user to jump to sister site without logging-in again
 - utility requests to refresh caches, eg SiteConfigCache and SiteAccess cache
 
 

@@ -1,141 +1,76 @@
 package com.slepeweb.common.service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.common.bean.NameValuePair;
 
-@Service("httpService")
+@Service
 public class HttpServiceImpl implements HttpService {
 
-	private static Logger LOG = Logger.getLogger(HttpServiceImpl.class);
-	private CloseableHttpClient client;
+	//private static Logger LOG = Logger.getLogger(HttpServiceImpl.class);
 	
-	public CloseableHttpClient getClient() {
-		if (this.client == null) {
-			this.client = HttpClients.custom().build();
-		}
-		return this.client;
+	public String get(CloseableHttpClient httpclient, String url) {		
+		return get(httpclient, url, null);
 	}
 
-	public NameValuePair getAuthorisationHeader(String userName, String password) {
-		if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(password)) {
-			byte[] encoded = null;
-			String credentials = String.format("%s___%s", userName, password);
-			
-			try {
-				encoded = Base64.encodeBase64(credentials.getBytes("ISO_8859_1"));
-			} 
-			catch (UnsupportedEncodingException e1) {
-				LOG.error("Failed to encode string", e1);
-			}
-			
-			return new NameValuePair("Authorization", "Basic " + new String(encoded));
-		}
+	public String get(CloseableHttpClient httpclient, String url, List<NameValuePair> headers) {
 		
-		return null;
-	}
-
-	public String get(String url) {		
-		return get(url, null);
-	}
-
-	public String get(String url, List<NameValuePair> headers) {
-		byte[] bytes = getBytes(url, headers);
-		return bytes == null ? new String() : new String(bytes);
-	}
-	
-	public byte[] getBytes(String url, List<NameValuePair> headers) {
-		CloseableHttpResponse res = null;
+		StringBuilder html = new StringBuilder();
 		
 		try {
-			res = getResponse(url, headers);						
-		    HttpEntity entity = res.getEntity();
-		    LOG.info(String.format("Retrieved resource [%s] with status [%s]", url, res.getStatusLine()));
-		    return EntityUtils.toByteArray(entity);
-		} 
-		catch (IOException e) {
-		    LOG.error(String.format("Failed to retrieve resource [%s]", url), e);
-		    
-		    // Force the client object to be re-created, in case it was the cause
-		    this.client = null;
-		}
-		finally {
-		    try {res.close();}
-		    catch (Exception e) {}
-		}
-		
-		return null;
-	}
-
-	private CloseableHttpResponse getResponse(String url, List<NameValuePair> headers) throws IOException {
-		
-		RequestBuilder builder = RequestBuilder.get().setUri(url);
-
-		if (headers != null) {
-			for (NameValuePair nvp : headers) {
-				builder.setHeader(nvp.getName(), nvp.getValue());
+			ClassicHttpRequest httpGet = ClassicRequestBuilder.get(url).build();
+			
+			if (headers != null) {
+				for (NameValuePair nvp : headers) {
+					httpGet.setHeader(nvp.getName(), nvp.getValue());
+				}
 			}
-		}
-		
-		// In order to ensure correct deallocation of system resources
-		// the user MUST call CloseableHttpResponse#close() from a finally clause.
-		// Please note that if response content is not fully consumed the underlying
-		// connection cannot be safely re-used and will be shut down and discarded
-		// by the connection manager. 
-		HttpUriRequest request = builder.build();
-		return getClient().execute(request);
-	}
-
-	public Map<String, String> getHeaders(String url) {
-		
-		CloseableHttpClient client = HttpClients.createDefault();
-		HttpHead httpHead = new HttpHead(url);
-		CloseableHttpResponse res = null;
-		
-		try {
-			res = client.execute(httpHead);
+			
+			// The underlying HTTP connection is still held by the response object
+			// to allow the response content to be streamed directly from the network socket.
+			// In order to ensure correct deallocation of system resources
+			// the user MUST call CloseableHttpResponse#close() from a finally clause.
+			// Please note that if response content is not fully consumed the underlying
+			// connection cannot be safely re-used and will be shut down and discarded
+			// by the connection manager.
+			
+			httpclient.execute(httpGet, response -> {
+				final HttpEntity entity1 = response.getEntity();
+				html.append(readInputStream(entity1.getContent()));
+				
+				EntityUtils.consume(entity1);
+				response.close();
+				return null;
+			});
 		}
 		catch (Exception e) {
-			LOG.error(String.format("Failed to retrieve resource [%s]", url), e);
-			return null;
+			System.err.println(e.getMessage());
 		}
 		
-		try {
-			try {
-			    LOG.info(String.format("Retrieved resource [%s] with status [%s]", url, res.getStatusLine()));
-			    Header[] headers = res.getAllHeaders();
-			    Map<String, String> map = new HashMap<String, String>(headers.length);
-			    for (Header h : headers) {
-			    	map.put(h.getName(), h.getValue());
-			    }
-			    return map;
-			} finally {
-			    res.close();
-			}
-		}
-		catch (IOException e) {
-			LOG.error(String.format("Failed to get header information for resource [%s]", url), e);
-		}
-		
-		return null;
+		return html.toString();
 	}
-	
+
+    private String readInputStream(InputStream is) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+        StringBuilder content = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        return content.toString();
+    }
+    
+
 }

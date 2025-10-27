@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.utils.SpringContext;
@@ -24,7 +26,8 @@ public class HttpProxyServlet extends HttpServlet {
 
 			try {
 				PrintWriter pw = res.getWriter();
-				String markup = svc.get(url);
+				CloseableHttpClient httpClient = HttpClients.createDefault();
+				String markup = svc.get(httpClient, url);
 				pw.write(markup);
 				pw.flush();
 			} catch (IOException e) {

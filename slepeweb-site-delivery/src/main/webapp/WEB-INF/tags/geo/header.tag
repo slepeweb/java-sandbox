@@ -7,10 +7,13 @@
 <header>
 	<nav class="navbar">
 		<div class="brand-title">
-			<span id="user-icon" class="${_isSuperUser ? 'super-user' : ''}"><i class="fa-regular fa-user"></i></span> 
+			<c:if test="${empty param.staticd}">
+				<span id="user-icon" class="${_isSuperUser ? 'super-user' : ''}"><i class="fa-regular fa-user"></i></span>
+			</c:if>
+			
 			<a href="/">GeorgieB</a>
 
-			<c:if test="${not empty _user}">
+			<c:if test="${empty param.staticd and not empty _user}">
 				<div id="user-menu" class="hidden">
 					<u>${_user.fullName}</u>
 					<ul>

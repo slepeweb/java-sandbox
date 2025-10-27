@@ -68,7 +68,9 @@ public class RequestPack {
 	
 	public RequestPack setUser(User user) {
 		this.user = user;
-		this.httpRequest.getSession().setAttribute(AttrName.USER, user);
+		if (this.httpRequest != null) {
+			this.httpRequest.getSession().setAttribute(AttrName.USER, user);
+		}
 		return this;
 	}
 

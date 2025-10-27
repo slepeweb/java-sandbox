@@ -11,6 +11,7 @@ public class ItemType extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	public static final String CONTENT_FOLDER_TYPE_NAME = "Content Folder";
 	public static final String PAGE_MIMETYPE = "application/cms";
+	public static final String PDF_MIMETYPE = "application/pdf";
 	public static final String JS_MIMETYPE = "text/javascript";
 	public static final String IMAGE_MIMETYPE_PREFIX = "image";
 	public static final String VIDEO_MIMETYPE_PREFIX = "video";
@@ -156,6 +157,7 @@ public class ItemType extends CmsBean {
 		return 
 			isImage() ||
 			isVideo() ||
+			isPdf() ||
 			! (getMimeType().equals(PAGE_MIMETYPE) ||
 					getMimeType().equals(JS_MIMETYPE));
 	}
@@ -166,6 +168,18 @@ public class ItemType extends CmsBean {
 
 	public boolean isVideo() {
 		return getMimeType().startsWith(VIDEO_MIMETYPE_PREFIX);
+	}
+	
+	public boolean isPdf() {
+		return getMimeType().equals(PDF_MIMETYPE);
+	}
+	
+	public static boolean isMedia(String mimeType) {
+		return 
+				mimeType.startsWith(IMAGE_MIMETYPE_PREFIX) || 
+				mimeType.startsWith(VIDEO_MIMETYPE_PREFIX) ||
+				mimeType.equals(PDF_MIMETYPE) ||
+				! (mimeType.equals(PAGE_MIMETYPE) || mimeType.equals(JS_MIMETYPE));
 	}
 
 	public String getMimeType() {

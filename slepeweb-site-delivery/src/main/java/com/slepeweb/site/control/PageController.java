@@ -24,6 +24,7 @@ import com.slepeweb.site.model.Page;
 import com.slepeweb.site.model.SiblingItemPager;
 import com.slepeweb.site.service.PdfService;
 import com.slepeweb.site.service.SolrService4Site;
+import com.slepeweb.site.service.StaticSiteService;
 import com.slepeweb.site.servlet.CmsDeliveryServlet;
 
 import jakarta.servlet.http.Cookie;
@@ -38,6 +39,7 @@ public class PageController extends BaseController {
 	@Autowired private SolrService4Site solrService4Site;
 	@Autowired private ItemService itemService;
 	@Autowired private PdfService pdfService;
+	@Autowired private StaticSiteService staticSiteService;
 	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
@@ -236,6 +238,23 @@ public class PageController extends BaseController {
 			model.addAttribute("_aggregatedMarkup", html);
 			model.addAttribute("_localHostname", i.getSite().getDeliveryHost().getNamePortAndProtocol());
 		}
+		
+		return page.getView();
+	}
+
+	@RequestMapping(value="/spring/toStatic")	
+	public String staticSiteBuilder(
+			@ModelAttribute("_item") Item i, 
+			@ModelAttribute("_shortSitename") String shortSitename, 
+			HttpServletRequest req,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "staticSiteBuilder", model);
+		
+		Item target = this.itemService.getItem(i.getSite().getId(), "/");
+		target.setRequestPack(i.getRequestPack()).setUser(i.getUser());
+
+		this.staticSiteService.build(target, req.getSession().getId());
 		
 		return page.getView();
 	}

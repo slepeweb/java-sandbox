@@ -16,8 +16,8 @@ public class PasskeyServiceImpl implements PasskeyService {
 	 * This service issues temporary passkeys that allow non-logged-in users to
 	 * access secure content via CmsDeliveryServlet.
 	 * 
-	 * The requirement for this service has cycled on/off for a while now. As of today,
-	 * this service is not in use, but who knows when it might be needed?
+	 * The requirement for this service has cycled on/off for a while now. The only 
+	 * code that currently uses it is for content that contains '<a class="xlink">' tags.
 	 */
 	
 	private Map<String, PasskeyModel> models = new HashMap<String, PasskeyModel>();

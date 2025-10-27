@@ -20,10 +20,14 @@
 		isSecured: ${_item.site.secured ? 'true' : 'false'},
 		alertSound: new Audio("/resources/doorbell.mp3"),
 		searchresultsItemPath: '${site:resolveConfig(_site.id, 'path.searchresults', _siteConfigService)}',
+		//staticDelivery: <c:choose><c:when test="${empty param.statics}">true</c:when><c:otherwise>false</c:otherwise></c:choose>,
+		staticDelivery: ${empty param.staticd ? 'false' : 'true'},
 	}
 </script>
 
-<script src="/resources/js/site.js"></script>
+<c:if test="${empty param.staticd}">
+	<script src="/resources/js/site.js"></script>
+</c:if>
 
 <gen:extraCSS />
 <gen:extraInpageCSS />
