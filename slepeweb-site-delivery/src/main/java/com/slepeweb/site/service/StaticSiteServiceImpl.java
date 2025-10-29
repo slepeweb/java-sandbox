@@ -41,7 +41,7 @@ import com.slepeweb.cms.service.MediaFileService;
 import com.slepeweb.common.bean.NameValuePair;
 import com.slepeweb.common.service.HttpService;
 import com.slepeweb.site.bean.StaticItem;
-import com.slepeweb.site.bean.UrlParser;
+import com.slepeweb.site.bean.UriSupport;
 
 @Service
 public class StaticSiteServiceImpl implements StaticSiteService {
@@ -78,15 +78,6 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		Files.createDirectories(Path.of(toAbsoluteStaticPath("/media")));
 		Files.createDirectories(Path.of(toAbsoluteStaticPath("/resources/" + s.getShortname())));
 		
-		/*
-		String absApacheTarget = toAbsoluteStaticPath(relWebappResourcePath);
-		Files.createDirectories(Path.of(absApacheTarget));
-		
-		// Copy /resources onto the file system
-		String absWebappResourcePath = i.getRequestPack().getHttpRequest().getServletContext().getRealPath(relWebappResourcePath);
-		copyDirectory(absWebappResourcePath, absApacheTarget);
-		*/
-		
 		List<NameValuePair> headers = new ArrayList<NameValuePair>();
 		headers.add(new NameValuePair("X-Static-Delivery", "1"));
 		headers.add(new NameValuePair("Cookie", "JSESSIONID=" + sessionId));
@@ -95,11 +86,11 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		// Stage 1: Scrape content from CMS delivery server, and save html in temporary files
 		if (s.isMultilingual()) {
 			for (String language : s.getAllLanguages()) {
-				crawlDynamicSite(httpclient, new UrlParser().setPath("/" + language), headers, s, h, u, true, urlMap);
+				crawlDynamicSite(httpclient, new UriSupport("/" + language), headers, s, h, u, urlMap);
 			}
 		}
 		else {
-			crawlDynamicSite(httpclient, new UrlParser().setPath("/"), headers, s, h, u, true, urlMap);
+			crawlDynamicSite(httpclient, new UriSupport("/"), headers, s, h, u, urlMap);
 		}
 		
 		// Stage 2: Edit each temporary html file, replacing internal urls to match how the files were saved
@@ -111,8 +102,8 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		}
 	}
 	
-	private void crawlDynamicSite(CloseableHttpClient httpClient, UrlParser urlParser, List<NameValuePair> headers, 
-			Site s, Host h, User u, boolean drillingDown, Map<String, StaticItem> pathMap) {
+	private void crawlDynamicSite(CloseableHttpClient httpClient, UriSupport usupp, List<NameValuePair> headers, 
+			Site s, Host h, User u, Map<String, StaticItem> pathMap) {
 		/*
 		 * sourceUrl represents any url that can be delivered by the cms, including:
 		 * - stylesheet
@@ -126,7 +117,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		 * Note that files below /resources can also be delivered by the CMS, but they are NOT cms items.
 		 */
 		
-		if (! preReqsSatisfied(h, urlParser, pathMap)) {
+		if (! preReqsSatisfied(h, usupp, pathMap)) {
 			// All url's in CMS are relative; only external resources use full urls.
 			// This must be an external url.
 			return;
@@ -136,46 +127,37 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		 * If when identifyItem finds that a) a minipath has been used in the sourceUrl,
 		 * and b) the item belongs to THIS site, then the sourceUrl's path is expanded
 		 */
-		Item i = identifyItem(s, urlParser);
+		Item i = identifyItem(s, usupp);
 		StaticItem si = null;
 		String html = null;
 				
 		if (i != null) {
-			if (pathMap.containsKey(urlParser.getPathAndQuery())) {
-				// This url has already been written to file - do not repeat.
-				//LOG.info(String.format("Map contains key %s - ignoring item", urlParser.getPathAndQuery()));
+			i.setUser(u);
+			
+			// We have navigated to an item, either a Page or media
+			// Have we already processed it?
+			if (pathMap.containsKey(usupp.getPathAndQuery())) {
 				return;
 			}
 			
-			if (i.isHiddenFromNav() || i.getType().getName().equals(ItemTypeName.CONTENT_FOLDER)) {
+			// Do we want it displayed on the site?
+			if (
+					! i.isRoot() && (
+							i.isHiddenFromNav() ||
+							i.getType().getName().equals(ItemTypeName.CONTENT_FOLDER) ||
+							! i.isAccessible())) {
+				
 				return;
 			}
 
-			i.setUser(u);
-			
 			// This url corresponds to a CMS item. What is it's mime type?
-			si = new StaticItem(i, urlParser);
+			si = new StaticItem(i, usupp);
 			
 			if (i.isPage()) {
-				si.setStaticPath4Page();
-				urlParser.addQueryParam(STATIC_DELIVERY_PARAM, "1");
-				html = this.httpService.get(httpClient, urlParser.toString(), headers);
-				urlParser.removeQueryParam(STATIC_DELIVERY_PARAM);
-				
-				if (StringUtils.isNotBlank(html)) {
-					writeToFile(i, html, si.getTempStaticPath());
-				}
+				html = renderPage(i, si, httpClient, headers);
 			}
 			else if (i.getType().isMedia()) {
-				si.setStaticPath4Media(i);
-				String view = urlParser.getQueryParam("view");
-				Media m = view != null && view.equals("thumbnail") ? i.getThumbnail() : i.getMedia();
-				
-				if (m != null) {
-					String mediaFilePath = this.mediaFileService.getRepositoryFilePath(m.getFolder(), m.getRepositoryFileName());
-					String targetPath = toAbsoluteStaticPath(si.getStaticPath());
-					copyFile(mediaFilePath, targetPath);
-				}
+				copyMedia(i, si);
 			}
 			
 			doubleMapStaticItem(si, pathMap);
@@ -188,40 +170,26 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 			 * then identify all other links/inlines on this page, and crawl to them
 			 * and map them, BUT DO NOT continue further from there
 			 */
-			if (i.isPage() && StringUtils.isNotBlank(html) && drillingDown) {
+			if (i.isPage() && StringUtils.isNotBlank(html)) {
 				Document doc = createJsoupDocument(html);
-				//followInlines(httpClient, headers, doc, "a", "href", s, h, u, pathMap);
-				followInlines(httpClient, headers, doc, "img", "src", s, h, u, pathMap);
-				followInlines(httpClient, headers, doc, "script", "src", s, h, u, pathMap);
-				followInlines(httpClient, headers, doc, "link", "href", s, h, u, pathMap);
-			}
-			
-			// Continue crawling DOWN the site hierarchy UNLESS we got here by following an inline link
-			if (drillingDown) {
-				Item child;
-				for (Link l : i.getBindings()) {
-					child = l.getChild();
-					if (child.isPage()) {
-						crawlDynamicSite(httpClient, new UrlParser().setPath(child.getPath()), headers, s, h, u, true, pathMap);
-					}
-				}
+				followInlines(doc, httpClient, headers, s, h, u, pathMap);
+				
+				// Deal with related media items (eg. pdfs)
+				followRelatedMedia(i, httpClient, headers, s, h, u, pathMap);
+				
+				// Finally, continue crawling DOWN the site hierarchy 
+				followBindings(i, httpClient, headers, s, h, u, pathMap);
 			}
 		}
 		else {
-			// This must be a resource, given that it is being delivered by the cms,
-			// yet is NOT an item.
-			
-			if (pathMap.containsKey(urlParser.getPathAndQuery())) {
+			// This must be a resource, given that it is being delivered by the cms,urlSupport
+			// yet is NOT an item.			
+			if (pathMap.containsKey(usupp.getPathAndQuery())) {
 				return;
 			}
 			
-			si = new StaticItem(urlParser, "not/classified", false);
-			si.setStaticPath4Resource();
-			html = this.httpService.get(httpClient, urlParser.toString(), headers);
-			
-			if (writeToFile(null, html, si.getStaticPath())) {
-				String key = urlParser.getPathAndQuery();
-
+			if (renderResource(usupp, httpClient, headers)) {
+				String key = usupp.getPathAndQuery();
 				if (! pathMap.containsKey(key)) {
 					pathMap.put(key, si);
 				}
@@ -230,41 +198,107 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		
 	}
 	
-	private void followInlines(CloseableHttpClient httpClient, List<NameValuePair> headers, 
-			Document doc, String tag, String attr, Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+	private String renderPage(Item i, StaticItem si, CloseableHttpClient httpClient, List<NameValuePair> headers) {
+		UriSupport usupp = si.getUriSupport();
+		si.setStaticPath4Page();
+		usupp.addQueryParam(STATIC_DELIVERY_PARAM, "1");
+		String html = this.httpService.get(httpClient, usupp.toString(), headers);
+		usupp.removeQueryParam(STATIC_DELIVERY_PARAM);
+		
+		if (StringUtils.isNotBlank(html)) {
+			writeToFile(i, html, si.getTempStaticPath());
+		}
+		
+		return html;
+	}
+	
+	private void copyMedia(Item i, StaticItem si) {
+		UriSupport usupp = si.getUriSupport();
+		si.setStaticPath4Media(i);
+		String view = usupp.getQueryParam("view");
+		Media m = view != null && view.equals("thumbnail") ? i.getThumbnail() : i.getMedia();
+		
+		if (m != null) {
+			String mediaFilePath = this.mediaFileService.getRepositoryFilePath(m.getFolder(), m.getRepositoryFileName());
+			String targetPath = toAbsoluteStaticPath(si.getStaticPath());
+			copyFile(mediaFilePath, targetPath);
+		}
+	}
+	
+	private boolean renderResource(UriSupport usupp, CloseableHttpClient httpClient, List<NameValuePair> headers) {
+		StaticItem si = new StaticItem(usupp, "not/classified", false);
+		si.setStaticPath4Resource();
+		String html = this.httpService.get(httpClient, usupp.toString(), headers);
+		return writeToFile(null, html, si.getStaticPath());
+	}
+	
+	private void followInlines(Document doc, CloseableHttpClient httpClient, List<NameValuePair> headers, 
+			Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+		
+		followInlines(doc, httpClient, headers, "img", "src", s, h, u, pathMap);
+		followInlines(doc, httpClient, headers, "script", "src", s, h, u, pathMap);
+		followInlines(doc, httpClient, headers, "link", "href", s, h, u, pathMap);
+	}
+
+	private void followInlines(Document doc, CloseableHttpClient httpClient, List<NameValuePair> headers, 
+			String tag, String attr, Site s, Host h, User u, Map<String, StaticItem> pathMap) {
 		
 		String url;
-		UrlParser urlParser;
+		UriSupport urlSupport;
 		
 		for (Element ele : doc.getElementsByTag(tag)) {
 			url = ele.attr(attr);
 			if (! (url.startsWith("#") || StringUtils.isBlank(url))) {
-				urlParser = new UrlParser().parse(url);
-				crawlDynamicSite(httpClient, urlParser, headers, s, h, u, false, pathMap);
+				urlSupport = new UriSupport(url);
+				crawlDynamicSite(httpClient, urlSupport, headers, s, h, u, pathMap);
 			}
 		}
 	}
 	
-	private boolean preReqsSatisfied(Host h, UrlParser urlParser, Map<String, StaticItem> pathMap) {
+	private void followBindings(Item i, CloseableHttpClient httpClient, List<NameValuePair> headers, 
+			Site s, Host h, User u, Map<String, StaticItem> pathMap) {
 		
-		if (StringUtils.isBlank(urlParser.getPath())) {
+		Item child;
+		for (Link l : i.getBindings()) {
+			child = l.getChild();
+			if (child.isPage()) {
+				crawlDynamicSite(httpClient, new UriSupport(child.getPath()), headers, s, h, u, pathMap);
+			}
+		}
+	}
+	
+	private void followRelatedMedia(Item i, CloseableHttpClient httpClient, List<NameValuePair> headers, 
+			Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+		
+		Item child;
+		for (Link l : i.getRelations()) {
+			child = l.getChild();
+			if (child.getType().isMedia()) {
+				crawlDynamicSite(httpClient, new UriSupport(child.getPath()), headers, s, h, u, pathMap);
+			}
+		}
+	}
+	
+	private boolean preReqsSatisfied(Host h, UriSupport urlSupport, Map<String, StaticItem> pathMap) {
+		
+		if (StringUtils.isBlank(urlSupport.getPath())) {
 			// Typically, this happens when a 'src' or 'href' attribute is blank
 			return false;
 		}
 		
-		if (urlParser.getHostname() != null) {
+		if (urlSupport.getHost() != null) {
 			// All url's in CMS are relative; only external resources use full urls.
 			// This must be an external url.
 			return false;
 		}
 		
-		urlParser.setProtocol(h.getProtocol());
-		urlParser.setHostname(h.getNameAndPort());
+		urlSupport.setProtocol(h.getProtocol());
+		urlSupport.setHost(h.getNameAndPort());
 		return true;
 	}
 	
-	private Item identifyItem(Site s, UrlParser urlParser) {
-		String itemPath = urlParser.getPath();
+	private Item identifyItem(Site s, UriSupport urlSupport) {
+		String itemPath = urlSupport.getPath();
 		Item i = null;
 		
 		if (itemPath == null) {
@@ -273,7 +307,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		
 		if (! itemPath.startsWith("/resources/")) {
 			
-			if (s.isMultilingual() && urlParser.getPath().length() > 2) {
+			if (s.isMultilingual() && urlSupport.getPath().length() > 2) {
 				itemPath = itemPath.substring(3);
 				if (itemPath.equals("")) {
 					itemPath = "/";
@@ -286,11 +320,11 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 				i = this.itemService.getItemByOriginalId(Long.valueOf(m.group(3)));
 				if (i != null && i.getSite().getId().equals(s.getId())) {
 					// So, path WAS a minipath - NOW change it to a true path
-					urlParser.setPath(i.getPath());
+					urlSupport.setPath(i.getPath());
 				}
 				else {
 					/* The minipath relates to an item on a different site. This typically is
-					 * the case for image items stored in the pho site. Leave urlParser as-is.
+					 * the case for image items stored in the pho site. Leave urlSupport as-is.
 					 */
 				}
 			}
@@ -302,7 +336,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		
 		if (i != null) {
 			// All items have a minipath representation
-			urlParser.setMinipath(i.getOrigId());
+			urlSupport.setMinipath(i.getOrigId());
 		}
 		return i;
 	}
@@ -312,12 +346,12 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		 * Double up on entries to the map, since an item can be identified by both
 		 * its path and its origId.
 		 */
-		String key = si.getUrlParser().getPathAndQuery();
+		String key = si.getUriSupport().getPathAndQuery();
 		if (! map.containsKey(key)) {
 			map.put(key, si);
 		}
 		
-		key = si.getUrlParser().getMinipathAndQuery();
+		key = si.getUriSupport().getMinipathAndQuery();
 		if (! map.containsKey(key)) {
 			map.put(key, si);
 		}
@@ -369,7 +403,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
     	Elements eles = doc.getElementsByTag(tag);
     	String uri;
 		StaticItem si;
-		UrlParser urlParser;
+		UriSupport urlSupport;
     	 
     	for (Element ele : eles) {
     		uri = ele.attr(attr);
@@ -378,14 +412,14 @@ public class StaticSiteServiceImpl implements StaticSiteService {
     			continue;
     		}
     		
-    		urlParser = new UrlParser().parse(uri);
-    		si = pathMap.get(urlParser.getPathAndQuery());
+    		urlSupport = new UriSupport(uri);
+    		si = pathMap.get(urlSupport.getPathAndQuery());
     		
     		if (si != null) {
     			ele.attr(attr, si.getStaticPath());
     		}
     		else {
-    			LOG.warn(String.format("Failed to locate item url [%s] in map (on '%s' tag)", urlParser.getPathAndQuery(), tag));
+    			LOG.warn(String.format("No replacement found for url [%s] on '%s' attribute of '%s' tag)", urlSupport.getPathAndQuery(), attr, tag));
     		}
     	}
     	

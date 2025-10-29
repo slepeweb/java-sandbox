@@ -2,13 +2,14 @@ package com.slepeweb.site.geo.bean;
 
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.site.model.LinkTarget;
 
 public class SectionMenu {
 	private LinkTarget root;
 	
 	public SectionMenu(Item i) {
-		if (i.isSiteRoot() || i.isHiddenFromNav()) {
+		if (i.isSiteRoot() || ! CmsUtil.isApt4Navigation(i)) {
 			return;
 		}
 		
