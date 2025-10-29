@@ -30,9 +30,11 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.Host;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.MediaFileService;
@@ -47,6 +49,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 	private static Logger LOG = Logger.getLogger(StaticSiteServiceImpl.class);
 	private static final Pattern MINIPATH_PATTERN = Pattern.compile("^(/(\\w\\w))?/\\$_(\\d+)(\\?.*)?$");
 	private static final Set<PosixFilePermission> MEDIA_PERMISSIONS =  PosixFilePermissions.fromString("rw-r--r--");
+	private static final String STATIC_DELIVERY_PARAM = "staticd";
 
 	
 	@Autowired private ItemService itemService;
@@ -56,7 +59,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 	
 	private String rootFilePath;
 	
-	public void build(Item i, String sessionId) {
+	public void build(Item i, String sessionId) throws Exception {
 		
 		Map<String, StaticItem> urlMap = new HashMap<String, StaticItem>();
 		
@@ -71,6 +74,19 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 				toString();
 		}
 
+		// Create required directories on the file system
+		Files.createDirectories(Path.of(toAbsoluteStaticPath("/media")));
+		Files.createDirectories(Path.of(toAbsoluteStaticPath("/resources/" + s.getShortname())));
+		
+		/*
+		String absApacheTarget = toAbsoluteStaticPath(relWebappResourcePath);
+		Files.createDirectories(Path.of(absApacheTarget));
+		
+		// Copy /resources onto the file system
+		String absWebappResourcePath = i.getRequestPack().getHttpRequest().getServletContext().getRealPath(relWebappResourcePath);
+		copyDirectory(absWebappResourcePath, absApacheTarget);
+		*/
+		
 		List<NameValuePair> headers = new ArrayList<NameValuePair>();
 		headers.add(new NameValuePair("X-Static-Delivery", "1"));
 		headers.add(new NameValuePair("Cookie", "JSESSIONID=" + sessionId));
@@ -79,11 +95,11 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		// Stage 1: Scrape content from CMS delivery server, and save html in temporary files
 		if (s.isMultilingual()) {
 			for (String language : s.getAllLanguages()) {
-				crawlDynamicSite(httpclient, new UrlParser().setPath("/" + language), headers, s, h, u, urlMap);
+				crawlDynamicSite(httpclient, new UrlParser().setPath("/" + language), headers, s, h, u, true, urlMap);
 			}
 		}
 		else {
-			crawlDynamicSite(httpclient, new UrlParser().setPath("/"), headers, s, h, u, urlMap);
+			crawlDynamicSite(httpclient, new UrlParser().setPath("/"), headers, s, h, u, true, urlMap);
 		}
 		
 		// Stage 2: Edit each temporary html file, replacing internal urls to match how the files were saved
@@ -96,7 +112,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 	}
 	
 	private void crawlDynamicSite(CloseableHttpClient httpClient, UrlParser urlParser, List<NameValuePair> headers, 
-			Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+			Site s, Host h, User u, boolean drillingDown, Map<String, StaticItem> pathMap) {
 		/*
 		 * sourceUrl represents any url that can be delivered by the cms, including:
 		 * - stylesheet
@@ -130,6 +146,10 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 				//LOG.info(String.format("Map contains key %s - ignoring item", urlParser.getPathAndQuery()));
 				return;
 			}
+			
+			if (i.isHiddenFromNav() || i.getType().getName().equals(ItemTypeName.CONTENT_FOLDER)) {
+				return;
+			}
 
 			i.setUser(u);
 			
@@ -138,8 +158,9 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 			
 			if (i.isPage()) {
 				si.setStaticPath4Page();
-				urlParser.addQueryParam("staticd", "1");
+				urlParser.addQueryParam(STATIC_DELIVERY_PARAM, "1");
 				html = this.httpService.get(httpClient, urlParser.toString(), headers);
+				urlParser.removeQueryParam(STATIC_DELIVERY_PARAM);
 				
 				if (StringUtils.isNotBlank(html)) {
 					writeToFile(i, html, si.getTempStaticPath());
@@ -157,42 +178,69 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 				}
 			}
 			
-			mapStaticItem(si, pathMap);
+			doubleMapStaticItem(si, pathMap);
 			
 			/* 
-			 * IFF this is a page, ie if html has been retrieved,
-			 * then identify all other links on this page, and crawl to them
+			 * IFF:
+			 * - this is a page, ie if html has been retrieved
+			 * - we got here by drilling DOWN the hierarchy
+			 * 
+			 * then identify all other links/inlines on this page, and crawl to them
+			 * and map them, BUT DO NOT continue further from there
 			 */
-			if (i.isPage() && StringUtils.isNotBlank(html)) {
-				followLinks(httpClient, headers, html, "a", "href", s, h, u, pathMap);
-				followLinks(httpClient, headers, html, "img", "src", s, h, u, pathMap);
+			if (i.isPage() && StringUtils.isNotBlank(html) && drillingDown) {
+				Document doc = createJsoupDocument(html);
+				//followInlines(httpClient, headers, doc, "a", "href", s, h, u, pathMap);
+				followInlines(httpClient, headers, doc, "img", "src", s, h, u, pathMap);
+				followInlines(httpClient, headers, doc, "script", "src", s, h, u, pathMap);
+				followInlines(httpClient, headers, doc, "link", "href", s, h, u, pathMap);
+			}
+			
+			// Continue crawling DOWN the site hierarchy UNLESS we got here by following an inline link
+			if (drillingDown) {
+				Item child;
+				for (Link l : i.getBindings()) {
+					child = l.getChild();
+					if (child.isPage()) {
+						crawlDynamicSite(httpClient, new UrlParser().setPath(child.getPath()), headers, s, h, u, true, pathMap);
+					}
+				}
 			}
 		}
 		else {
 			// This must be a resource, given that it is being delivered by the cms,
 			// yet is NOT an item.
+			
+			if (pathMap.containsKey(urlParser.getPathAndQuery())) {
+				return;
+			}
+			
 			si = new StaticItem(urlParser, "not/classified", false);
 			si.setStaticPath4Resource();
 			html = this.httpService.get(httpClient, urlParser.toString(), headers);
-			writeToFile(null, html, si.getStaticPath());				
+			
+			if (writeToFile(null, html, si.getStaticPath())) {
+				String key = urlParser.getPathAndQuery();
+
+				if (! pathMap.containsKey(key)) {
+					pathMap.put(key, si);
+				}
+			}
 		}
 		
 	}
 	
-	private void followLinks(CloseableHttpClient httpClient, List<NameValuePair> headers, 
-			String html, String tag, String attr, Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+	private void followInlines(CloseableHttpClient httpClient, List<NameValuePair> headers, 
+			Document doc, String tag, String attr, Site s, Host h, User u, Map<String, StaticItem> pathMap) {
 		
-		Document doc = createJsoupDocument(html);
-    	Elements eles = doc.getElementsByTag(tag);
-
 		String url;
 		UrlParser urlParser;
 		
-		for (Element ele : eles) {
+		for (Element ele : doc.getElementsByTag(tag)) {
 			url = ele.attr(attr);
 			if (! (url.startsWith("#") || StringUtils.isBlank(url))) {
 				urlParser = new UrlParser().parse(url);
-				crawlDynamicSite(httpClient, urlParser, headers, s, h, u, pathMap);
+				crawlDynamicSite(httpClient, urlParser, headers, s, h, u, false, pathMap);
 			}
 		}
 	}
@@ -259,17 +307,19 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		return i;
 	}
 	
-	private void mapStaticItem(StaticItem si, Map<String, StaticItem> map) {
+	private void doubleMapStaticItem(StaticItem si, Map<String, StaticItem> map) {
 		/*
 		 * Double up on entries to the map, since an item can be identified by both
 		 * its path and its origId.
 		 */
-		if (! map.containsKey(si.getUrlParser().getPath())) {
-			map.put(si.getUrlParser().getPath(), si);
+		String key = si.getUrlParser().getPathAndQuery();
+		if (! map.containsKey(key)) {
+			map.put(key, si);
 		}
 		
-		if (! map.containsKey(si.getUrlParser().getMinipath())) {
-			map.put(si.getUrlParser().getMinipath(), si);
+		key = si.getUrlParser().getMinipathAndQuery();
+		if (! map.containsKey(key)) {
+			map.put(key, si);
 		}
 	}
 	
@@ -358,12 +408,15 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		return new StringBuilder(this.rootFilePath).append(path).toString();
 	}
 
-	private void writeToFile(Item i, String html, String path) {
+	private boolean writeToFile(Item i, String html, String path) {
 		String absPath = toAbsoluteStaticPath(path);
 		
 		if (! writeToFile(html, absPath)) {
 			LOG.warn(String.format("Failed write: item=[%s], path=[%s]", i, absPath));
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private boolean writeToFile(String html, String filePath) {
@@ -403,6 +456,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
         	Path target = Path.of(to);
             Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
             Files.setPosixFilePermissions(target, MEDIA_PERMISSIONS);
+			LOG.info(String.format("Copied media item to [%s]", to));
             return true;
         } catch (Exception e) {
 			LOG.warn(String.format("Error copying file [%s] to [%s]: %s", from, to, e.getMessage()));
@@ -410,6 +464,28 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		return false;
 	}
 	
+	// Code courtesy of ChatGPT!
+	@SuppressWarnings("unused")
+	private void copyDirectory(String from, String to) throws Exception {
+		Path source = Path.of(from);
+		Path target = Path.of(to);
+		
+		try (var paths = Files.walk(source)) {
+		    paths.forEach(path -> {
+		        Path targetPath = target.resolve(source.relativize(path));
+		        try {
+		            if (Files.isDirectory(path)) {
+		                Files.createDirectories(targetPath);
+		            } else {
+		                Files.copy(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
+		            }
+		        } catch (IOException e) {
+		            throw new RuntimeException(e);
+		        }
+		    });
+		}
+	}
+
 	private void mkdirs(String staticPath) {
 		int cursor = staticPath.lastIndexOf("/");
 		String directoryPart = staticPath.substring(0, cursor);

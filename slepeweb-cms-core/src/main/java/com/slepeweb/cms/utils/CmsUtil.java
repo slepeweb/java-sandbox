@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.constant.ItemTypeName;
 
 public class CmsUtil {
 	
@@ -67,5 +68,13 @@ public class CmsUtil {
 		}
 		
 		return result;
+	}
+	
+	public static boolean isApt4Navigation(Item i) {
+		return
+				! i.getType().isMedia() &&
+				! i.isHiddenFromNav() &&
+				! i.getType().getName().equals(ItemTypeName.CONTENT_FOLDER) &&
+				i.isAccessible();
 	}
 }

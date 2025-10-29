@@ -247,16 +247,16 @@ public class PageController extends BaseController {
 			@ModelAttribute("_item") Item i, 
 			@ModelAttribute("_shortSitename") String shortSitename, 
 			HttpServletRequest req,
-			ModelMap model) {	
-		
-		Page page = getStandardPage(i, shortSitename, "staticSiteBuilder", model);
+			HttpServletResponse res,
+			ModelMap model) throws Exception {	
 		
 		Item target = this.itemService.getItem(i.getSite().getId(), "/");
 		target.setRequestPack(i.getRequestPack()).setUser(i.getUser());
 
 		this.staticSiteService.build(target, req.getSession().getId());
+		res.sendRedirect("/");
 		
-		return page.getView();
+		return null;
 	}
 
 	@SuppressWarnings("unused")

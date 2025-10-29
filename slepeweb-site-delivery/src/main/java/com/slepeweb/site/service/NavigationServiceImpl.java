@@ -7,6 +7,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.constant.FieldName;
+import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.site.model.LinkTarget;
 
 @Service("navigationService")
@@ -14,7 +15,8 @@ public class NavigationServiceImpl implements NavigationService {
 	private static Logger LOG = Logger.getLogger(NavigationServiceImpl.class);
 	
 	public LinkTarget drillDown(Item parent, int numLevels, String currentItemPath) {
-		if (! parent.getType().isMedia()) {
+		if (CmsUtil.isApt4Navigation(parent)) {
+					
 			LinkTarget parentTarget = createLinkTarget(parent, currentItemPath);
 			LOG.debug(String.format("Created link: %s", parent.getPath()));
 			

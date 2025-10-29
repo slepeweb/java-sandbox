@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.site.service.NavigationService;
 
 public class Header implements Serializable {
@@ -32,9 +33,10 @@ public class Header implements Serializable {
 		Item i = getPage().getItem();
 		
 		while (! i.isSiteRoot()) {
-			if (! i.isHiddenFromNav() && i.isAccessible()) {
+			if (CmsUtil.isApt4Navigation(i)) {
 				this.breadcrumbItems.add(i);
 			}
+			
 			i = i.getOrthogonalParent();
 		}
 		

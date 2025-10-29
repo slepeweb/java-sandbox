@@ -21,6 +21,11 @@ public class StaticItem {
 		this.directory = isDirectory;
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("%s -> %s", this.urlParser.getPathAndQuery(), this.staticPath);
+	}
+	
 	public void setStaticPath4Resource() {
 		this.staticPath = this.urlParser.getPath();
 	}

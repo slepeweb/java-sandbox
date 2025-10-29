@@ -65,6 +65,10 @@ public class UrlParser {
 		return this;
 	}
 	
+	public void removeQueryParam(String name) {
+		this.queryParams.remove(name);
+	}
+	
 	public String getQueryParam(String name) {
 		return this.queryParams.get(name);
 	}
@@ -161,6 +165,10 @@ public class UrlParser {
 
 	public String getPathAndQuery() {
 		return new StringBuilder(getPath()).append(getQueryStr()).toString();
+	}
+
+	public String getMinipathAndQuery() {
+		return new StringBuilder(getMinipath()).append(getQueryStr()).toString();
 	}
 
 	public String getMinipath() {
