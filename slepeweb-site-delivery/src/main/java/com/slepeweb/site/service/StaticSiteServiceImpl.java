@@ -50,6 +50,9 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 	private static final Pattern MINIPATH_PATTERN = Pattern.compile("^(/(\\w\\w))?/\\$_(\\d+)(\\?.*)?$");
 	private static final Set<PosixFilePermission> MEDIA_PERMISSIONS =  PosixFilePermissions.fromString("rw-r--r--");
 	private static final String STATIC_DELIVERY_PARAM = "staticd";
+	private static final String RESOURCES_FILENAME = "resources";
+	private static final String RESOURCES_PATH = "/" + RESOURCES_FILENAME;
+	private static final String MEDIA_PATH = "/media";
 
 	
 	@Autowired private ItemService itemService;
@@ -59,6 +62,8 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 	
 	private String rootFilePath;
 	
+	public record Wallet(Site site, Host host, User user, CloseableHttpClient httpClient, List<NameValuePair> headers) {}
+
 	public void build(Item i, String sessionId) throws Exception {
 		
 		Map<String, StaticItem> urlMap = new HashMap<String, StaticItem>();
@@ -75,25 +80,27 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		}
 
 		// Create required directories on the file system
-		Files.createDirectories(Path.of(toAbsoluteStaticPath("/media")));
-		Files.createDirectories(Path.of(toAbsoluteStaticPath("/resources/" + s.getShortname())));
+		Files.createDirectories(Path.of(toAbsoluteStaticPath(MEDIA_PATH)));
+		Files.createDirectories(Path.of(toAbsoluteStaticPath(RESOURCES_PATH + "/" + s.getShortname())));
 		
 		List<NameValuePair> headers = new ArrayList<NameValuePair>();
 		headers.add(new NameValuePair("X-Static-Delivery", "1"));
 		headers.add(new NameValuePair("Cookie", "JSESSIONID=" + sessionId));
-		CloseableHttpClient httpclient = HttpClients.createDefault();		
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		
+		Wallet wallet = new Wallet(s, h, u, httpclient, headers);		
 		
 		// Stage 1: Scrape content from CMS delivery server, and save html in temporary files
 		if (s.isMultilingual()) {
 			for (String language : s.getAllLanguages()) {
-				crawlDynamicSite(httpclient, new UriSupport("/" + language), headers, s, h, u, urlMap);
+				crawlDynamicSite(wallet, new UriSupport("/" + language), urlMap);
 			}
 		}
 		else {
-			crawlDynamicSite(httpclient, new UriSupport("/"), headers, s, h, u, urlMap);
+			crawlDynamicSite(wallet, new UriSupport("/"), urlMap);
 		}
 		
-		// Stage 2: Edit each temporary html file, replacing internal urls to match how the files were saved
+		// Stage 2: Edit each temporary html file, replacing internal urls to match the static files created
 		File root = new File(this.cmsService.getStaticSiteRoot() + "/" + s.getShortname());
 		for (File f : root.listFiles()) {
 			if (! f.getName().equals("resources")) {
@@ -102,8 +109,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		}
 	}
 	
-	private void crawlDynamicSite(CloseableHttpClient httpClient, UriSupport usupp, List<NameValuePair> headers, 
-			Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+	private void crawlDynamicSite(Wallet wallet, UriSupport usupp, Map<String, StaticItem> pathMap) {
 		/*
 		 * sourceUrl represents any url that can be delivered by the cms, including:
 		 * - stylesheet
@@ -117,7 +123,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		 * Note that files below /resources can also be delivered by the CMS, but they are NOT cms items.
 		 */
 		
-		if (! preReqsSatisfied(h, usupp, pathMap)) {
+		if (! preReqsSatisfied(wallet.host(), usupp, pathMap)) {
 			// All url's in CMS are relative; only external resources use full urls.
 			// This must be an external url.
 			return;
@@ -127,12 +133,12 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		 * If when identifyItem finds that a) a minipath has been used in the sourceUrl,
 		 * and b) the item belongs to THIS site, then the sourceUrl's path is expanded
 		 */
-		Item i = identifyItem(s, usupp);
+		Item i = identifyItem(wallet.site(), usupp);
 		StaticItem si = null;
 		String html = null;
 				
 		if (i != null) {
-			i.setUser(u);
+			i.setUser(wallet.user());
 			
 			// We have navigated to an item, either a Page or media
 			// Have we already processed it?
@@ -154,7 +160,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 			si = new StaticItem(i, usupp);
 			
 			if (i.isPage()) {
-				html = renderPage(i, si, httpClient, headers);
+				html = renderPage(i, si, wallet);
 			}
 			else if (i.getType().isMedia()) {
 				copyMedia(i, si);
@@ -172,13 +178,13 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 			 */
 			if (i.isPage() && StringUtils.isNotBlank(html)) {
 				Document doc = createJsoupDocument(html);
-				followInlines(doc, httpClient, headers, s, h, u, pathMap);
+				followInlines(doc, pathMap, wallet);
 				
 				// Deal with related media items (eg. pdfs)
-				followRelatedMedia(i, httpClient, headers, s, h, u, pathMap);
+				followRelatedMedia(i, pathMap, wallet);
 				
 				// Finally, continue crawling DOWN the site hierarchy 
-				followBindings(i, httpClient, headers, s, h, u, pathMap);
+				followBindings(i, pathMap, wallet);
 			}
 		}
 		else {
@@ -188,7 +194,7 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 				return;
 			}
 			
-			if (renderResource(usupp, httpClient, headers)) {
+			if (renderResource(usupp, wallet)) {
 				String key = usupp.getPathAndQuery();
 				if (! pathMap.containsKey(key)) {
 					pathMap.put(key, si);
@@ -198,11 +204,11 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		
 	}
 	
-	private String renderPage(Item i, StaticItem si, CloseableHttpClient httpClient, List<NameValuePair> headers) {
+	private String renderPage(Item i, StaticItem si, Wallet wallet) {
 		UriSupport usupp = si.getUriSupport();
 		si.setStaticPath4Page();
 		usupp.addQueryParam(STATIC_DELIVERY_PARAM, "1");
-		String html = this.httpService.get(httpClient, usupp.toString(), headers);
+		String html = this.httpService.get(wallet.httpClient(), usupp.toString(), wallet.headers());
 		usupp.removeQueryParam(STATIC_DELIVERY_PARAM);
 		
 		if (StringUtils.isNotBlank(html)) {
@@ -225,23 +231,21 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 		}
 	}
 	
-	private boolean renderResource(UriSupport usupp, CloseableHttpClient httpClient, List<NameValuePair> headers) {
+	private boolean renderResource(UriSupport usupp, Wallet wallet) {
 		StaticItem si = new StaticItem(usupp, "not/classified", false);
 		si.setStaticPath4Resource();
-		String html = this.httpService.get(httpClient, usupp.toString(), headers);
+		String html = this.httpService.get(wallet.httpClient(), usupp.toString(), wallet.headers());
 		return writeToFile(null, html, si.getStaticPath());
 	}
 	
-	private void followInlines(Document doc, CloseableHttpClient httpClient, List<NameValuePair> headers, 
-			Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+	private void followInlines(Document doc, Map<String, StaticItem> pathMap, Wallet wallet) {
 		
-		followInlines(doc, httpClient, headers, "img", "src", s, h, u, pathMap);
-		followInlines(doc, httpClient, headers, "script", "src", s, h, u, pathMap);
-		followInlines(doc, httpClient, headers, "link", "href", s, h, u, pathMap);
+		followInlines(doc, "img", "src", pathMap, wallet);
+		followInlines(doc, "script", "src", pathMap, wallet);
+		followInlines(doc, "link", "href", pathMap, wallet);
 	}
 
-	private void followInlines(Document doc, CloseableHttpClient httpClient, List<NameValuePair> headers, 
-			String tag, String attr, Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+	private void followInlines(Document doc, String tag, String attr, Map<String, StaticItem> pathMap, Wallet wallet) {
 		
 		String url;
 		UriSupport urlSupport;
@@ -250,31 +254,29 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 			url = ele.attr(attr);
 			if (! (url.startsWith("#") || StringUtils.isBlank(url))) {
 				urlSupport = new UriSupport(url);
-				crawlDynamicSite(httpClient, urlSupport, headers, s, h, u, pathMap);
+				crawlDynamicSite(wallet, urlSupport, pathMap);
 			}
 		}
 	}
 	
-	private void followBindings(Item i, CloseableHttpClient httpClient, List<NameValuePair> headers, 
-			Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+	private void followBindings(Item i, Map<String, StaticItem> pathMap, Wallet wallet) {
 		
 		Item child;
 		for (Link l : i.getBindings()) {
 			child = l.getChild();
 			if (child.isPage()) {
-				crawlDynamicSite(httpClient, new UriSupport(child.getPath()), headers, s, h, u, pathMap);
+				crawlDynamicSite(wallet, new UriSupport(child.getPath()), pathMap);
 			}
 		}
 	}
 	
-	private void followRelatedMedia(Item i, CloseableHttpClient httpClient, List<NameValuePair> headers, 
-			Site s, Host h, User u, Map<String, StaticItem> pathMap) {
+	private void followRelatedMedia(Item i, Map<String, StaticItem> pathMap, Wallet wallet) {
 		
 		Item child;
 		for (Link l : i.getRelations()) {
 			child = l.getChild();
 			if (child.getType().isMedia()) {
-				crawlDynamicSite(httpClient, new UriSupport(child.getPath()), headers, s, h, u, pathMap);
+				crawlDynamicSite(wallet, new UriSupport(child.getPath()), pathMap);
 			}
 		}
 	}

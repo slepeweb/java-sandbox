@@ -15,7 +15,7 @@ public class NavigationServiceImpl implements NavigationService {
 	private static Logger LOG = Logger.getLogger(NavigationServiceImpl.class);
 	
 	public LinkTarget drillDown(Item parent, int numLevels, String currentItemPath) {
-		if (CmsUtil.isApt4Navigation(parent)) {
+		if (CmsUtil.isAppropriate4Navigation(parent)) {
 					
 			LinkTarget parentTarget = createLinkTarget(parent, currentItemPath);
 			LOG.debug(String.format("Created link: %s", parent.getPath()));

@@ -33,7 +33,7 @@ public class Header implements Serializable {
 		Item i = getPage().getItem();
 		
 		while (! i.isSiteRoot()) {
-			if (CmsUtil.isApt4Navigation(i)) {
+			if (CmsUtil.isAppropriate4Navigation(i)) {
 				this.breadcrumbItems.add(i);
 			}
 			
@@ -52,7 +52,11 @@ public class Header implements Serializable {
 		
 		// Can't imagine the home page will be inaccessible to a particular user
 		if (root != null) {
-			this.topNavigation.addAll(navigationService.drillDown(root, 3, i.getPath()).getChildren());
+			LinkTarget rootLink = navigationService.drillDown(root, 3, i.getPath());
+			
+			if (rootLink != null) {
+				this.topNavigation.addAll(rootLink.getChildren());
+			}
 			LOG.debug(String.format("Top navigation has %d entries", this.topNavigation.size()));
 		}
 	}

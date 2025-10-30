@@ -70,7 +70,7 @@ public class CmsUtil {
 		return result;
 	}
 	
-	public static boolean isApt4Navigation(Item i) {
+	public static boolean isAppropriate4Navigation(Item i) {
 		return
 				! i.getType().isMedia() &&
 				! i.isHiddenFromNav() &&

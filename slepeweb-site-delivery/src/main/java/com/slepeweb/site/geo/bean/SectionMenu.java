@@ -9,24 +9,25 @@ public class SectionMenu {
 	private LinkTarget root;
 	
 	public SectionMenu(Item i) {
-		if (i.isSiteRoot() || ! CmsUtil.isApt4Navigation(i)) {
+		if (i.isSiteRoot() || ! CmsUtil.isAppropriate4Navigation(i)) {
 			return;
 		}
 		
-		LinkTarget lt, lt2;
+		LinkTarget lt;
 		Item p = i.getOrthogonalParent();
 		this.root = new LinkTarget(p);
 		
 		for (Link sib : p.getBindings()) {
-			if (! sib.getChild().isHiddenFromNav()) {
+			if (CmsUtil.isAppropriate4Navigation(sib.getChild())) {
 				lt = new LinkTarget(sib.getChild());
 				this.root.getChildren().add(lt);
 				lt.setSelected(sib.getChild().getId().equals(i.getId()));
 				
 				if (lt.isSelected()) {				
 					for (Link l2 : sib.getChild().getBindings()) {
-						lt2 = new LinkTarget(l2.getChild());
-						lt.getChildren().add(lt2);
+						if (CmsUtil.isAppropriate4Navigation(l2.getChild())) {
+							lt.getChildren().add(new LinkTarget(l2.getChild()));
+						}
 					}
 				}
 			}
