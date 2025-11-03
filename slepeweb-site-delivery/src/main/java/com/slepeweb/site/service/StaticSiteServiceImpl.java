@@ -273,7 +273,17 @@ public class StaticSiteServiceImpl implements StaticSiteService {
 	private void followRelatedMedia(Item i, Map<String, StaticItem> pathMap, Wallet wallet) {
 		
 		Item child;
+		
+		// Relations
 		for (Link l : i.getRelations()) {
+			child = l.getChild();
+			if (child.getType().isMedia()) {
+				crawlDynamicSite(wallet, new UriSupport(child.getPath()), pathMap);
+			}
+		}
+		
+		// Inlines
+		for (Link l : i.getInlines()) {
 			child = l.getChild();
 			if (child.getType().isMedia()) {
 				crawlDynamicSite(wallet, new UriSupport(child.getPath()), pathMap);

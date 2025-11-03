@@ -219,6 +219,12 @@ _cms.field.onpageload = function() {
 			if (value === 'p') {
 				_cms.field.widefieldInsert('<p>$$$</p>')
 			}
+			else if (value === 'br') {
+				_cms.field.widefieldInsert('<br />')
+			}
+			else if (value === 'hr') {
+				_cms.field.widefieldInsert('<hr />')
+			}
 			else if (value === 'code') {
 				_cms.field.widefieldInsert('<code>$$$</code>')
 			}

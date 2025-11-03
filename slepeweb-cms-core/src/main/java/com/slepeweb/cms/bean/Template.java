@@ -1,7 +1,5 @@
 package com.slepeweb.cms.bean;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 
 public class Template extends CmsBean {

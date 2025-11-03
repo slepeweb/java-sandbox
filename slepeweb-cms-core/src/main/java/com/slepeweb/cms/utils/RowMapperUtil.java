@@ -266,7 +266,8 @@ public class RowMapperUtil {
 					setName(rs.getString("name")).
 					setController(rs.getString("forward")).
 					setSiteId(rs.getLong("siteid")).
-					setItemTypeId(rs.getLong("typeid"));
+					setItemTypeId(rs.getLong("typeid")).
+					setAdmin(rs.getBoolean("admin"));
 		}
 	}
 	
