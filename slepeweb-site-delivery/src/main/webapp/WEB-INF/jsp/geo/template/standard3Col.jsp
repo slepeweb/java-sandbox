@@ -9,9 +9,11 @@
 	<div class="main standard-3col">
 		<div class="leftside">
 			<geo:inThisSection />
+			<geo:relatedItems />
 		</div>
 		
-		<c:set var="sidebarIsPresent" value="${fn:length(_item.relatedItems) > 0}" />
+		<%-- Sidebar is out of action, for the moment at least --%>
+		<c:set var="sidebarIsPresent" value="${0 gt 1}" />
 		<c:set var="mainBodyClass" value="full-width" />
 		<c:if test="${sidebarIsPresent}"><c:set var="mainBodyClass" value="nearly-full-width" /></c:if>
 		
@@ -22,7 +24,7 @@
 			</div>
 		
 			<c:if test="${sidebarIsPresent}">
-				<geo:relatedItems />
+				<%-- Sidebar is out of action, for the moment at least --%>			
 			</c:if>
 		</div>
 	</div>

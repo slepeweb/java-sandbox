@@ -2,9 +2,9 @@
 
 <div class="in-this-section">
 	<c:if test="${fn:length(_inThisSection.root.children) gt 0}">
-		<h4>${_inThisSection.root.title} 
-			<span style="padding-left: 2em;"><a href="${_inThisSection.root.href}" 
-				title="Navigate upwards"><i class="fa-solid fa-arrow-up"></i></a></span></h4>
+		<h4>In this section ...</h4>
+<%-- 			<span style="padding-left: 2em;"><a href="${_inThisSection.root.href}"  
+ 				title="Navigate upwards"><i class="fa-solid fa-arrow-up"></i></a></span> --%>
 				
 		<c:forEach items="${_inThisSection.root.children}" var="sib_target">
 			<div<c:if test="${sib_target.selected}"> class="selected"</c:if>>${sib_target.tag}

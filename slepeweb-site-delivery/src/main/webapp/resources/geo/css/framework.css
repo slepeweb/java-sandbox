@@ -7,31 +7,39 @@ div.standard-3col div.leftside, div.standard-3col div.rightside {
 }
 
 div.standard-3col div.leftside div.in-this-section,
+div.standard-3col div.leftside div.related-items,
 div.standard-3col div.rightside div.sidebar {
 	background-color: #eee;
 	min-height: 200px;
 	padding: 0.5em;
+	border: 1px solid #d5d1d1;
+}
+
+div.standard-3col div.leftside div.related-items {
+	margin-top: 2em;
+	background-color: #d1d9f0;
+	border: 1px solid #91aeff;
 }
 
 div.sidebar-wrapper {
 	padding-left: 0.5em;
 }
 
-div.in-this-section, div.sidebar {
+div.in-this-section,  div.related-items, div.sidebar {
 	min-width: 124px;
 }
 
-div.in-this-section > div, div.sidebar > div {
+div.in-this-section > div,  div.related-items, div.sidebar > div {
 	padding: 0.4em 0 0.4em 0;
 	line-height: 1.0em;
 }
 
-div.in-this-section a, div.sidebar a {
+div.in-this-section a,  div.related-items a, div.sidebar a {
 	text-decoration: none;
 	font-size: 0.95em;
 }
 
-div.in-this-section a:hover, div.sidebar a:hover {
+div.in-this-section a:hover,  div.related-items a:hover, div.sidebar a:hover {
 	text-decoration: underline;
 }
 
