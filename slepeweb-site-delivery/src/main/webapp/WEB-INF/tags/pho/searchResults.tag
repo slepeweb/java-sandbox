@@ -42,6 +42,9 @@
 				<p class="heading">${_heading}</p>
 				<p class="caption">${_teaser}</p>
 				<pho:captionTagList list="${_result.tags}" />
+				
+				<%--TODO: styling reqd --%>
+				<p class="caption">[${_result.origId}]</p>
 			</div>
 				
     </div>

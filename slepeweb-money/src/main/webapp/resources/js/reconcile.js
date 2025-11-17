@@ -63,6 +63,8 @@ $(function() {
 
 	// When user updates the current balance on the statement ...
 	$('input#balance-now').keyup(function() {		
+		$('table.trn_listing').removeClass('lolight')
+
 		let input$ = $(this)
 		if (input$.val().length < 2) {
 			return
@@ -88,8 +90,8 @@ $(function() {
 	})
 	
 	// When user reconciles a transaction ...
-	$('td.reconcile-switch').click(function() {		
-		if ($('input#balance-now').val().length < 2) {
+	$('td.reconcile-switch').click(function() {
+		if ($('table.trn_listing').hasClass('lolight') || $('input#balance-now').val().length < 2) {
 			// Ignore event
 			return
 		}

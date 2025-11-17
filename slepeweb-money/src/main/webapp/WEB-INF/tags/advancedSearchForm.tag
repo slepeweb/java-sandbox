@@ -28,6 +28,11 @@
 		  <tsf:payee payeeName="${_params.payeeName}" />
 			<mny:categoryList heading="Categories" categories="${_categoryGroup}" />
 	    	    
+	    <mny:tableRow heading="Notes" tdclass="width25">
+       	<input type="text" id="memo" name="memo"
+  					placeholder="Match input here against transaction notes" value="${_params.memo}" />	        	
+	    </mny:tableRow>
+
 	    <mny:tableRow heading="Dates">
 	    	<div id="period-box">
 	       	Within the last: <input type="number" id="periodvalue" type="text" name="periodvalue" value="${_params.periodValue}" />

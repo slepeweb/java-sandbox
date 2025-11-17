@@ -48,6 +48,10 @@ input.debit-amount {
 	color: red;
 }
 
+table.trn_listing.lolight {
+	opacity: 20%;
+}
+
 div#reconcile-list div#menu-icons span {
 	color: #666;
 	font-size: 1.5em;

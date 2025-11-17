@@ -45,7 +45,7 @@
 	</div>
 		
 	<c:choose><c:when test="${not empty _tl}">
-	<table class="trn_listing">
+	<table class="trn_listing lolight">
 		<thead>
 			<tr>
 				<th>Date</th>
