@@ -7,4 +7,5 @@ import com.slepeweb.cms.bean.User;
 public interface SiteAccessService {
 	boolean isAccessible(Item i);
 	boolean isAccessible(SolrDocument4Cms doc, User u);
+	void forceCacheRefresh();
 }

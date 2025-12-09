@@ -14,6 +14,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.LinkFilter;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfigCache;
+import com.slepeweb.cms.component.CacheRefresher;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.utils.CookieHelper;
 import com.slepeweb.commerce.bean.Basket;
@@ -40,10 +41,16 @@ public class PageController extends BaseController {
 	@Autowired private ItemService itemService;
 	@Autowired private PdfService pdfService;
 	@Autowired private StaticSiteService staticSiteService;
+	@Autowired private CacheRefresher cacheRefresher;
 	
 	@RequestMapping(value="/**")	
 	public void mainController(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
 		this.cmsDeliveryServlet.doGet(req, res, model);
+	}
+	
+	@RequestMapping(value="/$cache_refresh$")	
+	public void updateCaches(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
+		this.cacheRefresher.execute();
 	}
 	
 	@RequestMapping(value="/spring/homepage")	

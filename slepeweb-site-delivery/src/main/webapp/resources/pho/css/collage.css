@@ -1,0 +1,8 @@
+body {
+	width: 32in;
+}
+
+div.photo-row img {
+	height: 590px;
+	margin: 4px;
+}

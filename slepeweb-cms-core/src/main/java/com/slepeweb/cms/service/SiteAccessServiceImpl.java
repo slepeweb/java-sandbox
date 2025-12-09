@@ -16,6 +16,8 @@ import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.User;
 
+import jakarta.annotation.PostConstruct;
+
 @Repository
 public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccessService {
 	
@@ -60,8 +62,13 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	@Autowired private PasskeyService passkeyService;
 	@Autowired private UserService userService;
 
-	private Map<Long, List<AccessRule>> readRules = new HashMap<Long, List<AccessRule>>();
-	private Map<Long, List<AccessRule>> writeRules = new HashMap<Long, List<AccessRule>>();
+	private Map<Long, List<AccessRule>> readRules;
+	private Map<Long, List<AccessRule>> writeRules;
+	
+	@PostConstruct
+	private void init() {
+		forceCacheRefresh();
+	}
 	
 	public boolean isAccessible(Item i) {
 		if (this.cmsService.isEditorialContext()) {
@@ -283,5 +290,11 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 		}
 		
 		return false;
+	}
+	
+	public void forceCacheRefresh() {
+		this.readRules = new HashMap<Long, List<AccessRule>>();
+		this.writeRules = new HashMap<Long, List<AccessRule>>();		
+		LOG.info("(Re-)built the site access rules cache");
 	}
 }

@@ -11,13 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.slepeweb.cms.bean.SiteConfigCache;
-import com.slepeweb.cms.bean.SiteConfigProperty;
 import com.slepeweb.cms.service.CryptoService;
-import com.slepeweb.cms.service.SiteConfigService;
 
 /*
- * This is a bean creation factory, currently defining a bean named aesKey.
+ * This is a bean creation factory, currently defining
+ * - a bean named aesKey
+ * - a cache of site config properties
+ * 
  */
 
 @Configuration
@@ -26,7 +26,6 @@ public class SpringBeanFactory {
 	private Logger LOG = Logger.getLogger(SpringBeanFactory.class);
 	
 	@Autowired private CryptoService cryptoService;
-	@Autowired private SiteConfigService siteConfigService;
 	
 	@Bean
     public SecretKey aesKey() throws Exception {
@@ -54,15 +53,4 @@ public class SpringBeanFactory {
         throw new IllegalStateException(msg);
     }
 	
-	@Bean
-	public SiteConfigCache siteConfigCache() {
-		SiteConfigCache cache = new SiteConfigCache();
-		
-		for (SiteConfigProperty scp : this.siteConfigService.getAll()) {
-			LOG.info(scp);
-			cache.put(scp.getSiteId(), scp);
-		}
-		
-		return cache;
-	}
 }
