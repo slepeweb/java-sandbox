@@ -105,7 +105,7 @@ public class MagicMarkupServiceImpl implements MagicMarkupService {
 	private void transformXImages(Document doc) {
     	
     	String origId, url, width, body, caption, cssfloat;
-    	String template;
+    	String template, attr;
     	Item i;
     	 
     	for (Element e : doc.getElementsByClass("ximg")) {
@@ -114,20 +114,18 @@ public class MagicMarkupServiceImpl implements MagicMarkupService {
     		}
     		
     		origId = e.attr("data-id");
-    		i = this.itemService.getItem(Long.valueOf(origId));
+    		i = this.itemService.getItemByOriginalId(Long.valueOf(origId));
     		if (i == null) {
     			continue;
     		}
     		
-     		url = String.format("/$_%d", i.getId());
+     		url = String.format("/$_%d", i.getOrigId());
     		
-    		width = e.attr("data-width");
-    		if (StringUtils.isNotBlank(width)) {
-    			width = String.format("style=\"width: %s\"", width); 
-    		}
+    		attr = e.attr("data-width");
+    		width = StringUtils.isNotBlank(attr) ? String.format("style=\"width: %s\"", attr) : ""; 
     		
-    		cssfloat = e.attr("data-float");    		
-    		cssfloat = StringUtils.isNotBlank(cssfloat) ? "class=\"right\"" : "";
+    		attr = e.attr("data-float");    		
+    		cssfloat = StringUtils.isNotBlank(attr) ? String.format("class=\"%s\"", attr) : "";
 
     		caption = e.attr("data-caption");
     		if (StringUtils.isBlank(caption)) {
