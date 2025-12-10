@@ -49,8 +49,9 @@ public class PageController extends BaseController {
 	}
 	
 	@RequestMapping(value="/$cache_refresh$")	
-	public void updateCaches(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {		
+	public void updateCaches(HttpServletResponse res) throws Exception {		
 		this.cacheRefresher.execute();
+		res.sendRedirect("/");
 	}
 	
 	@RequestMapping(value="/spring/homepage")	

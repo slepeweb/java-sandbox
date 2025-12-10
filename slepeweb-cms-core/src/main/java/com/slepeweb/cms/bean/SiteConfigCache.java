@@ -24,10 +24,11 @@ public class SiteConfigCache {
 	
 	@PostConstruct
 	private void init() {
+		this.map = new HashMap<Long, SiteConfig>();
 		forceCacheRefresh();
 	}
 	
-	public void put(Long siteId, SiteConfigProperty scp) {
+	private void put(Long siteId, SiteConfigProperty scp) {
 		
 		SiteConfig sc = this.map.get(siteId);
 		if (sc == null) {
@@ -69,17 +70,16 @@ public class SiteConfigCache {
 		return s != null && s.toLowerCase().matches("yes|true|1");
 	}
 	
-	public SiteConfig get(Long siteId) {
+	public synchronized SiteConfig get(Long siteId) {
 		return this.map.get(siteId);
 	}
 	
-	public void forceCacheRefresh() {
+	public synchronized void forceCacheRefresh() {
+
 		this.map = new HashMap<Long, SiteConfig>();
-		
 		for (SiteConfigProperty scp : this.siteConfigService.getAll()) {
 			put(scp.getSiteId(), scp);
-		}
-		
+		}		
 		LOG.info("(Re-)built the site config properties cache");
 	}
 	

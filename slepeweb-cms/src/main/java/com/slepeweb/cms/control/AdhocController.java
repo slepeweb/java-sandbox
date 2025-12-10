@@ -13,6 +13,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.component.CacheRefresher;
 import com.slepeweb.cms.service.ItemService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,9 +22,11 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/adhoc")
 public class AdhocController extends BaseController {
 	
-	private static final String ADHOC_VIEW = "cms.adhoc";
+	private static final String ADHOC_VIEW = "adhoc";
 	private static Logger LOG = Logger.getLogger(AdhocController.class);
+	
 	@Autowired private ItemService itemService;
+	@Autowired private CacheRefresher cacheRefresher;
 	
 	@RequestMapping("/orphan/media/files")
 	public String doOrphanMediaFiles(HttpServletRequest req, ModelMap model) {
@@ -78,4 +81,11 @@ public class AdhocController extends BaseController {
 		return ADHOC_VIEW;
 	}
 	
+
+	@RequestMapping(value="/$cache_refresh$")	
+	public String updateCaches(ModelMap model) throws Exception {		
+		this.cacheRefresher.execute();
+		model.addAttribute("_message", "Cached refreshed - use browser Back to return to editing item");
+		return ADHOC_VIEW;
+	}
 }

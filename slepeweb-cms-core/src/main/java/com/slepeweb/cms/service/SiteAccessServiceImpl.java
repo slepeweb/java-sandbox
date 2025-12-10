@@ -155,8 +155,10 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	private List<AccessRule> getReadRules(Long siteId) {
 		List<AccessRule> list = this.readRules.get(siteId);
 		if (list == null) {
-			list = this.accessService.getReadable(siteId);
-			this.readRules.put(siteId, list);
+			synchronized (this) {
+				list = this.accessService.getReadable(siteId);
+				this.readRules.put(siteId, list);
+			}
 		}
 		return list;
 	}
@@ -164,8 +166,10 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	private List<AccessRule> getWriteRules(Long siteId) {
 		List<AccessRule> list = this.writeRules.get(siteId);
 		if (list == null) {
-			list = this.accessService.getWriteable(siteId);
-			this.writeRules.put(siteId, list);
+			synchronized (this) {
+				list = this.accessService.getWriteable(siteId);
+				this.writeRules.put(siteId, list);
+			}
 		}
 		return list;
 	}
@@ -292,9 +296,9 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 		return false;
 	}
 	
-	public void forceCacheRefresh() {
+	public synchronized void forceCacheRefresh() {
 		this.readRules = new HashMap<Long, List<AccessRule>>();
 		this.writeRules = new HashMap<Long, List<AccessRule>>();		
-		LOG.info("(Re-)built the site access rules cache");
+		LOG.info("(Re-)initialised the site access rules cache");
 	}
 }
