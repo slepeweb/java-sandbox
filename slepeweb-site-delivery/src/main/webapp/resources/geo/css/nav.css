@@ -48,6 +48,10 @@ header {
     transition: background 0.3s;
 }
 
+.navbar a.open-site-link {
+	color: #292929;
+}
+
 .navbar a:hover {
     background-color: #555;
 }
@@ -135,6 +139,7 @@ div#user-menu {
     z-index: 1;
     font-size: 0.65em;
     padding: 0.25em;
+    width: max-content;
 }
 
 div#user-menu ul {

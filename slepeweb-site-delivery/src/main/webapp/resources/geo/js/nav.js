@@ -61,6 +61,15 @@ let userLogoutBehaviour = function(action) {
 	})
 }
 
+_site.support.openSite = function(url) {
+	_site.support.ajax('GET', '/rest/passkey', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+		if (! resp.error) {
+			window.open(`${url}?_passkey=${resp.data[0]}`, '_blank');
+		}
+	});
+}
+
+
 $(function() {
 	// Mouse pointer is over a top-level menu option
 	$("div.navbar a.toplevel").on('mouseenter', function(e) {
@@ -94,6 +103,11 @@ $(function() {
 		$('div#user-menu').removeClass('hidden')
 	})
 	
+	$('a.open-site-link').click(function(e) {
+		e.preventDefault()
+		_site.support.openSite($(this).attr('href'))
+	})
+
 	userLogoutBehaviour('logout');
 	userLogoutBehaviour('superlogout');
 });

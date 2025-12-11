@@ -17,6 +17,9 @@
 				<div id="user-menu" class="hidden">
 					<u>${_user.fullName}</u>
 					<ul>
+						<li><a class="open-site-link" href="/$_1760">> Open 'Photos'</a></li>
+						<li><a class="open-site-link" href="/$_1202">> Open 'Ancestry'</a></li>
+						
 						<li id="logout-link">> Logout</li>
 						<c:if test="${_isSuperUser}">
 							<li id="superlogout-link">> Super-logout</li>

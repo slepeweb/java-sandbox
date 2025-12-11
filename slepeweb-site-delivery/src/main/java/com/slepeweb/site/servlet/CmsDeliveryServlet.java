@@ -122,6 +122,11 @@ public class CmsDeliveryServlet {
 			return;
 		}
 
+		/*
+		 * If this is a request for a page using a minipath, and the item in question belongs to the same site as
+		 * indicated by the hostname for this request, then redirect the request so that,
+		 * rather than displaying the minipath in the browser url, we'll show the item url instead.
+		 */
 		// Avoid displaying minipaths, if possible, by redirecting requests
 		if (r.isMiniPath() && r.getSite().getId().equals(item.getSite().getId())) {
 			res.sendRedirect(item.getUrl() + r.getQueryString());
@@ -129,8 +134,9 @@ public class CmsDeliveryServlet {
 		}
 		
 		/*
-		 * This might be a request for a page/item on a secured site that the user does not have access to,
-		 * simply because he hasn't (yet) logged into that site.
+		 * If this is a request for a page on a secured site using a minipath, and the item in question belongs 
+		 * to  A DIFFERENT site to the one indicated by the hostname for this request, then a passkey would be required
+		 * before we could continue processing the request, enabling a login to be performed on the OTHER site.
 		 */
 		if (
 				item.getSite().isSecured() &&
@@ -149,11 +155,18 @@ public class CmsDeliveryServlet {
 			return;
 		}
 
-		// Redirect request to login page if user does not have access to item. 
-		// This check also makes sure user is logged in on secured sites
+		/*
+		 *  Redirect request to login page if:
+		 *  - item is on a secured site AND user is not logged in AND no passkey provided on the url
+		 *  OR
+		 *  - the logged-in user does not have access to item. 
+		 *  
+		 *  If a passkey IS provided on the url, AND it is valid, the user is logged-in to the site
+		 *  by this accessibility check.
+		 */
 		if (! item.isAccessible()) {
-			// Site access rules deny access to this user, AND no suitable passkey provided
-			// Redirect to login page, UNLESS this IS a request for the login page
+			// Site access rules deny access to this user, AND no suitable passkey provided.
+			// So, redirect to login page, UNLESS this IS a request for the login page.
 			String loginUrl = getLoginRedirectionUrl(item, req);
 			if (loginUrl != null) {
 				res.sendRedirect(loginUrl);
