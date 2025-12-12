@@ -62,6 +62,39 @@ public class PhotosPageController extends BaseController {
 		return page.getView();
 	}
 
+	@RequestMapping(value="/collage")	
+	public String collage(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			@ModelAttribute(AttrName.SITE) Site site, 
+			HttpServletRequest req,
+			ModelMap model) {	
+		
+		Page page = getStandardPage(i, shortSitename, "collage", model);
+		model.addAttribute("_photoList", new int[][] {
+			
+			// David
+			/*
+				{4206, 4002, 3339, 2265, 3994, 2264}, 
+				{3338, 2086, 2263, 2323, 2111}, 
+				{3326, 2528, 2485, 2255, 2526}, 
+				{4187, 2459, 2324, 3967, 2356, 2454},
+				{4208, 2080, 4005, 2455, 2468},
+				{3328, 0, 2246, 3351}
+				*/
+				
+			// John
+			{3315, 2132, 3254, 3371},
+			{3258, 3391, 3368, 3966},
+			{3253, 3260, 3314, 4354, 3255},
+			{2475, 3257, 4324, 2270},
+			{2242, 0, 3382}
+		});
+		
+		model.addAttribute("_photoMargin", new int[] {45, 75, 0, 30, 200, 0});
+		return page.getView();
+	}
+
 	@RequestMapping(value="/search", method=RequestMethod.POST)	
 	public String searchPost(
 			@ModelAttribute(AttrName.ITEM) Item i, 
