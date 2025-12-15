@@ -330,7 +330,7 @@ _cms.support.checkSession = function() {
 						if (resp.error) {
 							console.log('Failed to end session cleanly')
 						}
-						window.open('/cms/page/login', '_self')
+						window.open('/cms_/page/login', '_self')
 					})
 				}
 				else {				

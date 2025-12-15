@@ -217,7 +217,7 @@ input[type="checkbox"], input[type="radio"] {
 	position: absolute;
 	top: 40px;
 	left: 0px;
-	background-image: url('/cms/resources/css/readonly.png');
+	background-image: url('/cms_/resources/css/readonly.png');
 	height: 95%;
 	width: 100%;
 	background-repeat: repeat;

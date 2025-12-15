@@ -145,7 +145,7 @@ public class PageController extends BaseController {
 					
 					String idStr = req.getParameter("origid");
 					if (StringUtils.isNotBlank(idStr)) {
-						String path = String.format("/cms/page/editor/%s", idStr);
+						String path = String.format("/cms_/page/editor/%s", idStr);
 						res.sendRedirect(path);
 						return null;
 					}

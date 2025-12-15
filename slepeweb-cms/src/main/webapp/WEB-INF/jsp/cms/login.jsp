@@ -31,7 +31,7 @@
 		</form>	
 		
 		<p style="margin-top: 1em;">
-			<a href="/cms/user/forgot/password" target="_blank">Forgot password?</a>
+			<a href="/cms_/user/forgot/password" target="_blank">Forgot password?</a>
 		</p>
 
 	</div>

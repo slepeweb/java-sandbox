@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface CookieService {
-	static final String CMS_COOKIE_PATH = "/cms";	
+	static final String CMS_COOKIE_PATH = "/cms_";	
 	static final String STICKY_ADDNEW_CONTROLS = "stickyaddnew";	
 	
 	void updateBreadcrumbsCookie(Item i, HttpServletRequest req, HttpServletResponse res);

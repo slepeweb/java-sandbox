@@ -76,7 +76,7 @@ public class LoginController extends BaseController {
 			}
 			model.addAttribute("_redirectPath", redirectPath);
 			model.addAttribute("_forgottenPasswordFormHref", 
-					i.getSite().getEditorialHost().getNamePortAndProtocol() + "/cms/user/forgot/password");
+					i.getSite().getEditorialHost().getNamePortAndProtocol() + "/cms_/user/forgot/password");
 			
 			if (req.getParameter("logout") != null) {
 				this.loginService.logout(req);

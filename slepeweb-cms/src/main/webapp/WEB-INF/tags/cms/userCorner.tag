@@ -14,8 +14,8 @@
 				
 			<div id="user-menu" class="hidden">
 				<ul>
-					<li><a href="/cms/user/update/form/${_user.id}">&gt; Update account</a></li>
-					<li><a href="/cms/page/login?logout">&gt; Logout</a></li>
+					<li><a href="/cms_/user/update/form/${_user.id}">&gt; Update account</a></li>
+					<li><a href="/cms_/page/login?logout">&gt; Logout</a></li>
 				</ul>
 			</div>
 		</div>
