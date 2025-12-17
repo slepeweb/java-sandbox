@@ -144,6 +144,11 @@ div.flash-error {
 	line-height: 1.65em;
 }
 
+code.solo {
+	display: block;
+	width: fit-content;
+}
+
 @media only screen and (max-width: 1000px) {
 	div#below-nav {
 	  grid-template-columns: 50% 50%;

@@ -722,15 +722,6 @@ public class Item extends CmsBean {
 		return false;
 	}
 	
-	public boolean isMiniPath() {
-		return this.requestPack.isMiniPath();
-	}
-
-	public Item setMiniPath(boolean b) {
-		this.requestPack.setMiniPath(b);
-		return this;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -937,6 +928,16 @@ public class Item extends CmsBean {
 		this.requestPack = r;
 		return this;
 	}
+	
+	// Is this item's site match the host (/site) in the request?
+	public boolean isForeigner() {
+		if (this.requestPack == null) {
+			// Haven't a clue
+			return false;
+		}
+		
+		return ! this.requestPack.getSite().getId().equals(this.site.getId());
+	}
 
 	// Does this item pass access rules set in db table 'access'
 	public boolean isAccessible() {
@@ -975,7 +976,6 @@ public class Item extends CmsBean {
 	public String getTempMediaFilepath(boolean isThumbnail) {
 		return getCmsService().getMediaFileService().getTempMediaFilepath(this, isThumbnail);
 	}	
-
 	
 	/*
 	 * IFF this site is designated as a secured site ...

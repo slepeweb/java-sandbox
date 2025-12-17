@@ -26,7 +26,7 @@ public class HttpUtil {
 		StringBuffer cacheControl = new StringBuffer();
 		
 		if (0L == privateCacheTime && 0L == publicCacheTime) {
-			cacheControl.append("no-cache, s-maxage=0, max-age=0");
+			cacheControl.append("no-store, no-cache, must-revalidate, s-maxage=0, max-age=0");
 		} 
 		else {			
 			cacheControl.
@@ -38,6 +38,12 @@ public class HttpUtil {
 		if (lastModified > -1L) {
 			res.setDateHeader("Last-Modified", lastModified);
 		}
+		
+		/*
+		 * ChatGPT recommends additional headers, esp. for no-cache situation:
+		 * res.setHeader("Pragma", "no-cache");
+		 * res.setDateHeader("Expires", 0);
+		 */
 	}
 	
 	public static String encodeUrl(String s) {

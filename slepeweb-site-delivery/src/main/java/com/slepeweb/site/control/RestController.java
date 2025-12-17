@@ -17,7 +17,6 @@ import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.component.Passkey;
 import com.slepeweb.cms.component.PasskeyModel;
-import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.SiteConfigKey;
 import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
@@ -113,16 +112,9 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/logout/{siteId}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public RestResponse logout(@PathVariable long siteId, HttpServletRequest req) {
-		req.getSession().removeAttribute(AttrName.USER);
-		req.getSession().removeAttribute(AttrName.SUPER_USER);
+		req.getSession().invalidate();
 		String loginPath = this.siteConfigCache.getValue(siteId, SiteConfigKey.LOGIN_PATH, "/login");
 		return new RestResponse().addMessage("Done").setData(loginPath);
 	}
 	
-	@RequestMapping(value="/superlogout/{siteId}", method=RequestMethod.GET, produces="application/json")
-	@ResponseBody
-	public RestResponse superlogout(@PathVariable long siteId, HttpServletRequest req) {
-		req.getSession().removeAttribute(AttrName.SUPER_USER);
-		return new RestResponse().addMessage("Done").setData("/");
-	}
 }

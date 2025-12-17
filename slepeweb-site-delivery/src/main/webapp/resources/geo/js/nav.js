@@ -51,9 +51,9 @@ class MenuHandler {
 
 let _menu = new MenuHandler();
 
-let userLogoutBehaviour = function(action) {
-	$(`div#user-menu li#${action}-link`).click(function() {
-		_site.support.ajax('GET', `/rest/${action}/${_site.siteId}`, {dataType: 'json', mimeType: 'application/json'}, function(resp) {
+let userLogoutBehaviour = function() {
+	$(`div#user-menu li#logout-link`).click(function() {
+		_site.support.ajax('GET', `/rest/logout/${_site.siteId}`, {dataType: 'json', mimeType: 'application/json'}, function(resp) {
 			if (! resp.error) {
 				window.location = `${resp.data}`;
 			}
@@ -108,6 +108,5 @@ $(function() {
 		_site.support.openSite($(this).attr('href'))
 	})
 
-	userLogoutBehaviour('logout');
-	userLogoutBehaviour('superlogout');
+	userLogoutBehaviour();
 });

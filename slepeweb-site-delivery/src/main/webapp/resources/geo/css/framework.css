@@ -29,7 +29,7 @@ div.in-this-section,  div.related-items, div.sidebar {
 	min-width: 124px;
 }
 
-div.in-this-section > div,  div.related-items, div.sidebar > div {
+div.in-this-section > div,  div.related-items > div, div.sidebar > div {
 	padding: 0.4em 0 0.4em 0;
 	line-height: 1.0em;
 }

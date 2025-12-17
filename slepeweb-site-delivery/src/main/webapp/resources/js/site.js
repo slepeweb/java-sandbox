@@ -67,6 +67,12 @@ _site.support.moveComponent = function(parent$) {
 	parent$.append(comp$)
 }
 
+// Disable the browser back-forward cache (BFCache), by forcing a page reload
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+})
 
 $(function() {
 

@@ -1,9 +1,5 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
-<!-- 
-	id: 		${_item.id}
-	origId:	${_item.origId}
--->
 <header>
 	<nav class="navbar">
 		<div class="brand-title">
@@ -18,12 +14,8 @@
 					<u>${_user.fullName}</u>
 					<ul>
 						<li><a class="open-site-link" href="/$_1760">> Open 'Photos'</a></li>
-						<li><a class="open-site-link" href="/$_1202">> Open 'Ancestry'</a></li>
-						
+						<li><a class="open-site-link" href="/$_1202">> Open 'Ancestry'</a></li>						
 						<li id="logout-link">> Logout</li>
-						<c:if test="${_isSuperUser}">
-							<li id="superlogout-link">> Super-logout</li>
-						</c:if>
 					</ul>
 				</div>
 			</c:if>

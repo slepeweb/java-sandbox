@@ -72,7 +72,7 @@
 
 <script>
 	$(function() {
-		$('input[name=answer0]').focus()
+		$('input[name=a0]').focus()
 	})
 </script>		
 

@@ -20,6 +20,27 @@ public class ItemType extends CmsBean {
 	private String name, mimeType = PAGE_MIMETYPE;
 	private List<FieldForType> fieldsForType;
 	
+	public String getFontAwesomeClass() {
+		String dflt = "fa-file-lines";
+		
+		if (this.mimeType.equals(PAGE_MIMETYPE)) {
+			return dflt;
+		}
+		else if (this.mimeType.equals(PDF_MIMETYPE)) {
+			return "fa-file-pdf";
+		}
+		else if (this.mimeType.startsWith(IMAGE_MIMETYPE_PREFIX)) {
+			return "fa-image";
+		}
+		else if (this.mimeType.startsWith(VIDEO_MIMETYPE_PREFIX)) {
+			return "fa-circle-play";
+		}
+		
+		return dflt;
+	}
+
+	
+
 	public void assimilate(Object obj) {
 		if (obj instanceof ItemType) {
 			ItemType it = (ItemType) obj;
