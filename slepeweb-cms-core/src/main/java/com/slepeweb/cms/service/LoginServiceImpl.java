@@ -78,7 +78,8 @@ public class LoginServiceImpl implements LoginService {
 		}
 		else {
 			userMsg = "All form fields must be populated!";
-			supp.setSendmailFlag(false);
+			// Don't send an email if BOTH fields are blank
+			supp.setSendmailFlag(! (StringUtils.isBlank(alias) && StringUtils.isBlank(password)));
 			LOG.warn("Form data incomplete");
 		}
 		
