@@ -22,6 +22,7 @@
 		searchresultsItemPath: '${site:resolveConfig(_site.id, 'path.searchresults', _siteConfigService)}',
 		//staticDelivery: <c:choose><c:when test="${empty param.statics}">true</c:when><c:otherwise>false</c:otherwise></c:choose>,
 		staticDelivery: ${empty param.staticd ? 'false' : 'true'},
+		userIsLoggedIn: ${empty _user ? 'false' : 'true'},
 	}
 </script>
 

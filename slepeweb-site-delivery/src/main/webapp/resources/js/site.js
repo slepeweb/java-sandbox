@@ -80,7 +80,7 @@ $(function() {
 		_site.support.openEditor($(this).attr('title'));
 	})
 	
-	if (_site.isSecured) {
+	if (_site.isSecured && _site.userIsLoggedIn) {
 		window.setInterval(_site.support.checkSession, 60 * 1000)
 	}
 	

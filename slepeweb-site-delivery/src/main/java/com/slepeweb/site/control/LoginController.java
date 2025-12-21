@@ -40,7 +40,13 @@ public class LoginController extends BaseController {
 			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			HttpServletRequest req,
 			HttpServletResponse res,
-			ModelMap model) throws IOException {					
+			ModelMap model) throws IOException {
+		
+		// Deal with login attempts from some hackers who don't reveal the host making this request
+		if (StringUtils.isBlank(req.getHeader("Host"))) {
+			res.sendError(HttpServletResponse.SC_NO_CONTENT);
+			return null;
+		}
 		
 		String redirectPath = null;
 		
