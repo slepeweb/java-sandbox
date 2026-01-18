@@ -426,9 +426,9 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			params[index++] = to;
 		}		
 		
-		long sum = this.jdbcTemplate.queryForObject(sb.toString(), Long.class, params);
+		Long sum = this.jdbcTemplate.queryForObject(sb.toString(), Long.class, params);
 		Account a = this.accountService.get(accountId);
-		return a.getOpeningBalance() + sum;
+		return a.getOpeningBalance() + (sum == null ? 0 : sum.longValue());
 	}
 
 	public int delete(long id) {
