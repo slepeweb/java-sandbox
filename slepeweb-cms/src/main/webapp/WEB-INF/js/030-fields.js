@@ -219,6 +219,15 @@ _cms.field.onpageload = function() {
 			if (value === 'p') {
 				_cms.field.widefieldInsert('<p>$$$</p>')
 			}
+			else if (value === 'strong') {
+				_cms.field.widefieldInsert('<strong>$$$</strong>')
+			}
+			else if (value === 'i') {
+				_cms.field.widefieldInsert('<i>$$$</i>')
+			}
+			else if (value === 'u') {
+				_cms.field.widefieldInsert('<u>$$$</u>')
+			}
 			else if (value === 'br') {
 				_cms.field.widefieldInsert('<br />')
 			}
@@ -229,14 +238,13 @@ _cms.field.onpageload = function() {
 				_cms.field.widefieldInsert('<code>$$$</code>')
 			}
 			else if (value === 'ul') {
-				_cms.field.widefieldInsert(`<ul>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-</ul>`)
+				_cms.field.widefieldInsert('<ul><li></li></ul>')
+			}
+			else if (value === 'ol') {
+				_cms.field.widefieldInsert('<ol><li></li></ol>')
+			}
+			else if (value === 'li') {
+				_cms.field.widefieldInsert(`<li>$$$</li>`)
 			}
 			else if (value === 'h2') {
 				_cms.field.widefieldInsert('<h2>$$$</h2>')
@@ -256,6 +264,9 @@ _cms.field.onpageload = function() {
 			else if (value === 'link') {
 				_cms.field.widefieldInsert('<a href="/$_1234">$$$</a>')
 			}
+			else if (value === 'xlink') {
+				_cms.field.widefieldInsert('<a class="xlink" href="/$_1234">$$$</a>')
+			}
 			else if (value === 'ximg') {
 				_cms.field.widefieldInsert(`<div class="ximg" data-id="1234">Optional floated text</div>
 /* 
@@ -273,7 +284,14 @@ Optional class: border
 </table>`
 )
 			}
+			else if (value === 'tr') {
+				_cms.field.widefieldInsert('<tr><td></td></tr>')
+			}
 			
+			else if (value === 'td') {
+				_cms.field.widefieldInsert('<td>$$$</td>')
+			}
+
 			// Re-set the select element
 			option$.parent().val('')
 			
