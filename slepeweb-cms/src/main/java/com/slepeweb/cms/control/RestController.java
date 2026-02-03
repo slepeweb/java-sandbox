@@ -130,6 +130,7 @@ public class RestController extends BaseController {
 			
 			model.put("editingItem", i);
 			model.put("allVersions", i.getAllVersions());
+			model.addAttribute("availableTemplatesForSite", i.getSite().getAvailableTemplates(u));
 			model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId(), u));
 			
 			if (i.isProduct()) {

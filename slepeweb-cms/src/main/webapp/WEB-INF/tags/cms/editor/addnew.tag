@@ -36,7 +36,7 @@
 				<hr />
 
 				<%-- First display non-admin templates --%>
-				<c:forEach items="${availableTemplatesForType}" var="template">
+				<c:forEach items="${availableTemplatesForSite}" var="template">
 					<c:if test="${not template.admin}">
 						<option value="${template.id}"
 							<c:if test="${_stickyAddNewControls.lastTemplate eq template.id}">selected</c:if>
@@ -46,7 +46,7 @@
 
 				<%-- Then display templates only available to admin users --%>
 				<c:set var="adminTemplateOptions">
-					<c:forEach items="${availableTemplatesForType}" var="template">
+					<c:forEach items="${availableTemplatesForSite}" var="template">
 						<c:if test="${template.admin}">
 							<option value="${template.id}"
 								<c:if test="${_stickyAddNewControls.lastTemplate eq template.id}">selected</c:if>

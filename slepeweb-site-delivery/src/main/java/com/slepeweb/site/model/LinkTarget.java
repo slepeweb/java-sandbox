@@ -18,8 +18,17 @@ public class LinkTarget implements Serializable {
 	public LinkTarget() {}
 	
 	public LinkTarget(Item i) {
-		setTitle(StringUtils.isBlank(i.getFieldValue("navtitle")) ? 
-				i.getFieldValue("title") : i.getFieldValue("navtitle"));
+		String title = i.getFieldValue("navtitle");
+		
+		if (StringUtils.isBlank(title)) {
+			title = i.getFieldValue("title");
+		}
+
+		if (StringUtils.isBlank(title)) {
+			title = i.getName();
+		}
+
+		setTitle(title);
 		setTeaser(i.getFieldValue("teaser"));
 		setHref(i.getUrl());
 	}

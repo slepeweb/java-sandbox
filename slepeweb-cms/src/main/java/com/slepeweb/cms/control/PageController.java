@@ -84,7 +84,6 @@ public class PageController extends BaseController {
 		model.addAttribute("editingItem", i);
 		model.addAttribute("site", i.getSite());
 		model.addAttribute("rootItem", i.getSite().getItem("/"));
-		model.addAttribute("availableTemplatesForType", i.getSite().getAvailableTemplates(i.getType().getId(), getUser(req)));
 		
 		if (i.isProduct()) {
 			model.addAttribute("availableAxes", this.cmsService.getAxisService().get());
