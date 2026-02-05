@@ -98,7 +98,7 @@ public class AssetController extends BaseController {
 				}
 				
 				// Note that there could be more than one account that was closed in a given year
-				yearlyClosingBalance.put(closingYear, closingBalance + this.transactionService.getBalance(a.getId()));				
+				yearlyClosingBalance.put(closingYear, closingBalance + this.transactionService.calculateBalance(a.getId()));				
 			}
 			
 			if (openingYear < minYear) {

@@ -7,7 +7,16 @@ import com.slepeweb.common.bean.MoneyDashboard;
 import com.slepeweb.money.Util;
 
 public class Dashboard {
-	private List<DashboardAccountGroup> groups = new ArrayList<DashboardAccountGroup>();
+	private List<DashboardAccountGroup> groups;
+	
+	public Dashboard() {
+		this.groups = new ArrayList<DashboardAccountGroup>();
+		
+		String[] types = {"current", "credit", "service", "savings", "pension"};
+		for (String type : types) {
+			this.groups.add(new DashboardAccountGroup(type));
+		}
+	}
 	
 	public DashboardAccountGroup find(String type) {
 		for (DashboardAccountGroup g : this.groups) {

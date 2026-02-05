@@ -10,8 +10,6 @@ public class Account extends Payee {
 	private boolean closed;
 	private String note, type;
 	private long reconciled;
-	
-	// This field is not stored in the db - it is calculated by TransactionService
 	private long balance;
 	
 	public void assimilate(Object obj) {
@@ -19,6 +17,7 @@ public class Account extends Payee {
 			super.assimilate(obj);
 			
 			Account a = (Account) obj;
+			setBalance(a.getBalance()).
 			setOpeningBalance(a.getOpeningBalance()).
 			setClosed(a.isClosed()).
 			setNote(a.getNote()).
@@ -46,6 +45,7 @@ public class Account extends Payee {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + (int) (openingBalance ^ (openingBalance >>> 32));
+		result = prime * result + (int) (balance ^ (balance >>> 32));
 		result = prime * result + (closed ? 1231 : 1237);
 		result = prime * result + ((note == null) ? 0 : note.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -54,6 +54,10 @@ public class Account extends Payee {
 	}
 
 	private boolean accountEquals(Account a) {
+		if (balance != a.getBalance()) {
+			return false;
+		}
+		
 		if (closed != a.isClosed()) {
 			return false;
 		}
@@ -79,6 +83,11 @@ public class Account extends Payee {
 		}
 		
 		return true;
+	}
+	
+	public long credit(long amount) {
+		this.balance += amount;
+		return this.balance;
 	}
 	
 	public long getOpeningBalance() {
@@ -139,8 +148,9 @@ public class Account extends Payee {
 		return balance;
 	}
 
-	public void setBalance(long balance) {
+	public Account setBalance(long balance) {
 		this.balance = balance;
+		return this;
 	}
 
 	public String getType() {

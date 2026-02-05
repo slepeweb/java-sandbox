@@ -109,12 +109,11 @@ public class TransactionController extends BaseController {
 		Timestamp to = new Timestamp(monthEnd.getTimeInMillis());
 		
 		TransactionList tl = new TransactionList();
-		tl.setBalance(this.transactionService.getBalance(accountId));
 		List<Transaction> transactions = this.transactionService.getTransactionsForAccount(accountId, from, to);
 		int numTransactions = transactions.size();
 		tl.setRunningBalances(new RunningBalance[numTransactions]);
 		
-		long balanceEnd = this.transactionService.getBalance(accountId, to);
+		long balanceEnd = this.transactionService.calculateBalance(accountId, to);
 		long balance = balanceEnd;
 		Transaction t;
 		

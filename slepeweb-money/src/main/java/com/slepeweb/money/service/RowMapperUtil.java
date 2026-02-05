@@ -151,7 +151,8 @@ public class RowMapperUtil {
 			setOpeningBalance(rs.getLong("openingbalance")).
 			setClosed(rs.getBoolean("closed")).
 			setNote(rs.getString("note")).
-			setReconciled(rs.getLong(reconciled));
+			setReconciled(rs.getLong(reconciled)).
+			setBalance(rs.getLong("balance"));
 	}
 	
 	private static Category makeCategory(ResultSet rs) throws SQLException {

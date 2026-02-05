@@ -61,7 +61,7 @@ public class MoneyTransactionReporter {
 					
 					pw.write("\n");
 					pw.write(String.format("Balance for account '%s': %s\n", a.getName(), 
-							Util.formatPounds(a.getOpeningBalance() + transactionService.getBalance(id))));
+							Util.formatPounds(a.getOpeningBalance() + transactionService.calculateBalance(id))));
 					pw.write("==========================================================\n");
 					
 					balance = a.getOpeningBalance();

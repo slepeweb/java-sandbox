@@ -30,7 +30,7 @@ public class Transaction extends DbEntity {
 	private List<SplitTransaction> splits = new ArrayList<SplitTransaction>();
 	private Transaction previous;
 	
-	/* These properties iare NOT stored in the db */
+	/* These properties are NOT stored in the db */
 	private boolean provisionallyReconciled; /* true if reconciled before pausing the (reconciliation) process temporarily. */
 	private boolean partReconciled; /* true if this transaction, or its mirror (in the case of a transfer) has been reconciled. */
 	
@@ -51,13 +51,6 @@ public class Transaction extends DbEntity {
 		
 		assimilateSplits(source.getSplits());
 	}
-	
-//	public void assimilateSplits(Transaction source) {
-//		getSplits().clear();
-//		for (SplitTransaction st : source.getSplits()) {
-//			getSplits().add(st.setTransactionId(getId()));
-//		}
-//	}
 	
 	public void assimilateSplits(List<SplitTransaction> source) {
 		getSplits().clear();

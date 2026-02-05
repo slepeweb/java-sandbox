@@ -27,8 +27,8 @@ public interface TransactionService {
 	void updateTransfer(Long from, Long to) throws MissingDataException, DuplicateItemException;
 	void updateSplit(Transaction t);
 	void updateReconciled(long id);
-	long getBalance(long accountId);
-	long getBalance(long accountId, Timestamp to);
+	long calculateBalance(long accountId);
+	long calculateBalance(long accountId, Timestamp to);
 	long getNumTransactionsForAccount(long accountId);
 	long getNumTransactionsForPayee(long payeeId);
 	long getNumTransactionsForCategory(long categoryId);

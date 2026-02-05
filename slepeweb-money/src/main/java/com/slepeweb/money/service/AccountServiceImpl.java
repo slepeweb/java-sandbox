@@ -45,8 +45,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into account (origid, name, type, openingbalance, closed, note, reconciled) values (?, ?, ?, ?, ?, ?, ?)", 
-					a.getOrigId(), a.getName(), a.getType(), a.getOpeningBalance(), a.isClosed(), a.getNote(), a.getReconciled());
+					"insert into account (origid, name, type, openingbalance, closed, note, reconciled, balance) values (?, ?, ?, ?, ?, ?, ?, ?)", 
+					a.getOrigId(), a.getName(), a.getType(), a.getOpeningBalance(), a.isClosed(), a.getNote(), a.getReconciled(), a.getBalance());
 			
 			a.setId(getLastInsertId());	
 			
@@ -65,9 +65,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 			dbRecord.assimilate(a);
 			
 			this.jdbcTemplate.update(
-					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ?, reconciled = ? where id = ?", 
+					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ?, reconciled = ?, balance = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getType(), dbRecord.getOpeningBalance(), dbRecord.isClosed(), 
-					dbRecord.getNote(), dbRecord.getReconciled(), dbRecord.getId());
+					dbRecord.getNote(), dbRecord.getReconciled(), dbRecord.getBalance(), dbRecord.getId());
 			
 			if (nameChanged) {
 				// Update transaction documents in solr, which store account name, NOT id.
@@ -118,15 +118,11 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
 	}
 	
-	public List<Account> getAllWithBalances() {
-		String sql = "select * from account where closed=false order by type, name";
-		List<Account> accounts =  this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
-		
-		for (Account a : accounts ) {
-			a.setBalance(this.transactionService.getBalance(a.getId()));
+	public void resetBalances() throws MissingDataException, DuplicateItemException, DataInconsistencyException {
+		for (Account a : getAll(false) ) {
+			a.setBalance(this.transactionService.calculateBalance(a.getId()));
+			save(a);
 		}
-		
-		return accounts;
 	}
 	
 	public List<Account> getAssets() {
@@ -144,5 +140,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		}
 
 		return this.jdbcTemplate.update("delete from account where id = ?", id);
+	}
+	
+	public void updateBalance(Account a) {
+		this.jdbcTemplate.update("update account set balance = ? where id = ?", a.getBalance(), a.getId()); 
 	}
 }

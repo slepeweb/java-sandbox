@@ -36,7 +36,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	private static final String SELECT = 
 			"select " +
 					"a.id as accountid, a.origid as accountorigid, a.name as accountname, " +
-					"a.type as accounttype, a.openingbalance, a.closed, a.note, a.reconciled as accountreconciled, " + 
+					"a.type as accounttype, a.openingbalance, a.balance, a.closed, a.note, a.reconciled as accountreconciled, " + 
 					"p.id as payeeid, p.origid as payeeorigid, p.name as payeename, " + 
 					"c.id as categoryid, c.origid as categoryorigid, c.major, c.minor, c.expense, " + 
 					"t.id, t.origid, t.entered, t.memo, t.reference, t.amount, t.reconciled, " +
@@ -72,18 +72,31 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			List<SplitTransaction> revisedSplits = new ArrayList<SplitTransaction>(pt.getSplits());
 			
 			if (pt.isInDatabase()) {
-				Transaction dbRecord = get(pt.getId());	
+				// Update an existing transaction
+				Transaction dbRecord = get(pt.getId());
+				
+				// We also need a preserved copy of the original transaction
+				Transaction dbRecordSaved = get(pt.getId());
+				
 				if (dbRecord != null) {
+					// Beware - this next step assimilates pt into dbRecord, so dbRecord 
+					// no longer contains the original transaction data
 					t = update(dbRecord, pt);
+					
+					// Now, adjust balances according to the chnges to dbRecord
+					adjustBalancesForUpdatedTransactions(dbRecordSaved, dbRecord);
 				}
 				else {
 					throw new DataInconsistencyException(error(LOG, "Transaction does not exist in DB", pt));
 				}
 			}
 			else {
+				// Insert a new transaction
 				t = insert(pt);
+				t.getAccount().credit(t.getAmount());
+				this.accountService.updateBalance(t.getAccount());
 			}
-			
+
 			// Also save the new transaction's splits, if any
 			t.assimilateSplits(revisedSplits);
 			t = this.splitTransactionService.save(t);
@@ -116,6 +129,39 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			String t = "Transaction not saved - insufficient data";
 			LOG.error(compose(t, pt));
 			throw new MissingDataException(t);
+		}
+	}
+	
+	/*
+	 * We are now tracking account balances each time a transaction is inserted or updated.
+	 * When a transaction is updated, this might involve not only a change in the amount,
+	 * but also an account change, so transaction updates need to be handled separately.
+	 */
+	private void adjustBalancesForUpdatedTransactions(Transaction original, Transaction updated) {
+		long amountDelta = 0;
+		Account a = null;
+		
+		if (original.getAccount().getId() == updated.getAccount().getId()) {
+			// No change observed regarding the account
+			amountDelta = updated.getAmount() - original.getAmount();
+			
+			if (amountDelta > 0) {
+				a = updated.getAccount();
+				a.credit(amountDelta);
+				this.accountService.updateBalance(a);
+			}
+		}
+		else {
+			// The updated transaction relates to a different account!
+			// Adjust the original account's balance
+			a = original.getAccount();
+			a.credit(- original.getAmount());
+			this.accountService.updateBalance(a);
+
+			// Now adjust the update account's balance
+			a = updated.getAccount();
+			a.credit(updated.getAmount());
+			this.accountService.updateBalance(a);
 		}
 	}
 	
@@ -410,11 +456,11 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return list;
 	}
 	
-	public long getBalance(long accountId) {
-		return getBalance(accountId, null);
+	public long calculateBalance(long accountId) {
+		return calculateBalance(accountId, null);
 	}
 	
-	public long getBalance(long accountId, Timestamp to) {
+	public long calculateBalance(long accountId, Timestamp to) {
 		StringBuilder sb = new StringBuilder("select sum(amount) from transaction where accountid = ? ");
 		int arrlen = 1 + (to != null ? 1 : 0);
 		Object[] params = new Object[arrlen];
@@ -447,6 +493,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		num += this.jdbcTemplate.update("delete from transaction where id = ?", id);		
 		this.solrService4Money.removeTransactionsById(id);
+		
+		// Update account balance
+		Account a = t.getAccount();
+		a.credit(- t.getAmount());
+		this.accountService.updateBalance(a);
+		
 		return num;
 	}	
 }

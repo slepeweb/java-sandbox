@@ -40,10 +40,10 @@ public class PageController extends BaseController {
 		return "dashboard";
 	}
 	
-	private Dashboard buildDashboard() {
+	private Dashboard buildDashboard()  {
 		Dashboard dash = new Dashboard();
 		DashboardAccountGroup group;
-		List<Account> all = this.accountService.getAllWithBalances();
+		List<Account> all = this.accountService.getAll();
 		
 		for (Account a : all) {
 			// Not interested in 'other' accounts, ie not to be included in the summary or asset history

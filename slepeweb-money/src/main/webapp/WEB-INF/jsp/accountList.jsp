@@ -5,7 +5,10 @@
 <mny:standardLayout>
 
 	<mny:pageHeading heading="Accounts">
-		<a href="add" title="Create a new account">New account</a>
+		<ul>
+			<li><a href="add" title="Create a new account">New account</a></li>
+			<li><a href="balancer" title="Re-calculate balances for all open accounts">Reset balances</a></li>
+		</ul>
 	</mny:pageHeading>
 	
 	<p><strong>${fn:length(_openAccounts)} Open accounts, ${fn:length(_closedAccounts)} Closed accounts</strong></p>

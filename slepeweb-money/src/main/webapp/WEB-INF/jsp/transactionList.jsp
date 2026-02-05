@@ -31,7 +31,7 @@
 		</div>
 		
 		<div class="inline-block">
-			<p><strong>Today's balance: <span class="scale_3-2">${mon:displayAmountWS(_tl.balance)}</span></strong></p>
+			<p><strong>Today's balance: <span class="scale_3-2">${mon:displayAmountWS(_tl.account.balance)}</span></strong></p>
 		</div>
 	</div>
 	

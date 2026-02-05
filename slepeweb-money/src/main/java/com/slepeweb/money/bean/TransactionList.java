@@ -7,7 +7,6 @@ public class TransactionList {
 	private RunningBalance[] runningBalances;
 	private Timestamp periodStart, periodEnd;
 	private MonthPager pager;
-	private long balance;
 	
 	public Account getAccount() {
 		return account;
@@ -58,12 +57,4 @@ public class TransactionList {
 		// Use month and year of either start/end
 		return String.format("%1$tB %1$tY", getPeriodStart());
 	}
-
-	public long getBalance() {
-		return balance;
-	}
-
-	public void setBalance(long balance) {
-		this.balance = balance;
-	}	
 }

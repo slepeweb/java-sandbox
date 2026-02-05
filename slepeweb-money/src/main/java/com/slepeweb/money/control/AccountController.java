@@ -3,6 +3,7 @@ package com.slepeweb.money.control;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -23,6 +24,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/account")
 public class AccountController extends BaseController {
 	
+	private static Logger LOG = Logger.getLogger(AccountController.class);
+
 	@Autowired private AccountService accountService;
 	@Autowired private TransactionService transactionService;
 	
@@ -108,6 +111,31 @@ public class AccountController extends BaseController {
 		}
 		else {
 			flash = "failure|Failed to delete account - authorisation failure";		
+		}
+		
+		return new RedirectView(String.format("%s/account/list?flash=%s", 
+				req.getContextPath(), Util.encodeUrl(flash)));
+	}	
+
+	
+	@RequestMapping(value="/balancer", method=RequestMethod.GET)
+	public RedirectView balancer(HttpServletRequest req) {
+		
+		String flash = null;		
+		User u = getUser(req);
+		
+		if (! u.isAdmin()) {
+			flash = "failure|This is an admin function";
+		}
+		else {
+			try {
+				this.accountService.resetBalances();
+				flash="success|Account balances re-calculated";
+			}
+			catch (Exception e) {
+				flash = "failure|Failed to re-calculate account balances";
+				LOG.error(flash, e);
+			}
 		}
 		
 		return new RedirectView(String.format("%s/account/list?flash=%s", 
