@@ -8,6 +8,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
@@ -119,10 +120,24 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	}
 	
 	public void resetBalances() throws MissingDataException, DuplicateItemException, DataInconsistencyException {
+		long balanceWas, balanceNow;
+		int count = 0;
+		
 		for (Account a : getAll(false) ) {
-			a.setBalance(this.transactionService.calculateBalance(a.getId()));
-			save(a);
+			balanceWas = a.getBalance();
+			balanceNow = this.transactionService.calculateBalance(a.getId());
+			
+			if (balanceNow != balanceWas) {
+				a.setBalance(balanceNow);
+				save(a);
+				count += 1;
+				
+				LOG.warn(String.format("Balance for account %s was %s, and has been reset to %s", 
+						a.getName(), Util.formatPounds(balanceWas), Util.formatPounds(balanceNow)));
+			}
 		}
+		
+		LOG.info(String.format("%s account balances were reset", count));
 	}
 	
 	public List<Account> getAssets() {

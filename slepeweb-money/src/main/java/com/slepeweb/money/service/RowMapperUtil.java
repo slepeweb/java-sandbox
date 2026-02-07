@@ -187,7 +187,8 @@ public class RowMapperUtil {
 					setAccount(
 							new Account().
 							setId(rs.getLong("accountid")).
-							setName(rs.getString("accountname"))).
+							setName(rs.getString("accountname")).
+							setBalance(rs.getLong("balance"))).
 					setPayee(
 							new Payee().
 							setId(rs.getLong("payeeid")).

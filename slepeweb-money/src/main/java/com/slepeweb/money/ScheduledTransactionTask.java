@@ -35,7 +35,7 @@ public class ScheduledTransactionTask implements Job {
 		// getAll() does NOT retrieve splits. This is done seperately when we iterate over them later
 		List<ScheduledTransaction> all = scheduledTransactionService.getAll();
 		
-		LOG.info(String.format("There are %d scheduled transactions", all.size()));
+		LOG.debug(String.format("There are %d scheduled transactions", all.size()));
 		Calendar scheduled = Calendar.getInstance();
 		Calendar now = Calendar.getInstance();
 		Transaction t;
@@ -44,11 +44,11 @@ public class ScheduledTransactionTask implements Job {
 		
 		for (ScheduledTransaction scht : all) {
 			if (! scht.isEnabled()) {
-				LOG.info(String.format("Schedule [%s] is disabled", scht.getLabel()));
+				LOG.debug(String.format("Schedule [%s] is disabled", scht.getLabel()));
 				continue;
 			}
 			
-			LOG.info(String.format("Considering schedule [%s], due [%s] ... ", scht.getLabel(), scht.getNextDate().toLocalDateTime()));
+			LOG.debug(String.format("Considering schedule [%s], due [%s] ... ", scht.getLabel(), scht.getNextDate().toLocalDateTime()));
 			scheduled.setTime(scht.getNextDate());
 			createdTransaction = false;
 			
@@ -57,8 +57,6 @@ public class ScheduledTransactionTask implements Job {
 			t = Transaction.adapt(scht);
 			
 			if (scheduled.before(now)) {
-				LOG.info(String.format("... processing scheduled transaction [%s]", scht.getLabel()));
-
 				// Use scht properties to save a Transaction
 				t.setId(0);
 				t.setEntered(new Timestamp(now.getTimeInMillis()));
@@ -67,10 +65,11 @@ public class ScheduledTransactionTask implements Job {
 				try {
 					transactionService.save(t);
 					createdTransaction = true;
+					LOG.info(String.format("Processed scheduled transaction [%s]", scht.getLabel()));
 					count++;
 				}
 				catch (Exception e) {
-					LOG.error("Failed to save transaction", e);
+					LOG.error("Failed to process scheduled transaction", e);
 				}
 			}
 			
@@ -82,7 +81,7 @@ public class ScheduledTransactionTask implements Job {
 			}
 		}
 		
-		LOG.info(String.format("Created %d transactions", count));
+		LOG.info(String.format("Scheduler created %d transactions", count));
 	}
 	
 	private Calendar getNextDate(Calendar lastDate, String intervalStr) {

@@ -28,7 +28,7 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	
 	private static final String SELECT = 
 			"select " +
-					"a.id as accountid, a.name as accountname, " +
+					"a.id as accountid, a.name as accountname, a.balance, " +
 					"m.id as mirrorid, m.name as mirrorname, " +
 					"p.id as payeeid, p.name as payeename, " +
 					"c.id as categoryid, c.major, c.minor, " +
@@ -171,7 +171,10 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	public void updateNextDate(ScheduledTransaction t) {
 		this.jdbcTemplate.update("update scheduledtransaction set nextdate = ? where id = ?", 
 				t.getNextDate(), t.getId());
-		LOG.info(compose("Updated lastentered for scheduled transaction", t));
+		
+		// NOTE: t.toString() outputs the date the transaction was entered, NOT the scheduled date 
+		// of the next one. This causes confusion in the log.
+		LOG.debug(compose("Updated lastentered for scheduled transaction", t));
 	}
 
 }
