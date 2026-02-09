@@ -54,6 +54,7 @@ public class ScheduledTransactionTask implements Job {
 			
 			// Populate the splits
 			scht.setSplits(scheduledSplitService.get(scht.getId()));
+			
 			t = Transaction.adapt(scht);
 			
 			if (scheduled.before(now)) {

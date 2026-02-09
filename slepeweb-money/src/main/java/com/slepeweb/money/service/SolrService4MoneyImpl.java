@@ -292,13 +292,13 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			q.addSort("entered", SolrQuery.ORDER.desc);
 			q.setStart(params.getStart());
 			q.setRows(params.getPageSize());
-			LOG.info(String.format("Solr query: [%s]", q.getQuery()));				
+			LOG.debug(String.format("Solr query: [%s]", q.getQuery()));				
 
 			try {
 				QueryResponse qr = getClient().query(q);
 				response.setResults(qr.getBeans(FlatTransaction.class));
 				response.setTotalHits(qr.getResults().getNumFound());
-				LOG.info(String.format("Query returned %d results [%s]", response.getResults().size(),
+				LOG.debug(String.format("Query returned %d results [%s]", response.getResults().size(),
 						qr.getHeader().toString()));
 
 				response.setPager(new SolrPager<FlatTransaction>(response.getTotalHits(), response.getResults(),

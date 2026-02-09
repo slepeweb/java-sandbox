@@ -28,10 +28,12 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	
 	private static final String SELECT = 
 			"select " +
-					"a.id as accountid, a.name as accountname, a.balance, " +
-					"m.id as mirrorid, m.name as mirrorname, " +
-					"p.id as payeeid, p.name as payeename, " +
-					"c.id as categoryid, c.major, c.minor, " +
+					"a.id as accountid, a.origid as accountorigid, a.name as accountname, " +
+					"a.type as accounttype, a.openingbalance, a.balance as accountbalance, " +
+					"a.closed, a.note, a.reconciled as accountreconciled, " +
+					"m.id as mirrorid, m.name as mirrorname, m.balance as mirrorbalance, " +
+					"p.id as payeeid, p.origid as payeeorigid, p.name as payeename, " +
+					"c.id as categoryid, c.origid as categoryorigid, c.major, c.minor, c.expense, " +
 					"t.id, t.label, t.nextdate, t.period, " +
 					"t.memo, t.reference, t.amount, " +
 					"t.split, t.enabled " + FROM;

@@ -133,26 +133,30 @@ public class RowMapperUtil {
 	}
 	
 	private static Account makeAccount(ResultSet rs) throws SQLException {
-		return makeAccount(rs, "id", "origid", "name", "type", "reconciled");
+		return makeAccount(rs, "id", "origid", "name", "type", "reconciled", "balance");
 	}
 	
 	private static Account makeAccountX(ResultSet rs) throws SQLException {
-		return makeAccount(rs, "accountid", "accountorigid", "accountname", "accounttype", "accountreconciled");
+		return makeAccount(rs, "accountid", "accountorigid", "accountname", "accounttype", "accountreconciled", "accountbalance");
 	}
 	
 	private static Account makeAccount(ResultSet rs, String idStr, String origIdStr, 
-			String name, String type, String reconciled) throws SQLException {
+			String name, String type, String reconciled, String balance) throws SQLException {
 		
-		return new Account().
-			setId(rs.getLong(idStr)).
+		return makeAccountShell(rs, idStr, name, balance).
 			setOrigId(rs.getLong(origIdStr)).
-			setName(rs.getString(name)).
 			setType(rs.getString(type)).
+			setReconciled(rs.getLong(reconciled)).
 			setOpeningBalance(rs.getLong("openingbalance")).
 			setClosed(rs.getBoolean("closed")).
-			setNote(rs.getString("note")).
-			setReconciled(rs.getLong(reconciled)).
-			setBalance(rs.getLong("balance"));
+			setNote(rs.getString("note"));
+	}
+	
+	private static Account makeAccountShell(ResultSet rs, String idStr, String name, String balance) throws SQLException {
+		return new Account().
+				setId(rs.getLong(idStr)).
+				setName(rs.getString(name)).
+				setBalance(rs.getLong(balance));
 	}
 	
 	private static Category makeCategory(ResultSet rs) throws SQLException {
@@ -184,20 +188,9 @@ public class RowMapperUtil {
 					setEnabled(rs.getBoolean("enabled"));
 			
 			scht.
-					setAccount(
-							new Account().
-							setId(rs.getLong("accountid")).
-							setName(rs.getString("accountname")).
-							setBalance(rs.getLong("balance"))).
-					setPayee(
-							new Payee().
-							setId(rs.getLong("payeeid")).
-							setName(rs.getString("payeename"))).
-					setCategory(
-							new Category().
-							setId(rs.getLong("categoryid")).
-							setMajor(rs.getString("major")).
-							setMinor(rs.getString("minor"))).
+					setAccount(makeAccountShell(rs, "accountid", "accountname", "accountbalance")).
+					setPayee(makePayeeX(rs)).
+					setCategory(makeCategoryX(rs)).
 					setSplit(rs.getBoolean("split")).
 					setAmount(rs.getLong("amount")).
 					setReference(rs.getString("reference")).
@@ -206,10 +199,7 @@ public class RowMapperUtil {
 			
 			String mirrorName = rs.getString("mirrorname");
 			if (StringUtils.isNotBlank(mirrorName)) {
-				scht.setMirror(							
-						new Account().
-						setId(rs.getLong("mirrorid")).
-						setName(rs.getString("mirrorname")));
+				scht.setMirror(makeAccountShell(rs, "mirrorid", "mirrorname", "mirrorbalance"));						
 			}
 			
 			return scht;

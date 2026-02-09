@@ -62,6 +62,7 @@ public class ScheduledTransactionManager {
 	        map.put("categoryService", this.categoryService);
 	        JobDataMap params = new JobDataMap(map);
 
+	        // The scheduled task is defined in ScheduledTransactionTask.execute()
 	        JobDetail job = JobBuilder.newJob(ScheduledTransactionTask.class).
 	        		withIdentity(JOB_NAME, JOB_GROUP).
 	        		usingJobData(params).

@@ -49,7 +49,7 @@ public class Transfer extends Transaction {
 				this.mirrorAccount = t.getAccount();
 			}
 		}
-		return this.mirrorAccount == null ? new Account().setName("Uknown") : this.mirrorAccount;
+		return this.mirrorAccount == null ? new Account().setName("Unknown") : this.mirrorAccount;
 	}
 
 	public Transfer setMirrorAccount(Account mirrorAccount) {
