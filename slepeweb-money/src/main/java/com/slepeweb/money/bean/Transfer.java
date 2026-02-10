@@ -34,7 +34,7 @@ public class Transfer extends Transaction {
 		return doc.
 				setMajorCategory("Transfer").
 				setMinorCategory("").
-				setMemo(String.format("%s '%s'", isDebit() ? "To" : "From", getMirrorAccount().getName()));
+				setPayee(String.format("%s '%s'", isDebit() ? "To" : "From", getMirrorAccount().getName()));
 	}
 
 	public Transfer setTransactionService(TransactionService transactionService) {
