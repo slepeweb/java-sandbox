@@ -30,7 +30,7 @@ public class LoginServiceImpl implements LoginService {
 	
 	public LoginSupport login(String alias, String password, boolean asContentEditor, HttpServletRequest req) {
 		
-		LoginSupport supp = new LoginSupport().setRequest(req).setAlias(alias).setPassword(password).setIp("999.1.2.9");
+		LoginSupport supp = new LoginSupport().setRequest(req).setAlias(alias).setPassword(password);
 		
 		// Don't send an email if EITHER alias or password field is blank
 		if (StringUtils.isBlank(alias) || StringUtils.isBlank(password)) {
