@@ -1,10 +1,13 @@
 package com.slepeweb.cms.bean;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 public class LoginSupport {
 
 	private User user;
 	private boolean success, sendmailFlag;
-	private String alias, password, userMessage, emailMessage;
+	private String alias, password, userMessage, emailMessage, ip;
+	private HttpServletRequest request;
 	
 	public User getUser() {
 		return user;
@@ -69,4 +72,22 @@ public class LoginSupport {
 		return this;
 	}
 
+	public HttpServletRequest getRequest() {
+		return request;
+	}
+
+	public LoginSupport setRequest(HttpServletRequest request) {
+		this.request = request;
+		this.ip = request.getHeader("X-Forwarded-For");
+		return this;
+	}
+
+	public LoginSupport setIp(String ip) {
+		this.ip = ip;
+		return this;
+	}
+
+	public String getIp() {
+		return this.ip;
+	}
 }

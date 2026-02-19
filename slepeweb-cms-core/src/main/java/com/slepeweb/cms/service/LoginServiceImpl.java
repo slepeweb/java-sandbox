@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.component.LoginMonitor;
+import com.slepeweb.cms.component.LoginMonitor.LoginFailure;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.common.service.SendMailService;
 
@@ -20,6 +22,7 @@ public class LoginServiceImpl implements LoginService {
 	
 	@Autowired private UserService userService;
 	@Autowired private SendMailService sendMailService;
+	@Autowired private LoginMonitor loginMonitor;
 	
 	public LoginSupport login(String alias, String password, HttpServletRequest req) {
 		return login(alias, password, false, req);
@@ -27,68 +30,71 @@ public class LoginServiceImpl implements LoginService {
 	
 	public LoginSupport login(String alias, String password, boolean asContentEditor, HttpServletRequest req) {
 		
-		LoginSupport supp = new LoginSupport().setAlias(alias).setPassword(password);
-		String userMsg = "";
+		LoginSupport supp = new LoginSupport().setRequest(req).setAlias(alias).setPassword(password).setIp("999.1.2.9");
 		
-		if (StringUtils.isNotBlank(alias) && StringUtils.isNotBlank(password)) {
-			// Look for secret flag
-			if (StringUtils.contains(password, "^")) {
-				password = StringUtils.replace(password, "^", "");
-			}
-			else {
-				supp.setSendmailFlag(true);
-			}
-			
-			User u = this.userService.get(alias);
-			
-			if (u != null) {
-				supp.setUser(u);
-				
-				if (asContentEditor && ! u.isEditor()) {
-					LOG.info(userMsg = String.format("'%s' does not have permission to use the content editor", alias));
-				}
-				else if (u.getPassword() != null) {
-					StandardPasswordEncoder encoder = new StandardPasswordEncoder();					
-					if (encoder.matches(password, u.getPassword())) {
-						if (u.isEnabled()) {
-							supp.setSuccess(true);
-							req.getSession().setAttribute(AttrName.USER, supp.getUser().setLoggedIn(true));	
-							LOG.info(String.format("Successful login [%s], session %s, for site %s", alias, 
-									req.getSession().getId(), req.getAttribute(AttrName.SITE)));
-						}
-						else {
-							userMsg = "The user account is disabled right now.";
-							LOG.info(String.format("Failed attempt to login to disabled account [%s]", alias));
-						}
-					}
-					else {
-						userMsg = "Invalid account details!";
-						LOG.info(String.format("Failed login [%s]/[%s]", alias, password));
-					}
-				}
-				else {
-					userMsg = "Account availability error!";
-					LOG.warn(String.format("Account setup not complete [%s]", u));
-				}
-			}
-			else {
-				userMsg = "Invalid username and/or password!";
-				LOG.info(String.format("Failed login [%s]/[%s]", alias, password));
-			}
-		}
-		else {
-			userMsg = "All form fields must be populated!";
-			// Don't send an email if BOTH fields are blank
+		// Don't send an email if EITHER alias or password field is blank
+		if (StringUtils.isBlank(alias) || StringUtils.isBlank(password)) {
 			supp.setSendmailFlag(! (StringUtils.isBlank(alias) && StringUtils.isBlank(password)));
 			LOG.warn("Form data incomplete");
+			return communicateResult(supp, "All form fields must be populated!");
 		}
 		
+		// Look for secret flag that prohibits emails being sent
+		if (StringUtils.contains(password, "^")) {
+			password = StringUtils.replace(password, "^", "");
+		}
+		else {
+			supp.setSendmailFlag(true);
+		}
+		
+		// Check user exists in the database
+		User u = this.userService.get(alias);		
+		if (u == null) {
+			return communicateResult(supp, "Invalid username and/or password!", 
+					String.format("Failed login [%s]/[%s]", alias, password));
+		}
+		
+		supp.setUser(u);
+		
+		// Check content-editor privelege is granted for content editing app
+		if (asContentEditor && ! u.isEditor()) {
+			return communicateResult(supp, String.format("'%s' does not have permission to use the content editor", alias));
+		}
+		
+		// Check supplied password against database record 
+		StandardPasswordEncoder encoder = new StandardPasswordEncoder();					
+		if (! encoder.matches(password, u.getPassword())) {
+			// Failed login request - inform monitor
+			this.loginMonitor.add(supp.getIp());
+			
+			return communicateResult(supp, "Invalid account details!", 
+					String.format("Failed login [%s]/[%s]", alias, password));
+		}
+		
+		if (u.isEnabled()) {
+			supp.setSuccess(true);
+			req.getSession().setAttribute(AttrName.USER, supp.getUser().setLoggedIn(true));	
+			return communicateResult(supp, String.format("Successful login [%s], session %s, for site %s", alias, 
+					req.getSession().getId(), req.getAttribute(AttrName.SITE)));
+		}
+		else {
+			return communicateResult(supp, "The user account is disabled right now.", 
+					String.format("Failed attempt to login to disabled account [%s]", alias));
+		}
+	}
+	
+	private LoginSupport communicateResult(LoginSupport supp, String userMsg) {
+		return communicateResult(supp, userMsg, userMsg);
+	}
+	
+	private LoginSupport communicateResult(LoginSupport supp, String userMsg, String logMsg) {
+		LOG.info(String.format("%s - (%s)", logMsg, supp.getIp()));
 		supp.setUserMessage(userMsg);
 		
 		if (! supp.isSuccess()) {
-			supp.setEmailMessage(getEmailMessage(req, userMsg));
+			this.loginMonitor.add(supp.getIp());
 		}
-		
+
 		/* 
 		 * Note that an email IS sent 
 		 * a) on successful login, if the user doesn't know about the 'back door', or
@@ -99,7 +105,9 @@ public class LoginServiceImpl implements LoginService {
 		return supp;
 	}
 	
-	private String getEmailMessage(HttpServletRequest req, String userMsg) {
+	private String composeEmailMessage(LoginSupport supp) {
+		HttpServletRequest req = supp.getRequest();
+		String userMsg = supp.getUserMessage();
 		String servletPath = req.getServletPath();
 		servletPath = (servletPath == null) ? "" : servletPath;
 		String pathInfo = req.getPathInfo();
@@ -145,7 +153,16 @@ public class LoginServiceImpl implements LoginService {
 		String to = "george@buttigieg.org.uk";
 		String name = "George Buttigieg";
 		
-		if (! supp.isSuccess() || supp.isSendmailFlag()) {
+		LoginFailure f = this.loginMonitor.get(supp.getIp());
+		
+		/*
+		 * Proceed to send email IFF
+		 * a) either login failed OR login did not go through backdoor
+		 *    AND
+		 * b) either no login failures registered for this ip OR it's the first one
+		 */
+		if ((! supp.isSuccess() || supp.isSendmailFlag()) && (f == null || f.getCount() == 1)) {
+			supp.setEmailMessage(composeEmailMessage(supp));
 			String msg = supp.getUserMessage() != null ?  supp.getUserMessage() : ""; 
 			this.sendMailService.sendMail(from, to, name, "CMS login: " + msg, supp.getEmailMessage());
 		}		

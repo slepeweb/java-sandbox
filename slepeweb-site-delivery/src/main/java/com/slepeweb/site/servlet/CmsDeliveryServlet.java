@@ -20,6 +20,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
+import com.slepeweb.cms.component.LoginMonitor;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.SiteConfigKey;
@@ -44,6 +45,7 @@ public class CmsDeliveryServlet {
 	@Autowired private ItemService itemService;
 	@Autowired private SiteConfigCache siteConfigCache;
 	@Autowired private SiteCookieService siteCookieService;
+	@Autowired private LoginMonitor loginMonitor;
 
 	private Item identifyItem(HttpServletRequest req) {
 		Item i = null;
@@ -109,7 +111,7 @@ public class CmsDeliveryServlet {
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
-		Item item = identifyItem(req);		
+		Item item = identifyItem(req);
 		if (item == null) {
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -122,6 +124,26 @@ public class CmsDeliveryServlet {
 			return;
 		}
 
+		// Check whether this request has been forwarded correctly by apache AND is
+		// not party to excessive failed login attaempts
+		if (item.getCmsService().isProductionDeployment() && item.getSite().isSecured()) {
+			// Identify ip
+			String ip = req.getHeader("X-Forwarded-For");
+			
+			if (ip == null) {
+				res.sendError(HttpServletResponse.SC_FORBIDDEN);
+				LOG.warn("Request does not reveal IP - forbidden");
+				return;
+			}
+			
+			// Check offenders
+			if (this.loginMonitor.isProblem(ip)) {
+				res.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE);
+				LOG.warn(String.format("Suspected probing request [%s] - not acceptable", ip));
+				return;
+			}
+		}
+		
 		/*
 		 * If this is a request for a page using a minipath, and the item in question belongs to the same site as
 		 * indicated by the hostname for this request, then redirect the request so that,
