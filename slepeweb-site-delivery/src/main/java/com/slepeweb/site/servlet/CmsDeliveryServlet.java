@@ -131,7 +131,7 @@ public class CmsDeliveryServlet {
 		}
 		
 		// Filter out dodgy requests, typically from hackers probing weaknesses
-		//if (this.cmsService.isProductionDeployment()) {
+		if (this.cmsService.isProductionDeployment()) {
 			/* 
 			 * Check whether this request has been forwarded correctly by Apache (in the
 			 * production environment) AND is not the subject of excessive login failures.
@@ -139,8 +139,8 @@ public class CmsDeliveryServlet {
 			 * identifying the IP address of the client.
 			 */
 			if (ipAddress == null) {
-				res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-				LOG.warn("Request does not reveal IP - 400 response (SC_BAD_REQUEST)");
+				res.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+				LOG.warn("Request does not reveal IP - 503 response (SC_SERVICE_UNAVAILABLE)");
 				return;
 			}
 			
@@ -151,11 +151,11 @@ public class CmsDeliveryServlet {
 			 * 
 			 */
 			if (this.badActorMonitor.isBad(ipAddress)) {
-				res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-				LOG.warn(String.format("Possible rogue actor [%s] - 400 response (SC_BAD_REQUEST)", ipAddress));
+				res.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+				LOG.warn(String.format("Possible rogue actor [%s] - 503 response (SC_SERVICE_UNAVAILABLE)", ipAddress));
 				return;
 			}
-		//}
+		}
 		
 		// Every request received should identify an item in the CMS, excepting favicon.ico!
 		Item item = identifyItem(req);
