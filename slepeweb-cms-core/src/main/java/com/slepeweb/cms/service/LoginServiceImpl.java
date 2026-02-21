@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.User;
-import com.slepeweb.cms.component.LoginMonitor;
-import com.slepeweb.cms.component.LoginMonitor.LoginFailure;
+import com.slepeweb.cms.component.BadActorMonitor;
+import com.slepeweb.cms.component.BadActorMonitor.BadActorRecord;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.common.service.SendMailService;
 
@@ -22,7 +22,7 @@ public class LoginServiceImpl implements LoginService {
 	
 	@Autowired private UserService userService;
 	@Autowired private SendMailService sendMailService;
-	@Autowired private LoginMonitor loginMonitor;
+	@Autowired private BadActorMonitor badActorMonitor;
 	
 	public LoginSupport login(String alias, String password, HttpServletRequest req) {
 		return login(alias, password, false, req);
@@ -65,8 +65,6 @@ public class LoginServiceImpl implements LoginService {
 		StandardPasswordEncoder encoder = new StandardPasswordEncoder();					
 		if (! encoder.matches(password, u.getPassword())) {
 			// Failed login request - inform monitor
-			this.loginMonitor.add(supp.getIp());
-			
 			return communicateResult(supp, "Invalid account details!", 
 					String.format("Failed login [%s]/[%s]", alias, password));
 		}
@@ -91,10 +89,6 @@ public class LoginServiceImpl implements LoginService {
 		LOG.info(String.format("%s - (%s)", logMsg, supp.getIp()));
 		supp.setUserMessage(userMsg);
 		
-		if (! supp.isSuccess()) {
-			this.loginMonitor.add(supp.getIp());
-		}
-
 		/* 
 		 * Note that an email IS sent 
 		 * a) on successful login, if the user doesn't know about the 'back door', or
@@ -153,7 +147,7 @@ public class LoginServiceImpl implements LoginService {
 		String to = "george@buttigieg.org.uk";
 		String name = "George Buttigieg";
 		
-		LoginFailure f = this.loginMonitor.get(supp.getIp());
+		BadActorRecord rec = this.badActorMonitor.getRecord(supp.getIp());
 		
 		/*
 		 * Proceed to send email IFF
@@ -161,7 +155,7 @@ public class LoginServiceImpl implements LoginService {
 		 *    AND
 		 * b) either no login failures registered for this ip OR it's the first one
 		 */
-		if ((! supp.isSuccess() || supp.isSendmailFlag()) && (f == null || f.getCount() == 1)) {
+		if ((! supp.isSuccess() || supp.isSendmailFlag()) && (rec == null || rec.getCount() == 1)) {
 			supp.setEmailMessage(composeEmailMessage(supp));
 			String msg = supp.getUserMessage() != null ?  supp.getUserMessage() : ""; 
 			this.sendMailService.sendMail(from, to, name, "CMS login: " + msg, supp.getEmailMessage());

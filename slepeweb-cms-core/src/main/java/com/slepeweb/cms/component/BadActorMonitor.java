@@ -7,21 +7,21 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LoginMonitor {
+public class BadActorMonitor {
 	
 	private static long CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
-	private Map<String, LoginFailure> failures = new HashMap<String, LoginFailure>();
+	private Map<String, BadActorRecord> failures = new HashMap<String, BadActorRecord>();
 	private long lastCleanup = System.currentTimeMillis();
 	
-	public LoginFailure get(String ip) {
+	public BadActorRecord getRecord(String ip) {
 		return this.failures.get(ip);
 	}
 	
-	public void add(String ip) {
+	public void registerFailure(String ip) {
 		if (ip != null) {
-			LoginFailure f = get(ip);
+			BadActorRecord f = getRecord(ip);
 			if (f == null) {
-				f = new LoginFailure(ip, System.currentTimeMillis());
+				f = new BadActorRecord(ip, System.currentTimeMillis());
 				this.failures.put(ip, f);
 			}
 			
@@ -29,12 +29,12 @@ public class LoginMonitor {
 		}
 	}
 	
-	public boolean isProblem(String ip) {
+	public boolean isBad(String ip) {
 		// Remove any stale entries
 		cleanupIf();
 		
 		// Test whether this IP has an failure record with too many counts
-		LoginFailure f = get(ip);
+		BadActorRecord f = getRecord(ip);
 		return f != null && f.isTooMany();
 	}
 	
@@ -44,9 +44,9 @@ public class LoginMonitor {
 			return 0;
 		}
 		
-		Iterator<LoginFailure> iter = this.failures.values().iterator();
+		Iterator<BadActorRecord> iter = this.failures.values().iterator();
 		int count = 0;
-		LoginFailure f;
+		BadActorRecord f;
 		
 		while (iter.hasNext()) {
 			f = iter.next();
@@ -59,18 +59,17 @@ public class LoginMonitor {
 		this.lastCleanup = System.currentTimeMillis();
 		return count;
 	}
-	
-	
-	public static class LoginFailure {
 
-		private static final int MAX_COUNT = 3;
+	public static class BadActorRecord {
+			
+		private static final int MAX_FAILURES = 4;
 		private static final int RESET_INTERVAL = 10 * 60 * 1000; // 10 minutes in milliseconds
 		
 		private String ip;
 		private long when;
 		private int count = 0;
 		
-		public LoginFailure(String ip, long when) {
+		public BadActorRecord(String ip, long when) {
 			this.ip = ip;
 			this.when = when;
 		}
@@ -96,8 +95,9 @@ public class LoginMonitor {
 		}
 		
 		public boolean isTooMany() {
-			return this.count >= MAX_COUNT;
+			return this.count >= MAX_FAILURES;
 		}
 
 	}
+
 }

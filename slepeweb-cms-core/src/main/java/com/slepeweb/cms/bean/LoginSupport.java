@@ -1,5 +1,7 @@
 package com.slepeweb.cms.bean;
 
+import com.slepeweb.common.util.HttpUtil;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 public class LoginSupport {
@@ -78,7 +80,7 @@ public class LoginSupport {
 
 	public LoginSupport setRequest(HttpServletRequest request) {
 		this.request = request;
-		this.ip = request.getHeader("X-Forwarded-For");
+		this.ip = HttpUtil.getForwardedIp(request);
 		return this;
 	}
 

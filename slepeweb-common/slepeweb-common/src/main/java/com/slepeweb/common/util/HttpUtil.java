@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class HttpUtil {
@@ -98,4 +99,8 @@ public class HttpUtil {
 		return s;
 	}
 
+	public static String getForwardedIp(HttpServletRequest req) {
+		//return req.getHeader("X-Forwarded-For");
+		return "999.1.2.9";
+	}
 }

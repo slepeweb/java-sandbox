@@ -20,7 +20,7 @@ import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
-import com.slepeweb.cms.component.LoginMonitor;
+import com.slepeweb.cms.component.BadActorMonitor;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.SiteConfigKey;
@@ -45,8 +45,12 @@ public class CmsDeliveryServlet {
 	@Autowired private ItemService itemService;
 	@Autowired private SiteConfigCache siteConfigCache;
 	@Autowired private SiteCookieService siteCookieService;
-	@Autowired private LoginMonitor loginMonitor;
+	@Autowired private BadActorMonitor badActorMonitor;
 
+	private boolean isFaviconPath(String s) {
+		return s != null && s.equals("/favicon.ico");
+	}
+	
 	private Item identifyItem(HttpServletRequest req) {
 		Item i = null;
 		String language = null;
@@ -54,10 +58,6 @@ public class CmsDeliveryServlet {
 		RequestPack r = new RequestPack(req);
 		r.setSite(getSite(req));
 		
-		if (path.equals("/favicon.ico")) {
-			return null;
-		}
-
 		/*
 		 *  PATH_PATTERN_A is used in requests for items by their origid, in the form of a 'minipath',
 		 *  such as '/$_4023'. This is particularly useful when the item belongs to a 'foreign' site, 
@@ -105,45 +105,76 @@ public class CmsDeliveryServlet {
 		return String.format("/%s%s", i.getLanguage(), path);
 	}
 	
+	private boolean isBlacklisted(HttpServletRequest req) {
+		if (isFaviconPath(getItemPath(req))) {
+			return true;
+		}
+		
+		if (req.getServerName().equals("localhost")) {
+			return true;
+		}
+
+		return false;
+	}
+	
 	public void doPost(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		doGet(req, res, model);
 	}
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res, ModelMap model) throws Exception {
 		
+		String ipAddress = HttpUtil.getForwardedIp(req);
+		
+		// Filter out blacklisted urls
+		if (isBlacklisted(req)) {
+			return;
+		}
+		
+		// Filter out dodgy requests, typically from hackers probing weaknesses
+		//if (this.cmsService.isProductionDeployment()) {
+			/* 
+			 * Check whether this request has been forwarded correctly by Apache (in the
+			 * production environment) AND is not the subject of excessive login failures.
+			 * While proxying https requests to CMS, Apache is configured to add this header,
+			 * identifying the IP address of the client.
+			 */
+			if (ipAddress == null) {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				LOG.warn("Request does not reveal IP - 400 response (SC_BAD_REQUEST)");
+				return;
+			}
+			
+			/* 
+			 * Check request is not from a rogue actor. These are users who have either 
+			 * a) repeatedly failed to login to secured sites, or
+			 * b) requested invalid item paths, typically when probing urls
+			 * 
+			 */
+			if (this.badActorMonitor.isBad(ipAddress)) {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				LOG.warn(String.format("Possible rogue actor [%s] - 400 response (SC_BAD_REQUEST)", ipAddress));
+				return;
+			}
+		//}
+		
+		// Every request received should identify an item in the CMS, excepting favicon.ico!
 		Item item = identifyItem(req);
 		if (item == null) {
-			res.sendError(HttpServletResponse.SC_NOT_FOUND);
+			if (! isFaviconPath(getItemPath(req))) {
+				this.badActorMonitor.registerFailure(ipAddress);
+				res.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}
 			return;
 		}
 		
 		// identifyItem() will have assigned a RequestPack to item
 		RequestPack r = item.getRequestPack();
 		if (r.getSite() == null) {
+			this.badActorMonitor.registerFailure(ipAddress);
 			res.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
-		// Check whether this request has been forwarded correctly by apache AND is
-		// not party to excessive failed login attaempts
-		if (item.getCmsService().isProductionDeployment() && item.getSite().isSecured()) {
-			// Identify ip
-			String ip = req.getHeader("X-Forwarded-For");
-			
-			if (ip == null) {
-				res.sendError(HttpServletResponse.SC_FORBIDDEN);
-				LOG.warn("Request does not reveal IP - forbidden");
-				return;
-			}
-			
-			// Check offenders
-			if (this.loginMonitor.isProblem(ip)) {
-				res.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE);
-				LOG.warn(String.format("Suspected probing request [%s] - not acceptable", ip));
-				return;
-			}
-		}
-		
 		/*
 		 * If this is a request for a page using a minipath, and the item in question belongs to the same site as
 		 * indicated by the hostname for this request, then redirect the request so that,

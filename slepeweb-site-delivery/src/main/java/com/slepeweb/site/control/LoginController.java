@@ -15,6 +15,7 @@ import com.slepeweb.cms.bean.LoginSupport;
 import com.slepeweb.cms.bean.QandAList;
 import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.User;
+import com.slepeweb.cms.component.BadActorMonitor;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.SiteConfigKey;
 import com.slepeweb.cms.service.LoginService;
@@ -33,6 +34,7 @@ public class LoginController extends BaseController {
 	@Autowired private LoginService loginService;
 	@Autowired private SiteConfigCache siteConfigCache;
 	@Autowired private QandAService qandAService;
+	@Autowired private BadActorMonitor badActorMonitor;
 	
 	@RequestMapping(value="/login")
 	public String login (
@@ -42,14 +44,8 @@ public class LoginController extends BaseController {
 			HttpServletResponse res,
 			ModelMap model) throws IOException {
 		
-		// Deal with login attempts from some hackers who don't reveal the host making this request
-		if (StringUtils.isBlank(req.getHeader("Host"))) {
-			res.sendError(HttpServletResponse.SC_NO_CONTENT);
-			return null;
-		}
-		
 		String redirectPath = null;
-		
+				
 		if (req.getMethod().equalsIgnoreCase("post")) {
 			String alias = req.getParameter("alias");
 			StringBuffer msg = new StringBuffer(String.format("User '%s' logging in ... ", alias));
@@ -67,6 +63,7 @@ public class LoginController extends BaseController {
 				res.sendRedirect(path);
 			}
 			else {
+				this.badActorMonitor.registerFailure(supp.getIp());				
 				model.addAttribute("error", supp.getUserMessage());
 				msg.append("FAILED: " + supp.getUserMessage());
 			}
