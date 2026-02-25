@@ -100,7 +100,16 @@ public class HttpUtil {
 	}
 
 	public static String getForwardedIp(HttpServletRequest req) {
-		return req.getHeader("X-Forwarded-For");
-		//return "999.1.2.9";
+		String ip = req.getHeader("X-Forwarded-For");
+		
+		if (ip == null) {
+			ip = req.getRemoteAddr();
+		}
+		
+		if (ip == null) {
+			ip = "999.1.2.9";
+		}
+		
+		return ip;
 	}
 }

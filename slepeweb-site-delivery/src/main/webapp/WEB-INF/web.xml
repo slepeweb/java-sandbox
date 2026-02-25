@@ -68,10 +68,10 @@
     <url-pattern>/resources/*</url-pattern>
   </servlet-mapping>
   
-  <error-page>
-  	<error-code>404</error-code>
-  	<location>/$_4365</location>
-  </error-page>
+<!--   <error-page> -->
+<!--   	<error-code>404</error-code> -->
+<!--   	<location>/$_4365</location> -->
+<!--   </error-page> -->
   
   <!-- 
   <error-page>

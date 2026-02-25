@@ -20,7 +20,14 @@ public class RequestPack {
 	private Map<String, String[]> params = new HashMap<String, String[]>();
 	private boolean miniPath;
 	private String view;
-		
+	
+	/*
+	 *  Multilingulal sites have url's the begin with the 2-character country code, 
+	 *  eg. /gr/item/path. In this example, the requestPath would be '/gr/item/path',
+	 *  the country code would be 'gr', and the itemPath would be '/item/path'.
+	 */
+	private String itemPath, requestPath;
+	
 	public RequestPack(User u) {
 		this.user = u;
 	}
@@ -114,6 +121,24 @@ public class RequestPack {
 
 	public RequestPack setSite(Site site) {
 		this.site = site;
+		return this;
+	}
+
+	public String getItemPath() {
+		return itemPath;
+	}
+
+	public RequestPack setItemPath(String path) {
+		this.itemPath = path;
+		return this;
+	}
+
+	public String getRequestPath() {
+		return requestPath;
+	}
+
+	public RequestPack setRequestPath(String requestPath) {
+		this.requestPath = requestPath;
 		return this;
 	}
 

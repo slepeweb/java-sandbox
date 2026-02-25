@@ -1,5 +1,6 @@
 package com.slepeweb.cms.bean;
 
+import com.slepeweb.cms.component.BadActorMonitor.BadActorRecord;
 import com.slepeweb.common.util.HttpUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ public class LoginSupport {
 	private boolean success, sendmailFlag;
 	private String alias, password, userMessage, emailMessage, ip;
 	private HttpServletRequest request;
+	private BadActorRecord badActor;
 	
 	public User getUser() {
 		return user;
@@ -91,5 +93,14 @@ public class LoginSupport {
 
 	public String getIp() {
 		return this.ip;
+	}
+
+	public BadActorRecord getBadActor() {
+		return badActor;
+	}
+
+	public LoginSupport setBadActor(BadActorRecord badActor) {
+		this.badActor = badActor;
+		return this;
 	}
 }

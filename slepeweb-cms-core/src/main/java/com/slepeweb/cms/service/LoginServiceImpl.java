@@ -87,8 +87,19 @@ public class LoginServiceImpl implements LoginService {
 	
 	private LoginSupport communicateResult(LoginSupport supp, String userMsg, String logMsg) {
 		LOG.info(String.format("%s - (%s)", logMsg, supp.getIp()));
-		supp.setUserMessage(userMsg);
+		supp.setUserMessage("CMS login failure: " + (userMsg == null ? "" : userMsg));
 		
+		// Before deciding to send an email, update the bad actor register if necessary
+		if (! supp.isSuccess() && supp.getIp() != null) {
+			BadActorRecord rec = this.badActorMonitor.registerLoginFailure(supp.getIp());
+			
+			String msg = String.format("%s - %d attempts remaining", supp.getUserMessage(),
+					BadActorRecord.MAX_LOGIN_FAILURES - rec.getCounters()[0]);
+
+			supp.setUserMessage(msg);
+			supp.setBadActor(rec);	
+		}
+
 		/* 
 		 * Note that an email IS sent 
 		 * a) on successful login, if the user doesn't know about the 'back door', or
@@ -147,7 +158,7 @@ public class LoginServiceImpl implements LoginService {
 		String to = "george@buttigieg.org.uk";
 		String name = "George Buttigieg";
 		
-		BadActorRecord rec = this.badActorMonitor.getRecord(supp.getIp());
+		BadActorRecord rec = supp.getBadActor();
 		
 		/*
 		 * Proceed to send email IFF
@@ -155,10 +166,9 @@ public class LoginServiceImpl implements LoginService {
 		 *    AND
 		 * b) either no login failures registered for this ip OR it's the first one
 		 */
-		if ((! supp.isSuccess() || supp.isSendmailFlag()) && (rec == null || rec.getCount() == 1)) {
+		if ((! supp.isSuccess() || supp.isSendmailFlag()) && (rec == null || rec.getCounters()[0] == 1)) {
 			supp.setEmailMessage(composeEmailMessage(supp));
-			String msg = supp.getUserMessage() != null ?  supp.getUserMessage() : ""; 
-			this.sendMailService.sendMail(from, to, name, "CMS login: " + msg, supp.getEmailMessage());
+			this.sendMailService.sendMail(from, to, name, supp.getUserMessage(), supp.getEmailMessage());
 		}		
 	}
 

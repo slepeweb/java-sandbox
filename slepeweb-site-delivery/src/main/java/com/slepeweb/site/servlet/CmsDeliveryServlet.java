@@ -1,5 +1,6 @@
 package com.slepeweb.site.servlet;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -21,6 +22,7 @@ import com.slepeweb.cms.bean.SiteConfigCache;
 import com.slepeweb.cms.bean.StringWrapper;
 import com.slepeweb.cms.bean.Template;
 import com.slepeweb.cms.component.BadActorMonitor;
+import com.slepeweb.cms.component.BadActorMonitor.BadActorRecord;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.SiteConfigKey;
@@ -51,12 +53,12 @@ public class CmsDeliveryServlet {
 		return s != null && s.equals("/favicon.ico");
 	}
 	
-	private Item identifyItem(HttpServletRequest req) {
+	private Item identifyItem(RequestPack r) {
 		Item i = null;
 		String language = null;
-		String path = getItemPath(req);
-		RequestPack r = new RequestPack(req);
-		r.setSite(getSite(req));
+		Site site = r.getSite();
+		String requestPath = getRequestPath(r.getHttpRequest());
+		r.setRequestPath(requestPath);	
 		
 		/*
 		 *  PATH_PATTERN_A is used in requests for items by their origid, in the form of a 'minipath',
@@ -64,7 +66,7 @@ public class CmsDeliveryServlet {
 		 *  enabling 'this' site to render it. Minipaths are also useful when you want to create a link
 		 *  in the body of some content, and you don't want that link to break should the item get moved.
 		 */
-		Matcher m = PATH_PATTERN_A.matcher(path);
+		Matcher m = PATH_PATTERN_A.matcher(requestPath);
 		
 		if (m.matches()) {
 			language = m.group(2);
@@ -72,16 +74,20 @@ public class CmsDeliveryServlet {
 			r.setMiniPath(true);
 		}
 		else {
-			m = PATH_PATTERN_B.matcher(path);
+			m = PATH_PATTERN_B.matcher(requestPath);
 			
-			if (m.matches()) {
+			if (m.matches()) {				
 				language = m.group(2);
-				path = m.group(3);
+				String itemPath = m.group(3);
 				
-				if (r.getSite() != null) {
-					path = r.getSite().isMultilingual() ? path : m.group(0);
-					i = r.getSite().getItem(path);
+				if (site != null) {
+					if (! site.isMultilingual()) {
+						itemPath = m.group(0);
+					}
+					i = site.getItem(itemPath);
 				}
+					
+				r.setItemPath(itemPath);
 			}
 		}
 		
@@ -89,29 +95,65 @@ public class CmsDeliveryServlet {
 			r.setLanguage(language == null ? i.getSite().getLanguage() : language);
 			i.setRequestPack(r);
 			
-			req.setAttribute(AttrName.ITEM, i);
-			req.setAttribute(AttrName.SITE, i.getSite());
+			r.getHttpRequest().setAttribute(AttrName.ITEM, i);
+			r.getHttpRequest().setAttribute(AttrName.SITE, site);
 		}
 
 		return i;
 	}
 	
-	private String getLoginPath(Item i) {
-		String path = this.siteConfigCache.getValue(i.getSite().getId(), SiteConfigKey.LOGIN_PATH, "/login");		
-		if (! i.getSite().isMultilingual()) {
+	private String composeRequestPath(Site s, String siteConfigKey, String dflt, String language) {
+		String path = this.siteConfigCache.getValue(s.getId(), siteConfigKey, dflt);		
+		if (! s.isMultilingual()) {
 			return path;
 		}
 		
-		return String.format("/%s%s", i.getLanguage(), path);
+		return String.format("/%s%s", language, path);
 	}
 	
 	private boolean isBlacklisted(HttpServletRequest req) {
-		if (isFaviconPath(getItemPath(req))) {
+		if (isFaviconPath(getRequestPath(req))) {
 			return true;
 		}
 		
 		if (req.getServerName().equals("localhost")) {
 			return true;
+		}
+
+		return false;
+	}
+	
+	/*
+	 * Check there are no bad marks in the register against the IP address making this request.
+	 * We are monitoring excessive:
+	 * a) login failures
+	 * b) 404 errors
+	 */
+	private boolean roguesRedirected(HttpServletResponse res, String ipAddress) throws IOException {
+		
+		if (ipAddress == null) {
+			res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			return true;
+		}
+		
+		this.badActorMonitor.removeStaleEntries();
+		BadActorRecord rec = this.badActorMonitor.getRecord(ipAddress);
+		
+		/* 
+		 * Check request is not from a rogue actor. These are users who have either 
+		 * a) repeatedly failed to login to secured sites, or
+		 * b) requested invalid item paths, typically when probing urls
+		 * 
+		 */
+		if (rec != null) {
+			if (rec.isTooManyLoginFailures()) {
+				res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+				return true;
+			}
+			else if (rec.isTooManyProbingFailures()) {
+				res.sendError(HttpServletResponse.SC_NOT_FOUND);
+				return true;
+			}
 		}
 
 		return false;
@@ -125,56 +167,41 @@ public class CmsDeliveryServlet {
 		
 		String ipAddress = HttpUtil.getForwardedIp(req);
 		
-		// Filter out blacklisted urls
+		// Filter out blacklisted urls, including favicon.ico
 		if (isBlacklisted(req)) {
 			return;
 		}
 		
 		// Filter out dodgy requests, typically from hackers probing weaknesses
-		if (this.cmsService.isProductionDeployment()) {
-			/* 
-			 * Check whether this request has been forwarded correctly by Apache (in the
-			 * production environment) AND is not the subject of excessive login failures.
-			 * While proxying https requests to CMS, Apache is configured to add this header,
-			 * identifying the IP address of the client.
-			 */
-			if (ipAddress == null) {
-				res.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-				LOG.warn("Request does not reveal IP - 503 response (SC_SERVICE_UNAVAILABLE)");
-				return;
-			}
-			
-			/* 
-			 * Check request is not from a rogue actor. These are users who have either 
-			 * a) repeatedly failed to login to secured sites, or
-			 * b) requested invalid item paths, typically when probing urls
-			 * 
-			 */
-			if (this.badActorMonitor.isBad(ipAddress)) {
-				res.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-				LOG.warn(String.format("Possible rogue actor [%s] - 503 response (SC_SERVICE_UNAVAILABLE)", ipAddress));
-				return;
-			}
+		if (roguesRedirected(res, ipAddress)) {
+			return;
 		}
 		
-		// Every request received should identify an item in the CMS, excepting favicon.ico!
-		Item item = identifyItem(req);
+		/* 
+		 * getSite() determines the site based on the supplied hostname and port. If these values are
+		 * not registered in the host table, getSite() will return null.
+		 */
+		Site site = getSite(req);
+		if (site == null) {
+			return;
+		}
+		
+		/*
+		 *  Every request that gets this far should identify an item in the CMS (see isBlacklisted()).
+		 *  NOTE: identifyItem() updates the RequestPack object.
+		 */
+		RequestPack r = new RequestPack(req).setSite(site);
+		Item item = identifyItem(r);
 		if (item == null) {
-			if (! isFaviconPath(getItemPath(req))) {
-				this.badActorMonitor.registerFailure(ipAddress);
-				res.sendError(HttpServletResponse.SC_NOT_FOUND);
+			this.badActorMonitor.registerProbingFailure(ipAddress);
+			
+			String notfoundPath = composeRequestPath(site, SiteConfigKey.NOTFOUND_PATH, "/notfound", r.getLanguage());
+			if (! r.getRequestPath().equals(notfoundPath)) {
+				res.sendRedirect(notfoundPath);
 			}
 			return;
 		}
 		
-		// identifyItem() will have assigned a RequestPack to item
-		RequestPack r = item.getRequestPack();
-		if (r.getSite() == null) {
-			this.badActorMonitor.registerFailure(ipAddress);
-			res.sendError(HttpServletResponse.SC_NOT_FOUND);
-			return;
-		}
-
 		/*
 		 * If this is a request for a page using a minipath, and the item in question belongs to the same site as
 		 * indicated by the hostname for this request, then redirect the request so that,
@@ -266,7 +293,7 @@ public class CmsDeliveryServlet {
 	
 	private String getLoginRedirectionUrl(Item item, HttpServletRequest req) {
 
-		String loginPath = getLoginPath(item);
+		String loginPath = composeRequestPath(item.getSite(), SiteConfigKey.LOGIN_PATH, "/login", item.getLanguage());
 		
 		if (! (item.getMiniPath().equals(loginPath) || item.getPath().equals(SiteConfigKey.LOGIN_PATH))) {
 			// On successful login, redirect to original target page UNLESS target was the homepage
@@ -347,7 +374,7 @@ public class CmsDeliveryServlet {
 		return null;
 	}
 
-	private String getItemPath(HttpServletRequest req) {
+	private String getRequestPath(HttpServletRequest req) {
 		String servletPath = req.getServletPath();
 		servletPath = (servletPath == null) ? "" : servletPath;
 

@@ -1,9 +1,12 @@
 TODO: This is the main todo file:
 
 HIGH
+- improve ui on login error messages
+- is anc using common login code?
 
 
 MEDIUM
+- anc site is not displaying images below /content - src=/en/content/blah
 - When an item is inaccessible in cms-e, the delete icon in the header should also be disabled
 - Thumbnails sometimes have wrong orientation - will take a lot of work to rectify. See ImageUtil.
 - re-test registration process (anc)
