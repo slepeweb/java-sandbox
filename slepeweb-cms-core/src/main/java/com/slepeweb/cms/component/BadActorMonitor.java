@@ -1,7 +1,9 @@
 package com.slepeweb.cms.component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -77,27 +79,25 @@ public class BadActorMonitor {
 			return 0;
 		}
 		
-		StringBuffer sb = new StringBuffer("Removing stale entries from register ...");
+		List<String> removals = new ArrayList<String>();
 		
 		Iterator<BadActorRecord> iter = this.failures.values().iterator();
-		int numRemoved = 0;
 		BadActorRecord f;
 		
 		while (iter.hasNext()) {
 			f = iter.next();
 			if (f.isCleanupDue(now)) {
-				sb.append(String.format("\n%s\t%d Logins\t%d Notfounds", f.getIp(), f.getCounters()[0], f.getCounters()[1]));
+				removals.add(String.format("Stale entry: \n%s\t%d Logins\t%d Notfounds", f.getIp(), f.getCounters()[0], f.getCounters()[1]));
 				iter.remove();
-				numRemoved++;
 			}
 		}
 		
-		if (numRemoved > 0) {
-			LOG.info(sb.toString());
+		for (String s : removals) {
+			LOG.info(s);
 		}
 		
 		this.lastCleanup = now;
-		return numRemoved;
+		return removals.size();
 	}
 
 	public static class BadActorRecord {

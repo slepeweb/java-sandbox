@@ -305,7 +305,7 @@ public class CmsDeliveryServlet {
 				redirectUrl = id != null ? id.getPath() : "/";
 			}
 
-			LOG.warn(String.format("Item [%s] is not accessible - redirecting to %s, then on successful login to %s", 
+			LOG.debug(String.format("Item [%s] is not accessible - redirecting to %s, then on successful login to %s", 
 					item.getUrl(), loginPath, redirectUrl));
 			
 			return String.format("%s?redirectPath=%s", loginPath, redirectUrl);

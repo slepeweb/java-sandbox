@@ -1,12 +1,13 @@
 TODO: This is the main todo file:
 
 HIGH
-- improve ui on login error messages
-- is anc using common login code?
+
 
 
 MEDIUM
-- anc site is not displaying images below /content - src=/en/content/blah
+- anc login ui should display error messages in red, just like glj now does
+- anc site is not displaying images - I believe this is due to the move towards storing images as 
+- --files instead of db blobs. All images on anc will need to be re-created manually.
 - When an item is inaccessible in cms-e, the delete icon in the header should also be disabled
 - Thumbnails sometimes have wrong orientation - will take a lot of work to rectify. See ImageUtil.
 - re-test registration process (anc)

@@ -4,11 +4,8 @@
 
 <div class="main">
 	<c:if test="${not empty error}">
-		<div class="underline red"><p>${error}</p></div>
+		<div class="login-error"><p>${error}</p></div>
 	</c:if>
-	<c:if test="${not empty msg}">
-		<div class="underline green"><p>${msg}</p></div>
-	</c:if>	
 	
 	<h2>${_item.fields.heading}</h2>
 	<p>${_item.fields.bodytext}</p>

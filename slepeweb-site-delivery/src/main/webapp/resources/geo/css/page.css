@@ -138,6 +138,10 @@ div.flash-error {
 	display: none;
 }
 
+div.login-error {
+	color: red;
+}
+
 
 .ui-helper-reset {
 	font-size: 14px;
