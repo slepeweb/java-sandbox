@@ -87,7 +87,7 @@ public class BadActorMonitor {
 		while (iter.hasNext()) {
 			f = iter.next();
 			if (f.isCleanupDue(now)) {
-				removals.add(String.format("Stale entry: \n%s\t%d Logins\t%d Notfounds", f.getIp(), f.getCounters()[0], f.getCounters()[1]));
+				removals.add(String.format("Stale entry: %s\t%d Logins\t%d Notfounds", f.getIp(), f.getCounters()[0], f.getCounters()[1]));
 				iter.remove();
 			}
 		}
