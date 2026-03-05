@@ -49,10 +49,6 @@ public class CmsDeliveryServlet {
 	@Autowired private SiteCookieService siteCookieService;
 	@Autowired private BadActorMonitor badActorMonitor;
 
-	private boolean isFaviconPath(String s) {
-		return s != null && s.equals("/favicon.ico");
-	}
-	
 	private Item identifyItem(RequestPack r) {
 		Item i = null;
 		String language = null;
@@ -112,11 +108,21 @@ public class CmsDeliveryServlet {
 	}
 	
 	private boolean isBlacklisted(HttpServletRequest req) {
-		if (isFaviconPath(getRequestPath(req))) {
+		String path = getRequestPath(req);
+		String agent = req.getHeader("user-agent");
+		
+		/* 
+		 * PUZZLED: On dev, request for 'favicon.ico' doesn't reach this method!
+		 */
+		if (path.matches("^/(favicon.ico|robots.txt)")) {
 			return true;
 		}
 		
 		if (req.getServerName().equals("localhost")) {
+			return true;
+		}
+		
+		if (agent.matches("^.*?(l9explore|paloaltonetworks|OAI-SearchBot|Go-http-client).*$")) {
 			return true;
 		}
 
