@@ -135,7 +135,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	/*
 	 * We are now tracking account balances each time a transaction is inserted or updated.
 	 * When a transaction is updated, this might involve not only a change in the amount,
-	 * but also an account change, so transaction updates need to be handled separately.
+	 * but also an account change, so account updates for transfers need to be handled separately.
 	 */
 	private void adjustBalancesForUpdatedTransactions(Transaction original, Transaction updated) {
 		long amountDelta = 0;
@@ -145,7 +145,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			// No change observed regarding the account
 			amountDelta = updated.getAmount() - original.getAmount();
 			
-			if (amountDelta > 0) {
+			if (Math.abs(amountDelta) > 0) {
 				a = updated.getAccount();
 				a.credit(amountDelta);
 				this.accountService.updateBalance(a);
