@@ -60,7 +60,7 @@ public class ScheduledTransactionTask implements Job {
 			if (scheduled.before(now)) {
 				// Use scht properties to save a Transaction
 				t.setId(0);
-				t.setEntered(new Timestamp(now.getTimeInMillis()));
+				t.setEntered(Util.toTimestamp(Util.today()));
 				t.setSource(4);
 				
 				try {

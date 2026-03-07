@@ -493,6 +493,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		num += this.jdbcTemplate.update("delete from transaction where id = ?", id);		
 		this.solrService4Money.removeTransactionsById(id);
+		LOG.info(compose("Deleted transaction by id", id));
 		
 		// Update account balance
 		Account a = t.getAccount();
