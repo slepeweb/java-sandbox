@@ -114,6 +114,20 @@ public class Item extends CmsBean {
 		return b;
 	}
 	
+	public String getTitle() {
+		String title = getFieldValue("title");
+
+		if (StringUtils.isBlank(title) && getType().isImage()) {
+			title = getFieldValue("alt");
+		}
+
+		if (StringUtils.isBlank(title)) {
+			title = getName();
+		}
+		
+		return title;
+	}
+	
 	public void resetDateUpdated() {
 		setDateUpdated(new Timestamp(System.currentTimeMillis()));
 	}

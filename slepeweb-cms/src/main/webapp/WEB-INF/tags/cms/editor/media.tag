@@ -32,19 +32,34 @@
 			</table>
 		</div>
 
-		<div>
-			<p><strong>Thumbnail:</strong></p>
+		<div id="media-tab-image">
+			<c:set var="_displayImage" value="${true}" />
+			
 			<c:choose><c:when test="${editingItem.thumbnailWithBinaryContent}">
+				<c:set var="_imageHeading" value="Thumbnail" />
+				<c:set var="_imageViewClause" value="view=thumbnail&" />
+			</c:when><c:otherwise>
+				<c:set var="_imageViewClause" value="" />
+				
+				<c:choose><c:when test="${editingItem.type.image and editingItem.mainMediaWithBinaryContent}">
+					<c:set var="_imageHeading" value="Main image" />
+				</c:when><c:otherwise>
+					<c:set var="_imageHeading" value="No thumbnail available" />
+					<c:set var="_displayImage" value="${false}" />
+				</c:otherwise></c:choose>
+			</c:otherwise></c:choose>
+			
+			<p><strong>${_imageHeading}:</strong></p>
+			
+			<c:if test="${_displayImage}">
 				<%-- 
 					Both the editorial and delivery hosts are capable of rendering image data, but
 					this image is served from the editorial host, enabling un-published media to be displayed.
 				--%>
 				<c:set var="_host" value="${editingItem.site.editorialHost}" />
 				<c:set var="_timestamp" value="${cmsf:now()}" />
-				<img src="${_host.namePortAndProtocol}/cms_/stream/itemid/${editingItem.id}/${editingItem.type.shortMimeType}?view=thumbnail&_=${_timestamp}" />
-			</c:when><c:otherwise>
-				<p>No thumbnail uploaded.</p>
-			</c:otherwise></c:choose>
+				<img src="${_host.namePortAndProtocol}/cms_/stream/itemid/${editingItem.id}/${editingItem.type.shortMimeType}?${_imageViewClause}_=${_timestamp}" />
+			</c:if>
 		</div>
 	</div>
 	

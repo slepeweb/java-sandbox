@@ -18,6 +18,7 @@
 	<li><a href="#core-tab">Core</a></li>
 	<c:if test="${not editingItem.shortcut}"><li><a href="#field-tab">Fields</a></li></c:if>
 	<li><a href="#links-tab">Links</a></li>
+	
 	<c:if test="${not editingItem.shortcut and editingItem.type.media}">
 		<li><a href="#media-tab">Media</a></li>
 	</c:if>

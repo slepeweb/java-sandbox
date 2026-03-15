@@ -13,7 +13,7 @@ import com.slepeweb.site.service.NavigationService;
 
 public class Page implements Serializable, NestableComponent {
 	private static final long serialVersionUID = 1L;
-	//private static Logger LOG = Logger.getLogger(Page.class);
+
 	private String href;
 	private Header header;
 	private Footer footer;
@@ -23,6 +23,7 @@ public class Page implements Serializable, NestableComponent {
 	private List<String> roles;
 	private Item item;
 	private NavigationService navigationService;
+	private List<LinkTarget> relatedLinkTargets;
 	
 	public Page(NavigationService svc) {
 		this.navigationService = svc;
@@ -157,9 +158,26 @@ public class Page implements Serializable, NestableComponent {
 		return item;
 	}
 
-	public Page setItem(Item item) {
-		this.item = item;
+	public Page setItem(Item i) {
+		this.item = i;
+		this.heading = this.title = i.getTitle();
+		this.body = i.getFieldValue("bodytext");
 		return this;
+	}
+
+	public List<LinkTarget> getRelatedLinkTargets() {
+		if (this.relatedLinkTargets == null) {
+			if (this.item == null) {
+				return null;
+			}
+			
+			this.relatedLinkTargets = new ArrayList<LinkTarget>();
+			for (Item i : this.item.getRelatedItems()) {
+				this.relatedLinkTargets.add(new LinkTarget(i));
+			}
+		}
+		
+		return this.relatedLinkTargets;		
 	}
 
 	public NavigationService getNavigationService() {

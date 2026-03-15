@@ -42,12 +42,12 @@ _cms.dialog.define = function(title, selector, width, height, buttons, close, is
 
 _cms.dialog.open = function(d) {
 	d.obj.dialog("open");
-	d.open = true;
+	//d.open = true;
 }
 
 _cms.dialog.close = function(d) {
 	d.obj.dialog("close");
-	d.open = false;
+	//d.open = false;
 }
 
 _cms.dialog.confirmTrash.define = function() {

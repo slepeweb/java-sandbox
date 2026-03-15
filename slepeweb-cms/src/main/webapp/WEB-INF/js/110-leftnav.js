@@ -49,7 +49,7 @@ _cms.leftnav.define.fancytree = function() {
 			}
 			else if (_cms.leftnav.mode == "link") {
 				$(_cms.links.sel.LINK_TARGET_ORIGID).val(null);
-				$(_cms.links.sel.LINK_TARGET_IDENTIFIER).html("'" + _cms.leftnav.tree.activeNode.title + "'");
+				$(_cms.links.sel.LINK_TARGET_NAME).html("'" + _cms.leftnav.tree.activeNode.title + "'");
 				$(_cms.links.sel.CHILDID_INPUT).val(_cms.leftnav.tree.activeNode.key);
 			}
 			else if (_cms.leftnav.mode == "move") {

@@ -99,9 +99,6 @@ public class BaseController {
 	
 	protected Page getStandardPage(Item i, String shortSitename, String viewNameSuffix, ModelMap model) {			
 		Page p = new Page(this.navigationService).
-				setTitle(i.getFieldValue("title")).
-				setHeading(i.getFieldValue("title")).
-				setBody(i.getFieldValue("bodytext")).
 				setItem(i).
 				setView(composeJspPath(shortSitename, viewNameSuffix));
 		

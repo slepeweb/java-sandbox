@@ -550,6 +550,10 @@ button[disabled=disabled] {
 	margin-right: 2em;
 }
 
+#media-tab-image img {
+	width: 50%;
+}
+
 input.highlight {
 	border: purple solid 5px;
 }
@@ -814,6 +818,10 @@ div.user-update-msg {
 		grid-template-columns: fit-content(200px) 1fr;
 	}
 	
+	#media-tab-image img {
+		width: 30%;
+	}
+
 	#search-bar {
 		margin-top: 1.5em;
 		width: 100%;

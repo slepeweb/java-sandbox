@@ -19,6 +19,7 @@ div.nblock {
   justify-items: center;
   padding: 1em 0 0 1em;
   border: 1px solid #ccc;
+  background-color: #e3e3f7;
 }
 
 div.twoblock {

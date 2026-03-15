@@ -10,27 +10,24 @@ import com.slepeweb.cms.bean.Item;
 
 public class LinkTarget implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private String title, teaser, href, style;
+	private String title, teaser, href, style, fontAwesomeClass;
 	private Image thumbnail;
-	private boolean trusted, selected;
+	private boolean trusted, selected, foreigner;
 	private List<LinkTarget> children = new ArrayList<LinkTarget>();
 	
 	public LinkTarget() {}
 	
 	public LinkTarget(Item i) {
-		String title = i.getFieldValue("navtitle");
+		String s = i.getFieldValue("navtitle");
+		if (StringUtils.isBlank(s)) {
+			s = i.getTitle();
+		}
 		
-		if (StringUtils.isBlank(title)) {
-			title = i.getFieldValue("title");
-		}
-
-		if (StringUtils.isBlank(title)) {
-			title = i.getName();
-		}
-
-		setTitle(title);
+		setTitle(s);
 		setTeaser(i.getFieldValue("teaser"));
-		setHref(i.getUrl());
+		setFontAwesomeClass(i.getType().getFontAwesomeClass());
+		setHref(i.isForeigner() ? i.getMiniPath() : i.getUrl());
+		setForeigner(i.isForeigner());
 	}
 	
 	public String toString() {
@@ -116,6 +113,24 @@ public class LinkTarget implements Serializable {
 
 	public LinkTarget setStyle(String style) {
 		this.style = style;
+		return this;
+	}
+
+	public String getFontAwesomeClass() {
+		return fontAwesomeClass;
+	}
+
+	public LinkTarget setFontAwesomeClass(String fontAwesomeClass) {
+		this.fontAwesomeClass = fontAwesomeClass;
+		return this;
+	}
+
+	public boolean isForeigner() {
+		return foreigner;
+	}
+
+	public LinkTarget setForeigner(boolean foreigner) {
+		this.foreigner = foreigner;
 		return this;
 	}
 }
