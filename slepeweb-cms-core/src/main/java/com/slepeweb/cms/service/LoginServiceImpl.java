@@ -72,8 +72,8 @@ public class LoginServiceImpl implements LoginService {
 		if (u.isEnabled()) {
 			supp.setSuccess(true);
 			req.getSession().setAttribute(AttrName.USER, supp.getUser().setLoggedIn(true));	
-			return communicateResult(supp, String.format("Successful login [%s], session %s, for site %s", alias, 
-					req.getSession().getId(), req.getAttribute(AttrName.SITE)));
+			return communicateResult(supp, String.format("Successful login [%s] for site %s", alias, 
+					req.getAttribute(AttrName.SITE)));
 		}
 		else {
 			return communicateResult(supp, "The user account is disabled right now.", 
@@ -87,7 +87,9 @@ public class LoginServiceImpl implements LoginService {
 	
 	private LoginSupport communicateResult(LoginSupport supp, String userMsg, String logMsg) {
 		LOG.info(String.format("%s - (%s)", logMsg, supp.getIp()));
-		supp.setUserMessage("CMS login failure: " + (userMsg == null ? "" : userMsg));
+		supp.setUserMessage(
+				(supp.isSuccess() ? "Successful CMS login: " : "CMS login failure: ") + 
+				(userMsg == null ? "" : userMsg));
 		
 		// Before deciding to send an email, update the bad actor register if necessary
 		if (! supp.isSuccess() && supp.getIp() != null) {
@@ -125,7 +127,7 @@ public class LoginServiceImpl implements LoginService {
 				  td:first-child {background-color: #b0c4de;}
 				</style>""");
 		
-		emailMsg.append(String.format("<p>User message: %s</p>", userMsg));
+		emailMsg.append(String.format("<p>%s</p>", userMsg));
 
 		emailMsg.append("<h3>Request headers</h3><table>");
 		emailMsg.append(String.format("<tr><td>Host</td><td>%s</td></tr>", notNull(req.getHeader("host"))));
@@ -135,6 +137,7 @@ public class LoginServiceImpl implements LoginService {
 		emailMsg.append(String.format("<tr><td>Agent</td><td>%s</td></tr>", notNull(req.getHeader("user-agent"))));
 		emailMsg.append("</table>");
 		
+		/*
 		emailMsg.append("<h3>HttpServletRequest properties</h3><table>");
 		emailMsg.append(String.format("<tr><td>Server name</td><td>%s</td></tr>", notNull(req.getServerName())));
 		emailMsg.append(String.format("<tr><td>Request URL</td><td>%s</td></tr>", notNull(req.getRequestURL().toString())));
@@ -145,6 +148,7 @@ public class LoginServiceImpl implements LoginService {
 		emailMsg.append(String.format("<tr><td>Remote address</td><td>%s</td></tr>", notNull(req.getRemoteAddr())));
 		emailMsg.append(String.format("<tr><td>Local address</td><td>%s</td></tr>", notNull(req.getLocalAddr())));
 		emailMsg.append("</table>");
+		*/
 		
 		return emailMsg.toString();
 	}
