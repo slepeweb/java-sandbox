@@ -45,10 +45,11 @@ div.in-this-section a:hover,  div.related-items a:hover, div.sidebar a:hover {
 
 div.in-this-section div.selected {
 	background-color: #c8d9b1;
+	border: 2px solid cadetblue;
 }
 
 div.in-this-section div.selected-child {
-	background-color: #81b9ca;
+	background-color: #dbd9d9;
 	padding: 0.4em 0 0.4em 1.0em;
 }
 

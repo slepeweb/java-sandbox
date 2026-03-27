@@ -2,12 +2,13 @@
 
 <div class="in-this-section">
 	<c:if test="${fn:length(_inThisSection.root.children) gt 0}">
-		<h4>In this section ...</h4>
-<%-- 			<span style="padding-left: 2em;"><a href="${_inThisSection.root.href}"  
- 				title="Navigate upwards"><i class="fa-solid fa-arrow-up"></i></a></span> --%>
+		<h4>${_inThisSection.root.tag}</h4>
 				
 		<c:forEach items="${_inThisSection.root.children}" var="sib_target">
-			<div<c:if test="${sib_target.selected}"> class="selected"</c:if>>${sib_target.tag}
+			<c:set var="_clazz">${sib_target.selected ? 'class="selected"' : ''}</c:set>
+			<c:set var="_spacer">${sib_target.selected ? '&nbsp;' : ''}</c:set>
+			
+			<div ${_clazz}>${_spacer}${sib_target.tag}
 				<c:if test="${sib_target.selected}">
 					<c:forEach items="${sib_target.children}" var="c_target">
 						<div class="selected-child">${c_target.tag}</div>
