@@ -26,7 +26,7 @@ public class NoHook implements ICmsHook {
 	}
 
 	@Override
-	public IGuidance getLinknameGuidance(String linkname) {
+	public IGuidance getLinkDataGuidance(String type, String name) {
 		return null;
 	}
 }

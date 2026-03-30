@@ -7,6 +7,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
 
 public class LinkTarget implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -16,6 +19,19 @@ public class LinkTarget implements Serializable {
 	private List<LinkTarget> children = new ArrayList<LinkTarget>();
 	
 	public LinkTarget() {}
+	
+	public LinkTarget(Link l) {
+		this(l.getChild());
+		
+		// Override title with content in data (if populated) for standard relations
+		if (
+			l.getType().equals(LinkType.relation) && 
+			l.getName().equals(LinkName.std) && 
+			StringUtils.isNotBlank(l.getData())) {
+			
+				setTitle(l.getData());
+		}
+	}
 	
 	public LinkTarget(Item i) {
 		String s = i.getFieldValue("navtitle");

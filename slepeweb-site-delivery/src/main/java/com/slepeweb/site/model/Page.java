@@ -7,6 +7,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.site.service.NavigationService;
 
@@ -23,7 +26,7 @@ public class Page implements Serializable, NestableComponent {
 	private List<String> roles;
 	private Item item;
 	private NavigationService navigationService;
-	private List<LinkTarget> relatedLinkTargets;
+	private List<LinkTarget> stdRelatedLinkTargets;
 	
 	public Page(NavigationService svc) {
 		this.navigationService = svc;
@@ -165,19 +168,20 @@ public class Page implements Serializable, NestableComponent {
 		return this;
 	}
 
-	public List<LinkTarget> getRelatedLinkTargets() {
-		if (this.relatedLinkTargets == null) {
-			if (this.item == null) {
-				return null;
-			}
-			
-			this.relatedLinkTargets = new ArrayList<LinkTarget>();
-			for (Item i : this.item.getRelatedItems()) {
-				this.relatedLinkTargets.add(new LinkTarget(i));
+	public List<LinkTarget> getStdRelatedLinkTargets() {
+		if (this.stdRelatedLinkTargets != null || getItem() == null) {
+			return this.stdRelatedLinkTargets;
+		}
+		
+		this.stdRelatedLinkTargets = new ArrayList<LinkTarget>();
+		
+		for (Link l : getItem().getRelations()) {
+			if (l.getType().equals(LinkType.relation) && l.getName().equals(LinkName.std)) {
+				this.stdRelatedLinkTargets.add(new LinkTarget(l));
 			}
 		}
 		
-		return this.relatedLinkTargets;		
+		return this.stdRelatedLinkTargets;
 	}
 
 	public NavigationService getNavigationService() {

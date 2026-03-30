@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 public class LinkName extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	public static final String std = "std";
+	public static final String partner = "partner";
 	public static final String RIGHT_SIDE = "rightside";
 	public static final String LEFT_SIDE = "leftside";
 	public static final String HEAD = "head";

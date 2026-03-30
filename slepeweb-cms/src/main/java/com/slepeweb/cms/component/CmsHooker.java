@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.service.SiteService;
 
@@ -15,6 +16,11 @@ public class CmsHooker {
 	
 	public void setHooks(Map<String, ICmsHook> map) {
 		this.hooks = map;
+	}
+	
+	// Use this method IFF the item has been retrieved from the db
+	public ICmsHook getHook(Item i) {
+		return getHook(i.getSite().getShortname());
 	}
 	
 	public ICmsHook getHook(String siteName) {

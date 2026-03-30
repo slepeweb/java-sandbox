@@ -73,7 +73,7 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "homepage", model);
-		addGeoExtras(i, req, res, model);
+		addGeoExtras(page, req, res, model);
 		return page.getView();
 	}
 
@@ -92,7 +92,7 @@ public class GeoPageController extends BaseController {
 		params.setSearchText(terms).setUser(i.getUser());
 		model.addAttribute("_searchResponse", this.solrService4Geo.query(params));
 		
-		addGeoExtras(i, req, res, model);
+		addGeoExtras(page, req, res, model);
 		return page.getView();
 	}
 
@@ -105,7 +105,7 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "standardWide", model);
-		addGeoExtras(i, req, res, model);
+		addGeoExtras(page, req, res, model);
 		return page.getView();
 	}
 
@@ -131,7 +131,7 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "standard3Col", model);
-		addGeoExtras(i, req, res, model);
+		addGeoExtras(page, req, res, model);
 		return page.getView();
 	}
 
@@ -162,7 +162,7 @@ public class GeoPageController extends BaseController {
 		}
 		
 		Page page = getStandardPage(i, shortSitename, "standard3Col", model);
-		addGeoExtras(i, req, res, model);
+		addGeoExtras(page, req, res, model);
 		return page.getView();
 	}
 
@@ -180,7 +180,7 @@ public class GeoPageController extends BaseController {
 		
 		if (req.getMethod().equalsIgnoreCase("get")) {
 			Page page = getStandardPage(i, shortSitename, "pwForm", model);
-			addGeoExtras(i, req, res, model);
+			addGeoExtras(page, req, res, model);
 			return page.getView();
 		}
 		
@@ -237,7 +237,7 @@ public class GeoPageController extends BaseController {
 		Page page = getStandardPage(i, shortSitename, "pwList", model);
 		model.addAttribute("_pwl", pwl);
 		model.addAttribute("_important", important);
-		addGeoExtras(i, req, res, model);
+		addGeoExtras(page, req, res, model);
 		return page.getView();
 	}
 
@@ -256,7 +256,7 @@ public class GeoPageController extends BaseController {
 		// Request for form
 		if (req.getMethod().equalsIgnoreCase("get")) {
 			Page page = getStandardPage(i, shortSitename, "moneyForm", model);
-			addGeoExtras(i, req, res, model);
+			addGeoExtras(page, req, res, model);
 			return page.getView();
 		}
 		
@@ -282,7 +282,7 @@ public class GeoPageController extends BaseController {
 				
 		Page page = getStandardPage(i, shortSitename, "moneyList", model);
 		model.addAttribute("_dashboard", dashboard);
-		addGeoExtras(i, req, res, model);
+		addGeoExtras(page, req, res, model);
 		return page.getView();
 	}
 	
@@ -305,14 +305,14 @@ public class GeoPageController extends BaseController {
 			ModelMap model) {	
 		
 		Page page = getStandardPage(i, shortSitename, "standard3Col", model);
-		addGeoExtras(i, req, res, model);
+		addGeoExtras(page, req, res, model);
 		return page.getView();
 	}
 
-	private void addGeoExtras(Item i, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
+	private void addGeoExtras(Page p, HttpServletRequest req, HttpServletResponse res, ModelMap model) {
 		model.addAttribute(MAGIC_MARKUP_SERVICE, this.magicMarkupService);
-		model.addAttribute("_inThisSection", new SectionMenu(i));
-		model.addAttribute(HISTORY, this.siteCookieService.updateBreadcrumbsCookie(i, req, res));
+		model.addAttribute("_inThisSection", new SectionMenu(p.getItem()));
+		model.addAttribute(HISTORY, this.siteCookieService.updateBreadcrumbsCookie(p.getItem(), req, res));
 		model.addAttribute("_isSuperUser", Boolean.valueOf(req.getSession().getAttribute(AttrName.SUPER_USER) != null));
 	}
 	
@@ -421,4 +421,5 @@ public class GeoPageController extends BaseController {
         
         return null;
     }
+
 }

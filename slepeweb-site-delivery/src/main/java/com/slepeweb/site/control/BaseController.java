@@ -108,6 +108,7 @@ public class BaseController {
 		//p.getLeftSidebar().setComponents(this.componentService.getComponents(components, LinkName.LEFT_SIDE));
 		//p.getRightSidebar().setComponents(this.componentService.getComponents(components, LinkName.RIGHT_SIDE));
 		
+		p.getStdRelatedLinkTargets();
 		model.addAttribute("_page", p);
 		return p;
 	}

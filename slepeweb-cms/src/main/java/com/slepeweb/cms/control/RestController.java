@@ -1133,7 +1133,7 @@ public class RestController extends BaseController {
 			parent.saveLinks();
 			
 			// Related items are stored in solr for pho site.
-			ICmsHook hook = this.cmsHooker.getHook(parent.getSite().getShortname());
+			ICmsHook hook = this.cmsHooker.getHook(parent);
 			hook.updateLinksPost(parent);			
 			
 			resp.addMessage(String.format("%d links saved", links.size()));
@@ -1201,7 +1201,7 @@ public class RestController extends BaseController {
 			
 			if (lt != null) {
 				for (LinkName ln : this.cmsService.getLinkNameService().getLinkNames(siteId, lt.getId())) {
-					guidance = hook.getLinknameGuidance(ln.getName());
+					guidance = hook.getLinkDataGuidance(lt.getName(), ln.getName());
 					options.add(new LinkNameOption(ln.getName(), guidance));
 				}
 			}

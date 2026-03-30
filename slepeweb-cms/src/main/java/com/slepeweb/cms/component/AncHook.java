@@ -3,6 +3,8 @@ package com.slepeweb.cms.component;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.LinkName;
+import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.constant.FieldName;
 
@@ -45,8 +47,8 @@ public class AncHook extends NoHook {
 	}
 
 	@Override
-	public IGuidance getLinknameGuidance(String linkname) {
-		if (linkname.equals("partner")) {
+	public IGuidance getLinkDataGuidance(String type, String name) {
+		if (type.equals(LinkType.relation) && name.equals(LinkName.partner)) {
 			return this.ancPartnerLinkGuidance;
 		}
 

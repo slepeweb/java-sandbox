@@ -17,5 +17,5 @@ public interface ICmsHook {
 	IGuidance getFieldGuidance(String variable);
 	
 	// Guidance on link name options
-	IGuidance getLinknameGuidance(String name);
+	IGuidance getLinkDataGuidance(String type, String name);
 }
