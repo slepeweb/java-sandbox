@@ -25,7 +25,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	public Account save(Account a) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (a.isDefined4Insert()) {
 			if (a.isInDatabase()) {
-				Account dbRecord = get(a.getId());		
+				// Get the record in the db so that we can detect any name change
+				Account dbRecord = get(a.getId());
+				
 				if (dbRecord != null) {
 					return update(dbRecord, a);
 				}
@@ -65,11 +67,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 			
 			dbRecord.assimilate(a);
 			
-			// Do NOT update the balance
 			this.jdbcTemplate.update(
-					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ?, reconciled = ? where id = ?", 
+					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ?, reconciled = ?, balance = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getType(), dbRecord.getOpeningBalance(), dbRecord.isClosed(), 
-					dbRecord.getNote(), dbRecord.getReconciled(), dbRecord.getId());
+					dbRecord.getNote(), dbRecord.getReconciled(), dbRecord.getBalance(), dbRecord.getId());
 			
 			if (nameChanged) {
 				// Update transaction documents in solr, which store account name, NOT id.
