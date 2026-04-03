@@ -19,6 +19,6 @@ public interface AccountService {
 	Account save(Account f) throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	Account update(Account existing, Account with);
 	void updateReconciled(Account a);
-	void updateBalance(Account a);
+	void saveBalance(Account a);
 	int delete(long id);
 }

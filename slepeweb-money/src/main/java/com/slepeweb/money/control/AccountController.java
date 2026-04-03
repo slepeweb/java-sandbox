@@ -78,7 +78,6 @@ public class AccountController extends BaseController {
 				setType(req.getParameter("type")).
 				setClosed(! req.getParameter("status").equals("open")).
 				setOpeningBalance(Util.parsePounds(req.getParameter("opening"))).
-				setBalance(Long.parseLong(req.getParameter("balance"))).
 				setNote(req.getParameter("note")).
 				setReconciled(Util.parsePounds(req.getParameter("reconciled")));
 		

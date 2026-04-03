@@ -56,7 +56,6 @@
 
 	    <input type="hidden" name="id" value="${_account.id}" />   
 	    <input type="hidden" name="formMode" value="${_formMode}" />   
-	    <input type="hidden" name="balance" value="${_account.balance}" />   
 	</form>		  	
 		
 </mny:standardLayout>

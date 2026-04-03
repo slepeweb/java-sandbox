@@ -67,10 +67,11 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 			
 			dbRecord.assimilate(a);
 			
+			// Do NOT update balance here - that's the job of saveBalance()
 			this.jdbcTemplate.update(
-					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ?, reconciled = ?, balance = ? where id = ?", 
+					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ?, reconciled = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getType(), dbRecord.getOpeningBalance(), dbRecord.isClosed(), 
-					dbRecord.getNote(), dbRecord.getReconciled(), dbRecord.getBalance(), dbRecord.getId());
+					dbRecord.getNote(), dbRecord.getReconciled(), dbRecord.getId());
 			
 			if (nameChanged) {
 				// Update transaction documents in solr, which store account name, NOT id.
@@ -131,7 +132,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 			
 			if (balanceNow != balanceWas) {
 				a.setBalance(balanceNow);
-				save(a);
+				saveBalance(a);
 				count += 1;
 				
 				LOG.warn(String.format("Balance for account %s was %s, and has been reset to %s", 
@@ -159,7 +160,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		return this.jdbcTemplate.update("delete from account where id = ?", id);
 	}
 	
-	public void updateBalance(Account a) {
+	public void saveBalance(Account a) {
 		this.jdbcTemplate.update("update account set balance = ? where id = ?", a.getBalance(), a.getId()); 
 	}
 }

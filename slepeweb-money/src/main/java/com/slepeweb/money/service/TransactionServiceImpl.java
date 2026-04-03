@@ -94,7 +94,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				// Insert a new transaction
 				t = insert(pt);
 				t.getAccount().credit(t.getAmount());
-				this.accountService.updateBalance(t.getAccount());
+				this.accountService.saveBalance(t.getAccount());
 			}
 
 			// Also save the new transaction's splits, if any
@@ -148,7 +148,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			if (Math.abs(amountDelta) > 0) {
 				a = updated.getAccount();
 				a.credit(amountDelta);
-				this.accountService.updateBalance(a);
+				this.accountService.saveBalance(a);
 			}
 		}
 		else {
@@ -156,12 +156,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			// Adjust the original account's balance
 			a = original.getAccount();
 			a.credit(- original.getAmount());
-			this.accountService.updateBalance(a);
+			this.accountService.saveBalance(a);
 
 			// Now adjust the update account's balance
 			a = updated.getAccount();
 			a.credit(updated.getAmount());
-			this.accountService.updateBalance(a);
+			this.accountService.saveBalance(a);
 		}
 	}
 	
@@ -498,7 +498,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		// Update account balance
 		Account a = t.getAccount();
 		a.credit(- t.getAmount());
-		this.accountService.updateBalance(a);
+		this.accountService.saveBalance(a);
 		
 		return num;
 	}	
