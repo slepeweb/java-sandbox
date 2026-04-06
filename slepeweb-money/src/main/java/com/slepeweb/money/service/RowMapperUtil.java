@@ -14,6 +14,7 @@ import com.slepeweb.money.bean.NakedTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.Property;
 import com.slepeweb.money.bean.SavedSearch;
+import com.slepeweb.money.bean.SavingsAccount;
 import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
@@ -46,7 +47,7 @@ public class RowMapperUtil {
 			Transaction t = transferId > 0 ? new Transfer() : new Transaction();
 			
 			return t.
-					setAccount(makeAccountX(rs)).
+					setAccount(makeAccount4Transaction(rs)).
 					setPayee(makePayeeX(rs)).
 					setCategory(makeCategoryX(rs)).
 					setSplit(rs.getBoolean("split")).
@@ -133,30 +134,50 @@ public class RowMapperUtil {
 	}
 	
 	private static Account makeAccount(ResultSet rs) throws SQLException {
-		return makeAccount(rs, "id", "origid", "name", "type", "reconciled", "balance");
+		Account a = makeAccount(rs, "id", "origid", "name", "type", "reconciled", "balance");
+		
+		if (a.isSavings()) {
+			SavingsAccount sa = (SavingsAccount) a;
+			sa.setAccountId(rs.getInt("accountid"));
+			sa.setOwner(rs.getString("owner"));
+			sa.setAccess(rs.getString("access"));
+			sa.setSchedule(rs.getString("schedule"));
+			sa.setRate(rs.getString("rate"));
+			sa.setMatures(rs.getTimestamp("matures"));
+		}
+		
+		return a;
 	}
 	
-	private static Account makeAccountX(ResultSet rs) throws SQLException {
+	private static Account makeAccount4Transaction(ResultSet rs) throws SQLException {
 		return makeAccount(rs, "accountid", "accountorigid", "accountname", "accounttype", "accountreconciled", "accountbalance");
 	}
 	
 	private static Account makeAccount(ResultSet rs, String idStr, String origIdStr, 
 			String name, String type, String reconciled, String balance) throws SQLException {
 		
-		return makeAccountShell(rs, idStr, name, balance).
-			setOrigId(rs.getLong(origIdStr)).
-			setType(rs.getString(type)).
-			setReconciled(rs.getLong(reconciled)).
-			setOpeningBalance(rs.getLong("openingbalance")).
-			setClosed(rs.getBoolean("closed")).
-			setNote(rs.getString("note"));
+		String accountType = rs.getString(type);
+		boolean isSavingsAccount = accountType != null && accountType.equals("savings");
+		Account a = isSavingsAccount ? new SavingsAccount() : new Account();
+		
+		initAccount(a, rs, idStr, name, balance);
+		a.setOrigId(rs.getLong(origIdStr));
+		a.setType(accountType);
+		a.setSortCode(rs.getString("sortcode"));
+		a.setAccountNo(rs.getString("accountno"));
+		a.setRollNo(rs.getString("rollno"));
+		a.setReconciled(rs.getLong(reconciled));
+		a.setOpeningBalance(rs.getLong("openingbalance"));
+		a.setClosed(rs.getBoolean("closed"));
+		a.setNote(rs.getString("note"));
+		
+		return a;
 	}
 	
-	private static Account makeAccountShell(ResultSet rs, String idStr, String name, String balance) throws SQLException {
-		return new Account().
-				setId(rs.getLong(idStr)).
-				setName(rs.getString(name)).
-				setBalance(rs.getLong(balance));
+	private static void initAccount(Account a, ResultSet rs, String idStr, String name, String balance) throws SQLException {
+		a.setId(rs.getLong(idStr));
+		a.setName(rs.getString(name));
+		a.setBalance(rs.getLong(balance));
 	}
 	
 	private static Category makeCategory(ResultSet rs) throws SQLException {
@@ -187,8 +208,11 @@ public class RowMapperUtil {
 					setPeriod(rs.getString("period")).
 					setEnabled(rs.getBoolean("enabled"));
 			
+			Account shell = new Account();
+			initAccount(shell, rs, "accountid", "accountname", "accountbalance");
+			
 			scht.
-					setAccount(makeAccountShell(rs, "accountid", "accountname", "accountbalance")).
+					setAccount(shell).
 					setPayee(makePayeeX(rs)).
 					setCategory(makeCategoryX(rs)).
 					setSplit(rs.getBoolean("split")).
@@ -199,7 +223,9 @@ public class RowMapperUtil {
 			
 			String mirrorName = rs.getString("mirrorname");
 			if (StringUtils.isNotBlank(mirrorName)) {
-				scht.setMirror(makeAccountShell(rs, "mirrorid", "mirrorname", "mirrorbalance"));						
+				shell = new Account();
+				initAccount(shell, rs, "mirrorid", "mirrorname", "mirrorbalance");
+				scht.setMirror(shell);						
 			}
 			
 			return scht;

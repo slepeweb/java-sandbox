@@ -7,6 +7,7 @@
 	<mny:pageHeading heading="Accounts">
 		<ul>
 			<li><a href="add" title="Create a new account">New account</a></li>
+			<li><a href="list/savings" title="List savings accounts">List savings</a></li>
 			<li><a href="balancer" title="Re-calculate balances for all open accounts">Reset balances</a></li>
 		</ul>
 	</mny:pageHeading>

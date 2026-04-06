@@ -49,7 +49,7 @@
 		    <tsf:ids entity="${_transaction}" />
 		    
 	    	<mny:tableRow heading="Date">
-		    	<input id="entered" class="datepicker ${_readonlyClass}" type="text"name="entered" ${_readonlyAttr}
+		    	<input id="entered" class="datepicker ${_readonlyClass}" type="text" name="entered" ${_readonlyAttr}
 		        	placeholder="Enter transaction date" value="${mon:formatTimestamp(_transaction.entered)}" />
 		    </mny:tableRow>
 

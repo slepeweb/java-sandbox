@@ -2,6 +2,7 @@ package com.slepeweb.money.service;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.SavingsAccount;
 import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -48,11 +50,18 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into account (origid, name, type, openingbalance, closed, note, reconciled, balance) values (?, ?, ?, ?, ?, ?, ?, ?)", 
-					a.getOrigId(), a.getName(), a.getType(), a.getOpeningBalance(), a.isClosed(), a.getNote(), a.getReconciled(), a.getBalance());
+					"insert into account (origid, name, type, sortcode, accountno, rollno, openingbalance, closed, " + 
+							"note, reconciled, balance) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+					a.getOrigId(), a.getName(), a.getType(), a.getSortCode(), a.getAccountNo(), a.getRollNo(),
+					a.getOpeningBalance(), a.isClosed(), a.getNote(), a.getReconciled(), a.getBalance());
 			
 			a.setId(getLastInsertId());	
 			
+			if (a instanceof SavingsAccount) {
+				SavingsAccount sa = (SavingsAccount) a;
+				insertNewSavings(sa);
+			}
+	
 			LOG.info(compose("Added new account", a));		
 			return a;
 		}
@@ -60,22 +69,66 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 			throw new DuplicateItemException("Account already inserted");
 		}
 	}
+	
+	private void insertNewSavings(SavingsAccount sa) {
+		this.jdbcTemplate.update(
+				"insert into savings (accountid, matures, access, schedule, owner, rate) values (?, ?, ?, ?, ?, ?)", 
+				sa.getId(), sa.getMatures(), sa.getAccess(), sa.getSchedule(), sa.getOwner(), sa.getRate());
+	}
 
 	public Account update(Account dbRecord, Account a) {
 		if (! dbRecord.equals(a)) {
 			boolean nameChanged = ! dbRecord.getName().equals(a.getName());
 			
-			dbRecord.assimilate(a);
+			// Eliminate redundant data according to account type
+			if (! (a.isCurrent() || a.isSavings())) {
+				a.setSortCode(null).setAccountNo(null).setRollNo(null);
+			}
+			
+			/*
+			 *  NO NEED to call Account.assimilate(), because Account 'a' is e fully populated by accountForm.jsp.
+			 *  Attempts to retain the usual call to assimilate() ran into difficulties when the new SavingsAccount
+			 *  class was introduced. Enough said!
+			 */
 			
 			// Do NOT update balance here - that's the job of saveBalance()
 			this.jdbcTemplate.update(
-					"update account set name = ?, type = ?, openingbalance = ?, closed = ?, note = ?, reconciled = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getType(), dbRecord.getOpeningBalance(), dbRecord.isClosed(), 
-					dbRecord.getNote(), dbRecord.getReconciled(), dbRecord.getId());
+					"update account set name = ?, type = ?, sortcode = ?, accountno = ?, rollno = ?, openingbalance = ?, " + 
+							"closed = ?, note = ?, reconciled = ? where id = ?", 
+					a.getName(), a.getType(), a.getSortCode(), a.getAccountNo(),
+					a.getRollNo(), a.getOpeningBalance(), a.isClosed(), 
+					a.getNote(), a.getReconciled(), a.getId());
 			
 			if (nameChanged) {
 				// Update transaction documents in solr, which store account name, NOT id.
-				this.solrService4Money.save(this.transactionService.getTransactionsForAccount(dbRecord.getId()));
+				this.solrService4Money.save(this.transactionService.getTransactionsForAccount(a.getId()));
+			}
+			
+			/*
+			 * There are 3 scenarios to consider regarding updates and savings accounts:
+			 * a) account type has changed TO savings
+			 * b) account type WAS savings
+			 * c) account type REMAINs savings
+			 */
+			if (dbRecord.isSavings() && a.isSavings()) {
+				
+				// Case c)
+				SavingsAccount sa = (SavingsAccount) a;
+
+				this.jdbcTemplate.update(
+						"update savings set matures = ?, access = ?, schedule = ?, owner = ?, rate = ? where accountid = ?", 
+						sa.getMatures(), sa.getAccess(), sa.getSchedule(), sa.getOwner(), 
+						sa.getRate(), sa.getAccountId());
+			}
+			else if (dbRecord.isSavings() && ! a.isSavings()) {
+				
+				// Case b)
+				this.jdbcTemplate.update("delete from savings where accountid = ?", a.getId());
+			}
+			else  if (! dbRecord.isSavings() && a.isSavings()){
+				
+				// Case a)
+				insertNewSavings((SavingsAccount) a);
 			}
 			
 			LOG.info(compose("Updated account", a));
@@ -92,15 +145,15 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	}
 
 	public Account get(String name) {
-		return get("select * from account where name = ?", name);
+		return get(buildSelect("name = ?"), name);
 	}
 
 	public Account get(long id) {
-		return get("select * from account where id = ?", id);
+		return get(buildSelect("id = ?"), id);
 	}
 	
-	public Account getByOrigId(long id) {
-		return get("select * from account where origid = ?", id);
+	public Account getByOrigId(long origId) {
+		return get(buildSelect("origid = ?"), origId);
 	}
 	
 	private Account get(String sql, Object... params) {
@@ -116,9 +169,19 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	public List<Account> getAll() {
 		return getAll(false);
 	}
+	
+	private String buildSelect(String whereClause) {
+		return "select * from account a left join savings sa on sa.accountid = a.id " +
+			(StringUtils.isNotBlank(whereClause) ? "where " + whereClause : "");
+	}
 
 	public List<Account> getAll(boolean includingClosed) {
-		String sql = String.format("select * from account %s order by name", includingClosed ? "" : "where closed=false");
+		String sql = buildSelect(includingClosed ? "" : "closed=false") + " order by a.name";
+		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
+	}
+	
+	public List<Account> getAllSavings() {
+		String sql = buildSelect("closed=false and type='savings'") + " order by matures";
 		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
 	}
 	
@@ -144,8 +207,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	}
 	
 	public List<Account> getAssets() {
-		//String sql = "select * from account where type in ('current', 'savings', 'pension') order by name";
-		String sql = "select * from account where type != 'other' order by name";
+		String sql = buildSelect("type != 'other'") + " order by a.name";
 		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
 	}
 	

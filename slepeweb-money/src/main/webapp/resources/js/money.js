@@ -7,6 +7,7 @@ var _money = {
 	chart: {},
 	service: {},
 	reconcile: {},
+	accpunt: {},
 };
 
 _money.shared.isNotEmpty = function(field, sel, errors, isWarning) {

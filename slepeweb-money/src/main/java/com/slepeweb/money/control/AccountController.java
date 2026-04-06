@@ -14,6 +14,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.SavingsAccount;
 import com.slepeweb.money.bean.User;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.TransactionService;
@@ -30,7 +31,7 @@ public class AccountController extends BaseController {
 	@Autowired private TransactionService transactionService;
 	
 	@RequestMapping(value="/list")	
-	public String list(ModelMap model) { 
+	public String listAll(ModelMap model) { 
 		List<Account> open = this.accountService.getAll(false);
 		List<Account> all = this.accountService.getAll(true);
 		
@@ -49,10 +50,20 @@ public class AccountController extends BaseController {
 		return "accountList";
 	}
 		
+	@RequestMapping(value="/list/savings")	
+	public String listSavings(ModelMap model) { 
+		List<Account> open = this.accountService.getAllSavings();
+		model.addAttribute("_savings", open);
+		return "savingsList";
+	}
+		
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String addForm(ModelMap model) {
 		
 		model.addAttribute("_account", new Account());
+		
+		// Cater for possibility that account type will be 'savings'
+		model.addAttribute("_savings", new SavingsAccount());
 		model.addAttribute("_formMode", "add");
 		return "accountForm";
 	}
@@ -60,7 +71,15 @@ public class AccountController extends BaseController {
 	@RequestMapping(value="/form/{accountId}", method=RequestMethod.GET)
 	public String updateForm(@PathVariable long accountId, ModelMap model) {
 		
-		model.addAttribute("_account", this.accountService.get(accountId));
+		Account a = this.accountService.get(accountId);
+		
+		model.addAttribute("_account", a);
+		
+		/* Cater for possibility that an old savings account did not have a
+		 * corresponding savings record in the db.
+		 */
+		model.addAttribute("_savings", a.isSavings() ? a : new SavingsAccount());
+		
 		model.addAttribute("_formMode", "update");
 		model.addAttribute("_numDeletableTransactions", this.transactionService.getNumTransactionsForAccount(accountId));
 		return "accountForm";
@@ -71,15 +90,31 @@ public class AccountController extends BaseController {
 		
 		String flash;	
 		boolean isUpdateMode = req.getParameter("formMode").equals("update");
+		String accountType = req.getParameter("type");
+		boolean isSavingsAccount = accountType != null && accountType.equals("savings");
+		Account a = isSavingsAccount ? new SavingsAccount() : new Account();
 		
-		Account a = new Account().
-				setId(Long.valueOf(req.getParameter("id"))).
-				setName(req.getParameter("name")).
-				setType(req.getParameter("type")).
-				setClosed(! req.getParameter("status").equals("open")).
-				setOpeningBalance(Util.parsePounds(req.getParameter("opening"))).
-				setNote(req.getParameter("note")).
-				setReconciled(Util.parsePounds(req.getParameter("reconciled")));
+		a.
+			setId(Long.valueOf(req.getParameter("id"))).
+			setName(req.getParameter("name")).
+			setType(accountType).
+			setSortCode(req.getParameter("sortcode")).
+			setAccountNo(req.getParameter("accountno")).
+			setRollNo(req.getParameter("rollno")).
+			setClosed(! req.getParameter("status").equals("open")).
+			setOpeningBalance(Util.parsePounds(req.getParameter("opening"))).
+			setNote(req.getParameter("note")).
+			setReconciled(Util.parsePounds(req.getParameter("reconciled")));
+		
+		if (isSavingsAccount) {
+			SavingsAccount sa = (SavingsAccount) a;
+			sa.
+				setMatures(Util.parseTimestamp(req.getParameter("matures"))). 
+				setAccess(req.getParameter("access")).
+				setSchedule(req.getParameter("schedule")).
+				setOwner(req.getParameter("owner")).
+				setRate(req.getParameter("rate"));
+		}
 		
 		try {
 			this.accountService.save(a);

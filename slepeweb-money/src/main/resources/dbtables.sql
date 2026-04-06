@@ -4,6 +4,7 @@ drop table if exists transaction;
 drop table if exists scheduledtransaction;
 drop table if exists scheduledsplit;
 drop table if exists account;
+drop table if exists savings;
 drop table if exists payee;
 drop table if exists category;
 drop table if exists search;
@@ -48,6 +49,19 @@ create table account
 	index idx_account_origid (origid),
 	unique key idx_account_name (name),
 	index idx_status (closed)
+) ENGINE=InnoDB;
+
+create table savingsaccount
+(
+	accountid int,
+	matures timestamp,
+	access varchar(16),
+	schedule varchar(16),
+	owner varchar(16),
+	rate varchar(16),
+	primary key (id),
+	index idx_savings_matures (matures),
+	constraint foreign key (accountid) references account(id) on delete cascade
 ) ENGINE=InnoDB;
 
 create table transaction
