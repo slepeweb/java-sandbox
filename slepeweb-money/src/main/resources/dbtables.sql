@@ -51,7 +51,7 @@ create table account
 	index idx_status (closed)
 ) ENGINE=InnoDB;
 
-create table savingsaccount
+create table savings
 (
 	accountid int,
 	matures timestamp,
@@ -59,7 +59,7 @@ create table savingsaccount
 	schedule varchar(16),
 	owner varchar(16),
 	rate varchar(16),
-	primary key (id),
+	primary key (accountid),
 	index idx_savings_matures (matures),
 	constraint foreign key (accountid) references account(id) on delete cascade
 ) ENGINE=InnoDB;

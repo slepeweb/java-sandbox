@@ -113,12 +113,23 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 			if (dbRecord.isSavings() && a.isSavings()) {
 				
 				// Case c)
+				SavingsAccount saRecord = (SavingsAccount) dbRecord;
 				SavingsAccount sa = (SavingsAccount) a;
-
-				this.jdbcTemplate.update(
-						"update savings set matures = ?, access = ?, schedule = ?, owner = ?, rate = ? where accountid = ?", 
-						sa.getMatures(), sa.getAccess(), sa.getSchedule(), sa.getOwner(), 
-						sa.getRate(), sa.getAccountId());
+				
+				/* Cater for situation where a savings account does not have a corresponding entry in the 
+				 * savings table. In this case, dbRecord (being a SavingsAccount object) will have a
+				 * null value in the 'accountId field', and so a new record needs to be added rather than
+				 * an existing record being updated.
+				 */
+				if (saRecord.isLinked()) {
+					this.jdbcTemplate.update(
+							"update savings set matures = ?, access = ?, schedule = ?, owner = ?, rate = ? where accountid = ?", 
+							sa.getMatures(), sa.getAccess(), sa.getSchedule(), sa.getOwner(), 
+							sa.getRate(), sa.getId());
+				}
+				else {
+					insertNewSavings(sa);
+				}
 			}
 			else if (dbRecord.isSavings() && ! a.isSavings()) {
 				
