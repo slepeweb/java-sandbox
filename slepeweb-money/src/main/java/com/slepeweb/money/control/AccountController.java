@@ -121,7 +121,9 @@ public class AccountController extends BaseController {
 			flash = String.format("success|Account successfully %s", isUpdateMode ? "updated" : "added");
 		}
 		catch (Exception e) {
-			flash = String.format("failure|Failed to %s account", isUpdateMode ? "update" : "add new");
+			String err = String.format("Failed to %s account", isUpdateMode ? "update" : "add new");
+			flash = String.format("failure|%s", err);
+			LOG.error(String.format("%s: %s", err, e.getMessage()));
 		}
 	
 		return new RedirectView(String.format("%s/account/form/%d?flash=%s", 

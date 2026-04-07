@@ -1,7 +1,8 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="entity" required="true" rtexprvalue="true" %><%@ 
-	attribute name="many" required="false" rtexprvalue="true" %>
+	attribute name="many" required="false" rtexprvalue="true" %><%@ 
+	attribute name="menuadd" required="false" rtexprvalue="true" %>
 
 <!-- standardFormMenu.tag -->
 
@@ -16,5 +17,7 @@
 	<c:if test="${_formMode eq 'add' or _formMode eq 'adhoc' or _formMode eq 'update'}">
 		<li><a href="${_ctxPath}/${entity}/list" title="List existing ${several}">List ${several}</a></li>
 	</c:if>
+	
+	<c:if test="${not empty menuadd}"><li>${menuadd}</li></c:if>
 </ul>
 	

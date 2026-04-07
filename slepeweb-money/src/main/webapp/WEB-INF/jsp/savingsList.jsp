@@ -15,11 +15,14 @@
 		<p>Accounts are listed in order of maturity date.</p>
 		
 		<table>
-			<tr><th>Name</th><th>Accessibility</th><th>Balance</th><th>Matures</th><th>Notes</th></tr>
+			<tr><th>Name</th><th>Owner</th><th>Rate</th><th>Accessibility</th><th>Balance</th><th>Matures</th><th>Notes</th></tr>
+			
 			<c:forEach items="${_savings}" var="_a">
 				<tr>
 					<td class="name"><a href="${_ctxPath}/account/form/${_a.id}" 
 						title="Update details of this account">${_a.name}</a></td>
+					<td>${_a.owner}</td>
+					<td>${_a.rate}</td>
 					<td>${_a.access}</td>
 					<td>${mon:displayAmountWS(_a.balance)}</td>
 					<td>${mon:formatTimestamp(_a.matures)}</td>

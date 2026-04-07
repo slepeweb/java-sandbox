@@ -14,7 +14,8 @@
 
 <mny:standardLayout>
 
-	<mny:standardFormPageHeading entity="account" />
+	<c:set var="menuadd"><a href="${_ctxPath}/account/list/savings">List only savings</a></c:set>
+	<mny:standardFormPageHeading entity="account" menuadd="${menuadd}" />
 	
 	<form id="account-form" method="post" action="${_ctxPath}/account/update">	  
 	    <table>
