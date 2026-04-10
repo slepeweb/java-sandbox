@@ -51,7 +51,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		try {
 			this.jdbcTemplate.update(
 					"insert into account (origid, name, type, sortcode, accountno, rollno, openingbalance, closed, " + 
-							"note, reconciled, balance) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+							"note, reconciled, balance) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 					a.getOrigId(), a.getName(), a.getType(), a.getSortCode(), a.getAccountNo(), a.getRollNo(),
 					a.getOpeningBalance(), a.isClosed(), a.getNote(), a.getReconciled(), a.getBalance());
 			
