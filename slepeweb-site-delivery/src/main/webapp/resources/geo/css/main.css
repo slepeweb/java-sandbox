@@ -7,7 +7,7 @@ body, input, select, textarea {
 }
 
 body {
-  max-width: 1170px;
+  max-width: 1138px;
   /* This centres the page horizontally */
   margin: auto;
 }

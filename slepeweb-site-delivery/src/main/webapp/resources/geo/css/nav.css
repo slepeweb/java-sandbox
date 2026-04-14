@@ -14,12 +14,17 @@ header {
 
 /* Navbar styling */
 .navbar {
-    background-color: #6f86ca;
 		display: flex;
     justify-content: space-between;
     align-items: center;
     padding-left: 10px;
     height: 5em;
+}
+
+nav.navbar {
+/*     background-color: #6f86ca; */
+	background-image: url("/resources/geo/hero7.jpg");
+	background-position: right;
 }
 
 .navbar .hidden {
