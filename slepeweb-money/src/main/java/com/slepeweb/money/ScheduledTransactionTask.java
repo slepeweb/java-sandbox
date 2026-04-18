@@ -55,15 +55,19 @@ public class ScheduledTransactionTask implements Job {
 			// Populate the splits
 			scht.setSplits(scheduledSplitService.get(scht.getId()));
 			
-			t = Transaction.adapt(scht);
+			// This returns either a Transaction or a Transfer object, nearly fully populated
+			t = Transaction.adapt(scht);					
 			
 			if (scheduled.before(now)) {
-				// Use scht properties to save a Transaction
-				t.setId(0);
+				t.setId(0); // Indicating a new transaction is required
 				t.setEntered(Util.toTimestamp(Util.today()));
 				t.setSource(4);
 				
 				try {
+					/*
+					 *  The transactionService will take care of mirrored transactions
+					 *  should t be a Transfer object
+					 */
 					transactionService.save(t);
 					createdTransaction = true;
 					LOG.info(String.format("Processed scheduled transaction [%s]", scht.getLabel()));

@@ -42,6 +42,7 @@ public class Transfer extends Transaction {
 		return this;
 	}
 
+	@Override
 	public Account getMirrorAccount() {
 		if (this.mirrorAccount == null && this.transactionService != null) {
 			Transaction t = this.transactionService.get(getTransferId());
@@ -55,5 +56,10 @@ public class Transfer extends Transaction {
 	public Transfer setMirrorAccount(Account mirrorAccount) {
 		this.mirrorAccount = mirrorAccount;
 		return this;
+	}
+	
+	@Override
+	public boolean isTransfer() {
+		return true;
 	}
 }

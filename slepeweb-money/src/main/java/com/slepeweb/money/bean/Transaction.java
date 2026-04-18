@@ -40,7 +40,7 @@ public class Transaction extends DbEntity {
 		setPayee(source.getPayee());
 		setCategory(source.getCategory());
 		setEntered(source.getEntered());
-		setXferId(source.getTransferId());
+		setTransferId(source.getTransferId());
 		setReconciled(source.isReconciled());
 		setAmount(source.getAmount());
 		setReference(source.getReference());
@@ -93,7 +93,7 @@ public class Transaction extends DbEntity {
 	
 	public static Transaction adapt(ScheduledTransaction scht) {
 		Transaction t = new Transaction();
-		if (scht.getMirror() != null) {
+		if (scht.getMirrorAccount() != null) {
 			t = new Transfer();
 		}
 		
@@ -108,12 +108,14 @@ public class Transaction extends DbEntity {
 			setSplit(scht.isSplit());
 		
 		if (t.isTransfer()) {
-			t.setXferId(scht.getMirror().getId());
 			Transfer tr = (Transfer) t;
-			tr.setMirrorAccount(scht.getMirror());
+			tr.setMirrorAccount(scht.getMirrorAccount());
+		}
+		else {
+			// Transfers cannot handle splits
+			t.setSplits(scht.getSplits());			
 		}
 
-		t.setSplits(scht.getSplits());
 		return t;
 	}
 	
@@ -191,7 +193,7 @@ public class Transaction extends DbEntity {
 	}
 	
 	public boolean isTransfer() {
-		return this instanceof Transfer || getTransferId() > 0L;
+		return getTransferId() > 0L;
 	}
 	
 	boolean isStandard() {
@@ -250,7 +252,7 @@ public class Transaction extends DbEntity {
 		return this.xferId;
 	}
 
-	public Transaction setXferId(long id) {
+	public Transaction setTransferId(long id) {
 		this.xferId = id;
 		return this;
 	}

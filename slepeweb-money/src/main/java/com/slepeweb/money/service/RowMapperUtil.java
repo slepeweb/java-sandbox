@@ -52,7 +52,7 @@ public class RowMapperUtil {
 					setCategory(makeCategoryX(rs)).
 					setSplit(rs.getBoolean("split")).
 					setEntered(rs.getTimestamp("entered")).
-					setXferId(transferId).
+					setTransferId(transferId).
 					setReconciled(rs.getBoolean("reconciled")).
 					setAmount(rs.getLong("amount")).
 					setReference(rs.getString("reference")).
@@ -225,7 +225,7 @@ public class RowMapperUtil {
 			if (StringUtils.isNotBlank(mirrorName)) {
 				shell = new Account();
 				initAccount(shell, rs, "mirrorid", "mirrorname", "mirrorbalance");
-				scht.setMirror(shell);						
+				scht.setMirrorAccount(shell);						
 			}
 			
 			return scht;

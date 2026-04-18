@@ -42,7 +42,8 @@ public class ScheduledTransaction extends Transaction {
 		super.assimilate(obj);
 		ScheduledTransaction source = (ScheduledTransaction) obj;
 		setLabel(source.getLabel());
-		setMirror(source.getMirror());
+		setPeriod(source.getPeriod());
+		setMirrorAccount(source.getMirrorAccount());
 		setEnabled(source.isEnabled());
 		setNextDate(source.getNextDate());
 		
@@ -50,9 +51,12 @@ public class ScheduledTransaction extends Transaction {
 	}
 	
 	public void assimilateSplits(Transaction source) {
-		getSplits().clear();
-		for (SplitTransaction st : source.getSplits()) {
-			getSplits().add(st.setTransactionId(getId()));
+		// Transfers cannot involve split transactions
+		if (! source.isTransfer()) {
+			getSplits().clear();
+			for (SplitTransaction st : source.getSplits()) {
+				getSplits().add(st.setTransactionId(getId()));
+			}
 		}
 	}
 	
@@ -72,7 +76,7 @@ public class ScheduledTransaction extends Transaction {
 	
 
 	public boolean isTransfer() {
-		return getMirror() != null && getMirror().getId() > 0L;
+		return getMirrorAccount() != null && getMirrorAccount().getId() > 0L;
 	}
 
 	public void setSplits(ScheduledSplitService svc) {
@@ -115,11 +119,12 @@ public class ScheduledTransaction extends Transaction {
 		return this;
 	}
 
-	public Account getMirror() {
+	@Override
+	public Account getMirrorAccount() {
 		return mirror;
 	}
 
-	public ScheduledTransaction setMirror(Account mirror) {
+	public ScheduledTransaction setMirrorAccount(Account mirror) {
 		this.mirror = mirror;
 		return this;
 	}	

@@ -118,7 +118,7 @@ public class MoneyImportManager {
 				// in order for equals() to give the desired result in TransactionServiceImpl
 				if (dbRecord.isTransfer()) {
 					t = new Transfer(t);
-					t.setXferId(dbRecord.getTransferId());
+					t.setTransferId(dbRecord.getTransferId());
 				}
 				t = mis.updateTransaction(dbRecord, t);
 			}

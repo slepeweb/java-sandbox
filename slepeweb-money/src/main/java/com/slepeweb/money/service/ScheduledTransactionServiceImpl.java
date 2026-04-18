@@ -78,7 +78,7 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 					scht.getLabel(), scht.getNextDate(), scht.getPeriod(),
 					scht.getAccount().getId(), 
-					scht.getMirror() != null ? scht.getMirror().getId() : null, 
+					scht.getMirrorAccount() != null ? scht.getMirrorAccount().getId() : null, 
 					scht.getPayee().getId(), scht.getCategory().getId(), 
 					scht.isSplit(), scht.getAmount(),
 					scht.getReference(), scht.getMemo(), scht.isEnabled());
@@ -105,7 +105,7 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 						"where id = ?", 
 						dbRecord.getLabel(), dbRecord.getNextDate(), dbRecord.getPeriod(),
 						dbRecord.getAccount().getId(), 
-						dbRecord.getMirror() != null ? dbRecord.getMirror().getId() : null, 
+						dbRecord.getMirrorAccount() != null ? dbRecord.getMirrorAccount().getId() : null, 
 						dbRecord.getPayee().getId(), dbRecord.getCategory().getId(),
 						dbRecord.isSplit(), dbRecord.getAmount(),  
 						dbRecord.getMemo(), dbRecord.isEnabled(), dbRecord.getReference(), 

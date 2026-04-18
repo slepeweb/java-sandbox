@@ -86,9 +86,9 @@ public class ScheduledTransactionController extends BaseController {
 		Account a = this.accountService.get(Long.valueOf(req.getParameter("account")));
 		
 		Account m = null;
-		String mirror = req.getParameter("xferaccount");
-		if (isTransfer && StringUtils.isNotBlank(mirror)) {
-			m = this.accountService.get(Long.valueOf(mirror));
+		String mirrorAccount = req.getParameter("xferaccount");
+		if (isTransfer && StringUtils.isNotBlank(mirrorAccount)) {
+			m = this.accountService.get(Long.valueOf(mirrorAccount));
 		}
 		
 		Payee p = this.payeeService.get(req.getParameter("payee"));
@@ -109,7 +109,7 @@ public class ScheduledTransactionController extends BaseController {
 				setLabel(req.getParameter("label")).
 				setNextDate(Util.parseTimestamp(req.getParameter("nextdate"))).
 				setPeriod(req.getParameter("period")).
-				setMirror(m).
+				setMirrorAccount(m).
 				setEnabled(StringUtils.isNotBlank(req.getParameter("enabled")));
 
 		scht.

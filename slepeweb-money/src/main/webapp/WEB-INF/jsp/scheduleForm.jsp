@@ -35,7 +35,7 @@
 
 	    	<mny:tableRow heading="Interval">
 		    	<input id="period" type="text" name="period" placeholder="Specify interval between scheduled transactions" 
-		        		value="${mon:tertiaryOp(_schedule.period, _schedule.period, '1m')}">
+		        		value="${mon:tertiaryOp(not empty _schedule.period, _schedule.period, '1m')}">
 				</mny:tableRow>
 
 	    	<mny:tableRow heading="Next date">
@@ -45,7 +45,7 @@
 
 		    <tsf:account accountId="${_schedule.account.id}" />
 		    <tsf:paymentType entity="${_schedule}" />
-		    <tsf:transfer istransfer="${_schedule.transfer}" mirror="${_schedule.mirror}" />
+		    <tsf:transfer istransfer="${_schedule.transfer}" mirror="${_schedule.mirrorAccount}" />
 		    <tsf:payee payeeName="${_schedule.payee.name}" />
 		    <tsf:category entity="${_schedule}" />
 		    <tsf:subCategory entity="${_schedule}" />

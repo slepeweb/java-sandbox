@@ -187,6 +187,7 @@ public class TransactionController extends BaseController {
 		Category c;
 		Transaction t;
 		
+		// Set payee and category
 		if (isTransfer) {
 			// Override setting on form - 'split' has no meaning with transfers
 			isSplit = false;
@@ -209,6 +210,7 @@ public class TransactionController extends BaseController {
 			}
 		}
 		
+		// Set remaining transaction properties
 		t.		
 			setId(Util.toLong(req.getParameter("id"))).
 			setOrigId(Util.toLong(req.getParameter("origid"))).
@@ -222,7 +224,7 @@ public class TransactionController extends BaseController {
 			t.setSource(3);
 		}
 		
-		// Note: Transfers can NOT have split transactions
+		// Note: Transfers can NOT have split transactions. This is enforced earlier in this method.
 		if (isSplit) {
 			List<String> allMajors = this.categoryService.getAllMajorValues();
 			Category_GroupSet cgs = new Category_GroupSet("Splits", FormSupport.TRANSACTION_CTX, allMajors);
@@ -230,8 +232,10 @@ public class TransactionController extends BaseController {
 			t.setSplits(cg.toSplitTransactions(this.categoryService, multiplier));
 		}
 		
+		// Save the transaction
 		t = save(t);
 		
+		// Update transaction history and redirect request to transaction form view
 		if (t != null) {
 			getHistory(req).setLastTransaction(t);
 			flash = String.format("success|Transaction successfully %s", isUpdateMode ? "updated" : "added");
@@ -244,6 +248,7 @@ public class TransactionController extends BaseController {
 			flash = "failure|Failed to save transaction";
 		}
 	
+		// Default on transaction update error
 		return new RedirectView(String.format("%s/transaction/list?flash=%s", 
 				req.getContextPath(), Util.encodeUrl(flash)));
 	}

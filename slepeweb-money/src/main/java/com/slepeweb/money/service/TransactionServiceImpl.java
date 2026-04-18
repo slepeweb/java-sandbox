@@ -52,7 +52,6 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		
 		Account mirrorAccount = null;
-		boolean isTransfer = pt instanceof Transfer;
 		Transfer tt = null;
 		Transaction previous = null;
 		
@@ -60,12 +59,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			previous = get(pt.getId());
 		}
 		
-		if (isTransfer) {
+		if (pt.isTransfer()) {
 			tt = (Transfer) pt;
 			mirrorAccount = tt.getMirrorAccount();
 		}
 		
-		Transaction mirror = null;
+		Transaction mirrorTransaction = null;
 		
 		if (pt.isDefined4Insert()) {
 			Transaction t;
@@ -93,13 +92,17 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			else {
 				// Insert a new transaction
 				t = insert(pt);
+				
+				// Update the account balance
 				t.getAccount().credit(t.getAmount());
 				this.accountService.saveBalance(t.getAccount());
 			}
 
 			// Also save the new transaction's splits, if any
-			t.assimilateSplits(revisedSplits);
-			t = this.splitTransactionService.save(t);
+			if (! t.isTransfer()) {
+				t.assimilateSplits(revisedSplits);
+				t = this.splitTransactionService.save(t);
+			}
 			
 			// Keep a reference to the previous revision of this transaction, for
 			// when we update mirror transactions
@@ -107,16 +110,17 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			
 			// Manage mirror transaction, as applicable, including Solr updates for same
 			if (! ignoreMirror) {
-				mirror = manageMirror(t, mirrorAccount);
+				// This might return null, indicating that an existing mirror transaction has been deleted
+				mirrorTransaction = handleMirrorTransaction(t, mirrorAccount);
 				
-				if (mirror != null) {
+				if (mirrorTransaction != null) {
 					// Recursive call to save(), but for the mirror transaction
-					mirror = save(mirror, true);
+					mirrorTransaction = save(mirrorTransaction, true);
 					
 					// Bind two transactions together.
 					// Note that mirror is already bound to t, by manageMirror().
-					t.setXferId(mirror.getId());
-					updateTransfer(t.getId(), mirror.getId());
+					t.setTransferId(mirrorTransaction.getId());
+					updateTransfer(t.getId(), mirrorTransaction.getId());
 				}
 			}
 			
@@ -173,7 +177,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	 * 
 	 * Must only be called for Transfer objects, and NOT Transaction objects.
 	 */
-	private Transaction manageMirror(Transaction t, Account mirrorAccount) 
+	private Transaction handleMirrorTransaction(Transaction t, Account mirrorAccount) 
 			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		
 		Transaction mirror = null;
@@ -190,7 +194,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		}
 		else if (previousTransferId == 0 && mirrorAccount != null) {
 			// Case 1) create a new mirror transaction
-			mirror = mirrorTransaction(t, new Transaction().setSource(-1), mirrorAccount);
+			mirror = mirrorTransaction(t, new Transaction().setSource(t.getSource()), mirrorAccount);
 		}
 		else if (previousTransferId > 0 && mirrorAccount != null) {
 			// Case 2) update an existing mirror
@@ -212,10 +216,14 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		// Create new mirror transaction
 		Transaction mirror = base;
+		if (t.isTransfer()) {
+			mirror = new Transfer();
+			mirror.assimilate(base);
+		}
 		
 		if (! t.isReconciled()) {
 			mirror.
-				setXferId(t.getId()).
+				setTransferId(t.getId()).
 				setAccount(transferAccount).
 				setPayee(t.getPayee()).
 				setCategory(t.getCategory()).
