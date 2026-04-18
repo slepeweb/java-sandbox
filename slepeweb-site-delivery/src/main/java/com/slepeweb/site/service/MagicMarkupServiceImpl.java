@@ -31,6 +31,7 @@ public class MagicMarkupServiceImpl implements MagicMarkupService {
 		Document doc = createDocument(html);
 		transformXImages(doc);
 		transformXComponents(doc);
+		addLinkTitles(doc);
 		
 		return doc.body().html();
 	}
@@ -184,4 +185,28 @@ public class MagicMarkupServiceImpl implements MagicMarkupService {
     		parent.appendChild(comp);
     	}
     }
+	
+	private void addLinkTitles(Document doc) {
+		String href = null;
+		Long origId;
+		Item i;
+		Matcher m;
+		
+    	for (Element e : doc.getElementsByTag("a")) {
+    		href = e.attr("href");
+    		m = MINIPATH_PATTERN.matcher(href);
+    		
+    		if (m.matches()) {
+    			origId = Long.parseLong(m.group(1));
+           		i = this.itemService.getItem(Long.valueOf(origId));
+    			
+           		if (i == null) {
+           			LOG.error(String.format("Item with origId %d not found", origId));
+           			continue;
+           		}
+           		
+				e.attr("title", i.getTitle());
+	    	}
+    	}
+	}
 }
