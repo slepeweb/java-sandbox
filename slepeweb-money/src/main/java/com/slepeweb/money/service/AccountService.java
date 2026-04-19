@@ -15,7 +15,7 @@ public interface AccountService {
 	List<Account> getAll();
 	List<Account> getAll(boolean includingClosed);
 	List<Account> getAllSavings();
-	void resetBalances() throws MissingDataException, DuplicateItemException, DataInconsistencyException;
+	int resetBalances() throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	List<Account> getAssets();
 	Account save(Account f) throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	Account update(Account existing, Account with);

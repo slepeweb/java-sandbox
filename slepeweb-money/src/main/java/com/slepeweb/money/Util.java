@@ -117,7 +117,10 @@ public class Util {
 	
 	public static Timestamp parseTimestamp(String s) {
 		try {
-			return new Timestamp(SDF.parse(s).getTime());
+			Calendar c = Calendar.getInstance();
+			c.setTime(SDF.parse(s));
+			zeroTimeOfDay(c);
+			return new Timestamp(c.getTimeInMillis());
 		} 
 		catch (Exception e) {
 			return null;
@@ -148,7 +151,14 @@ public class Util {
 	}
 	
 	public static void zeroTimeOfDay(Calendar c) {
-		c.set(Calendar.HOUR_OF_DAY, 0);
+		/*
+		 * Well, actually 2am.
+		 * 2am BST is 1am UTC
+		 * MySQL stores Timestamps in UTC, but select SQL statments return the values 
+		 * according to the current timezone of the server. By setting times to 2am, we
+		 * avoid '00' hours rolling back to '23' when we're not in BST.
+		 */
+		c.set(Calendar.HOUR_OF_DAY, 2);
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);

@@ -166,8 +166,8 @@ public class AccountController extends BaseController {
 		}
 		else {
 			try {
-				this.accountService.resetBalances();
-				flash="success|Account balances re-calculated";
+				int num = this.accountService.resetBalances();
+				flash = String.format("success|%d account balances re-calculated", num);
 			}
 			catch (Exception e) {
 				flash = "failure|Failed to re-calculate account balances";
@@ -175,7 +175,7 @@ public class AccountController extends BaseController {
 			}
 		}
 		
-		return new RedirectView(String.format("%s/account/list?flash=%s", 
+		return new RedirectView(String.format("%s/?flash=%s", 
 				req.getContextPath(), Util.encodeUrl(flash)));
 	}	
 }

@@ -196,7 +196,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		return this.jdbcTemplate.query(sql, new RowMapperUtil.AccountMapper());
 	}
 	
-	public void resetBalances() throws MissingDataException, DuplicateItemException, DataInconsistencyException {
+	public int resetBalances() throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		long balanceWas, balanceNow;
 		int count = 0;
 		
@@ -215,6 +215,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		}
 		
 		LOG.info(String.format("%s account balances were reset", count));
+		return count;
 	}
 	
 	public List<Account> getAssets() {

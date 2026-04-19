@@ -47,9 +47,13 @@ public class ScheduledTransactionController extends BaseController {
 	}
 	
 	@RequestMapping(value="/trigger")	
-	public String trigger(ModelMap model) { 
+	public RedirectView trigger(HttpServletRequest req, ModelMap model) { 
 		this.scheduledTransactionManager.triggerNow();
-		return list(model);
+		
+		return new RedirectView(String.format("%s/schedule/list?flash=%s&ts=%d", 
+				req.getContextPath(), 
+				Util.encodeUrl("success|Schedules triggered"),
+				System.currentTimeMillis()));
 	}
 	
 	@RequestMapping(value="/add", method=RequestMethod.GET)
