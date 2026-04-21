@@ -30,6 +30,8 @@
 	<script src="/resources/js/site.js"></script>
 </c:if>
 
+<jsp:doBody />
+
 <gen:extraCSS />
 <gen:extraInpageCSS />
 <gen:extraInContentCSS />
@@ -37,4 +39,3 @@
 <gen:extraInpageJS />
 <gen:extraInContentJS />
 
-<jsp:doBody />

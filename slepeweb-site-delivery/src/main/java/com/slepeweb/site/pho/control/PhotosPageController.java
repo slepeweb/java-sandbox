@@ -1,10 +1,16 @@
 package com.slepeweb.site.pho.control;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -13,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.slepeweb.cms.bean.Dateish;
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.TagList;
 import com.slepeweb.cms.constant.AttrName;
+import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.TagService;
@@ -27,6 +36,7 @@ import com.slepeweb.common.solr.bean.SolrResponse;
 import com.slepeweb.site.control.BaseController;
 import com.slepeweb.site.model.Page;
 import com.slepeweb.site.pho.bean.PhoCookieValues;
+import com.slepeweb.site.pho.bean.PhoMetadata;
 import com.slepeweb.site.pho.bean.SolrParams4Pho;
 import com.slepeweb.site.pho.service.PhoCookieService;
 import com.slepeweb.site.pho.service.SolrService4Photos;
@@ -152,6 +162,82 @@ public class PhotosPageController extends BaseController {
 			
 		model.addAttribute("_search", response);
 		return page.getView();
+	}
+	
+	@RequestMapping(value="/export/csv", method=RequestMethod.GET)	
+	public String export2csv (
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
+			HttpServletRequest req,
+			ModelMap model) {
+		
+		String attr = "_csv";
+		@SuppressWarnings("unchecked")
+		List<PhoMetadata> csvTable = (List<PhoMetadata>) req.getSession().getAttribute(attr);
+		String refresh = req.getParameter("refresh");
+		
+		if (csvTable == null || refresh != null) {
+			
+			csvTable = new ArrayList<PhoMetadata>(1313);
+			
+			try {
+				csvTable.addAll(toCsv(this.itemService.getItemsByType(i.getSite().getId(), ItemTypeName.PHOTO_JPG)));
+				csvTable.addAll(toCsv(this.itemService.getItemsByType(i.getSite().getId(), ItemTypeName.MOVIE_MP4)));
+				
+				Collections.sort(csvTable, new Comparator<PhoMetadata>() {
+					@Override
+					public int compare(PhoMetadata o1, PhoMetadata o2) {
+						Dateish d1 = new Dateish(o1.getDateishStr());
+						Dateish d2 = new Dateish(o2.getDateishStr());
+						return d2.toSortableString().compareTo(d1.toSortableString());
+					}				
+				});
+				
+				PrintWriter pw = new PrintWriter(new FileWriter("/tmp/photos.csv"));
+				pw.println(StringUtils.join(PhoMetadata.getCsvHeader()));
+				
+				for (PhoMetadata d : csvTable) {
+					pw.println(d.getCsvRow());
+				}
+				
+				req.getSession().setAttribute(attr, csvTable);
+				pw.close();
+			}
+			catch (IOException e) {
+				System.out.print("CSV export failed: " + e.getMessage());
+			}
+		}
+		
+		Page page = getStandardPage(i, shortSitename, "csvExport", model);
+		model.addAttribute(attr, csvTable);
+		model.addAttribute("_header", PhoMetadata.getHeaderArray());
+		return page.getView();
+	}
+	
+	private List<PhoMetadata> toCsv(List<Item> list) throws IOException {
+		List<PhoMetadata> csvTable = new ArrayList<PhoMetadata>();
+		PhoMetadata meta;
+		
+		Media m;
+		for (Item i : list) {
+			m = i.getMedia();
+			if (m == null) {
+				continue;
+			}
+			
+			meta = new PhoMetadata().
+					setItemPath(i.getPath()).
+					setMediaFilePath(String.format("%s/%s", m.getFolder(), m.getRepositoryFileName())).
+					setMediaType(i.getType().isImage() ? "Image" : "Video").
+					setTags(i.getTagsAsString()).
+					setTitle(i.getTitle()).
+					setTeaser(i.getFieldValue(FieldName.TEASER)).
+					setDateishStr(i.getFieldValue(FieldName.DATEISH));
+
+			csvTable.add(meta);
+		}
+		
+		return csvTable;
 	}
 	
 	private String search(

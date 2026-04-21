@@ -15,6 +15,7 @@ public interface ItemService {
 	Item getItem(Long siteId, String path);
 	Item getEditableVersion(Long siteId, String path);
 	List<Item> getItemsByPathLike(Long siteId, String path);
+	List<Item> getItemsByType(Long siteId, String type);
 	Item getItem(Long id);
 	Item getItemByOriginalId(Long id);
 	Item getItem(Long id, int version);

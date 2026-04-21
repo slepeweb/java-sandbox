@@ -393,8 +393,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	 */
 	public List<Item> getItemsByPathLike(Long siteId, String path) {
 		String sql = String.format(SELECT_TEMPLATE, "i.siteid=? and i.path like ? and i.deleted=0" + getVersionClause());
-		List<Item> list = this.jdbcTemplate.query(
-				sql, new RowMapperUtil.ItemMapper(), siteId, path + "%");
+		List<Item> list = this.jdbcTemplate.query(sql, new RowMapperUtil.ItemMapper(), siteId, path + "%");
 		
 		for (int i = 0; i < list.size(); i++) {
 			list.set(i, extendIfProduct(list.get(i)));
@@ -403,6 +402,11 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 		return list;
 	}
 
+	public List<Item> getItemsByType(Long siteId, String type) {
+		String sql = String.format(SELECT_TEMPLATE, "i.siteid=? and it.name=? and i.deleted=0" + getVersionClause());
+		return this.jdbcTemplate.query(sql, new RowMapperUtil.ItemMapper(), siteId, type);
+	}
+	
 	public Item getItem(Long id) {
 		return getItem(
 			String.format(SELECT_TEMPLATE, "i.id=? and i.deleted=0"), 
