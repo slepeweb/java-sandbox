@@ -167,7 +167,7 @@ public class AccountController extends BaseController {
 		else {
 			try {
 				int num = this.accountService.resetBalances();
-				flash = String.format("success|%d account balances re-calculated", num);
+				flash = String.format("success|%d account balances required reset", num);
 			}
 			catch (Exception e) {
 				flash = "failure|Failed to re-calculate account balances";

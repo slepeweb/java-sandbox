@@ -48,90 +48,94 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return save(pt, false);
 	}
 		
-	private Transaction save(Transaction pt, boolean ignoreMirror) 
+	private Transaction save(Transaction formInput, boolean ignoreMirror) 
 			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		
-		Account mirrorAccount = null;
-		Transfer tt = null;
-		Transaction previous = null;
+		Account formInputMirrorAccount = null;
+		Transfer formInputAsTransfer = null;
+		Transaction transactionBeingUpdated = null;
 		
-		if (pt.getId() > 0) {
-			previous = get(pt.getId());
+		if (formInput.getId() > 0) {
+			transactionBeingUpdated = get(formInput.getId());
 		}
 		
-		if (pt.isTransfer()) {
-			tt = (Transfer) pt;
-			mirrorAccount = tt.getMirrorAccount();
+		if (formInput.isTransfer()) {
+			formInputAsTransfer = (Transfer) formInput;
+			formInputMirrorAccount = formInputAsTransfer.getMirrorAccount();
 		}
 		
-		Transaction mirrorTransaction = null;
+		/*
+		 *  If a Transaction is in fact a Transfer, then this is modelled as 2 transaction records ...
+		 *  one is a 'mirror' of the other.
+		 */
+		Transaction mirroredTransaction = null;
 		
-		if (pt.isDefined4Insert()) {
-			Transaction t;
-			List<SplitTransaction> revisedSplits = new ArrayList<SplitTransaction>(pt.getSplits());
+		if (formInput.isDefined4Insert()) {
+			Transaction savedTransaction;
+			List<SplitTransaction> revisedSplits = new ArrayList<SplitTransaction>(formInput.getSplits());
 			
-			if (pt.isInDatabase()) {
+			if (formInput.isInDatabase()) {
 				// Update an existing transaction
-				Transaction dbRecord = get(pt.getId());
+				Transaction dbRecordToUpdate = get(formInput.getId());
 				
 				// We also need a preserved copy of the original transaction
-				Transaction dbRecordSaved = get(pt.getId());
+				Transaction dbRecordBeforeUpdated = get(formInput.getId());
 				
-				if (dbRecord != null) {
+				if (dbRecordToUpdate != null) {
 					// Beware - this next step assimilates pt into dbRecord, so dbRecord 
 					// no longer contains the original transaction data
-					t = update(dbRecord, pt);
+					savedTransaction = update(dbRecordToUpdate, formInput);
 					
 					// Now, adjust balances according to the chnges to dbRecord
-					adjustBalancesForUpdatedTransactions(dbRecordSaved, dbRecord);
+					adjustBalancesForUpdatedTransactions(dbRecordBeforeUpdated, dbRecordToUpdate);
 				}
 				else {
-					throw new DataInconsistencyException(error(LOG, "Transaction does not exist in DB", pt));
+					throw new DataInconsistencyException(error(LOG, "Transaction does not exist in DB", formInput));
 				}
 			}
 			else {
 				// Insert a new transaction
-				t = insert(pt);
+				savedTransaction = insert(formInput);
 				
 				// Update the account balance
-				t.getAccount().credit(t.getAmount());
-				this.accountService.saveBalance(t.getAccount());
+				savedTransaction.getAccount().credit(savedTransaction.getAmount());
+				this.accountService.saveBalance(savedTransaction.getAccount());
 			}
 
 			// Also save the new transaction's splits, if any
-			if (! t.isTransfer()) {
-				t.assimilateSplits(revisedSplits);
-				t = this.splitTransactionService.save(t);
+			if (! savedTransaction.isTransfer()) {
+				savedTransaction.assimilateSplits(revisedSplits);
+				savedTransaction = this.splitTransactionService.save(savedTransaction);
 			}
 			
 			// Keep a reference to the previous revision of this transaction, for
 			// when we update mirror transactions
-			t.setPrevious(previous);
+			savedTransaction.setPrevious(transactionBeingUpdated);
 			
 			// Manage mirror transaction, as applicable, including Solr updates for same
 			if (! ignoreMirror) {
 				// This might return null, indicating that an existing mirror transaction has been deleted
-				mirrorTransaction = handleMirrorTransaction(t, mirrorAccount);
+				mirroredTransaction = identifyMirrorTransactionIfRequired(savedTransaction, formInputMirrorAccount);
 				
-				if (mirrorTransaction != null) {
+				if (mirroredTransaction != null) {
 					// Recursive call to save(), but for the mirror transaction
-					mirrorTransaction = save(mirrorTransaction, true);
+					mirroredTransaction = save(mirroredTransaction, true /* ie. don't get stuck in an a recursive loop */);
 					
 					// Bind two transactions together.
 					// Note that mirror is already bound to t, by manageMirror().
-					t.setTransferId(mirrorTransaction.getId());
-					updateTransfer(t.getId(), mirrorTransaction.getId());
+					savedTransaction.setTransferId(mirroredTransaction.getId());
+					updateTransfer(savedTransaction.getId(), mirroredTransaction.getId());
 				}
 			}
 			
 			// Update solr regarding the transaction AND its splits, if any
-			this.solrService4Money.save(t);
+			this.solrService4Money.save(savedTransaction);
 			
-			return t;
+			return savedTransaction;
 		}
 		else {
 			String t = "Transaction not saved - insufficient data";
-			LOG.error(compose(t, pt));
+			LOG.error(compose(t, formInput));
 			throw new MissingDataException(t);
 		}
 	}
@@ -177,68 +181,62 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	 * 
 	 * Must only be called for Transfer objects, and NOT Transaction objects.
 	 */
-	private Transaction handleMirrorTransaction(Transaction t, Account mirrorAccount) 
+	private Transaction identifyMirrorTransactionIfRequired(Transaction savedTransaction, Account formInputMirrorAccount) 
 			throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		
-		Transaction mirror = null;
-		long previousTransferId = 0L;
+		Transaction mirrorTransaction = null;
+		boolean formInputSpecifiesTransfer = formInputMirrorAccount != null;
+		boolean previousVersionWasTransfer = savedTransaction.getPrevious() != null && savedTransaction.getPrevious().getTransferId() > 0;
+		long previousTransferId = previousVersionWasTransfer ? savedTransaction.getPrevious().getTransferId() : 0L;
 		
-		if (t.getPrevious() != null) {
-			previousTransferId = t.getPrevious().getTransferId();
-		}		
-		
-		if (previousTransferId > 0 && mirrorAccount == null) {
+		if (previousVersionWasTransfer && ! formInputSpecifiesTransfer) {
 			// Case 3) delete the original mirror transaction
 			LOG.info(String.format("Deleted %d transaction(s)", delete(previousTransferId, true)));
 			this.solrService4Money.removeTransactionsById(previousTransferId);
 		}
-		else if (previousTransferId == 0 && mirrorAccount != null) {
+		else if (! previousVersionWasTransfer && formInputSpecifiesTransfer) {
 			// Case 1) create a new mirror transaction
-			mirror = mirrorTransaction(t, new Transaction().setSource(t.getSource()), mirrorAccount);
+			mirrorTransaction = mirrorTransaction(savedTransaction, new Transfer().setSource(savedTransaction.getSource()), formInputMirrorAccount);
 		}
-		else if (previousTransferId > 0 && mirrorAccount != null) {
+		else if (previousVersionWasTransfer && formInputSpecifiesTransfer) {
 			// Case 2) update an existing mirror
 			Transaction origMirrorTransaction = get(previousTransferId);
-			if (origMirrorTransaction != null) {
-				mirror = mirrorTransaction(t, origMirrorTransaction, mirrorAccount);
-			}
+			mirrorTransaction = mirrorTransaction(savedTransaction, origMirrorTransaction, formInputMirrorAccount);
 		}
 		
-		return mirror;
+		return mirrorTransaction;
 	}
 	
 	/*
 	 * Populate and save a mirror transaction, and link it to the master transaction.
 	 * Solr is NOT updated here.
 	 */
-	private Transaction mirrorTransaction(Transaction t, Transaction base, Account transferAccount)
+	private Transaction mirrorTransaction(Transaction savedTransaction, Transaction base, Account formInputMirrorAccount)
 			 throws MissingDataException, DuplicateItemException, DataInconsistencyException { 
 		
 		// Create new mirror transaction
 		Transaction mirror = base;
-		if (t.isTransfer()) {
-			mirror = new Transfer();
-			mirror.assimilate(base);
-		}
+		mirror.assimilate(base);
+		mirror.setId(base.getId());
 		
-		if (! t.isReconciled()) {
+		if (! savedTransaction.isReconciled()) {
 			mirror.
-				setTransferId(t.getId()).
-				setAccount(transferAccount).
-				setPayee(t.getPayee()).
-				setCategory(t.getCategory()).
-				setEntered(t.getEntered()).
-				setMemo(t.getMemo()).
-				setAmount(- t.getAmount());
+				setTransferId(savedTransaction.getId()).
+				setAccount(formInputMirrorAccount).
+				setPayee(savedTransaction.getPayee()).
+				setCategory(savedTransaction.getCategory()).
+				setEntered(savedTransaction.getEntered()).
+				setMemo(savedTransaction.getMemo()).
+				setAmount(- savedTransaction.getAmount());
 		}
 		else {
 			// Only certain properties an be updated on reconciled transactions
 			
 			mirror.
-				setPayee(t.getPayee()).
-				setCategory(t.getCategory()).
-				setEntered(t.getEntered()).
-				setMemo(t.getMemo());
+				setPayee(savedTransaction.getPayee()).
+				setCategory(savedTransaction.getCategory()).
+				setEntered(savedTransaction.getEntered()).
+				setMemo(savedTransaction.getMemo());
 		}
 		
 		return mirror;
