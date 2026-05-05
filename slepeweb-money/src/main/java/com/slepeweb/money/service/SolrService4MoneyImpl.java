@@ -144,14 +144,6 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 		sb.append(String.format("%s:\"%s\"", field, value));
 	}
 	
-	private Payee filterByPayee(Payee p, SolrQuery q, SolrParams params) {
-		if (p != null) {
-			q.addFilterQuery(String.format("payee:\"%s\"", p.getName()));
-			params.setPayeeName(p.getName());
-		}
-		return p;
-	}
-
 	public SolrResponse<FlatTransaction> query(SolrParams params) {
 		SolrResponse<FlatTransaction> response = new SolrResponse<FlatTransaction>(params);
 		SolrQuery q = new SolrQuery();
@@ -166,10 +158,10 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			}
 		}
 
-		Payee p;
 		if (params.getPayeeId() != null) {
-			if (filterByPayee(p = this.payeeService.get(params.getPayeeId()), q, params) != null) {
-				params.setPayeeName(p.getName());
+			Payee p = this.payeeService.get(params.getPayeeId());
+			if (p  != null) {
+				q.addFilterQuery(String.format("payee:\"%s\"", p.getName()));
 				isCriteriaSet = true;
 			}
 		}

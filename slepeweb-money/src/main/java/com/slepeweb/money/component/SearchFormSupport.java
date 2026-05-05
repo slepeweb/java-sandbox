@@ -16,6 +16,7 @@ import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.FlatTransaction;
+import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.SavedSearchSupport;
 import com.slepeweb.money.bean.SearchCategory;
@@ -104,6 +105,7 @@ public class SearchFormSupport {
 		
 		// Read the remaining search parameters from the submitted form
 		SolrParams params = readSearchCriteria(req);
+		payeeName2Id(params);
 		
 		/*
 		 *  Search functionality is based on a single group of categories.
@@ -139,13 +141,10 @@ public class SearchFormSupport {
 	}
 	
 	public SolrParams readSearchCriteria(HttpServletRequest req) {
-		// Payee may be specified by either name or id, but not both!
-		return 
-			new SolrParams(new SolrConfig()).
+		SolrParams params = new SolrParams(new SolrConfig()).
 			setAccountId(req.getParameter("account")).
-			setTransferAccountId(req.getParameter("transferAccount")).
-			setPayeeId(req.getParameter("payeeId")).
 			setPayeeName(req.getParameter("payee")).
+			setTransferAccountId(req.getParameter("transferAccount")).
 			setMemo(req.getParameter("memo")).
 			setPeriodValue(req.getParameter("periodvalue")).
 			setPeriodUnits(req.getParameter("periodunits")).
@@ -156,6 +155,8 @@ public class SearchFormSupport {
 			setToAmount(req.getParameter("to-amount")).
 			setPageSize(req.getParameter("pageSize")).
 			setPageNum(1);
+				
+		return params;
 	}	
 
 	public void executeSearch(SolrParams params, ModelMap model) {
@@ -202,4 +203,19 @@ public class SearchFormSupport {
 		return p != null && StringUtils.containsIgnoreCase(p, option);
 	}
 	
+	public void payeeId2Name(SolrParams params) {
+		if (params.getPayeeId() != null && params.getPayeeId().longValue() > 0) {
+			Payee p = this.payeeService.get(params.getPayeeId());
+			params.setPayeeName(p != null ? p.getName() : "");
+		}
+	}
+	
+	public void payeeName2Id(SolrParams params) {
+		if (StringUtils.isNotBlank(params.getPayeeName())) {
+			Payee p = this.payeeService.get(params.getPayeeName());
+			if (p != null) {
+				params.setPayeeId(p.getId());
+			}
+		}
+	}
 }
