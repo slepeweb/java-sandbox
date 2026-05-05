@@ -80,7 +80,6 @@ public class RowMapperUtil {
 					setMinorCategory(rs.getString("minor")).
 					setEntered(rs.getTimestamp("entered")).
 					setAmount(rs.getLong("amount")).
-//					setReference(rs.getString("reference")).
 					setMemo(rs.getString("memo"));
 		}
 	}

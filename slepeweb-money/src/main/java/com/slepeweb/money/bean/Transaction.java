@@ -78,7 +78,7 @@ public class Transaction extends DbEntity {
 	
 	@Override
 	public String toString() {
-		return String.format("(id: %d / %d) A.%s | P.%s: £%s (%6$td/%6$tm/%6$tY)", getId(), getOrigId(), 
+		return String.format("(id: %d) %s | %s: £%s (%6$td/%6$tm/%6$tY)", getId(),  
 				getAccount(), getPayee(), getAmountInPounds(), getEntered().getTime());
 	}
 	
@@ -134,7 +134,7 @@ public class Transaction extends DbEntity {
 		// Make a solr document representing the transaction
 		FlatTransaction parent = flattenParent();
 		list.add(parent);
-
+		
 		// Make solr documents for each split transaction
 		if (isSplit()) {
 			list.addAll(flattenSplits());

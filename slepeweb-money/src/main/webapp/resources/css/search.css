@@ -54,3 +54,12 @@ input[name="submit-option"] {
 	margin-right: 3em;
 }
 
+td.payee-or-transfer {
+	display: grid;
+	grid-template-columns: 45% 10% 45%;
+}
+
+div.or-spacer, span.subheading {
+	color: #24604e;
+}
+

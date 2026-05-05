@@ -19,8 +19,11 @@
 
 <mny:standardLayout>
 
-	<h2 class="inline-block">${_pageHeading} <c:if test="${not empty param.flash}"><span 
-		class="flash ${_flashType}">${_flashMessage}</span></c:if></h2>
+	<mny:pageHeading heading="${_pageHeading}">
+		<ul>
+			<mny:standardFormMenu entity="search" many="searches" />
+		</ul>
+	</mny:pageHeading>			
 			
 	<div id="tabs">
 		<ul>

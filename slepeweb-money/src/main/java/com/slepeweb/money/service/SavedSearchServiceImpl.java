@@ -89,7 +89,7 @@ public class SavedSearchServiceImpl extends BaseServiceImpl implements SavedSear
 	
 	public List<SavedSearch> getAll() {
 		return this.jdbcTemplate.query(
-				"select * from search where id > -1 order by saved desc, name", 
+				"select * from search where id > -1 order by name", 
 				new RowMapperUtil.SavedSearchMapper());
 	}
 	

@@ -143,6 +143,7 @@ public class SearchFormSupport {
 		return 
 			new SolrParams(new SolrConfig()).
 			setAccountId(req.getParameter("account")).
+			setTransferAccountId(req.getParameter("transferAccount")).
 			setPayeeId(req.getParameter("payeeId")).
 			setPayeeName(req.getParameter("payee")).
 			setMemo(req.getParameter("memo")).

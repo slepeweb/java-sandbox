@@ -155,10 +155,11 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 	public SolrResponse<FlatTransaction> query(SolrParams params) {
 		SolrResponse<FlatTransaction> response = new SolrResponse<FlatTransaction>(params);
 		SolrQuery q = new SolrQuery();
+		Account a;
 		boolean isCriteriaSet = false, isCategorySearch = false;
 
 		if (params.getAccountId() != null) {
-			Account a = this.accountService.get(params.getAccountId());
+			a = this.accountService.get(params.getAccountId());
 			if (a != null) {
 				q.addFilterQuery(String.format("account:\"%s\"", a.getName()));
 				isCriteriaSet = true;
@@ -172,10 +173,16 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 				isCriteriaSet = true;
 			}
 		}
-		else if (StringUtils.isNotBlank(params.getPayeeName()) && 
-				filterByPayee(p = this.payeeService.get(params.getPayeeName()), q, params) != null) {
-			params.setPayeeId(p.getId());
-			isCriteriaSet = true;
+		/*
+		 * Transfers are recorded in Solr using the payee field,
+		 * eg. "To 'Halifax Visa'"
+		 */
+		else if (params.getTransferAccountId() != null) {
+			a = this.accountService.get(params.getTransferAccountId());
+			if (a != null) {
+				q.addFilterQuery(String.format("payee:\"%s '%s'\"", ! params.isDebit() ? "To" : "From", a.getName()));
+				isCriteriaSet = true;
+			}
 		}
 
 		if (params.getCategoryId() != null) {
