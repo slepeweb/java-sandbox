@@ -27,6 +27,7 @@ public class BaseController {
 
 	//private static Logger LOG = Logger.getLogger(BaseController.class);
 	protected static final String HISTORY_ATTR = "history";
+	protected static final String ALL_MAJORS = "_allMajorCategories";
 	
 	@Autowired protected PayeeService payeeService;
 	@Autowired protected AccountService accountService;

@@ -25,7 +25,8 @@
 			</mny:tableRow>
 		  
 		  <tsf:account accountId="${_params.accountIdStr}" />
-		  <tsf:payeeOrTransferAccount payeeName="${_params.payeeName}" accountId="${_params.transferAccountIdStr}" />
+		  <tsf:payeeOrTransferAccount payeeName="${_params.payeeName}" 
+		  	accountId="${_params.transferAccountIdStr}" direction="${_params.transferDirection}" />
 		  <tr><td colspan="2"> </td></tr>
 			<mny:categoryList heading="Categories" categories="${_categoryGroup}" />
 	    	    

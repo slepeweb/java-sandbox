@@ -65,12 +65,14 @@ public class ScheduledTransactionController extends BaseController {
 				setCategory(new Category().setMajor("").setMinor(""));
 		
 		populateForm(model, scht, "add");
+		model.addAttribute(ALL_MAJORS, this.categoryService.getAllMajorValues());
 		return "scheduleForm";
 	}
 	
 	@RequestMapping(value="/edit/{id}", method=RequestMethod.GET)
 	public String updateForm(@PathVariable long id, ModelMap model) {		
 		populateForm(model, this.scheduledTransactionService.get(id), "update");
+		model.addAttribute(ALL_MAJORS, this.categoryService.getAllMajorValues());
 		return "scheduleForm";
 	}
 	
@@ -136,8 +138,7 @@ public class ScheduledTransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			List<String> allMajors = this.categoryService.getAllMajorValues();
-			Category_GroupSet cgs = new Category_GroupSet("Splits", FormSupport.TRANSACTION_CTX, allMajors);
+			Category_GroupSet cgs = new Category_GroupSet("Splits", FormSupport.TRANSACTION_CTX);
 			Category_Group cg = this.formSupport.readCategoryInputs(req, 1, cgs);
 			scht.setSplits(cg.toSplitTransactions(this.categoryService, multiplier));
 		}

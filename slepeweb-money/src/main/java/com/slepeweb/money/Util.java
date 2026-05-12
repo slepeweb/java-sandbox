@@ -29,7 +29,7 @@ public class Util {
 	 * of significant places, eg. £212,345.72
 	 */
 	public static String formatPounds(Long pence) {
-		long value = pence.longValue();
+		long value = pence != null ? pence.longValue() : 0L;
 		boolean debit = value < 0;
 		String sign = debit ? "-" : "";
 		long abs = debit ? -value : value;

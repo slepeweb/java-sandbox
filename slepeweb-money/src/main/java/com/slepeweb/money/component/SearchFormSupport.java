@@ -2,7 +2,6 @@ package com.slepeweb.money.component;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -68,8 +67,7 @@ public class SearchFormSupport {
 	public void populateForm(
 			SavedSearch ss, SolrParams params, String formMode, ModelMap model) {
 		
-		List<String> allMajors = this.categoryService.getAllMajorValues();
-		Category_GroupSet cgs = new Category_GroupSet("Search", SearchFormSupport.SEARCH_CTX, allMajors);
+		Category_GroupSet cgs = new Category_GroupSet("Search", SearchFormSupport.SEARCH_CTX);
 		Category_Group cg;
 		
 		if (params.getCategoryGroup() == null) {
@@ -92,20 +90,21 @@ public class SearchFormSupport {
 		model.addAttribute(ALL_PAYEES_ATTR, this.payeeService.getAll());
 		model.addAttribute(JSON_ATTR, Util.encodeUrl(JsonUtil.toJson(params)));		
 		model.addAttribute(FORM_MODE_ATTR, formMode);
-		model.addAttribute(CategoryController.ALL_MAJOR_CATEGORIES_ATTR, allMajors);
+		model.addAttribute(CategoryController.ALL_MAJOR_CATEGORIES_ATTR, this.categoryService.getAllMajorValues());
 	}
 	
 	
 	public SavedSearchSupport processFormSubmission(HttpServletRequest req, SavedSearch ss) {
-		List<String> allMajors = this.categoryService.getAllMajorValues();
-		Category_GroupSet cgs = new Category_GroupSet("Splits", SEARCH_CTX, allMajors);
+		Category_GroupSet cgs = new Category_GroupSet("Splits", SEARCH_CTX);
 		
-		// Create a new Category_Group using the submitted form data, and add it to the set IFF populated
-		this.formSupport.readCategoryInputs(req, 1, cgs);
-		
-		// Read the remaining search parameters from the submitted form
+		// Read the search parameters from the submitted form
 		SolrParams params = readSearchCriteria(req);
 		payeeName2Id(params);
+		
+		if (! params.isTransfer()) {
+			// Create a new Category_Group using the submitted form data, and add it to the set IFF populated
+			this.formSupport.readCategoryInputs(req, 1, cgs);			
+		}
 		
 		/*
 		 *  Search functionality is based on a single group of categories.
@@ -141,22 +140,32 @@ public class SearchFormSupport {
 	}
 	
 	public SolrParams readSearchCriteria(HttpServletRequest req) {
-		SolrParams params = new SolrParams(new SolrConfig()).
-			setAccountId(req.getParameter("account")).
-			setPayeeName(req.getParameter("payee")).
-			setTransferAccountId(req.getParameter("transferAccount")).
-			setMemo(req.getParameter("memo")).
-			setPeriodValue(req.getParameter("periodvalue")).
-			setPeriodUnits(req.getParameter("periodunits")).
-			setFrom(req.getParameter("from")).
-			setTo(req.getParameter("to")).
-			setDebit(req.getParameter("debitorcredit")).
-			setFromAmount(req.getParameter("from-amount")).
-			setToAmount(req.getParameter("to-amount")).
-			setPageSize(req.getParameter("pageSize")).
-			setPageNum(1);
+		
+		// 'payee' takes precedence over 'transferAccount'
+		String payeeName = req.getParameter("payee");
+		String transferAccount = req.getParameter("transferAccount");
+		
+		if (StringUtils.isNotBlank(payeeName)) {
+			transferAccount = null;
+		}
+
+		SolrParams p = new SolrParams(new SolrConfig());
+		p.setAccountId(req.getParameter("account"));
+		p.setPayeeName(payeeName);
+		p.setTransferAccountId(transferAccount);
+		p.setTransferDirection(req.getParameter("transferDirection"));
+		p.setMemo(req.getParameter("memo"));
+		p.setPeriodValue(req.getParameter("periodvalue"));
+		p.setPeriodUnits(req.getParameter("periodunits"));
+		p.setFrom(req.getParameter("from"));
+		p.setTo(req.getParameter("to"));
+		p.setDebit(req.getParameter("debitorcredit"));
+		p.setFromAmount(req.getParameter("from-amount"));
+		p.setToAmount(req.getParameter("to-amount"));
+		p.setPageSize(req.getParameter("pageSize"));
+		p.setPageNum(1);
 				
-		return params;
+		return p;
 	}	
 
 	public void executeSearch(SolrParams params, ModelMap model) {

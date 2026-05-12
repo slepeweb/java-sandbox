@@ -8,7 +8,7 @@
 <c:set var="_wider" value="${categories.context eq 'search' or categories.context eq 'chart' ? 'wider' : ''}" />
 
 <input type="hidden" name="numGroups" value="${categories.size}" />		    	
-	   		   		
+
 <c:forEach items="${categories.groups}" var="_group" varStatus="_grpStatus">
 
 	<tr class="category-list <c:if test="${not _group.visible}">invisible</c:if>"  data-id="${_group.id}">
@@ -45,7 +45,7 @@
 						data-id="${ident}"><i class="fa-solid fa-chevron-down" title="Add a category"></i></span>					
 
 					<select class="category ${_wider}" name="major_${ident}">
-						<c:forEach items="${categories.allMajors}" var="_c">
+						<c:forEach items="${_allMajorCategories}" var="_c">
 							<option value="${_c}" <c:if test="${_c eq _cat.major}">selected</c:if>>${_c}</option>
 						</c:forEach>
 					</select>
@@ -73,4 +73,3 @@
 	</tr>
 
 </c:forEach>
-

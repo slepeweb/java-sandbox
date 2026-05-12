@@ -1,6 +1,7 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="payeeName" required="true" rtexprvalue="true" %><%@ 
-	attribute name="accountId" required="true" rtexprvalue="true" %>
+	attribute name="accountId" required="true" rtexprvalue="true" %><%@ 
+	attribute name="direction" required="true" rtexprvalue="true" %>
 
 <!-- payeeOrTransferAccount.tag -->
 
@@ -17,9 +18,14 @@
 	 		<div class="or-spacer">OR</div>
 	 		
     	<div>
-    		<span class="subheading">Transfer account:</span>
+    		<span class="subheading" style="margin-right: 1.5em;">Transfer account:</span>
+    		To: <input type="radio" style="margin-right: 1.5em;" name="transferDirection" value="to"
+    					${direction eq 'to' ? 'checked' : ''} />
+    		From: <input type="radio" name="transferDirection" value="from"
+    					${direction eq 'from' ? 'checked' : ''} />
+    		
 				<select id="transferAccount" name="transferAccount">
-			   	<option value="">Choose ...</option>
+			   	<option value="-1">Choose ...</option>
 			   	<c:forEach items="${_allAccounts}" var="_a">
 			   		<option value="${_a.id}" <c:if test="${_a.id eq accountId}">selected</c:if>>${_a.name}</option>
 			   	</c:forEach>

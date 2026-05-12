@@ -1,14 +1,15 @@
 package com.slepeweb.money.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.slepeweb.money.bean.solr.SolrParamsBase;
 
 /*
  * This class supports a combination of purposes:
  * a) supports rendition of forms (groups)
  * b) in json form, it can be stored in the db (inputGroups)
  */
-@JsonIgnoreProperties({})
-public class ChartProperties {
+@JsonIgnoreProperties({"accountIdStr", "populated", "transfer", "transferAccountIdStr", "payeeName", "payeeIdStr"})
+public class ChartProperties extends SolrParamsBase {
 
 	private String title = "";
 	private int fromYear = 2015, toYear = 2019;

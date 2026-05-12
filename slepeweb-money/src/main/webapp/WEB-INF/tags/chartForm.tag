@@ -5,45 +5,33 @@
 
 <form id="chart-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">
 	<table id="year-ranges">
-	    <tr>
-	        <td class="heading width25"><label for="name">Title</label></td>
-	        <td>
-	        	<input type="text" id="name" name="name"
-    				placeholder="Provide a title for this chart" value="${_ss.name}" />
-	        	
-	        </td>
-	    </tr>
-	    <tr>
-	        <td class="heading width25"><label for="description">Description</label></td>
-	        <td>
-		        	<textarea id="description" name="description" rows="3" cols="40"
-	    					placeholder="Provide description to help reader understand content">${_ss.description}</textarea>	        	
-	        </td>
-	    </tr>
-	    <tr>
-	        <td class="heading width25"><label for="from">From year</label></td>
-	        <td>
-	        	<select id="from" name="from">
-							<c:forEach items="${_yearRange}" var="_year">
-								<option value="${_year}" <c:if test="${_chartProps.fromYear eq _year}">selected</c:if>>${_year}</option>
-							</c:forEach>
-	        	</select>
-	        </td>
-	    </tr>
-	    <tr>
-	        <td class="heading width25"><label for="to">To year</label></td>
-	        <td>
-						<select id="to" name="to">
-							<c:forEach items="${_yearRange}" var="_year">
-								<option value="${_year}" <c:if test="${_chartProps.toYear eq _year}">selected</c:if>>${_year}</option>
-							</c:forEach>
-	        	</select>
-	        </td>
-	    </tr>
-	
-			<mny:categoryList heading="Categories" categories="${_categoryGroup}" />			
-			<tr><td><button id="add-group-button" type="button" title="Add a group" ><i class="fa-solid fa-chevron-down" ></i> set</button></td></tr>
-			<mny:searchAndExecuteOptions />
+    <mny:tableRow heading="Title" tdclass="width25">
+      	<input type="text" id="name" name="name"
+ 					placeholder="Provide a title for this chart" value="${_ss.name}" />	        	
+    </mny:tableRow>
+    
+    <mny:tableRow heading="Description" tdclass="width25">
+      	<textarea id="description" name="description" rows="3" cols="40"
+ 					placeholder="Provide description to help reader understand content">${_ss.description}</textarea>
+   	</mny:tableRow>
+   	
+	  <tsf:account accountId="${_chartProps.accountIdStr}" />
+	  <tsf:payeeOrTransferAccount payeeName="${_chartProps.payeeName}" 
+	  	accountId="${_chartProps.transferAccountIdStr}" direction="${_chartProps.transferDirection}" />
+		
+		<tr>
+	    <td class="heading"><label>Date range</label></td>
+	    <td class="payee-or-transfer">
+				<mny:yearSelector id="from" heading="From" selected="${_chartProps.fromYear}" />
+				<div class="or-spacer"></div>
+				<mny:yearSelector id="to" heading="To" selected="${_chartProps.toYear}" />
+			</td>
+		</tr>
+	  <tr><td colspan="2"> </td></tr>
+	  
+		<mny:categoryList heading="Categories" categories="${_categoryGroup}" />
+		<tr class="add-category-group <c:if test="${_chartProps.transferAccountId gt 0}">invisible</c:if>"><td><button id="add-group-button" type="button" title="Add another category set" ><i class="fa-solid fa-plus" ></i> Add another category set</button></td></tr>
+		<mny:searchAndExecuteOptions />
 			
 	</table>
 		

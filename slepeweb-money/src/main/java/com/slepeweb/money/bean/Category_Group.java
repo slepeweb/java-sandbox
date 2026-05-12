@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.slepeweb.money.service.CategoryService;
 
-@JsonIgnoreProperties({"id", "visible", "lastVisible", "size", "root"})
+@JsonIgnoreProperties({"id", "visible", "populated", "lastVisible", "size", "root"})
 public class Category_Group {
 	
 	private int id = 1;
@@ -32,7 +32,7 @@ public class Category_Group {
 		return String.format("Category group#%d, %s", this.id, this.label);
 	}
 	
-	public boolean hasCompletedEntries() {
+	public boolean isPopulated() {
 		for (Category_ c : getCategories()) {
 			if (StringUtils.isNotBlank(c.getMajor())) {
 				return true;

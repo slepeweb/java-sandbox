@@ -5,19 +5,29 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties({"size", "firstGroup"})
+// TODO: Remove 'allMajors' from this list once you're sure all search json's have been updated
+
+@JsonIgnoreProperties({"size", "firstGroup", "populated", "allMajors"})
 public class Category_GroupSet {
 	private String title = "Title";
-	private List<String> allMajors = new ArrayList<String>();
 	private List<Category_Group> groups = new ArrayList<Category_Group>();
 	private String context;
 	
 	public Category_GroupSet() {}
 	
-	public Category_GroupSet(String ttl, String context, List<String> majors) {
+	public Category_GroupSet(String ttl, String context) {
 		this.title = ttl;
 		this.context = context;
-		this.allMajors = majors;
+	}
+	
+	public boolean isPopulated() {
+		for (Category_Group c : getGroups()) {
+			if (c.isPopulated()) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public void addGroup(Category_Group cg) {
@@ -42,15 +52,6 @@ public class Category_GroupSet {
 	
 	public Category_GroupSet setTitle(String title) {
 		this.title = title;
-		return this;
-	}
-	
-	public List<String> getAllMajors() {
-		return allMajors;
-	}
-	
-	public Category_GroupSet setAllMajors(List<String> allMajors) {
-		this.allMajors = allMajors;
 		return this;
 	}
 	

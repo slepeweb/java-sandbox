@@ -120,7 +120,7 @@ public class FormSupport {
 			}
 		}
 		
-		if (cg.hasCompletedEntries()) {
+		if (cg.isPopulated()) {
 			cgs.addGroup(cg);
 		}
 		

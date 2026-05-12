@@ -88,18 +88,17 @@ public class TransactionFormSupport {
 	}
 	
 	public void populateForm(ModelMap model, Transaction t, List<Account> allAccounts, String mode) {
-		List<String> allMajors = this.categoryService.getAllMajorValues();
 
 		model.addAttribute("_formMode", mode);
 		model.addAttribute("_allAccounts", allAccounts);
 		model.addAttribute("_allPayees", this.payeeService.getAll());
-		model.addAttribute("_allMajorCategories", allMajors);
+		model.addAttribute("_allMajorCategories", this.categoryService.getAllMajorValues());
 		
 		if (t.getCategory() != null) {
 			model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
 		}
 		
-		Category_GroupSet cgs = new Category_GroupSet("Transaction Splits", FormSupport.TRANSACTION_CTX, allMajors);
+		Category_GroupSet cgs = new Category_GroupSet("Transaction Splits", FormSupport.TRANSACTION_CTX);
 		Category_Group cg = this.formSupport.populateCategory_Group(1, "Splits", t.getSplits(), SplitTransaction.class);
 		cg.setVisible(true).setLastVisible(true);
 		cgs.addGroup(cg);

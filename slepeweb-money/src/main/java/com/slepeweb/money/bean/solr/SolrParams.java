@@ -18,9 +18,8 @@ import com.slepeweb.money.bean.StringOption;
  * by SOLR, which is a FlatTransaction.
  */
 
-@JsonIgnoreProperties({"start", "hrefBase", "accountIdStr", "transferAccountIdStr", 
-	"payeeName", "payeeIdStr", "categoryIdStr"})
-public class SolrParams {
+@JsonIgnoreProperties({"start", "hrefBase", "accountIdStr", "populated", "transfer", "transferAccountIdStr", "payeeName", "payeeIdStr", "categoryIdStr"})
+public class SolrParams extends SolrParamsBase {
 
 	public static final String START_OF_DAY = "T00:00:00Z";
 	public static final String END_OF_DAY = "T23:59:59Z";
@@ -29,9 +28,9 @@ public class SolrParams {
 	public static final String YEAR = "year";
 	
 	private SolrConfig config;
-	private String memo, majorCategory, minorCategory, payeeName;
+	private String memo, majorCategory, minorCategory;
 	private Category_Group categoryGroup;
-	private Long accountId, transferAccountId, payeeId, categoryId;
+	private Long categoryId;
 	private int pageNum, pageSize;
 	private Date from, to;
 	private Long fromAmount, toAmount;
@@ -107,17 +106,6 @@ public class SolrParams {
 		return this;
 	}
 
-	public String getPayeeName() {
-		return payeeName;
-	}
-
-	public SolrParams setPayeeName(String payeeName) {
-		if (StringUtils.isNotBlank(payeeName)) {
-			this.payeeName = payeeName;
-		}
-		return this;
-	}
-
 	public int getPeriodValue() {
 		return periodValue;
 	}
@@ -176,25 +164,6 @@ public class SolrParams {
 		return this;
 	}
 
-	public Long getPayeeId() {
-		return payeeId;
-	}
-
-	public String getPayeeIdStr() {
-		return getPayeeId() == null ? "" : String.valueOf(getPayeeId());
-	}
-
-	@JsonSetter("payeeId")
-	public SolrParams setPayeeId(Long payeeId) {
-		this.payeeId = payeeId;
-		return this;
-	}
-
-	public SolrParams setPayeeId(String payeeId) {
-		this.payeeId = Util.toLong(payeeId, null);
-		return this;
-	}
-
 	public Long getCategoryId() {
 		return categoryId;
 	}
@@ -211,44 +180,6 @@ public class SolrParams {
 
 	public SolrParams setCategoryId(String categoryId) {
 		this.categoryId = Util.toLong(categoryId, null);
-		return this;
-	}
-
-	public Long getAccountId() {
-		return accountId;
-	}
-
-	public String getAccountIdStr() {
-		return getAccountId() == null ? "" : String.valueOf(getAccountId());
-	}
-
-	@JsonSetter("accountId")
-	public SolrParams setAccountId(Long accountId) {
-		this.accountId = accountId;
-		return this;
-	}
-
-	public SolrParams setAccountId(String accountId) {
-		this.accountId = Util.toLong(accountId, null);		
-		return this;
-	}
-
-	public Long getTransferAccountId() {
-		return transferAccountId;
-	}
-
-	public String getTransferAccountIdStr() {
-		return getTransferAccountId() == null ? "0" : String.valueOf(getTransferAccountId());
-	}
-
-	@JsonSetter("transferAccountId")
-	public SolrParams setTransferAccountId(Long transferAccountId) {
-		this.transferAccountId = transferAccountId;
-		return this;
-	}
-
-	public SolrParams setTransferAccountId(String accountId) {
-		this.transferAccountId = Util.toLong(accountId, null);		
 		return this;
 	}
 
@@ -298,17 +229,6 @@ public class SolrParams {
 		return sb.toString();
 	}
 	
-	/*
-	private String clean(String s) {
-		String cleaned = s.replaceAll("[<>]", " ");
-		try {
-			return URLEncoder.encode(cleaned, "utf-8");
-		}
-		catch (UnsupportedEncodingException e) {}
-		return cleaned;
-	}
-	*/
-
 	public SolrConfig getConfig() {
 		return config;
 	}

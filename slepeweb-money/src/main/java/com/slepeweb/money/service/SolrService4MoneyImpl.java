@@ -172,7 +172,8 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 		else if (params.getTransferAccountId() != null) {
 			a = this.accountService.get(params.getTransferAccountId());
 			if (a != null) {
-				q.addFilterQuery(String.format("payee:\"%s '%s'\"", ! params.isDebit() ? "To" : "From", a.getName()));
+				q.addFilterQuery(String.format("payee:\"%s '%s'\"", 
+						params.getTransferDirection().equals("to") ? "To" : "From", a.getName()));
 				isCriteriaSet = true;
 			}
 		}
@@ -291,7 +292,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			q.addSort("entered", SolrQuery.ORDER.desc);
 			q.setStart(params.getStart());
 			q.setRows(params.getPageSize());
-			LOG.debug(String.format("Solr query: [%s]", q.getQuery()));				
+			LOG.debug(String.format("Solr query: [%s]", q.toQueryString()));
 
 			try {
 				QueryResponse qr = getClient().query(q);

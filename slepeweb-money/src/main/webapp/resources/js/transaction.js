@@ -8,9 +8,9 @@
 	This autofill code does NOT handle splits.
 */
 
-_money.transaction.fillLastPaymentDetails = function() {
+_money.transaction.fillLastPaymentDetails = function(obj) {
 	
-	var payeeName = $("#payee").val();
+	var payeeName = obj.item.value;
 	var majorEle = $("#major");	
 	var major = majorEle.find(':selected').val();
 	var memo = $("input[name='memo']").val();

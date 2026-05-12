@@ -42,7 +42,6 @@ public class TransactionController extends BaseController {
 	
 	@Autowired private FormSupport formSupport;
 	@Autowired private TransactionFormSupport transactionFormSupport;
-
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)	
 	public String listNoAccount(HttpServletRequest req, HttpServletResponse res, ModelMap model) { 
@@ -142,6 +141,7 @@ public class TransactionController extends BaseController {
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String addForm(HttpServletRequest req, ModelMap model) {
 		this.transactionFormSupport.populateForm(model, new Transaction(), "add");		
+		model.addAttribute(ALL_MAJORS, this.categoryService.getAllMajorValues());
 		return TRANSACTION_FORM;
 	}
 	
@@ -152,6 +152,8 @@ public class TransactionController extends BaseController {
 		Account a = this.accountService.get(accountId);
 		t.setAccount(a).setEntered(last.getEntered());		
 		this.transactionFormSupport.populateForm(model, t, "add");		
+
+		model.addAttribute(ALL_MAJORS, this.categoryService.getAllMajorValues());
 		return TRANSACTION_FORM;
 	}
 	
@@ -168,6 +170,7 @@ public class TransactionController extends BaseController {
 		
 		getHistory(req).setLastTransaction(t);
 		this.transactionFormSupport.populateForm(model, t, "update");
+		model.addAttribute(ALL_MAJORS, this.categoryService.getAllMajorValues());
 		return TRANSACTION_FORM;
 	}
 	
@@ -226,8 +229,7 @@ public class TransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions. This is enforced earlier in this method.
 		if (isSplit) {
-			List<String> allMajors = this.categoryService.getAllMajorValues();
-			Category_GroupSet cgs = new Category_GroupSet("Splits", FormSupport.TRANSACTION_CTX, allMajors);
+			Category_GroupSet cgs = new Category_GroupSet("Splits", FormSupport.TRANSACTION_CTX);
 			Category_Group cg = this.formSupport.readCategoryInputs(req, 1, cgs);
 			t.setSplits(cg.toSplitTransactions(this.categoryService, multiplier));
 		}
@@ -297,6 +299,7 @@ public class TransactionController extends BaseController {
 		
 		this.transactionFormSupport.populateForm(model, t, "add");
 		
+		model.addAttribute(ALL_MAJORS, this.categoryService.getAllMajorValues());
 		return TRANSACTION_FORM;
 	}	
 	

@@ -3,6 +3,7 @@
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 
 <c:set var="_extraJs" scope="request" value="chart.js,search.js,minorcats.js" />
+<c:set var="_extraCss" scope="request" value="search.css "/>
 
 <!-- chartResults.jsp -->
 

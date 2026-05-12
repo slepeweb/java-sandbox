@@ -73,9 +73,9 @@ _money.shared.getAllPayees = function(andThenExecute) {
 			$("#payee").autocomplete({
 				source: data,
 				minLength: 2,
-				change: function() {
+				select: function(e, o) {
 					if (andThenExecute) {
-						andThenExecute();
+						andThenExecute(o);
 					}
 				}
 			});
