@@ -7,8 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * including split-transactions, scheduled split-transactions, search criteria and 
  * chart definitions (which are based on search criteria).
  */
-@JsonIgnoreProperties({"visible", "lastVisible"})
+@JsonIgnoreProperties({"visible", "lastVisible", "major", "minor"})
 public class Category_ {
+	private long id;
 	private String major, minor;
 	private boolean visible, lastVisible, exclude;
 	private String memo;
@@ -17,6 +18,7 @@ public class Category_ {
 	public Category_() {}
 	
 	public Category_(SplitTransaction st) {
+		this.id = st.getCategory().getId();
 		this.major = st.getCategory().getMajor();
 		this.minor = st.getCategory().getMinor();
 		this.amount = st.getAmountValue();
@@ -24,12 +26,14 @@ public class Category_ {
 	}
 	
 	public Category_(SearchCategory c) {
+		this.id = c.getId();
 		this.major = c.getMajor();
 		this.minor = c.getMinor();
 		this.exclude = c.isExclude();
 	}
 	
 	public Category_(Category c) {
+		this.id = c.getId();
 		this.major = c.getMajor();
 		this.minor = c.getMinor();
 	}
@@ -46,6 +50,15 @@ public class Category_ {
 		}
 		
 		return "[blank]";
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public Category_ setId(long id) {
+		this.id = id;
+		return this;
 	}
 
 	public String getMajor() {

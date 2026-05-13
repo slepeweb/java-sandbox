@@ -97,6 +97,7 @@ public class FormSupport {
 		Category_Group cg = new Category_Group(groupId, "");
 		cg.setLabel(req.getParameter("groupname_" + groupId));
 		Category_ c;
+		Category dbc;
 		
 		for (int j = 1; j <= numCategories; j++) {
 			suffix = String.format("_%d_%d", groupId, j);
@@ -107,8 +108,10 @@ public class FormSupport {
 				excluded = Util.isPositive(req.getParameter("logic" + suffix));
 				memo = req.getParameter("memo" + suffix);
 				amountStr = req.getParameter("amount" + suffix);
+				dbc = this.categoryService.get(major, minor);
 				
 				c = new Category_().
+					setId(dbc.getId()).
 					setMajor(major).
 					setMinor(minor).
 					setMemo(memo).

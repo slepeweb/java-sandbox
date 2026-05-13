@@ -20,6 +20,7 @@ import com.slepeweb.money.bean.StringOption;
 
 @JsonIgnoreProperties({"start", "hrefBase", "accountIdStr", "populated", "transfer", "transferAccountIdStr", 
 	"payeeName", "payeeIdStr", "categoryIdStr", "periodUnitOptions", "majorCategory", "minorCategory", "categoryId"})
+
 public class SolrParams extends SolrParamsBase {
 
 	public static final String START_OF_DAY = "T00:00:00Z";

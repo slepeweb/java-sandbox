@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.slepeweb.money.service.CategoryService;
 
-@JsonIgnoreProperties({"id", "visible", "populated", "lastVisible", "size", "root"})
+@JsonIgnoreProperties({"id", "visible", "populated", "lastVisible", "size", "root", "options"})
 public class Category_Group {
 	
 	private int id = 1;

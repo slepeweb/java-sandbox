@@ -45,7 +45,7 @@ public class ChartController extends BaseController {
 		
 		SavedSearch ss = this.savedSearchService.get(id);
 		ChartProperties props = JsonUtil.fromJson(new TypeReference<ChartProperties>() {}, ss.getJson());
-		this.chartFormSupport.payeeId2Name(props);
+		this.chartFormSupport.convertId2Name(props);
 
 		model.addAttribute("_numDeletableTransactions", 0);		
 		this.chartFormSupport.populateForm(ss, props, SearchFormSupport.UPDATE_MODE, model);
@@ -118,7 +118,7 @@ public class ChartController extends BaseController {
 
 		SavedSearch ss = this.savedSearchService.get(id);
 		ChartProperties props = JsonUtil.fromJson(new TypeReference<ChartProperties>() {}, ss.getJson());
-		this.chartFormSupport.payeeId2Name(props);
+		this.chartFormSupport.convertId2Name(props);
 		this.chartFormSupport.populateForm(ss, props, SearchFormSupport.EXECUTE_MODE, model);
 
 		model.addAttribute(SearchFormSupport.FORM_MODE_ATTR, SearchFormSupport.EXECUTE_MODE);

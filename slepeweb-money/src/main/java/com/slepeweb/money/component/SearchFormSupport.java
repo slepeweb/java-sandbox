@@ -12,6 +12,8 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.common.util.JsonUtil;
 import com.slepeweb.money.Util;
+import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.Category_;
 import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.FlatTransaction;
@@ -99,7 +101,6 @@ public class SearchFormSupport {
 		
 		// Read the search parameters from the submitted form
 		SolrParams params = readSearchCriteria(req);
-		payeeName2Id(params);
 		
 		if (! params.isTransfer()) {
 			// Create a new Category_Group using the submitted form data, and add it to the set IFF populated
@@ -165,6 +166,7 @@ public class SearchFormSupport {
 		p.setPageSize(req.getParameter("pageSize"));
 		p.setPageNum(1);
 				
+		payeeName2Id(p);
 		return p;
 	}	
 
@@ -212,11 +214,33 @@ public class SearchFormSupport {
 		return p != null && StringUtils.containsIgnoreCase(p, option);
 	}
 	
-	public void payeeId2Name(SolrParams params) {
+	
+	
+	public void convertId2Name(SolrParams params) {
 		if (params.getPayeeId() != null && params.getPayeeId().longValue() > 0) {
 			Payee p = this.payeeService.get(params.getPayeeId());
 			params.setPayeeName(p != null ? p.getName() : "");
 		}
+		
+		Category c;
+		Category_Group group = params.getCategoryGroup();
+		
+		if (group == null) {
+			return;
+		}
+		
+		for (Category_ c_ : group.getCategories()) {
+			c = this.categoryService.get(c_.getId());
+			
+			if (c == null) {
+				// This is happening while the json properties are being updated
+				continue;
+			}
+			
+			c_.setMajor(c.getMajor());
+			c_.setMinor(c.getMinor());
+			group.addOptions(c.getMajor(), this.categoryService.getAllMinorValues(c.getMajor()));
+		}		
 	}
 	
 	public void payeeName2Id(SolrParams params) {

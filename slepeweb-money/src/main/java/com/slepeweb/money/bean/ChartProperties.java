@@ -8,7 +8,9 @@ import com.slepeweb.money.bean.solr.SolrParamsBase;
  * a) supports rendition of forms (groups)
  * b) in json form, it can be stored in the db (inputGroups)
  */
-@JsonIgnoreProperties({"accountIdStr", "populated", "transfer", "transferAccountIdStr", "payeeName", "payeeIdStr"})
+@JsonIgnoreProperties({"accountIdStr", "populated", "transfer", "transferAccountIdStr", 
+	"payeeName", "payeeIdStr", "categoryIdStr", "periodUnitOptions", "majorCategory", "minorCategory", "categoryId"})
+
 public class ChartProperties extends SolrParamsBase {
 
 	private String title = "";

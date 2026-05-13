@@ -103,7 +103,7 @@ public class SearchController extends BaseController {
 		
 		SavedSearch ss = this.savedSearchService.get(id);
 		SolrParams params = JsonUtil.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
-		this.searchFormSupport.payeeId2Name(params);
+		this.searchFormSupport.convertId2Name(params);
 		
 		model.addAttribute("_numDeletableTransactions", 0);
 		this.searchFormSupport.populateForm(ss, params, SearchFormSupport.UPDATE_MODE, model);	
@@ -145,7 +145,7 @@ public class SearchController extends BaseController {
 	public String get(@PathVariable int id, @PathVariable int page, ModelMap model) {
 		SavedSearch ss = this.savedSearchService.get(id);
 		SolrParams params = JsonUtil.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
-		this.searchFormSupport.payeeId2Name(params);
+		this.searchFormSupport.convertId2Name(params);
 		
 		params.setPageNum(page);		
 		model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);			

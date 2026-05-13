@@ -22,6 +22,8 @@ import org.springframework.ui.ModelMap;
 
 import com.slepeweb.common.util.JsonUtil;
 import com.slepeweb.money.Util;
+import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.Category_;
 import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.ChartData;
@@ -135,7 +137,6 @@ public class ChartFormSupport {
 		
 		// Read the remaining search parameters from the submitted form
 		ChartProperties props = readSearchCriteria(req);
-		payeeName2Id(props);
 		
 		if (! props.isTransfer()) {
 			// Create a new Category_Group using the submitted form data, and add it to the set IFF populated
@@ -194,6 +195,7 @@ public class ChartFormSupport {
 			p.setToYear(tmp);
 		}
 				
+		payeeName2Id(p);
 		return p;
 	}
 	
@@ -305,10 +307,28 @@ public class ChartFormSupport {
 		return dflt;
 	}
 	
-	public void payeeId2Name(ChartProperties props) {
+	public void convertId2Name(ChartProperties props) {
 		if (props.getPayeeId() != null && props.getPayeeId().longValue() > 0) {
 			Payee p = this.payeeService.get(props.getPayeeId());
 			props.setPayeeName(p != null ? p.getName() : "");
+		}
+		
+		Category_GroupSet set = props.getCategories();
+		Category c;		
+		
+		for (Category_Group group : set.getGroups()) {
+			for (Category_ c_ : group.getCategories()) {
+				c = this.categoryService.get(c_.getId());
+				
+				if (c == null) {
+					// This is happening while the json properties are being updated
+					continue;
+				}
+				
+				c_.setMajor(c.getMajor());
+				c_.setMinor(c.getMinor());
+				group.addOptions(c.getMajor(), this.categoryService.getAllMinorValues(c.getMajor()));
+			}
 		}
 	}
 	
