@@ -18,7 +18,8 @@ import com.slepeweb.money.bean.StringOption;
  * by SOLR, which is a FlatTransaction.
  */
 
-@JsonIgnoreProperties({"start", "hrefBase", "accountIdStr", "populated", "transfer", "transferAccountIdStr", "payeeName", "payeeIdStr", "categoryIdStr"})
+@JsonIgnoreProperties({"start", "hrefBase", "accountIdStr", "populated", "transfer", "transferAccountIdStr", 
+	"payeeName", "payeeIdStr", "categoryIdStr", "periodUnitOptions", "majorCategory", "minorCategory", "categoryId"})
 public class SolrParams extends SolrParamsBase {
 
 	public static final String START_OF_DAY = "T00:00:00Z";

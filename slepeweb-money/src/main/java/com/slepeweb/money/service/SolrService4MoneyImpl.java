@@ -18,7 +18,6 @@ import com.slepeweb.common.solr.service.SolrServiceBase;
 import com.slepeweb.common.util.DateUtil;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Category_;
 import com.slepeweb.money.bean.Category_Group;
 import com.slepeweb.money.bean.FlatTransaction;
@@ -38,7 +37,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 
 	@Autowired private AccountService accountService;
 	@Autowired private PayeeService payeeService;
-	@Autowired private CategoryService categoryService;
+	//@Autowired private CategoryService categoryService;
 
 	@PostConstruct
 	public void init() throws Exception {
@@ -178,6 +177,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			}
 		}
 
+		/*
 		if (params.getCategoryId() != null) {
 			isCategorySearch = true;
 			Category c = this.categoryService.get(params.getCategoryId());
@@ -200,7 +200,9 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 				q.addFilterQuery(String.format("minor:\"%s\"", params.getMinorCategory()));
 			}
 		}
-		else if (params.getCategoryGroup() != null && params.getCategoryGroup().getSize() > 0) {
+		else 
+		*/
+		if (params.getCategoryGroup() != null && params.getCategoryGroup().getSize() > 0) {
 			// This category-based search is specific to charting functionality.
 			// First, split the category list into included/excluded categories.
 			isCategorySearch = true;

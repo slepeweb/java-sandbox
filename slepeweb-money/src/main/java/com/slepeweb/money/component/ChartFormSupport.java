@@ -249,7 +249,7 @@ public class ChartFormSupport {
 			
 			if (! p.isTransfer()) {
 				for (Category_Group grp : props.getCategories().getGroups()) {
-					LOG.info(String.format("Processing category group #%d, '%s', containing %d categories", grp.getId(), grp.getLabel(), grp.getSize()));					
+					LOG.debug(String.format("Processing category group #%d, '%s', containing %d categories", grp.getId(), grp.getLabel(), grp.getSize()));					
 					p.setCategoryGroup(grp);
 					queryThenAggregateData(p, grp.getLabel(), year, supp);
 				}
