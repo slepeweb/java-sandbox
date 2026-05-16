@@ -8,7 +8,7 @@
 <c:set var="tdclass_">${not empty tdclass ? tdclass : ''}</c:set>
 
 <tr class="${trclass_}">
-    <td class="heading ${tdclass_}"><label>${heading}</label></td>
-    <td><jsp:doBody /></td>
+    <td class="heading"><label>${heading}</label></td>
+    <td class="${tdclass_}"><jsp:doBody /></td>
 </tr>
 	

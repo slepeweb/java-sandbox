@@ -44,8 +44,8 @@ public class SavedSearchServiceImpl extends BaseServiceImpl implements SavedSear
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into search (name, type, description, saved, json) values (?, ?, ?, ?, ?)", 
-					ss.getName(), ss.getType(), ss.getDescription(), ss.getSaved(), ss.getJson());
+					"insert into search (name, description, json) values (?, ?, ?)", 
+					ss.getName(), ss.getDescription(), ss.getJson());
 			
 			ss.setId(getLastInsertId());	
 			
@@ -62,8 +62,8 @@ public class SavedSearchServiceImpl extends BaseServiceImpl implements SavedSear
 			dbRecord.assimilate(ss);
 			
 			this.jdbcTemplate.update(
-					"update search set name = ?, type = ?, description = ?, saved = ?, json = ? where id = ?", 
-					dbRecord.getName(), dbRecord.getType(), dbRecord.getDescription(), dbRecord.getSaved(), dbRecord.getJson(), 
+					"update search set name = ?, description = ?, json = ? where id = ?", 
+					dbRecord.getName(), dbRecord.getDescription(), dbRecord.getJson(), 
 					dbRecord.getId());
 			
 			LOG.info(compose("Updated saved search", ss));

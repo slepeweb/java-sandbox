@@ -1,8 +1,5 @@
 package com.slepeweb.money.component;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,11 +113,9 @@ public class SearchFormSupport {
 			
 		// Update the SavedSearch object, which gets saved to the db
 		ss.
-			setType(SEARCH_CTX).
 			setName(req.getParameter("name")).
 			setDescription(req.getParameter("description")).
-			setJson(JsonUtil.toJson(params)).
-			setSaved(new Timestamp(new Date().getTime()));
+			setJson(JsonUtil.toJson(params));
 		
 		// This support object simplifies matters ???
 		SavedSearchSupport sss = new SavedSearchSupport().
@@ -170,7 +165,7 @@ public class SearchFormSupport {
 		return p;
 	}	
 
-	public void executeSearch(SolrParams params, ModelMap model) {
+	public long executeSearch(SolrParams params, ModelMap model) {
 		SolrResponse<FlatTransaction> resp = this.solrService4Money.query(params);
 		model.addAttribute(SearchFormSupport.SEARCH_RESPONSE_ATTR, resp);		
 		long credit = 0;
@@ -178,14 +173,15 @@ public class SearchFormSupport {
 			credit += ft.getAmount();
 		}
 		
-		model.addAttribute("_totalCredit", credit);		
+		model.addAttribute("_totalCredit", credit);
+		return credit;
 	}
 	
 	public RedirectView redirect2Execute(SavedSearchSupport supp) {
 		return redirect(
 				String.format(
 						"/%s/get/%d?flash=%s", 
-						supp.getSavedSearch().getType(),
+						"search",
 						supp.getSavedSearch().getId(),
 						Util.encodeUrl(supp.getFlash())));
 	}
@@ -194,14 +190,14 @@ public class SearchFormSupport {
 		return redirect(
 				String.format(
 						"/%s/get/adhoc?flash=%s", 
-						supp.getSavedSearch().getType(),
+						"search",
 						Util.encodeUrl(supp.getFlash())));
 	}
 	
 	public RedirectView redirect2List(SavedSearchSupport supp) {
 		return redirect(
 				String.format("/%s/list?flash=%s", 
-						supp.getSavedSearch().getType(),
+						"search",
 						Util.encodeUrl(supp.getFlash())));
 	}
 	
@@ -216,9 +212,12 @@ public class SearchFormSupport {
 	
 	
 	
-	public void convertId2Name(SolrParams params) {
+	public boolean convertId2Name(SolrParams params) {
+		boolean missingEntity = false;
+		
 		if (params.getPayeeId() != null && params.getPayeeId().longValue() > 0) {
 			Payee p = this.payeeService.get(params.getPayeeId());
+			missingEntity = missingEntity || p == null;
 			params.setPayeeName(p != null ? p.getName() : "");
 		}
 		
@@ -226,7 +225,7 @@ public class SearchFormSupport {
 		Category_Group group = params.getCategoryGroup();
 		
 		if (group == null) {
-			return;
+			return missingEntity;
 		}
 		
 		for (Category_ c_ : group.getCategories()) {
@@ -234,13 +233,16 @@ public class SearchFormSupport {
 			
 			if (c == null) {
 				// This is happening while the json properties are being updated
+				missingEntity = true;
 				continue;
 			}
 			
 			c_.setMajor(c.getMajor());
 			c_.setMinor(c.getMinor());
 			group.addOptions(c.getMajor(), this.categoryService.getAllMinorValues(c.getMajor()));
-		}		
+		}
+		
+		return missingEntity;
 	}
 	
 	public void payeeName2Id(SolrParams params) {

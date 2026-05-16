@@ -8,12 +8,12 @@
 <form id="advanced-search-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">	  
     <table id="multi-category-groupings">
 	    <c:if test="${_formMode ne 'adhoc'}">
-		    <mny:tableRow heading="Title" tdclass="width25">
+		    <mny:tableRow heading="Title">
         	<input type="text" id="name" name="name"
    					placeholder="Provide a title for this search" value="${_ss.name}" />	        	
 		    </mny:tableRow>
 		    
-		    <mny:tableRow heading="Description" tdclass="width25">
+		    <mny:tableRow heading="Description">
         	<textarea id="description" name="description" rows="3" cols="40"
    					placeholder="Provide description to help reader understand content">${_ss.description}</textarea>
 	    	</mny:tableRow>   	
@@ -30,7 +30,7 @@
 		  <tr><td colspan="2"> </td></tr>
 			<mny:categoryList heading="Categories" categories="${_categoryGroup}" />
 	    	    
-	    <mny:tableRow heading="Notes" tdclass="width25">
+	    <mny:tableRow heading="Notes">
        	<input type="text" id="memo" name="memo"
   					placeholder="Match input here against transaction notes" value="${_params.memo}" />	        	
 	    </mny:tableRow>

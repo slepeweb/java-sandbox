@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
+import com.slepeweb.money.bean.Chart;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.NakedTransaction;
 import com.slepeweb.money.bean.Payee;
@@ -109,11 +110,24 @@ public class RowMapperUtil {
 		public SavedSearch mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return new SavedSearch().
 					setId(rs.getLong("id")).
-					setSaved(rs.getTimestamp("saved")).
 					setName(rs.getString("name")).
-					setType(rs.getString("type")).
 					setJson(rs.getString("json")).
 					setDescription(rs.getString("description"));
+		}
+	}
+	
+	public static final class ChartMapper implements RowMapper<Chart> {
+		public Chart mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Chart ch = new Chart();
+			ch.setId(rs.getLong("id"));
+			ch.
+				setName(rs.getString("name")).
+				setDescription(rs.getString("description")).
+				setFromYear(rs.getInt("fromyear")).
+				setToYear(rs.getInt("toyear")).
+				setSearchIds(rs.getString("searchids"));
+			
+			return ch;
 		}
 	}
 	

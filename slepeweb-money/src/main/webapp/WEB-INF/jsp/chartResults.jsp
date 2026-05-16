@@ -27,9 +27,13 @@
 	}
 </c:set>
 
-<c:set var="_formActionUrl" scope="request">/chart/save/${_ss.id }</c:set>
+<c:set var="_formActionUrl" scope="request">/chart/save/${_chart.id }</c:set>
 
 <mny:standardLayout>
+
+	<script>
+		_money.chart.searchOptions = ${_searchOptionsJson};
+	</script>
 
 	<c:set var="_help" value="" />
 	<c:if test="${not empty _ss.description}">

@@ -32,7 +32,7 @@ public class SearchController extends BaseController {
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public String list(ModelMap model) {
-		model.addAttribute(SearchFormSupport.SEARCH_LIST_ATTR, filterSavedSearches(SearchFormSupport.SEARCH_CTX));
+		model.addAttribute(SearchFormSupport.SEARCH_LIST_ATTR, this.savedSearchService.getAll());
 		return SearchFormSupport.LIST_VIEW;
 	}
 
@@ -103,9 +103,12 @@ public class SearchController extends BaseController {
 		
 		SavedSearch ss = this.savedSearchService.get(id);
 		SolrParams params = JsonUtil.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
-		this.searchFormSupport.convertId2Name(params);
+		boolean missingEntity = this.searchFormSupport.convertId2Name(params);
 		
 		model.addAttribute("_numDeletableTransactions", 0);
+		if (missingEntity) {
+			model.addAttribute("_flasher", "failure|Check search definition for deleted data");
+		}
 		this.searchFormSupport.populateForm(ss, params, SearchFormSupport.UPDATE_MODE, model);	
 		return SearchFormSupport.FORM_VIEW;
 	}
@@ -145,7 +148,11 @@ public class SearchController extends BaseController {
 	public String get(@PathVariable int id, @PathVariable int page, ModelMap model) {
 		SavedSearch ss = this.savedSearchService.get(id);
 		SolrParams params = JsonUtil.fromJson(new TypeReference<SolrParams>() {}, ss.getJson());
-		this.searchFormSupport.convertId2Name(params);
+		boolean missingEntity = this.searchFormSupport.convertId2Name(params);
+		
+		if (missingEntity) {
+			model.addAttribute("_flasher", "failure|Check search definition for deleted data");
+		}
 		
 		params.setPageNum(page);		
 		model.addAttribute(SearchFormSupport.SAVED_SEARCH_ATTR, ss);			

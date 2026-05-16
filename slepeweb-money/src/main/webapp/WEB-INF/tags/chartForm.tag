@@ -4,37 +4,47 @@
 <!-- chartForm.tag -->
 
 <form id="chart-form" class="multi-category-input" method="post" action="${_ctxPath}${_formActionUrl}">
-	<table id="year-ranges">
-    <mny:tableRow heading="Title" tdclass="width25">
+	<table id="chart-table">
+    <mny:tableRow heading="Title">
       	<input type="text" id="name" name="name"
- 					placeholder="Provide a title for this chart" value="${_ss.name}" />	        	
+ 					placeholder="Provide a title for this chart" value="${_chart.name}" />	        	
     </mny:tableRow>
     
-    <mny:tableRow heading="Description" tdclass="width25">
+    <mny:tableRow heading="Description">
       	<textarea id="description" name="description" rows="3" cols="40"
- 					placeholder="Provide description to help reader understand content">${_ss.description}</textarea>
+ 					placeholder="Provide description to help reader understand content">${_chart.description}</textarea>
    	</mny:tableRow>
    	
-	  <tsf:account accountId="${_chartProps.accountIdStr}" />
-	  <tsf:payeeOrTransferAccount payeeName="${_chartProps.payeeName}" 
-	  	accountId="${_chartProps.transferAccountIdStr}" direction="${_chartProps.transferDirection}" />
-		
-		<tr>
-	    <td class="heading"><label>Date range</label></td>
-	    <td class="payee-or-transfer">
-				<mny:yearSelector id="from" heading="From" selected="${_chartProps.fromYear}" />
+    <mny:tableRow heading="Years range" tdclass="payee-or-transfer">
+				<mny:yearSelector id="from" heading="From" selected="${_chart.fromYear}" />
 				<div class="or-spacer"></div>
-				<mny:yearSelector id="to" heading="To" selected="${_chartProps.toYear}" />
-			</td>
-		</tr>
-	  <tr><td colspan="2"> </td></tr>
+				<mny:yearSelector id="to" heading="To" selected="${_chart.toYear}" />
+		</mny:tableRow>	
+		
+    <mny:tableRow heading="Search components">
+			<table id="searches">
+				<tr><th>Search title</th><th>Selected?</th></tr>
+				
+				<c:forEach items="${_searchOptions}" var="_sso" varStatus="_stat">
+					<tr id="tr${_sso.savedSearch.id}" class="${_sso.selected ? '' : 'invisible'}">
+						<td>${_sso.savedSearch.name}</td>
+						<td><input type="checkbox" name="chk${_sso.savedSearch.id}" ${_sso.selected ? 'checked' : ''} /></td>
+					</tr>
+				</c:forEach>				
+			</table>  
+	  </mny:tableRow>
 	  
-		<mny:categoryList heading="Categories" categories="${_categoryGroup}" />
-		<tr class="add-category-group <c:if test="${_chartProps.transferAccountId gt 0}">invisible</c:if>"><td><button id="add-group-button" type="button" title="Add another category set" ><i class="fa-solid fa-plus" ></i> Add another category set</button></td></tr>
+    <mny:tableRow heading="Add another search">
+    	<input type="text" id="search-selector" />
+    </mny:tableRow>
+    
+    <tr><td>&nbsp;</td></tr>
+    
+	  
 		<mny:searchAndExecuteOptions />
 			
 	</table>
 		
 	<mny:standardFormActionButtons submit="Submit selected action" cancel="Cancel" delete="Delete chart definition?" />
-	
+	<input id="idlist" type="hidden" name="idlist" />
 </form>			

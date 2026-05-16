@@ -16,17 +16,19 @@
 			<thead>
 				<tr>
 					<th>Name</th>
-					<th>Date created</th>
+					<th>Description</th>
 					<th>Execute</th>
+					<th>Delete?</th>
 				</tr>
 			</thead>
 			
 			<tbody>
 				<c:forEach items="${_searches}" var="_ss">
 					<tr>
-						<td><a href="${_ctxPath}/search/edit/${_ss.id}" title="${mon:renderEither(_ss.description, 'Click to update parameters for this search')}">${_ss.name}</a></td>
-						<td>${_ss.savedWithMinutes}</td>
+						<td><a href="${_ctxPath}/search/edit/${_ss.id}">${_ss.name}</a></td>
+						<td>${_ss.description}</td>
 						<td><i class="far fa-caret-square-right" title="Execute this search" data-id="${_ss.id}"></i></td>
+						<td><i class="fa fa-trash" title="Delete this chart definition" data-id="${_ss.id}"></i></td>
 					</tr>
 				</c:forEach>	
 			</tbody>		
@@ -42,6 +44,20 @@
 				var id = $(this).attr("data-id");
 				window.location = webContext + "/search/get/" + id;
 			});	
+			
+			
+			// Requires more thought
+// 			$(".fa-trash").click(function (e) {
+// 				var params = $(this).attr("data-params");
+// 				var id = $(this).attr("data-id");
+// 				window.location = webContext + "/search/get/" + id;
+				
+// 					var d = $("#delete-dialog");
+// 					var s = d.html();
+// 					d.html(s.replace("__N__", "${_numDeletableTransactions}"));
+// 					d.dialog("open");
+
+// 			});	
 		});
 	</script>
 	

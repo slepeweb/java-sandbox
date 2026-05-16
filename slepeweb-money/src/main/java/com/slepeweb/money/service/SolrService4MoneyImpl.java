@@ -294,7 +294,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			q.addSort("entered", SolrQuery.ORDER.desc);
 			q.setStart(params.getStart());
 			q.setRows(params.getPageSize());
-			LOG.debug(String.format("Solr query: [%s]", q.toQueryString()));
+			LOG.info(String.format("Solr query: [%s]", q.toQueryString()));
 
 			try {
 				QueryResponse qr = getClient().query(q);

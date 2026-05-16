@@ -176,17 +176,27 @@ create table userrole
 create table search
 (
 	id int not null auto_increment,
-	saved timestamp,
 	name varchar(255) NOT NULL,
-	type enum ('advanced', 'chart'),
 	description varchar(2047),
 	json varchar(4095) NOT NULL,
 	primary key (id),
-	index idx_search (saved desc, name)
+	index idx_search (name)
 ) ENGINE=InnoDB;
 
-insert into search(saved,name,type,json) values('2019-10-01 00:00:01','my search #9','advanced','{}');
+insert into search(name,json) values('2019-10-01 00:00:01','my search #9','advanced','{}');
 update search set id=-1 where id=1;
+
+create table chart
+(
+	id int not null auto_increment,
+	name varchar(255) NOT NULL,
+	description varchar(2047),
+	fromyear int NOT NULL,
+	toyear int NOT NULL,
+	searchids varchar(128),
+	primary key (id),
+	index idx_chart (name)
+) ENGINE=InnoDB;
 
 create table property
 (

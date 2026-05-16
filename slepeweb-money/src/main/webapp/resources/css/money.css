@@ -629,7 +629,7 @@ div.dashboard-group table h3 {
 }
 
 #trn-form tr td:first-child {
-  width: 130px;
+  width: 25%;
 }
 #trn-form tr input[name=amount] {
   width: 130px;
@@ -899,6 +899,14 @@ p.datetimenow {
   font-size: 0.9em;
   color: #24604e;
   margin-bottom: 0.5em;
+}
+
+i.fa-trash, i.fa-caret-square-right {
+	cursor: pointer;
+}
+
+td.heading {
+	width: 25%;
 }
 
 @media only screen and (max-width: 52em) {

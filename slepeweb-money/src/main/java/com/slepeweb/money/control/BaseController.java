@@ -14,6 +14,7 @@ import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.User;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.CategoryService;
+import com.slepeweb.money.service.ChartService;
 import com.slepeweb.money.service.PayeeService;
 import com.slepeweb.money.service.SavedSearchService;
 import com.slepeweb.money.service.ScheduledTransactionService;
@@ -36,6 +37,7 @@ public class BaseController {
 	@Autowired protected ScheduledTransactionService scheduledTransactionService;
 	@Autowired protected SolrService4Money solrService;
 	@Autowired protected SavedSearchService savedSearchService;
+	@Autowired protected ChartService chartService;
 	
 	protected User getUser(HttpServletRequest req) {
 		return (User) req.getSession().getAttribute(User.USER_ATTR);
@@ -49,18 +51,6 @@ public class BaseController {
 		return payees;
 	}
 
-	protected List<SavedSearch> filterSavedSearches(String type) {
-		List<SavedSearch> searches = new ArrayList<SavedSearch>();
-		
-		for (SavedSearch ss : this.savedSearchService.getAll()) {
-			if (ss.getType().equals(type)) {			
-				searches.add(ss);
-			}
-		}
-		
-		return searches;
-	}
-	
 	protected String storeSavedSearch(SavedSearch ss) {
 		String flash;
 		try {

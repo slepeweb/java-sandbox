@@ -12,11 +12,15 @@
 	<c:set var="_formActionUrl" scope="request">/chart/save</c:set>
 </c:when><c:when test="${_formMode eq 'update'}">
 	<c:set var="_pageHeading" value="Update chart" scope="request" />
-	<c:set var="_formActionUrl" scope="request">/chart/save/${_ss.id }</c:set>
+	<c:set var="_formActionUrl" scope="request">/chart/save/${_chart.id }</c:set>
 </c:when></c:choose>
 
 <mny:standardLayout>
 	
+<script>
+	_money.chart.searchOptions = ${_searchOptionsJson};
+</script>
+
 	<mny:pageHeading heading="${_pageHeading}">
 		<mny:standardFormMenu entity="chart" />
 	</mny:pageHeading>
@@ -25,14 +29,13 @@
 		<summary><i class="fa-solid fa-info fa-2x"></i></summary>
 		<ul>
 			<li>Charts aggregate transaction year by year, and present the totals in a bar chart. </li>
-			<li>Unless transactions of interest are identified as 'Transfers', groups of categories
-					can be defined, and each group will be represented in the bar chart in its own colour.</li>
-			<li>Category groups do not make sense when dealing with Transfers, and so are not available in that case.</li>
+			<li>The transactions that are charted are defined by searches.</li>
+			<li>A chart may be defined by several searches; the results for each search are differentiated by colour.</li>
 		</ul>
 	</details>
 	
 	<mny:chartForm />	
 
-	<mny:entityDeletionDialog entity="chart" mode="${_formMode}" id="${_ss.id}"/>
+	<mny:entityDeletionDialog entity="chart" mode="${_formMode}" id="${_chart.id}"/>
 
 </mny:standardLayout>
