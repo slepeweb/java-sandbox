@@ -28,7 +28,7 @@
 		  <tsf:payeeOrTransferAccount payeeName="${_params.payeeName}" 
 		  	accountId="${_params.transferAccountIdStr}" direction="${_params.transferDirection}" />
 		  <tr><td colspan="2"> </td></tr>
-			<mny:categoryList heading="Categories" categories="${_categoryGroup}" />
+			<mny:categoryList heading="Categories" ctx="search" group="${_params.categoryGroup}" />
 	    	    
 	    <mny:tableRow heading="Notes">
        	<input type="text" id="memo" name="memo"

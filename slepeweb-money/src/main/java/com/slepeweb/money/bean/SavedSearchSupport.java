@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 public class SavedSearchSupport {
 	private SavedSearch savedSearch;
 	private SolrParams solrParams;
-	private ChartProperties chartProperties;
 	private String flash, mode;
 	private boolean save, execute, adhoc;
 	
@@ -50,15 +49,6 @@ public class SavedSearchSupport {
 	
 	public SavedSearchSupport setSolrParams(SolrParams solrParams) {
 		this.solrParams = solrParams;
-		return this;
-	}
-
-	public ChartProperties getChartProperties() {
-		return chartProperties;
-	}
-
-	public SavedSearchSupport setChartProperties(ChartProperties chartProperties) {
-		this.chartProperties = chartProperties;
 		return this;
 	}
 

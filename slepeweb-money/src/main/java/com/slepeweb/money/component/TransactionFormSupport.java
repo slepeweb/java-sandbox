@@ -13,7 +13,6 @@ import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Category_Group;
-import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.MonthPager;
 import com.slepeweb.money.bean.NormalisedMonth;
 import com.slepeweb.money.bean.Option;
@@ -98,12 +97,10 @@ public class TransactionFormSupport {
 			model.addAttribute("_allMinorCategories", this.categoryService.getAllMinorValues(t.getCategory().getMajor()));
 		}
 		
-		Category_GroupSet cgs = new Category_GroupSet("Transaction Splits", FormSupport.TRANSACTION_CTX);
-		Category_Group cg = this.formSupport.populateCategory_Group(1, "Splits", t.getSplits(), SplitTransaction.class);
+		Category_Group cg = this.formSupport.populateCategory_Group(t.getSplits(), SplitTransaction.class);
 		cg.setVisible(true).setLastVisible(true);
-		cgs.addGroup(cg);
 		
-		model.addAttribute("_transactionSplits", cgs);
+		model.addAttribute("_transactionSplits", cg);
 	}
 	
 	public List<Option> buildMonthSelector(MonthPager pager) {

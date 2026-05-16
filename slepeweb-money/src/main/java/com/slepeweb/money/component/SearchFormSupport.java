@@ -12,7 +12,6 @@ import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Category_;
 import com.slepeweb.money.bean.Category_Group;
-import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.FlatTransaction;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
@@ -66,25 +65,22 @@ public class SearchFormSupport {
 	public void populateForm(
 			SavedSearch ss, SolrParams params, String formMode, ModelMap model) {
 		
-		Category_GroupSet cgs = new Category_GroupSet("Search", SearchFormSupport.SEARCH_CTX);
 		Category_Group cg;
 		
 		if (params.getCategoryGroup() == null) {
-			cg = this.formSupport.populateCategory_Group(1, "Categories", null, SearchCategory.class);	
+			cg = this.formSupport.populateCategory_Group(null, SearchCategory.class);	
 			params.setCategoryGroup(cg);
 		}
 		else {
 			cg = params.getCategoryGroup();
 			cg.setAllCategoriesVisible();
-			this.formSupport.addEmptyCategories(cg);
+			this.formSupport.addEmptyCategoryIf(cg);
 		}
 		
 		cg.setVisible(true);
-		cgs.addGroup(cg);
 
 		model.addAttribute(SAVED_SEARCH_ATTR, ss);		
 		model.addAttribute(PARAMS_ATTR, params);		
-		model.addAttribute(CATEGORY_GROUP_ATTR, cgs);				
 		model.addAttribute(ALL_ACCOUNTS_ATTR, this.accountService.getAll(true));
 		model.addAttribute(ALL_PAYEES_ATTR, this.payeeService.getAll());
 		model.addAttribute(JSON_ATTR, Util.encodeUrl(JsonUtil.toJson(params)));		
@@ -94,23 +90,15 @@ public class SearchFormSupport {
 	
 	
 	public SavedSearchSupport processFormSubmission(HttpServletRequest req, SavedSearch ss) {
-		Category_GroupSet cgs = new Category_GroupSet("Splits", SEARCH_CTX);
 		
 		// Read the search parameters from the submitted form
 		SolrParams params = readSearchCriteria(req);
 		
 		if (! params.isTransfer()) {
 			// Create a new Category_Group using the submitted form data, and add it to the set IFF populated
-			this.formSupport.readCategoryInputs(req, 1, cgs);			
+			params.setCategoryGroup(this.formSupport.readCategoryInputs(req));			
 		}
 		
-		/*
-		 *  Search functionality is based on a single group of categories.
-		 *  Combine the the first Category_Group into the SolrParams. It 
-		 *  is the SolrParams object that will get stored in the db as a json string.
-		 */
-		params.setCategoryGroup(cgs.getFirstGroup());
-			
 		// Update the SavedSearch object, which gets saved to the db
 		ss.
 			setName(req.getParameter("name")).

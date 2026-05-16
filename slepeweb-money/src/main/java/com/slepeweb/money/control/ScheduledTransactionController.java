@@ -17,7 +17,6 @@ import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Category_Group;
-import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.component.FormSupport;
@@ -138,8 +137,7 @@ public class ScheduledTransactionController extends BaseController {
 		
 		// Note: Transfers can NOT have split transactions
 		if (isSplit) {
-			Category_GroupSet cgs = new Category_GroupSet("Splits", FormSupport.TRANSACTION_CTX);
-			Category_Group cg = this.formSupport.readCategoryInputs(req, 1, cgs);
+			Category_Group cg = this.formSupport.readCategoryInputs(req);
 			scht.setSplits(cg.toSplitTransactions(this.categoryService, multiplier));
 		}
 		

@@ -10,26 +10,18 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.slepeweb.money.service.CategoryService;
 
-@JsonIgnoreProperties({"id", "visible", "populated", "lastVisible", "size", "root", "options"})
+@JsonIgnoreProperties({"id", "visible", "populated", "lastVisible", "size", "options"})
 public class Category_Group {
 	
-	private int id = 1;
-	private String label = "";
 	private List<Category_> categories = new ArrayList<Category_>();
 	private boolean visible, lastVisible;
 	private Map<String,List<String>> options = new HashMap<String,List<String>>();
-	private Category_GroupSet root;
 	
 	public Category_Group() {}
 	
-	public Category_Group(int i, String label) {
-		this.id = i;
-		this.label = label;
-	}
-	
 	@Override
 	public String toString() {
-		return String.format("Category group#%d, %s", this.id, this.label);
+		return "Category group";
 	}
 	
 	public boolean isPopulated() {
@@ -68,15 +60,6 @@ public class Category_Group {
 	
 	public int getSize() {
 		return this.categories.size();
-	}
-	
-	public int getId() {
-		return id;
-	}
-	
-	public Category_Group setId(int id) {
-		this.id = id;
-		return this;
 	}
 	
 	public List<Category_> getCategories() {
@@ -118,30 +101,12 @@ public class Category_Group {
 		return this;
 	}
 
-	public String getLabel() {
-		return label;
-	}
-
-	public Category_Group setLabel(String label) {
-		this.label = label;
-		return this;
-	}
-
 	public Map<String, List<String>> getOptions() {
 		return options;
 	}
 	
 	public Category_Group setOptions(Map<String, List<String>> options) {
 		this.options = options;
-		return this;
-	}
-	
-	public Category_GroupSet getRoot() {
-		return root;
-	}
-
-	public Category_Group setRoot(Category_GroupSet root) {
-		this.root = root;
 		return this;
 	}
 }

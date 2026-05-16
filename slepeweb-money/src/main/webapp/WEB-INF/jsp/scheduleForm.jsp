@@ -49,7 +49,7 @@
 		    <tsf:payee payeeName="${_schedule.payee.name}" />
 		    <tsf:category entity="${_schedule}" />
 		    <tsf:subCategory entity="${_schedule}" />
-				<mny:categoryList heading="Splits" categories="${_transactionSplits}" />
+				<mny:categoryList heading="Splits" ctx="transaction" group="${_transactionSplits}" />
 		    <tsf:notes memo="${_schedule.memo}" />
 		    <tsf:amount value="${_schedule.amountValue}" isdebit="${_schedule.debit}" />
 		    

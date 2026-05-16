@@ -59,7 +59,7 @@
 		    <tsf:payee payeeName="${_transaction.payee.name}" />
 		    <tsf:category entity="${_transaction}" />
 		    <tsf:subCategory entity="${_transaction}" />
-				<mny:categoryList heading="Splits" categories="${_transactionSplits}" />
+				<mny:categoryList heading="Splits" ctx="transaction" group="${_transactionSplits}" />
 		    <tsf:notes memo="${_transaction.memo}" />
 		    <tsf:amount value="${_transaction.amountValue}" isdebit="${_transaction.debit}" />
 

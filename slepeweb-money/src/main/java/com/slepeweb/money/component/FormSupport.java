@@ -12,7 +12,6 @@ import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Category_;
 import com.slepeweb.money.bean.Category_Group;
-import com.slepeweb.money.bean.Category_GroupSet;
 import com.slepeweb.money.bean.SearchCategory;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.service.CategoryService;
@@ -32,11 +31,10 @@ public class FormSupport {
 	 * a) SplitTransaction or
 	 * b) SearchCategory objects.
 	 */
-	public Category_Group populateCategory_Group(int groupId, String label, 
-			List<?> categoryLikeObjects, Class<?> clazz) {
+	public Category_Group populateCategory_Group(List<?> categoryLikeObjects, Class<?> clazz) {
 		
 		boolean isTransactionMode = clazz.equals(SplitTransaction.class);
-		Category_Group cg = new Category_Group(groupId, label);		
+		Category_Group cg = new Category_Group();		
 		Category_ c;
 		int count = 0;
 		int numVisible = categoryLikeObjects != null ? categoryLikeObjects.size() : 0;
@@ -64,11 +62,11 @@ public class FormSupport {
 			}
 		}
 		
-		addEmptyCategories(cg);				
+		addEmptyCategoryIf(cg);				
 		return cg;
 	}
 	
-	public void addEmptyCategories(Category_Group cg) {
+	public void addEmptyCategoryIf(Category_Group cg) {
 		Category_ c;
 		int numVisible = cg.getSize();
 		
@@ -84,23 +82,22 @@ public class FormSupport {
 	}
 	
 	/*
-	 * This method constructs a Category_GroupSet using posted form data 
+	 * This method constructs a Category_Group using posted form data 
 	 */
-	public Category_Group readCategoryInputs(HttpServletRequest req, int groupId, Category_GroupSet cgs) {
+	public Category_Group readCategoryInputs(HttpServletRequest req) {
 		
 		String major, minor, memo, amountStr;
 		boolean excluded;		
 		String suffix;
 		
-		String name = "numCategories_" + groupId;
+		String name = "numCategories";
 		int numCategories = Integer.valueOf(req.getParameter(name));
-		Category_Group cg = new Category_Group(groupId, "");
-		cg.setLabel(req.getParameter("groupname_" + groupId));
+		Category_Group cg = new Category_Group();
 		Category_ c;
 		Category dbc;
 		
 		for (int j = 1; j <= numCategories; j++) {
-			suffix = String.format("_%d_%d", groupId, j);
+			suffix = String.format("_%d", j);
 			major = req.getParameter("major" + suffix);
 			
 			if (StringUtils.isNotBlank(major)) {			
@@ -121,10 +118,6 @@ public class FormSupport {
 				c.setExclude(excluded);
 				cg.getCategories().add(c);
 			}
-		}
-		
-		if (cg.isPopulated()) {
-			cgs.addGroup(cg);
 		}
 		
 		return cg;

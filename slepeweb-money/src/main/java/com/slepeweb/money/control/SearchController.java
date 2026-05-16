@@ -109,6 +109,7 @@ public class SearchController extends BaseController {
 		if (missingEntity) {
 			model.addAttribute("_flasher", "failure|Check search definition for deleted data");
 		}
+		
 		this.searchFormSupport.populateForm(ss, params, SearchFormSupport.UPDATE_MODE, model);	
 		return SearchFormSupport.FORM_VIEW;
 	}
