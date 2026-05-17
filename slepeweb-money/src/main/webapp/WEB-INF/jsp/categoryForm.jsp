@@ -65,7 +65,7 @@
 </mny:standardLayout>
 
 
-<mny:entityDeletionDialog entity="category" mode="${_formMode}" id="${_category.id}"/>
+<mny:entityDeletionDialog entity="category" id="${_category.id}"/>
 
 <script>
 $(function() {

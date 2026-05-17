@@ -12,7 +12,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Chart;
-import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.SavedSearchOption;
 import com.slepeweb.money.component.ChartFormSupport;
 import com.slepeweb.money.component.SearchFormSupport;
@@ -68,11 +67,11 @@ public class ChartController extends BaseController {
 	
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.GET)
 	public RedirectView delete(@PathVariable int id, HttpServletRequest req, ModelMap model) {
-		SavedSearch ss = this.savedSearchService.get(id);
+		Chart ch = this.chartService.get(id);
 		String flash;
 		
 		try {
-			this.savedSearchService.delete(ss.getId());
+			this.chartService.delete(ch.getId());
 			flash = "success|Chart successfully deleted";
 		}
 		catch (Exception e) {

@@ -2,7 +2,9 @@
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
 	
-<mny:standardLayout>
+<c:set var="_extraJs" scope="request" value="searchAndChartLists.js" />
+
+<mny:standardLayout pageId="chartList">
 
 	<mny:pageHeading heading="Chart list">
 		<a href="${_ctxPath}/chart/add" title="Define and save new chart critera">New chart</a>
@@ -36,13 +38,7 @@
 		<p><strong>No saved charts</strong></p>
 	</c:otherwise></c:choose>
 	
-	<script>
-		$(function() {
-			$(".fa-caret-square-right").click(function (e) {
-				var id = $(this).attr("data-id");
-				window.location = webContext + "/chart/get/" + id;
-			});				
-		});
-	</script>
-	
+	<mny:listEntryDeletionDialog entity="chart" />
+
 </mny:standardLayout>
+	

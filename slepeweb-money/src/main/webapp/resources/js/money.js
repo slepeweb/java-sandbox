@@ -7,7 +7,8 @@ var _money = {
 	chart: {},
 	service: {},
 	reconcile: {},
-	accpunt: {},
+	account: {},
+	param: {},
 };
 
 _money.shared.isNotEmpty = function(field, sel, errors, isWarning) {
@@ -177,9 +178,6 @@ _money.shared.ajax = function(method, url, data, success, fail) {
 	$.ajax(webContext + url, params);
 }
 
-
-
-
 /*
 	The stuff below is not common to all js - needs to be re-factored
 */
@@ -209,4 +207,29 @@ $(function() {
 		heightStyle: 'content'
 	});
 	
+	$("#delete-dialog").dialog({
+		autoOpen: false, 
+		modal: true,
+		buttons: [
+			{
+				text: "Cancel",
+				icon: "ui-icon-arrowreturnthick-1-w",
+				click: function() {
+					$(this).dialog("close");
+				}
+			},
+			{
+				text: "Delete",
+				icon: "ui-icon-alert",
+				click: function() {
+					window.location = `${webContext}/${_money.param.entityType}/delete/${_money.param.entityId}`
+				}
+			}
+		]
+	});
+
+	$("#delete-button").click(function(e) {
+		$("#delete-dialog").dialog("open");
+	});	
+
 });	

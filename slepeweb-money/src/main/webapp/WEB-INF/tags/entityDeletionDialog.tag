@@ -1,44 +1,18 @@
 <%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
 	attribute name="entity" required="true" rtexprvalue="true" %><%@ 
-	attribute name="mode" required="true" rtexprvalue="true" %><%@ 
 	attribute name="id" required="true" rtexprvalue="true" %><%@ 
 	attribute name="level" required="false" rtexprvalue="true" %>
 
 <!-- entityDeletionDialog.tag -->
-
-<%-- Decided to leave this javascript in a jsp, as it uses ${jsp} expressions --%>
+<%-- 
+This dialog appears on ALL form pages. It
+requires money.js to have been loaded on the page.
+--%>
 
 <script>
-$(function() {
-	$("#delete-dialog").dialog({
-		autoOpen: false, 
-		modal: true,
-		buttons: [
-			{
-				text: "Cancel",
-				icon: "ui-icon-arrowreturnthick-1-w",
-				click: function() {
-					$(this).dialog("close");
-				}
-			},
-			{
-				text: "Delete",
-				icon: "ui-icon-alert",
-				click: function() {
-					window.location = webContext + "/${entity}/delete/" + "${id}";
-				}
-			}
-		]
-	});
-	
-	$("#delete-button").click(function(e){
-		var d = $("#delete-dialog");
-		var s = d.html();
-		d.html(s.replace("__N__", "${_numDeletableTransactions}"));
-		d.dialog("open");
-	});
-
-});
+	_money.param.entityType = '${entity}';
+	_money.param.entityId = '${id}';
+	_money.param.numDeletables = '${_numDeletableTransactions}'
 </script>
 
 <div id="delete-dialog" title="Delete ${entity}">
@@ -52,7 +26,10 @@ $(function() {
 	</c:when><c:when test="${entity eq 'schedule'}">
 		Are you sure you wish to delete this schedule?
 	</c:when><c:otherwise>
-		Deleting this ${level}${entity} will also delete __N__ corresponding transactions. Are you sure
-		you wish to proceed?
+		<c:if test="${_numDeletableTransactions gt 0}">
+			Deleting this ${level}${entity} will also delete ${_numDeletableTransactions} 
+			corresponding transactions.
+		</c:if>
+		Are you sure you wish to proceed?
 	</c:otherwise></c:choose>
 </div>

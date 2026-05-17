@@ -36,6 +36,6 @@
 	
 	<mny:chartForm />	
 
-	<mny:entityDeletionDialog entity="chart" mode="${_formMode}" id="${_chart.id}"/>
+	<mny:entityDeletionDialog entity="chart" id="${_chart.id}"/>
 
 </mny:standardLayout>

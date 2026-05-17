@@ -30,6 +30,6 @@
 
 	<mny:advancedSearchForm />	
 	
-	<mny:entityDeletionDialog entity="search" mode="${_formMode}" id="${_ss.id}"/>
+	<mny:entityDeletionDialog entity="search" id="${_ss.id}"/>
 
 </mny:standardLayout>

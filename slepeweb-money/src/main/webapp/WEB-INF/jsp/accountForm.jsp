@@ -131,4 +131,4 @@ $(function() {
 })
 </script>
 
-<mny:entityDeletionDialog entity="account" mode="${_formMode}" id="${_account.id}" />
+<mny:entityDeletionDialog entity="account" id="${_account.id}" />

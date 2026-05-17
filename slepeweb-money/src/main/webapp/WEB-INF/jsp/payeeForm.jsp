@@ -36,4 +36,4 @@ $(function() {
 })
 </script>
 
-<mny:entityDeletionDialog entity="payee" mode="${_formMode}" id="${_payee.id}"/>
+<mny:entityDeletionDialog entity="payee" id="${_payee.id}"/>

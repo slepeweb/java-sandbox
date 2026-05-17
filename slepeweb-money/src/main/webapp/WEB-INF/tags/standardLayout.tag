@@ -1,4 +1,6 @@
-<%@ tag %><%@ include file="/WEB-INF/jsp/tagDirectives.jsp" %><!DOCTYPE html>
+<%@ tag %><%@ 
+	attribute name="pageId" required="false" rtexprvalue="true" %><%@ 
+	include file="/WEB-INF/jsp/tagDirectives.jsp" %><!DOCTYPE html>
 
 <html>
 	<head>
@@ -17,7 +19,7 @@
 		</div>
 	
 		<div id="main-wrapper">
-			<div id="main" class="container">				
+			<div id="main" class="container" data-pageId="${pageId}">
 				<jsp:doBody />
 			</div>
 		</div>

@@ -1,8 +1,10 @@
 <%@ 
 	include file="/WEB-INF/jsp/pageDirectives.jsp" %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %>
+
+<c:set var="_extraJs" scope="request" value="searchAndChartLists.js" />
 	
-<mny:standardLayout>
+<mny:standardLayout pageId="searchList">
 
 	<mny:pageHeading heading="Saved searches">
 		<ul>
@@ -37,28 +39,6 @@
 		<p><strong>No saved searches</strong></p>
 	</c:otherwise></c:choose>
 	
-	<script>
-		$(function() {
-			$(".fa-caret-square-right").click(function (e) {
-				var params = $(this).attr("data-params");
-				var id = $(this).attr("data-id");
-				window.location = webContext + "/search/get/" + id;
-			});	
-			
-			
-			// Requires more thought
-// 			$(".fa-trash").click(function (e) {
-// 				var params = $(this).attr("data-params");
-// 				var id = $(this).attr("data-id");
-// 				window.location = webContext + "/search/get/" + id;
-				
-// 					var d = $("#delete-dialog");
-// 					var s = d.html();
-// 					d.html(s.replace("__N__", "${_numDeletableTransactions}"));
-// 					d.dialog("open");
-
-// 			});	
-		});
-	</script>
+	<mny:listEntryDeletionDialog entity="search" />
 	
 </mny:standardLayout>
