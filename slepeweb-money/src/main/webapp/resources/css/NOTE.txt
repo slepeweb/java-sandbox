@@ -1,6 +1,0 @@
-Early 2025, it seems I converted the css delivery system to use sass, but then forgot about it.
-
-search.css was then inserted into the css folder, but sass knows nothing about it. BUT, more significant
-is that money.css has evolved without any updates to sass.
-
-What's needed is to remove OR re-implement sass.
