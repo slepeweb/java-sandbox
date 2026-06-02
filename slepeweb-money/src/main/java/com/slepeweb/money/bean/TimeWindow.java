@@ -1,38 +1,39 @@
 package com.slepeweb.money.bean;
 
-import java.sql.Timestamp;
-import java.util.Date;
+import java.sql.Date;
+
+import com.slepeweb.money.Util;
 
 public class TimeWindow {
-	private Timestamp from, to;
+	private Date from, to;
 	
 	public TimeWindow() {
-		this.from = new Timestamp(0L);
-		this.to = new Timestamp(new Date().getTime());
+		this.from = new Date(0L);
+		this.to = Util.todaySQ();
 	}
 	
-	public TimeWindow(Timestamp from, Timestamp to) {
+	public TimeWindow(Date from, Date to) {
 		this.from = from;
 		this.to= to;
 	}
 	
-	public boolean wraps(Timestamp t) {
+	public boolean wraps(Date t) {
 		return t.after(this.from) && t.before(this.to);
 	}
 
-	public Timestamp getFrom() {
+	public Date getFrom() {
 		return from;
 	}
 
-	public void setFrom(Timestamp from) {
+	public void setFrom(Date from) {
 		this.from = from;
 	}
 
-	public Timestamp getTo() {
+	public Date getTo() {
 		return to;
 	}
 
-	public void setTo(Timestamp to) {
+	public void setTo(Date to) {
 		this.to = to;
 	}
 }

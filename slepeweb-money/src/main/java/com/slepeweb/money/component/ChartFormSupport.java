@@ -3,7 +3,6 @@ package com.slepeweb.money.component;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,7 +164,7 @@ public class ChartFormSupport {
 			return this.yearRange;
 		}
 		
-		int thisYear = Util.getYear(new Date());
+		int thisYear = Util.getYear(Util.todaySQ());
 		this.yearRange = new ArrayList<Integer>();
 		for (int i = 1995; i <= thisYear; i++) {
 			this.yearRange.add(i);

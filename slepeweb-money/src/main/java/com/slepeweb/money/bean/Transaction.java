@@ -1,11 +1,10 @@
 package com.slepeweb.money.bean;
 
-import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import com.slepeweb.money.Util;
@@ -23,7 +22,7 @@ public class Transaction extends DbEntity {
 	private long xferId = 0L;
 	private Payee payee;
 	private Category category;
-	private Timestamp entered = new Timestamp(new Date().getTime());
+	private Date entered = Util.todaySQ();
 	private boolean split, reconciled;
 	private long amount;
 	private String reference = "", memo = "";
@@ -209,7 +208,7 @@ public class Transaction extends DbEntity {
 		return this;
 	}
 	
-	public Timestamp getEntered() {
+	public Date getEntered() {
 		return entered;
 	}
 	
@@ -217,7 +216,7 @@ public class Transaction extends DbEntity {
 		return Util.formatTimestamp(getEntered());
 	}
 	
-	public Transaction setEntered(Timestamp entered) {
+	public Transaction setEntered(Date entered) {
 		this.entered = entered;
 		return this;
 	}

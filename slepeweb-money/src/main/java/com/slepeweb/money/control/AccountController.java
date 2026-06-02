@@ -109,7 +109,7 @@ public class AccountController extends BaseController {
 		if (isSavingsAccount) {
 			SavingsAccount sa = (SavingsAccount) a;
 			sa.
-				setMatures(Util.parseTimestamp(req.getParameter("matures"))). 
+				setMatures(Util.parseSqlDate(req.getParameter("matures"))). 
 				setAccess(req.getParameter("access")).
 				setSchedule(req.getParameter("schedule")).
 				setOwner(req.getParameter("owner")).

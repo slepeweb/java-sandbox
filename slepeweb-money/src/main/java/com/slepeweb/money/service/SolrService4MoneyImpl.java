@@ -1,8 +1,8 @@
 package com.slepeweb.money.service;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.common.solr.service.SolrServiceBase;
-import com.slepeweb.common.util.DateUtil;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category_;
@@ -248,8 +247,8 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 		String from = null, to = null;
 		
 		if (params.getPeriodValue() > 0) {
-			Calendar today = DateUtil.today();
-			Calendar past = DateUtil.today();
+			Calendar today = Calendar.getInstance();
+			Calendar past = Calendar.getInstance();
 			to = Util.formatSolrDate(today.getTime());
 			
 			if (params.getPeriodUnits().equals(SolrParams.WEEK)) {
@@ -311,7 +310,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			} catch (Exception e) {
 				response.setError(true);
 				response.setMessage("Search system error");
-				LOG.error(String.format(response.getMessage() + "[%s]", e.getMessage()));
+				LOG.error(String.format(response.getMessage() + "[%s]", e.getMessage()), e);
 			}
 		}
 		else {

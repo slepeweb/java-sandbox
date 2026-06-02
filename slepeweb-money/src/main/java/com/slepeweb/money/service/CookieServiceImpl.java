@@ -1,6 +1,6 @@
 package com.slepeweb.money.service;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import org.springframework.stereotype.Service;
 
@@ -34,15 +34,15 @@ public class CookieServiceImpl implements CookieService {
 		return null;
 	}
 	
-	public void updateLastEnteredCookie(Timestamp t, HttpServletRequest req, HttpServletResponse res) {
+	public void updateLastEnteredCookie(Date t, HttpServletRequest req, HttpServletResponse res) {
 		saveCookie(LAST_ENTERED_COOKIE_NAME, Util.formatTimestamp(t), res);
 	}
 	
-	public Timestamp getLastEntered(HttpServletRequest req) {
+	public Date getLastEntered(HttpServletRequest req) {
 		
 		for (Cookie c : req.getCookies()) {
 			if (c.getName().equals(LAST_ENTERED_COOKIE_NAME)) {
-				return Util.parseTimestamp(c.getValue());
+				return Util.parseSqlDate(c.getValue());
 			}
 		}
 		

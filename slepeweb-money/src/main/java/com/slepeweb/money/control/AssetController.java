@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,13 +50,13 @@ public class AssetController extends BaseController {
 	 */
 	@RequestMapping(value="/history")	
 	public String history(ModelMap model) { 
-		int thisYear = Util.getYear(new Date());
+		int thisYear = Util.getYear(Util.todaySQ());
 		return historyStart(thisYear - 10, model);
 	}
 	
 	@RequestMapping(value="/history/{displayYearStart}")	
 	public String historyStart(@PathVariable int displayYearStart, ModelMap model) { 
-		int thisYear = Util.getYear(new Date());
+		int thisYear = Util.getYear(Util.todaySQ());
 		return historyWindow(displayYearStart, thisYear, model);
 	}
 	
@@ -106,7 +105,7 @@ public class AssetController extends BaseController {
 			}
 		}
 		
-		int thisYear = Util.getYear(new Date());
+		int thisYear = Util.getYear(Util.todaySQ());
 		YearlyAssetStatus totalStatus = new YearlyAssetStatus(thisYear);
 		model.addAttribute("_totals", totalStatus);
 		

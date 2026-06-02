@@ -6,7 +6,7 @@ import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+import java.sql.Date;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -101,14 +101,18 @@ public class Util {
 		return s.replaceAll(",", "");
 	}
 	
-	public static String formatTimestamp(Date d) {
+	public static String formatSolrDate(java.sql.Date d) {
+		return formatSolrDate(new java.util.Date(d.getTime()));
+	}
+	
+	public static String formatTimestamp(java.util.Date d) {
 		if (d != null) {
 			return SDF.format(d);
 		}
 		return "";
 	}
 	
-	public static String formatSolrDate(Date d) {
+	public static String formatSolrDate(java.util.Date d) {
 		if (d != null) {
 			return SOLR_SDF.format(d);
 		}
@@ -127,9 +131,20 @@ public class Util {
 		}
 	}
 	
+	public static Date parseSqlDate(String s) {
+		try {
+			Calendar c = Calendar.getInstance();
+			c.setTime(SDF.parse(s));
+			return new Date(c.getTimeInMillis());
+		} 
+		catch (Exception e) {
+			return null;
+		}
+	}
+	
 	public static Date parseSolrDate(String s) {
 		try {
-			return SOLR_SDF.parse(s);
+			return new java.sql.Date(SOLR_SDF.parse(s).getTime());
 		} 
 		catch (Exception e) {
 			return null;
@@ -140,6 +155,10 @@ public class Util {
 		Calendar c = Calendar.getInstance();
 		zeroTimeOfDay(c);
 		return c;
+	}
+	
+	public static java.sql.Date todaySQ() {
+		return new java.sql.Date(System.currentTimeMillis());
 	}
 	
 	public static Timestamp toTimestamp(Calendar c) {

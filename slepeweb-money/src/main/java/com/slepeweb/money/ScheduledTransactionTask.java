@@ -60,7 +60,7 @@ public class ScheduledTransactionTask implements Job {
 			
 			if (scheduled.before(now)) {
 				t.setId(0); // Indicating a new transaction is required
-				t.setEntered(Util.toTimestamp(Util.today()));
+				t.setEntered(Util.todaySQ());
 				t.setSource(4);
 				
 				try {

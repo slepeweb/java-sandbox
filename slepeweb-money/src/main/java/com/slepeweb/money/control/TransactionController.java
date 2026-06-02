@@ -1,6 +1,6 @@
 package com.slepeweb.money.control;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class TransactionController extends BaseController {
 	public String listNoMonth(@PathVariable long accountId, HttpServletRequest req, HttpServletResponse res, ModelMap model) { 
 		
 		getHistory(req).getLastAccount().setId(accountId);
-		Timestamp end = getHistory(req).getLastTransaction().getEntered();
+		Date end = getHistory(req).getLastTransaction().getEntered();
 		NormalisedMonth endMonth = new NormalisedMonth(end);
 		return list(accountId, endMonth.getIndex(), model);
 	}
@@ -103,8 +103,8 @@ public class TransactionController extends BaseController {
 		monthBeginning.add(Calendar.MONTH, selectedMonth.getCalendarOffset());
 		monthBeginning.set(Calendar.DAY_OF_MONTH, 1);
 		
-		Timestamp from = new Timestamp(monthBeginning.getTimeInMillis());
-		Timestamp to = new Timestamp(monthEnd.getTimeInMillis());
+		Date from = new Date(monthBeginning.getTimeInMillis());
+		Date to = new Date(monthEnd.getTimeInMillis());
 		
 		TransactionList tl = new TransactionList();
 		List<Transaction> transactions = this.transactionService.getTransactionsForAccount(accountId, from, to);
@@ -217,7 +217,7 @@ public class TransactionController extends BaseController {
 			setId(Util.toLong(req.getParameter("id"))).
 			setOrigId(Util.toLong(req.getParameter("origid"))).
 			setAccount(a).
-			setEntered(Util.parseTimestamp(req.getParameter("entered"))).
+			setEntered(Util.parseSqlDate(req.getParameter("entered"))).
 			setMemo(req.getParameter("memo")).
 			setAmount(Util.parsePounds(req.getParameter("amount")) * multiplier).
 			setSplit(isSplit);
@@ -292,7 +292,7 @@ public class TransactionController extends BaseController {
 		Transaction t = this.transactionService.get(transactionId).
 				setId(0L).
 				setOrigId(0L).
-				setEntered(Util.now()).
+				setEntered(Util.todaySQ()).
 				setReconciled(false);
 		
 		this.transactionFormSupport.populateForm(model, t, "add");

@@ -1,7 +1,5 @@
 package com.slepeweb.money.bean;
 
-import java.util.Date;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.beans.Field;
 
@@ -10,7 +8,7 @@ import com.slepeweb.money.Util;
 public class FlatTransaction {
 
 	@Field("id") private String id;
-	@Field("entered") private Date entered;
+	@Field("entered") private java.util.Date entered;
 	@Field("amount") private Long amount;
 	@Field("account") private String account;
 	@Field("payee") private String payee;
@@ -64,15 +62,21 @@ public class FlatTransaction {
 		return this;
 	}
 
-	public Date getEntered() {
-		return entered;
+	public java.sql.Date getEntered() {
+		return new java.sql.Date(this.entered.getTime());
 	}
 	
 	public String getEnteredStr() {
 		return Util.formatTimestamp(getEntered());
 	}
 	
-	public FlatTransaction setEntered(Date entered) {
+	// Solr will call this method
+	public FlatTransaction setEntered(java.util.Date entered) {
+		this.entered = new java.sql.Date(entered.getTime());
+		return this;
+	}
+	
+	public FlatTransaction setEntered(java.sql.Date entered) {
 		this.entered = entered;
 		return this;
 	}

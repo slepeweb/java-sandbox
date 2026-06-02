@@ -3,9 +3,8 @@ package com.slepeweb.money;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.Calendar;
-import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -38,8 +37,8 @@ public class MoneyTransactionReporter {
 		Calendar monthBeginning = Calendar.getInstance();
 		monthBeginning.set(Calendar.DAY_OF_MONTH, 1);
 		monthBeginning.add(Calendar.MONTH, -3);
-		Timestamp from = new Timestamp(monthBeginning.getTimeInMillis());
-		Timestamp to = new Timestamp(today.getTimeInMillis());
+		Date from = new Date(monthBeginning.getTimeInMillis());
+		Date to = new Date(today.getTimeInMillis());
 		long balance = 0;
 		
 		// Open output file

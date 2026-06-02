@@ -1,7 +1,7 @@
 package com.slepeweb.money.control;
 
 import java.util.Calendar;
-import java.util.Date;
+import java.sql.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -41,7 +41,7 @@ public class IndexController extends BaseController {
 					Util.parseSolrDate(startStr + SolrParams.START_OF_DAY);
 			
 		Date end = StringUtils.isBlank(endStr) ? 
-				mark.getTime() :
+				new Date(mark.getTimeInMillis()) :
 					Util.parseSolrDate(endStr + SolrParams.END_OF_DAY);
 		
 		

@@ -1,6 +1,6 @@
 package com.slepeweb.money.service;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import com.slepeweb.money.bean.FlatTransaction;

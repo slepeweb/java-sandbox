@@ -3,7 +3,6 @@ package com.slepeweb.money.service.acorn;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -149,7 +148,7 @@ public class AcornAccessServiceImpl extends BaseServiceImpl implements AcornAcce
 					setPayee(this.noPayee).
 					setCategory(this.noCategory).
 					setAmount(- Util.decimal2long(r.getBigDecimal(AMOUNT))).
-					setEntered(new Timestamp(date.getTime())).
+					setEntered(new java.sql.Date(date.getTime())).
 					setMemo(r.getString(MEMO));
 			
 			Account leftAccount = this.accountMap.get(fromId);

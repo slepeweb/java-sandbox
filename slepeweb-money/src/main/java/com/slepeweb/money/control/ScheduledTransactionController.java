@@ -1,6 +1,6 @@
 package com.slepeweb.money.control;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -132,7 +132,7 @@ public class ScheduledTransactionController extends BaseController {
 		else {
 			// Set the 'date last entered' field to some arbirary date a long time ago,
 			// BUT NOT ZERO, since this is used as the test for an unset field.
-			scht.setEntered(new Timestamp(32000L));
+			scht.setEntered(new Date(32000L));
 		}
 		
 		// Note: Transfers can NOT have split transactions

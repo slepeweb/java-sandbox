@@ -3,7 +3,6 @@ package com.slepeweb.money.service;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -260,7 +259,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 					Transaction t = new Transaction().
 							setAccount(this.accountMap.get(Long.valueOf(r.getInt(ACCOUNT_ID)))).
 							setAmount(Util.decimal2long(r.getBigDecimal(AMOUNT))).
-							setEntered(new Timestamp(r.getDate(DATE_ENTERED).getTime())).
+							setEntered(new java.sql.Date(r.getDate(DATE_ENTERED).getTime())).
 							setMemo(r.getString(MEMO)).
 							setSource(1).
 							setOrigId(r.getInt(TRANSACTION_ID));

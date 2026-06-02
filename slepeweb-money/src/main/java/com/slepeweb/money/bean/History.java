@@ -1,6 +1,6 @@
 package com.slepeweb.money.bean;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import com.slepeweb.money.Util;
 
@@ -21,7 +21,7 @@ public class History {
 	
 	public History() {
 		Account a = new Account().setName("");
-		Timestamp now = Util.now();
+		Date now = Util.todaySQ();
 		Transaction t = new Transaction().setEntered(now).setAccount(a);
 		this.lastAccount = a;
 		this.lastTransaction = t;

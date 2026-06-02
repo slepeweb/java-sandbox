@@ -1,8 +1,7 @@
 package com.slepeweb.money.service;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -11,6 +10,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
@@ -360,11 +360,11 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	}
 
 	// TODO: review call to this method
-	public Timestamp getTransactionDateForAccount(long accountId, boolean first) {
+	public Date getTransactionDateForAccount(long accountId, boolean first) {
 		String sql = String.format("select entered from transaction where accountid = ? order by entered %s limit 1", 
 				first ? "" : "desc");
 		
-		List<Timestamp> list = this.jdbcTemplate.query(
+		List<Date> list = this.jdbcTemplate.query(
 				sql, 
 				new RowMapperUtil.TransactionDateMapper(),
 				new Object[]{accountId});
@@ -373,7 +373,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			return list.get(0);
 		}
 		
-		return first ? new Timestamp(0L) : new Timestamp(new Date().getTime());
+		return first ? new Date(0L) : Util.todaySQ();
 	}
 	
 	public List<Transaction> getTransactionsForAccount(long accountId) {
@@ -439,7 +439,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				categoryId);
 	}
 	
-	public List<Transaction> getTransactionsForAccount(long accountId, Timestamp from, Timestamp to) {
+	public List<Transaction> getTransactionsForAccount(long accountId, Date from, Date to) {
 		return getTransactions(
 				SELECT + "where t.accountid = ? and t.entered >= ? and t.entered <= ? order by t.entered", 
 				accountId, from, to);
@@ -466,7 +466,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return calculateBalance(accountId, null);
 	}
 	
-	public long calculateBalance(long accountId, Timestamp to) {
+	public long calculateBalance(long accountId, Date to) {
 		StringBuilder sb = new StringBuilder("select sum(amount) from transaction where accountid = ? ");
 		int arrlen = 1 + (to != null ? 1 : 0);
 		Object[] params = new Object[arrlen];

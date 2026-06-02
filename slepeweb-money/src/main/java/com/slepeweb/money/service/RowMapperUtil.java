@@ -2,7 +2,7 @@ package com.slepeweb.money.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -52,7 +52,7 @@ public class RowMapperUtil {
 					setPayee(makePayeeX(rs)).
 					setCategory(makeCategoryX(rs)).
 					setSplit(rs.getBoolean("split")).
-					setEntered(rs.getTimestamp("entered")).
+					setEntered(rs.getDate("entered")).
 					setTransferId(transferId).
 					setReconciled(rs.getBoolean("reconciled")).
 					setAmount(rs.getLong("amount")).
@@ -64,9 +64,9 @@ public class RowMapperUtil {
 		}
 	}
 	
-	public static final class TransactionDateMapper implements RowMapper<Timestamp> {
-		public Timestamp mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return rs.getTimestamp("entered");
+	public static final class TransactionDateMapper implements RowMapper<Date> {
+		public Date mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return rs.getDate("entered");
 		}
 	}
 	
@@ -79,7 +79,7 @@ public class RowMapperUtil {
 					setPayee(rs.getString("payee")).
 					setMajorCategory(rs.getString("major")).
 					setMinorCategory(rs.getString("minor")).
-					setEntered(rs.getTimestamp("entered")).
+					setEntered(rs.getDate("entered")).
 					setAmount(rs.getLong("amount")).
 					setMemo(rs.getString("memo"));
 		}
@@ -156,7 +156,7 @@ public class RowMapperUtil {
 			sa.setAccess(rs.getString("access"));
 			sa.setSchedule(rs.getString("schedule"));
 			sa.setRate(rs.getString("rate"));
-			sa.setMatures(rs.getTimestamp("matures"));
+			sa.setMatures(rs.getDate("matures"));
 		}
 		
 		return a;
