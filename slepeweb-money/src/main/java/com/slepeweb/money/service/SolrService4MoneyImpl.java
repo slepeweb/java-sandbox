@@ -1,8 +1,8 @@
 package com.slepeweb.money.service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -118,7 +118,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 
 	public boolean removeTransactionsByDate(Date start, Date end) {
 		return removeTransactions(String.format("entered:[%s TO %s]", 
-				Util.formatSolrDate(start), Util.formatSolrDate(end)));
+				Util.format4Solr(start), Util.format4Solr(end)));
 	}
 
 	private boolean removeTransactions(String query) {
@@ -247,25 +247,25 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 		String from = null, to = null;
 		
 		if (params.getPeriodValue() > 0) {
-			Calendar today = Calendar.getInstance();
-			Calendar past = Calendar.getInstance();
-			to = Util.formatSolrDate(today.getTime());
+			LocalDate today = Util.today();
+			LocalDate past = Util.today();
+			to = Util.format4Solr(today);
 			
 			if (params.getPeriodUnits().equals(SolrParams.WEEK)) {
-				past.add(Calendar.DAY_OF_YEAR, -7 * params.getPeriodValue());
+				past = past.plusDays(-7 * params.getPeriodValue());
 			}
 			else if (params.getPeriodUnits().equals(SolrParams.MONTH)) {
-				past.add(Calendar.MONTH, - params.getPeriodValue());
+				past = past.plusMonths(- params.getPeriodValue());
 			}
 			else if (params.getPeriodUnits().equals(SolrParams.YEAR)) {
-				past.add(Calendar.YEAR, - params.getPeriodValue());
+				past = past.plusYears(- params.getPeriodValue());
 			}
 			
-			from = Util.formatSolrDate(past.getTime());
+			from = Util.format4Solr(past);
 		}
 		else if (params.getFrom() != null || params.getTo() != null) {
-			from = params.getFrom() == null ? "*" : Util.formatSolrDate(params.getFrom());
-			to = params.getTo() == null ? "*" : Util.formatSolrDate(params.getTo());
+			from = params.getFrom() == null ? "*" : Util.format4Solr(params.getFrom());
+			to = params.getTo() == null ? "*" : Util.format4Solr(params.getTo());
 		}
 		
 		if (from != null && to != null) {

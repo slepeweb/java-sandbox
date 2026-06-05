@@ -1,6 +1,6 @@
 package com.slepeweb.money.bean;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,7 +9,7 @@ import com.slepeweb.money.service.ScheduledSplitService;
 public class ScheduledTransaction extends Transaction {
 	
 	private String label = "";
-	private Timestamp nextDate;
+	private Date nextDate;
 	private String period;
 	private boolean enabled;
 	
@@ -110,11 +110,11 @@ public class ScheduledTransaction extends Transaction {
 		return this;
 	}
 
-	public Timestamp getNextDate() {
+	public Date getNextDate() {
 		return nextDate;
 	}
 
-	public ScheduledTransaction setNextDate(Timestamp nextDate) {
+	public ScheduledTransaction setNextDate(Date nextDate) {
 		this.nextDate = nextDate;
 		return this;
 	}

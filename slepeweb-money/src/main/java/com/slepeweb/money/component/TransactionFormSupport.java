@@ -1,7 +1,7 @@
 package com.slepeweb.money.component;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -107,9 +107,9 @@ public class TransactionFormSupport {
 		
 		List<Option> yearSelector = new ArrayList<Option>();
 		int numYears = pager.getFirstMonth().distanceBefore(pager.getLastMonth()) / 12;
-		Calendar today = Util.today();
-		int thisYear = today.get(Calendar.YEAR);
-		NormalisedMonth m = new NormalisedMonth(today.getTime());
+		LocalDate today = Util.today();
+		int thisYear = today.getYear();
+		NormalisedMonth m = new NormalisedMonth(today);
 		Option o;
 				
 		for (int i = 0; i <= numYears + 1; i++) {

@@ -8,7 +8,10 @@ import com.slepeweb.money.Util;
 public class FlatTransaction {
 
 	@Field("id") private String id;
+	
+	// Solr seems to be determined to map a 'pdate' field to a java.util.Date object
 	@Field("entered") private java.util.Date entered;
+	
 	@Field("amount") private Long amount;
 	@Field("account") private String account;
 	@Field("payee") private String payee;
@@ -67,17 +70,17 @@ public class FlatTransaction {
 	}
 	
 	public String getEnteredStr() {
-		return Util.formatTimestamp(getEntered());
+		return Util.formatSimple(getEntered());
 	}
 	
 	// Solr will call this method
 	public FlatTransaction setEntered(java.util.Date entered) {
-		this.entered = new java.sql.Date(entered.getTime());
+		this.entered = entered;
 		return this;
 	}
 	
 	public FlatTransaction setEntered(java.sql.Date entered) {
-		this.entered = entered;
+		this.entered = new java.util.Date(entered.getTime());
 		return this;
 	}
 	

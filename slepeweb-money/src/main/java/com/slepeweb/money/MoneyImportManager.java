@@ -43,7 +43,7 @@ public class MoneyImportManager {
 				if (param.equals("-from")) {
 					value = argValue(i, args);
 					if (StringUtils.isNotBlank(value)) {
-						Date from = Util.parseSqlDate(value);
+						Date from = Util.parseSimpleDate(value);
 						if (from != null) {
 							twin = new TimeWindow();
 							twin.setFrom(from);

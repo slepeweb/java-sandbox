@@ -1,6 +1,6 @@
 package com.slepeweb.money.service;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class AssetServiceImpl implements AssetService {
 	 * 		transferId
 	 * 		memo (hack: using memo property to store the category type
 	 */
-	public List<NakedTransaction> get(Timestamp from, Timestamp to) {
+	public List<NakedTransaction> get(Date from, Date to) {
 		return this.jdbcTemplate.query(
 				"select t.entered, t.amount, t.transferid, c.expense " + 
 				"from transaction t, account a, category c " + 

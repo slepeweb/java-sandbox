@@ -1,6 +1,6 @@
 package com.slepeweb.money.bean;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -41,12 +41,12 @@ public class Property {
 		return -1L;
 	}
 	
-	public Timestamp getTimestampValue() {
+	public Date getDateValue() {
 		if (StringUtils.isNotBlank(getValue())) {
-			return Util.parseTimestamp(getValue());
+			return Util.parseSolrDate(getValue());
 		}
 		
-		return Util.now();
+		return Util.todayAsDate();
 	}
 
 	@Override

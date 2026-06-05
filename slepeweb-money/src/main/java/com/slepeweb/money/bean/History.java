@@ -21,7 +21,7 @@ public class History {
 	
 	public History() {
 		Account a = new Account().setName("");
-		Date now = Util.todaySQ();
+		Date now = Util.todayAsDate();
 		Transaction t = new Transaction().setEntered(now).setAccount(a);
 		this.lastAccount = a;
 		this.lastTransaction = t;

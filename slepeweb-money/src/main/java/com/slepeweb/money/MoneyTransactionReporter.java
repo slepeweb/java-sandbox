@@ -71,7 +71,7 @@ public class MoneyTransactionReporter {
 						pw.println(
 								pack(String.valueOf(t.getId()), 8) + 
 								pack(String.valueOf(t.getOrigId()), 8) + 
-								pack(Util.formatTimestamp(new Date(t.getEntered().getTime())), 16) + 
+								pack(Util.formatSimple(new Date(t.getEntered().getTime())), 16) + 
 								pack(t.getPayee().getName(), 40) + 
 								pack(t.getCategory().toString(), 40) + 
 								pack(t.getAmountInPounds(), 10) + 

@@ -217,7 +217,7 @@ public class RowMapperUtil {
 			ScheduledTransaction scht = 
 					new ScheduledTransaction().
 					setLabel(rs.getString("label")).
-					setNextDate(rs.getTimestamp("nextdate")).
+					setNextDate(rs.getDate("nextdate")).
 					setPeriod(rs.getString("period")).
 					setEnabled(rs.getBoolean("enabled"));
 			

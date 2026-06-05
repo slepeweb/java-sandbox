@@ -112,7 +112,7 @@ public class ScheduledTransactionController extends BaseController {
 
 		ScheduledTransaction scht = new ScheduledTransaction().
 				setLabel(req.getParameter("label")).
-				setNextDate(Util.parseTimestamp(req.getParameter("nextdate"))).
+				setNextDate(Util.parseSimpleDate(req.getParameter("nextdate"))).
 				setPeriod(req.getParameter("period")).
 				setMirrorAccount(m).
 				setEnabled(StringUtils.isNotBlank(req.getParameter("enabled")));

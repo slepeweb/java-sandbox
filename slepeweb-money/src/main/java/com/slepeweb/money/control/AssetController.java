@@ -2,8 +2,9 @@ package com.slepeweb.money.control;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,13 +51,13 @@ public class AssetController extends BaseController {
 	 */
 	@RequestMapping(value="/history")	
 	public String history(ModelMap model) { 
-		int thisYear = Util.getYear(Util.todaySQ());
+		int thisYear = Util.today().getYear();
 		return historyStart(thisYear - 10, model);
 	}
 	
 	@RequestMapping(value="/history/{displayYearStart}")	
 	public String historyStart(@PathVariable int displayYearStart, ModelMap model) { 
-		int thisYear = Util.getYear(Util.todaySQ());
+		int thisYear = Util.today().getYear();
 		return historyWindow(displayYearStart, thisYear, model);
 	}
 	
@@ -64,10 +65,9 @@ public class AssetController extends BaseController {
 	public String historyWindow(@PathVariable int displayYearStart, @PathVariable int displayYearEnd, ModelMap model) { 
 		YearlyAssetHistory history = new YearlyAssetHistory();
 		YearlyAssetStatus assetStatus;
-		Calendar from = Calendar.getInstance();
-		Calendar to = Calendar.getInstance();
-		Util.startOfYear(from);
-		Util.endOfYear(to);
+		LocalDate from = Util.startOfYear(Util.today());
+		LocalDate to = Util.endOfYear(Util.today());
+
 		Transaction mirror;
 		DefaultCategoryDataset ds = new DefaultCategoryDataset();
 		Long openingBalance, closingBalance;
@@ -76,9 +76,11 @@ public class AssetController extends BaseController {
 		Map<Integer, Long> yearlyOpeningBalance = new HashMap<Integer, Long>();
 		Map<Integer, Long> yearlyClosingBalance = new HashMap<Integer, Long>();
 		int openingYear, closingYear, minYear = 2020;
+		Date d;
 
 		for (Account a : this.accountService.getAssets()) {
-			openingYear = Util.getYear(this.transactionService.getTransactionDateForAccount(a.getId(), true));
+			d = this.transactionService.getTransactionDateForAccount(a.getId(), true);
+			openingYear = d.toLocalDate().getYear();
 			openingBalance = yearlyOpeningBalance.get(openingYear);
 			
 			if (openingBalance == null) {
@@ -89,7 +91,8 @@ public class AssetController extends BaseController {
 			yearlyOpeningBalance.put(openingYear, openingBalance + a.getOpeningBalance());
 			
 			if (a.isClosed()) {
-				closingYear = Util.getYear(this.transactionService.getTransactionDateForAccount(a.getId(), false));
+				d = this.transactionService.getTransactionDateForAccount(a.getId(), false);
+				closingYear = d.toLocalDate().getYear();
 				closingBalance = yearlyClosingBalance.get(closingYear);
 				
 				if (closingBalance == null) {
@@ -105,7 +108,7 @@ public class AssetController extends BaseController {
 			}
 		}
 		
-		int thisYear = Util.getYear(Util.todaySQ());
+		int thisYear = Util.today().getYear();
 		YearlyAssetStatus totalStatus = new YearlyAssetStatus(thisYear);
 		model.addAttribute("_totals", totalStatus);
 		
@@ -116,8 +119,8 @@ public class AssetController extends BaseController {
 		String accountType;
 				
 		for (int yearStepper = minYear; yearStepper <= thisYear; yearStepper++) {
-			from.set(Calendar.YEAR, yearStepper);
-			to.set(Calendar.YEAR, yearStepper);
+			from = from.withYear(yearStepper);
+			to = to.withYear(yearStepper);
 			assetStatus = new YearlyAssetStatus(yearStepper);
 			history.add(assetStatus);
 			
@@ -135,7 +138,7 @@ public class AssetController extends BaseController {
 				assetStatus.credit(-closingBalance);
 			}
 			
-			for (NakedTransaction t : this.assetService.get(Util.toTimestamp(from), Util.toTimestamp(to))) {
+			for (NakedTransaction t : this.assetService.get(Date.valueOf(from), Date.valueOf(to))) {
 				if (t.isTransfer()) {
 					mirror = this.transactionService.get(t.getTransferid());
 					accountType = mirror.getAccount().getType();

@@ -1,7 +1,7 @@
 package com.slepeweb.money.control;
 
-import java.util.Calendar;
 import java.sql.Date;
+import java.time.LocalDate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -32,18 +32,15 @@ public class IndexController extends BaseController {
 	public RedirectView indexByDatesAction(HttpServletRequest req) { 
 		String startStr = req.getParameter("from");
 		String endStr = req.getParameter("to");
-		Calendar mark = Util.today();
-		mark.add(Calendar.DATE, 1);
-		Util.zeroTimeOfDay(mark);
+		LocalDate mark = Util.today();
 		
 		Date start = StringUtils.isBlank(startStr) ? 
 				new Date(0L) :
 					Util.parseSolrDate(startStr + SolrParams.START_OF_DAY);
 			
 		Date end = StringUtils.isBlank(endStr) ? 
-				new Date(mark.getTimeInMillis()) :
+				Date.valueOf(mark) :
 					Util.parseSolrDate(endStr + SolrParams.END_OF_DAY);
-		
 		
 		this.solrService.removeTransactionsByDate(start, end);
 		boolean ok = this.solrService.save(this.transactionService.getTransactionsByDate(start, end));

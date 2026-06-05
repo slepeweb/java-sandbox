@@ -3,10 +3,11 @@ package com.slepeweb.money;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
-	public static final SimpleDateFormat SOLR_SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	public static final SimpleDateFormat SOLR_SDF = new SimpleDateFormat("yyyy-MM-dd'T00:02:00Z'");
+	public static final SimpleDateFormat MONTH_SDF = new SimpleDateFormat("MMMM");
 	
 	public static long decimal2long(BigDecimal d) {
 		return  d != null ? d.multiply(ONE_HUNDRED).longValue() : -1L;
@@ -99,146 +101,6 @@ public class Util {
 	
 	private static String cleanAmount(String s) {
 		return s.replaceAll(",", "");
-	}
-	
-	public static String formatSolrDate(java.sql.Date d) {
-		return formatSolrDate(new java.util.Date(d.getTime()));
-	}
-	
-	public static String formatTimestamp(java.util.Date d) {
-		if (d != null) {
-			return SDF.format(d);
-		}
-		return "";
-	}
-	
-	public static String formatSolrDate(java.util.Date d) {
-		if (d != null) {
-			return SOLR_SDF.format(d);
-		}
-		return "";
-	}
-	
-	public static Timestamp parseTimestamp(String s) {
-		try {
-			Calendar c = Calendar.getInstance();
-			c.setTime(SDF.parse(s));
-			zeroTimeOfDay(c);
-			return new Timestamp(c.getTimeInMillis());
-		} 
-		catch (Exception e) {
-			return null;
-		}
-	}
-	
-	public static Date parseSqlDate(String s) {
-		try {
-			Calendar c = Calendar.getInstance();
-			c.setTime(SDF.parse(s));
-			return new Date(c.getTimeInMillis());
-		} 
-		catch (Exception e) {
-			return null;
-		}
-	}
-	
-	public static Date parseSolrDate(String s) {
-		try {
-			return new java.sql.Date(SOLR_SDF.parse(s).getTime());
-		} 
-		catch (Exception e) {
-			return null;
-		}
-	}
-	
-	public static Calendar today() {
-		Calendar c = Calendar.getInstance();
-		zeroTimeOfDay(c);
-		return c;
-	}
-	
-	public static java.sql.Date todaySQ() {
-		return new java.sql.Date(System.currentTimeMillis());
-	}
-	
-	public static Timestamp toTimestamp(Calendar c) {
-		return new Timestamp(c.getTimeInMillis());
-	}
-	
-	public static Timestamp now() {
-		return toTimestamp(Calendar.getInstance());
-	}
-	
-	public static void zeroTimeOfDay(Calendar c) {
-		/*
-		 * Well, actually 2am.
-		 * 2am BST is 1am UTC
-		 * MySQL stores Timestamps in UTC, but select SQL statments return the values 
-		 * according to the current timezone of the server. By setting times to 2am, we
-		 * avoid '00' hours rolling back to '23' when we're not in BST.
-		 */
-		c.set(Calendar.HOUR_OF_DAY, 2);
-		c.set(Calendar.MINUTE, 0);
-		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.MILLISECOND, 0);
-	}
-	
-	public static Timestamp zeroTimeOfDay(Timestamp ts) {
-		Calendar c = Calendar.getInstance();
-		c.setTime(ts);
-		zeroTimeOfDay(c);
-		return new Timestamp(c.getTimeInMillis());
-	}
-	
-	public static void startOfYear(Calendar c) {
-		c.set(Calendar.DATE, 1);
-		c.set(Calendar.MONTH, 0);
-		zeroTimeOfDay(c);
-	}
-	
-	public static void endOfYear(Calendar c) {
-		c.set(Calendar.DATE, 31);
-		c.set(Calendar.MONTH, 11);
-		c.set(Calendar.HOUR_OF_DAY, 23);
-		c.set(Calendar.MINUTE, 59);
-		c.set(Calendar.SECOND, 59);
-		c.set(Calendar.MILLISECOND, 10);
-	}
-	
-	public static int getYear(Date d) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(d);
-		return cal.get(Calendar.YEAR);
-	}
-	
-	/**
-	 * Timestamp @to must always be non-null, as must @t.
-	 * Timestamp @from can be null.
-	 */
-	public static boolean isWithinTimeWindow(Timestamp from, Timestamp t, Timestamp to) {
-		if (to == null) {
-			return false;
-		}
-		else if (from != null) {
-			return t.after(from) && t.before(to);
-		}
-		else {
-			return t.before(to);
-		}
-	}
-	
-	public static int monthsDifference(Timestamp from, Timestamp to) {
-		Calendar calA = Calendar.getInstance();
-		calA.setTime(from);
-		int monthA = calA.get(Calendar.MONTH);
-		int yearA = calA.get(Calendar.YEAR);
-		
-		Calendar calB = Calendar.getInstance();
-		calB.setTime(to);
-		int monthB = calB.get(Calendar.MONTH);
-		int yearB = calB.get(Calendar.YEAR);
-		
-		return (yearB - yearA) * 12 + (monthB - monthA) + 1;
 	}
 	
 	public static boolean isPositive(String str) {
@@ -328,4 +190,132 @@ public class Util {
 		}
 	}
 	
+	public static String formatSimple(LocalDate d) {
+		return formatSimple(Date.valueOf(d));
+	}
+	
+	public static String format4Solr(LocalDate d) {
+		return format4Solr(Date.valueOf(d));
+	}
+	
+	public static String formatMonth(LocalDate d) {
+		return formatMonth(Date.valueOf(d));
+	}
+	
+	public static String formatSimple(Date d) {
+		return format(d, SDF);
+	}
+	
+	public static String format4Solr(Date d) {
+		return format(d, SOLR_SDF);
+	}
+	
+	public static String formatMonth(Date d) {
+		return format(d, MONTH_SDF);
+	}
+	
+	public static String format(Date d, SimpleDateFormat sdf) {
+		if (d != null) {
+			return sdf.format(d);
+		}
+		return "";
+	}
+	
+	public static Date parseSimpleDate(String s) {
+		return parseDate(s, SDF);
+	}
+	
+	public static Date parseSolrDate(String s) {
+		return parseDate(s, SOLR_SDF);
+	}
+	
+	public static Date parseDate(String s, SimpleDateFormat sdf) {
+		try {
+			return new Date(sdf.parse(s).getTime());
+		} 
+		catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static Date todayAsDate() {
+		return new Date(System.currentTimeMillis());
+	}
+	
+	public static LocalDate today() {
+		return todayAsDate().toLocalDate();
+	}
+	
+	public static LocalDate startOfYear(LocalDate d) {
+		return d.withDayOfYear(1);
+	}
+	
+	public static LocalDate endOfYear(LocalDate d) {
+		return d.withMonth(12).withDayOfMonth(31);
+	}
+	
+	/**
+	 * Date @to must always be non-null, as must @t.
+	 * Date @from can be null.
+	 */
+	public static boolean isWithinTimeWindow(LocalDate from, LocalDate t, LocalDate to) {
+		
+		if (to == null) {
+			// Usage error
+			return false;
+		}
+		
+		if (from == null) {
+			// No 'from' date
+			return t.isBefore(to) || t.isEqual(to);
+		}
+
+		// Both 'from' and 'to' dates provided
+		return (t.isAfter(from) && t.isBefore(to)) || t.isEqual(from) || t.isEqual(to);
+	}
+	
+	public static int monthsDifference(LocalDate from, LocalDate to) {
+		int monthA = from.getMonthValue();
+		int yearA = from.getYear();
+		int monthB = to.getMonthValue();
+		int yearB = to.getYear();
+		
+		return (yearB - yearA) * 12 + (monthB - monthA) + 1;
+	}
+
+	public static void main(String[] args) {
+		LocalDate today = Util.today();
+		LocalDate start = Util.startOfYear(today);
+		LocalDate end = Util.endOfYear(today);
+		LocalDate leftOut = start.minusDays(1);
+		LocalDate rightOut = end.plusDays(1);
+		LocalDate leftBoundary = start.minusDays(0);
+		LocalDate rightBoundary = end.plusDays(0);
+		
+		DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		out("start", start.format(f));
+		out("target", today.format(f));
+		out("end", end.format(f));
+		
+		out("today", String.valueOf(Util.isWithinTimeWindow(start, today, end)));
+		out("leftOut", String.valueOf(Util.isWithinTimeWindow(start, leftOut, end)));
+		out("rightOut", String.valueOf(Util.isWithinTimeWindow(start, rightOut, end)));
+		out("leftBoundary", String.valueOf(Util.isWithinTimeWindow(start, leftBoundary, end)));
+		out("rightBoundary", String.valueOf(Util.isWithinTimeWindow(start, rightBoundary, end)));
+
+		out("today", String.valueOf(Util.monthsDifference(start, today)));
+		out("less12months", String.valueOf(Util.monthsDifference(start.plusYears(-1), today)));
+}
+
+	public static void out(String label, ZonedDateTime zdt) {
+		out(label, zdt.toString());
+	}
+	
+	public static void out(String label, String value) {
+		out(String.format("%1$12s: %2$s", label, value));
+	}
+	
+	public static void out(String s) {
+		System.out.println(s);
+	}
 }

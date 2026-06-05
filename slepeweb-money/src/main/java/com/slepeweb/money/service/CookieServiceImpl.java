@@ -35,14 +35,14 @@ public class CookieServiceImpl implements CookieService {
 	}
 	
 	public void updateLastEnteredCookie(Date t, HttpServletRequest req, HttpServletResponse res) {
-		saveCookie(LAST_ENTERED_COOKIE_NAME, Util.formatTimestamp(t), res);
+		saveCookie(LAST_ENTERED_COOKIE_NAME, Util.formatSimple(t), res);
 	}
 	
 	public Date getLastEntered(HttpServletRequest req) {
 		
 		for (Cookie c : req.getCookies()) {
 			if (c.getName().equals(LAST_ENTERED_COOKIE_NAME)) {
-				return Util.parseSqlDate(c.getValue());
+				return Util.parseSimpleDate(c.getValue());
 			}
 		}
 		

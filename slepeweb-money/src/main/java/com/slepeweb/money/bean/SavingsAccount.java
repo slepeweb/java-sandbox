@@ -34,7 +34,7 @@ public class SavingsAccount extends Account {
 	public String getSummary() {
 		List<String> summary = new ArrayList<String>();
 		add2Summary(summary, getSortCode(), getAccountNo(), getRollNo(), getOwner(), getAccess(), getSchedule(), 
-				Util.formatTimestamp(getMatures()), getNote());
+				Util.formatSimple(getMatures()), getNote());
 		return StringUtils.join(summary, " | ");
 	}
 	

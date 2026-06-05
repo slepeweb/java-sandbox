@@ -1,7 +1,7 @@
 package com.slepeweb.money;
 
-import java.sql.Timestamp;
-import java.util.Calendar;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,8 +36,7 @@ public class ScheduledTransactionTask implements Job {
 		List<ScheduledTransaction> all = scheduledTransactionService.getAll();
 		
 		LOG.debug(String.format("There are %d scheduled transactions", all.size()));
-		Calendar scheduled = Calendar.getInstance();
-		Calendar now = Calendar.getInstance();
+		LocalDate scheduled = null, today = Util.today();
 		Transaction t;
 		boolean createdTransaction;
 		int count = 0;
@@ -48,8 +47,8 @@ public class ScheduledTransactionTask implements Job {
 				continue;
 			}
 			
-			LOG.debug(String.format("Considering schedule [%s], due [%s] ... ", scht.getLabel(), scht.getNextDate().toLocalDateTime()));
-			scheduled.setTime(scht.getNextDate());
+			LOG.debug(String.format("Considering schedule [%s], due [%s] ... ", scht.getLabel(), scht.getNextDate().toLocalDate()));
+			scheduled = scht.getNextDate().toLocalDate();
 			createdTransaction = false;
 			
 			// Populate the splits
@@ -58,9 +57,9 @@ public class ScheduledTransactionTask implements Job {
 			// This returns either a Transaction or a Transfer object, nearly fully populated
 			t = Transaction.adapt(scht);					
 			
-			if (scheduled.before(now)) {
+			if (scheduled.isBefore(today)) {
 				t.setId(0); // Indicating a new transaction is required
-				t.setEntered(Util.todaySQ());
+				t.setEntered(Util.todayAsDate());
 				t.setSource(4);
 				
 				try {
@@ -80,8 +79,8 @@ public class ScheduledTransactionTask implements Job {
 			
 			// Update the scheduled transaction to record lastEntered
 			if (createdTransaction) {
-				Calendar nextDate = getNextDate(scheduled, scht.getPeriod());
-				scht.setNextDate(new Timestamp(nextDate.getTimeInMillis()));
+				Date nextDate = getNextDate(scheduled, scht.getPeriod());
+				scht.setNextDate(nextDate);
 				scheduledTransactionService.updateNextDate(scht);
 			}
 		}
@@ -89,7 +88,7 @@ public class ScheduledTransactionTask implements Job {
 		LOG.info(String.format("Scheduler created %d transactions", count));
 	}
 	
-	private Calendar getNextDate(Calendar lastDate, String intervalStr) {
+	private Date getNextDate(LocalDate lastDate, String intervalStr) {
 		if (StringUtils.isBlank(intervalStr)) {
 			return null;
 		}
@@ -99,32 +98,29 @@ public class ScheduledTransactionTask implements Job {
 			return null;
 		}
 		
-		int dayOfMonth = Math.min(28, lastDate.get(Calendar.DAY_OF_MONTH));
-		Calendar nextDate = (Calendar) lastDate.clone();
+		int dayOfMonth = Math.min(28, lastDate.lengthOfMonth());
+		LocalDate nextDate = null;
 		int value = Integer.valueOf(m.group(1));
 		String units = m.group(2);
 		
 		if (units.equalsIgnoreCase("m")) {
 			// Units are months
-			nextDate.add(Calendar.MONTH, value);
-			nextDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+			nextDate = lastDate.plusMonths(value).withDayOfMonth(dayOfMonth);
 		}
 		else {
 			// Units must be days
-			nextDate.add(Calendar.DAY_OF_MONTH, value);
+			nextDate = lastDate.plusDays(value);
 		}
 		
-		Util.zeroTimeOfDay(nextDate);
-		return nextDate;
+		return Date.valueOf(nextDate);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
-		Calendar start = Calendar.getInstance();
-		start.set(Calendar.DAY_OF_MONTH, 31);
+		LocalDate start = Util.today();
+		start = start.withDayOfMonth(start.lengthOfMonth());
 		ScheduledTransactionTask task = new ScheduledTransactionTask();
-		out("1m: ", task.getNextDate(start, "1m").getTime().toGMTString());
-		out("28d: ", task.getNextDate(start, "29d").getTime().toGMTString());
+		out("1m: ", Util.formatSimple(task.getNextDate(start, "1m").toLocalDate()));
+		out("28d: ", Util.formatSimple(task.getNextDate(start, "40d").toLocalDate()));
 	}
 	
 	public static void out(String... str) {

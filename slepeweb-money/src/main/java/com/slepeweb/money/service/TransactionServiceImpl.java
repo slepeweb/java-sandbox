@@ -373,7 +373,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			return list.get(0);
 		}
 		
-		return first ? new Date(0L) : Util.todaySQ();
+		return first ? new Date(0L) : Util.todayAsDate();
 	}
 	
 	public List<Transaction> getTransactionsForAccount(long accountId) {

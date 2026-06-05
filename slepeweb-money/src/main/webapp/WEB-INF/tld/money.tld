@@ -35,7 +35,7 @@
 	<function>
 		<name>formatTimestamp</name>
 		<function-class>com.slepeweb.money.Util</function-class>
-		<function-signature>java.lang.String formatTimestamp(java.util.Date)</function-signature>
+		<function-signature>java.lang.String formatSimple(java.sql.Date)</function-signature>
 	</function>
 	
 	<function>

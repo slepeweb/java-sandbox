@@ -1,8 +1,8 @@
 package com.slepeweb.money.component;
 
 import java.awt.geom.Rectangle2D;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,18 +58,10 @@ public class ChartFormSupport {
 	public String executeSearches(Chart ch, HttpServletRequest req, ModelMap model) {
 		model.addAttribute(YEAR_RANGE_ATTR, this.formSupport.getYearRange());
 		
-		Calendar from = Util.today();
-		int currentYear = from.get(Calendar.YEAR);
-		
-		// from is Jan 1
-		from.set(Calendar.DATE, 1);
-		from.set(Calendar.MONTH, 0);
-		
-		// to is Dec 31
-		Calendar to = Calendar.getInstance();
-		to.setTime(from.getTime());
-		to.set(Calendar.DATE, 31);
-		to.set(Calendar.MONTH, 11);
+		// from Jan 1 in the current year to Dec 31
+		LocalDate from = Util.today().withMonth(1).withDayOfMonth(1);
+		LocalDate to = Util.today().withMonth(12).withDayOfMonth(31);
+		int currentYear = from.getYear();
 		
 		DefaultCategoryDataset ds = new DefaultCategoryDataset();				
 		List<Integer> years = new ArrayList<Integer>();
@@ -87,8 +79,8 @@ public class ChartFormSupport {
 	    boolean missingEntity;
 	    
 		for (int year = ch.getFromYear(); year <= ch.getToYear() && year <= currentYear; year++) {
-			from.set(Calendar.YEAR, year);
-			to.set(Calendar.YEAR, year);
+			from = from.withYear(year);
+			to = to.withYear(year);
 			
 			for (Long ssid : ch.getSearchIdsAsList()) {
 				ss = this.savedSearchService.get(ssid);
@@ -101,8 +93,8 @@ public class ChartFormSupport {
 				
 				// Adjust parameters TODO: will need to account for even larger numbers of transactions
 				params.setPageSize(2048);
-				params.setFrom(from.getTime());
-				params.setTo(to.getTime());
+				params.setFrom(from);
+				params.setTo(to);
 				missingEntity = this.searchFormSupport.convertId2Name(params);
 				
 				if (missingEntity) {
@@ -164,7 +156,7 @@ public class ChartFormSupport {
 			return this.yearRange;
 		}
 		
-		int thisYear = Util.getYear(Util.todaySQ());
+		int thisYear = Util.today().getYear();
 		this.yearRange = new ArrayList<Integer>();
 		for (int i = 1995; i <= thisYear; i++) {
 			this.yearRange.add(i);

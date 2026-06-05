@@ -1,7 +1,7 @@
 package com.slepeweb.money.bean;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.sql.Date;
+import java.time.LocalDate;
 
 import com.slepeweb.money.Util;
 
@@ -16,14 +16,16 @@ public class NormalisedMonth {
 		this.index = i;
 	}
 	
-	public NormalisedMonth(Date d) {
-		Calendar today = Util.today();
-		Calendar c = Util.today();
-		c.setTime(d);
+	public NormalisedMonth(Date ld) {
+		this(ld.toLocalDate());
+	}
+	
+	public NormalisedMonth(LocalDate c) {
+		LocalDate today = Util.today();
 		
 		this.index = 
-				((today.get(Calendar.YEAR) - c.get(Calendar.YEAR)) * 12) +
-				(today.get(Calendar.MONTH) - c.get(Calendar.MONTH)) +
+				((today.getYear() - c.getYear()) * 12) +
+				(today.getMonthValue() - c.getMonthValue()) +
 				1;			
 	}
 	
@@ -48,9 +50,8 @@ public class NormalisedMonth {
 	}
 	
 	public int getYear() {
-		Calendar cal = Util.today();
-		cal.add(Calendar.MONTH, getCalendarOffset());
-		return cal.get(Calendar.YEAR);
+		LocalDate ld = Util.today().plusMonths(getCalendarOffset());
+		return ld.getYear();
 	}
 
 	public boolean equals(NormalisedMonth nm) {

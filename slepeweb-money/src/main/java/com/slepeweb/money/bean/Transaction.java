@@ -22,7 +22,7 @@ public class Transaction extends DbEntity {
 	private long xferId = 0L;
 	private Payee payee;
 	private Category category;
-	private Date entered = Util.todaySQ();
+	private Date entered = Util.todayAsDate();
 	private boolean split, reconciled;
 	private long amount;
 	private String reference = "", memo = "";
@@ -213,7 +213,7 @@ public class Transaction extends DbEntity {
 	}
 	
 	public String getEnteredStr() {
-		return Util.formatTimestamp(getEntered());
+		return Util.formatSimple(getEntered());
 	}
 	
 	public Transaction setEntered(Date entered) {

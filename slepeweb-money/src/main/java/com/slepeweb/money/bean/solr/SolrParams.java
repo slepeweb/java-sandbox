@@ -1,7 +1,8 @@
 package com.slepeweb.money.bean.solr;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,8 +24,10 @@ import com.slepeweb.money.bean.StringOption;
 
 public class SolrParams extends SolrParamsBase {
 
+	// TODO: Review need for time components
 	public static final String START_OF_DAY = "T00:00:00Z";
 	public static final String END_OF_DAY = "T23:59:59Z";
+	
 	public static final String WEEK = "week";
 	public static final String MONTH = "month";
 	public static final String YEAR = "year";
@@ -34,7 +37,7 @@ public class SolrParams extends SolrParamsBase {
 	private Category_Group categoryGroup;
 	private Long categoryId;
 	private int pageNum, pageSize;
-	private Date from, to;
+	private LocalDate from, to;
 	private Long fromAmount, toAmount;
 	private boolean debit;
 	private int periodValue;
@@ -60,18 +63,18 @@ public class SolrParams extends SolrParamsBase {
 		this.config = config;
 	}
 	
-	public Date getFrom() {
+	public LocalDate getFrom() {
 		return from;
 	}
 
 	public SolrParams setFrom(String from) {
 		if (StringUtils.isNotBlank(from)) {
-			setFrom((Date) Util.parseSolrDate(from + START_OF_DAY));
+			setFrom(Util.parseSolrDate(from + START_OF_DAY).toLocalDate());
 		}
 		return this;
 	}
 
-	public SolrParams setFrom(Date from) {
+	public SolrParams setFrom(LocalDate from) {
 		this.from = from;
 		return this;
 	}
@@ -79,23 +82,23 @@ public class SolrParams extends SolrParamsBase {
 	@JsonSetter("from")
 	public SolrParams setFrom(long from) {
 		if (from > 0L) {
-			this.from = new Date(from);
+			this.from = new Date(from).toLocalDate();
 		}
 		return this;
 	}
 
-	public Date getTo() {
+	public LocalDate getTo() {
 		return to;
 	}
 
 	public SolrParams setTo(String to) {
 		if (StringUtils.isNotBlank(to)) {
-			setTo((Date) Util.parseSolrDate(to + END_OF_DAY));
+			setTo(Util.parseSolrDate(to + END_OF_DAY).toLocalDate());
 		}
 		return this;
 	}
 
-	public SolrParams setTo(Date to) {
+	public SolrParams setTo(LocalDate to) {
 		this.to = to;
 		return this;
 	}
@@ -103,7 +106,7 @@ public class SolrParams extends SolrParamsBase {
 	@JsonSetter("to")
 	public SolrParams setTo(long to) {
 		if (to > 0L) {
-			this.to = new Date(to);
+			this.to = new Date(to).toLocalDate();
 		}
 		return this;
 	}

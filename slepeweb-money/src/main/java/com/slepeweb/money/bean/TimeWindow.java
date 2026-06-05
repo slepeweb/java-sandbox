@@ -9,7 +9,7 @@ public class TimeWindow {
 	
 	public TimeWindow() {
 		this.from = new Date(0L);
-		this.to = Util.todaySQ();
+		this.to = Util.todayAsDate();
 	}
 	
 	public TimeWindow(Date from, Date to) {

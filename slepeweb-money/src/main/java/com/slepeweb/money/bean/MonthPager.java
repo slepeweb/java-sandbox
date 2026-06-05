@@ -1,8 +1,7 @@
 package com.slepeweb.money.bean;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import com.slepeweb.money.Util;
@@ -20,26 +19,24 @@ public class MonthPager {
 	
 	public List<Option> getNavigation() {
 		List<Option> options = new ArrayList<Option>();
-		Calendar current = Util.today();
-		SimpleDateFormat sdf = new SimpleDateFormat("MMMM");
 		Option o;
 		NormalisedMonth nm = new NormalisedMonth(getSelectedMonth());
 		nm.decrement(2);
-		current.add(Calendar.MONTH, nm.getCalendarOffset());
+		LocalDate current = Util.today().plusMonths(nm.getCalendarOffset());
 		
 		for (int i = 0; i < BLOCK; i++) {
 			if (nm.isOnOrAfter(getFirstMonth()) && nm.isOnOrBefore(getLastMonth())) {
-				o = new Option(nm.getIndex(), sdf.format(current.getTime()));
+				o = new Option(nm.getIndex(), Util.formatMonth(current));
 				
 				if (nm.equals(getSelectedMonth())) {
 					o.setSelected(true);
-					o.setName(o.getName() + " " + String.valueOf(current.get(Calendar.YEAR)));
+					o.setName(o.getName() + " " + String.valueOf(current.getYear()));
 				}
 				
 				options.add(o);
 			}
 			
-			current.add(Calendar.MONTH, 1);
+			current = current.plusMonths(1);
 			nm.increment(1);
 		}
 		

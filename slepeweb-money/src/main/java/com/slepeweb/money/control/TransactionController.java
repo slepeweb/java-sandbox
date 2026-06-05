@@ -1,7 +1,7 @@
 package com.slepeweb.money.control;
 
 import java.sql.Date;
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -89,22 +89,12 @@ public class TransactionController extends BaseController {
 			selectedMonth.set(lastMonth);
 		}
 			
-		Calendar monthEnd = Util.today();
-		monthEnd.add(Calendar.MONTH, selectedMonth.getCalendarOffset());
-		monthEnd.set(Calendar.DAY_OF_MONTH, monthEnd.getMaximum(Calendar.DAY_OF_MONTH));
+		LocalDate month = Util.today().plusMonths(selectedMonth.getCalendarOffset());
 		
-		// Wind down month end for shorter months
-		int day = monthEnd.get(Calendar.DATE);
-		if (day < 4) {
-			monthEnd.add(Calendar.DATE, -day);
-		}
-		
-		Calendar monthBeginning = Util.today();
-		monthBeginning.add(Calendar.MONTH, selectedMonth.getCalendarOffset());
-		monthBeginning.set(Calendar.DAY_OF_MONTH, 1);
-		
-		Date from = new Date(monthBeginning.getTimeInMillis());
-		Date to = new Date(monthEnd.getTimeInMillis());
+		LocalDate monthEnd = month.withDayOfMonth(month.lengthOfMonth());
+		Date to = Date.valueOf(monthEnd);
+		LocalDate monthBeginning = month.withDayOfMonth(1);
+		Date from = Date.valueOf(monthBeginning);
 		
 		TransactionList tl = new TransactionList();
 		List<Transaction> transactions = this.transactionService.getTransactionsForAccount(accountId, from, to);
@@ -217,7 +207,7 @@ public class TransactionController extends BaseController {
 			setId(Util.toLong(req.getParameter("id"))).
 			setOrigId(Util.toLong(req.getParameter("origid"))).
 			setAccount(a).
-			setEntered(Util.parseSqlDate(req.getParameter("entered"))).
+			setEntered(Util.parseSimpleDate(req.getParameter("entered"))).
 			setMemo(req.getParameter("memo")).
 			setAmount(Util.parsePounds(req.getParameter("amount")) * multiplier).
 			setSplit(isSplit);
@@ -292,7 +282,7 @@ public class TransactionController extends BaseController {
 		Transaction t = this.transactionService.get(transactionId).
 				setId(0L).
 				setOrigId(0L).
-				setEntered(Util.todaySQ()).
+				setEntered(Util.todayAsDate()).
 				setReconciled(false);
 		
 		this.transactionFormSupport.populateForm(model, t, "add");
