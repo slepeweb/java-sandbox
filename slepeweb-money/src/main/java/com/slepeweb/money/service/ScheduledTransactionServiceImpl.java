@@ -8,6 +8,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.ScheduledTransaction;
 import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
@@ -76,7 +77,7 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 					"insert into scheduledtransaction (label, nextdate, period, accountid, " +
 					"mirrorid, payeeid, categoryid, split, amount, reference, memo, enabled) " +
 					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-					scht.getLabel(), scht.getNextDate(), scht.getPeriod(),
+					scht.getLabel(), Util.toSqlDate(scht.getNextDate()), scht.getPeriod(),
 					scht.getAccount().getId(), 
 					scht.getMirrorAccount() != null ? scht.getMirrorAccount().getId() : null, 
 					scht.getPayee().getId(), scht.getCategory().getId(), 
@@ -172,7 +173,7 @@ public class ScheduledTransactionServiceImpl extends BaseServiceImpl implements 
 	
 	public void updateNextDate(ScheduledTransaction t) {
 		this.jdbcTemplate.update("update scheduledtransaction set nextdate = ? where id = ?", 
-				t.getNextDate(), t.getId());
+				Util.toSqlDate(t.getNextDate()), t.getId());
 		
 		// NOTE: t.toString() outputs the date the transaction was entered, NOT the scheduled date 
 		// of the next one. This causes confusion in the log.

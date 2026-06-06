@@ -49,9 +49,9 @@
 				<p class="or-spacer">OR</p>
 				
 	    	<div id="date-box">
-	       	From: <input class="datepicker" id="from" type="text" name="from" value="${mon:formatTimestamp(_params.from)}"
+	       	From: <input class="datepicker" id="from" type="text" name="from" value="${_params.from}"
 	       		placeholder="Optional search window start date" />
-	       	To: <input class="datepicker" id="to" type="text" name="to" value="${mon:formatTimestamp(_params.to)}"
+	       	To: <input class="datepicker" id="to" type="text" name="to" value="${_params.to}"
 	       		placeholder="Optional search window end date" />
 	    	</div>
 			</mny:tableRow>

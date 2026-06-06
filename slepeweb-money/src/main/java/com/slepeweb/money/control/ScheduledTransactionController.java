@@ -132,7 +132,7 @@ public class ScheduledTransactionController extends BaseController {
 		else {
 			// Set the 'date last entered' field to some arbirary date a long time ago,
 			// BUT NOT ZERO, since this is used as the test for an unset field.
-			scht.setEntered(new Date(32000L));
+			scht.setEntered(new Date(32000L).toLocalDate());
 		}
 		
 		// Note: Transfers can NOT have split transactions

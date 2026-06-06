@@ -1,6 +1,5 @@
 package com.slepeweb.money.control;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -58,7 +57,7 @@ public class TransactionController extends BaseController {
 	public String listNoMonth(@PathVariable long accountId, HttpServletRequest req, HttpServletResponse res, ModelMap model) { 
 		
 		getHistory(req).getLastAccount().setId(accountId);
-		Date end = getHistory(req).getLastTransaction().getEntered();
+		LocalDate end = getHistory(req).getLastTransaction().getEntered();
 		NormalisedMonth endMonth = new NormalisedMonth(end);
 		return list(accountId, endMonth.getIndex(), model);
 	}
@@ -92,16 +91,15 @@ public class TransactionController extends BaseController {
 		LocalDate month = Util.today().plusMonths(selectedMonth.getCalendarOffset());
 		
 		LocalDate monthEnd = month.withDayOfMonth(month.lengthOfMonth());
-		Date to = Date.valueOf(monthEnd);
 		LocalDate monthBeginning = month.withDayOfMonth(1);
-		Date from = Date.valueOf(monthBeginning);
 		
 		TransactionList tl = new TransactionList();
-		List<Transaction> transactions = this.transactionService.getTransactionsForAccount(accountId, from, to);
+		List<Transaction> transactions = 
+				this.transactionService.getTransactionsForAccount(accountId, monthBeginning, monthEnd);
 		int numTransactions = transactions.size();
 		tl.setRunningBalances(new RunningBalance[numTransactions]);
 		
-		long balanceEnd = this.transactionService.calculateBalance(accountId, to);
+		long balanceEnd = this.transactionService.calculateBalance(accountId, monthEnd);
 		long balance = balanceEnd;
 		Transaction t;
 		
@@ -115,8 +113,8 @@ public class TransactionController extends BaseController {
 		
 		tl.
 			setAccount(a).
-			setPeriodStart(from).
-			setPeriodEnd(to).
+			setPeriodStart(monthBeginning).
+			setPeriodEnd(monthEnd).
 			setPager(pager);
 		
 		model.addAttribute("_tl", tl);
@@ -282,7 +280,7 @@ public class TransactionController extends BaseController {
 		Transaction t = this.transactionService.get(transactionId).
 				setId(0L).
 				setOrigId(0L).
-				setEntered(Util.todayAsDate()).
+				setEntered(Util.today()).
 				setReconciled(false);
 		
 		this.transactionFormSupport.populateForm(model, t, "add");

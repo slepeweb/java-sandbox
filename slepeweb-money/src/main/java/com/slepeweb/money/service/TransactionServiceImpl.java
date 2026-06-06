@@ -1,6 +1,6 @@
 package com.slepeweb.money.service;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -254,7 +254,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 					"reconciled, transferid, reference, memo) " +
 					"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 					t.getAccount().getId(), t.getPayee().getId(), t.getCategory().getId(), 
-					t.isSplit(), t.getSource(), t.getOrigId(), t.getEntered(), t.getAmount(),
+					t.isSplit(), t.getSource(), t.getOrigId(), Util.toSqlDate(t.getEntered()), t.getAmount(),
 					false, t.getTransferId(), t.getReference(), t.getMemo());
 			
 			t.setId(getLastInsertId());	
@@ -278,7 +278,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 							"split = ?, amount = ?, " +
 							"memo = ?, reference = ?, transferid = ? " +
 							"where id = ?", 
-							dbRecord.getEntered(), 
+							Util.toSqlDate(dbRecord.getEntered()), 
 							dbRecord.getAccount().getId(), dbRecord.getPayee().getId(), dbRecord.getCategory().getId(), 
 							dbRecord.isSplit(), dbRecord.getAmount(), 
 							dbRecord.getMemo(), dbRecord.getReference(), dbRecord.getTransferId(),
@@ -360,11 +360,11 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	}
 
 	// TODO: review call to this method
-	public Date getTransactionDateForAccount(long accountId, boolean first) {
+	public LocalDate getTransactionDateForAccount(long accountId, boolean first) {
 		String sql = String.format("select entered from transaction where accountid = ? order by entered %s limit 1", 
 				first ? "" : "desc");
 		
-		List<Date> list = this.jdbcTemplate.query(
+		List<LocalDate> list = this.jdbcTemplate.query(
 				sql, 
 				new RowMapperUtil.TransactionDateMapper(),
 				new Object[]{accountId});
@@ -373,7 +373,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			return list.get(0);
 		}
 		
-		return first ? new Date(0L) : Util.todayAsDate();
+		return first ? Util.dayZero() : Util.today();
 	}
 	
 	public List<Transaction> getTransactionsForAccount(long accountId) {
@@ -408,10 +408,10 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				categoryId);
 	}
 	
-	public List<Transaction> getTransactionsByDate(Date from, Date to) {
+	public List<Transaction> getTransactionsByDate(LocalDate from, LocalDate to) {
 		return getTransactions(
 				SELECT + "where t.entered >= ? and t.entered <= ? order by t.entered", 
-				from, to);
+				Util.toSqlDate(from), Util.toSqlDate(to));
 	}
 	
 	public List<Transaction> getAll() {
@@ -439,10 +439,10 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				categoryId);
 	}
 	
-	public List<Transaction> getTransactionsForAccount(long accountId, Date from, Date to) {
+	public List<Transaction> getTransactionsForAccount(long accountId, LocalDate from, LocalDate to) {
 		return getTransactions(
 				SELECT + "where t.accountid = ? and t.entered >= ? and t.entered <= ? order by t.entered", 
-				accountId, from, to);
+				accountId, Util.toSqlDate(from), Util.toSqlDate(to));
 	}
 	
 	private List<Transaction> getTransactions(String sql, Object... params) {
@@ -466,7 +466,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		return calculateBalance(accountId, null);
 	}
 	
-	public long calculateBalance(long accountId, Date to) {
+	public long calculateBalance(long accountId, LocalDate to) {
 		StringBuilder sb = new StringBuilder("select sum(amount) from transaction where accountid = ? ");
 		int arrlen = 1 + (to != null ? 1 : 0);
 		Object[] params = new Object[arrlen];
@@ -475,7 +475,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		if (to != null) {
 			sb.append("and entered <= ? ");
-			params[index++] = to;
+			params[index++] = Util.toSqlDate(to);
 		}		
 		
 		Long sum = this.jdbcTemplate.queryForObject(sb.toString(), Long.class, params);
@@ -507,5 +507,5 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		this.accountService.saveBalance(a);
 		
 		return num;
-	}	
+	}
 }

@@ -3,8 +3,8 @@ package com.slepeweb.money.bean;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.sql.Date;
 import java.util.List;
 
 import com.slepeweb.money.Util;
@@ -22,7 +22,7 @@ public class Transaction extends DbEntity {
 	private long xferId = 0L;
 	private Payee payee;
 	private Category category;
-	private Date entered = Util.todayAsDate();
+	private LocalDate entered = Util.today();
 	private boolean split, reconciled;
 	private long amount;
 	private String reference = "", memo = "";
@@ -77,8 +77,8 @@ public class Transaction extends DbEntity {
 	
 	@Override
 	public String toString() {
-		return String.format("(id: %d) %s | %s: £%s (%5$td/%5$tm/%5$tY)", getId(),  
-				getAccount(), getPayee(), getAmountInPounds(), getEntered().getTime());
+		return String.format("(id: %d) %s | %s: £%s (%s)", getId(),  
+				getAccount(), getPayee(), getAmountInPounds(), Util.formatSimple(getEntered()));
 	}
 	
 	public String getTypeIdentifier() {
@@ -208,7 +208,7 @@ public class Transaction extends DbEntity {
 		return this;
 	}
 	
-	public Date getEntered() {
+	public LocalDate getEntered() {
 		return entered;
 	}
 	
@@ -216,7 +216,7 @@ public class Transaction extends DbEntity {
 		return Util.formatSimple(getEntered());
 	}
 	
-	public Transaction setEntered(Date entered) {
+	public Transaction setEntered(LocalDate entered) {
 		this.entered = entered;
 		return this;
 	}

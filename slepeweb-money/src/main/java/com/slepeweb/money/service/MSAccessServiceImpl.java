@@ -3,6 +3,7 @@ package com.slepeweb.money.service;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -141,7 +142,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		this.trnSplitCursorFinder = CursorBuilder.createCursor(db.getTable(TRANSACTION_SPLIT_TBL));
 		
 		// Locate the first transaction record within the given time window
-		this.trnCursorSeq.findClosestRowByEntry(new Date(twin.getFrom().getTime()));
+		this.trnCursorSeq.findClosestRowByEntry(java.sql.Date.valueOf(twin.getFrom()));
 	}
 	
 	public static long decimal2long(BigDecimal dec) {
@@ -249,8 +250,9 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		Row r = this.trnCursorSeq.getCurrentRow();
 		
 		if (r != null) {
-			Date entered = r.getDate(DATE_ENTERED);
-			if (entered.before(twin.getTo())) {
+			LocalDate entered = new java.sql.Date(r.getDate(DATE_ENTERED).getTime()).toLocalDate();
+			
+			if (entered.isBefore(twin.getTo()) || entered.isEqual(twin.getTo())) {
 				Integer htrn = r.getInt(TRANSACTION_ID);
 				
 				// Do NOT process child transactions, ie those that are part of a split transaction
@@ -259,7 +261,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 					Transaction t = new Transaction().
 							setAccount(this.accountMap.get(Long.valueOf(r.getInt(ACCOUNT_ID)))).
 							setAmount(Util.decimal2long(r.getBigDecimal(AMOUNT))).
-							setEntered(new java.sql.Date(r.getDate(DATE_ENTERED).getTime())).
+							setEntered(new java.sql.Date(r.getDate(DATE_ENTERED).getTime()).toLocalDate()).
 							setMemo(r.getString(MEMO)).
 							setSource(1).
 							setOrigId(r.getInt(TRANSACTION_ID));

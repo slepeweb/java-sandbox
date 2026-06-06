@@ -1,6 +1,6 @@
 package com.slepeweb.money.service;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
 
@@ -34,11 +34,11 @@ public class CookieServiceImpl implements CookieService {
 		return null;
 	}
 	
-	public void updateLastEnteredCookie(Date t, HttpServletRequest req, HttpServletResponse res) {
+	public void updateLastEnteredCookie(LocalDate t, HttpServletRequest req, HttpServletResponse res) {
 		saveCookie(LAST_ENTERED_COOKIE_NAME, Util.formatSimple(t), res);
 	}
 	
-	public Date getLastEntered(HttpServletRequest req) {
+	public LocalDate getLastEntered(HttpServletRequest req) {
 		
 		for (Cookie c : req.getCookies()) {
 			if (c.getName().equals(LAST_ENTERED_COOKIE_NAME)) {

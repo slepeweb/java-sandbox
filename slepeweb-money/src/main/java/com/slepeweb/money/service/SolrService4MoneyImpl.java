@@ -1,6 +1,5 @@
 package com.slepeweb.money.service;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +115,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 		return removeTransactions("*:*");
 	}
 
-	public boolean removeTransactionsByDate(Date start, Date end) {
+	public boolean removeTransactionsByDate(LocalDate start, LocalDate end) {
 		return removeTransactions(String.format("entered:[%s TO %s]", 
 				Util.format4Solr(start), Util.format4Solr(end)));
 	}
@@ -126,7 +125,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			// Note that split transactions have an id that begins with the parent transaction
 			getClient().deleteByQuery(query);
 			LOG.debug(String.format("Document(s) removed from Solr [%s]", query));
-			return true;
+			return commit(getClient());
 		} catch (Exception e) {
 			LOG.error(String.format("Solr failed to remove document(s) from Solr: %s [%s]", e.getMessage(), query));
 		}
@@ -176,31 +175,6 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			}
 		}
 
-		/*
-		if (params.getCategoryId() != null) {
-			isCategorySearch = true;
-			Category c = this.categoryService.get(params.getCategoryId());
-			if (c != null) {
-				if (StringUtils.isNotBlank(c.getMinor())) {
-					q.addFilterQuery(String.format("major:\"%s\"", c.getMajor()));
-					q.addFilterQuery(String.format("minor:\"%s\"", c.getMinor()));
-				} else {
-					q.addFilterQuery(String.format("major:\"%s\"", c.getMajor()));
-				}
-				isCriteriaSet = true;
-			}
-		}
-		else if (StringUtils.isNotBlank(params.getMajorCategory())) {
-			isCategorySearch = true;
-			q.addFilterQuery(String.format("major:\"%s\"", params.getMajorCategory()));
-			isCriteriaSet = true;
-			
-			if (StringUtils.isNotBlank(params.getMinorCategory())) {
-				q.addFilterQuery(String.format("minor:\"%s\"", params.getMinorCategory()));
-			}
-		}
-		else 
-		*/
 		if (params.getCategoryGroup() != null && params.getCategoryGroup().getSize() > 0) {
 			// This category-based search is specific to charting functionality.
 			// First, split the category list into included/excluded categories.
@@ -264,8 +238,8 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			from = Util.format4Solr(past);
 		}
 		else if (params.getFrom() != null || params.getTo() != null) {
-			from = params.getFrom() == null ? "*" : Util.format4Solr(params.getFrom());
-			to = params.getTo() == null ? "*" : Util.format4Solr(params.getTo());
+			from = params.getFrom() == null ? "*" : params.getFrom() + Util.TIME_ZERO;
+			to = params.getTo() == null ? "*" : params.getTo() + Util.TIME_ZERO;
 		}
 		
 		if (from != null && to != null) {
@@ -293,7 +267,7 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			q.addSort("entered", SolrQuery.ORDER.desc);
 			q.setStart(params.getStart());
 			q.setRows(params.getPageSize());
-			LOG.info(String.format("Solr query: [%s]", q.toQueryString()));
+			LOG.debug(String.format("Solr query: [%s]", q.toQueryString()));
 
 			try {
 				QueryResponse qr = getClient().query(q);

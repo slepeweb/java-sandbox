@@ -93,8 +93,8 @@ public class ChartFormSupport {
 				
 				// Adjust parameters TODO: will need to account for even larger numbers of transactions
 				params.setPageSize(2048);
-				params.setFrom(from);
-				params.setTo(to);
+				params.setFrom(Util.formatSimple(from));
+				params.setTo(Util.formatSimple(to));
 				missingEntity = this.searchFormSupport.convertId2Name(params);
 				
 				if (missingEntity) {

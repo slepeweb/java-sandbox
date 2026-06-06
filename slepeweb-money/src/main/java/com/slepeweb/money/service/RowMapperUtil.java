@@ -1,8 +1,9 @@
 package com.slepeweb.money.service;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Date;
+import java.time.LocalDate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -52,7 +53,7 @@ public class RowMapperUtil {
 					setPayee(makePayeeX(rs)).
 					setCategory(makeCategoryX(rs)).
 					setSplit(rs.getBoolean("split")).
-					setEntered(rs.getDate("entered")).
+					setEntered(rs.getDate("entered").toLocalDate()).
 					setTransferId(transferId).
 					setReconciled(rs.getBoolean("reconciled")).
 					setAmount(rs.getLong("amount")).
@@ -64,9 +65,9 @@ public class RowMapperUtil {
 		}
 	}
 	
-	public static final class TransactionDateMapper implements RowMapper<Date> {
-		public Date mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return rs.getDate("entered");
+	public static final class TransactionDateMapper implements RowMapper<LocalDate> {
+		public LocalDate mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return rs.getDate("entered").toLocalDate();
 		}
 	}
 	
@@ -79,7 +80,7 @@ public class RowMapperUtil {
 					setPayee(rs.getString("payee")).
 					setMajorCategory(rs.getString("major")).
 					setMinorCategory(rs.getString("minor")).
-					setEntered(rs.getDate("entered")).
+					setEntered(rs.getDate("entered").toLocalDate()).
 					setAmount(rs.getLong("amount")).
 					setMemo(rs.getString("memo"));
 		}
@@ -156,7 +157,11 @@ public class RowMapperUtil {
 			sa.setAccess(rs.getString("access"));
 			sa.setSchedule(rs.getString("schedule"));
 			sa.setRate(rs.getString("rate"));
-			sa.setMatures(rs.getDate("matures"));
+			
+			Date matures = rs.getDate("matures");
+			if (matures != null) {
+				sa.setMatures(matures.toLocalDate());
+			}
 		}
 		
 		return a;
@@ -217,7 +222,7 @@ public class RowMapperUtil {
 			ScheduledTransaction scht = 
 					new ScheduledTransaction().
 					setLabel(rs.getString("label")).
-					setNextDate(rs.getDate("nextdate")).
+					setNextDate(rs.getDate("nextdate").toLocalDate()).
 					setPeriod(rs.getString("period")).
 					setEnabled(rs.getBoolean("enabled"));
 			

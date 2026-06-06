@@ -1,6 +1,6 @@
 package com.slepeweb.money;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,7 +43,8 @@ public class MoneyImportManager {
 				if (param.equals("-from")) {
 					value = argValue(i, args);
 					if (StringUtils.isNotBlank(value)) {
-						Date from = Util.parseSimpleDate(value);
+						LocalDate from = Util.parseSimpleDate(value);
+						
 						if (from != null) {
 							twin = new TimeWindow();
 							twin.setFrom(from);

@@ -76,11 +76,11 @@ public class AssetController extends BaseController {
 		Map<Integer, Long> yearlyOpeningBalance = new HashMap<Integer, Long>();
 		Map<Integer, Long> yearlyClosingBalance = new HashMap<Integer, Long>();
 		int openingYear, closingYear, minYear = 2020;
-		Date d;
+		LocalDate d;
 
 		for (Account a : this.accountService.getAssets()) {
 			d = this.transactionService.getTransactionDateForAccount(a.getId(), true);
-			openingYear = d.toLocalDate().getYear();
+			openingYear = d.getYear();
 			openingBalance = yearlyOpeningBalance.get(openingYear);
 			
 			if (openingBalance == null) {
@@ -92,7 +92,7 @@ public class AssetController extends BaseController {
 			
 			if (a.isClosed()) {
 				d = this.transactionService.getTransactionDateForAccount(a.getId(), false);
-				closingYear = d.toLocalDate().getYear();
+				closingYear = d.getYear();
 				closingBalance = yearlyClosingBalance.get(closingYear);
 				
 				if (closingBalance == null) {

@@ -1,6 +1,5 @@
 package com.slepeweb.money;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -47,8 +46,8 @@ public class ScheduledTransactionTask implements Job {
 				continue;
 			}
 			
-			LOG.debug(String.format("Considering schedule [%s], due [%s] ... ", scht.getLabel(), scht.getNextDate().toLocalDate()));
-			scheduled = scht.getNextDate().toLocalDate();
+			LOG.debug(String.format("Considering schedule [%s], due [%s] ... ", scht.getLabel(), scht.getNextDate()));
+			scheduled = scht.getNextDate();
 			createdTransaction = false;
 			
 			// Populate the splits
@@ -59,7 +58,7 @@ public class ScheduledTransactionTask implements Job {
 			
 			if (scheduled.isBefore(today)) {
 				t.setId(0); // Indicating a new transaction is required
-				t.setEntered(Util.todayAsDate());
+				t.setEntered(Util.today());
 				t.setSource(4);
 				
 				try {
@@ -79,7 +78,7 @@ public class ScheduledTransactionTask implements Job {
 			
 			// Update the scheduled transaction to record lastEntered
 			if (createdTransaction) {
-				Date nextDate = getNextDate(scheduled, scht.getPeriod());
+				LocalDate nextDate = getNextDate(scheduled, scht.getPeriod());
 				scht.setNextDate(nextDate);
 				scheduledTransactionService.updateNextDate(scht);
 			}
@@ -88,7 +87,7 @@ public class ScheduledTransactionTask implements Job {
 		LOG.info(String.format("Scheduler created %d transactions", count));
 	}
 	
-	private Date getNextDate(LocalDate lastDate, String intervalStr) {
+	private LocalDate getNextDate(LocalDate lastDate, String intervalStr) {
 		if (StringUtils.isBlank(intervalStr)) {
 			return null;
 		}
@@ -112,15 +111,15 @@ public class ScheduledTransactionTask implements Job {
 			nextDate = lastDate.plusDays(value);
 		}
 		
-		return Date.valueOf(nextDate);
+		return nextDate;
 	}
 	
 	public static void main(String[] args) {
 		LocalDate start = Util.today();
 		start = start.withDayOfMonth(start.lengthOfMonth());
 		ScheduledTransactionTask task = new ScheduledTransactionTask();
-		out("1m: ", Util.formatSimple(task.getNextDate(start, "1m").toLocalDate()));
-		out("28d: ", Util.formatSimple(task.getNextDate(start, "40d").toLocalDate()));
+		out("1m: ", Util.formatSimple(task.getNextDate(start, "1m")));
+		out("28d: ", Util.formatSimple(task.getNextDate(start, "40d")));
 	}
 	
 	public static void out(String... str) {

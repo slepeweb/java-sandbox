@@ -73,7 +73,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	private void insertNewSavings(SavingsAccount sa) {
 		this.jdbcTemplate.update(
 				"insert into savings (accountid, matures, access, schedule, owner, rate) values (?, ?, ?, ?, ?, ?)", 
-				sa.getId(), sa.getMatures(), sa.getAccess(), sa.getSchedule(), sa.getOwner(), sa.getRate());
+				sa.getId(), Util.toSqlDate(sa.getMatures()), sa.getAccess(), sa.getSchedule(), sa.getOwner(), sa.getRate());
 	}
 
 	public Account update(Account dbRecord, Account a) {
@@ -124,7 +124,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 				if (saRecord.isLinked()) {
 					this.jdbcTemplate.update(
 							"update savings set matures = ?, access = ?, schedule = ?, owner = ?, rate = ? where accountid = ?", 
-							sa.getMatures(), sa.getAccess(), sa.getSchedule(), sa.getOwner(), 
+							Util.toSqlDate(sa.getMatures()), sa.getAccess(), sa.getSchedule(), sa.getOwner(), 
 							sa.getRate(), sa.getId());
 				}
 				else {

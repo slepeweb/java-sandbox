@@ -3,8 +3,7 @@ package com.slepeweb.money;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.sql.Date;
-import java.util.Calendar;
+import java.time.LocalDate;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -33,12 +32,8 @@ public class MoneyTransactionReporter {
 	}
 	
 	private void report(TransactionService transactionService, AccountService accountService, long[] accounts) {	
-		Calendar today = Calendar.getInstance();
-		Calendar monthBeginning = Calendar.getInstance();
-		monthBeginning.set(Calendar.DAY_OF_MONTH, 1);
-		monthBeginning.add(Calendar.MONTH, -3);
-		Date from = new Date(monthBeginning.getTimeInMillis());
-		Date to = new Date(today.getTimeInMillis());
+		LocalDate today = Util.today();
+		LocalDate monthBeginning = Util.today().withDayOfMonth(1).plusMonths(-3);
 		long balance = 0;
 		
 		// Open output file
@@ -65,13 +60,13 @@ public class MoneyTransactionReporter {
 					
 					balance = a.getOpeningBalance();
 					
-					for (Transaction t : transactionService.getTransactionsForAccount(id, from, to)) {
+					for (Transaction t : transactionService.getTransactionsForAccount(id, monthBeginning, today)) {
 						balance += t.getAmount();
 						
 						pw.println(
 								pack(String.valueOf(t.getId()), 8) + 
 								pack(String.valueOf(t.getOrigId()), 8) + 
-								pack(Util.formatSimple(new Date(t.getEntered().getTime())), 16) + 
+								pack(Util.formatSimple(t.getEntered()), 16) + 
 								pack(t.getPayee().getName(), 40) + 
 								pack(t.getCategory().toString(), 40) + 
 								pack(t.getAmountInPounds(), 10) + 

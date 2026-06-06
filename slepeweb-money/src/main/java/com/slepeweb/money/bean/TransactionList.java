@@ -1,11 +1,11 @@
 package com.slepeweb.money.bean;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class TransactionList {
 	private Account account;
 	private RunningBalance[] runningBalances;
-	private Date periodStart, periodEnd;
+	private LocalDate periodStart, periodEnd;
 	private MonthPager pager;
 	
 	public Account getAccount() {
@@ -26,20 +26,20 @@ public class TransactionList {
 		return this;
 	}
 	
-	public Date getPeriodStart() {
+	public LocalDate getPeriodStart() {
 		return periodStart;
 	}
 	
-	public TransactionList setPeriodStart(Date periodStart) {
+	public TransactionList setPeriodStart(LocalDate periodStart) {
 		this.periodStart = periodStart;
 		return this;
 	}
 	
-	public Date getPeriodEnd() {
+	public LocalDate getPeriodEnd() {
 		return periodEnd;
 	}
 	
-	public TransactionList setPeriodEnd(Date periodEnd) {
+	public TransactionList setPeriodEnd(LocalDate periodEnd) {
 		this.periodEnd = periodEnd;
 		return this;
 	}

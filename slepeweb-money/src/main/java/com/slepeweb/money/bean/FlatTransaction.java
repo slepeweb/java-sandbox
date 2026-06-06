@@ -1,5 +1,9 @@
 package com.slepeweb.money.bean;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.beans.Field;
 
@@ -8,10 +12,6 @@ import com.slepeweb.money.Util;
 public class FlatTransaction {
 
 	@Field("id") private String id;
-	
-	// Solr seems to be determined to map a 'pdate' field to a java.util.Date object
-	@Field("entered") private java.util.Date entered;
-	
 	@Field("amount") private Long amount;
 	@Field("account") private String account;
 	@Field("payee") private String payee;
@@ -26,6 +26,13 @@ public class FlatTransaction {
 	 * 2 - transaction document represents a split
 	 */
 	@Field("type") private int type;
+		
+	/*
+	 *  Solr seems to be determined to map a 'pdate' field to a java.util.Date object.
+	 *  Extra methods required for solr to get/set the field.
+	 */
+	@Field("entered") private java.util.Date enteredAsUtilDate;
+	private LocalDate entered;
 	
 	public FlatTransaction() {}
 	
@@ -65,23 +72,38 @@ public class FlatTransaction {
 		return this;
 	}
 
-	public java.sql.Date getEntered() {
-		return new java.sql.Date(this.entered.getTime());
-	}
-	
 	public String getEnteredStr() {
 		return Util.formatSimple(getEntered());
 	}
 	
-	// Solr will call this method
-	public FlatTransaction setEntered(java.util.Date entered) {
-		this.entered = entered;
+	/*
+	 * Methods required by money app
+	 */
+	public FlatTransaction setEntered(LocalDate ld) {
+		this.entered = ld;
+		
+		// Add 2 hours for date/times stored by solr
+		ZonedDateTime zdt = ld.atStartOfDay(ZoneId.of("UTC"));
+		zdt.plusHours(2);
+		this.enteredAsUtilDate = Util.toUtilDate(zdt);
 		return this;
 	}
 	
-	public FlatTransaction setEntered(java.sql.Date entered) {
-		this.entered = new java.util.Date(entered.getTime());
+	public LocalDate getEntered() {
+		return this.entered != null ? this.entered : Util.toLocalDate(this.enteredAsUtilDate);
+	}
+	
+	/*
+	 * Methods required by solr
+	 */
+	public FlatTransaction setEnteredAsUtilDate(java.util.Date d) {
+		this.enteredAsUtilDate = d;
+		this.entered = Util.toLocalDate(d);
 		return this;
+	}
+	
+	public java.util.Date getEnteredAsUtilDate() {
+		 return this.enteredAsUtilDate;
 	}
 	
 	public String getPayee() {

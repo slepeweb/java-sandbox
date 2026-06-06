@@ -4,8 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -14,9 +14,10 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Util {
 	private static BigDecimal ONE_HUNDRED = new BigDecimal(100.0);
-	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
-	public static final SimpleDateFormat SOLR_SDF = new SimpleDateFormat("yyyy-MM-dd'T00:02:00Z'");
-	public static final SimpleDateFormat MONTH_SDF = new SimpleDateFormat("MMMM");
+	public static final String TIME_ZERO = "T00:00:00Z";
+	public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	public static final DateTimeFormatter SOLR_DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX").withZone(ZoneOffset.UTC);
+	public static final DateTimeFormatter MONTH_DTF = DateTimeFormatter.ofPattern("MMMM");
 	
 	public static long decimal2long(BigDecimal d) {
 		return  d != null ? d.multiply(ONE_HUNDRED).longValue() : -1L;
@@ -190,60 +191,59 @@ public class Util {
 		}
 	}
 	
-	public static String formatSimple(LocalDate d) {
-		return formatSimple(Date.valueOf(d));
-	}
 	
-	public static String format4Solr(LocalDate d) {
-		return format4Solr(Date.valueOf(d));
+	/*
+	 * LocalDate handling
+	 */
+	
+	public static String formatSimple(LocalDate d) {
+		return format(d, DTF);
 	}
 	
 	public static String formatMonth(LocalDate d) {
-		return formatMonth(Date.valueOf(d));
+		return format(d, MONTH_DTF);
 	}
 	
-	public static String formatSimple(Date d) {
-		return format(d, SDF);
-	}
-	
-	public static String format4Solr(Date d) {
-		return format(d, SOLR_SDF);
-	}
-	
-	public static String formatMonth(Date d) {
-		return format(d, MONTH_SDF);
-	}
-	
-	public static String format(Date d, SimpleDateFormat sdf) {
+	public static String format(LocalDate d, DateTimeFormatter dtf) {
 		if (d != null) {
-			return sdf.format(d);
+			return d.format(dtf);
 		}
 		return "";
 	}
 	
-	public static Date parseSimpleDate(String s) {
-		return parseDate(s, SDF);
-	}
-	
-	public static Date parseSolrDate(String s) {
-		return parseDate(s, SOLR_SDF);
-	}
-	
-	public static Date parseDate(String s, SimpleDateFormat sdf) {
+	public static LocalDate parseSimpleDate(String s) {
 		try {
-			return new Date(sdf.parse(s).getTime());
+			return LocalDate.parse(s, DTF);
 		} 
 		catch (Exception e) {
 			return null;
 		}
 	}
 	
-	public static Date todayAsDate() {
-		return new Date(System.currentTimeMillis());
+	public static String format4Solr(LocalDate d) {
+		try {
+			return SOLR_DTF.format(d.atStartOfDay(ZoneOffset.UTC).plusHours(2));
+		} 
+		catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static LocalDate parseSolrDate(String s) {
+		try {
+			return ZonedDateTime.parse(s, SOLR_DTF).toLocalDate();
+		} 
+		catch (Exception e) {
+			return null;
+		}
 	}
 	
 	public static LocalDate today() {
-		return todayAsDate().toLocalDate();
+		return new Date(System.currentTimeMillis()).toLocalDate();
+	}
+	
+	public static LocalDate dayZero() {
+		return LocalDate.ofEpochDay(0L);
 	}
 	
 	public static LocalDate startOfYear(LocalDate d) {
@@ -282,9 +282,36 @@ public class Util {
 		
 		return (yearB - yearA) * 12 + (monthB - monthA) + 1;
 	}
+	
+	public static java.sql.Date toSqlDate(LocalDate d) {
+		return java.sql.Date.valueOf(d);
+	}
+
+	public static LocalDate toLocalDate(java.sql.Date d) {
+		return d.toLocalDate();
+	}
+
+	public static LocalDate toLocalDate(java.util.Date d) {
+		return toLocalDate(new java.sql.Date(d.getTime()));
+	}
+
+	public static java.util.Date toUtilDate(LocalDate ld) {
+		java.sql.Date sd = toSqlDate(ld);
+		return new java.util.Date(sd.getTime());
+	}
+
+	public static java.util.Date toUtilDate(ZonedDateTime zdt) {
+		return java.util.Date.from(zdt.toInstant());
+	}
 
 	public static void main(String[] args) {
 		LocalDate today = Util.today();
+		String str = Util.format4Solr(today);
+		out(str);
+		LocalDate d = Util.parseSolrDate(str);
+		out(d.toString());
+		
+		/*
 		LocalDate start = Util.startOfYear(today);
 		LocalDate end = Util.endOfYear(today);
 		LocalDate leftOut = start.minusDays(1);
@@ -305,6 +332,7 @@ public class Util {
 
 		out("today", String.valueOf(Util.monthsDifference(start, today)));
 		out("less12months", String.valueOf(Util.monthsDifference(start.plusYears(-1), today)));
+		*/
 }
 
 	public static void out(String label, ZonedDateTime zdt) {

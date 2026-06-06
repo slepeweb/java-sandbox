@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.service.AccountService;
@@ -67,7 +68,7 @@ public class Operations {
 			}
 			
 			if (! origIds.contains(t.getOrigId())) {
-				log("!!! Excess transaction found in mysql db", t.getEntered().toGMTString(), t.getAmountInPounds());
+				log("!!! Excess transaction found in mysql db", Util.formatSimple(t.getEntered()), t.getAmountInPounds());
 			}
 		}
 		

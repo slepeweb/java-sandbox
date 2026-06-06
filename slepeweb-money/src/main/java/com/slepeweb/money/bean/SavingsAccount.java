@@ -1,6 +1,6 @@
 package com.slepeweb.money.bean;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +10,7 @@ import com.slepeweb.money.Util;
 
 public class SavingsAccount extends Account {
 	
-	private Date matures;
+	private LocalDate matures;
 	private String rate;
 	private String access, schedule, owner;
 	private int accountId;
@@ -42,11 +42,11 @@ public class SavingsAccount extends Account {
 		return this.accountId > 0;
 	}
 	
-	public Date getMatures() {
+	public LocalDate getMatures() {
 		return matures;
 	}
 
-	public SavingsAccount setMatures(Date matures) {
+	public SavingsAccount setMatures(LocalDate matures) {
 		this.matures = matures;
 		return this;
 	}

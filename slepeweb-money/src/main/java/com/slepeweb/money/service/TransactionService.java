@@ -1,6 +1,6 @@
 package com.slepeweb.money.service;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.slepeweb.money.bean.Transaction;
@@ -15,19 +15,19 @@ public interface TransactionService {
 	Transaction getLastTransactionsForPayee(long payeeId);
 	List<Transaction> getAll();
 	List<Transaction> getTransactionsForAccount(long id);
-	List<Transaction> getTransactionsForAccount(long id, Date from, Date to);
+	List<Transaction> getTransactionsForAccount(long id, LocalDate from, LocalDate to);
 	List<Transaction> getUnreconciled(long accountId);
 	List<Transaction> getTransactionsForPayee(long id);
 	List<Transaction> getTransactionsForCategory(long id);
-	List<Transaction> getTransactionsByDate(Date from, Date to);
-	Date getTransactionDateForAccount(long accountId, boolean first);
+	List<Transaction> getTransactionsByDate(LocalDate from, LocalDate to);
+	LocalDate getTransactionDateForAccount(long accountId, boolean first);
 	Transaction save(Transaction p) throws MissingDataException, DuplicateItemException, DataInconsistencyException;
 	Transaction update(Transaction from, Transaction to) throws MissingDataException, DuplicateItemException;
 	void updateTransfer(Long from, Long to) throws MissingDataException, DuplicateItemException;
 	void updateSplit(Transaction t);
 	void updateReconciled(long id);
 	long calculateBalance(long accountId);
-	long calculateBalance(long accountId, Date to);
+	long calculateBalance(long accountId, LocalDate to);
 	long getNumTransactionsForAccount(long accountId);
 	long getNumTransactionsForPayee(long payeeId);
 	long getNumTransactionsForCategory(long categoryId);

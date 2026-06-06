@@ -13,7 +13,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.solr.SolrParams;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -34,13 +33,12 @@ public class IndexController extends BaseController {
 		String endStr = req.getParameter("to");
 		LocalDate mark = Util.today();
 		
-		Date start = StringUtils.isBlank(startStr) ? 
-				new Date(0L) :
-					Util.parseSolrDate(startStr + SolrParams.START_OF_DAY);
+		LocalDate start = StringUtils.isBlank(startStr) ? 
+				new Date(0L).toLocalDate() :
+					Util.parseSimpleDate(startStr);
 			
-		Date end = StringUtils.isBlank(endStr) ? 
-				Date.valueOf(mark) :
-					Util.parseSolrDate(endStr + SolrParams.END_OF_DAY);
+		LocalDate end = StringUtils.isBlank(endStr) ? mark :
+					Util.parseSimpleDate(endStr);
 		
 		this.solrService.removeTransactionsByDate(start, end);
 		boolean ok = this.solrService.save(this.transactionService.getTransactionsByDate(start, end));

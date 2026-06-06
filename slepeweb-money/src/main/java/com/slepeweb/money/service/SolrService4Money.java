@@ -1,6 +1,6 @@
 package com.slepeweb.money.service;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.slepeweb.money.bean.FlatTransaction;
@@ -17,7 +17,7 @@ public interface SolrService4Money {
 	boolean removeTransactionsByAccount(String name);
 	boolean removeTransactionsByPayee(String name);
 	boolean removeTransactionsByCategory(String major, String minor);
-	boolean removeTransactionsByDate(Date start, Date end);
+	boolean removeTransactionsByDate(LocalDate start, LocalDate end);
 	SolrResponse<FlatTransaction> query(SolrParams p);
 	FlatTransaction getDocument(long transactionId);
 	FlatTransaction queryLatestTransactionByPayee(String payee);
