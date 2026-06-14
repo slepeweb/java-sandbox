@@ -235,6 +235,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	}
 	
 	public void saveBalance(Account a) {
-		this.jdbcTemplate.update("update account set balance = ? where id = ?", a.getBalance(), a.getId()); 
+		this.jdbcTemplate.update("update account set balance = ? where id = ?", a.getBalance(), a.getId());
+		LOG.info(String.format("Account balance for %s updated to %s", a.getName(), a.getBalance()));
 	}
 }

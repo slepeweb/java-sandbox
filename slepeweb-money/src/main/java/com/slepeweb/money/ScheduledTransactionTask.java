@@ -56,7 +56,7 @@ public class ScheduledTransactionTask implements Job {
 			// This returns either a Transaction or a Transfer object, nearly fully populated
 			t = Transaction.adapt(scht);					
 			
-			if (scheduled.isBefore(today)) {
+			if (scheduled.isEqual(today) || scheduled.isBefore(today)) {
 				t.setId(0); // Indicating a new transaction is required
 				t.setEntered(Util.today());
 				t.setSource(4);
