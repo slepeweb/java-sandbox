@@ -219,10 +219,10 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 		
 		// Date ranges
 		String from = null, to = null;
+		LocalDate today = Util.today();
+		LocalDate past = Util.today();
 		
 		if (params.getPeriodValue() > 0) {
-			LocalDate today = Util.today();
-			LocalDate past = Util.today();
 			to = Util.format4Solr(today);
 			
 			if (params.getPeriodUnits().equals(SolrParams.WEEK)) {
@@ -237,9 +237,14 @@ public class SolrService4MoneyImpl extends SolrServiceBase implements SolrServic
 			
 			from = Util.format4Solr(past);
 		}
-		else if (params.getFrom() != null || params.getTo() != null) {
-			from = params.getFrom() == null ? "*" : params.getFrom() + Util.TIME_ZERO;
-			to = params.getTo() == null ? "*" : params.getTo() + Util.TIME_ZERO;
+		else {
+			boolean fromIsBlank = StringUtils.isBlank(params.getFrom());
+			boolean toIsBlank = StringUtils.isBlank(params.getTo());
+			
+			if (! fromIsBlank || ! toIsBlank) {
+				from = fromIsBlank ? "*" : params.getFrom() + Util.TIME_ZERO;
+				to = toIsBlank ? "*" : params.getTo() + Util.TIME_ZERO;
+			}
 		}
 		
 		if (from != null && to != null) {
