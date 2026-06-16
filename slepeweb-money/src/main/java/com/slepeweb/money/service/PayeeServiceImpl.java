@@ -2,7 +2,6 @@ package com.slepeweb.money.service;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -21,6 +20,7 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 	
 	@Autowired private TransactionService transactionService;
 	@Autowired private SolrService4Money solrService4Money;
+	private Payee noPayee;
 	
 	public Payee save(Payee pe) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (pe.isDefined4Insert()) {
@@ -81,19 +81,24 @@ public class PayeeServiceImpl extends BaseServiceImpl implements PayeeService {
 	}
 
 	public Payee get(String name) {
-		Payee p = get("select * from payee where name = ?", new Object[]{name});
+		return get("select * from payee where name = ?", new Object[]{name});
+	}
+	
+	public Payee getElseNoPayee(String name) {
+		Payee p = get(name);
 		if (p != null) {
 			return p;
 		}
-		else if (StringUtils.isNotBlank(name)) {		
-			return getNoPayee();
-		}
-		
-		return null;
+		return getNoPayee();
 	}
 	
 	public Payee getNoPayee() {
-		return get("");
+		if (this.noPayee != null) {
+			return this.noPayee;
+		}
+		
+		this.noPayee = get("");
+		return this.noPayee;
 	}
 
 	public Payee get(long id) {

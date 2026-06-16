@@ -9,9 +9,17 @@ public class Category extends DbEntity {
 	
 	public static final String EXPENSE_TYPE = "expense";
 	public static final String INCOME_TYPE = "income";
+	public static final String NO_CATEGORY = "[noCategory]";
 	
 	private String major = "", minor = "";
 	private boolean expense = true;
+	
+	public Category() {}
+	
+	public Category(String major, String minor) {
+		this.major = major;
+		this.minor = minor;
+	}
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Category) {
@@ -42,7 +50,7 @@ public class Category extends DbEntity {
 			return sb.toString();
 		}
 		
-		return "[blank]";
+		return NO_CATEGORY;
 	}
 	
 	public Category setId(long id) {
@@ -89,6 +97,11 @@ public class Category extends DbEntity {
 	
 	public String getType() {
 		return isExpense() ? EXPENSE_TYPE : INCOME_TYPE;
+	}
+	
+	public String getName() {
+		String s = toString();
+		return s.equals(NO_CATEGORY) ? "" : s;
 	}
 
 	@Override

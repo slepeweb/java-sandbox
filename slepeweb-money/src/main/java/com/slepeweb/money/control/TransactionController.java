@@ -188,7 +188,7 @@ public class TransactionController extends BaseController {
 				setCategory(noCategory);
 		}
 		else {
-			Payee p = identifyPayee(req.getParameter("payee"));		
+			Payee p = getPayeeElseNew(req.getParameter("payee"));		
 			t = new Transaction().setPayee(p);
 			
 			if (isSplit) {
@@ -239,22 +239,6 @@ public class TransactionController extends BaseController {
 		// Default on transaction update error
 		return new RedirectView(String.format("%s/transaction/list?flash=%s", 
 				req.getContextPath(), Util.encodeUrl(flash)));
-	}
-	
-	private Payee identifyPayee(String name) {
-		Payee p = this.payeeService.get(name);
-		if (p.isNoPayee()) {
-			p = new Payee().setName(name);
-			try {
-				p = this.payeeService.save(p);
-				LOG.info(String.format("Created new payee: %s", name));
-			}
-			catch (Exception e) {
-				throw new RuntimeException("Failed to create new Payee");
-			}
-		}
-		
-		return p;
 	}
 	
 	@RequestMapping(value="/delete/{transactionId}", method=RequestMethod.GET)

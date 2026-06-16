@@ -2,7 +2,6 @@ package com.slepeweb.money.service;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -21,6 +20,7 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 
 	@Autowired private TransactionService transactionService;
 	@Autowired private SolrService4Money solrService4Money;
+	private Category noCategory;
 	
 	public Category save(Category c) throws MissingDataException, DuplicateItemException, DataInconsistencyException {
 		if (c.isDefined4Insert()) {
@@ -95,19 +95,24 @@ public class CategoryServiceImpl extends BaseServiceImpl implements CategoryServ
 			minor = "";
 		}
 		
-		Category c = get("select * from category where major = ? and minor = ?", major, minor);
+		return get("select * from category where major = ? and minor = ?", major, minor);
+	}
+	
+	public Category getElseNoCategory(String major, String minor) {
+		Category c = get(major, minor);
 		if (c != null) {
 			return c;
 		}
-		else if (StringUtils.isNotBlank(major)) {		
-			return getNoCategory();
-		}
-		
-		return null;
+		return getNoCategory();
 	}
 	
 	public Category getNoCategory() {
-		return get("", "");
+		if (this.noCategory != null) {
+			return this.noCategory;
+		}
+		
+		this.noCategory = get("", "");
+		return this.noCategory;
 	}
 
 	public Category get(long id) {

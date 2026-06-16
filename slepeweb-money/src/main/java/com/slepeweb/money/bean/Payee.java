@@ -3,6 +3,8 @@ package com.slepeweb.money.bean;
 import org.apache.commons.lang3.StringUtils;
 
 public class Payee extends DbEntity {
+	
+	public static final String NO_PAYEE = "[noPayee]";
 	private String name;
 	
 	public boolean isAccount() {
@@ -28,7 +30,7 @@ public class Payee extends DbEntity {
 	
 	@Override
 	public String toString() {
-		return StringUtils.isNotBlank(getName()) ? getName() : "[blank]";
+		return StringUtils.isNotBlank(getName()) ? getName() : NO_PAYEE;
 	}
 	
 	@Override

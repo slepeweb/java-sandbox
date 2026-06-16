@@ -49,7 +49,7 @@ public class Category_ {
 			return sb.toString();
 		}
 		
-		return "[blank]";
+		return "[noCategory]";
 	}
 
 	public long getId() {

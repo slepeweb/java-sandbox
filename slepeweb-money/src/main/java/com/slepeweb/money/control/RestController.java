@@ -45,7 +45,7 @@ public class RestController extends BaseController {
 	@RequestMapping(value="/transaction/latest/bypayee/{payeeName}", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public FlatTransaction getRecentTransaction(@PathVariable String payeeName, ModelMap model) {
-		Payee p = this.payeeService.get(payeeName);
+		Payee p = this.payeeService.getElseNoPayee(payeeName);		
 		Transaction t = this.transactionService.getLastTransactionsForPayee(p.getId());
 		return new FlatTransaction(t);
 	}

@@ -112,6 +112,7 @@ public class AcornMoneyImportServiceImpl implements AcornMoneyImportService {
 	
 	private Payee getPayee(String name) {
 		Payee p = this.payeeService.get(name);
+		
 		if (p == null) {
 			p = new Payee().setName(name);
 			try {

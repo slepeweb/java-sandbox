@@ -96,10 +96,7 @@ public class ScheduledTransactionController extends BaseController {
 			m = this.accountService.get(Long.valueOf(mirrorAccount));
 		}
 		
-		Payee p = this.payeeService.get(req.getParameter("payee"));
-		if (p == null) {
-			p = this.payeeService.get("");
-		}
+		Payee p = this.payeeService.getElseNoPayee(req.getParameter("payee"));
 		
 		Category c = null;
 		if (isStandard) {
@@ -107,7 +104,7 @@ public class ScheduledTransactionController extends BaseController {
 		}
 
 		if (c == null) {
-			c = this.categoryService.get("", "");
+			c = this.categoryService.getNoCategory();
 		}
 
 		ScheduledTransaction scht = new ScheduledTransaction().

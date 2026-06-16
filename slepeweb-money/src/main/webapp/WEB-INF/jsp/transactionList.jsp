@@ -96,7 +96,7 @@
 					<td class="payee">${_payee}</td>
 					
 					<c:choose><c:when test="${not _trn.split and not _trn.transfer}">
-						<td class="category">${_trn.category}</td>
+						<td class="category">${_trn.category.name}</td>
 						<td class="currency amount">${mon:displayAmountNS(_trn.amount)}</td>
 						<td class="memo">${_trn.memo}</td>
 					</c:when><c:when test="${_trn.transfer}">

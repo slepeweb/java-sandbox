@@ -3,10 +3,12 @@ package com.slepeweb.money.control;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.History;
 import com.slepeweb.money.bean.Payee;
 import com.slepeweb.money.bean.SavedSearch;
@@ -25,7 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 public class BaseController {
 
-	//private static Logger LOG = Logger.getLogger(BaseController.class);
+	private static Logger LOG = Logger.getLogger(BaseController.class);
 	protected static final String HISTORY_ATTR = "history";
 	protected static final String ALL_MAJORS = "_allMajorCategories";
 	
@@ -71,7 +73,47 @@ public class BaseController {
 			req.getSession().setAttribute(HISTORY_ATTR, h);
 		}
 		return h;
-	}	
+	}
+	
+	public Payee getPayeeElseNew(String name) {
+		Payee p = this.payeeService.get(name);
+		
+		if (p != null) {
+			return p;
+		}
+		
+		try {
+			p = this.payeeService.save(new Payee().setName(name));
+			LOG.info(String.format("Created new payee: %s", name));
+			return p;
+		}
+		catch (Exception e) {
+			LOG.error(String.format("Failed to save new payee %s", name));
+		}
+		
+		return null;
+	}
+	
+	public Category getCategoryElseNew(String major, String minor) {
+		Category c = this.categoryService.get(major, minor);
+		
+		if (c != null) {
+			return c;
+		}
+		
+		try {
+			c = this.categoryService.save(new Category(major, minor));
+			LOG.info(String.format("Created new category: %s", c));
+			return c;
+		}
+		catch (Exception e) {
+			LOG.error(String.format("Failed to save new category %s/%s", major, minor));
+		}
+		
+		return null;
+	}
+	
+
 	
 	@ModelAttribute(value="_ctxPath")
 	protected String getWebContextPath(HttpServletRequest req) {
