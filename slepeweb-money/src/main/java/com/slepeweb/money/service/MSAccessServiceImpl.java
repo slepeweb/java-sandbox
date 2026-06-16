@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -288,7 +287,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		Row r = this.trnSplitCursorSeq.getNextRow();
 		
 		if (r != null) {
-			return new Transaction().setOrigId(new Long(r.getInt(TRANSACTION_PARENT_ID)));
+			return new Transaction().setOrigId(Long.valueOf(r.getInt(TRANSACTION_PARENT_ID)));
 		}
 		
 		return null;
@@ -308,7 +307,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		
 			while (this.trnSplitCursorFinder.findNextRow(parentCriteria)) {
 				parentTransactionRow = this.trnSplitCursorFinder.getCurrentRow();
-				childId = new Long(parentTransactionRow.getInt(TRANSACTION_ID));
+				childId = Long.valueOf(parentTransactionRow.getInt(TRANSACTION_ID));
 				
 				// Find the child transaction in trn table
 				if (this.trnCursorFinder.findFirstRow(Collections.singletonMap(TRANSACTION_ID, childId))) {
@@ -367,7 +366,7 @@ public class MSAccessServiceImpl extends BaseServiceImpl implements MSAccessServ
 		Row r = this.trnXferCursorSeq.getNextRow();
 		
 		if (r != null) {
-			return new Long[]{new Long(r.getInt("htrnLink")), new Long(r.getInt("htrnFrom"))};
+			return new Long[]{Long.valueOf(r.getInt("htrnLink")), Long.valueOf(r.getInt("htrnFrom"))};
 		}
 		
 		return null;
