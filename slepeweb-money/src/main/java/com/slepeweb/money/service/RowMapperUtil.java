@@ -126,7 +126,8 @@ public class RowMapperUtil {
 				setDescription(rs.getString("description")).
 				setFromYear(rs.getInt("fromyear")).
 				setToYear(rs.getInt("toyear")).
-				setSearchIds(rs.getString("searchids"));
+				setSearchIds(rs.getString("searchids")).
+				setNotes(rs.getString("notes"));
 			
 			return ch;
 		}

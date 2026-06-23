@@ -39,7 +39,10 @@
     </mny:tableRow>
     
     <tr><td>&nbsp;</td></tr>
-    
+
+    <mny:tableRow heading="Notes">
+    	<textarea name="notes" rows="4">${_chart.notes}</textarea>
+    </mny:tableRow>
 	  
 		<mny:searchAndExecuteOptions />
 			

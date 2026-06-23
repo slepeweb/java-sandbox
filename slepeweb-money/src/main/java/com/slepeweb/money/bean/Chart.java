@@ -5,21 +5,26 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.slepeweb.money.Util;
+
 public class Chart extends DbEntity {
 	
-	private String name, description, searchIds;
-	private int fromYear, toYear;
+	private static int CURRENT_YEAR = Util.today().getYear();
+	private String name, description, searchIds, notes;
+	private int fromYear = CURRENT_YEAR, toYear = CURRENT_YEAR;
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Chart) {
 			Chart ch = (Chart) obj;
 			setName(ch.getName()).
 			setDescription(ch.getDescription()).
-			setSearchIds(ch.getSearchIds()).setFromYear(ch.getFromYear()).setToYear(ch.getToYear());
+			setSearchIds(ch.getSearchIds()).
+			setFromYear(ch.getFromYear()).
+			setToYear(ch.getToYear()).
+			setNotes(ch.getNotes());
 		}
 	}
 		
-
 	@Override
 	public boolean isDefined4Insert() {
 		return StringUtils.isNotBlank(getName()) && 
@@ -45,6 +50,22 @@ public class Chart extends DbEntity {
 		
 		for (String s : this.searchIds.split(",")) {
 			list.add(Long.parseLong(s));
+		}
+		
+		return list;
+	}
+	
+	public List<String> getNotesAsList() {
+		List<String> list = new ArrayList<String>();
+		
+		if (StringUtils.isBlank(this.notes)) {
+			return list;
+		}
+		
+		for (String s : this.notes.split("(\\r\\n)")) {
+			if (StringUtils.isNotBlank(s)) {
+				list.add(s.trim());
+			}
 		}
 		
 		return list;
@@ -83,6 +104,7 @@ public class Chart extends DbEntity {
 		result = prime * result + fromYear;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((searchIds == null) ? 0 : searchIds.hashCode());
+		result = prime * result + ((notes == null) ? 0 : notes.hashCode());
 		result = prime * result + toYear;
 		return result;
 	}
@@ -113,6 +135,11 @@ public class Chart extends DbEntity {
 			if (other.searchIds != null)
 				return false;
 		} else if (!searchIds.equals(other.searchIds))
+			return false;
+		if (notes == null) {
+			if (other.notes != null)
+				return false;
+		} else if (!notes.equals(other.notes))
 			return false;
 		if (toYear != other.toYear)
 			return false;
@@ -149,6 +176,17 @@ public class Chart extends DbEntity {
 
 	public Chart setToYear(int to) {
 		this.toYear = to;
+		return this;
+	}
+
+
+	public String getNotes() {
+		return notes;
+	}
+
+
+	public Chart setNotes(String notes) {
+		this.notes = notes;
 		return this;
 	}
 

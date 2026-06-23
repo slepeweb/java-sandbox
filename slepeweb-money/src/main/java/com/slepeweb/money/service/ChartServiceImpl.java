@@ -41,8 +41,8 @@ public class ChartServiceImpl extends BaseServiceImpl implements ChartService {
 		
 		try {
 			this.jdbcTemplate.update(
-					"insert into chart (name, description, fromyear, toyear, searchids) values (?, ?, ?, ?, ?)", 
-					ch.getName(), ch.getDescription(), ch.getFromYear(), ch.getToYear(), ch.getSearchIds());
+					"insert into chart (name, description, fromyear, toyear, searchids, notes) values (?, ?, ?, ?, ?, ?)", 
+					ch.getName(), ch.getDescription(), ch.getFromYear(), ch.getToYear(), ch.getSearchIds(), ch.getNotes());
 			
 			ch.setId(getLastInsertId());	
 			
@@ -59,9 +59,9 @@ public class ChartServiceImpl extends BaseServiceImpl implements ChartService {
 			dbRecord.assimilate(ch);
 			
 			this.jdbcTemplate.update(
-					"update chart set name = ?, description = ?, fromyear = ?, toyear = ?, searchids = ? where id = ?", 
+					"update chart set name = ?, description = ?, fromyear = ?, toyear = ?, searchids = ?, notes = ? where id = ?", 
 					dbRecord.getName(), dbRecord.getDescription(), 
-					dbRecord.getFromYear(), dbRecord.getToYear(), dbRecord.getSearchIds(), 
+					dbRecord.getFromYear(), dbRecord.getToYear(), dbRecord.getSearchIds(), dbRecord.getNotes(),
 					dbRecord.getId());
 			
 			LOG.info(compose("Updated chart", ch));

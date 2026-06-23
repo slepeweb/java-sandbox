@@ -3,11 +3,16 @@
 
 <!-- chartResults.tag -->
 
-<c:choose><c:when test="${not empty noCategoriesSpecified}">
-	<p>No categories specified - please <a href="${_ctxPath}/chart/by/categories${queryString}">try again</a>.</p>
-</c:when><c:otherwise>
-	<c:if test="${not empty _chartSVG}">
-		${_chartSVG}
-	</c:if>
-</c:otherwise></c:choose>
+<c:if test="${not empty _chartSVG}">
+	${_chartSVG}
+</c:if>
+
+<c:if test="${not empty _chart.notes}">
+	<h3>Notes</h3>
+	<ul>
+		<c:forEach items="${_chart.notesAsList}" var="_line">
+			<li>${_line}</li>
+		</c:forEach>
+	</ul>
+</c:if>
 	

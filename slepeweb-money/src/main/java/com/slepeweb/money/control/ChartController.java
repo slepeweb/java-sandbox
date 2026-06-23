@@ -100,7 +100,8 @@ public class ChartController extends BaseController {
 		ch.setName(req.getParameter("name"));
 		ch.setDescription(req.getParameter("description"));
 		ch.setFromYear(this.chartFormSupport.getYear(req, "from", 2015));		
-		ch.setToYear(this.chartFormSupport.getYear(req, "to", 2019));		
+		ch.setToYear(this.chartFormSupport.getYear(req, "to", 2019));
+		ch.setNotes(req.getParameter("notes"));
 		
 		if (ch.getToYear() < ch.getFromYear()) {
 			int tmp = ch.getFromYear();

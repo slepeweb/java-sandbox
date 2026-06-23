@@ -77,12 +77,13 @@ public class ChartFormSupport {
 	    ChartDataSupport supp = new ChartDataSupport(ds, chartDataByLabel, labels);
 	    SavedSearch ss;
 	    boolean missingEntity;
+	    List<Long> searchIdList = ch.getSearchIdsAsList();
 	    
 		for (int year = ch.getFromYear(); year <= ch.getToYear() && year <= currentYear; year++) {
 			from = from.withYear(year);
 			to = to.withYear(year);
 			
-			for (Long ssid : ch.getSearchIdsAsList()) {
+			for (Long ssid : searchIdList) {
 				ss = this.savedSearchService.get(ssid);
 				if (ss == null) {
 					LOG.error("Saved search id not recognised");
@@ -95,6 +96,7 @@ public class ChartFormSupport {
 				params.setPageSize(2048);
 				params.setFrom(Util.formatSimple(from));
 				params.setTo(Util.formatSimple(to));
+				params.setPeriodValue(0); // To force query to search by given dates
 				missingEntity = this.searchFormSupport.convertId2Name(params);
 				
 				if (missingEntity) {
