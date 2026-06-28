@@ -106,6 +106,12 @@ public class ChartFormSupport {
 				queryThenAggregateData(params, ss.getName(), year, supp);
 			}
 		}
+		
+		/*
+		 *  Is the data mostly expenses, or incomes? If expenses, negate the values
+		 *  before adding to the dataset
+		 */
+		addValuesToDataset(supp);
 	 
 		JFreeChart chart = ChartFactory.createBarChart(
 		         ch.getName(), "Years", "Amounts (£)",
@@ -138,7 +144,6 @@ public class ChartFormSupport {
 			amount += ft.getAmount();
 		}
 		
-		supp.ds.addValue(Util.toPounds(amount), label, Integer.valueOf(year));
 		chartData.getData().put(year, amount);
 	}
 
@@ -183,5 +188,25 @@ public class ChartFormSupport {
 		return sb.toString();
 	}
 	
-
+	private void addValuesToDataset(ChartDataSupport supp) {
+		
+		boolean isMainlyExpenses = true;
+		
+		for (ChartData cd : supp.chartDataByLabel.values()) {
+			isMainlyExpenses = isMainlyExpenses && cd.isExpense();
+		}
+		
+		int factor = isMainlyExpenses ? -1 : 1;
+		ChartData cd;
+		Long amount;
+		
+		for (String label : supp.labels) {
+			cd = supp.chartDataByLabel.get(label);
+			
+			for (int year : cd.getData().keySet()) {
+				amount = cd.getData().get(year) * factor;
+				supp.ds.addValue(Util.toPounds(amount), label, Integer.valueOf(year));
+			}
+		}
+	}
 }

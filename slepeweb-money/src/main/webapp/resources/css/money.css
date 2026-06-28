@@ -706,18 +706,34 @@ div.dashboard-group table h3 {
 }
 
 #navigation {
-  text-decoration: none;
-  list-style: none;
   display: inline-block;
+  width: 100%;
+  margin-top: 32px;
   padding-left: 0.5em;
+  background-color: beige;
+  border: 2px solid #478472;
 }
+
 #navigation li {
   display: inline-block;
   margin-right: 2em;
 }
 
+#navigation a, div.menu a {
+	text-decoration: none;
+	font-weight: bold;
+	color: #478472;
+}
+
+#navigation a {
+	font-size: 1.2em;
+}
+
 header {
   line-height: 2em;
+  background-image: url('/money/resources/images/dollar2.jpg');
+  background-position-y: -220px;
+  height: 100px;
 }
 
 #year-selector {

@@ -5,7 +5,7 @@
 <!-- loginForm.jsp -->
 
 <mny:standardLayout>
-	<mny:pageHeading heading="Login" />
+	<mny:pageHeading heading="Financial Accounts - Login" />
 	
 	<p class="datetimenow">${_now}</p>
 	<p>Please enter your login details:</p>
