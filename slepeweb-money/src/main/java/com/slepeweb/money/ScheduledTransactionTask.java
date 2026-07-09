@@ -97,7 +97,7 @@ public class ScheduledTransactionTask implements Job {
 			return null;
 		}
 		
-		int dayOfMonth = Math.min(28, lastDate.lengthOfMonth());
+		int dayOfMonth = Math.min(28, lastDate.getDayOfMonth());
 		LocalDate nextDate = null;
 		int value = Integer.valueOf(m.group(1));
 		String units = m.group(2);
@@ -116,10 +116,9 @@ public class ScheduledTransactionTask implements Job {
 	
 	public static void main(String[] args) {
 		LocalDate start = Util.today();
-		start = start.withDayOfMonth(start.lengthOfMonth());
 		ScheduledTransactionTask task = new ScheduledTransactionTask();
 		out("1m: ", Util.formatSimple(task.getNextDate(start, "1m")));
-		out("28d: ", Util.formatSimple(task.getNextDate(start, "40d")));
+		out("28d: ", Util.formatSimple(task.getNextDate(start, "28d")));
 	}
 	
 	public static void out(String... str) {
