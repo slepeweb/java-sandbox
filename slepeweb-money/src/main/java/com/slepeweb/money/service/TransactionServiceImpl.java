@@ -86,7 +86,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 					// no longer contains the original transaction data
 					savedTransaction = update(dbRecordToUpdate, formInput);
 					
-					// Now, adjust balances according to the chnges to dbRecord
+					// Now, adjust balances according to the changes to dbRecord
 					adjustBalancesForUpdatedTransactions(dbRecordBeforeUpdated, dbRecordToUpdate);
 				}
 				else {
@@ -97,9 +97,12 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				// Insert a new transaction
 				savedTransaction = insert(formInput);
 				
-				// Update the account balance
-				savedTransaction.getAccount().credit(savedTransaction.getAmount());
-				this.accountService.saveBalance(savedTransaction.getAccount());
+				/*
+				 *  Update the account balance, allowing for the fact that formInput might relate to a ScheduledTransaction,
+				 *  in which case savedTransaction.getAccount().getBalance() can't be trusted. This next line ensures that the 
+				 *  correct account balance is retrieved fresh from the database.
+				 */
+				this.accountService.credit(savedTransaction);
 			}
 
 			// Also save the new transaction's splits, if any
@@ -146,30 +149,26 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 	 * but also an account change, so account updates for transfers need to be handled separately.
 	 */
 	private void adjustBalancesForUpdatedTransactions(Transaction original, Transaction updated) {
-		long amountDelta = 0;
-		Account a = null;
+		long credit = 0;
 		
 		if (original.getAccount().getId() == updated.getAccount().getId()) {
-			// No change observed regarding the account
-			amountDelta = updated.getAmount() - original.getAmount();
+			/*
+			 *  No change observed regarding the account. 
+			 *  credit is positive if new amount > original amount
+			 */
+			credit = updated.getAmount() - original.getAmount();
 			
-			if (Math.abs(amountDelta) > 0) {
-				a = updated.getAccount();
-				a.credit(amountDelta);
-				this.accountService.saveBalance(a);
+			if (Math.abs(credit) > 0) {
+				this.accountService.credit(credit, updated.getAccount());
 			}
 		}
 		else {
 			// The updated transaction relates to a different account!
 			// Adjust the original account's balance
-			a = original.getAccount();
-			a.credit(- original.getAmount());
-			this.accountService.saveBalance(a);
+			this.accountService.credit(- original.getAmount(), original.getAccount());
 
 			// Now adjust the update account's balance
-			a = updated.getAccount();
-			a.credit(updated.getAmount());
-			this.accountService.saveBalance(a);
+			this.accountService.credit(updated.getAmount(), updated.getAccount());
 		}
 	}
 	
@@ -503,8 +502,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		
 		// Update account balance
 		Account a = t.getAccount();
-		a.credit(- t.getAmount());
-		this.accountService.saveBalance(a);
+		this.accountService.credit(- t.getAmount(), a);
 		
 		return num;
 	}

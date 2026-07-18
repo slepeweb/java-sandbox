@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.SavingsAccount;
+import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -234,8 +235,33 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		return this.jdbcTemplate.update("delete from account where id = ?", id);
 	}
 	
-	public void saveBalance(Account a) {
+	private void saveBalance(Account a) {
 		this.jdbcTemplate.update("update account set balance = ? where id = ?", a.getBalance(), a.getId());
 		LOG.info(String.format("Account balance for %s updated to £%s", a.getName(), Util.formatPounds(a.getBalance())));
 	}
+
+	/*
+	 * ONLY use the next signature if you know that the account balance is set, which is NOT the case
+	 * when dealing with Account objects returned by ScheduledTransaction.getAccount().
+	 */
+	public void credit(long amount, Account a) {
+		if (a != null) {
+			a.setBalance(a.getBalance() + amount);
+			saveBalance(a);
+		}
+	}
+
+	/*
+	 * These remaining credit methods are used when all you have for certain is an account id, and you need to retrieve
+	 * the corresponding account balance from the database. This is the case when dealing with ScheduledTransaction objects,
+	 * which cannot be relied on having accurate balances set on their associated Accounts.
+	 */
+	public void credit(Transaction t) {
+		credit(t.getAmount(), t.getAccount().getId());
+	}
+
+	public void credit(long amount, long accountId) {
+		credit(amount, get(accountId));
+	}
+	
 }

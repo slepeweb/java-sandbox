@@ -31,7 +31,16 @@ public class ScheduledTransactionTask implements Job {
 		TransactionService transactionService = 
 				(TransactionService) context.getJobDetail().getJobDataMap().get("transactionService");
 		
-		// getAll() does NOT retrieve splits. This is done seperately when we iterate over them later
+		/*
+		 * NOTE: 
+		 * 		getAll() retrieves all scheduled transactions, and binds those objects to account objects, and
+		 * 		accounts have balances. As we loop through the schedules, we are updating account balances, and so
+		 * 		the objects returned by getAll() may need to have there associated balances updated. An object of
+		 * 		class AccountBalanceTracker is used to record updated Accounts and apply those changes to the
+		 * 		ScheduledTransaction objects retrieved earlier.
+		 * 
+		 *  getAll() does NOT retrieve splits. This is done separately when we iterate over them later.
+		 */
 		List<ScheduledTransaction> all = scheduledTransactionService.getAll();
 		
 		LOG.debug(String.format("There are %d scheduled transactions", all.size()));
@@ -54,7 +63,7 @@ public class ScheduledTransactionTask implements Job {
 			scht.setSplits(scheduledSplitService.get(scht.getId()));
 			
 			// This returns either a Transaction or a Transfer object, nearly fully populated
-			t = Transaction.adapt(scht);					
+			t = Transaction.adapt(scht);
 			
 			if (scheduled.isEqual(today) || scheduled.isBefore(today)) {
 				t.setId(0); // Indicating a new transaction is required
@@ -62,12 +71,10 @@ public class ScheduledTransactionTask implements Job {
 				t.setSource(4);
 				
 				try {
-					/*
-					 *  The transactionService will take care of mirrored transactions
-					 *  should t be a Transfer object
-					 */
+					// The transactionService will take care of mirrored transactions
 					transactionService.save(t);
 					createdTransaction = true;
+					
 					LOG.info(String.format("Processed scheduled transaction [%s]", scht.getLabel()));
 					count++;
 				}
