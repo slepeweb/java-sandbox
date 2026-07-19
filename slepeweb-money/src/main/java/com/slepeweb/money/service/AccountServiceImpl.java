@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.SavingsAccount;
-import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -252,14 +251,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 	}
 
 	/*
-	 * These remaining credit methods are used when all you have for certain is an account id, and you need to retrieve
+	 * This credit method is used when all you have for certain is an account id, and you need to retrieve
 	 * the corresponding account balance from the database. This is the case when dealing with ScheduledTransaction objects,
 	 * which cannot be relied on having accurate balances set on their associated Accounts.
 	 */
-	public void credit(Transaction t) {
-		credit(t.getAmount(), t.getAccount().getId());
-	}
-
 	public void credit(long amount, long accountId) {
 		credit(amount, get(accountId));
 	}

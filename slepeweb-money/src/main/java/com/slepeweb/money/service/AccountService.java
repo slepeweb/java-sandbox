@@ -3,7 +3,6 @@ package com.slepeweb.money.service;
 import java.util.List;
 
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.except.DataInconsistencyException;
 import com.slepeweb.money.except.DuplicateItemException;
 import com.slepeweb.money.except.MissingDataException;
@@ -23,6 +22,5 @@ public interface AccountService {
 	void updateReconciled(Account a);
 	void credit(long amount, long accountId);
 	void credit(long amount, Account a);
-	void credit(Transaction t);
 	int delete(long id);
 }

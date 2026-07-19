@@ -102,7 +102,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				 *  in which case savedTransaction.getAccount().getBalance() can't be trusted. This next line ensures that the 
 				 *  correct account balance is retrieved fresh from the database.
 				 */
-				this.accountService.credit(savedTransaction);
+				this.accountService.credit(savedTransaction.getAmount(), savedTransaction.getAccount().getId());
 			}
 
 			// Also save the new transaction's splits, if any
