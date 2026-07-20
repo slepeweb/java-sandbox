@@ -239,24 +239,12 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 		LOG.info(String.format("Account balance for %s updated to £%s", a.getName(), Util.formatPounds(a.getBalance())));
 	}
 
-	/*
-	 * ONLY use the next signature if you know that the account balance is set, which is NOT the case
-	 * when dealing with Account objects returned by ScheduledTransaction.getAccount().
-	 */
-	public void credit(long amount, Account a) {
+	public void adjustBalance(long amount, long accountId) {
+		Account a = get(accountId);
 		if (a != null) {
 			a.setBalance(a.getBalance() + amount);
 			saveBalance(a);
 		}
-	}
-
-	/*
-	 * This credit method is used when all you have for certain is an account id, and you need to retrieve
-	 * the corresponding account balance from the database. This is the case when dealing with ScheduledTransaction objects,
-	 * which cannot be relied on having accurate balances set on their associated Accounts.
-	 */
-	public void credit(long amount, long accountId) {
-		credit(amount, get(accountId));
 	}
 	
 }

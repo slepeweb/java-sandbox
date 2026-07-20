@@ -102,7 +102,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 				 *  in which case savedTransaction.getAccount().getBalance() can't be trusted. This next line ensures that the 
 				 *  correct account balance is retrieved fresh from the database.
 				 */
-				this.accountService.credit(savedTransaction.getAmount(), savedTransaction.getAccount().getId());
+				this.accountService.adjustBalance(savedTransaction.getAmount(), savedTransaction.getAccount().getId());
 			}
 
 			// Also save the new transaction's splits, if any
@@ -159,16 +159,16 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 			credit = updated.getAmount() - original.getAmount();
 			
 			if (Math.abs(credit) > 0) {
-				this.accountService.credit(credit, updated.getAccount());
+				this.accountService.adjustBalance(credit, updated.getAccount().getId());
 			}
 		}
 		else {
 			// The updated transaction relates to a different account!
 			// Adjust the original account's balance
-			this.accountService.credit(- original.getAmount(), original.getAccount());
+			this.accountService.adjustBalance(- original.getAmount(), original.getAccount().getId());
 
 			// Now adjust the update account's balance
-			this.accountService.credit(updated.getAmount(), updated.getAccount());
+			this.accountService.adjustBalance(updated.getAmount(), updated.getAccount().getId());
 		}
 	}
 	
@@ -501,8 +501,7 @@ public class TransactionServiceImpl extends BaseServiceImpl implements Transacti
 		LOG.info(compose("Deleted transaction by id", id));
 		
 		// Update account balance
-		Account a = t.getAccount();
-		this.accountService.credit(- t.getAmount(), a);
+		this.accountService.adjustBalance(- t.getAmount(), t.getAccount().getId());
 		
 		return num;
 	}
