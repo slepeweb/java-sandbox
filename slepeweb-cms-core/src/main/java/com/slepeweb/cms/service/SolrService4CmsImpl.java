@@ -2,10 +2,13 @@ package com.slepeweb.cms.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +35,9 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 	//private static Logger LOG = Logger.getLogger(SolrService4CmsImpl.class);
 	private static final String SPACE = " ";
 	private static final int MAX_WIDTH = 200;
+	private static Pattern ID_PATTERN = Pattern.compile("^\\$_(\\d+)$");
+	
+	@Autowired private ItemService itemService;
 		
 	@PostConstruct
 	public void init() throws Exception {
@@ -251,51 +257,69 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 		return null;
 	}
 
-	public SolrResponse<SolrDocument4Cms> query(Object p) {
+	private record ResponsePack(List<SolrDocument4Cms> results, long totalHits, int pageSize, int pageNum) {};
+	
+	public SolrResponse<SolrDocument4Cms> query(SolrParams4Cms params) {
 		
-		if (p instanceof SolrParams4Cms) {
-			SolrParams4Cms params = (SolrParams4Cms) p;
-			SolrResponse<SolrDocument4Cms> response = new SolrResponse<SolrDocument4Cms>();
-			
-			if (StringUtils.isBlank(params.getSearchText())) {
-				response.setError(true);
-				response.setMessage("Please enter terms to search");
-			}
-			else {
-				SolrQuery q = new SolrQuery();
-				q.setQuery(params.getSearchText());
-				q.addFilterQuery(String.format("siteid:\"%d\"", params.getSiteId()));
-				q.addFilterQuery(String.format("language:\"%s\"", params.getLanguage()));
-				q.addFilterQuery(String.format("editable:\"%s\"", "true"));
-				q.add("defType", "dismax");
-				q.add("qf", "title^10 tags^8 teaser^4 bodytext");
-				q.setStart(params.getStart());
-				q.setRows(params.getPageSize());
-				
-				try {
-					QueryResponse qr = getClient().query(q);
-					response.setResults(qr.getBeans(SolrDocument4Cms.class));
-					response.setTotalHits(qr.getResults().getNumFound());
-					
-					response.setPager(new SolrPager<SolrDocument4Cms>(
-							response.getTotalHits(), 
-							params.getPageSize(), 
-							params.getPageNum()));		
-					
-					return response;
-					
-				} catch (Exception e) {
-					response.setError(true);
-					response.setMessage("Search system error");
-				} 
-			}
-			
-			response.setTotalHits(0);
-			response.setResults(new ArrayList<SolrDocument4Cms>(0));
-			return response;
+		SolrResponse<SolrDocument4Cms> response = new SolrResponse<SolrDocument4Cms>();
+		ResponsePack results = null;
+		String searchText = params.getSearchText();
+		
+		if (StringUtils.isBlank(searchText)) {
+			return error(response, "Please enter terms to search");
 		}
 		
-		return null;
+		Matcher m = ID_PATTERN.matcher(searchText);
+		
+		if (m.matches()) {
+			Item i = this.itemService.getEditableVersion(Long.valueOf(m.group(1)));
+			if (i == null) {
+				return error(response, "No such item with this origId");
+			}
+			
+			if (! i.setUser(params.getUser()).isAccessible()) {
+				return error(response, "Item with this id is not accessible by this user");
+			}
+			
+			List<SolrDocument4Cms> list = new ArrayList<SolrDocument4Cms>(1);
+			list.add(new SolrDocument4Cms(i));
+			results = new ResponsePack(list, 1, params.getPageSize(), 1);
+			return pack(response, results);
+		}
+		
+		SolrQuery q = new SolrQuery();
+		q.setQuery(params.getSearchText());
+		q.addFilterQuery(String.format("siteid:\"%d\"", params.getSiteId()));
+		q.addFilterQuery(String.format("language:\"%s\"", params.getLanguage()));
+		q.addFilterQuery(String.format("editable:\"%s\"", "true"));
+		q.add("defType", "dismax");
+		q.add("qf", "title^10 tags^8 teaser^4 bodytext");
+		q.setStart(params.getStart());
+		q.setRows(params.getPageSize());
+		
+		try {
+			QueryResponse qr = getClient().query(q);
+			results = new ResponsePack(qr.getBeans(SolrDocument4Cms.class), qr.getResults().getNumFound(), params.getPageSize(), params.getPageNum());
+			return pack(response, results);
+			
+		} catch (Exception e) {
+			return error(response, "Search system error");
+		} 
+	}
+	
+	private SolrResponse<SolrDocument4Cms> pack(SolrResponse<SolrDocument4Cms> response, ResponsePack data) {
+		response.setResults(data.results);
+		response.setTotalHits(data.totalHits);
+		response.setPager(new SolrPager<SolrDocument4Cms>(data.totalHits, data.pageSize, data.pageNum));		
+		return response;
+	}
+	
+	private SolrResponse<SolrDocument4Cms> error(SolrResponse<SolrDocument4Cms> response, String message) {
+		response.setError(true);
+		response.setMessage(message);
+		response.setTotalHits(0);
+		response.setResults(new ArrayList<SolrDocument4Cms>(0));
+		return response;
 	}
 	
 }

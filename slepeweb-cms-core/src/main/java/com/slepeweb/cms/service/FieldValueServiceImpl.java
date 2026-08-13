@@ -60,7 +60,7 @@ public class FieldValueServiceImpl extends BaseServiceImpl implements FieldValue
 			LOG.info(compose("Updated field value", fv));
 		}
 		else {
-			LOG.info(compose("Field value unchanged", fv));
+			LOG.debug(compose("Field value unchanged", fv));
 		}
 	}
 

@@ -472,6 +472,7 @@ public class RestController extends BaseController {
 		
 		// Loop through fields for this item type
 		for (FieldForType fft : i.getType().getFieldsForType()) {
+			
 			// Only interested in multilingual fields for additional languages IFF site is multilingual
 			if (i.getSite().isMultilingual() && 
 					! (language.equals(i.getSite().getLanguage()) || fft.getField().isMultilingual())) {
@@ -488,6 +489,13 @@ public class RestController extends BaseController {
 			
 			// Form input value, as a string.
 			stringValue = request.getParameter(variable);
+			
+			if (
+					(stringValue == null && fv == null) || 
+					(stringValue != null && fv != null && stringValue.equals(fv.getStringValue()))) {
+				
+				continue;
+			}
 			
 			// If field type is date/datetime, then stringvalue is calculated 
 			// from 2 separate form input fields:
@@ -527,62 +535,60 @@ public class RestController extends BaseController {
 				stringValue = dateValueStr + (timeValueStr == null ? "" : " " + timeValueStr);
 			}
 			
-			if (stringValue != null) {			
-				if (fv == null) {
-					fv = CmsBeanFactory.makeFieldValue().
-							setField(fft.getField()).
-							setItemId(i.getId()).
-							setValue(fft.getField().getDefaultValueObject()).
-							setLanguage(language);
-				}
-				
-				if (ft == FieldType.integer && StringUtils.isNotBlank(stringValue)) {
-					fv.setValue(Integer.parseInt(stringValue));
-				}
-				else if (ft == FieldType.date || ft == FieldType.datetime) {
-					if (ft == FieldType.date) {
-						sdf = DateUtil.DATE_PATTERN_B;
-					}
-					else {
-						sdf = DateUtil.DATE_AND_TIME_PATTERN;
-					}
-					
-					try {
-						cal = Calendar.getInstance();
-						cal.setTime(sdf.parse(stringValue));
-						cal.set(Calendar.MILLISECOND, 0);
-						cal.set(Calendar.SECOND, 1);
-						
-						if (ft == FieldType.date) {
-							cal.set(Calendar.MINUTE, 0);
-							cal.set(Calendar.HOUR, 0);
-						}
-						
-						stamp = new Timestamp(cal.getTimeInMillis());
-						fv.setDateValue(stamp);
-						fv.setStringValue(stringValue);
-					}
-					catch (ParseException e) {
-						errors.add(String.format("Date not parseable [%s]", stringValue));
-						continue;
-					}
+			if (fv == null) {
+				fv = CmsBeanFactory.makeFieldValue().
+						setField(fft.getField()).
+						setItemId(i.getId()).
+						setValue(fft.getField().getDefaultValueObject()).
+						setLanguage(language);
+			}
+			
+			if (ft == FieldType.integer && StringUtils.isNotBlank(stringValue)) {
+				fv.setValue(Integer.parseInt(stringValue));
+			}
+			else if (ft == FieldType.date || ft == FieldType.datetime) {
+				if (ft == FieldType.date) {
+					sdf = DateUtil.DATE_PATTERN_B;
 				}
 				else {
-					fv.setValue(stringValue);
+					sdf = DateUtil.DATE_AND_TIME_PATTERN;
 				}
 				
-				// Does this field value require validation?
-				ICmsHook hook = this.cmsHooker.getHook(i.getSite().getShortname());
-				if (! validateFieldValue(fv, hook.getFieldGuidance(fv.getField().getVariable()), errors)) {
+				try {
+					cal = Calendar.getInstance();
+					cal.setTime(sdf.parse(stringValue));
+					cal.set(Calendar.MILLISECOND, 0);
+					cal.set(Calendar.SECOND, 1);
+					
+					if (ft == FieldType.date) {
+						cal.set(Calendar.MINUTE, 0);
+						cal.set(Calendar.HOUR, 0);
+					}
+					
+					stamp = new Timestamp(cal.getTimeInMillis());
+					fv.setDateValue(stamp);
+					fv.setStringValue(stringValue);
+				}
+				catch (ParseException e) {
+					errors.add(String.format("Date not parseable [%s]", stringValue));
 					continue;
 				}
-				
-				/* 
-				 * Save this FieldValue for saving later, as long as there are no subsequent 
-				 * errors relating to other fields on this item.
-				 */
-				fvList2Save.add(fv);
 			}
+			else {
+				fv.setValue(stringValue);
+			}
+			
+			// Does this field value require validation?
+			ICmsHook hook = this.cmsHooker.getHook(i.getSite().getShortname());
+			if (! validateFieldValue(fv, hook.getFieldGuidance(fv.getField().getVariable()), errors)) {
+				continue;
+			}
+			
+			/* 
+			 * Save this FieldValue for saving later, as long as there are no subsequent 
+			 * errors relating to other fields on this item.
+			 */
+			fvList2Save.add(fv);
 		}
 		
 		
@@ -613,8 +619,11 @@ public class RestController extends BaseController {
 				i.resetDateUpdated();	
 				i = i.save();
 				
-				// Now save the item's field values
-				i.saveFieldValues();
+				/*
+				 *  The i.save() return value will have nullified the item's field values. These need to be re-populated
+				 *  so that the new field values are recorded in ItemUpdateHistory.
+				 */
+				i.getFieldValues();
 				
 				resp.setData(pushItemUpdateRecord(request, before, i, Action.field));
 				resp.addMessage(String.format("%d fields updated", c));
@@ -1295,8 +1304,10 @@ public class RestController extends BaseController {
 		
 		if (i != null) {
 			SolrParams4Cms params = new SolrParams4Cms(new SolrConfig().setPageSize(20)).
-					setSearchText(searchtext).
-					setSiteId(i.getSite().getId()).setLanguage(i.getLanguage());
+					setSearchText(searchtext.trim()).
+					setSiteId(i.getSite().getId()).
+					setLanguage(i.getLanguage()).
+					setUser(i.getUser());
 			
 			model.addAttribute("_response", this.solrService4Cms.query(params));
 		}

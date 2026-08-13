@@ -7,6 +7,7 @@ public class SolrParams4Cms extends SolrParams {
 
 	private String searchText, language;
 	private Long siteId;
+	private User user;
 
 	public SolrParams4Cms(SolrConfig config) {
 		super(config);
@@ -36,6 +37,15 @@ public class SolrParams4Cms extends SolrParams {
 
 	public SolrParams4Cms setLanguage(String language) {
 		this.language = language;
+		return this;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public SolrParams4Cms setUser(User user) {
+		this.user = user;
 		return this;
 	}
 }
