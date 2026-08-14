@@ -257,12 +257,9 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 		return null;
 	}
 
-	private record ResponsePack(List<SolrDocument4Cms> results, long totalHits, int pageSize, int pageNum) {};
-	
 	public SolrResponse<SolrDocument4Cms> query(SolrParams4Cms params) {
 		
 		SolrResponse<SolrDocument4Cms> response = new SolrResponse<SolrDocument4Cms>();
-		ResponsePack results = null;
 		String searchText = params.getSearchText();
 		
 		if (StringUtils.isBlank(searchText)) {
@@ -272,19 +269,25 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 		Matcher m = ID_PATTERN.matcher(searchText);
 		
 		if (m.matches()) {
-			Item i = this.itemService.getEditableVersion(Long.valueOf(m.group(1)));
+			Long origId = Long.valueOf(m.group(1));
+			Item i = this.itemService.getEditableVersion(origId);
+			
 			if (i == null) {
-				return error(response, "No such item with this origId");
+				return error(response, String.format("Unable to find item with origId '%d'", origId));
 			}
 			
 			if (! i.setUser(params.getUser()).isAccessible()) {
-				return error(response, "Item with this id is not accessible by this user");
+				return error(response, String.format("Item with id '%d' is not accessible by this user"));
 			}
 			
 			List<SolrDocument4Cms> list = new ArrayList<SolrDocument4Cms>(1);
 			list.add(new SolrDocument4Cms(i));
-			results = new ResponsePack(list, 1, params.getPageSize(), 1);
-			return pack(response, results);
+
+			if (! i.getSite().getId().equals(params.getSiteId())) {
+				return error(response, String.format("Item with id '%d' belongs to a different site, and cannot be edited here.", i.getOrigId()));
+			}
+			
+			return pack(response, String.format("Found the requested item with id '%d':", i.getOrigId()), list, 1, params.getPageSize(), 1);
 		}
 		
 		SolrQuery q = new SolrQuery();
@@ -299,18 +302,21 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 		
 		try {
 			QueryResponse qr = getClient().query(q);
-			results = new ResponsePack(qr.getBeans(SolrDocument4Cms.class), qr.getResults().getNumFound(), params.getPageSize(), params.getPageNum());
-			return pack(response, results);
+			return pack(response, "Please select an item from the list:", 
+					qr.getBeans(SolrDocument4Cms.class), qr.getResults().getNumFound(), params.getPageSize(), params.getPageNum());
 			
 		} catch (Exception e) {
 			return error(response, "Search system error");
 		} 
 	}
 	
-	private SolrResponse<SolrDocument4Cms> pack(SolrResponse<SolrDocument4Cms> response, ResponsePack data) {
-		response.setResults(data.results);
-		response.setTotalHits(data.totalHits);
-		response.setPager(new SolrPager<SolrDocument4Cms>(data.totalHits, data.pageSize, data.pageNum));		
+	private SolrResponse<SolrDocument4Cms> pack(SolrResponse<SolrDocument4Cms> response, String message, 
+			List<SolrDocument4Cms> results, long totalHits, int pageSize, int pageNum) {
+		
+		response.setResults(results);
+		response.setTotalHits(totalHits);
+		response.setPager(new SolrPager<SolrDocument4Cms>(totalHits, pageSize, pageNum));
+		response.setMessage(message);
 		return response;
 	}
 	

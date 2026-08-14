@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemUpdateHistory;
 import com.slepeweb.cms.bean.ItemUpdateRecord;
@@ -87,8 +88,15 @@ public class ItemUpdateUndoServiceImpl implements ItemUpdateUndoService {
 				}
 				// field values
 				else if (updateRecord.getAction() == Action.field) {
-					dbRecord.setFieldValues(i.getFieldValueSet());
-					dbRecord.saveFieldValues();
+					FieldValue historic;
+					
+					for (FieldValue current : dbRecord.getFieldValueSet().getAllValues()) {
+						historic = i.getFieldValueObj(current.getField().getVariable(), current.getLanguage());
+						if (! current.equals(historic)) {
+							current.assimilate(historic);
+							current.save();
+						}
+					}
 				}
 				// links
 				else if (updateRecord.getAction() == Action.links) {

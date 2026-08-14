@@ -734,6 +734,10 @@ div#session-expiry-warning.hidden {
 	display: none;
 }
 
+#searchresults p.error-message {
+	color: red;
+}
+
 #login, #user-form {
 	font-size: 1.1em;
 }
@@ -756,7 +760,7 @@ div#user-menu {
     background-color: pink;
     z-index: 1;
     padding: 0.25em;
-		border: 2px solid red;
+	border: 2px solid red;
 }
 
 div#user-menu.hidden {

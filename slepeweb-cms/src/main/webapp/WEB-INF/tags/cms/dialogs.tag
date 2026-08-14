@@ -68,7 +68,6 @@
 <edit:links-editbinding />
 
 <div id="searchresults-container" class="hide">
-	<p>Pick an item in the list</p>
 	<div id="searchresults"></div>
 </div>
 
