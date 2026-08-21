@@ -15,12 +15,12 @@
 <script>
 	let _site = {
 		siteId: ${_item.site.id},
+		shortname: '${_item.site.shortname}',
 		support: {},
 		origId: ${_item.origId},
 		isSecured: ${_item.site.secured ? 'true' : 'false'},
 		alertSound: new Audio("/resources/doorbell.mp3"),
 		searchresultsItemPath: '${site:resolveConfig(_site.id, 'path.searchresults', _siteConfigService)}',
-		//staticDelivery: <c:choose><c:when test="${empty param.statics}">true</c:when><c:otherwise>false</c:otherwise></c:choose>,
 		staticDelivery: ${empty param.staticd ? 'false' : 'true'},
 		userIsLoggedIn: ${empty _user ? 'false' : 'true'},
 	}

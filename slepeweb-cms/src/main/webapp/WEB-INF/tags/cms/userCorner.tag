@@ -4,7 +4,7 @@
   taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <div class="ha">
-	<h1 class="main-heading">slepe web solutions CMS</h1>
+	<h1 class="main-heading ${editingItem.site.shortname}">${editingItem.site.deliveryHost.publicName}</h1>
 	
 	<c:if test="${not empty _user}">
 		<div id="user-corner">

@@ -64,7 +64,7 @@ let userLogoutBehaviour = function() {
 _site.support.openSite = function(url) {
 	_site.support.ajax('GET', '/rest/passkey', {dataType: 'json', mimeType: 'application/json'}, function(resp) {
 		if (! resp.error) {
-			window.open(`${url}?_passkey=${resp.data[0]}`, '_blank');
+			window.open(`${url}?_passkey=${resp.data[0]}`, 'cmsd-' + _site.shortname);
 		}
 	});
 }

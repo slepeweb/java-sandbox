@@ -36,6 +36,12 @@ public class RestController extends BaseController {
 	@Autowired private SiteConfigCache siteConfigCache;
 
 	
+	/*
+	 * This controller allows a user to open the content editor for an item delivered by cms-d.
+	 * 
+	 * See also com.slepeweb.cms.control.RestController.issueXPasskey, which provides functionality to
+	 * open the content editor for a different site.
+	 */
 	@RequestMapping(value="/xpasskey", method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public RestResponse issueXPasskey(HttpServletRequest req) {

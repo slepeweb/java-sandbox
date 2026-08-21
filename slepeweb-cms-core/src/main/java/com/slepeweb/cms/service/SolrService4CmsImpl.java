@@ -2,13 +2,10 @@ package com.slepeweb.cms.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,10 +32,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 	//private static Logger LOG = Logger.getLogger(SolrService4CmsImpl.class);
 	private static final String SPACE = " ";
 	private static final int MAX_WIDTH = 200;
-	private static Pattern ID_PATTERN = Pattern.compile("^\\$_(\\d+)$");
 	
-	@Autowired private ItemService itemService;
-		
 	@PostConstruct
 	public void init() throws Exception {
 		setServerUrl("http://localhost:8983/solr/cms");
@@ -265,31 +259,7 @@ public class SolrService4CmsImpl extends SolrService4CmsBase implements SolrServ
 		if (StringUtils.isBlank(searchText)) {
 			return error(response, "Please enter terms to search");
 		}
-		
-		Matcher m = ID_PATTERN.matcher(searchText);
-		
-		if (m.matches()) {
-			Long origId = Long.valueOf(m.group(1));
-			Item i = this.itemService.getEditableVersion(origId);
-			
-			if (i == null) {
-				return error(response, String.format("Unable to find item with origId '%d'", origId));
-			}
-			
-			if (! i.setUser(params.getUser()).isAccessible()) {
-				return error(response, String.format("Item with id '%d' is not accessible by this user"));
-			}
-			
-			List<SolrDocument4Cms> list = new ArrayList<SolrDocument4Cms>(1);
-			list.add(new SolrDocument4Cms(i));
-
-			if (! i.getSite().getId().equals(params.getSiteId())) {
-				return error(response, String.format("Item with id '%d' belongs to a different site, and cannot be edited here.", i.getOrigId()));
-			}
-			
-			return pack(response, String.format("Found the requested item with id '%d':", i.getOrigId()), list, 1, params.getPageSize(), 1);
-		}
-		
+				
 		SolrQuery q = new SolrQuery();
 		q.setQuery(params.getSearchText());
 		q.addFilterQuery(String.format("siteid:\"%d\"", params.getSiteId()));

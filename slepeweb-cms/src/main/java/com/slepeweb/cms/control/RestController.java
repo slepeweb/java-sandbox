@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -43,6 +45,8 @@ import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.FieldValueSet;
+import com.slepeweb.cms.bean.Host;
+import com.slepeweb.cms.bean.Host.HostType;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.ItemGist;
 import com.slepeweb.cms.bean.ItemIdentifier;
@@ -59,6 +63,7 @@ import com.slepeweb.cms.bean.MoverItem.RelativeLocation;
 import com.slepeweb.cms.bean.Ownership;
 import com.slepeweb.cms.bean.RestResponse;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.SolrDocument4Cms;
 import com.slepeweb.cms.bean.SolrParams4Cms;
 import com.slepeweb.cms.bean.StickyAddNewControls;
 import com.slepeweb.cms.bean.Template;
@@ -75,6 +80,7 @@ import com.slepeweb.cms.json.LinkParams;
 import com.slepeweb.cms.service.CookieService;
 import com.slepeweb.cms.service.FieldForTypeService;
 import com.slepeweb.cms.service.FieldService;
+import com.slepeweb.cms.service.HostService;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.ItemUpdateUndoService;
 import com.slepeweb.cms.service.ItemWorkerService;
@@ -83,6 +89,7 @@ import com.slepeweb.cms.service.MediaFileService;
 import com.slepeweb.cms.service.MediaService;
 import com.slepeweb.cms.service.SolrService4Cms;
 import com.slepeweb.cms.service.TagService;
+import com.slepeweb.cms.service.XPasskeyService;
 import com.slepeweb.commerce.bean.Product;
 import com.slepeweb.common.solr.bean.SolrConfig;
 import com.slepeweb.common.util.DateUtil;
@@ -96,6 +103,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/rest")
 public class RestController extends BaseController {
 	private static Logger LOG = Logger.getLogger(SessionController.class);
+	private static Pattern ID_PATTERN = Pattern.compile("^\\$_(\\d+)$");
 	
 	@Autowired private ItemService itemService;
 	@Autowired private LinkService linkService;
@@ -110,6 +118,8 @@ public class RestController extends BaseController {
 	@Autowired private ItemUpdateUndoService itemUpdateUndoService;
 	@Autowired private MediaService mediaService;
 	@Autowired private MediaFileService mediaFileService;
+	@Autowired private HostService hostService;
+	@Autowired private XPasskeyService xPasskeyService;
 	
 	/* 
 	 * This mapping is used by the main left-hand navigation.
@@ -1296,23 +1306,55 @@ public class RestController extends BaseController {
 
 	@RequestMapping("/search")
 	public String search(ModelMap model, 
-			@RequestParam(value="key", required=true) Long origId,
+			@RequestParam(value="key", required=true) Long baseId,
 			@RequestParam(value="searchtext", required=true) String searchtext,
 			HttpServletRequest req) {	
 		
-		Item i = this.getEditableVersion(origId, req);
+		// This is the item corresponding to the page that initiated the search
+		Item baseItem = this.itemService.getEditableVersion(baseId);
 		
-		if (i != null) {
+		Matcher m = ID_PATTERN.matcher(searchtext);
+		
+		if (m.matches()) {
+			Long searchId = Long.valueOf(m.group(1));
+			Item i = this.itemService.getEditableVersion(searchId);
+			
+			if (i == null) {
+				packSearchResponseB(true, 1, String.format("Unable to find item with origId '%d'", searchId), null, model);
+			}
+			else {
+				SolrDocument4Cms doc = new SolrDocument4Cms(i);
+				
+				if (! i.getSite().getId().equals(baseItem.getSite().getId())) {
+					// 'Search' found an item belonging to a different site
+					packSearchResponseB(false, 2, String.format("NOTE: Item with id '%d' belongs to a different site", searchId), doc, model);
+				}
+				else {
+					packSearchResponseB(false, 3, String.format("Found the requested item with id '%d':", searchId), doc, model);
+				}
+			}
+			
+			return "searchresultsB";
+		}
+		else {
 			SolrParams4Cms params = new SolrParams4Cms(new SolrConfig().setPageSize(20)).
 					setSearchText(searchtext.trim()).
-					setSiteId(i.getSite().getId()).
-					setLanguage(i.getLanguage()).
-					setUser(i.getUser());
+					setSiteId(baseItem.getSite().getId()).
+					setLanguage(baseItem.getLanguage()).
+					setUser(baseItem.getUser());
 			
 			model.addAttribute("_response", this.solrService4Cms.query(params));
+			return "searchresults";
 		}
-		
-		return "searchresults";		
+	}
+	
+	private void packSearchResponseB(Boolean error, Integer code, String message, Object payload, ModelMap model) {
+		Object[] arr = new Object[4];
+		arr[0] = error;
+		arr[1] = code;
+		arr[2] = message;
+		arr[3] = payload;
+		model.addAttribute("_response", arr);
 	}
 	
 	@RequestMapping(value="/item/{origId}/flag", method=RequestMethod.GET, produces="application/json")
@@ -1584,6 +1626,29 @@ public class RestController extends BaseController {
 		}
 		
 		return ! reverse;
+	}
+	
+	/*
+	 * This controller provides functionality to open the content editor for an item on a different site,
+	 * from a page rendered by cms-e.
+	 * 
+	 * See also com.slepeweb.site.control.RestController.issueXPasskey, which provides functionality to
+	 * open the content editor from a page delivered by cms-d.
+	 */
+	@RequestMapping(value="/xpasskey/{targetId}", method=RequestMethod.GET, produces="application/json")
+	@ResponseBody
+	public RestResponse issueXPasskey(HttpServletRequest req, @PathVariable long targetId) {
+		
+		RestResponse resp = new RestResponse();
+		
+		User u = getUser(req);
+		Item i = this.itemService.getItemByOriginalId(targetId).setUser(u);
+		Host editorialHost = this.hostService.getHost(i.getSite().getId(), HostType.editorial);
+
+		String passkey = this.xPasskeyService.issueKey(u);
+		resp.setError(passkey == null);
+		resp.setData(new Object[] {editorialHost.getNameAndPort(), passkey});
+		return resp;
 	}
 	
 }

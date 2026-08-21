@@ -122,6 +122,14 @@ h1.main-heading {
 	margin-bottom: 6px;
 }
 
+h1.main-heading.geo {
+	color: #0000ba;
+}
+
+h1.main-heading.pho {
+	color: green;
+}
+
 p.main-heading {
 	margin-top: 0px;
 }

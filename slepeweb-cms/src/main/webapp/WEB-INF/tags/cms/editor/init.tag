@@ -74,7 +74,7 @@
 			shortcut: ${_linkTypeNameOptions.shortcut}
 	};
 	
-	_cms.alertSound = new Audio("/cms/resources/doorbell.mp3");
+	_cms.alertSound = new Audio("/cms_/resources/doorbell.mp3");
 	
 	$(function() {
 		/* 
@@ -88,6 +88,7 @@
 		_cms.links.onpageload();
 		_cms.dialog.onpageload();
 		_cms.field.onpageload();
+		_cms.search.onpageload();
 		
 		// Load the editors
 		_cms.support.renderItemForms(_cms.editingItemId, _cms.activeTab);
