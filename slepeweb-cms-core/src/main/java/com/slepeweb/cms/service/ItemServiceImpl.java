@@ -493,9 +493,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	}
 	
 	private Item getItem(String sql, Object... params) {
-		Item i = (Item) getLastInList(this.jdbcTemplate.query(
-			sql, new RowMapperUtil.ItemMapper(), params));
-		
+		Item i = (Item) getLastInList(this.jdbcTemplate.query(sql, new RowMapperUtil.ItemMapper(), params));
 		return extendIfProduct(i);
 	}
 

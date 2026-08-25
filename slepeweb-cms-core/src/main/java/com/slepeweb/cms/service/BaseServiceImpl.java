@@ -15,7 +15,7 @@ public class BaseServiceImpl {
 	@Autowired protected JdbcTemplate jdbcTemplate;
 	
 	protected String getVersionClause() {
-		return this.cmsService.isDeliveryContext() ? " and i.published = 1" : " and i.editable = 1";
+		return this.cmsService.isDeliveryContext() && ! this.cmsService.isStagingContext() ? " and i.published = 1" : " and i.editable = 1";
 	}
 	
 	protected Long getLastInsertId() {

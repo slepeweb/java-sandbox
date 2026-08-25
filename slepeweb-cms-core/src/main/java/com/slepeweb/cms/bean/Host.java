@@ -11,7 +11,7 @@ public class Host extends CmsBean {
 	private HostType type;
 	
 	public enum HostType {
-		editorial, delivery, both;
+		editorial, delivery, staging, both;
 	}
 
 	public void assimilate(Object obj) {

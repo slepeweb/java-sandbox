@@ -8,6 +8,7 @@ import com.slepeweb.commerce.service.VariantService;
 public interface CmsService {
 	boolean isEditorialContext();
 	boolean isDeliveryContext();
+	boolean isStagingContext();
 	boolean isCommerceEnabled();
 	String getStaticSiteRoot();
 	boolean isProductionDeployment();

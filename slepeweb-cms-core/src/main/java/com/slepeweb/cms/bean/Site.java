@@ -174,6 +174,10 @@ public class Site extends CmsBean {
 		return getHost(HostType.valueOf("delivery"));
 	}
 	
+	public Host getStagingHost() {
+		return getHost(HostType.valueOf("staging"));
+	}
+	
 	private Host getHost(HostType type) {
 		return getCmsService().getHostService().getHost(getId(), type);
 	}

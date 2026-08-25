@@ -69,17 +69,6 @@ public class CmsServiceImpl implements CmsService {
 		return ! isEditorialContext();
 	}
 	
-	/*
-	 * TODO: Implementation of 'staging' server delivery has not been addressed, and to do so would
-	 * require the following:
-	 * 
-	 * - introduce 'stagingContext' entries into CmsService bean definition (*-servlet.xml)
-	 * - modify getVersionClause() in ItemService to reference this property
-	 * - create a third webapp, that is essentially a copy of cms-d, except for stagingContext = true.
-	 * 
-	 * This last point is probably the reason why staging functionality has not been implemented, since
-	 * a) it was not really important to me, and b) it would require a 3rd webapp which would waste resources.
-	 */
 	private boolean stagingContext;
 	
 	public void setstagingContext(boolean b) {
