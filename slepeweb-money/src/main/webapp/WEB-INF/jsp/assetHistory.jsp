@@ -33,7 +33,20 @@
 			<li><a href="#results-tab">Results</a></li>
 			<li><a href="#data-tab">Data</a></li>
 		</ul>
-		<div id="results-tab">${_assetSVG}</div>
+		<div id="results-tab">
+			${_assetSVG}
+			<c:if test="${not empty _notes}">
+				<div class="chart-notes">
+					<h3>Notes</h3>
+					<ul>
+						<c:forEach items="${_notes}" var="_n">
+							<li>${_n}</li>
+						</c:forEach>
+					</ul>
+				</div>
+			</c:if>
+		</div>
+		
 		<div id="data-tab">
 			<c:if test="${not empty _assetSVG}">
 				<c:set var="_balance" value="${0}" />

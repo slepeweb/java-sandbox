@@ -29,6 +29,7 @@ import com.slepeweb.money.bean.SavedSearch;
 import com.slepeweb.money.bean.SavedSearchOption;
 import com.slepeweb.money.bean.solr.SolrParams;
 import com.slepeweb.money.bean.solr.SolrResponse;
+import com.slepeweb.money.service.NoteService;
 import com.slepeweb.money.service.SavedSearchService;
 import com.slepeweb.money.service.SolrService4Money;
 
@@ -49,6 +50,7 @@ public class ChartFormSupport {
 	@Autowired private SearchFormSupport searchFormSupport;
 	@Autowired private SolrService4Money solrService4Money;
 	@Autowired private SavedSearchService savedSearchService;
+	@Autowired private NoteService noteService;
 
 	private List<Integer> yearRange;
 	
@@ -121,6 +123,8 @@ public class ChartFormSupport {
 		SVGGraphics2D svg2d = new SVGGraphics2D(1000, 600);
 	    chart.draw(svg2d,new Rectangle2D.Double(0, 0, 1000, 600));
 	    model.addAttribute("_chartSVG", svg2d.getSVGElement());
+	    
+	    model.addAttribute("_notes", this.noteService.getNotes(ch.getId(), ch.getFromYear(), ch.getToYear()));
 		
 		return RESULTS_VIEW; 
 	}

@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.slepeweb.money.Note;
 import com.slepeweb.money.bean.Account;
 import com.slepeweb.money.bean.Category;
 import com.slepeweb.money.bean.Chart;
@@ -280,6 +281,16 @@ public class RowMapperUtil {
 					setPassword(rs.getString("password")).
 					setEnabled(rs.getBoolean("enabled")).
 					setRoles(rs.getString("roles"));
+		}
+	}
+
+	public static final class NoteMapper implements RowMapper<Note> {
+		public Note mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new Note().
+					setId(rs.getLong("id")).
+					setYear(rs.getInt("year")).
+					setWhen(rs.getString("when")).
+					setDetail(rs.getString("detail"));
 		}
 	}
 }

@@ -925,6 +925,20 @@ td.heading {
 	width: 25%;
 }
 
+div.chart-notes h3 {
+	font-size: 1em;
+	margin-bottom: 0;
+}
+
+div.chart-notes ul {
+	margin: 0;
+}
+
+div.chart-notes li {
+	margin-bottom: 0;
+	font-size: 0.9em;
+}
+
 @media only screen and (max-width: 52em) {
   body, input, select, textarea {
     font-size: 15px;

@@ -7,12 +7,14 @@
 	${_chartSVG}
 </c:if>
 
-<c:if test="${not empty _chart.notes}">
-	<h3>Notes</h3>
-	<ul>
-		<c:forEach items="${_chart.notesAsList}" var="_line">
-			<li>${_line}</li>
-		</c:forEach>
-	</ul>
+<c:if test="${not empty _notes}">
+	<div class="chart-notes">
+		<h3>Notes</h3>
+		<ul>
+			<c:forEach items="${_notes}" var="_n">
+				<li>${_n}</li>
+			</c:forEach>
+		</ul>
+	</div>
 </c:if>
 	

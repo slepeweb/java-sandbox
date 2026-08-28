@@ -30,6 +30,7 @@ import com.slepeweb.money.bean.YearlyAssetHistory;
 import com.slepeweb.money.bean.YearlyAssetStatus;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.AssetService;
+import com.slepeweb.money.service.NoteService;
 import com.slepeweb.money.service.TransactionService;
 
 @Controller
@@ -39,6 +40,7 @@ public class AssetController extends BaseController {
 	@Autowired private AssetService assetService;
 	@Autowired private AccountService accountService;
 	@Autowired private TransactionService transactionService;
+	@Autowired private NoteService noteService;
 	
 	public static final String INCOME_LABEL = "Income";
 	public static final String EXPENSE_LABEL = "Expense";
@@ -185,6 +187,7 @@ public class AssetController extends BaseController {
 		chart.draw(svg2d,new Rectangle2D.Double(0, 0, width, height));
 		model.addAttribute("_assetSVG", svg2d.getSVGElement());
 		model.addAttribute("_history", history);
+		model.addAttribute("_notes", this.noteService.getNotes(-1, displayYearStart, displayYearEnd));
 		return "assetHistory";
 	}	
 }
