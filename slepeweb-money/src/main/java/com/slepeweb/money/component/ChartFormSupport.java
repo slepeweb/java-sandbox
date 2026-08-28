@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.graphics2d.svg.SVGGraphics2D;
@@ -119,6 +122,10 @@ public class ChartFormSupport {
 		         ch.getName(), "Years", "Amounts (£)",
 		         ds,
 		         PlotOrientation.VERTICAL, true, true, false);
+		
+		CategoryPlot plot = chart.getCategoryPlot();
+		CategoryAxis domainAxis = plot.getDomainAxis();
+		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
 		
 		SVGGraphics2D svg2d = new SVGGraphics2D(1000, 600);
 	    chart.draw(svg2d,new Rectangle2D.Double(0, 0, 1000, 600));

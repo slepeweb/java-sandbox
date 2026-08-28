@@ -16,16 +16,17 @@ import com.slepeweb.money.Note;
 public class NoteServiceImpl extends BaseServiceImpl implements NoteService {
 	
 	public List<Note> getNotes(long chartId, int begin, int end) {
-		String sql = """
+		String sql = String.format("""
 			select n.id, n.year, n.when, n.detail
 			from chartnote cn
 			join chart c on c.id = cn.chartid
 			join note n on n.id = cn.noteid 
-			where cn.chartid = ? and c.id 
-			""";
+			where cn.chartid = ? and c.id %s
+			order by n.year asc
+			""", 
+			chartId == -1 ? "= -1" : "> -1");
 		
-		List<Note> list = this.jdbcTemplate.query(sql + (chartId == -1 ? "= -1" : "> -1"), 
-				new RowMapperUtil.NoteMapper(), new Object[] {chartId});
+		List<Note> list = this.jdbcTemplate.query(sql, new RowMapperUtil.NoteMapper(), new Object[] {chartId});
 		
 		Iterator<Note> iter = list.iterator();
 		Note n;
