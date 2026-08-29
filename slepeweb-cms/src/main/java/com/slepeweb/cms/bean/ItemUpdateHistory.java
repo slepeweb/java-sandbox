@@ -33,7 +33,7 @@ public class ItemUpdateHistory {
 		this.lifo.add(rec);
 		this.pointer = getSize() - 1;
 		
-		LOG.info("ItemUpdateRecord appended ... " + getStatus());
+		LOG.debug("ItemUpdateRecord appended ... " + getStatus());
 		
 		return rec;
 	}

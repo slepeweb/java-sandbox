@@ -97,8 +97,10 @@ public class ScheduledTransactionManager {
 	@PreDestroy
 	public void preDestroy() {
 		try {
-	        this.scheduler.shutdown();
-	        LOG.info("Shut down the quartz scheduler");
+			if (this.scheduler != null && ! this.scheduler.isShutdown()) {
+				this.scheduler.shutdown(true);
+		        LOG.info("Shut down the quartz scheduler");
+			}
 		}
 		catch (Exception e) {
 			LOG.error("Failed to shutdown the quartz scheduler", e);

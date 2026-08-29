@@ -102,7 +102,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/rest")
 public class RestController extends BaseController {
-	private static Logger LOG = Logger.getLogger(SessionController.class);
+	private static Logger LOG = Logger.getLogger(RestController.class);
 	private static Pattern ID_PATTERN = Pattern.compile("^\\$_(\\d+)$");
 	
 	@Autowired private ItemService itemService;
@@ -1252,7 +1252,7 @@ public class RestController extends BaseController {
 	//@ResponseBody
 	public void javascript(HttpServletRequest req, HttpServletResponse res, ModelMap model) {	
 		
-		LOG.info("assembling js files");
+		LOG.debug("assembling js files");
 		
 		StringBuilder sb = new StringBuilder();
 		File folder = new File(req.getServletContext().getRealPath("/WEB-INF/js"));

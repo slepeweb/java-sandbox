@@ -1,6 +1,8 @@
 package com.slepeweb.money.control;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -11,25 +13,28 @@ import java.util.Map;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.graphics2d.svg.SVGGraphics2D;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
+import com.slepeweb.money.bean.Chart;
 import com.slepeweb.money.bean.NakedTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.YearlyAssetHistory;
 import com.slepeweb.money.bean.YearlyAssetStatus;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.AssetService;
+import com.slepeweb.money.service.ChartService;
 import com.slepeweb.money.service.NoteService;
 import com.slepeweb.money.service.TransactionService;
 
@@ -41,30 +46,23 @@ public class AssetController extends BaseController {
 	@Autowired private AccountService accountService;
 	@Autowired private TransactionService transactionService;
 	@Autowired private NoteService noteService;
+	@Autowired private ChartService chartService;
 	
 	public static final String INCOME_LABEL = "Income";
 	public static final String EXPENSE_LABEL = "Expense";
 	public static final String BALANCE_LABEL = "Balance";
 	
-	/*
-	 * The 'history' methods retrieve transaction records directly from the
-	 * database, and not from solr. They determine whether the transaction is
-	 * income or an expense by the category.
-	 */
 	@RequestMapping(value="/history")	
-	public String history(ModelMap model) { 
-		int thisYear = Util.today().getYear();
-		return historyStart(thisYear - 10, model);
-	}
-	
-	@RequestMapping(value="/history/{displayYearStart}")	
-	public String historyStart(@PathVariable int displayYearStart, ModelMap model) { 
-		int thisYear = Util.today().getYear();
-		return historyWindow(displayYearStart, thisYear, model);
-	}
-	
-	@RequestMapping(value="/history/{displayYearStart}/{displayYearEnd}")	
-	public String historyWindow(@PathVariable int displayYearStart, @PathVariable int displayYearEnd, ModelMap model) { 
+	public String historyWindow(ModelMap model) {
+		
+		Chart ch = this.chartService.get(-1);
+		if (ch == null) {
+			throw new RuntimeException("Chart (-1) has not been declared");
+		}
+		
+		int displayYearStart = ch.getFromYear();
+		int displayYearEnd = ch.getToYear();
+		
 		YearlyAssetHistory history = new YearlyAssetHistory();
 		YearlyAssetStatus assetStatus;
 		LocalDate from = Util.startOfYear(Util.today());
@@ -170,18 +168,22 @@ public class AssetController extends BaseController {
 			}
 		}
 
-		JFreeChart chart = ChartFactory.createBarChart(
+		JFreeChart chart = ChartFactory.createLineChart(
 		         "Asset history", "Years", "Amount (£)",
 		         ds,
 		         PlotOrientation.VERTICAL, true, true, false);
 		
-		CategoryPlot categoryplot = chart.getCategoryPlot();
-		BarRenderer bar = new BarRenderer();		
-		bar.setSeriesPaint(0, Color.BLUE);
-		bar.setSeriesPaint(1, Color.RED);
-		bar.setSeriesPaint(2, Color.GREEN);
-		categoryplot.setRenderer(bar);
-
+		CategoryPlot plot = chart.getCategoryPlot();
+		CategoryAxis domainAxis = plot.getDomainAxis();
+		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+		
+		CategoryItemRenderer renderer = plot.getRenderer();
+		Paint[] colors = new Paint[] {Color.BLUE, Color.RED, Color.YELLOW};
+		for (int i = 0; i < colors.length; i++) {
+		    renderer.setSeriesStroke(i, new BasicStroke(2.5f));
+		    renderer.setSeriesPaint(i, colors[i]);
+		}
+		
 		int width = 1170, height = 600;
 		SVGGraphics2D svg2d = new SVGGraphics2D(width, height);
 		chart.draw(svg2d,new Rectangle2D.Double(0, 0, width, height));

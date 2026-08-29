@@ -20,56 +20,56 @@
 	    </c:if>
 	    
 	    <mny:tableRow heading="Page size">
-      	<input type="text" id="pageSize" name="pageSize"
+      		<input type="text" id="pageSize" name="pageSize"
  					placeholder="Specify the page size" value="${_params.pageSize}" />	        	
-			</mny:tableRow>
+		</mny:tableRow>
 		  
-		  <tsf:account accountId="${_params.accountIdStr}" />
-		  <tsf:payeeOrTransferAccount payeeName="${_params.payeeName}" 
-		  	accountId="${_params.transferAccountIdStr}" direction="${_params.transferDirection}" />
-		  <tr><td colspan="2"> </td></tr>
-			<mny:categoryList heading="Categories" ctx="search" group="${_params.categoryGroup}" />
+		<tsf:account accountId="${_params.accountIdStr}" />
+		<tsf:payeeOrTransferAccount payeeName="${_params.payeeName}" 
+		  		accountId="${_params.transferAccountIdStr}" direction="${_params.transferDirection}" />
+		<tr><td colspan="2"> </td></tr>
+		<mny:categoryList heading="Categories" ctx="search" group="${_params.categoryGroup}" />
 	    	    
 	    <mny:tableRow heading="Notes">
-       	<input type="text" id="memo" name="memo"
-  					placeholder="Match input here against transaction notes" value="${_params.memo}" />	        	
+       		<input type="text" id="memo" name="memo"
+  				placeholder="Match input here against transaction notes" value="${_params.memo}" />	        	
 	    </mny:tableRow>
 
 	    <mny:tableRow heading="Dates">
 	    	<div id="period-box">
-	       	Within the last: <input type="number" id="periodvalue" type="text" name="periodvalue" value="${_params.periodValue}" />
+	       		Within the last: <input type="number" id="periodvalue" type="text" name="periodvalue" value="${_params.periodValue}" />
 
 	       		<select id="periodunits" name="periodunits">
 	       			<c:forEach items="${_params.periodUnitOptions}" var="_option">
 	       				<option value="${_option.value}" <c:if test="${_option.selected}">selected</c:if>>${_option.name}</option>
 	       			</c:forEach>
 	       		</select>
-       	</div>
+			</div>
 
-				<p class="or-spacer">OR</p>
+			<p class="or-spacer">OR</p>
 				
 	    	<div id="date-box">
-	       	From: <input class="datepicker" id="from" type="text" name="from" value="${_params.from}"
-	       		placeholder="Optional search window start date" />
-	       	To: <input class="datepicker" id="to" type="text" name="to" value="${_params.to}"
-	       		placeholder="Optional search window end date" />
+		       	From: <input class="datepicker" id="from" type="text" name="from" value="${_params.from}"
+		       		placeholder="Optional search window start date" />
+		       	To: <input class="datepicker" id="to" type="text" name="to" value="${_params.to}"
+		       		placeholder="Optional search window end date" />
 	    	</div>
-			</mny:tableRow>
+		</mny:tableRow>
 	    
 	    <mny:tableRow heading="Amounts">
-       	From: <input class="amount" id="from-amount" type="text" name="from-amount" 
-       		value="${not empty _params.fromAmount ? mon:formatPounds(_params.fromAmount) : ''}"
-       		placeholder="Optional minimum amount" />
-       	To: <input class="amount" id="to-amount" type="text" name="to-amount" 
-       		value="${not empty _params.toAmount ? mon:formatPounds(_params.toAmount) : ''}"
-       		placeholder="Optional maximum amount" />
+	       	From: <input class="amount" id="from-amount" type="text" name="from-amount" 
+	       		value="${not empty _params.fromAmount ? mon:formatPounds(_params.fromAmount) : ''}"
+	       		placeholder="Optional minimum amount" />
+	       	To: <input class="amount" id="to-amount" type="text" name="to-amount" 
+	       		value="${not empty _params.toAmount ? mon:formatPounds(_params.toAmount) : ''}"
+	       		placeholder="Optional maximum amount" />
        	
-				<c:set var="_selectedDebitOrCredit" value="${_params.debit ? '-1' : '1'}" />
-       	<select name="debitorcredit" class="amount">
-       		<option value="-1" <c:if test="${_selectedDebitOrCredit eq '-1'}">selected</c:if>>Debit</option>
-       		<option value="1" <c:if test="${_selectedDebitOrCredit eq '1'}">selected</c:if>>Credit</option>
-       	</select>
-			</mny:tableRow>
+			<c:set var="_selectedDebitOrCredit" value="${_params.debit ? '-1' : '1'}" />
+	       	<select name="debitorcredit" class="amount">
+	       		<option value="-1" <c:if test="${_selectedDebitOrCredit eq '-1'}">selected</c:if>>Debit</option>
+	       		<option value="1" <c:if test="${_selectedDebitOrCredit eq '1'}">selected</c:if>>Credit</option>
+	       	</select>
+		</mny:tableRow>
 			
 	    <c:if test="${_formMode ne 'adhoc'}">
 	    	<mny:searchAndExecuteOptions />

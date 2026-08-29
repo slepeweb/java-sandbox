@@ -176,7 +176,7 @@ public class ChartFormSupport {
 		
 		int thisYear = Util.today().getYear();
 		this.yearRange = new ArrayList<Integer>();
-		for (int i = 1995; i <= thisYear; i++) {
+		for (int i = 1991; i <= thisYear; i++) {
 			this.yearRange.add(i);
 		}
 		

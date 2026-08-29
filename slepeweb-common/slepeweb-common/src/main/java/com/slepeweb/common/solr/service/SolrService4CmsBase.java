@@ -33,7 +33,7 @@ public abstract class SolrService4CmsBase extends SolrServiceBase {
 		try {
 			getBatchingClient().addBeans(docs);
 			UpdateResponse resp = getBatchingClient().commit();
-			LOG.info(String.format("Item successfully indexed by Solr, status [%d]", resp.getStatus()));
+			LOG.debug(String.format("Item successfully indexed by Solr, status [%d]", resp.getStatus()));
 			return true;
 		}
 		catch (Exception e) {
