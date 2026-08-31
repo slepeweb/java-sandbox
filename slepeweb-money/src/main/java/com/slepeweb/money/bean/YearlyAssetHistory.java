@@ -18,4 +18,17 @@ public class YearlyAssetHistory {
 	public void add(YearlyAssetStatus status) {
 		this.list.add(status);
 	}
+	
+	public boolean isEmpty() {
+		return this.list.size() == 0;
+	}
+	
+	public YearlyAssetStatus getGrandTotals() {
+		YearlyAssetStatus summary = new YearlyAssetStatus();
+		for (YearlyAssetStatus yas : getList()) {
+			summary.add(yas);
+		}
+		
+		return summary;
+	}
 }

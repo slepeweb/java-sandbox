@@ -26,15 +26,10 @@
 					<tr>
 						<td><a href="${_ctxPath}/chart/edit/${_ch.id}">${_ch.name}</a></td>
 						<td>${_ch.description}</td>
-						<c:choose><c:when test="${_ch.id gt -1}">
-							<td><i class="far fa-caret-square-right" title="Generate the chart"
-								data-id="${_ch.id}"></i></td>
-							<td><i class="fa fa-trash" title="Delete this chart definition"
-								data-id="${_ch.id}"></i></td>
-						</c:when><c:otherwise>
-							<td></td>
-							<td></td>
-						</c:otherwise></c:choose>
+						<td><i class="far fa-caret-square-right" title="Generate the chart"
+							data-id="${_ch.id}"></i></td>
+						<td><i class="fa fa-trash" title="Delete this chart definition"
+							data-id="${_ch.id}"></i></td>
 					</tr>
 				</c:forEach>
 			</tbody>			

@@ -23,6 +23,7 @@ import com.slepeweb.money.bean.SplitTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.Transfer;
 import com.slepeweb.money.bean.User;
+import com.slepeweb.money.bean.YearlyAssetStatus;
 
 public class RowMapperUtil {
 
@@ -291,6 +292,16 @@ public class RowMapperUtil {
 					setYear(rs.getInt("year")).
 					setWhen(rs.getString("when")).
 					setDetail(rs.getString("detail"));
+		}
+	}
+
+	public static final class YearlyAssetStatusMapper implements RowMapper<YearlyAssetStatus> {
+		public YearlyAssetStatus mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new YearlyAssetStatus().
+					setYear(rs.getInt("year")).
+					setIncome(rs.getInt("income")).
+					setExpense(rs.getInt("expense")).
+					setBalance(rs.getInt("balance"));
 		}
 	}
 }

@@ -87,7 +87,7 @@ public class ChartServiceImpl extends BaseServiceImpl implements ChartService {
 	
 	public List<Chart> getAll() {
 		return this.jdbcTemplate.query(
-				"select * from chart order by name", 
+				"select * from chart where id > -1 order by name", 
 				new RowMapperUtil.ChartMapper());
 	}
 	

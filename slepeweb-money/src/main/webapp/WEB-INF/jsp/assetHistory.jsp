@@ -53,27 +53,25 @@
 				
 				<table>
 					<tr>
-						<c:forTokens items="Year End,Income,Expense,Growth,Balance" delims="," var="_label">
+						<c:forTokens items="Year End,Income,Expense,Balance" delims="," var="_label">
 							<th>${_label}</th>
 						</c:forTokens>
 					</tr>
 					
-					<c:forEach items="${_data}" var="_assetData">
-						<c:set var="_balance" value="${_balance + _assetData.growth}" />
+					<c:forEach items="${_history.list}" var="_assetData">
 						<tr>
 							<th>${_assetData.year}</th>
 							<td>${mon:formatPounds(_assetData.income)}</td>
 							<td>${mon:formatPounds(_assetData.expense)}</td>
-							<td <c:if test="${_assetData.growth lt 0}">class="debit"</c:if>>${mon:formatPounds(_assetData.growth)}</td>
-							<td>${mon:formatPounds(_balance)}</td>
+							<td>${mon:formatPounds(_assetData.balance)}</td>
 						</tr>
 					</c:forEach>
 										
 					<tr class="totals">
 						<td>Totals</td>
-						<td>${mon:formatPounds(_totals.income)}</td>
-						<td>${mon:formatPounds(_totals.expense)}</td>
-						<td>${mon:formatPounds(_totals.growth)}</td>
+						<td>${mon:formatPounds(_history.grandTotals.income)}</td>
+						<td>${mon:formatPounds(_history.grandTotals.expense)}</td>
+						<td></td>
 						<td></td>
 					</tr>
 			</table>

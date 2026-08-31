@@ -1,42 +1,31 @@
 package com.slepeweb.money.control;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Paint;
-import java.awt.geom.Rectangle2D;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.graphics2d.svg.SVGGraphics2D;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.slepeweb.money.Util;
 import com.slepeweb.money.bean.Account;
-import com.slepeweb.money.bean.Chart;
 import com.slepeweb.money.bean.NakedTransaction;
 import com.slepeweb.money.bean.Transaction;
 import com.slepeweb.money.bean.YearlyAssetHistory;
 import com.slepeweb.money.bean.YearlyAssetStatus;
+import com.slepeweb.money.component.ChartPlottingComponent;
 import com.slepeweb.money.service.AccountService;
 import com.slepeweb.money.service.AssetService;
-import com.slepeweb.money.service.ChartService;
 import com.slepeweb.money.service.NoteService;
 import com.slepeweb.money.service.TransactionService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value="/asset")
@@ -46,105 +35,89 @@ public class AssetController extends BaseController {
 	@Autowired private AccountService accountService;
 	@Autowired private TransactionService transactionService;
 	@Autowired private NoteService noteService;
-	@Autowired private ChartService chartService;
+	@Autowired private ChartPlottingComponent chartPlottingComponent;
 	
 	public static final String INCOME_LABEL = "Income";
 	public static final String EXPENSE_LABEL = "Expense";
 	public static final String BALANCE_LABEL = "Balance";
 	
 	@RequestMapping(value="/history")	
-	public String historyWindow(ModelMap model) {
+	public String save(ModelMap model) {
+		YearlyAssetHistory history = new YearlyAssetHistory();
+		DefaultCategoryDataset ds = new DefaultCategoryDataset();
 		
-		Chart ch = this.chartService.get(-1);
-		if (ch == null) {
-			throw new RuntimeException("Chart (-1) has not been declared");
+		for (YearlyAssetStatus yas : this.assetService.getAll()) {
+			history.add(yas);
+			ds.addValue(Util.toPounds(yas.getIncome()), INCOME_LABEL, Integer.valueOf(yas.getYear()));
+			ds.addValue(Util.toPounds(yas.getExpense()), EXPENSE_LABEL, Integer.valueOf(yas.getYear()));
+			ds.addValue(Util.toPounds(yas.getBalance()), BALANCE_LABEL, Integer.valueOf(yas.getYear()));
 		}
 		
-		int displayYearStart = ch.getFromYear();
-		int displayYearEnd = ch.getToYear();
+		SVGGraphics2D svg2d = this.chartPlottingComponent.plotAssetHistoryAsLine(ds);
+		model.addAttribute("_assetSVG", svg2d.getSVGElement());
+		model.addAttribute("_history", history);
 		
-		YearlyAssetHistory history = new YearlyAssetHistory();
-		YearlyAssetStatus assetStatus;
-		LocalDate from = Util.startOfYear(Util.today());
-		LocalDate to = Util.endOfYear(Util.today());
-
-		Transaction mirror;
-		DefaultCategoryDataset ds = new DefaultCategoryDataset();
-		Long openingBalance, closingBalance;
+		if (! history.isEmpty()) {
+			int first = history.getList().get(0).getYear();
+			int size = history.getList().size();
+			int last = history.getList().get(size - 1).getYear();
+			model.addAttribute("_notes", this.noteService.getNotes(-1, first, last));
+		}
+		
+		return "assetHistory";
+	}
+	
+	@RequestMapping(value="/history/save")	
+	public RedirectView historyWindow(HttpServletRequest req, ModelMap model) throws Exception {
 		
 		// Work out opening and closing balances of asset accounts
-		Map<Integer, Long> yearlyOpeningBalance = new HashMap<Integer, Long>();
-		Map<Integer, Long> yearlyClosingBalance = new HashMap<Integer, Long>();
-		int openingYear, closingYear, minYear = 2020;
-		LocalDate d;
-
-		for (Account a : this.accountService.getAssets()) {
-			d = this.transactionService.getTransactionDateForAccount(a.getId(), true);
-			openingYear = d.getYear();
-			openingBalance = yearlyOpeningBalance.get(openingYear);
-			
-			if (openingBalance == null) {
-				openingBalance = Long.valueOf(0);	
-			}
-			
-			// Note that there could be more than one account that was opened in a given year
-			yearlyOpeningBalance.put(openingYear, openingBalance + a.getOpeningBalance());
-			
-			if (a.isClosed()) {
-				d = this.transactionService.getTransactionDateForAccount(a.getId(), false);
-				closingYear = d.getYear();
-				closingBalance = yearlyClosingBalance.get(closingYear);
-				
-				if (closingBalance == null) {
-					closingBalance = Long.valueOf(0);	
-				}
-				
-				// Note that there could be more than one account that was closed in a given year
-				yearlyClosingBalance.put(closingYear, closingBalance + this.transactionService.calculateBalance(a.getId()));				
-			}
-			
-			if (openingYear < minYear) {
-				minYear = openingYear;
-			}
-		}
+		Map<Integer, Long[]> yearlyBalances = sumBalances();
 		
-		int thisYear = Util.today().getYear();
-		YearlyAssetStatus totalStatus = new YearlyAssetStatus(thisYear);
-		model.addAttribute("_totals", totalStatus);
+		YearlyAssetHistory history = new YearlyAssetHistory();
+		model.addAttribute("_data", history.getList());
 		
-		long overallBalance = 0L;
-		List<YearlyAssetStatus> data = new ArrayList<YearlyAssetStatus>();
-		model.addAttribute("_data", data);
-		
+		Transaction mirror;
 		String accountType;
+		
+		YearlyAssetStatus yearlySummary;
+		
+		Long openingBalance, closingBalance, accumulativeBalance = 0L;
+		LocalDate from = Util.startOfYear(Util.today());
+		LocalDate to = Util.endOfYear(Util.today());
+		int thisYear = to.getYear();		
+		Long[] pair;
 				
-		for (int yearStepper = minYear; yearStepper <= thisYear; yearStepper++) {
-			from = from.withYear(yearStepper);
-			to = to.withYear(yearStepper);
-			assetStatus = new YearlyAssetStatus(yearStepper);
-			history.add(assetStatus);
-			
+		for (int year = 1991; year <= thisYear; year++) {
 			// Do we apply any opening balances to this year?
-			openingBalance = yearlyOpeningBalance.get(yearStepper);
-			if (openingBalance != null) {
-				assetStatus.credit(openingBalance);
+			pair = yearlyBalances.get(year);
+			
+			if (pair == null) {
+				openingBalance = 0L;
+				closingBalance = 0L;
+			}
+			else {
+				openingBalance = pair[0];
+				closingBalance = pair[1];
 			}
 			
+			yearlySummary = new YearlyAssetStatus(year);
+			history.add(yearlySummary);
+			yearlySummary.credit(openingBalance);
+
 			// Do we remove any non-zero closing balances to this year?
 			// (If the account is closed, it shouldn't have any funds in it, but some older ones do!)
-			closingBalance = yearlyClosingBalance.get(yearStepper);
-			if (closingBalance != null) {
-				//assetStatus.debit(closingBalance);
-				assetStatus.credit(-closingBalance);
-			}
+			yearlySummary.credit(-closingBalance);
+						
+			from = from.withYear(year);
+			to = to.withYear(year);
 			
-			for (NakedTransaction t : this.assetService.get(Date.valueOf(from), Date.valueOf(to))) {
+			for (NakedTransaction t : this.assetService.getTransactionsBetween(Date.valueOf(from), Date.valueOf(to))) {
 				if (t.isTransfer()) {
 					mirror = this.transactionService.get(t.getTransferid());
 					accountType = mirror.getAccount().getType();
 					if (accountType == null || accountType.equals("other")) {
 						// Some of the old (now closed) accounts used to be (for example) for Gas and Electricity, etc
-						assetStatus.count(t);
+						yearlySummary.count(t);
 					}
 					else {
 						// Ignore transfers between accounts that are considered assets,
@@ -153,43 +126,67 @@ public class AssetController extends BaseController {
 					}
 				}
 				else {
-					assetStatus.count(t);
+					yearlySummary.count(t);
 				}
 			}
 			
-			overallBalance += assetStatus.getGrowth();
-			totalStatus.add(assetStatus);
-			data.add(assetStatus);
+			accumulativeBalance += yearlySummary.getGrowth();
+			yearlySummary.setBalance(accumulativeBalance);
+			history.add(yearlySummary);
+		}
+		
+		// Now save records in the db
+		this.assetService.save(history);
+
+		return new RedirectView(String.format("%s/asset/history", req.getContextPath()));
+	}	
+	
+	/*
+	 *	This method loops over each account, accumulating opening and closing balances by year.
+	 *
+	 *  The map returned by this method is keyed by year. Each year is mapped to an array having 2 element, ie opening 
+	 *  and closing balances for the year.
+	 */
+	private Map<Integer, Long[]> sumBalances() {
+		
+		Map<Integer, Long[]> yearlyBalances = new HashMap<Integer, Long[]>();
+		
+		int openingYear, closingYear;
+		Long[] pair;
+		LocalDate d;
+	
+		for (Account a : this.accountService.getAssets()) {
 			
-			if (yearStepper >= displayYearStart && yearStepper <= displayYearEnd) {
-				ds.addValue(Util.toPounds(assetStatus.getIncome()), INCOME_LABEL, Integer.valueOf(yearStepper));
-				ds.addValue(Util.toPounds(assetStatus.getExpense()), EXPENSE_LABEL, Integer.valueOf(yearStepper));
-				ds.addValue(Util.toPounds(overallBalance), BALANCE_LABEL, Integer.valueOf(yearStepper));
+			// Get the date of the FIRST transaction on this account
+			d = this.transactionService.getTransactionDateForAccount(a.getId(), true);
+			
+			openingYear = d.getYear();
+			pair = yearlyBalances.get(openingYear);
+			
+			if (pair == null) {
+				pair = new Long[] {Long.valueOf(0), Long.valueOf(0)};
+				yearlyBalances.put(openingYear, pair);
+			}
+			
+			pair[0] += a.getOpeningBalance();
+			
+			if (a.isClosed()) {
+				
+				// Get the date of the LAST transaction on this account
+				d = this.transactionService.getTransactionDateForAccount(a.getId(), false);
+				closingYear = d.getYear();
+				pair = yearlyBalances.get(closingYear);
+
+				if (pair == null) {
+					pair = new Long[] {Long.valueOf(0), Long.valueOf(0)};
+					yearlyBalances.put(closingYear, pair);
+				}
+				
+				pair[1] += this.transactionService.calculateBalance(a.getId());				
 			}
 		}
+		
+		return yearlyBalances;
+	}
 
-		JFreeChart chart = ChartFactory.createLineChart(
-		         "Asset history", "Years", "Amount (£)",
-		         ds,
-		         PlotOrientation.VERTICAL, true, true, false);
-		
-		CategoryPlot plot = chart.getCategoryPlot();
-		CategoryAxis domainAxis = plot.getDomainAxis();
-		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
-		
-		CategoryItemRenderer renderer = plot.getRenderer();
-		Paint[] colors = new Paint[] {Color.BLUE, Color.RED, Color.YELLOW};
-		for (int i = 0; i < colors.length; i++) {
-		    renderer.setSeriesStroke(i, new BasicStroke(2.5f));
-		    renderer.setSeriesPaint(i, colors[i]);
-		}
-		
-		int width = 1170, height = 600;
-		SVGGraphics2D svg2d = new SVGGraphics2D(width, height);
-		chart.draw(svg2d,new Rectangle2D.Double(0, 0, width, height));
-		model.addAttribute("_assetSVG", svg2d.getSVGElement());
-		model.addAttribute("_history", history);
-		model.addAttribute("_notes", this.noteService.getNotes(-1, displayYearStart, displayYearEnd));
-		return "assetHistory";
-	}	
 }

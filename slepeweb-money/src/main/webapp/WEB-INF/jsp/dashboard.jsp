@@ -8,7 +8,10 @@
 	<mny:pageHeading heading="Dashboard">
 		<ul>
 			<li><a href="${_ctxPath}/index/by/dates" title="Re-index ALL transactions (for searching)">Re-index</a></li>
-			<li><a href="${_ctxPath}/asset/history" title="Calculate growth/decline of all assets over complete data set">Asset history</a></li>	
+			<li>
+				<a href="${_ctxPath}/asset/history" title="Calculate growth/decline of all assets over complete data set">Asset history</a>&nbsp;
+				<a href="${_ctxPath}/asset/history/save" title="Refresh"><i class="fa-solid fa-rotate-right"></i></a>
+			</li>	
 			<li><a href="${_ctxPath}/login?logout" title="Logout">Logout</a></li>	
 		</ul>
 	</mny:pageHeading>			

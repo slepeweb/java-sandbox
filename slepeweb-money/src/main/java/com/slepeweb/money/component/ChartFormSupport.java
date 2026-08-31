@@ -1,6 +1,5 @@
 package com.slepeweb.money.component;
 
-import java.awt.geom.Rectangle2D;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,12 +8,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.graphics2d.svg.SVGGraphics2D;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +47,7 @@ public class ChartFormSupport {
 	@Autowired private SolrService4Money solrService4Money;
 	@Autowired private SavedSearchService savedSearchService;
 	@Autowired private NoteService noteService;
+	@Autowired private ChartPlottingComponent chartPlottingComponent;
 
 	private List<Integer> yearRange;
 	
@@ -117,20 +111,9 @@ public class ChartFormSupport {
 		 *  before adding to the dataset
 		 */
 		addValuesToDataset(supp);
-	 
-		JFreeChart chart = ChartFactory.createBarChart(
-		         ch.getName(), "Years", "Amounts (£)",
-		         ds,
-		         PlotOrientation.VERTICAL, true, true, false);
-		
-		CategoryPlot plot = chart.getCategoryPlot();
-		CategoryAxis domainAxis = plot.getDomainAxis();
-		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
-		
-		SVGGraphics2D svg2d = new SVGGraphics2D(1000, 600);
-	    chart.draw(svg2d,new Rectangle2D.Double(0, 0, 1000, 600));
-	    model.addAttribute("_chartSVG", svg2d.getSVGElement());
-	    
+	 		
+		SVGGraphics2D svg2d = this.chartPlottingComponent.plotChartAsBarchart(ch.getName(), ds);
+	    model.addAttribute("_chartSVG", svg2d.getSVGElement());	    
 	    model.addAttribute("_notes", this.noteService.getNotes(ch.getId(), ch.getFromYear(), ch.getToYear()));
 		
 		return RESULTS_VIEW; 
