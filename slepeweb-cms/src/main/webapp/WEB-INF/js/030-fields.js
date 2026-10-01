@@ -292,6 +292,10 @@ Optional class: border
 				_cms.field.widefieldInsert('<td>$$$</td>')
 			}
 
+			else if (value === 'chevron') {
+				_cms.field.widefieldInsert('&#x276E;$$$&#x276F;')
+			}
+
 			// Re-set the select element
 			option$.parent().val('')
 			

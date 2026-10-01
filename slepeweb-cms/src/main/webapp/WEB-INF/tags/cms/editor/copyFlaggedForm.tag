@@ -22,7 +22,7 @@
 				
 <c:forEach items="${_fieldSupport[editingItem.site.language]}" var="fes">
 	<div class="ff">
-		<input type="checkbox" class="copy-fieldvalue" data-name="${fes.field.variable}" />
+		<input type="checkbox" class="copy-fieldvalue" data-name="${fes.fieldValue.field.variable}" />
 		<label>${fes.label} : </label> 
 		${fes.inputTag}
 	</div>					

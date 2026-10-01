@@ -4,25 +4,16 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.slepeweb.cms.bean.guidance.IGuidance;
 import com.slepeweb.cms.utils.LogUtil;
-import com.slepeweb.common.util.DateUtil;
 
 
 public class Field extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private static Logger LOG = Logger.getLogger(Field.class);
-	private static final String INPUT_TAG = "input";
-	private static final String TEXT_AREA_TAG = "textarea";
-	private static final String SELECT_TAG = "select";
-	private static final String RADIO = "radio";
-	private static final String CHECKBOX = "checkbox";
-	private static final String TEXT = "text";
 	
 	private Long id;
 	private String name, variable, help;
@@ -68,131 +59,6 @@ public class Field extends CmsBean {
 	
 	public void delete() {
 		getFieldService().deleteField(this);
-	}
-	
-	public String getInputTag(IGuidance guidance) {
-		return getInputTag(null, guidance);
-	}
-	
-	public String getInputTag(FieldValue fv, IGuidance guidance) {
-		StringBuilder sb = new StringBuilder();
-		String tag = null, inputType = "";
-		String rows = null, cols = null;
-		
-		if (
-				getType() == FieldType.integer || 
-				getType() == FieldType.url || 
-				getType() == FieldType.date|| 
-				getType() == FieldType.datetime) {
-			
-			tag = INPUT_TAG;
-			rows = cols = null;
-			
-			if (
-					getType() == FieldType.date || 
-					getType() == FieldType.datetime) {
-						
-				inputType = getType().name();
-			}
-		}
-		else if (
-				getType() == FieldType.text || 
-				getType() == FieldType.markup || 
-				getType() == FieldType.dateish) {
-			
-			if (getSize() > 0 && getSize() <= 120) {
-				tag = INPUT_TAG;
-				inputType = TEXT;
-			}
-			else {
-				tag = TEXT_AREA_TAG;
-				cols = "80";
-				rows = getSize() > 0 && getSize() <= 256 ? "4" : "10";
-			}
-		}
-		else if (getType() == FieldType.radio || getType() == FieldType.checkbox) {
-			tag = INPUT_TAG;
-			inputType = getType().name();
-		}
-		else if (getType() == FieldType.select) {
-			tag = SELECT_TAG;
-		}
-		
-		ValidValueList vvl = getValidValueListObject();
-		String notNullStringValue = fv != null && fv.getStringValue() != null ? fv.getStringValue() : "";
-		
-		if (tag.equals(INPUT_TAG)) {
-			// We need to produce an <input> element
-			if (inputType.equals(RADIO) || inputType.equals(CHECKBOX)) {
-				for (String vv : vvl.getValues()) {
-					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s ", 
-							inputType, getVariable(), vv, getTooltip()));
-					
-					if (fv != null && fv.getStringValue() != null) {
-						for (String partValue : fv.getStringValue().split("\\|")) {
-							if (partValue.equals(vv)) {
-								sb.append(" checked"); 
-							}
-						}
-					}
-					else if (getValidValueListObject().getDefaultValue().equals(vv)) {
-						sb.append(" checked"); 
-					}
-					
-					sb.append(String.format("/><span style=\"margin-right: 30px\">%s</span>", vv));
-				}
-			}
-			else {
-				if (inputType.equals(FieldType.date.name()) || inputType.equals(FieldType.datetime.name())) {
-					Date d = null;
-					String dateValueStr = "", timeValueStr = "";
-					if (fv != null) {
-						d = fv.getDateValue();
-						dateValueStr = DateUtil.DATE_PATTERN_B.format(d);
-						timeValueStr = DateUtil.TIME_PATTERN.format(d);
-					}
-					
-					// Input field for the datepicker
-					sb.append("<").append(tag).append(String.format(" type=\"text\" name=\"%s_d\" class=\"datepicker\" value=\"%s\"%s />", 
-							getVariable(), dateValueStr, getTooltip()));
-				
-					if (inputType.equals(FieldType.datetime.name())) {
-						// Input field for time
-						sb.append("<").append(tag).append(String.format(" type=\"text\" name=\"%s_t\" class=\"timepicker\" value=\"%s\"%s />", 
-								getVariable(), timeValueStr, getTooltip()));
-					}
-				}
-				else {
-					// This is a plain text input field, and NOT a date/datetime one
-					sb.append("<").append(tag).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s ", 
-							inputType, getVariable(), notNullStringValue, getTooltip()));
-					
-					// Is there guidance for this field?
-					if (guidance != null) {
-						sb.append(String.format("data-validation=\"%s\" ", guidance.getRegExp()));
-						sb.append(String.format("data-variable=\"%s\" ", getVariable()));
-					}
-					
-					sb.append(" />");
-				}
-			}
-		}
-		else if (tag.equals(SELECT_TAG)) {
-			sb.append("<").append(tag).append(String.format(" name=\"%s\" value=\"%s\"%s>", 
-					getVariable(), notNullStringValue, getTooltip()));
-			
-			for (String vv : vvl.getValues()) {
-				sb.append(String.format("<option value=\"%s\"%s>%s</option>", 
-						vv, notNullStringValue.equals(vv) ? " selected" : "", vv));
-			}
-			sb.append("</").append(SELECT_TAG).append(">");
-		}
-		else if (tag.equals(TEXT_AREA_TAG)) {
-			sb.append("<").append(tag).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\" spellcheck=\"%s\"%s>%s</%s>", 
-					getVariable(), cols, rows, isMarkup() ? "false" : "true", getTooltip(), notNullStringValue, tag));
-		}
-		
-		return sb.toString();
 	}
 	
 	public Long getId() {

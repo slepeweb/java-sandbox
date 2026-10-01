@@ -20,27 +20,30 @@
 	<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
 		<div id="form-fields-${_lang}" class="hideable fieldset">
 			<c:forEach items="${_fieldSupport[_lang]}" var="fes">
-				<c:choose><c:when test="${fes.field.type == 'layout'}">
+				<c:set var="_field" value="${fes.fieldValue.field}" />
+				
+				<c:choose><c:when test="${_field.type == 'layout'}">
 					<hr />
 				</c:when><c:otherwise>
-					<div id="${fes.field.variable}" class="ff<c:if test='${fes.field.markup}'> markup</c:if>">
+					<div id="${_field.variable}" class="ff<c:if test='${_field.markup}'> markup</c:if>">
 						<label>${fes.label} : </label>
 						<div class="inputs">
 							${fes.inputTag}
 						</div>
+						
 						<div class="extras">
 							<c:if test="${not empty fes.guidance}">
 								<span class="field-guidance-icon"><i class="far fa-question-circle"></i></span>
 							</c:if>
 							
-							<c:if test="${fes.field.expandable}">
+							<c:if test="${_field.expandable}">
 								<div id="widefield-open-icon"><i class="fa-solid fa-arrows-left-right-to-line"></i></div>
 							</c:if>							
 						</div>
 					</div>
 					
 					<c:if test="${not empty fes.guidance and _lang eq editingItem.language}">
-						<div class="hide" data-variable="${fes.field.variable}">
+						<div class="hide" data-variable="${_field.variable}">
 							<edit:guidance guidance="${fes.guidance}" />
 						</div>
 					</c:if>

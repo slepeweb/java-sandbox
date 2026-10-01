@@ -129,25 +129,18 @@ public class BaseController {
 					guidance = hook.getFieldGuidance(variable);
 					
 					fes = new FieldEditorSupport().
-							setField(fft.getField()).
 							setLabel(fft.getField().getName()).
 							setGuidance(guidance);
 					
 					fv = languageValuesMap == null ? null : languageValuesMap.get(variable);
+					fes.setFieldValue(fv);
 					
-					if (fft.getField().getType() != FieldType.layout) {
-						if (fv == null) {
-							fes.setInputTag(fft.getField().getInputTag(guidance));
-						}
-						else {
-							// Hide text field values for inaccessible items
-							if (! accessible && (ft == FieldType.markup || ft == FieldType.text)) {
+					if (
+							! accessible && 
+							fv != null &&
+							fft.getField().getType() != FieldType.layout &&
+							(ft == FieldType.markup || ft == FieldType.text)) {
 								fv.setValue("");
-							}
-							
-							fes.setFieldValue(fv);
-							fes.setInputTag(fv.getInputTag(guidance));
-						}
 					}
 					
 					list.add(fes);
