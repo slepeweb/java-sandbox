@@ -35,12 +35,10 @@ public class LoginServiceImpl implements LoginService {
 				if (u.getPassword() != null) {
 					String testPassword = password;
 
-					if (this.security.equals("high")) {
-						resp.setSendEmail(! StringUtils.contains(password, "^"));
-						if (! resp.isSendEmail()) {
-							testPassword = testPassword.replace("^", "");
-						}
+					resp.setSendEmail(! StringUtils.contains(password, "^"));
+					testPassword = testPassword.replace("^", "");
 						
+					if (this.security.equals("high")) {
 						testPassword = unspinPassword(testPassword);
 					}
 					
