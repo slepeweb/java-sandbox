@@ -38,7 +38,7 @@
 				<option value="xlink">&lt;xlink&gt; (custom)</option>
 				<option value="xcomp">&lt;xcomp&gt; (custom)</option>
 				<hr />
-				<option value="chevron">&#x276E;&#x276F; (chevrons)</option>
+				<option value="chevron">&#x276E; &#x276F; (decorative)</option>
 			</select>
 		</div>
 		

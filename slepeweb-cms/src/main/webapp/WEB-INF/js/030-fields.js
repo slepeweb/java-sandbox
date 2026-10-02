@@ -293,7 +293,7 @@ Optional class: border
 			}
 
 			else if (value === 'chevron') {
-				_cms.field.widefieldInsert('&#x276E;$$$&#x276F;')
+				_cms.field.widefieldInsert('❮$$$❯')
 			}
 
 			// Re-set the select element

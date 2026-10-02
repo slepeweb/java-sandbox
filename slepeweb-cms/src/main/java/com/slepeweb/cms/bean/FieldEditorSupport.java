@@ -104,7 +104,7 @@ public class FieldEditorSupport {
 		String notNullStringValue = this.fieldValue != null && this.fieldValue.getStringValue() != null ? this.fieldValue.getStringValue() : "";
 		
 		// The browser will interfere with entity codes
-		notNullStringValue = notNullStringValue.replaceAll("&(.*?;)", "&amp;$1");
+		// notNullStringValue = notNullStringValue.replaceAll("&(.*?;)", "&amp;$1");
 		
 		if (tagName.equals(INPUT_TAG)) {
 			// We need to produce an <input> element
