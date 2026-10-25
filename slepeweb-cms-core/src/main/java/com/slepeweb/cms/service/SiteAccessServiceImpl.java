@@ -217,23 +217,36 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 
 	private boolean itemMatchesRule(Item i, AccessRule rule) {
 		return ruleMatches(
+				i.getType().getName(),
 				i.getTemplate() == null ? null : i.getTemplate().getController(), 
 				
 				// Don't evaluate item tags unless rule specifies tag pattern
 				// This will eliminate unnecessary db queries
 				StringUtils.isNotBlank(rule.getTagPattern()) ? i.getTagsAsString() : null, 
 						
-				i.getPath(), i.getOwnerId(), rule);
+				i.getPath(), 
+				i.getOwnerId(), 
+				rule);
 	}
 	
 	private boolean documentMatchesRule(SolrDocument4Cms doc, AccessRule rule) {
-		return ruleMatches(null, doc.getType(), doc.getPath(), doc.getOwnerId(), rule);
+		return ruleMatches(doc.getType(), doc.getTemplate(), doc.getTags(), doc.getPath(), doc.getOwnerId(), rule);
 	}
 
-	private boolean ruleMatches(String springTemplatePath, String tagList, String path, Long ownerId, AccessRule rule) {
+	private boolean ruleMatches(String itemType, String springTemplatePath, String tagList, String path, Long ownerId, AccessRule rule) {
 		
 		// Must match ALL constraints to return positive
 		
+		if (StringUtils.isNotBlank(rule.getTypePattern())) {
+			// Item type rule applies
+			if (
+				itemType == null || 
+				! itemType.matches(rule.getTypePattern())) {
+			
+				return false; 
+			}
+		}
+
 		if (StringUtils.isNotBlank(rule.getTemplatePattern())) {
 			// Template rule applies
 			if (

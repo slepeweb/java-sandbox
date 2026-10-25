@@ -6,13 +6,16 @@ public class AccessRule extends CmsBean {
 
 	private static final long serialVersionUID = 3525217730680353953L;
 	private Long id, siteId;
-	private String name, mode, tagPattern, templatePattern, itemPathPattern, ownerIdPattern, rolePattern;
+	private String name, mode, tagPattern, typePattern, templatePattern, itemPathPattern, ownerIdPattern, rolePattern;
 	private boolean access, enabled;
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		append("id", String.valueOf(this.id), sb);
 		append("name", this.name, sb);
+		append("itemtype", this.typePattern, sb);
+		append("template", this.templatePattern, sb);
 		append("tag", this.tagPattern, sb);
 		append("ownerId", this.ownerIdPattern, sb);
 		append("itemPath", this.itemPathPattern, sb);
@@ -26,7 +29,7 @@ public class AccessRule extends CmsBean {
 			if (sb.length() > 0) {
 				sb.append(", ");
 			}
-			sb.append(name).append("=").append(value);
+			sb.append(name).append(": ").append(value);
 		}
 	}
 	
@@ -137,6 +140,15 @@ public class AccessRule extends CmsBean {
 
 	public AccessRule setTagPattern(String pattern) {
 		this.tagPattern = pattern;
+		return this;
+	}
+
+	public String getTypePattern() {
+		return negateIf(typePattern);
+	}
+
+	public AccessRule setTypePattern(String pattern) {
+		this.typePattern = pattern;
 		return this;
 	}
 

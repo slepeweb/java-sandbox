@@ -311,6 +311,7 @@ public class RowMapperUtil {
 					setName(rs.getString("name")).
 					setRolePattern(rs.getString("role")).
 					setTagPattern(rs.getString("tag")).
+					setTypePattern(rs.getString("itemtype")).
 					setTemplatePattern(rs.getString("template")).
 					setItemPathPattern(rs.getString("path")).
 					setOwnerIdPattern(rs.getString("ownerid")).
