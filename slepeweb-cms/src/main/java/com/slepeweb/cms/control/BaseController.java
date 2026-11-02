@@ -129,6 +129,7 @@ public class BaseController {
 					guidance = hook.getFieldGuidance(variable);
 					
 					fes = new FieldEditorSupport().
+							setField(fft.getField()).
 							setLabel(fft.getField().getName()).
 							setGuidance(guidance);
 					

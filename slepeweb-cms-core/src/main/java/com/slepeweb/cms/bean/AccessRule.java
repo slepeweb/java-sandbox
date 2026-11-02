@@ -7,7 +7,8 @@ public class AccessRule extends CmsBean {
 	private static final long serialVersionUID = 3525217730680353953L;
 	private Long id, siteId;
 	private String name, mode, tagPattern, typePattern, templatePattern, itemPathPattern, ownerIdPattern, rolePattern;
-	private boolean access, enabled;
+	private boolean enabled;
+	private int access, ordering;
 
 	@Override
 	public String toString() {
@@ -19,8 +20,8 @@ public class AccessRule extends CmsBean {
 		append("tag", this.tagPattern, sb);
 		append("ownerId", this.ownerIdPattern, sb);
 		append("itemPath", this.itemPathPattern, sb);
-		append("access", String.valueOf(this.access), sb);
 		append("role2access", this.rolePattern, sb);
+		append("action", String.valueOf(this.access), sb);
 		return sb.toString();
 	}
 	
@@ -170,17 +171,30 @@ public class AccessRule extends CmsBean {
 		return this;
 	}
 
-	public boolean isAccess() {
+	public int getAccess() {
 		return access;
+	}
+
+	public AccessRule setAccess(int action) {
+		this.access = action;
+		return this;
+	}
+
+	public int getOrdering() {
+		return ordering;
+	}
+
+	public AccessRule setOrdering(int ordering) {
+		this.ordering = ordering;
+		return this;
 	}
 
 	public boolean givesAccess() {
-		return access;
+		return this.access == 1 || this.access == 0;
 	}
 
-	public AccessRule setAccess(boolean access) {
-		this.access = access;
-		return this;
+	public boolean considerNextRule() {
+		return this.access == 0;
 	}
 
 	public boolean isEnabled() {

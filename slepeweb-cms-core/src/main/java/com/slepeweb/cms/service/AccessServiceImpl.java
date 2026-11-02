@@ -2,7 +2,6 @@ package com.slepeweb.cms.service;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import com.slepeweb.cms.bean.AccessRule;
@@ -11,8 +10,12 @@ import com.slepeweb.cms.utils.RowMapperUtil;
 @Repository
 public class AccessServiceImpl extends BaseServiceImpl implements AccessService {
 	
-	private static Logger LOG = Logger.getLogger(HostServiceImpl.class);
+	//private static Logger LOG = Logger.getLogger(HostServiceImpl.class);
 	
+	/*
+	 * The access table is managed by mysql admin, and so UI for same is not required ... currently.
+	 * 
+	 * 
 	public AccessRule save(AccessRule ar) {
 		if (ar.isDefined4Insert()) {
 			AccessRule dbRecord = get(ar.getId());		
@@ -67,11 +70,12 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 			LOG.warn(compose("Deleted rule", id));
 		}
 	}
-
 	public AccessRule get(Long siteId, String ruleName) {
 		return (AccessRule) getFirstInList(this.jdbcTemplate.query("select * from access where siteid=? and name = ?", 
 				new RowMapperUtil.AccessMapper(), siteId, ruleName));
 	}
+	 */
+
 
 	public AccessRule get(Long id) {
 		return (AccessRule) getFirstInList(this.jdbcTemplate.query("select * from access where id=?", 
@@ -80,7 +84,7 @@ public class AccessServiceImpl extends BaseServiceImpl implements AccessService 
 	
 	private List<AccessRule> getList(Long siteId, String mode) {
 		return this.jdbcTemplate.query(
-				String.format("select * from access where siteid=? and mode=? and enabled=? order by name"), 
+				String.format("select * from access where siteid=? and mode=? and enabled=? order by ordering"), 
 				new RowMapperUtil.AccessMapper(), siteId, mode, true);
 	}
 	

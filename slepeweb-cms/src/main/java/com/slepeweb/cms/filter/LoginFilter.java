@@ -34,7 +34,7 @@ public class LoginFilter implements Filter {
 		HttpServletResponse res = (HttpServletResponse) response;	
 		User u = (User) req.getSession().getAttribute(AttrName.USER);
 		
-		if (	u == null && 
+		if (u == null && 
 				! (	req.getServletPath().equals(this.loginPath) ||
 					req.getServletPath().equals(this.forgotPasswordPath) ||
 					req.getServletPath().equals(this.passwordResetPath) ||

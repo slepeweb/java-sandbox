@@ -308,6 +308,8 @@ public class RowMapperUtil {
 			return CmsBeanFactory.makeAccessRule().
 					setId(rs.getLong("id")).
 					setSiteId(rs.getLong("siteid")).
+					setMode(rs.getString("mode")).
+					setOrdering(rs.getInt("ordering")).
 					setName(rs.getString("name")).
 					setRolePattern(rs.getString("role")).
 					setTagPattern(rs.getString("tag")).
@@ -315,7 +317,7 @@ public class RowMapperUtil {
 					setTemplatePattern(rs.getString("template")).
 					setItemPathPattern(rs.getString("path")).
 					setOwnerIdPattern(rs.getString("ownerid")).
-					setAccess(rs.getBoolean("access")).
+					setAccess(rs.getInt("access")).
 					setEnabled(rs.getBoolean("enabled"));
 		}
 	}

@@ -15,10 +15,20 @@ public class FieldEditorSupport {
 	private static final String CHECKBOX = "checkbox";
 	private static final String TEXT = "text";
 	
+	private Field field;
 	private FieldValue fieldValue;
 	private String label, inputTag;
 	private IGuidance guidance;
 	
+	public Field getField() {
+		return field;
+	}
+
+	public FieldEditorSupport setField(Field field) {
+		this.field = field;
+		return this;
+	}
+
 	public FieldValue getFieldValue() {
 		return fieldValue;
 	}
@@ -57,9 +67,8 @@ public class FieldEditorSupport {
 		StringBuilder sb = new StringBuilder();
 		String tagName = null, inputType = "";
 		String rows = null, cols = null;
-		Field f = this.fieldValue.getField();
-		FieldType fieldType = f.getType();
-		int fieldSize = f.getSize();
+		FieldType fieldType = this.field.getType();
+		int fieldSize = this.field.getSize();
 		
 		if (
 				fieldType == FieldType.integer || 
@@ -100,7 +109,7 @@ public class FieldEditorSupport {
 			tagName = SELECT_TAG;
 		}
 		
-		ValidValueList vvl = f.getValidValueListObject();
+		ValidValueList vvl = this.field.getValidValueListObject();
 		String notNullStringValue = this.fieldValue != null && this.fieldValue.getStringValue() != null ? this.fieldValue.getStringValue() : "";
 		
 		// The browser will interfere with entity codes
@@ -111,7 +120,7 @@ public class FieldEditorSupport {
 			if (inputType.equals(RADIO) || inputType.equals(CHECKBOX)) {
 				for (String vv : vvl.getValues()) {
 					sb.append("<").append(tagName).append(String.format(" type=\"%s\" name=\"%s\" value=\"%s\"%s ", 
-							inputType, f.getVariable(), vv, f.getTooltip()));
+							inputType, this.field.getVariable(), vv, this.field.getTooltip()));
 					
 					if (this.fieldValue != null && this.fieldValue.getStringValue() != null) {
 						for (String partValue : this.fieldValue.getStringValue().split("\\|")) {
@@ -120,7 +129,7 @@ public class FieldEditorSupport {
 							}
 						}
 					}
-					else if (f.getValidValueListObject().getDefaultValue().equals(vv)) {
+					else if (this.field.getValidValueListObject().getDefaultValue().equals(vv)) {
 						sb.append(" checked"); 
 					}
 					
@@ -141,12 +150,12 @@ public class FieldEditorSupport {
 				
 				// Input field for the datepicker
 				sb.append("<").append(tagName).append(String.format(" type=\"text\" name=\"%s_d\" class=\"datepicker\" value=\"%s\"%s />", 
-						f.getVariable(), dateValueStr, f.getTooltip()));
+						this.field.getVariable(), dateValueStr, this.field.getTooltip()));
 			
 				if (inputType.equals(FieldType.datetime.name())) {
 					// Input field for time
 					sb.append("<").append(tagName).append(String.format(" type=\"text\" name=\"%s_t\" class=\"timepicker\" value=\"%s\"%s />", 
-							f.getVariable(), timeValueStr, f.getTooltip()));
+							this.field.getVariable(), timeValueStr, this.field.getTooltip()));
 				}
 				
 				return sb.toString();
@@ -154,11 +163,11 @@ public class FieldEditorSupport {
 			
 			// This is a plain text input field, and NOT a date/datetime one
 			sb.append(new StringBuilder(String.format("<%s type=\"%s\" name=\"%s\" value=\"%s\" %s ", 
-					tagName, inputType, f.getVariable(), notNullStringValue, f.getTooltip())));
+					tagName, inputType, this.field.getVariable(), notNullStringValue, this.field.getTooltip())));
 			
 			// Is there guidance for this field?
 			if (this.guidance != null) {
-				sb.append(String.format("data-validation=\"%s\" data-variable=\"%s\" ", this.guidance.getRegExp(), f.getVariable()));
+				sb.append(String.format("data-validation=\"%s\" data-variable=\"%s\" ", this.guidance.getRegExp(), this.field.getVariable()));
 			}
 			
 			sb.append(String.format("value=\"%s\" />", notNullStringValue));			
@@ -167,7 +176,7 @@ public class FieldEditorSupport {
 		
 		if (tagName.equals(SELECT_TAG)) {
 			sb.append("<").append(tagName).append(String.format(" name=\"%s\" value=\"%s\"%s>", 
-					f.getVariable(), notNullStringValue, f.getTooltip()));
+					this.field.getVariable(), notNullStringValue, this.field.getTooltip()));
 			
 			for (String vv : vvl.getValues()) {
 				sb.append(String.format("<option value=\"%s\"%s>%s</option>", 
@@ -180,7 +189,7 @@ public class FieldEditorSupport {
 		
 		if (tagName.equals(TEXT_AREA_TAG)) {
 			sb.append("<").append(tagName).append(String.format(" name=\"%s\" cols=\"%s\" rows=\"%s\" spellcheck=\"%s\"%s>%s</%s>", 
-					f.getVariable(), cols, rows, f.isMarkup() ? "false" : "true", f.getTooltip(), notNullStringValue, tagName));
+					this.field.getVariable(), cols, rows, this.field.isMarkup() ? "false" : "true", this.field.getTooltip(), notNullStringValue, tagName));
 			return sb.toString();
 		}
 		

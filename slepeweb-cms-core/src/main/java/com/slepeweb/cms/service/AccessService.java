@@ -4,10 +4,10 @@ import java.util.List;
 import com.slepeweb.cms.bean.AccessRule;
 
 public interface AccessService {
-	void delete(Long id);
+//	void delete(Long id);
 	AccessRule get(Long id);
-	AccessRule get(Long siteId, String ruleName);
+//	AccessRule get(Long siteId, String ruleName);
 	List<AccessRule> getReadable(Long siteId);
 	List<AccessRule> getWriteable(Long siteId);
-	AccessRule save(AccessRule ar);
+//	AccessRule save(AccessRule ar);
 }

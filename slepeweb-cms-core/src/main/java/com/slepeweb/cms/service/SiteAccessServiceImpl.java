@@ -26,6 +26,7 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	 * 
 	 * siteid	: self-explanatory
 	 * mode		: r (read/site delivery access) or w (write/editorial access)
+	 * ordering : numeric setting order in which rules are tested
 	 * name		: rule name, used to sort rules in order, which is VERY significant ^^
 	 * 
 	 * Then we have a set of columns that hold item properties to match against. Each
@@ -40,8 +41,10 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	 * 
 	 * If ALL non-NULL rules match this item, then the next 2 columns are considered.
 	 * 
-	 * access	: 1 (access IS granted), or 0 (access is subject to the user having a
-	 * 			  role that matches the re in the 'role' column)
+	 * access	: 1  (access is granted, and further rules can be ignored)
+	 *            0  (access is granted BUT further rules must be considered)
+	 *            -1 (access is denied)
+
 	 * role		: re to match the user's roles
 	 * 
 	 * Finally, the last column can be used to enable/disable the rule.
@@ -49,10 +52,7 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	 * enabled	: 1 (yes) or 0 (no)
 	 * 
 	 * ^^
-	 * Rules are grouped by mode, and for each mode, ordered by name, in alphabetical order.
-	 * When an item is considered for accessibility, in either 'r' or 'w' mode, the first 
-	 * rule in the list that matches the item determines the outcome. In other words, the
-	 * remaining rules in the list are IGNORED. So rule naming is VERY IMPORTANT.
+	 * Rules are grouped by mode, and for each mode, ordered by 'ordering', in numeric order.
 	 */
 	
 	private static Logger LOG = Logger.getLogger(SiteAccessServiceImpl.class);
@@ -127,29 +127,28 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	}
 	
 	private boolean isAccessible(Item i, List<AccessRule> rules) {		
-		// The first matching rule applies - rules should be ordered from most specific to least.
+
+		boolean accessible = false;
+		
 		for (AccessRule rule : rules) {
 			if (itemMatchesRule(i, rule)) {
+				accessible = rule.givesAccess();
 				
-				// This rule matches. All later rules in the list are ignored.
-				if (rule.givesAccess()) {
-					/*
-					 * ie. the 'access' column in db has value 'true', which means
-					 * the rule is satisfied, and we don't need to consult the 'role' column.
-					 */
-					return true;
+				if (! accessible ) {
+					LOG.info(String.format("Access denied: item = %s >>> rule = %s", i, rule));
+					return accessible;
+				}
+				else {
+					LOG.debug(String.format("Access granted: item = %s >>> rule = %s", i, rule));
 				}
 				
-				/*
-				 * So, the 'access' column in db has value 'false', which means
-				 * we must now test whether the user has the role specified in the 'role' column.
-				 * User does NOT get access by this rule UNLESS he has specified role.
-				 */
-				return userRolesMatchRule(i.getUser(), i.getSite().getId(), rule);
+				if (! rule.considerNextRule()) {
+					break;
+				}
 			}
 		}
-			
-		return false; 
+		
+		return accessible; 
 	}
 	
 	private List<AccessRule> getReadRules(Long siteId) {
@@ -192,7 +191,7 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	private boolean isAccessible(SolrDocument4Cms doc, User u, List<AccessRule> rules) {		
 		// The first matching rule applies - rules should be ordered from most specific to least.
 		for (AccessRule rule : rules) {
-			if (documentMatchesRule(doc, rule)) {
+			if (documentMatchesRule(doc, rule, u)) {
 				
 				// This rule matches. All later rules in the list are ignored.
 				if (rule.givesAccess()) {
@@ -202,13 +201,6 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 					 */
 					return true;
 				}
-				
-				/*
-				 * So, the 'access' column in db has value 'false', which means
-				 * we must now test whether the user has the role specified in the 'role' column.
-				 * User does NOT get access by this rule UNLESS he has specified role.
-				 */
-				return userRolesMatchRule(u, Long.valueOf(doc.getSiteId()), rule);
 			}
 		}
 			
@@ -216,7 +208,7 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 	}
 
 	private boolean itemMatchesRule(Item i, AccessRule rule) {
-		return ruleMatches(
+		boolean matches = ruleMatches(
 				i.getType().getName(),
 				i.getTemplate() == null ? null : i.getTemplate().getController(), 
 				
@@ -227,10 +219,15 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 				i.getPath(), 
 				i.getOwnerId(), 
 				rule);
+		
+		matches =  matches && userRolesMatchRule(i.getUser(), i.getSite().getId(), rule);
+		return matches;
 	}
 	
-	private boolean documentMatchesRule(SolrDocument4Cms doc, AccessRule rule) {
-		return ruleMatches(doc.getType(), doc.getTemplate(), doc.getTags(), doc.getPath(), doc.getOwnerId(), rule);
+	private boolean documentMatchesRule(SolrDocument4Cms doc, AccessRule rule, User u) {
+		boolean matches = ruleMatches(doc.getType(), doc.getTemplate(), doc.getTags(), doc.getPath(), doc.getOwnerId(), rule);
+		matches =  matches && userRolesMatchRule(u, Long.valueOf(doc.getSiteId()), rule);
+		return matches;
 	}
 
 	private boolean ruleMatches(String itemType, String springTemplatePath, String tagList, String path, Long ownerId, AccessRule rule) {
@@ -295,7 +292,15 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 		return true;
 	}
 	
-	public boolean userRolesMatchRule(User u, Long siteId, AccessRule rule) {
+	private boolean userRolesMatchRule(User u, Long siteId, AccessRule rule) {
+		
+		/*
+		 *  If a user does NOT need to be logged in in order to access an item, then the 'role' column
+		 *  in the 'access' table MUST be blank, or null.
+		 */
+		if (StringUtils.isBlank(rule.getRolePattern())) {
+			return true;
+		}
 		
 		if (u != null) {
 			// Must match ANY of the user's roles
@@ -305,7 +310,7 @@ public class SiteAccessServiceImpl extends BaseServiceImpl implements SiteAccess
 				}
 			}
 		}
-		
+			
 		return false;
 	}
 	
