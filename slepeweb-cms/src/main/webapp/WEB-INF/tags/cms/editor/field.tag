@@ -20,7 +20,7 @@
 	<c:forEach items="${editingItem.site.allLanguages}" var="_lang">
 		<div id="form-fields-${_lang}" class="hideable fieldset">
 			<c:forEach items="${_fieldSupport[_lang]}" var="fes">
-				<c:set var="_field" value="${fes.fieldValue.field}" />
+				<c:set var="_field" value="${fes.field}" />
 				
 				<c:choose><c:when test="${_field.type == 'layout'}">
 					<hr />

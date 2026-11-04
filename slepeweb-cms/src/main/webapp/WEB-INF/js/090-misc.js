@@ -187,10 +187,14 @@ _cms.misc.behaviour.trash.restore = function() {
 						parentNode.load(true);
 					}
 					
-					// Navigate to the restored item
-					_cms.leftnav.navigate(resp.data[1].key, _cms.core.TABID, function() {
-						_cms.support.flashMessage(resp);
-					});
+					// Navigate to the restored item - ISN'T WORKING; ANYWAY, WHAT IF YOU'VE RESTORED LOTS OF ITEMS?
+					//_cms.leftnav.navigate(resp.data[1].key, _cms.core.TABID, function() {
+					//	_cms.support.flashMessage(resp);
+					//});
+					
+					_cms.misc.refresh.trash();
+					_cms.support.flashMessage(resp);
+
 				}
 				else {
 					_cms.support.flashMessage(_cms.support.toStatus(true, "Restore failed"));

@@ -66,7 +66,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		LOG.info(String.format("Moving [%s] (mover) %s [%s] (target)", mover, mode.toUpperCase(), target));			
 		
 		// Cannot move an item to one of its descendants
-		if (newParent.getPath().startsWith(mover.getPath())) {
+		if (newParent.getPath().startsWith(mover.getPath() + "/")) {
 			throw new ResourceException("Cannot move an item to one of its descendants");
 		}
 		

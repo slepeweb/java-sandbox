@@ -1,5 +1,7 @@
 package com.slepeweb.cms.component;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.slepeweb.cms.bean.FieldForType;
@@ -14,10 +16,11 @@ public class GeoHook extends BaseHook {
 	
 	@Override
 	public void addItemPost(Item i) {
-		boolean flag1 = false, flag2 = false;
+		boolean flag1 = false, flag2 = false, flag3 = false;
+		List<FieldForType> fields4Type = this.fieldForTypeService.getFieldsForType(i.getType().getId());
 		
-		for (FieldForType fft : this.fieldForTypeService.getFieldsForType(i.getType().getId())) {
-			if (flag1 && flag2) {
+		for (FieldForType fft : fields4Type) {
+			if (flag1 && flag2 && flag3) {
 				break;
 			}
 			
@@ -29,9 +32,13 @@ public class GeoHook extends BaseHook {
 				i.setFieldValue(FieldName.HIDE_FROM_NAV, "no");
 				flag2 = true;
 			}
+			else if (fft.getField().getVariable().equals(FieldName.TITLE)) {
+				i.setFieldValue("title", i.getName());
+				flag3 = true;
+			}
 		}
 		
-		if (flag1 || flag2) {
+		if (flag1 || flag2 || flag3) {
 			try {
 				i.saveFieldValues();
 			}
