@@ -2,18 +2,18 @@ form#reconcile-form {
 	display: none;
 }
 
-p.reconcile-dashboard {
-	margin-bottom: 0.5em;
+div#reconcile-dashboard {
+	padding: 0.3em;
+	background-color: #ffdce2;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+	margin-bottom: 1em;
+}
+
+div#reconcile-dashboard p {
+	margin-bottom: 0em;
 }
 	
-p.reconcile-dashboard span {
-	margin-right: 3em;
-}
-
-p.reconcile-dashboard span.blockable {
-	margin-right: 0em;
-}
-
 p.dimmed, td.dimmed, button.dimmed {
 	opacity: 30%;
 }
@@ -36,6 +36,14 @@ button#commit {
 	background-color:  #04AA6D;
 	color: #fff;
 	padding: 0.3em 0.5em;
+	cursor: pointer;
+}
+
+button#trigger-action {
+	width: 50%;
+	height: 60%;
+	background-color:  #04AA6D;
+	color: #fff;
 	cursor: pointer;
 }
 

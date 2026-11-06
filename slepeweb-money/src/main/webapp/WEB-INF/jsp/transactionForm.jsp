@@ -40,6 +40,7 @@
 				<li><a href="../copy/${_transaction.id}">Copy this transaction</a><li>
 			</c:if>
 			<li><a href="../list/${_transaction.account.id}">List transactions</a></li>
+				<li><a href="../reconcile/form/${_transaction.account.id}" title="Reconcile recent transactions">Reconcile</a></li>
 		</ul>
 	</mny:pageHeading>
 	

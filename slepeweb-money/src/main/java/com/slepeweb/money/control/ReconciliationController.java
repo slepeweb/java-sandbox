@@ -34,7 +34,7 @@ public class ReconciliationController extends BaseController {
 		// Has this account been part-reconciled in this http session?
 		ReconciliationData d = (ReconciliationData) req.getSession().getAttribute(PAUSED_RECONCILIATIONS);
 		
-		// If session holds data fro a different account, remove that session data
+		// If session holds data from a different account, remove that session data
 		if (d != null && d.getAccountId() != accountId) {
 			req.getSession().removeAttribute(PAUSED_RECONCILIATIONS);
 			d = null;
@@ -53,6 +53,8 @@ public class ReconciliationController extends BaseController {
 		
 		model.addAttribute("_tl", transactions);
 		model.addAttribute("_account", a);
+		model.addAttribute("_flashable", true);
+		model.addAttribute("_paused", d != null);
 		
 		return RECONCILE_LIST;
 	}

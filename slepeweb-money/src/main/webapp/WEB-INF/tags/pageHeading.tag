@@ -13,7 +13,7 @@
 			<p>${intro}</p>
 		</c:if>
 		
-		<c:if test="${not empty param.flash}">
+		<c:if test="${not empty param.flash or _flashable}">
 			<div class="flash ${_flashType}">${_flashMessage}</div>
 		</c:if>
 	</div>

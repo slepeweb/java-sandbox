@@ -15,20 +15,22 @@
 			</ul>
 		</mny:pageHeading>
 		
-		<p class="reconcile-dashboard">
-			<span class="blockable">Balance b/f: £<span id="balance-bf"
+		<input type="hidden" name="paused" value="${_paused ? 'true' : 'false'}" />
+		
+		<div id="reconcile-dashboard">
+			<p>Balance b/f: £<span id="balance-bf"
 				<c:if test="${_account.reconciled < 0}">class="debit-amount"</c:if>>
-					${mon:formatPounds(_account.reconciled)}</span></span>
+					${mon:formatPounds(_account.reconciled)}</span></p>
 			
 			<c:set var="balanceNow" value="${empty pausedReconciliations ? 0 : pausedReconciliations.target}" />
-			<span class="blockable">Balance now: £<input id="balance-now" autocomplete="off" value="${mon:formatPounds(balanceNow)}" /></span>
-		</p>
+			<p>Balance now: £<input id="balance-now" autocomplete="off" value="${mon:formatPounds(balanceNow)}" /></p>
 
-		<p class="reconcile-dashboard monitor">
-			<span class="blockable">To reconcile: £<span id="reconcile-target">${mon:formatPounds(balanceNow - _account.reconciled)}</span></span>
-			<span class="blockable">Reconciled: £<span id="amount-reconciled">0.00</span></span>
-			<span class="blockable">Outstanding: £<span id="amount-outstanding">0.00</span></span>
-		</p>
+			<p>To reconcile: £<span id="reconcile-target">${mon:formatPounds(balanceNow - _account.reconciled)}</span></p>
+			<p>Reconciled: £<span id="amount-reconciled">0.00</span></p>
+			<p>Outstanding: £<span id="amount-outstanding">0.00</span></p>
+
+			<button id="trigger-action">Start</button>
+		</div>
 		
 		<form id="reconcile-form" method="post" action="${_ctxPath}/transaction/reconcile/submit/${_account.id}">
 			<input type="hidden" name="transactionIds" value="" />
@@ -38,7 +40,6 @@
 		<div id="menu-icons">
 			<span id="undo" title="Undo reconciliation"><i class="fa-solid fa-arrow-rotate-left"></i></span>
 			<span id="pause" title="Pause reconciliation"><i class="fa-solid fa-pause"></i></span>
-			<span id="restart" title="Restart reconciliation"><i class="fa-solid fa-arrow-rotate-right"></i></span>
 			<button id="commit" class="dimmed">Commit</button>
 		</div>
 		
@@ -64,8 +65,7 @@
 				</c:if>
 				
 				<tr data-id="${_trn.id}" data-pence="${_trn.amount}" data-provisional="${_trn.provisionallyReconciled ? 'yes' : 'no'}">
-					<td class="date"><a href="${_ctxPath}/transaction/form/${_trn.id}"
-						title="Update this transaction">${_trn.enteredStr}</a></td>
+					<td class="date">${_trn.enteredStr}</td>
 					<td class="payee">${_payee}</td>
 					
 					<c:choose><c:when test="${not _trn.split and not _trn.transfer}">
