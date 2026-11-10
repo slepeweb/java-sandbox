@@ -16,4 +16,5 @@ public interface ItemWorkerService {
 	Item restoreItem(Long id);
 	Item revert(Item source) throws ResourceException;
 	List<String> saveTags(Item i, String tagStr, List<String> recentTags);
+	void tagItemPlusInlines(Item i, String tagvalue, String mode) throws ResourceException;
 }

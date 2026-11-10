@@ -1,5 +1,6 @@
 _cms.flags = {
 	move: {},
+	tag: {},
 	sel: {
 		FLAGGED_ITEMS_SECTION: 'div#flagged-items-section',
 		COPY_DATA_SECTION: 'div#copy-data-section',
@@ -16,6 +17,9 @@ _cms.flags.sel.MOVE_ITEM_PICKER = _cms.flags.sel.MOVE_SECTION + ' i.itempicker';
 _cms.flags.sel.MOVE_MODE_SELECT = _cms.flags.sel.MOVE_SECTION + ' select[name=position]';
 _cms.flags.sel.MOVE_ACTION_BUTTON = _cms.flags.sel.FLAGGED_ITEMS_SECTION + ' button#move-flagged-button';
 _cms.flags.sel.MOVE_TARGET_ID = _cms.flags.sel.MOVE_SECTION + ' #move-target-identifier2';
+_cms.flags.sel.TAG_RADIO_OPTION = _cms.flags.sel.FLAGGED_ITEMS_SECTION + ' input[name=tagpage-option]:checked';
+_cms.flags.sel.TAG_VALUE = _cms.flags.sel.FLAGGED_ITEMS_SECTION + ' input[name=tagvalue]';
+_cms.flags.sel.TAG_BUTTON = _cms.flags.sel.FLAGGED_ITEMS_SECTION + ' button#tag-flagged-button';
 
 _cms.flags.numberOf = function() {
 	return $('div#flagged-items-dialog li').length;
@@ -107,7 +111,7 @@ _cms.flags.behaviour = function() {
 	
 	// Mode selector for move op
 	$(_cms.flags.sel.MOVE_MODE_SELECT).change(function(){
-		_cms.flags.move.check_data_is_complete();
+		_cms.flags.move.checkDataIsComplete();
 	});
 
 	// Move button
@@ -131,6 +135,34 @@ _cms.flags.behaviour = function() {
 				});
 		}
 	});
+
+	$(_cms.flags.sel.TAG_RADIO_OPTION).change(function() {
+		_cms.flags.tag.checkDataIsComplete();
+	});
+	
+	$(_cms.flags.sel.TAG_VALUE).mouseleave(function() {
+		_cms.flags.tag.checkDataIsComplete();
+	});
+
+	// Tagging
+	$(_cms.flags.sel.TAG_BUTTON).click(function(e) {
+		if (_cms.flags.reportIfNotExist()) {
+			_cms.dialog.open(_cms.dialog.eggTimer);
+			
+			var params = {
+				mode: $(_cms.flags.sel.TAG_RADIO_OPTION).val(),
+				tagvalue: $(_cms.flags.sel.TAG_VALUE).val()
+			};
+			
+			_cms.support.ajax('POST', '/rest/flaggedItems/tag', {data: params, dataType: 'json'}, 
+				function(resp,b,c) {
+					_cms.dialog.close(_cms.dialog.eggTimer);
+					_cms.support.flashMessage(resp)
+					_cms.support.refreshtab("core", _cms.leftnav.tree.activeNode.key)
+			})
+		}
+	});
+
 }
 
 _cms.flags.collateFormData = function(clazz, type, params) {
@@ -182,11 +214,18 @@ _cms.flags.refreshCopyForm = function(key) {
 	);
 }
 
-_cms.flags.move.check_data_is_complete = function() {
+_cms.flags.move.checkDataIsComplete = function() {
 	var isComplete = $(_cms.flags.sel.MOVE_MODE_SELECT).val() != "none" && 
 		$(_cms.flags.sel.MOVE_TARGET_ID).html().startsWith("'");
 	
 	_cms.support.enableIf(_cms.flags.sel.MOVE_ACTION_BUTTON, isComplete);
+}
+
+_cms.flags.tag.checkDataIsComplete = function() {
+	var isComplete = $(_cms.flags.sel.TAG_RADIO_OPTION).length > 0  && 
+		$(_cms.flags.sel.TAG_VALUE).val();
+	
+	_cms.support.enableIf(_cms.flags.sel.TAG_BUTTON, isComplete);
 }
 
 

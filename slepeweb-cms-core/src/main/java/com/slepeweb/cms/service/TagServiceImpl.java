@@ -52,7 +52,7 @@ public class TagServiceImpl extends BaseServiceImpl implements TagService {
 			"insert into tag (siteid, itemid, value) values (?, ?, ?)", 
 			siteId, itemId, value);
 		
-		LOG.info(String.format("Tagged item '%d' [%s]", itemId, value));
+		LOG.debug(String.format("Tagged item '%d' [%s]", itemId, value));
 	}
 
 	public void deleteTags(Long itemId) {

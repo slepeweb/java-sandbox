@@ -1,5 +1,7 @@
 package com.slepeweb.common.util;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class StringUtil {
@@ -54,4 +56,17 @@ public class StringUtil {
 	public static Object tertiaryOp(Boolean test, Object trueResult, Object falseResult) {
 		return test ? trueResult : falseResult;
 	}
+	
+	public static String list2String(List<String> list, String delim) {
+		StringBuilder sb = new StringBuilder();
+		for (String s : list) {
+			if (sb.length() > 0) {
+				sb.append(delim);
+			}
+			sb.append(s);
+		}
+		return sb.toString();
+	}
+	
+
 }

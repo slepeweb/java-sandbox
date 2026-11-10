@@ -1,11 +1,14 @@
-package com.slepeweb.site.bean;
+package com.slepeweb.cms.bean;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.slepeweb.cms.utils.CmsUtil;
 
 public class UriSupport {
 
@@ -158,10 +161,34 @@ public class UriSupport {
 		this.minipath = String.format("/$_%d", id);
 	}
 	
+	public boolean isRelative() {
+		return getHost() == null;
+	}
+	
+	public boolean isMinipath() {
+		return getPath().matches(CmsUtil.MINIPATH_PATTERN_STR);
+	}
+	
+	public Long parseMinipathId() {
+		Matcher m = CmsUtil.MINIPATH_PATTERN.matcher(getPath());
+		if (m.matches()) {
+			return Long.valueOf(m.group(1));
+		}
+		return null;
+	}
+	
 	public static void main(String[] args) {
+		UriSupport s;
 		System.out.println(new UriSupport("http://a.com/a/b/c?d=1&e=2"));
-		System.out.println(new UriSupport("http://a.com/a/b/c"));
-		System.out.println(new UriSupport("/a/b/c?d=1&e=2"));
+		
+		s = new UriSupport("http://a.com/a/b/c");
+		System.out.println(s);
+		System.out.println(s.isRelative());
+		
+		s = new UriSupport("/a/b/c?d=1&e=2");
+		System.out.println(s);
+		System.out.println(s.isRelative());
+		
 		System.out.println(new UriSupport("/a/b/c"));
 		System.out.println(new UriSupport("/"));
 		System.out.println(new UriSupport("//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"));

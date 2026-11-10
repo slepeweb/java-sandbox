@@ -1651,4 +1651,37 @@ public class RestController extends BaseController {
 		return resp;
 	}
 	
+	@RequestMapping(value="/flaggedItems/tag", method=RequestMethod.POST, produces="application/json")
+	@ResponseBody
+	public RestResponse tagFlagged(HttpServletRequest req) throws ResourceException {
+		
+		RestResponse resp = new RestResponse();
+		Map<Long, ItemGist> flaggedItems = getFlaggedItems(req);
+		Iterator<Long> iter = flaggedItems.keySet().iterator();
+		String tagValue = req.getParameter("tagvalue");
+		String mode = req.getParameter("mode");
+		
+		if (StringUtils.isBlank(tagValue)) {
+			return resp.setError(true).addMessage("No tag value provided");
+		}
+		
+		Long origId;
+		Item i;
+		int count = 0;
+		
+		while (iter.hasNext()) {
+			origId = iter.next();
+			i = getEditableVersion(origId, req);
+			
+			if (i == null) {
+				continue;
+			}
+			
+			this.itemWorkerService.tagItemPlusInlines(i, tagValue, mode);
+			count ++;
+		}
+		
+		return resp.setError(count == 0).addMessage(String.format("%d pages tagged", count));
+	}
+	
 }

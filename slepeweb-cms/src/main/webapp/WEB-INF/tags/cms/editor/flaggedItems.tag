@@ -28,6 +28,17 @@
 		<div><button id="trash-button" type="button">Trash ALL</button></div>
 	</div>
 
+	<div id="tagpage-ops" class="section-ops">
+		<div><strong>Tag ALL</strong> currently flagged items
+			<div>
+				<div class="radio-pair"><input type="radio" name="tagpage-option" value="tag" /> <span class="radio-label">Tag</span></div>
+				<div class="radio-pair"><input type="radio" name="tagpage-option" value="untag" /> <span class="radio-label">Un-tag</span></div>
+				<div class="radio-pair"><input type="text" name="tagvalue" value="" placeholder="Enter tag value" /></div> 
+			</div>
+		</div>
+		<div><button id="tag-flagged-button" type="button" disabled="disabled">Submit</button></div>
+	</div>		
+	
 	<div class="section-ops">
 		<p><strong>Copy data</strong> to <strong>ALL</strong> currently flagged items?</p>
 		<p id="copy-data-downarrow"><i class="fa-solid fa-angle-down fa-2x"></i></p>

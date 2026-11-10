@@ -28,6 +28,7 @@ import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.SiteConfigKey;
 import com.slepeweb.cms.service.CmsService;
 import com.slepeweb.cms.service.ItemService;
+import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.cms.utils.LogUtil;
 import com.slepeweb.common.util.HttpUtil;
 import com.slepeweb.site.service.SiteCookieService;
@@ -40,7 +41,7 @@ public class CmsDeliveryServlet {
 	private static Logger LOG = Logger.getLogger(CmsDeliveryServlet.class);
 	
 	private long defaultPrivateCacheTime, defaultPublicCacheTime;
-	private static Pattern PATH_PATTERN_A = Pattern.compile("^(/(\\w\\w))?/\\$_(\\d+)$");
+	private static Pattern PATH_PATTERN_A = CmsUtil.MINIPATH_PATTERN;		// Pattern.compile("^(/(\\w\\w))?/\\$_(\\d+)$");
 	private static Pattern PATH_PATTERN_B = Pattern.compile("^(/(\\w\\w))?(/.*?)$");
 	
 	@Autowired private CmsService cmsService;
@@ -136,10 +137,15 @@ public class CmsDeliveryServlet {
 	 * b) 404 errors
 	 */
 	private boolean roguesRedirected(HttpServletResponse res, String ipAddress) throws IOException {
-		
+
 		if (ipAddress == null) {
 			res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			return true;
+		}
+		
+		// Ignore failed requests from this server
+		if (ipAddress.equals("127.0.0.1")) {
+			return false;
 		}
 		
 		this.badActorMonitor.removeStaleEntries();

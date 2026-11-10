@@ -1,0 +1,12 @@
+div#tagpage-ops input[name=tagvalue] {
+	margin-left: 1em;
+	width: 12em;
+}
+
+div#tagpage-ops div.tag-value {
+	margin-top: 1em;
+}
+
+div#tagpage-ops div.tag-value span {
+	margin-left: 3em;
+}

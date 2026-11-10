@@ -2,6 +2,7 @@ package com.slepeweb.cms.bean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,6 +10,14 @@ public class Tag extends CmsBean {
 	private static final long serialVersionUID = 1L;
 	private String value;
 	private Long itemId, siteId;
+	
+	public Tag() {}
+	
+	public Tag(Item i, String value) {
+		this.itemId = i.getId();
+		this.siteId = i.getSite().getId();
+		this.value = value;
+	}
 	
 	public void assimilate(Object obj) {
 		if (obj instanceof Tag) {
@@ -32,7 +41,7 @@ public class Tag extends CmsBean {
 	
 	@Override
 	public String toString() {
-		return String.format("Tags for itemId %d: '%s'", getItemId(), getValue());
+		return getValue();
 	}
 
 	@Deprecated
@@ -81,6 +90,24 @@ public class Tag extends CmsBean {
 	public Tag setValue(String value) {
 		this.value = value;
 		return this;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(itemId, siteId, value);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Tag other = (Tag) obj;
+		return Objects.equals(itemId, other.itemId) && Objects.equals(siteId, other.siteId)
+				&& Objects.equals(value, other.value);
 	}
 
 }

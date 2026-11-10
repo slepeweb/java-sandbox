@@ -2,6 +2,7 @@ package com.slepeweb.cms.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,6 +13,9 @@ import com.slepeweb.cms.constant.ItemTypeName;
 
 public class CmsUtil {
 	
+	public static final String MINIPATH_PATTERN_STR = "^(/(\\w\\w))?/\\$_(\\d+)$";
+	public static final Pattern MINIPATH_PATTERN = Pattern.compile(MINIPATH_PATTERN_STR);
+
 	public static String getParentPathFromPath(Item i) {
 		if (! i.isRoot()) {
 			return getParentPathFromPath(i.getPath());

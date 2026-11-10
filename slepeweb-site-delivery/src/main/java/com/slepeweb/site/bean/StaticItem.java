@@ -1,6 +1,7 @@
 package com.slepeweb.site.bean;
 
 import com.slepeweb.cms.bean.Item;
+import com.slepeweb.cms.bean.UriSupport;
 
 public class StaticItem {
 

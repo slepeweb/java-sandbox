@@ -5,6 +5,7 @@ HIGH
 
 
 MEDIUM
+- cms-e: in the dialog displaying search results, add checkboxes to all some/all results to be flagged
 - anc login ui should display error messages in red, just like glj now does
 - anc site is not displaying images - I believe this is due to the move towards storing images as 
 - --files instead of db blobs. All images on anc will need to be re-created manually.

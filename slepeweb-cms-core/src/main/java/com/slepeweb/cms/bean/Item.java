@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.CmsUtil;
+import com.slepeweb.common.util.StringUtil;
 
 public class Item extends CmsBean {
 	private static final long serialVersionUID = 1L;
@@ -843,16 +844,9 @@ public class Item extends CmsBean {
 	}
 
 	public String getTagsAsString() {
-		StringBuilder sb = new StringBuilder();
-		for (Tag t : getTags()) {
-			if (sb.length() > 0) {
-				sb.append(", ");
-			}
-			sb.append(t.getValue());
-		}
-		return sb.toString();
+		return StringUtil.list2String(getTagValues(), ", ");
 	}
-
+	
 	public Item setParent(Item parent) {
 		this.parent = parent;
 		return this;

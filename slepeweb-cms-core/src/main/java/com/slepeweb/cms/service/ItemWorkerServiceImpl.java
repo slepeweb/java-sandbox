@@ -6,10 +6,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.slepeweb.cms.bean.CmsBeanFactory;
+import com.slepeweb.cms.bean.Field.FieldType;
 import com.slepeweb.cms.bean.FieldForType;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.FieldValueSet;
@@ -19,21 +23,26 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.MoverItem;
+import com.slepeweb.cms.bean.UriSupport;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.NotRevertableException;
 import com.slepeweb.cms.except.NotVersionableException;
 import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.utils.LogUtil;
+import com.slepeweb.common.util.StringUtil;
 
 /*
  * This service offloads some of the heavy-lifting that was originally located
  * in ItemServiceImpl. It has been moved to this file, so that ItemServiceImpl
- * can concentrate on JDBC instructions.
+ * can concentrate on JDBC instructions. In addition, this service method, like
+ * all the others in this folder, are covered by a TransactionManager, so either all
+ * db updates are effective, or none.
  */
 
 @Service
 public class ItemWorkerServiceImpl implements ItemWorkerService {
 	private static Logger LOG = Logger.getLogger(ItemWorkerServiceImpl.class);
+	private static String TAG_MODE_TAG = "tag";
 
 	@Autowired private ItemService itemService;
 	@Autowired private LinkService linkService;
@@ -375,9 +384,18 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		saveLinks(i, null);
 	}
 	
+	/**
+	 * Saves tags as a comma-delimited string in the item db table.
+	 * 
+	 * @param i				the item where the new tags are saved
+	 * @param tagStr		the comma-delimited string of tag values
+	 * @param recentTags	@Nullable the list of tags used recently, stored in the session, and displayed in the item core tab
+	 * 
+	 * @return a list of the latest tag values utilised in this session
+	 */
 	public List<String> saveTags(Item i, String tagStr, List<String> recentTags) {
-		List<String> existingTagValues = i.getTagValues();
-		List<String> latestTagValues = Arrays.asList(tagStr.split("[ ,]+"));
+		List<String> existingTagValues = i.getTagValues();							// eg. john, paul, george
+		List<String> latestTagValues = Arrays.asList(tagStr.split("[ ,]+"));		// eg. john, paul, fred, anne
 		List<String> freshTagValues = new ArrayList<String>();
 		
 		if (existingTagValues.size() != latestTagValues.size() || ! existingTagValues.containsAll(latestTagValues)) {
@@ -386,12 +404,13 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 			// Identify recently-applied tags - remove existing tags from latest, and see what's left.
 			for (String v : latestTagValues) {
 				if (! existingTagValues.contains(v)) {
-					freshTagValues.add(v);
+					freshTagValues.add(v);											// eg. [fred, anne]
 				}
 			}
 			
-			// latestTagValues now contains new selections
-			if (freshTagValues.size() > 0 && recentTags != null) {
+			// Need to put fresh tag values at the head of the most recent list (eg [fred, anne]), and remove
+			// any duplicate instances of 'fred' and 'anne'
+			if (recentTags != null && freshTagValues.size() > 0) {
 				
 				// Filter out duplicates
 				for (String v : recentTags) {
@@ -478,5 +497,73 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 	
 	private String compose(String template, Object ... params) {
 		return LogUtil.compose(template, params);
+	}
+	
+	public void tagItemPlusInlines(Item i, String tagvalue, String mode) throws ResourceException {
+		String newTagStr = mode.equals(TAG_MODE_TAG) ? extendTagString(i, tagvalue) : contractTagString(i, tagvalue);
+		saveTags(i, newTagStr, null);
+		logTagged(i, tagvalue);
+		
+		// Field values
+		Document doc;
+		for (FieldValue fv : i.getFieldValues().values()) {
+			if (fv.getField().getType().equals(FieldType.markup)) {
+		    	doc = Jsoup.parse(fv.getStringValue());
+		    	updateChildTags(i, tagvalue, mode, doc, "img", "src");
+		    	updateChildTags(i, tagvalue, mode, doc, "source", "src");
+			}
+		}
+	}
+	
+	private String extendTagString(Item i, String value) {
+		List<String> values = i.getTagValues();
+		
+		if (! values.contains(value)) {
+			values.add(value);
+		}
+		
+		return StringUtil.list2String(values, ",");
+	}
+
+	@SuppressWarnings("unused")
+	private String contractTagString(Item i, String value) {
+		List<String> values = i.getTagValues();
+		values.remove(value);
+		return StringUtil.list2String(values, ",");
+	}
+
+
+	
+	private void updateChildTags(Item i, String tagvalue, String mode,
+			Document doc, String tagName, String attrName) throws ResourceException {
+		
+		UriSupport uriSupp;
+		Item child;
+		String newTagStr;
+		
+    	for (Element ele : doc.getElementsByTag(tagName)) {
+    		uriSupp = new UriSupport(ele.attr(attrName));
+    		
+    		if (uriSupp.isRelative()) {
+    			if (! uriSupp.isMinipath()) {
+    				child = i.getItem(uriSupp.getPath());
+    			}
+    			else {
+    				child = this.itemService.getEditableVersion(uriSupp.parseMinipathId());
+    			}
+    			
+    			if (child == null) {
+    				continue;
+    			}
+    			
+    			newTagStr = mode.equals(TAG_MODE_TAG) ? extendTagString(child, tagvalue) : contractTagString(child, tagvalue); 
+    			saveTags(child, newTagStr, null);
+    			logTagged(child, tagvalue);
+    		}
+    	}
+	}
+		
+	private void logTagged(Item i, String s) {
+		LOG.info(String.format("Updated [%s] with tag value '%s'", i.getPath(), s));
 	}
 }

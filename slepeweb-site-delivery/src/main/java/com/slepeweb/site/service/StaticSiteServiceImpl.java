@@ -33,6 +33,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.Media;
 import com.slepeweb.cms.bean.Site;
+import com.slepeweb.cms.bean.UriSupport;
 import com.slepeweb.cms.bean.User;
 import com.slepeweb.cms.constant.ItemTypeName;
 import com.slepeweb.cms.service.CmsService;
@@ -41,7 +42,6 @@ import com.slepeweb.cms.service.MediaFileService;
 import com.slepeweb.common.bean.NameValuePair;
 import com.slepeweb.common.service.HttpService;
 import com.slepeweb.site.bean.StaticItem;
-import com.slepeweb.site.bean.UriSupport;
 
 @Service
 public class StaticSiteServiceImpl implements StaticSiteService {
