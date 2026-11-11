@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -511,6 +512,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		    	doc = Jsoup.parse(fv.getStringValue());
 		    	updateChildTags(i, tagvalue, mode, doc, "img", "src");
 		    	updateChildTags(i, tagvalue, mode, doc, "source", "src");
+		    	updateChildTags(i, tagvalue, mode, doc, "div", "data-id");
 			}
 		}
 	}
@@ -547,6 +549,10 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
     		if (uriSupp.isRelative()) {
     			if (! uriSupp.isMinipath()) {
     				child = i.getItem(uriSupp.getPath());
+    			}
+    			else if (StringUtils.isNumeric(uriSupp.getPath())) {
+    				// Dealing with the likes of: <div class="ximg" data-id="1234">
+    				child = this.itemService.getEditableVersion(Long.valueOf(uriSupp.getPath()));
     			}
     			else {
     				child = this.itemService.getEditableVersion(uriSupp.parseMinipathId());
