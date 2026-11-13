@@ -84,6 +84,15 @@ public class Shortcut extends Item {
 	}
 	
 	@Override
+	public List<Tag> getTags() {
+		if (isMergeable()) {
+			return this.referred.getTags();
+		}
+		
+		return new ArrayList<Tag>();
+	}
+	
+	@Override
 	public Template getTemplate() {
 		if (isMergeable()) {
 			return this.referred.getTemplate();

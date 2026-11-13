@@ -1100,7 +1100,6 @@ public class RestController extends BaseController {
 		Item child;
 		List<Link> links = new ArrayList<Link>();
 		Link l;
-		Item i;
 		int count = 0;
 		
 		// Need to return extra information if parent is a Shortcut, and its target has been completed/broken
@@ -1131,8 +1130,7 @@ public class RestController extends BaseController {
 			}
 			
 			child = getEditableVersion(lp.getChildId(), req);
-			i = CmsBeanFactory.makeItem(null).setId(child.getId());			
-			l.setChild(i);			
+			l.setChild(child);			
 			links.add(l);
 			
 			if (parent.isShortcut() && lp.getType().equals(LinkType.shortcut)) {

@@ -1,12 +1,15 @@
 <%@ tag %><%@ 
 	include file="/WEB-INF/jsp/tagDirectives.jsp" %><%@ 
-	attribute name="urlPrefix" required="true" rtexprvalue="true" %>
+	attribute name="urlPrefix" required="true" rtexprvalue="true" %><%@ 
+	attribute name="privateCollection" required="false" rtexprvalue="true" type="java.lang.Boolean" %>
 
 <gen:debug><!-- tags/pho/searchResults.tag --></gen:debug>
 
 <div id="search-results">
-	<p><strong>Found ${_search.totalHits} results for your search terms &quot;${_params.searchText}&quot;</strong></p>
-	<p class="right"><a href="/">Search again <i class="fa-solid fa-magnifying-glass"></i></a></p>
+	<c:if test="${not privateCollection}">
+		<p><strong>Found ${_search.totalHits} results for your search terms &quot;${_params.searchText}&quot;</strong></p>
+		<p class="right"><a href="/">Search again <i class="fa-solid fa-magnifying-glass"></i></a></p>
+	</c:if>
 		
 	<c:if test="${_search.pager.maxPages gt 1}">
 		<p>Showing page ${_search.pager.selectedPage} of ${_search.pager.maxPages} pages:</p>

@@ -28,6 +28,7 @@ import com.slepeweb.cms.bean.TagList;
 import com.slepeweb.cms.constant.AttrName;
 import com.slepeweb.cms.constant.FieldName;
 import com.slepeweb.cms.constant.ItemTypeName;
+import com.slepeweb.cms.except.ResourceException;
 import com.slepeweb.cms.service.ItemService;
 import com.slepeweb.cms.service.TagService;
 import com.slepeweb.common.solr.bean.SolrConfig;
@@ -129,29 +130,40 @@ public class PhotosPageController extends BaseController {
 	
 	@RequestMapping(value="/search/related", method=RequestMethod.GET)	
 	public String related(
-			@ModelAttribute(AttrName.ITEM) Item i, 
-			@ModelAttribute(SHORT_SITENAME) String shortSitename, 
 			@RequestParam(value="id", required=true) Long id,
 			HttpServletRequest request,
-			ModelMap model) {	
+			ModelMap model) throws ResourceException {	
 		
-		Item parent = this.itemService.getItem(id);
-		List<SolrDocument4Cms> docs = new ArrayList<SolrDocument4Cms>();
+		return linkedMedia(this.itemService.getItem(id), "relation", request, model);
+	}
+	
+	@RequestMapping(value="/private", method=RequestMethod.GET)	
+	public String bound(
+			@ModelAttribute(AttrName.ITEM) Item i, 
+			HttpServletRequest request,
+			ModelMap model) throws ResourceException {
 		
-		if (parent != null) {
-			List<String> targets = Arrays.asList(new String[] {
-					ItemTypeName.PHOTO_JPG, ItemTypeName.MOVIE_MP4
-			});
-			
-			for (Item r : parent.getRelatedItems()) {
-				if (targets.contains(r.getType().getName())) {
-					docs.add(new SolrDocument4Cms(r));
-				}
+		return linkedMedia(i, "bindings", request, model);
+	}
+	
+	private String linkedMedia(Item parent, String view, HttpServletRequest request,ModelMap model) throws ResourceException {
+		
+		if (parent == null) {
+			throw new ResourceException("Item not found");
+		}
+		
+		List<String> targets = Arrays.asList(new String[] {ItemTypeName.PHOTO_JPG, ItemTypeName.MOVIE_MP4});
+		List<SolrDocument4Cms> docs = new ArrayList<SolrDocument4Cms>();		
+		List<Item> linkedItems = view.equals("relations") ? parent.getRelatedItems() : parent.getBoundItems();
+		
+		for (Item r : linkedItems) {
+			if (targets.contains(r.getType().getName())) {
+				docs.add(new SolrDocument4Cms(r));
 			}
 		}
 
-		Page page = getStandardPage(i, shortSitename, "relations", model);
-		page.setTitle(i.getName());
+		Page page = getStandardPage(parent, parent.getSite().getShortname(), view, model);
+		page.setTitle(parent.getName());
 		
 		SolrResponse<SolrDocument4Cms> response = new SolrResponse<SolrDocument4Cms>();
 		response.setResults(docs);
@@ -163,6 +175,7 @@ public class PhotosPageController extends BaseController {
 		model.addAttribute("_search", response);
 		return page.getView();
 	}
+
 	
 	@RequestMapping(value="/export/csv", method=RequestMethod.GET)	
 	public String export2csv (
