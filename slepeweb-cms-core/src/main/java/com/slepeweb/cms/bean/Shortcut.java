@@ -1,167 +1,87 @@
 package com.slepeweb.cms.bean;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 public class Shortcut extends Item {
 	
 	private static final long serialVersionUID = 1L;
+	private static Logger LOG = Logger.getLogger(Shortcut.class);
+	
 	private Item referred;
+	private Long id4OrthogonalParent;
+	private boolean replacedParentLinks2This;
 		
 	public Item getReferred() {
 		return this.referred;
 	}
-
+	
 	public Shortcut setReferred(Item referred) {
 		this.referred = referred;
 		return this;
 	}
+	
 
 	@Override
 	public boolean isShortcut() {
 		return true;
 	}
 	
-	public boolean isComplete() {
+	public boolean isLinked() {
 		return this.referred != null;
 	}
 	
-	private boolean isMergeable() {
-		return isComplete() && ! getCmsService().isEditorialContext();
+	public Long getId4OrthogonalParent() {
+		return id4OrthogonalParent;
 	}
 
-	// There should only be one version of a Shortcut item.
-	@Override
-	public boolean isEditable() {
-		if (isMergeable()) {
-			return this.referred.isEditable();
-		}
-		return true;
-	}
-
-	// There should only be one version of a Shortcut item.
-	@Override
-	public boolean isPublished() {
-		if (isMergeable()) {
-			return this.referred.isPublished();
-		}
-		return true;
+	public void setId4OrthogonalParent(Long id4OrthogonalParent) {
+		this.id4OrthogonalParent = id4OrthogonalParent;
 	}
 
 	@Override
-	public boolean isSearchable() {
-		if (isMergeable()) {
-			return this.referred.isSearchable();
-		}
-		return false;
-	}
-
-	@Override
-	public List<Link> getLinks() {
-		if (isMergeable()) {
-			return this.referred.getLinks();
-		}
-		else if (getCmsService().isEditorialContext()) {
-			return super.getLinks();
+	public List<Link> getParentLinks(boolean includeBinding) {
+		
+		if (! this.getCmsService().isDeliveryContext() || ! includeBinding || this.replacedParentLinks2This) {
+			return super.getParentLinks(includeBinding);
 		}
 		
-		return new ArrayList<Link>();
-	}
-	
-	@Override
-	public List<Item> getAllVersions() {
-		return new ArrayList<Item>();
-	}
-	
-	@Override
-	public FieldValueSet getFieldValueSet() {
-		if (isMergeable()) {
-			return this.referred.getFieldValueSet();
+		/*
+		 * To reach this point:
+		 * a) The context IS 'delivery'
+		 * b) binding links ARE required
+		 * c) We haven't already replaced the shortcut's parent binding
+		 */
+		
+		List<Link> shortcutParentLinks = getLinkService().getParentLinks(this.id4OrthogonalParent);
+		if (shortcutParentLinks.size() == 0 ) {
+			LOG.info(String.format("Shortcut [%s] has no binding parent [%d]", this, this.id4OrthogonalParent));
+			return super.getParentLinks(true);
 		}
 		
-		return new FieldValueSet(getSite(), new ArrayList<FieldValue>());
-	}
-	
-	@Override
-	public List<Tag> getTags() {
-		if (isMergeable()) {
-			return this.referred.getTags();
-		}
+		// This includes binding, shortcut, component, relation and inline link types
+		List<Link> allParentLinks = super.getParentLinks(true);
 		
-		return new ArrayList<Tag>();
-	}
-	
-	@Override
-	public Template getTemplate() {
-		if (isMergeable()) {
-			return this.referred.getTemplate();
-		}
+		// We don't want the parent binding of the target item, we want the one for the shortcut item
+		Iterator<Link> iter = allParentLinks.iterator();
+		Link l;
 		
-		return null;
-	}
-
-	@Override
-	public ItemType getType() {
-		if (isMergeable()) {
-			return this.referred.getType();
-		}
-		
-		return super.getType();
-	}
-
-	@Override
-	public boolean hasMedia() {
-		if (isMergeable()) {
-			return getCmsService().getMediaService().hasMedia(this.referred);
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public List<Media> getAllMedia() {
-		if (isMergeable()) {
-			if (this.allMedia == null) {
-				this.allMedia = this.cmsService.getMediaService().getAllMedia(this.referred.getId());
+		// Remove the parent binding to the target ...
+		while (iter.hasNext()) {
+			l = iter.next();
+			if (l.getType().equals(LinkType.binding)) {
+				iter.remove();
+				break;
 			}
-			
-			return this.allMedia;
-		}
-		return null;
-	}
-	
-	
-	@Override
-	public boolean isDeleted() {
-		if (isMergeable()) {
-			return this.referred.isDeleted();
 		}
 		
-		return super.isDeleted();
-	}
-
-	@Override
-	public Timestamp getDateCreated() {
-		if (isMergeable()) {
-			return this.referred.getDateCreated();
-		}
+		// ... and replace with the one to the shortcut
+		allParentLinks.add(shortcutParentLinks.get(0));
 		
-		return super.getDateCreated();
-	}
-
-	@Override
-	public Timestamp getDateUpdated() {
-		if (isMergeable()) {
-			return this.referred.getDateUpdated();
-		}
-		
-		return super.getDateUpdated();
+		this.replacedParentLinks2This = true;
+		return allParentLinks;
 	}
 	
-	@Override
-	public long getIdentifier() {
-		return isComplete() ? this.referred.getId() : -1;
-	}
-
 }

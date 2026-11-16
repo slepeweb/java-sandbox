@@ -395,6 +395,7 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 	 * @return a list of the latest tag values utilised in this session
 	 */
 	public List<String> saveTags(Item i, String tagStr, List<String> recentTags) {
+		
 		List<String> existingTagValues = i.getTagValues();							// eg. john, paul, george
 		List<String> latestTagValues = Arrays.asList(tagStr.split("[ ,]+"));		// eg. john, paul, fred, anne
 		List<String> freshTagValues = new ArrayList<String>();
@@ -501,6 +502,14 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 	}
 	
 	public void tagItemPlusInlines(Item i, String tagvalue, String mode) throws ResourceException {
+
+		if (i.isShortcut()) {
+			List<Link> links = i.getCmsService().getLinkService().getLinks(i.getId(), LinkType.shortcut);
+			if (links.size() == 1) {
+				i = links.get(0).getChild();
+			}
+		}
+		
 		String newTagStr = mode.equals(TAG_MODE_TAG) ? extendTagString(i, tagvalue) : contractTagString(i, tagvalue);
 		saveTags(i, newTagStr, null);
 		logTagged(i, tagvalue);
@@ -541,9 +550,14 @@ public class ItemWorkerServiceImpl implements ItemWorkerService {
 		
 		UriSupport uriSupp;
 		Item child;
-		String newTagStr;
+		String newTagStr, attrValue;
 		
     	for (Element ele : doc.getElementsByTag(tagName)) {
+    		attrValue = ele.attr(attrName);
+    		if (StringUtils.isBlank(attrValue)) {
+    			continue;
+    		}
+    		
     		uriSupp = new UriSupport(ele.attr(attrName));
     		
     		if (uriSupp.isRelative()) {

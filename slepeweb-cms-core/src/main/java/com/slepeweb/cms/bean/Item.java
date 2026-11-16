@@ -76,27 +76,22 @@ public class Item extends CmsBean {
 	}
 	
 	public void assimilate(Object obj) {
-		if (obj instanceof Item) {
-			Item i = (Item) obj;
-			setName(i.getName());
-			setSimpleName(i.getSimpleName());
-			setPath(i.getPath());
-			setDateCreated(i.getDateCreated());
-			setDateUpdated(i.getDateUpdated());
-			setDeleted(i.isDeleted());
-			setSite(i.getSite());
-			setType(i.getType());
-			setTemplate(i.getTemplate());
-			setEditable(i.isEditable());
-			setPublished(i.isPublished());
-			setSearchable(i.isSearchable());
-			setVersion(i.getVersion());
-			setLanguage(i.getLanguage());
-			setOwnerId(i.getOwnerId());
-			
-			// Must assimilate fields and links too? What about tags?
-			// NO - fields and links are loaded when needed.
-		}
+		Item i = (Item) obj;
+		setName(i.getName());
+		setSimpleName(i.getSimpleName());
+		setPath(i.getPath());
+		setDateCreated(i.getDateCreated());
+		setDateUpdated(i.getDateUpdated());
+		setDeleted(i.isDeleted());
+		setSite(i.getSite());
+		setType(i.getType());
+		setTemplate(i.getTemplate());
+		setEditable(i.isEditable());
+		setPublished(i.isPublished());
+		setSearchable(i.isSearchable());
+		setVersion(i.getVersion());
+		setLanguage(i.getLanguage());
+		setOwnerId(i.getOwnerId());
 	}
 	
 	public boolean isDefined4Insert() {
@@ -552,18 +547,19 @@ public class Item extends CmsBean {
 			setRequestPack(this.parentLinks);
 		}
 		
-		if (! includeBinding) {
-			List<Link> links = new ArrayList<Link>(this.parentLinks.size());
-			for (Link l : this.parentLinks) {
-				if (! l.getType().equals(LinkType.binding) && ! l.getType().equals(LinkType.component)) {
-					links.add(l);
-				}
-			}
-			
-			return links;
+		if (includeBinding) {
+			return this.parentLinks;
 		}
 		
-		return this.parentLinks;
+		// Filter out binding and component links
+		List<Link> links = new ArrayList<Link>(this.parentLinks.size());
+		for (Link l : this.parentLinks) {
+			if (! l.getType().equals(LinkType.binding) && ! l.getType().equals(LinkType.component)) {
+				links.add(l);
+			}
+		}
+		
+		return links;
 	}
 	
 	public Link getOrthogonalParentLink() {
@@ -589,6 +585,10 @@ public class Item extends CmsBean {
 	
 	public Media getThumbnail() {
 		return filterMedia(true);
+	}
+	
+	protected void setParentLinks(List<Link> links) {
+		this.parentLinks = links;
 	}
 	
 	protected Media filterMedia(boolean thumbnailRequired) {

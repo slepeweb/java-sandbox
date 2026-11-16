@@ -27,7 +27,7 @@ public class LinkServiceImpl extends BaseServiceImpl implements LinkService {
 			"select i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, s.secured, " +
 			"it.id as typeid, it.name as typename, it.mimetype, it.privatecache, it.publiccache, " +
 			"l.parentid, lt.name as linktype, ln.name as linkname, l.ordering, l.data, " +
-			"t.id as templateid, t.name as templatename, t.forward " +
+			"t.id as templateid, t.name as templatename, t.forward, t.siteid, t.typeid, t.admin " +
 			"from item i " +
 			"join site s on i.siteid = s.id " +
 			"join itemtype it on i.typeid = it.id " +

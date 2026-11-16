@@ -2,7 +2,6 @@ package com.slepeweb.cms.utils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 import org.springframework.jdbc.core.RowMapper;
 
@@ -21,7 +20,6 @@ import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
 import com.slepeweb.cms.bean.LoggerBean;
 import com.slepeweb.cms.bean.Media;
-import com.slepeweb.cms.bean.Shortcut;
 import com.slepeweb.cms.bean.Site;
 import com.slepeweb.cms.bean.SiteConfigProperty;
 import com.slepeweb.cms.bean.SiteType;
@@ -107,22 +105,11 @@ public class RowMapperUtil {
 				setSearchable(rs.getBoolean("searchable")).
 				setVersion(rs.getInt("version"));
 		
-		if (! item.isShortcut()) {
-			Template t = null;
-			long templateId = rs.getLong("templateid");
-			if (templateId != 0) {
-				t = CmsBeanFactory.makeTemplate().
-						setId(templateId).
-						setName(rs.getString("templatename")).
-						setController(rs.getString("forward")).
-						setItemTypeId(rs.getLong("typeid")).
-						setSiteId(rs.getLong("siteid"));
-			}
-			
-			item.setTemplate(t);
+		long templateId = rs.getLong("templateid");
+		if (templateId != 0) {
+			item.setTemplate(mapTemplate(rs, "templateid", "templatename"));
 		}
 		
-		identifyTargetIfShortcut(item);
 		return item;
 	}
 	
@@ -133,16 +120,6 @@ public class RowMapperUtil {
 			setMimeType(rs.getString("mimetype")).
 			setPrivateCache(rs.getLong("privatecache")).
 			setPublicCache(rs.getLong("publiccache"));
-	}
-	
-	private static void identifyTargetIfShortcut(Item i) {
-		if (i.isShortcut()) {
-			List<Link> links = i.getCmsService().getLinkService().getLinks(i.getId(), LinkType.shortcut);
-			if (links.size() > 0) {
-				Shortcut sh = (Shortcut) i;
-				sh.setReferred(links.get(0).getChild());
-			}
-		}
 	}
 	
 	public static final class LinkMapper implements RowMapper<Link> {
@@ -261,14 +238,18 @@ public class RowMapperUtil {
 	
 	public static final class TemplateMapper implements RowMapper<Template> {
 		public Template mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return CmsBeanFactory.makeTemplate().
-					setId(rs.getLong("id")).
-					setName(rs.getString("name")).
-					setController(rs.getString("forward")).
-					setSiteId(rs.getLong("siteid")).
-					setItemTypeId(rs.getLong("typeid")).
-					setAdmin(rs.getBoolean("admin"));
+			return mapTemplate(rs, "id", "name");
 		}
+	}
+	
+	private static Template mapTemplate(ResultSet rs, String id, String name) throws SQLException {
+		return CmsBeanFactory.makeTemplate().
+				setId(rs.getLong(id)).
+				setName(rs.getString(name)).
+				setController(rs.getString("forward")).
+				setSiteId(rs.getLong("siteid")).
+				setItemTypeId(rs.getLong("typeid")).
+				setAdmin(rs.getBoolean("admin"));
 	}
 	
 	public static final class SiteConfigMapper implements RowMapper<SiteConfigProperty> {

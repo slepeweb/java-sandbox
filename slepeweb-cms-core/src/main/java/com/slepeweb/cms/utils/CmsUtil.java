@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.slepeweb.cms.bean.FieldValue;
 import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
+import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.bean.Shortcut;
 import com.slepeweb.cms.constant.ItemTypeName;
 
 public class CmsUtil {
@@ -80,5 +82,36 @@ public class CmsUtil {
 				! i.isHiddenFromNav() &&
 				! i.getType().getName().equals(ItemTypeName.CONTENT_FOLDER) &&
 				i.isAccessible();
+	}
+	
+	public static Item transformShortcut4Delivery(Item i) {
+		
+		if (! (i.isShortcut() && i.getCmsService().isDeliveryContext())) {
+			return i;
+		}
+		
+		List<Link> links = i.getCmsService().getLinkService().getLinks(i.getId(), LinkType.shortcut);
+		
+		if (links.size() > 0) {
+			Item target = links.get(0).getChild();
+			
+			Shortcut sh = (Shortcut) i;
+			String shortcutPath = i.getPath();
+			sh.setId4OrthogonalParent(i.getId());				
+			
+			// Merge MOST data from target to shortcut
+			sh.assimilate(target);
+			
+			// For the purpose of item linkages, assign the id of the target item to the shortcut
+			sh.setId(target.getId());
+			sh.setReferred(target);
+			
+			// But retain the shortcut path
+			sh.setPath(shortcutPath);
+			
+			return sh;
+		}
+
+		return i;
 	}
 }

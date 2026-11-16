@@ -15,6 +15,7 @@ import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.except.DuplicateItemException;
 import com.slepeweb.cms.except.MissingDataException;
 import com.slepeweb.cms.except.ResourceException;
+import com.slepeweb.cms.utils.CmsUtil;
 import com.slepeweb.cms.utils.RowMapperUtil;
 import com.slepeweb.commerce.bean.Product;
 
@@ -26,7 +27,7 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	private final static String SELECT_TEMPLATE = 
 			"select i.*, s.name as sitename, s.shortname as site_shortname, s.language, s.xlanguages, s.secured, " +
 			"it.id as typeid, it.name as typename, it.mimetype, it.privatecache, it.publiccache, " +
-			"t.id as templateid, t.name as templatename, t.forward " +
+			"t.id as templateid, t.name as templatename, t.forward, t.siteid, t.typeid, t.admin " +
 			"from item i " +
 			"join site s on i.siteid = s.id " +
 			"join itemtype it on i.typeid = it.id " +
@@ -494,6 +495,22 @@ public class ItemServiceImpl extends BaseServiceImpl implements ItemService {
 	
 	private Item getItem(String sql, Object... params) {
 		Item i = (Item) getLastInList(this.jdbcTemplate.query(sql, new RowMapperUtil.ItemMapper(), params));
+		if (i == null) {
+			return i;
+		}
+		
+		/*
+		 * The ItemMapper method determines whether the item is a Shortcut or a plain item. (Products are also
+		 * catered for but maintenance and testing of the commerce module has lapsed.)
+		 * 
+		 * If this is a Shortcut item, and we're in a delivery context, we merge data from the shortcut's target
+		 * into the shortcut itself. The only data the shortcut retains is it's path, and its awareness of it's true
+		 * orthogonal parent.
+		 */
+		if (i.isShortcut()) {
+			return CmsUtil.transformShortcut4Delivery(i);
+		}
+
 		return extendIfProduct(i);
 	}
 

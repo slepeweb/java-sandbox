@@ -10,6 +10,7 @@ import com.slepeweb.cms.bean.Item;
 import com.slepeweb.cms.bean.Link;
 import com.slepeweb.cms.bean.LinkName;
 import com.slepeweb.cms.bean.LinkType;
+import com.slepeweb.cms.utils.CmsUtil;
 
 public class LinkTarget implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -34,6 +35,10 @@ public class LinkTarget implements Serializable {
 	}
 	
 	public LinkTarget(Item i) {
+		if (i.isShortcut() && i.getCmsService().isDeliveryContext()) {
+			i = CmsUtil.transformShortcut4Delivery(i);
+		}
+		
 		String s = i.getFieldValue("navtitle");
 		if (StringUtils.isBlank(s)) {
 			s = i.getTitle();
